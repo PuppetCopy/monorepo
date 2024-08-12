@@ -1,12 +1,12 @@
 {
   "name": "docs",
   "scripts": {
-    "docs:dev": "bun docs:docgen && vocs dev",
-    "docs:build": "bun docs:docgen && vocs build",
-    "docs:docgen": "bun ./script/shell/docgen.ts",
-    "docs:preview": "vocs preview"
+    "docs:dev": "bun docs:docgen && vitepress dev",
+    "docs:build": "bun docs:docgen && vitepress build",
+    "docs:preview": "bun docs:docgen && vitepress preview",
+    "docs:docgen": "bun ./docgen.ts"
   },
-  "devDependencies": {
-    "vocs": "1.0.0-alpha.55"
+  "dependencies": {
+    "vitepress": "1.3.2"
   }
 }
