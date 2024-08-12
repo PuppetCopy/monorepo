@@ -13,7 +13,11 @@
     "DeFi"
   ],
   "workspaces": [
-    "**"
+    "client",
+    "middleware",
+    "docs",
+    "subgraph",
+    "opengraph"
   ],
   "files": [
     "src/**/*.sol",
