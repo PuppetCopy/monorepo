@@ -88,7 +88,7 @@ export default defineConfig({
     replaceExec,
   ],
   build: {
-    outDir: ".dist",
+    outDir: "dist",
     target: "es2022",
   }
 })

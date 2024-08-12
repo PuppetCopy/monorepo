@@ -1,7 +1,7 @@
 {
   "npm.packageManager": "bun",
   "search.exclude": {
-    "**/.dist": true,
+    "**/dist": true,
     "**/node_modules": true,
     "**/lib": true,
     "**/generated": true,
