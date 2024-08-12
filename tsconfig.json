@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "useDefineForClassFields": true,
+    // Incremental builds
+    // NOTE: Enabling incremental builds speeds up `tsc`. Keep in mind though that it does not reliably bust the cache when the `tsconfig.json` file changes.
+    "incremental": true,
+    /* Bundler mode */
+    "composite": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    // Language and environment
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "target": "ES2021", // Setting this to `ES2021` enables native support for `Node v16+`: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping.
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
+    // Interop constraints
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": false,
+    "forceConsistentCasingInFileNames": true,
+    // Skip type checking for node modules
+    "skipLibCheck": true
+  }
+}

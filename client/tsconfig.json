@@ -1,0 +1,65 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "WebWorker"
+    ],
+    "types": [
+      "vite/client",
+      "vite-plugin-pwa/vanillajs",
+    ],
+    "composite": true,
+    "module": "ESNext",
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    /* Linting */
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
+  },
+  "references": [
+    {
+      "path": "../middleware/gmx-core"
+    },
+    {
+      "path": "../middleware/gmx-const"
+    },
+    {
+      "path": "../middleware/const"
+    },
+    {
+      "path": "../middleware/utils"
+    },
+    {
+      "path": "../middleware/core"
+    },
+    {
+      "path": "../middleware/ui-components"
+    },
+    {
+      "path": "../middleware/ui-router"
+    },
+    {
+      "path": "../middleware/wallet"
+    },
+    {
+      "path": "../middleware/ui-storage"
+    },
+    {
+      "path": "../middleware/@gambitdao-gbc-middleware"
+    },
+  ],
+  "include": [
+    "src",
+    "src/sw.ts"
+  ]
+}

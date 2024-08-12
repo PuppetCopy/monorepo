@@ -1,0 +1,13 @@
+.DS_Store
+
+dist
+.env
+coverage
+coverage.json
+broadcast
+
+# foundry files
+forge-artifacts
+forge-artifacts-dev
+forge-cache
+forge-cache-dev

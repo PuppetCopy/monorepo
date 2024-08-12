@@ -1,0 +1,32 @@
+# Start with Alpine Linux
+FROM oven/bun:alpine as base
+WORKDIR /usr/src/app
+
+# Install dependencies
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash chromium-swiftshader ttf-freefont font-noto-emoji && \
+    apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community font-wqy-zenhei
+
+# Add Chrome as a user and set permissions
+RUN adduser -D chrome && chown -R chrome:chrome /usr/src/app
+
+# Set environment variables for headless Chrome
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/ \
+    CHROMIUM_FLAGS="--disable-software-rasterizer --disable-dev-shm-usage"
+
+# Copy package.json and install dependencies
+COPY package.json /usr/src/app/
+RUN bun install
+
+# Copy the rest of the application
+COPY . .
+
+# Switch to non-root user
+USER chrome
+
+# Expose the port the app runs on
+EXPOSE 3000/tcp
+
+# Set the entrypoint to run the app
+ENTRYPOINT [ "bun", "run", "index.ts" ]

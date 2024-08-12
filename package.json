@@ -1,0 +1,35 @@
+{
+  "name": "puppet-monorepo",
+  "license": "BSL-1.1 and MIT",
+  "private": true,
+  "description": "Puppet Frontend Monorepo",
+  "packageManager": "bun@1.1.22",
+  "keywords": [
+    "puppet",
+    "Copy Trading",
+    "dex",
+    "ethereum",
+    "arbitrum",
+    "DeFi"
+  ],
+  "workspaces": [
+    "**"
+  ],
+  "files": [
+    "src/**/*.sol",
+    "!src/test/*",
+    "artifacts/contracts/**/*.json",
+    "!artifacts/contracts/test/**/*"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/node": "^22.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser": "^8.0.1",
+    "concurrently": "^8.2.2",
+    "eslint": "9.x",
+    "globals": "^15.9.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "npm.packageManager": "bun",
+  "typescript.format.enable": false,
+  "search.exclude": {
+    "**/.dist": true,
+    "**/node_modules": true,
+    "**/lib": true,
+    "**/generated": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  "solidity.formatter": "forge",
+  "security.olympix.project.includePath": "/src",
+  "security.olympix.project.analyzeWholeProject": false,
+  "[solidity]": {
+    "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  }
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>__APP_NAME__</title>
+    <meta name="description" content="__APP_DESC_LONG__">
+    <meta name="theme-color" content="__THEME_BACKGROUND__">
+    <link rel="icon" href="pwa-192x192.png">
+    <link rel="apple-touch-icon" href="pwa-512x512.png" sizes="512x512">
+    <link rel="preload" href="VAG-400.woff2" as="font" type="font/woff2" crossorigin="">
+    <link rel="preload" href="font/VAG-900.woff2" as="font" type="font/woff2" crossorigin="">
+
+    <style>
+        :root {
+            --font-monospace: -apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif;
+            --font: 'VAG Rounded', -apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif;
+            --d: 2500ms;
+            --angle: 90deg;
+            --gradX: 100%;
+            --gradY: 50%;
+            --c1: rgba(168, 239, 255, 1);
+            --c2: rgba(168, 239, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+            background-color: __THEME_BACKGROUND__;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            appearance: none;
+        }
+
+        /* Firefox */
+        input[type="number"] {
+            appearance: none;
+        }
+
+        html,
+        button,
+        input {
+            font-family: var(--font);
+            text-rendering: geometricPrecision;
+            font-size: 100%;
+            font-feature-settings: "tnum" on, "lnum" on;
+        }
+
+        @font-face {
+            font-family: 'VAG Rounded';
+            src: url("font/VAG-400.woff2") format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'VAG Rounded';
+            src: url("font/VAG-900.woff2") format('woff2');
+            font-weight: 900;
+            font-style: bold;
+            font-display: swap;
+        }
+
+        @keyframes signal { 
+            from { 
+                transform: scale(0);
+                opacity: 0;
+            } 
+            20% {
+                opacity: 1;
+            }
+            to { 
+                transform: scale(2);
+                opacity: 0;
+            }  
+        }
+
+        @keyframes borderRotate {
+          100% { transform: translateX(-50%); }
+        }
+    </style>
+
+
+    <meta property="og:url" content="__WEBSITE__">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="__APP_DESC_SHORT__">
+    <meta property="og:image" content="__OG_IMAGE__">
+
+    <!-- <meta name="twitter:image:src" content="__OG_IMAGE__">
+    <meta name="twitter:site" content="__TWITTER_ID__" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="__APP_DESC_SHORT__"> -->
+
+    <script type="module" src="/src/main.ts"></script>
+</head>
+
+<body>
+</body>
+
+</html>

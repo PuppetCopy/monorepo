@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": ".dist/esm",
+    "rootDir": "src",
+    "declarationDir": ".dist/types"
+  },
+  "references": [
+    {
+      "path": "../gmx-core"
+    }
+  ]
+}

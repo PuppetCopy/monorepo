@@ -1,0 +1,32 @@
+
+export const TOKEN_SYMBOL = {
+  PUPPET: 'PUPPET',
+  GMX: 'GMX',
+  GLP: "GLP",
+  // PUPPPET: "PUPPPET",
+
+  ETH: 'ETH',
+  WETH: 'WETH',
+  UNI: "UNI",
+  LINK: "LINK",
+  AVAX: "AVAX",
+  WAVAX: "WAVAX",
+  ARB: "ARB",
+  SOL: "SOL",
+  SynDOGE: "SynDOGE",
+  SynBTC: "SynBTC",
+  SynLTC: "SynLTC",
+  SynXRP: "SynXRP",
+
+  USDT: "USDT",
+  DAI: "DAI",
+  USDC: 'USDC',
+  FRAX: 'FRAX',
+  MIM: "MIM",
+  WBTC: "WBTC",
+  BTCB: "BTCB",
+  BTC: "BTC",
+  USDCE: "USDCE",
+  WBTCE: "WBTCE",
+  ESGMX: "ESGMX",
+} as const
