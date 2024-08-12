@@ -4,6 +4,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "useDefineForClassFields": true,
+    "composite": true,
     // Incremental builds
     // NOTE: Enabling incremental builds speeds up `tsc`. Keep in mind though that it does not reliably bust the cache when the `tsconfig.json` file changes.
     "incremental": true,

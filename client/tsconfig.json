@@ -10,7 +10,6 @@
       "vite/client",
       "vite-plugin-pwa/vanillajs",
     ],
-    "composite": true,
     "module": "ESNext",
     /* Bundler mode */
     "moduleResolution": "bundler",

@@ -20,7 +20,8 @@
     "opengraph"
   ],
   "scripts": {
-    "docs:build": "cd docs && bun run docs:build"
+    "docs:build": "cd docs && bun run build",
+    "client:build": "cd client && bun run build"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
