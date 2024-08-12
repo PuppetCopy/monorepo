@@ -4,9 +4,10 @@
 **Inherits:**
 Permission, EIP712, ReentrancyGuardTransient
 
-Includes a buyback functionality where the protocol publicly offers to buy back its own tokens using accumulated fees in different tokens.
+Implements a buyback functionality where the protocol publicly offers to buy back its own tokens using accumulated whitelisted revenue
+tokens with a specified threshold.
 
-*The contract inherits from Permission.sol to be used by permissioned contracts, EIP712, and ReentrancyGuardTransient to provide buyback
+*The contract inherits from Permission to be used by permissioned contracts, EIP712, and ReentrancyGuardTransient to provide buyback
 functionality with permission checks and reentrancy protection.*
 
 
