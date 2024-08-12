@@ -19,12 +19,6 @@
     "subgraph",
     "opengraph"
   ],
-  "scripts": {
-    "docs:dev": "vocs dev",
-    "docs:build": "bun docs:docgen && vocs build",
-    "docs:docgen": "bun docgen.ts",
-    "docs:preview": "vocs preview"
-  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@typescript-eslint/eslint-plugin": "^8.0.1",
@@ -32,7 +26,6 @@
     "eslint": "9.x",
     "globals": "^15.9.0",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.0.1",
-    "vocs": "1.0.0-alpha.55"
+    "typescript-eslint": "^8.0.1"
   }
 }

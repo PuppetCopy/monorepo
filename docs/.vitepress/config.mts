@@ -5,7 +5,7 @@ export default defineConfig({
   title: "Puppet Docs",
   description: "Matching top Traders with Investors",
   themeConfig: {
-    logo: '/puppet.png',
+    logo: '/assets/puppet.png',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
@@ -14,33 +14,55 @@ export default defineConfig({
 
     sidebar: [
       {
-        collapsed: true,
-        text: 'Examples',
+        collapsed: false,
+        text: 'Introduction',
         items: [
-            {
-          text: 'PuppetToken.sol',
-          link: '/contracts/tokenomics/PuppetToken',
-        },
-        {
-          text: 'VotingEscrow.sol',
-          link: '/contracts/tokenomics/VotingEscrow',
-        },
-        {
-          text: 'RevenueLogic.sol',
-          link: '/contracts/tokenomics/RevenueLogic',
-        },
-        {
-          text: 'RewardLogic.sol',
-          link: '/contracts/tokenomics/RewardLogic',
-        },
-          { text: 'Genesis Chat', link: 'https://t.me/+ooS1qp3Ar7xlYWNk' },
-          { text: 'App', link: 'https://puppet.house/app/trade' }
+          {
+            text: 'What is Puppet?',
+            link: 'pages/introduction',
+          },
+          {
+            text: 'Tokenomics',
+            link: 'pages/tokenomics',
+          },
+          { text: 'Chat Group', link: 'https://t.me/+ooS1qp3Ar7xlYWNk' },
+          { text: 'App', link: 'https://puppet.house/app/trade' }]
+      },
+      {
+        text: 'Introduction',
+        link: '/introduction',
+      },
+      {
+        collapsed: true,
+        text: 'Contracts Natspec',
+        items: [
+          {
+            text: 'PuppetToken.sol',
+            link: 'pages/contracts/tokenomics/PuppetToken',
+          },
+          {
+            text: 'VotingEscrow.sol',
+            link: 'pages//contracts/tokenomics/VotingEscrow',
+          },
+          {
+            text: 'RevenueLogic.sol',
+            link: 'pages//contracts/tokenomics/RevenueLogic',
+          },
+          {
+            text: 'RewardLogic.sol',
+            link: 'pages//contracts/tokenomics/RewardLogic',
+          }
         ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      {
+        icon: {
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm121.8 169.9l-40.7 191.8c-3 13.6-11.1 16.9-22.4 10.5l-62-45.7-29.9 28.8c-3.3 3.3-6.1 6.1-12.5 6.1l4.4-63.1 114.9-103.8c5-4.4-1.1-6.9-7.7-2.5l-142 89.4-61.2-19.1c-13.3-4.2-13.6-13.3 2.8-19.7l239.1-92.2c11.1-4 20.8 2.7 17.2 19.5z"/></svg>'
+        }, link: 'https://t.me/+ooS1qp3Ar7xlYWNk'
+      },
+      { icon: 'github', link: 'https://github.com/GMX-Blueberry-Club/puppet' }
     ]
   }
 })
