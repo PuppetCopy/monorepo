@@ -19,6 +19,9 @@
     "subgraph",
     "opengraph"
   ],
+  "scripts": {
+    "docs:build": "cd docs && vitepress build"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@typescript-eslint/eslint-plugin": "^8.0.1",
