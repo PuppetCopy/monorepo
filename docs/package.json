@@ -2,7 +2,7 @@
   "name": "docs",
   "scripts": {
     "dev": "bun docgen && vitepress dev",
-    "preview": "bun docs:docgen && vitepress preview",
+    "preview": "bun docgen && vitepress preview",
     "build": "vitepress build",
     "docgen": "bun ./docgen.ts"
   },

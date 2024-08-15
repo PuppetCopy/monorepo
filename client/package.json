@@ -42,7 +42,7 @@
     "mersenne-twister": "^1.1.0",
     "puppet-middleware-const": "workspace:*",
     "puppet-middleware-utils": "workspace:*",
-    "viem": "^2.19.3"
+    "viem": "^2.19.4"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.7",

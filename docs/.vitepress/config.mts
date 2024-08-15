@@ -4,9 +4,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Puppet Docs",
   description: "Matching top Traders with Investors",
-  cleanUrls: false,
+  cleanUrls: true,
+  vite: {
+    publicDir: 'public',
+  },
   themeConfig: {
-    logo: '/assets/puppet.png',
+    logo: 'assets/puppet.png',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       // { text: 'Home', link: '/' },
@@ -24,34 +27,34 @@ export default defineConfig({
           },
           {
             text: 'Tokenomics',
-            link: 'pages/tokenomics',
+            link: '/pages/tokenomics',
           },
         ]
       },
       {
         collapsed: false,
         text: 'Contracts',
-        link: 'pages/generated-contracts/contracts',
+        link: '/pages/generated-contracts/contracts',
         items: [
           {
             text: 'License',
-            link: 'pages/generated-contracts/license',
+            link: '/pages/generated-contracts/license',
           },
           {
             text: 'PuppetToken.sol',
-            link: 'pages/generated-contracts/tokenomics/PuppetToken',
+            link: '/pages/generated-contracts/tokenomics/PuppetToken',
           },
           {
             text: 'VotingEscrow.sol',
-            link: 'pages/generated-contracts/tokenomics/VotingEscrow',
+            link: '/pages/generated-contracts/tokenomics/VotingEscrow',
           },
           {
             text: 'RevenueLogic.sol',
-            link: 'pages/generated-contracts/tokenomics/RevenueLogic',
+            link: '/pages/generated-contracts/tokenomics/RevenueLogic',
           },
           {
             text: 'RewardLogic.sol',
-            link: 'pages/generated-contracts/tokenomics/RewardLogic',
+            link: '/pages/generated-contracts/tokenomics/RewardLogic',
           }
         ]
       }
@@ -62,6 +65,6 @@ export default defineConfig({
         link: 'https://t.me/+ooS1qp3Ar7xlYWNk'
       },
       { icon: 'github', link: 'https://github.com/GMX-Blueberry-Club/puppet-contracts' }
-    ]
+    ],
   }
 })

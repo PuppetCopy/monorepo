@@ -1,5 +1,5 @@
 import { Behavior, fromCallback } from "@aelea/core"
-import { $element, $node, $text, attr, component, eventElementTarget, style, styleInline } from "@aelea/dom"
+import { $element, $Node, $node, $text, attr, component, eventElementTarget, style, styleInline } from "@aelea/dom"
 import { Route } from "@aelea/router"
 import { $column, $icon, $row, designSheet, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
@@ -50,6 +50,18 @@ export const $Home = (config: ITreasury) => component((
 
   const bodyPointerMove = eventElementTarget('pointermove', document.body)
 
+  const $windowButton = $row(style({ backgroundColor: pallete.negative, width: '8px', height: '8px', borderRadius: '50%' }))
+  const $windowTopBar = $row(style({ backgroundColor: pallete.background, alignItems: 'center', gap: '3px', padding: '4px 6px' }))(
+    $windowButton(style({ backgroundColor: pallete.negative }))(),
+    $windowButton(style({ backgroundColor: pallete.indeterminate }))(),
+    $windowButton(style({ backgroundColor: pallete.positive }))(),
+  )
+
+  const $mockWindow = ($content: $Node) => $column(style({ borderRadius: '4px', overflow: 'hidden', boxShadow: '#00000063 0px 5px 20px 3px' }))(
+    $windowTopBar,
+    $content
+  )
+
   return [
     $column(layoutSheet.spacingBig, style({ flex: 1, lineHeight: '1.3' }))(
 
@@ -69,27 +81,27 @@ export const $Home = (config: ITreasury) => component((
           // color: 'black'
         })
       )(
-        $row(style({  flex: 1, width: '50vh', perspective: '680px', position: 'absolute', bottom: 0 }))(
-          $column(style({ transform: 'translateY(0px) translateZ(0) rotateX(40deg)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0px 5px 20px 3px black' }))(
-          // mac os window style
-            $row(style({ backgroundColor: pallete.background, height: '30px', flexDirection: 'column', alignItems: 'center' }))(
-
-            ),
-            $element('video')(
-              attr({
-                playsinline: '',
-                width: '100%',
-                height: '100%',
-                loop: '',
-                autoplay: '',
-              })
-            )(
-              $element('source')(attr({ type: 'video/mp4', src: '/video/leaderboard-pick-traders.mp4' }))()
+        $row(style({ flex: 1, width: '50vh', perspective: '680px', position: 'absolute', bottom: 0 }))(
+          style({
+            transform: 'translateY(0px) translateZ(0) rotateX(40deg)'
+          })(
+            $mockWindow(
+              $element('video')(
+                attr({
+                  playsinline: '',
+                  width: '100%',
+                  height: '100%',
+                  loop: '',
+                  autoplay: '',
+                })
+              )(
+                $element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))()
+              )
             )
-          ),
+          )
         ),
 
-        $column(layoutSheet.spacingBig, style({ 
+        $column(layoutSheet.spacingBig, style({
           alignItems: 'center',
           // color: invertColor(pallete.message)
         }))(
@@ -107,87 +119,87 @@ export const $Home = (config: ITreasury) => component((
             screenUtils.isMobileScreen ? $text(style({ textAlign: 'center' }))('< Comming Soon >') : empty(),
 
             $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-              $Link({
-                disabled: now(true),
-                $content: $anchor(
-                  $ButtonSecondary({
-                    // disabled: now(true),
-                    $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                      $icon({ $content: $puppetLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
-                      $text('Puppet'),
-                      $node(
-                        styleInline(map(move => {
-                          const shalf = document.body.clientWidth / 2
-                          const alpha = (shalf - move.clientX) / shalf
+              // $Link({
+              //   disabled: now(true),
+              //   $content: $anchor(
+              //     $ButtonSecondary({
+              //       // disabled: now(true),
+              //       $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+              //         $icon({ $content: $puppetLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
+              //         $text('Puppet'),
+              //         $node(
+              //           styleInline(map(move => {
+              //             const shalf = document.body.clientWidth / 2
+              //             const alpha = (shalf - move.clientX) / shalf
 
-                          return { opacity: alpha }
-                        }, bodyPointerMove)),
-                        style({
-                          pointerEvents: 'none',
-                          background: pallete.negative,
-                          filter: 'blur(1em)',
-                          width: '100%',
-                          height: '100%',
-                          left: '0px',
-                          top: '120%',
-                          position: 'absolute',
-                          content: '. ',
-                          transform: 'perspective(1em) rotateX(40deg) scale(1, 0.35)'
-                        })
-                      )()
-                    ),
-                    $container: $element('button')(
-                      designSheet.btn,
-                      style({ position: 'relative', borderRadius: '30px' })
-                    )
-                  })({})
-                ),
-                url: '/app/leaderboard', route: config.parentRoute.create({ fragment: 'fefe' })
-              })({
-                click: linkClickTether()
-              }),
+              //             return { opacity: alpha }
+              //           }, bodyPointerMove)),
+              //           style({
+              //             pointerEvents: 'none',
+              //             background: pallete.negative,
+              //             filter: 'blur(1em)',
+              //             width: '100%',
+              //             height: '100%',
+              //             left: '0px',
+              //             top: '120%',
+              //             position: 'absolute',
+              //             content: '. ',
+              //             transform: 'perspective(1em) rotateX(40deg) scale(1, 0.35)'
+              //           })
+              //         )()
+              //       ),
+              //       $container: $element('button')(
+              //         designSheet.btn,
+              //         style({ position: 'relative', borderRadius: '30px' })
+              //       )
+              //     })({})
+              //   ),
+              //   url: '/app/leaderboard', route: config.parentRoute.create({ fragment: 'fefe' })
+              // })({
+              //   click: linkClickTether()
+              // }),
 
-              screenUtils.isDesktopScreen ? $text('< Comming Soon >') : empty(),
+              // screenUtils.isDesktopScreen ? $text('< Comming Soon >') : empty(),
 
-              $Link({
-                disabled: now(true),
-                $content: $anchor(
-                  $ButtonSecondary({
-                    $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                      $icon({ $content: $gmxLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
-                      $text('Trader'),
-                      $node(
-                        styleInline(map(move => {
-                          const shalf = document.body.clientWidth / 2
-                          const alpha = (shalf - move.clientX) / shalf
+              // $Link({
+              //   disabled: now(true),
+              //   $content: $anchor(
+              //     $ButtonSecondary({
+              //       $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+              //         $icon({ $content: $gmxLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
+              //         $text('Trader'),
+              //         $node(
+              //           styleInline(map(move => {
+              //             const shalf = document.body.clientWidth / 2
+              //             const alpha = (shalf - move.clientX) / shalf
 
-                          return { opacity: alpha > 0 ? 0 : Math.abs(alpha) }
-                        }, bodyPointerMove)),
-                        style({
-                          pointerEvents: 'none',
-                          background: pallete.positive,
-                          filter: 'blur(1em)',
-                          width: '100%',
-                          height: '100%',
-                          left: '0px',
-                          top: '120%',
-                          position: 'absolute',
-                          content: '. ',
-                          transform: 'perspective(1em) rotateX(40deg) scale(1, 0.35)'
-                        })
-                      )()
-                    ),
+              //             return { opacity: alpha > 0 ? 0 : Math.abs(alpha) }
+              //           }, bodyPointerMove)),
+              //           style({
+              //             pointerEvents: 'none',
+              //             background: pallete.positive,
+              //             filter: 'blur(1em)',
+              //             width: '100%',
+              //             height: '100%',
+              //             left: '0px',
+              //             top: '120%',
+              //             position: 'absolute',
+              //             content: '. ',
+              //             transform: 'perspective(1em) rotateX(40deg) scale(1, 0.35)'
+              //           })
+              //         )()
+              //       ),
 
-                    $container: $element('button')(
-                      designSheet.btn,
-                      style({ position: 'relative', borderRadius: '30px' })
-                    )
-                  })({})
-                ),
-                url: '/app/trade', route: config.parentRoute.create({ fragment: 'fefe' })
-              })({
-                click: linkClickTether()
-              }),
+              //       $container: $element('button')(
+              //         designSheet.btn,
+              //         style({ position: 'relative', borderRadius: '30px' })
+              //       )
+              //     })({})
+              //   ),
+              //   url: '/app/trade', route: config.parentRoute.create({ fragment: 'fefe' })
+              // })({
+              //   click: linkClickTether()
+              // }),
             ),
 
 
@@ -225,13 +237,13 @@ export const $Home = (config: ITreasury) => component((
                     )
                   })
                 )
-              }, installUserChoice) 
+              }, installUserChoice)
               : empty(),
           ),
           $text(style({ color: pallete.foreground, position: 'absolute', bottom: '50px', left: '50%', transform: 'translateX(-50%)' }))('Learn More'),
 
         )
-        
+
 
         // $wheelWrapper(style({
         //   right: 'calc(100% + 3vw)',
@@ -273,14 +285,16 @@ export const $Home = (config: ITreasury) => component((
           $text(`every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.`),
         ),
         $row(style({ flex: 1 }))(
-          $element('video')(attr({
-            playsinline: '',
-            width: '100%',
-            height: '100%',
-            loop: '',
-            autoplay: '',
-          }))(
-            $element('source')(attr({ type: 'video/mp4', src: '/video/leaderboard-pick-traders.mp4' }))()
+          $mockWindow(
+            $element('video')(attr({
+              playsinline: '',
+              width: '100%',
+              height: '100%',
+              loop: '',
+              autoplay: '',
+            }))(
+              $element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))()
+            )
           )
         )
       ),
@@ -292,14 +306,16 @@ export const $Home = (config: ITreasury) => component((
           $text('Trading done seamlessly with their own funds and without directly knowing or managing puppets funds.'),
         ),
         $row(style({ flex: 1 }))(
-          $element('video')(attr({
-            playsinline: '',
-            width: '100%',
-            height: '100%',
-            loop: '',
-            autoplay: '',
-          }))(
-            $element('source')(attr({ type: 'video/mp4', src: '/video/trade-adjust.mp4' }))()
+          $mockWindow(
+            $element('video')(attr({
+              playsinline: '',
+              width: '100%',
+              height: '100%',
+              loop: '',
+              autoplay: '',
+            }))(
+              $element('source')(attr({ type: 'video/mp4', src: 'assets/video/trade-adjust.mp4' }))()
+            )
           )
         )
       ),
