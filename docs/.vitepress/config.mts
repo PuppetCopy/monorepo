@@ -4,7 +4,6 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Puppet Docs",
   description: "Matching top Traders with Investors",
-  cleanUrls: true,
   vite: {
     publicDir: 'public',
   },
