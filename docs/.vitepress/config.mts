@@ -8,8 +8,8 @@ export default defineConfig({
     logo: '/assets/puppet.png',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      // { text: 'Home', link: '/' },
+      // { text: 'Examples', link: '/markdown-examples' }
     ],
     sidebar: [
       {
@@ -17,6 +17,7 @@ export default defineConfig({
         text: 'Introduction',
         items: [
           {
+
             text: 'What is Puppet?',
             link: 'pages/introduction',
           },
@@ -24,8 +25,6 @@ export default defineConfig({
             text: 'Tokenomics',
             link: 'pages/tokenomics',
           },
-          // { text: 'Chat Group', link: 'https://t.me/+ooS1qp3Ar7xlYWNk' },
-          // { text: 'App', link: 'https://puppet.house/app/trade' }
         ]
       },
       {

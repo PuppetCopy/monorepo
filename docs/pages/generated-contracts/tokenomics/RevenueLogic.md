@@ -1,5 +1,5 @@
 # RevenueLogic
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/86f5edc5c43c92874fd3cadff78422e25e3cc674/src/tokenomics/RevenueLogic.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/tokenomics/RevenueLogic.sol)
 
 **Inherits:**
 Permission, EIP712, ReentrancyGuardTransient
