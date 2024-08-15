@@ -1,9 +1,9 @@
 {
   "name": "docs",
   "scripts": {
-    "dev": "bun docs:docgen && vitepress dev",
-    "build": "vitepress build",
+    "dev": "bun docgen && vitepress dev",
     "preview": "bun docs:docgen && vitepress preview",
+    "build": "vitepress build",
     "docgen": "bun ./docgen.ts"
   },
   "dependencies": {

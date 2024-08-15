@@ -1,16 +1,14 @@
+
 # What is Puppet?
 
-Puppet is a copy trading platform Puppets (Investors) pick and choose top traders to copy with a single deposit, follow the trades of top performers on platforms like GMX v2, with the ability and plans to expand to others
+## Deposit Once, Follow Many
 
-## Seamless Matching Engine
+Your one deposit can follow multiple traders. When a match with a trader happens, part of your deposit mirrors their position
 
-Traders continue their usual trading on GMX or directly through Puppet, without directly managing Puppets fund. They trade with their own money, taking on the usual risks. This setup ensures that the trading experience remains seamless with symmetric risk. Successful traders are rewarded in Puppet Tokens
+## Build a Portfolio, Protect Your Investment
 
-## Single Deposit Many Traders
+Find and follow leading traders. Set rules to safeguard your funds. Your deposit copies their trades proportionally
 
-A single deposit is matched against as many traders. whenever a match occurs a portion will used for a combined Mirrored Position
+## Seamless Trading
 
-## Risk Adjusted Portfolio
-
-Pick Top Traders to Copy Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.
-every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.
+Traders operate on GMX or Puppet as usual, using their own funds and taking on normal risks. This keeps their trading experience consistent with Puppets. Successful traders earn Puppet Tokens as rewards
