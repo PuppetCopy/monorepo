@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Puppet Docs",
   description: "Matching top Traders with Investors",
-  cleanUrls: true,
+  cleanUrls: false,
   themeConfig: {
     logo: '/assets/puppet.png',
     // https://vitepress.dev/reference/default-theme-config
