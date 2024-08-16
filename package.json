@@ -16,7 +16,6 @@
     "client",
     "middleware/*",
     "docs",
-    "subgraph",
     "opengraph"
   ],
   "scripts": {

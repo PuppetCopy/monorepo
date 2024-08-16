@@ -1,17 +1,32 @@
 {
-  "name": "puppet-subgraph",
-  "license": "UNLICENSED",
+  "name": "subgraph",
+  "version": "0.1.0",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph codegen && graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ puppet",
-    "create-local": "graph create --node http://localhost:8020/ puppet",
-    "remove-local": "graph remove --node http://localhost:8020/ puppet",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 puppet",
-    "test": "graph test"
+    "clean": "tsc --clean",
+    "build": "tsc --build",
+    "watch": "tsc --watch",
+    "mocha": "ts-mocha test/**/*.ts",
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "stop": "envio stop",
+    "test": "pnpm mocha",
+    "start": "ts-node generated/src/Index.bs.js"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "10.0.6",
+    "@types/node": "20.8.8",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "10.9.1",
+    "typescript": "5.5.4",
+    "mocha": "10.2.0"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.80.0",
-    "@graphprotocol/graph-ts": "0.35.1"
-  }
+    "chai": "4.3.10",
+    "envio": "2.0.1"
+  },
+  "optionalDependencies": {
+    "generated": "./generated"
+  },
+  "packageManager": "pnpm@8.10.2+sha512.0782093d5ba6c7ad9462081bc1ef0775016a4b4109eca1e1fedcea6f110143af5f50993db36c427d4fa8c62be3920a3224db12da719d246ca19dd9f18048c33c"
 }
