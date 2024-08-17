@@ -7,6 +7,8 @@ import { queryLatestPriceTick, queryRouteTypeList } from "puppet-middleware-util
 import { $rootContainer } from "../pages/common"
 import { $trader } from "./$trader"
 import { Stream } from "@most/types"
+import { subgraphClient } from "../common/graphClient"
+
 
 function dispatchPushStateEvent(url: string, title: string = '') {
   history.pushState({}, title, url)
@@ -34,8 +36,8 @@ export const $Opengraph = (parentRoute: router.Route) => component(() => {
 
   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
   const selectedTradeRouteList = now([])
-  const priceTickMapQuery = queryLatestPriceTick({ activityTimeframe, selectedTradeRouteList })
-  const routeTypeListQuery = now(queryRouteTypeList())
+  const priceTickMapQuery = queryLatestPriceTick(subgraphClient, { activityTimeframe, selectedTradeRouteList })
+  const routeTypeListQuery = now(queryRouteTypeList(subgraphClient))
 
   // use playwright pushstate events as trigger to change route
   const pushstateEvents: Stream<IOgRouteChange> = eventElementTarget('ogRouteChange' as any, window)

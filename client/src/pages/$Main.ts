@@ -32,6 +32,7 @@ import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
 import { $heading2 } from "../common/$text"
 import { $Admin } from "./$Admin"
+import { subgraphClient } from "../common/graphClient"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -45,7 +46,7 @@ interface IApp {
 }
 
 
-export const chains = [ arbitrum ] as const
+export const chains = [arbitrum] as const
 
 
 // const storage = createStorage({ storage: window.localStorage, key: 'walletLink' })
@@ -106,15 +107,16 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
   const selectedTradeRouteList = replayLatest(multicast(uiStorage.replayWrite(storeDb.store.global, selectTradeRouteList, 'selectedTradeRouteList')))
 
-  const routeTypeListQuery = now(queryRouteTypeList())
-  const priceTickMapQuery = replayLatest(queryLatestPriceTick({ activityTimeframe, selectedTradeRouteList }, 50))
+  const routeTypeListQuery = now(queryRouteTypeList(subgraphClient))
+  const priceTickMapQuery = replayLatest(queryLatestPriceTick(subgraphClient, { activityTimeframe, selectedTradeRouteList }, 50))
 
+  const subgraphStatusStream = subgraphStatus(subgraphClient)
   const subgraphBeaconStatusColor = map(status => {
-    const timestampDelta = unixTimestampNow() - status.block.timestamp
+    const timestampDelta = unixTimestampNow() - new Date(status.timestamp_caught_up_to_head_or_endblock).getTime()
 
     const color = timestampDelta > 60 ? pallete.negative : timestampDelta > 10 ? pallete.indeterminate : pallete.positive
     return color
-  }, subgraphStatus)
+  }, subgraphStatusStream)
   const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
   //  fromPromise(indexDb.get(store.global, 'wallet'))
@@ -129,7 +131,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const initWalletProvider: Stream<EIP6963ProviderDetail | null> = map(params => {
 
     return params.walletRdnsStore ? params.announcedProviderList.find(p => p.info.rdns === params.walletRdnsStore) || null : null
-  }, combineObject({ announcedProviderList, walletRdnsStore }) )
+  }, combineObject({ announcedProviderList, walletRdnsStore }))
 
 
   // hanlde disconnect and account change
@@ -139,7 +141,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const chainIdQuery = indexDb.get(store.global, 'chain')
   const chainQuery: Stream<Promise<viem.Chain>> = now(chainIdQuery.then(id => chains.find(c => c.id === id) || arbitrum))
 
-  const { 
+  const {
     providerClientQuery,
     publicProviderClientQuery,
     walletClientQuery
@@ -174,7 +176,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               )
             })
           )
-              
+
         )
       }, newUpdateInvoke),
       router.contains(appRoute)(
@@ -219,7 +221,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute,  walletClientQuery, routeTypeListQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, routeTypeListQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectTradeRouteList: selectTradeRouteListTether(),
@@ -239,7 +241,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                     $node(),
                     $text(style({ fontSize: '1.5rem', textAlign: 'center', fontWeight: 'bold' }))('Terms And Conditions'),
                     $text(style({ whiteSpace: 'pre-wrap' }))(`By accessing, I agree that ${document.location.host} is not responsible for any loss of funds, and I agree to the following terms and conditions:`),
-                    $element('ul')(layoutSheet.spacing, style({  }))(
+                    $element('ul')(layoutSheet.spacing, style({}))(
                       $liItem(
                         $text(`I am not a United States person or entity;`),
                       ),
@@ -267,26 +269,26 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   })({
                     changeWallet: changeWalletTether(),
                   })
-                }, awaitPromises(chainQuery))  
+                }, awaitPromises(chainQuery))
               ),
               $row(layoutSheet.spacing, style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
                 $row(
                   $Tooltip({
                     $content: switchMap(params => {
-                      const blocksBehind = $text(readableUnitAmount(Math.max(0, Number(params.latestBlock) - params.subgraphStatus.block.number)))
-                      const timeSince = getTimeSince(Number(params.subgraphStatus.block.timestamp))
-                      
+                      const blocksBehind = $text(readableUnitAmount(Math.max(0, Number(params.latestBlock - params.subgraphStatus.latest_processed_block))))
+                      const timeSince = getTimeSince(new Date(params.subgraphStatus.timestamp_caught_up_to_head_or_endblock).getTime())
+
 
                       return $column(layoutSheet.spacingTiny)(
                         $text('Subgraph Status'),
                         $column(
-                          params.subgraphStatus.hasIndexingErrors
-                            ? $alertPositiveContainer($text('Indexing has experienced errors')) : empty(),
-                          $infoLabeledValue('Latest Sync', timeSince), 
+                          // params.subgraphStatus.hasIndexingErrors
+                          //   ? $alertPositiveContainer($text('Indexing has experienced errors')) : empty(),
+                          $infoLabeledValue('Latest Sync', timeSince),
                           $infoLabeledValue('blocks behind', blocksBehind),
                         )
                       )
-                    }, zipState({ subgraphStatus, latestBlock })),
+                    }, zipState({ subgraphStatus: subgraphStatusStream, latestBlock })),
                     $anchor: $row(
                       style({ width: '8px', height: '8px', borderRadius: '50%', outlineOffset: '4px', padding: '6px' }),
                       styleBehavior(map(color => {

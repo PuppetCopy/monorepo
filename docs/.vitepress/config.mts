@@ -32,28 +32,28 @@ export default defineConfig({
       },
       {
         collapsed: false,
-        text: 'Contracts',
-        link: '/pages/generated-contracts/contracts',
+        text: 'Sources',
+        link: '/pages/generated-sources/contracts',
         items: [
           {
             text: 'License',
-            link: '/pages/generated-contracts/license',
+            link: '/pages/generated-sources/license',
           },
           {
             text: 'PuppetToken.sol',
-            link: '/pages/generated-contracts/tokenomics/PuppetToken',
+            link: '/pages/generated-sources/tokenomics/PuppetToken',
           },
           {
             text: 'VotingEscrow.sol',
-            link: '/pages/generated-contracts/tokenomics/VotingEscrow',
+            link: '/pages/generated-sources/tokenomics/VotingEscrow',
           },
           {
             text: 'RevenueLogic.sol',
-            link: '/pages/generated-contracts/tokenomics/RevenueLogic',
+            link: '/pages/generated-sources/tokenomics/RevenueLogic',
           },
           {
             text: 'RewardLogic.sol',
-            link: '/pages/generated-contracts/tokenomics/RewardLogic',
+            link: '/pages/generated-sources/tokenomics/RewardLogic',
           }
         ]
       }

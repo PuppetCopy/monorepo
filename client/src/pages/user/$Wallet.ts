@@ -24,6 +24,7 @@ import { $ButtonSecondary } from "../../components/form/$Button"
 import { getTokenDescription } from "gmx-middleware-utils"
 import { ARBITRUM_ADDRESS } from "gmx-middleware-const"
 import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
+import { subgraphClient } from "../../common/graphClient"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -108,7 +109,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
         }, walletClientQuery)
 
         if (params.profileMode === IWalletTab.PUPPET) {
-          const puppetTradeRouteListQuery = queryPuppetTradeRoute({ address, activityTimeframe, selectedTradeRouteList })
+          const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
           
           const settledPositionListQuery = map(async tradeRoute => {
             return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
@@ -127,8 +128,8 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
             selectTradeRouteList: selectTradeRouteListTether(),
           })
         } else if (params.profileMode === IWalletTab.TRADER) {
-          const settledPositionListQuery = queryTraderPositionSettled({ activityTimeframe, selectedTradeRouteList, address })
-          const openPositionListQuery = queryTraderPositionOpen({ address, selectedTradeRouteList })
+          const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { activityTimeframe, selectedTradeRouteList, address })
+          const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
 
           return $column(layoutSheet.spacingTiny)(
             $TraderPage({ ...config, openPositionListQuery, settledPositionListQuery })({ 

@@ -22,6 +22,7 @@ import { $ProfilePerformanceGraph } from "../../components/trade/$ProfilePerform
 import * as storeDb from "../../const/store.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
+import { subgraphClient } from "../../common/graphClient"
 
 
 
@@ -58,8 +59,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   const pageParms = map(params => {
     const requestPage = { ...params.sortBy, offset: 0, pageSize: 20 }
     const page = startWith(requestPage, scrollRequest)
-    const openPositionListQuery = queryTraderPositionOpen({})
-    const settledPositionListQuery = queryTraderPositionSettled({ activityTimeframe: params.activityTimeframe })
+    const openPositionListQuery = queryTraderPositionOpen(subgraphClient, {})
+    const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { activityTimeframe: params.activityTimeframe })
 
 
     const dataSource: Stream<TablePageResponse<ITableRow>> = awaitPromises(map(async reqParams => {

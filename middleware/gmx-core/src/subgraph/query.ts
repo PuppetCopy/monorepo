@@ -29,9 +29,9 @@ export type ISchema<T extends GqlType<any>> = {
 
 export type ISchemaQuery<TSchema, TQuery> = {
   [P in keyof TQuery]: TQuery[P] extends any[]
-    ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : TQuery[P] extends object
-      ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : P extends keyof TSchema
-        ? TSchema[P] : never
+  ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : TQuery[P] extends object
+  ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : P extends keyof TSchema
+  ? TSchema[P] : never
 }
 
 export type PrettifyT<T> = {
@@ -42,7 +42,7 @@ export type PrettifyT<T> = {
 
 
 
-interface IQuerySubgraph <Type extends GqlType<any>, TQuery>{
+interface IQuerySubgraph<Type extends GqlType<any>, TQuery> {
   schema: ISchema<Type>
   document?: TQuery | undefined
   filter?: any
@@ -50,24 +50,9 @@ interface IQuerySubgraph <Type extends GqlType<any>, TQuery>{
 
   first?: number
   skip?: number
-  orderBy?: string
-  orderDirection?: 'asc' | 'desc'
+  orderBy?: { [key in keyof Type]?: 'asc' | 'asc_nulls_first' | 'asc_nulls_last' | 'desc' | 'desc_nulls_first' | 'desc_nulls_last' }
 }
 
-export const documentQuery = <Type extends GqlType<any>, TQuery>(
-  params: IQuerySubgraph<Type, TQuery>,
-): string => {
-
-  const typeName = params.schema.__typename as string
-  const whereClause = parseWhereClause(params.filter)
-  const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
-  const graphDocumentIdentifier = `${typeName.charAt(0).toLowerCase() + typeName.slice(1)}s`
-  const changeBlockFilterParam = params.startBlock ? ` _change_block: { number_gte: ${params.startBlock} }, ` : ''
-  const orderByFilterParam = params.orderBy ? ` orderBy: ${params.orderBy}, ` : ''
-  const orderDirectionFilterParam = params.orderDirection ? ` orderDirection: ${params.orderDirection}, ` : ''
-
-  return `${graphDocumentIdentifier}(first: ${params.first || 1000}, ${orderByFilterParam} ${orderDirectionFilterParam} where: { ${changeBlockFilterParam} ${whereClause} }) { ${fieldStructure} }`
-}
 
 export const querySubgraph = <Type extends GqlType<any>, TQuery>(
   client: Client,
@@ -76,30 +61,28 @@ export const querySubgraph = <Type extends GqlType<any>, TQuery>(
 ): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
 
   const typeName = params.schema.__typename as string
-  const whereClause = parseWhereClause(params.filter)
+  const whereClause = params.filter ? `where: {${parseFilterObject(params.filter)}}` : ''
+  const orderByFilterParam = params.orderBy ? `order_by: {${parseFilterObject(params.orderBy)}}` : ''
   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
-  const graphDocumentIdentifier = `${typeName.charAt(0).toLowerCase() + typeName.slice(1)}s`
-  const changeBlockFilterParam = params.startBlock ? ` _change_block: { number_gte: ${params.startBlock} }, ` : ''
-  const orderByFilterParam = params.orderBy ? ` orderBy: ${params.orderBy}, ` : ''
-  const orderDirectionFilterParam = params.orderDirection ? ` orderDirection: ${params.orderDirection}, ` : ''
+  const filter = orderByFilterParam || whereClause ? `( ${orderByFilterParam} ${whereClause})` : ''
 
-  const entry = `${graphDocumentIdentifier}(first: ${params.first || 1000}, ${orderByFilterParam} ${orderDirectionFilterParam} where: { ${changeBlockFilterParam} ${whereClause} }) { ${fieldStructure} }`
+  const entry = `${typeName}${filter} { ${fieldStructure} }`
 
   const newLogsFilter = client.query(`{ ${entry} }`, {}, context)
     .then(response => {
-      if (response.error) throw new Error(`${graphDocumentIdentifier} query error: ${response.error.message}`)
+      if (response.error) throw new Error(`${typeName} query error: ${response.error.message}`)
 
-      if (!(graphDocumentIdentifier in response.data)) {
-        throw new Error(`No ${graphDocumentIdentifier} found in subgraph response`)
+      if (!(typeName in response.data)) {
+        throw new Error(`No ${typeName} found in subgraph response`)
       }
 
-      const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[graphDocumentIdentifier]
+      const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[typeName]
 
       if (list instanceof Array) {
         return list.map(item => parseQueryResults(item, params.schema))
       }
 
-      throw new Error(`No ${graphDocumentIdentifier} found in subgraph response`)
+      throw new Error(`No ${typeName} found in subgraph response`)
     })
 
   return newLogsFilter as any
@@ -116,16 +99,33 @@ export function parseQueryResults(json: any, schema: any) {
       const parseFn = getMappedValue(abiParamParseMap, schemaType)
 
       entity[key] = parseFn(value)
-    } else if(value instanceof Array) {
+    } else if (value instanceof Array) {
       entity[key] = value.map((item, i) => parseQueryResults(item, schemaType))
-    } else if(value instanceof Object) {
-      entity[key] = parseQueryResults(value, schemaType )
+    } else if (value instanceof Object) {
+      entity[key] = parseQueryResults(value, schemaType)
     } else {
       entity[key] = value
     }
 
   })
   return entity
+}
+
+function parseFilterObject(query: any) {
+  if (query === undefined) return ''
+  if (typeof query !== 'object') throw new Error('Query must be an object')
+
+  const fields: string[] = []
+  Object.entries(query).forEach(([key, value]) => {
+
+    if (value instanceof Object) {
+      fields.push(`${key} { ${parseQueryObject(value)} }`)
+    } else {
+      fields.push(`${key}: { ${value} }`)
+    }
+
+  })
+  return fields.join(' ')
 }
 
 function parseQueryObject(query: any) {
@@ -142,25 +142,9 @@ function parseQueryObject(query: any) {
   return fields.join(' ')
 }
 
-function parseWhereClause(query?: object) {
-  if (query === undefined) return ''
-  if (typeof query !== 'object') throw new Error('Query must be an object')
 
-  const where: string[] = []
 
-  Object.entries(query).forEach(([key, value]) => {
-
-    if (value === undefined) return
-
-    const valueFormatted = typeof value === 'string' ? `"${value}"` : String(value)
-
-    where.push(`${key}: ${valueFormatted}`)
-  })
-
-  return where.join(', ')
-}
-
-function fillQuery(obj: any){
+function fillQuery(obj: any) {
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key]
     acc[key] = value instanceof Object ? fillQuery(value) : null

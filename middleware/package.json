@@ -1,5 +1,5 @@
 {
-  "name": "middleware-monorepo",
+  "name": "middleware",
   "license": "AGPL-3.0",
   "private": true,
   "description": "Puppet Frontend Monorepo",
@@ -7,13 +7,6 @@
   "workspaces": [
     "*"
   ],
-  "scripts": {
-    "build": "cd client && bun run build",
-    "clean": "cd client && bun run clean",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.2.0",
