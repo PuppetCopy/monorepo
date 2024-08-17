@@ -8,6 +8,7 @@ import { ISetRouteType, queryTraderPositionOpen, queryTraderPositionSettled } fr
 import * as viem from 'viem'
 import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 import { $TraderSummary } from "../components/participant/$Summary.js"
+import { subgraphClient } from "../common/graphClient"
 
 
 
@@ -23,8 +24,8 @@ export const $trader = (config: ITrader) => {
   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
   const selectedTradeRouteList = now([])
 
-  const settledPositionListQuery = queryTraderPositionSettled({ address, activityTimeframe, selectedTradeRouteList })
-  const openPositionListQuery = queryTraderPositionOpen({ address, selectedTradeRouteList })
+  const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+  const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
   
 
   return $column(layoutSheet.spacingBig, style({ placeContent: 'space-between', flex: 1 }))(

@@ -12,6 +12,7 @@ import { $PuppetSummary, $TraderSummary } from "../../components/participant/$Su
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import { IPageParams, IUserActivityPageParams, IUserPositionPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
+import { subgraphClient } from "../../common/graphClient"
 
 
 
@@ -82,8 +83,8 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
               const urlFragments = document.location.pathname.split('/')
               const address = viem.getAddress(urlFragments[urlFragments.length - 1])
 
-              const settledPositionListQuery = queryTraderPositionSettled({ address, activityTimeframe, selectedTradeRouteList })
-              const openPositionListQuery = queryTraderPositionOpen({ address, selectedTradeRouteList })
+              const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+              const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
 
               return $column(layoutSheet.spacingBig)(
                 $TraderSummary({ ...config, address, settledPositionListQuery, openPositionListQuery })({}),
@@ -102,7 +103,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const address = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const puppetTradeRouteListQuery = queryPuppetTradeRoute({ address, activityTimeframe, selectedTradeRouteList })
+              const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
 
               const settledPositionListQuery = map(async trList => {
                 const tradeList = (await trList).flatMap(p => p.settledList.map(x => x.position))

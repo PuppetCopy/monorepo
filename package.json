@@ -16,7 +16,8 @@
     "client",
     "middleware/*",
     "docs",
-    "opengraph"
+    "opengraph",
+    "subgraph"
   ],
   "scripts": {
     "docs:build": "cd docs && bun run build",

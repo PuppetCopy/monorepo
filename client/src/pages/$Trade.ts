@@ -37,6 +37,7 @@ import * as trade from "../logic/traderRead.js"
 import { exchangesWebsocketPriceSource, readTokenSpendAmount, getTraderTradeRoute } from "../logic/traderRead.js"
 import { $seperator2 } from "./common.js"
 import { ITradeFocusMode } from "./type.js"
+import { subgraphClient } from "../common/graphClient"
 
 
 
@@ -225,7 +226,7 @@ export const $Trade = (config: ITradeComponent) => component((
       return now(Promise.resolve([] as IMirrorPositionOpen[]))
     }
 
-    return queryTraderPositionOpen({ address: wallet.account.address  })
+    return queryTraderPositionOpen(subgraphClient, { address: wallet.account.address  })
   }, awaitPromises(walletClientQuery))))
 
 
@@ -422,7 +423,7 @@ export const $Trade = (config: ITradeComponent) => component((
   }, combineObject({ feeDisplayRate, marketInfoQuery }))))
 
   const pricefeed = replayLatest(multicast(awaitPromises(map(async params => {
-    return queryLatestTokenPriceFeed({
+    return queryLatestTokenPriceFeed(subgraphClient, {
       token: params.indexToken,
       interval: params.chartInterval,
     })
