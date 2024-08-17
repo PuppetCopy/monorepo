@@ -25,8 +25,5 @@
     "chai": "4.3.10",
     "envio": "2.0.1"
   },
-  "optionalDependencies": {
-    "generated": "./generated"
-  },
   "packageManager": "pnpm@9.0.6"
 }
