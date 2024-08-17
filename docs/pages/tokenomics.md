@@ -10,6 +10,8 @@ Puppet's smart contracts integrate a simple emissions model. Tokens are minted a
 - **Revenue-Driven Buyback**: Revenue is used to buy back tokens, distributed to users who commit to long-term locking
 - **Foundation Emission**: Earns a share of the tokens minted based on protocol performance, share factor decreases over time to promote decentralization
 
+*Flywheel Diagram*
+
 ![Flywheel](/assets/flywheel.png){data-zoomable}
 
 ## Revenue-Driven Emissions
