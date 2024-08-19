@@ -14,7 +14,7 @@ export const store = uiStorage.createStoreDefinition('root', 4, {
     initialState: {
       chain: arbitrum.id,
       wallet: null as null | string,
-      activityTimeframe: IntervalTime.MONTH,
+      activityTimeframe: IntervalTime.HR24,
       marketList: [] as IMarketCreatedEvent[],
       selectedTradeRouteList: [] as ISetRouteType[],
     }

@@ -31,7 +31,9 @@ function jazzicon(address: string, shapeCount = DEFAULT_SHAPE_COUNT, wobble = DE
 
   const position = generator.random()
   const hueShift = 30 * position - wobble / 2
-  const colors = baseColors.map((hex) => Color(hex).rotate(hueShift).hex())
+  const colors = baseColors.map((hex) =>
+    Color(hex).rotate(hueShift).hex()
+  )
 
   function nextColor(): string {
     generator.random()

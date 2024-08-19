@@ -24,7 +24,7 @@ type PackedAbiType =
   | 'bytes'
 
 export type ISchema<T extends GqlType<any>> = {
-  [P in keyof T]: T[P] extends any[] ? any : T[P] extends GqlType<any> ? ISchema<T[P]> : P extends `__typename` ? string : PackedAbiType
+  [P in keyof T]?: T[P] extends any[] ? any : T[P] extends GqlType<any> ? ISchema<T[P]> : P extends `__typename` ? string : PackedAbiType
 }
 
 export type ISchemaQuery<TSchema, TQuery> = {
@@ -40,17 +40,31 @@ export type PrettifyT<T> = {
 
 
 
+export type IQueryFilter<T> = {
+  [K in keyof T]?: {
+    _eq?: string | number | boolean
+    _gt?: string | number | boolean
+    _gte?: string | number | boolean
+    _lt?: string | number | boolean
+    _lte?: string | number | boolean
+    _regexp?: string
+  }
+}
+
+export type IQueryOrderBy<T> = {
+  [K in keyof T]?: 'asc' | 'asc_nulls_first' | 'asc_nulls_last' | 'desc' | 'desc_nulls_first' | 'desc_nulls_last'
+}
 
 
-interface IQuerySubgraph<Type extends GqlType<any>, TQuery> {
+export interface IQuerySubgraph<Type extends GqlType<any>, TQuery> {
   schema: ISchema<Type>
   document?: TQuery | undefined
-  filter?: any
+  filter?: IQueryFilter<Type>
   startBlock?: bigint
 
   first?: number
   skip?: number
-  orderBy?: { [key in keyof Type]?: 'asc' | 'asc_nulls_first' | 'asc_nulls_last' | 'desc' | 'desc_nulls_first' | 'desc_nulls_last' }
+  orderBy?: IQueryOrderBy<Type>
 }
 
 
@@ -61,8 +75,8 @@ export const querySubgraph = <Type extends GqlType<any>, TQuery>(
 ): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
 
   const typeName = params.schema.__typename as string
-  const whereClause = params.filter ? `where: {${parseFilterObject(params.filter)}}` : ''
-  const orderByFilterParam = params.orderBy ? `order_by: {${parseFilterObject(params.orderBy)}}` : ''
+  const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
+  const orderByFilterParam = params.orderBy ? parseFilterObject({ order_by: params.orderBy }) : ''
   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
   const filter = orderByFilterParam || whereClause ? `( ${orderByFilterParam} ${whereClause})` : ''
 
@@ -88,7 +102,6 @@ export const querySubgraph = <Type extends GqlType<any>, TQuery>(
   return newLogsFilter as any
 }
 
-
 // recursively parse a json object to query result
 export function parseQueryResults(json: any, schema: any) {
   const entity: any = {}
@@ -113,15 +126,14 @@ export function parseQueryResults(json: any, schema: any) {
 
 function parseFilterObject(query: any) {
   if (query === undefined) return ''
-  if (typeof query !== 'object') throw new Error('Query must be an object')
 
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
 
     if (value instanceof Object) {
-      fields.push(`${key} { ${parseQueryObject(value)} }`)
-    } else {
-      fields.push(`${key}: { ${value} }`)
+      fields.push(`${key}: { ${parseFilterObject(value)} }`)
+    } else if (value !== undefined) {
+      fields.push(`${key}: ${value}`)
     }
 
   })

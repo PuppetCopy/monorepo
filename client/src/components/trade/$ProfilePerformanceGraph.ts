@@ -11,15 +11,15 @@ import {
   unixTimestampNow
 } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
-import { IMirrorPositionOpen, IMirrorPositionSettled, getParticiapntMpPortion } from "puppet-middleware-utils"
+import { IMirrorSeed, IMirror, getParticiapntPortion } from "puppet-middleware-utils"
 import * as viem from "viem"
-import { IPositionDecrease, IPositionIncrease, IPriceTickListMap, IPricetick, getPositionPnlUsd } from "gmx-middleware-utils"
+import { IPositionDecrease, IPositionIncrease, IPriceTickListMap, IPricetick, getMarketToken, getPositionPnlUsd } from "gmx-middleware-utils"
 
 
 
 type IPerformanceTickUpdateTick = {
   update: IPositionIncrease | IPositionDecrease
-  mp: IMirrorPositionSettled | IMirrorPositionOpen
+  mp: IMirror | IMirrorSeed
   timestamp: number
 }
 
@@ -30,8 +30,8 @@ type ITimelinePositionOpen = IPerformanceTickUpdateTick & {
 
 export interface IPerformanceTimeline {
   puppet?: viem.Address
-  openPositionList: IMirrorPositionOpen[]
-  settledPositionList: IMirrorPositionSettled[]
+  openPositionList: IMirrorSeed[]
+  settledPositionList: IMirror[]
   priceTickMap: IPriceTickListMap
   tickCount: number
   activityTimeframe: IntervalTime
@@ -58,10 +58,10 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
   const startTime = timeNow - config.activityTimeframe
   const openAdjustList: IPerformanceTickUpdateTick[] = config.openPositionList
     .flatMap((mp): IPerformanceTickUpdateTick[] => {
-      const tickList = [...mp.position.link.increaseList, ...mp.position.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime)
+      const tickList = [...mp.link.increaseList, ...mp.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime)
 
       if (tickList.length === 0) {
-        const update = mp.position.link.increaseList[mp.position.link.increaseList.length - 1]
+        const update = mp.link.increaseList[mp.link.increaseList.length - 1]
 
         return [{ update, mp, timestamp: startTime }]
       }
@@ -70,10 +70,10 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
     })
 
   const settledAdjustList: IPerformanceTickUpdateTick[] = config.settledPositionList.flatMap(mp => {
-    return [...mp.position.link.increaseList, ...mp.position.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime).map(update => ({ update, mp, timestamp: Number(update.blockTimestamp) }))
+    return [...mp.link.increaseList, ...mp.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime).map(update => ({ update, mp, timestamp: Number(update.blockTimestamp) }))
   })
 
-  const uniqueIndexTokenList = [...new Set([...config.openPositionList.map(mp => mp.position.indexToken), ...config.settledPositionList.map(mp => mp.position.indexToken)])]
+  const uniqueIndexTokenList = [...new Set([...config.openPositionList, ...config.settledPositionList].map(mp => getMarketToken(mp.market).indexToken))]
 
   const priceUpdateTicks = uniqueIndexTokenList.flatMap(indexToken => config.priceTickMap[indexToken] ?? [])
   const source = [...openAdjustList, ...settledAdjustList, ...priceUpdateTicks].sort((a, b) => getTime(a) - getTime(b))
@@ -90,9 +90,9 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
     seedMap: (acc, next) => {
       if ('price' in next) {
         const pendingPnl = Object.values(acc.positionOpen).reduce((pnlAcc, slot) => {
-          if  (slot.update.collateralAmount === 0n) return pnlAcc
+          if (slot.update.collateralAmount === 0n) return pnlAcc
           const pnl = getPositionPnlUsd(slot.update.isLong, slot.update.sizeInUsd, slot.update.sizeInTokens, next.price)
-          const pnlShare = getParticiapntMpPortion(slot.mp, pnl, config.puppet)
+          const pnlShare = getParticiapntPortion(slot.mp, pnl, config.puppet)
 
           return pnlAcc + pnlShare
         }, 0n)
@@ -112,11 +112,11 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
         }
         return { ...acc }
       }
-      
+
       delete acc.positionOpen[key]
 
       const nextSettlePnl = next.update.basePnlUsd
-      const pnlPortion = getParticiapntMpPortion(next.mp, nextSettlePnl, config.puppet)
+      const pnlPortion = getParticiapntPortion(next.mp, nextSettlePnl, config.puppet)
       const openPnl = Object.values(acc.positionOpen).reduce((a, b) => a + b.openPnl + b.realisedPnl, 0n)
 
       const settledPnl = acc.realisedPnl + pnlPortion // - position.cumulativeFee
@@ -125,7 +125,7 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
       return { ...acc, realisedPnl: settledPnl, value }
     },
   })
-    
+
   return data
 }
 
@@ -146,7 +146,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
       shape: 'circle'
     }
   })
-  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.position.link.decreaseList).map((pos): IMarker => {
+  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
     return {
       position: 'inBar',
       color: colorAlpha(pallete.message, .15),
@@ -162,7 +162,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
   return [
     config.$container(
       $Baseline({
-        containerOp: style({  inset: '0px 0px 0px 0px', position: 'absolute' }),
+        containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
         markers: now(allMarkerList),
         chartConfig: {
           width: 100,
@@ -184,7 +184,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
           },
           // height: 150,
           // width: 100,
-          timeScale :{
+          timeScale: {
             visible: false
           },
           // ...config.chartConfig

@@ -17,7 +17,7 @@ import {
 import { CandlestickData, Coordinate, LineStyle, Time } from "lightweight-charts"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { IMirrorPositionOpen, getLastAdjustment, latestPriceMap, queryLatestTokenPriceFeed, queryTraderPositionOpen } from "puppet-middleware-utils"
+import { IMirrorSeed, getLastAdjustment, latestPriceMap, queryLatestTokenPriceFeed, queryTraderPositionOpen } from "puppet-middleware-utils"
 import { $ButtonToggle, $CandleSticks, $infoLabel, $infoLabeledValue, $intermediate$node, $intermediateMessage, $target } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
@@ -85,21 +85,21 @@ export const $Trade = (config: ITradeComponent) => component((
 
   [enableTrading, enableTradingTether]: Behavior<boolean>,
 
-  [switchPosition, switchPositionTether]: Behavior<IMirrorPositionOpen>,
+  [switchPosition, switchPositionTether]: Behavior<IMirrorSeed>,
   [requestTrade, requestTradeTether]: Behavior<IRequestTrade>,
 
   [changeYAxisCoords, changeYAxisCoordsTether]: Behavior<Coordinate>,
   [changefocusPrice, changefocusPriceTether]: Behavior<number | null>,
   [changeIsFocused, changeIsFocusedTether]: Behavior<boolean>,
-  
+
   [changeFeeDisplayRate, changeFeeDisplayRateTether]: Behavior<IntervalTime>,
 
-  [clickResetPositionQuery, clickResetPositionTether]: Behavior<IMirrorPositionOpen | null>,
+  [clickResetPositionQuery, clickResetPositionTether]: Behavior<IMirrorSeed | null>,
 
 ) => {
 
   const { routeTypeListQuery, walletClientQuery, chain, providerClientQuery, parentRoute, referralCode } = config
-  
+
 
   const focusMode = replayLatest(switchFocusMode, ITradeFocusMode.collateral)
 
@@ -140,12 +140,12 @@ export const $Trade = (config: ITradeComponent) => component((
     return trade.readAddressTokenBalance(wallet, params.primaryToken, wallet.account.address)
   }, combineObject({ primaryToken, walletClientQuery }))))
 
-  
+
   const collateralPrice = map(params => {
     const token = params.latestPriceMap[params.collateralToken].min
 
     return token
-  },  combineObject({ collateralToken, latestPriceMap }))
+  }, combineObject({ collateralToken, latestPriceMap }))
 
 
   const marketPrice: Stream<IMarketPrice> = map(params => {
@@ -184,7 +184,7 @@ export const $Trade = (config: ITradeComponent) => component((
     if (!getRouteTypeKeyArgs) {
       throw new Error(`Route type not found for ${params.collateralToken} ${params.indexToken} ${params.isLong}`)
     }
-    
+
     return getRouteTypeKeyArgs.routeTypeKey
   }, combineObject({ collateralToken, indexToken, isLong, routeTypeListQuery })))))
 
@@ -214,7 +214,7 @@ export const $Trade = (config: ITradeComponent) => component((
     if (res !== null) {
       storedRouteKeyMap[address] = res
     }
-  
+
     await indexDb.set(store.tradeBox, 'traderRouteMap', storedRouteKeyMap)
 
     return res
@@ -223,14 +223,14 @@ export const $Trade = (config: ITradeComponent) => component((
 
   const openPositionListQuery = multicast(replayLatest(switchMap(wallet => {
     if (wallet === null) {
-      return now(Promise.resolve([] as IMirrorPositionOpen[]))
+      return now(Promise.resolve([] as IMirrorSeed[]))
     }
 
-    return queryTraderPositionOpen(subgraphClient, { address: wallet.account.address  })
+    return queryTraderPositionOpen(subgraphClient, { address: wallet.account.address })
   }, awaitPromises(walletClientQuery))))
 
 
-  const mirrorPosition: Stream<IMirrorPositionOpen | null> = replayLatest(multicast(mergeArray([
+  const mirrorPosition: Stream<IMirrorSeed | null> = replayLatest(multicast(mergeArray([
     awaitPromises(switchLatest(map(query => {
       return map(async params => {
         if (params.tradeRoute === null) {
@@ -239,7 +239,7 @@ export const $Trade = (config: ITradeComponent) => component((
 
         const address = params.tradeRoute
         const key = getPositionKey(address, params.market.marketToken, params.collateralToken, params.isLong)
-        const mp = (await query).find(slot => slot.position.key === key)
+        const mp = (await query).find(slot => slot.key === key)
 
         if (!mp) {
           return null
@@ -316,14 +316,14 @@ export const $Trade = (config: ITradeComponent) => component((
     // constant(false, clickResetPosition),
     replayLatest(multicast(changeIsFocused), false)
   ])
-  
+
   const leverage = replayLatest(multicast(mergeArray([
     changeLeverage,
     uiStorage.replayWrite(store.tradeBox, debounce(50, changeLeverage), 'leverage'),
     filterNull(map(params => {
       if (params.mirrorPosition === null) return null
 
-      const initialLeverage = div(params.mirrorPosition.position.sizeInUsd, params.netPositionValueUsd)
+      const initialLeverage = div(params.mirrorPosition.sizeInUsd, params.netPositionValueUsd)
 
       return initialLeverage
     }, zipState({ netPositionValueUsd, mirrorPosition })))
@@ -347,12 +347,12 @@ export const $Trade = (config: ITradeComponent) => component((
     // collateralDelta,
     collateralDeltaAmount,
   }
-  
+
   const averagePrice = multicast(map(params => {
     if (params.mirrorPosition === null) return 0n
-    
-    const totalSize = params.mirrorPosition.position.sizeInUsd + params.sizeDeltaUsd
-    const totalSizeInTokens = params.mirrorPosition.position.sizeInTokens + getTokenAmount(params.indexPrice, params.sizeDeltaUsd)
+
+    const totalSize = params.mirrorPosition.sizeInUsd + params.sizeDeltaUsd
+    const totalSizeInTokens = params.mirrorPosition.sizeInTokens + getTokenAmount(params.indexPrice, params.sizeDeltaUsd)
     const avg = (totalSize / totalSizeInTokens) * getDenominator(params.indexDescription.decimals)
 
     return avg
@@ -374,7 +374,7 @@ export const $Trade = (config: ITradeComponent) => component((
     const collateralUsd = positionCollateral + getTokenUsd(params.collateralPrice, params.collateralDeltaAmount)
 
     const lp = getLiquidationPrice(params.marketInfo, params.isLong, params.collateralToken, params.indexToken, size, sizeUsd, collateral, collateralUsd)
-    
+
     return lp
   }, zipState({ mirrorPosition, collateralPrice, indexPrice, sizeDeltaUsd, collateralDeltaAmount, marketInfo, isLong, collateralToken, indexToken })))
 
@@ -410,13 +410,13 @@ export const $Trade = (config: ITradeComponent) => component((
     return getAvailableReservedUsd(mktInfo, params.marketPrice, params.isLong)
   }, combineObject({ marketInfoQuery, marketPrice, isLong, feeDisplayRate }))))
 
-  const marketBorrowRateQuery =  replayLatest(multicast(map(async params => {
+  const marketBorrowRateQuery = replayLatest(multicast(map(async params => {
     const mktInfo = await params.marketInfoQuery
 
     return getBorrowingFactorPerInterval(mktInfo.fees, params.isLong, params.feeDisplayRate)
   }, combineObject({ isLong, feeDisplayRate, marketInfoQuery }))))
 
-  const marketFundingRateQuery =  replayLatest(multicast(map(async params => {
+  const marketFundingRateQuery = replayLatest(multicast(map(async params => {
     const mktInfo = await params.marketInfoQuery
 
     return getFundingFactorPerInterval(mktInfo.usage, mktInfo.fees, params.feeDisplayRate)
@@ -424,8 +424,8 @@ export const $Trade = (config: ITradeComponent) => component((
 
   const pricefeed = replayLatest(multicast(awaitPromises(map(async params => {
     return queryLatestTokenPriceFeed(subgraphClient, {
-      token: params.indexToken,
-      interval: params.chartInterval,
+      token: { _eq: params.indexToken },
+      interval: { _eq: params.chartInterval },
     })
   }, combineObject({ chartInterval, indexToken })))))
 
@@ -500,7 +500,7 @@ export const $Trade = (config: ITradeComponent) => component((
     parentRoute: config.parentRoute,
     referralCode: config.referralCode,
     tradeState,
-    resetAdjustments: clickResetPositionQuery, 
+    resetAdjustments: clickResetPositionQuery,
     $container: $column
   })({
     slideLeverage: changeLeverageTether(),
@@ -521,7 +521,7 @@ export const $Trade = (config: ITradeComponent) => component((
 
 
   return [
-    $column(screenUtils.isDesktopScreen ? style({  flex: 1 }) : style({  }))(
+    $column(screenUtils.isDesktopScreen ? style({ flex: 1 }) : style({}))(
 
 
       // filterNull(
@@ -542,7 +542,7 @@ export const $Trade = (config: ITradeComponent) => component((
 
       $column(
         screenUtils.isDesktopScreen
-          ? style({ 
+          ? style({
             // paddingLeft: '26px'
           })
           : style({}),
@@ -608,7 +608,7 @@ export const $Trade = (config: ITradeComponent) => component((
                     IntervalTime.MIN60,
                     IntervalTime.HR6,
                     IntervalTime.HR24,
-                  // GMX.TIME_INTERVAL_MAP.DAY7,
+                    // GMX.TIME_INTERVAL_MAP.DAY7,
                   ],
                   $$option: map(option => {
                     const timeframeLabel = TIME_INTERVAL_LABEL_MAP[option]
@@ -643,7 +643,7 @@ export const $Trade = (config: ITradeComponent) => component((
                     IntervalTime.MIN60,
                     IntervalTime.HR6,
                     IntervalTime.HR24,
-                  // GMX.TIME_INTERVAL_MAP.DAY7,
+                    // GMX.TIME_INTERVAL_MAP.DAY7,
                   ],
                 }
               })({
@@ -760,12 +760,12 @@ export const $Trade = (config: ITradeComponent) => component((
             ],
             appendData: scan((prev: CandlestickData, next): CandlestickData => {
               const marketPrice = formatFixed(next.indexPrice, USD_DECIMALS - params.indexDescription.decimals)
-              
+
               const timeNow = unixTimestampNow()
               const nextTimeSlot = Math.floor(timeNow / tf)
               const nextTime = nextTimeSlot * tf
               const isNext = nextTime > (prev.time as number)
- 
+
               document.title = `${next.indexTokenDescription.symbol} ${readableTokenPrice(params.indexDescription.decimals, next.indexPrice)}`
 
               if (isNext) {
@@ -822,7 +822,7 @@ export const $Trade = (config: ITradeComponent) => component((
             // click: chartClickTether(),
           })
 
-              
+
         }, combineObject({ chartInterval, indexDescription }), pricefeed)),
 
         screenUtils.isDesktopScreen
@@ -876,7 +876,7 @@ export const $Trade = (config: ITradeComponent) => component((
               switchIsIncrease: switchIsIncreaseTether(),
               changeLeverage: changeLeverageTether(),
             }),
-                    
+
           ),
 
           $seperator2,
@@ -893,8 +893,8 @@ export const $Trade = (config: ITradeComponent) => component((
           ),
 
           $seperator2,
-                  
-  
+
+
         )
 
         // switchMap(params => {

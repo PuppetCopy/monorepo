@@ -129,7 +129,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
               shape: 'circle'
             }
           })
-          const settledMarkerList = params.settledPositionList.flatMap(pos => pos.position.link.decreaseList).map((pos): IMarker => {
+          const settledMarkerList = params.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
             return {
               position: 'inBar',
               color: colorAlpha(pallete.message, .5),

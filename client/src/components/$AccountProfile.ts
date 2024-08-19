@@ -38,11 +38,12 @@ export const $profileAvatar = (config: IAccountPreview) => {
   const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: address.toLowerCase() })))
 
   return $row(style({ width: `${profileSize}px`, borderRadius: '50%', overflow: 'hidden', height: `${profileSize}px` }))(
-    switchMap(profile => {
-      return profile && profile.profile
-        ? $berryByToken(profile.profile) as any
-        : $jazzicon(address)
-    }, profileEv)
+    $jazzicon(address),
+    // switchMap(profile => {
+    //   return profile && profile.profile
+    //     ? $berryByToken(profile.profile) as any
+    //     : $jazzicon(address)
+    // }, profileEv)
   )
 }
 

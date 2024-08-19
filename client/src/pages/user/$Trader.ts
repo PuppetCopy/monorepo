@@ -62,7 +62,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
             return $Table({
               dataSource,
               columns: [
-                ...screenUtils.isDesktopScreen ? [positionTimeColumn] : [],
+                // ...screenUtils.isDesktopScreen ? [positionTimeColumn] : [],
                 entryColumn,
                 puppetsColumn(changeRouteTether),
                 settledSizeColumn(),

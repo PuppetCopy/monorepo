@@ -1,6 +1,6 @@
-import { GMX_EventEmitter, PriceCandle, handlerContext } from "generated"
-import { OrderStatus, PRICEFEED_INTERVAL_LIST } from "./const"
-import { getAddressItem, getUintItem, getBytes32Item, EventLog, getAddressItemList, getBoolItem } from "./utils"
+import { GMX_EventEmitter, handlerContext, PositionSettled, PositionOpen } from "generated"
+import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, OrderStatus, PLATFORM_STAT_INTERVAL, PRICEFEED_INTERVAL_LIST } from "./const"
+import { getAddressItem, getUintItem, getBytes32Item, EventLog, getAddressItemList, getBoolItem, getIntItem, toBasisPoints } from "./utils"
 
 
 
@@ -71,7 +71,7 @@ GMX_EventEmitter.EventLog2.handler(async ({ event, context }) => {
 
   const orderStatus: number | undefined = orderStatusMap[event.params.eventName as keyof typeof orderStatusMap]
   if (orderStatus) {
-    
+
 
   }
 })
@@ -86,52 +86,44 @@ async function onOraclePriceUpdate(event: EventLog, context: handlerContext) {
 
   for (let index = 0; index < PRICEFEED_INTERVAL_LIST.length; index++) {
     const interval = PRICEFEED_INTERVAL_LIST[index]
-    const slot = timestamp / interval
-    const timeSlot = slot * interval
-    const latestId = `${token}:${interval}`
 
-    const stored = await context.PriceCandleSeed.get(latestId)
+    await updatePriceCandle(interval, timestamp, token, context, price)
+  }
+}
 
-    const latest = stored ? { ...stored } : {
+
+async function updatePriceCandle(interval: bigint, timestamp: bigint, token: string, context: handlerContext, price: bigint) {
+  const timeSlot = (timestamp / interval) * interval
+  const id = `${token}:${interval}:${timeSlot}`
+  const storedSeed = await context.PriceCandle.get(id)
+
+  if (storedSeed) {
+    const seed = { ...storedSeed }
+
+    if (price > seed.h) {
+      seed.h = price
+    } else if (price < seed.l) {
+      seed.l = price
+    }
+
+    seed.c = price
+
+    context.PriceCandle.set(seed)
+  } else {
+    context.PriceCandle.set({
+      id,
       token: token,
-      interval: Number(interval),
-      timestamp: Number(timeSlot),
+
+      interval: interval,
+      timestamp: timeSlot,
+
       o: price,
       h: price,
       l: price,
-      c: price,
-      id: latestId
-    }
-
-
-    if (timeSlot > latest.timestamp) {
-      // store previous candle and initialize next candle
-      const candleId = `${latest.token}:${interval}:${latest.timestamp}`
-      const candle: PriceCandle = {
-        id: candleId,
-        token: latest.token,
-        interval: latest.interval,
-        timestamp: timeSlot,
-        o: price,
-        h: price,
-        l: price,
-        c: price
-      }
-
-      context.PriceCandle.set(candle)
-
-    } else {
-      if (price > latest.h) {
-        latest.h = price
-      } else if (price < latest.l) {
-        latest.l = price
-      }
-    }
-
-    latest.c = price
-
-    context.PriceCandleSeed.set(latest)
+      c: price
+    })
   }
+
 }
 
 async function onPositionIncrease(event: EventLog, context: handlerContext) {
@@ -158,6 +150,7 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
   const isLong = getBoolItem(event, 0)
 
   const collateralTokenPriceMax = getUintItem(event, 10)
+  const collateralUsd = collateralAmount * collateralTokenPriceMax
 
   let positionLinkId
   if (!openSlot) {
@@ -174,24 +167,25 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
       link_id: orderKey,
       key: positionKey,
 
+      mirror_id: undefined,
+
       account: account,
       market: market,
       collateralToken: collateralToken,
-      // indexToken: getAddressItem(event, 3),
 
       sizeInUsd: sizeInUsd,
       sizeInTokens: sizeInTokens,
       collateralAmount: collateralAmount,
 
-      cumulativeSizeUsd: 0n,
-      cumulativeSizeToken: 0n,
-      cumulativeCollateralUsd: 0n,
-      cumulativeCollateralToken: 0n,
+      cumulativeSizeUsd: sizeInUsd,
+      cumulativeSizeToken: sizeInTokens,
+      cumulativeCollateralUsd: collateralUsd,
+      cumulativeCollateralToken: collateralAmount,
 
-      maxSizeUsd: 0n,
-      maxSizeToken: 0n,
-      maxCollateralToken: 0n,
-      maxCollateralUsd: 0n,
+      maxSizeUsd: sizeInUsd,
+      maxSizeToken: sizeInTokens,
+      maxCollateralToken: collateralAmount,
+      maxCollateralUsd: collateralUsd,
 
       isLong: isLong,
 
@@ -205,7 +199,6 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
   } else {
     positionLinkId = openSlot.link_id
 
-    const collateralUsd = openSlot.collateralAmount * collateralTokenPriceMax
 
     context.PositionOpen.set({
       ...openSlot,
@@ -227,7 +220,7 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
 
   context.PositionIncrease.set({
     id: orderId,
-    feeCollected_id: orderId,
+    // feeCollected_id: orderId,
     link_id: positionLinkId,
 
     account: account,
@@ -250,9 +243,9 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
     sizeDeltaInTokens: getUintItem(event, 13),
     orderType: Number(getUintItem(event, 14)),
 
-    collateralDeltaAmount: getUintItem(event, 0),
-    priceImpactUsd: getUintItem(event, 1),
-    priceImpactAmount: getUintItem(event, 2),
+    collateralDeltaAmount: getIntItem(event, 0),
+    priceImpactUsd: getIntItem(event, 1),
+    priceImpactAmount: getIntItem(event, 2),
 
     isLong: isLong,
 
@@ -287,31 +280,39 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
   const sizeInUsd = getUintItem(event, 0)
   const sizeInTokens = getUintItem(event, 1)
   const collateralAmount = getUintItem(event, 2)
-  const basePnlUsd = getUintItem(event, 1)
+
+  const basePnlUsd = getIntItem(event, 1)
 
 
   if (sizeInTokens > 0) {
     context.PositionOpen.set({
       ...openPosition,
-      sizeInUsd,
-      sizeInTokens,
-      collateralAmount,
+      sizeInUsd: openPosition.sizeInUsd - sizeInUsd,
+      sizeInTokens: openPosition.sizeInTokens - sizeInTokens,
+      collateralAmount: openPosition.collateralAmount - collateralAmount,
+
       realisedPnlUsd: openPosition.realisedPnlUsd + basePnlUsd,
     })
   } else {
 
-    context.PositionSettled.set({
+    const settled = {
       ...openPosition,
       realisedPnlUsd: openPosition.realisedPnlUsd + basePnlUsd,
-    })
+    }
 
-
+    context.PositionSettled.set(settled)
     context.PositionOpen.deleteUnsafe(positionKey)
+
+    for (let index = 0; index < PLATFORM_STAT_INTERVAL.length; index++) {
+      const interval = PLATFORM_STAT_INTERVAL[index]
+      await updateAccountSummary(context, event, interval, ADDRESS_ZERO, settled)
+    }
+
   }
 
   context.PositionDecrease.set({
     id: orderId,
-    feeCollected_id: orderId,
+    // feeCollected_id: orderId,
     link_id: openPosition.link_id,
 
     account: account,
@@ -336,9 +337,9 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
     valuesPriceImpactDiffUsd: getUintItem(event, 15),
     orderType: Number(getUintItem(event, 16)),
 
-    priceImpactUsd: getUintItem(event, 0),
-    basePnlUsd: getUintItem(event, 1),
-    uncappedBasePnlUsd: getUintItem(event, 2),
+    priceImpactUsd: getIntItem(event, 0),
+    basePnlUsd: basePnlUsd,
+    uncappedBasePnlUsd: getIntItem(event, 2),
 
     isLong: getBoolItem(event, 0),
 
@@ -354,3 +355,58 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
 
 }
 
+
+
+async function updateAccountSummary(context: handlerContext, event: EventLog, interval: bigint, account: string, position: PositionSettled) {
+  const timestamp = (BigInt(event.block.timestamp) / interval) * interval
+  const id = `${account}:${interval}`
+  const seed = await context.AccountSummary.get(id)
+
+  if (seed) {
+    context.AccountSummary.set({
+      id,
+      account,
+
+      interval,
+      timestamp,
+      puppets: 0n,
+
+      cumulativeSizeUsd: seed.cumulativeSizeUsd + position.cumulativeSizeUsd,
+      cumulativeCollateralUsd: seed.cumulativeCollateralUsd + position.cumulativeCollateralUsd,
+      maxSizeUsd: position.maxSizeUsd > seed.maxSizeUsd ? position.maxSizeUsd : seed.maxSizeUsd,
+      maxCollateralUsd: position.maxCollateralUsd > seed.maxCollateralUsd ? position.maxCollateralUsd : seed.maxCollateralUsd,
+      pnl: seed.pnl + position.realisedPnlUsd,
+      roi: toBasisPoints(seed.pnl + position.realisedPnlUsd, seed.maxCollateralUsd),
+      winCount: position.realisedPnlUsd > 0 ? seed.winCount + 1n : seed.winCount,
+      lossCount: position.realisedPnlUsd < 0 ? seed.lossCount + 1n : seed.lossCount,
+      successRate: toBasisPoints(seed.winCount + 1n, seed.winCount + seed.lossCount + 1n)
+    })
+  } else {
+
+    context.AccountSummary.set({
+      id,
+      account,
+
+      interval,
+      timestamp,
+
+      puppets: 0n,
+
+      cumulativeSizeUsd: position.cumulativeSizeUsd,
+      cumulativeCollateralUsd: position.cumulativeCollateralUsd,
+      maxSizeUsd: position.maxSizeUsd,
+
+      maxCollateralUsd: position.maxCollateralUsd,
+      pnl: position.realisedPnlUsd,
+      roi: toBasisPoints(position.realisedPnlUsd, position.maxCollateralUsd),
+      winCount: position.realisedPnlUsd > 0 ? 1n : 0n,
+      lossCount: position.realisedPnlUsd < 0 ? 1n : 0n,
+      successRate: position.realisedPnlUsd > 0 ? BASIS_POINTS_DIVISOR : 0n
+    })
+
+
+
+  }
+
+
+}

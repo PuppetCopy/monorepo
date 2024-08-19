@@ -1,7 +1,10 @@
 import { EventLog as EventLogCtx, GMX_EventEmitter_EventLog1_eventArgs } from "generated";
+import { BASIS_POINTS_DIVISOR } from "./const";
 
 export type EventLog = EventLogCtx<GMX_EventEmitter_EventLog1_eventArgs>
-
+export type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+}
 
 export function getAddressItem(log: EventLog, idx: number) {
   return log.params.eventData[0][0][idx][1]
@@ -59,4 +62,13 @@ export function getStringItemList(log: EventLog, idx: number) {
   return log.params.eventData[6][1][idx][1]
 }
 
+export function toBasisPoints(value: bigint, divisor: bigint): bigint {
+  if (divisor === 0n) return 0n
+
+  return value * BASIS_POINTS_DIVISOR / divisor
+}
+
+export function applyBasisPoints(bps: bigint, value: bigint): bigint {
+  return value * bps / BASIS_POINTS_DIVISOR
+}
 

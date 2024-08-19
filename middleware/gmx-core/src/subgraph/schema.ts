@@ -1,4 +1,4 @@
-import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPositionOpen, IPositionSettled, IPriceCandle, IPriceCandleSeed } from "../types.js"
+import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle, IPriceCandleSeed, IPositionOpen } from "../types.js"
 import { ISchema } from "./query.js"
 
 
@@ -100,8 +100,8 @@ const orderStatus: ISchema<IOrderStatus> ={
 
 const positionIncrease: ISchema<IPositionIncrease> = {
   id: 'string',
-  order: orderStatus,
-  feeCollected: positionFeesCollected,
+  // order: orderStatus,
+  // feeCollected: positionFeesCollected,
 
   account: 'address',
   market: 'address',
@@ -140,8 +140,8 @@ const positionIncrease: ISchema<IPositionIncrease> = {
 
 const positionDecrease: ISchema<IPositionDecrease> = {
   id: 'string',
-  order: orderStatus,
-  feeCollected: positionFeesCollected,
+  // order: orderStatus,
+  // feeCollected: positionFeesCollected,
 
   account: 'address',
   market: 'address',
@@ -237,12 +237,12 @@ const positionLink: ISchema<IPositionLink> = {
 
   increaseList: positionIncrease,
   decreaseList: positionDecrease,
-  feeUpdateList: positionFeeUpdate,
+  // feeUpdateList: positionFeeUpdate,
  
   __typename: 'PositionLink',
 }
 
-const position = {
+const positionAbstract = {
   id: 'string',
   link: positionLink,
 
@@ -251,7 +251,7 @@ const position = {
   account: 'address',
   market: 'address',
   collateralToken: 'address',
-  indexToken: 'address',
+  // indexToken: 'address',
 
   sizeInUsd: 'uint256',
   sizeInTokens: 'uint256',
@@ -275,11 +275,11 @@ const position = {
 } as const
 
 const positionOpen: ISchema<IPositionOpen> = {
-  ...position,
+  ...positionAbstract,
   __typename: 'PositionOpen',
 }
-const positionSettled: ISchema<IPositionSettled> = { 
-  ...position,
+const position: ISchema<IPosition> = { 
+  ...positionAbstract,
   __typename: 'PositionSettled',
 }
 
@@ -314,7 +314,7 @@ const priceCandle: ISchema<IPriceCandle> = {
 
 export const schema = { 
   orderCreated, orderStatus, positionFeesCollected,
-  positionSettled, positionOpen, positionLink,
+  position, positionOpen, positionLink,
   
   positionIncrease, positionDecrease,
 

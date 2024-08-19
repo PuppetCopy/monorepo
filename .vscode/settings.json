@@ -5,6 +5,7 @@
     "**/node_modules": true,
     "**/lib": true,
     "**/generated": true,
+    "**/generated-sources": true,
     "**/tsconfig.tsbuildinfo": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",

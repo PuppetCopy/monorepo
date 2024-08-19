@@ -52,17 +52,16 @@ export async function readPuppetDepositAmount(
 export async function readPuppetAllowance(
   provider: walletLink.IClient,
   puppet: viem.Address,
-  tradeRoute: viem.Address,
   contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id),
 ) {
   
-  const [exists, factor] = await readContract(provider, {
-    ...contractDefs.Datastore,
-    functionName: 'tryGetAddressToUintFor',
-    args: [getPuppetAllowancesKey(puppet), tradeRoute]
-  })
+  // const [exists, factor] = await readContract(provider, {
+  //   ...contractDefs.Datastore,
+  //   functionName: 'tryGetAddressToUintFor',
+  //   args: [getPuppetAllowancesKey(puppet), tradeRoute]
+  // })
 
-  return exists ? factor : 0n
+  return 0n
 }
 
 

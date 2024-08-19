@@ -6,7 +6,7 @@ import { Stream } from "@most/types"
 import { IntervalTime, groupArrayMany, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
 import * as GMX from 'gmx-middleware-const'
 import { getTokenDescription } from "gmx-middleware-utils"
-import { IPuppetTradeRoute, ISetRouteType, getParticiapntMpPortion } from "puppet-middleware-utils"
+import { IPuppetTradeRoute, ISetRouteType, getParticiapntPortion } from "puppet-middleware-utils"
 import { $infoTooltipLabel, $intermediateMessage } from "ui-components"
 import * as viem from "viem"
 import { $route } from "../../common/$common.js"
@@ -147,7 +147,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
           }
 
           const usedBalance = puppetTradeRouteList.flatMap(route => route.openList).reduce((acc, pos) => {
-            const collateralUsd = getParticiapntMpPortion(pos.position, pos.position.position.maxCollateralUsd, wallet.account.address)
+            const collateralUsd = getParticiapntPortion(pos.position, pos.position.maxCollateralUsd, wallet.account.address)
             return acc + collateralUsd
           }, 0n)
 

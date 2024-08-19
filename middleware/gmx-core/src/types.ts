@@ -1,10 +1,9 @@
 import { Stream } from "@most/types"
 import { Abi, ExtractAbiEvent } from "abitype"
 import { IntervalTime } from "common-utils"
-import * as GMX from "gmx-middleware-const"
 import { TOKEN_SYMBOL } from "gmx-middleware-const"
+import * as GMX from "gmx-middleware-const"
 import * as viem from "viem"
-
 
 
 export type ITokenSymbol = keyof typeof TOKEN_SYMBOL
@@ -75,30 +74,10 @@ export interface IAbstractPositionParams {
   isLong: boolean
 }
 
-export interface IAbstractPositionIdentity extends IAbstractPositionParams {
-  account: viem.Address
-  key: viem.Hex
-}
-
-
-export type IAbstractPositionAdjustment = {
-  collateralDelta: bigint
-  sizeDelta: bigint
-}
 
 
 
-
-export enum PositionStatus {
-  OPEN,
-  CLOSED,
-  LIQUIDATED
-}
-
-
-
-
-export interface IPosition<TypeName extends 'PositionOpen' | 'PositionSettled'> extends ILogTxType<TypeName> {
+export interface IPositionAbstract<TypeName extends 'PositionOpen' | 'PositionSettled' = 'PositionOpen' | 'PositionSettled'> extends ILogTxType<TypeName> {
   link: IPositionLink
 
   key: viem.Hex
@@ -106,7 +85,6 @@ export interface IPosition<TypeName extends 'PositionOpen' | 'PositionSettled'> 
   account: viem.Address
   market: viem.Address
   collateralToken: viem.Address
-  indexToken: viem.Address
 
   sizeInUsd: bigint
   sizeInTokens: bigint
@@ -126,8 +104,8 @@ export interface IPosition<TypeName extends 'PositionOpen' | 'PositionSettled'> 
   isLong: boolean
 }
 
-export type IPositionOpen = IPosition<'PositionOpen'>
-export type IPositionSettled = IPosition<'PositionSettled'>
+export type IPositionOpen = IPositionAbstract<'PositionOpen'>
+export type IPosition = IPositionAbstract<'PositionSettled'>
 
 
 
@@ -467,7 +445,7 @@ export interface IPositionLink extends ILogTypeId<'PositionLink'> {
 
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
-  feeUpdateList: IPositionFeesCollected[]
+  // feeUpdateList: IPositionFeesCollected[]
 }
 
 
@@ -630,11 +608,6 @@ export interface IMarketInfo {
 
 export type IMarketCreatedEvent = ILogTxType<'MarketCreated'> & IMarket & {
   salt: viem.Hex
-}
-
-export type ITradeRoute = IAbstractPositionParams & {
-  marketSalt: viem.Address
-  routeTypeKey: viem.Hex
 }
 
 

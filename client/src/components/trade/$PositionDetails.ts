@@ -5,7 +5,7 @@ import { map, now } from "@most/core"
 import { Stream } from "@most/types"
 import { StateStream, getMappedValue, getTimeSince, getTokenUsd, readableDate, readableTokenPrice, readableUsd, switchMap, unixTimestampNow } from "common-utils"
 import { IPositionDecrease, IPositionIncrease, IPriceCandle, TEMP_MARKET_TOKEN_MARKET_MAP, getTokenDescription } from "gmx-middleware-utils"
-import { IMirrorPositionOpen } from "puppet-middleware-utils"
+import { IMirrorSeed } from "puppet-middleware-utils"
 import { $Table, $infoLabel, $txHashRef } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -20,7 +20,7 @@ interface IPositionAdjustmentHistory extends IWalletPageParams {
   pricefeed: Stream<IPriceCandle[]>
   tradeConfig: StateStream<ITradeConfig> // ITradeParams
   tradeState: StateStream<ITradeParams>
-  mirrorPosition: Stream<IMirrorPositionOpen | null>
+  mirrorPosition: Stream<IMirrorSeed | null>
 }
 
 
@@ -37,7 +37,7 @@ export const $PositionDetails = (config: IPositionAdjustmentHistory) => componen
   return [
     switchMap(pos => {
       const dataSource: Stream<(IPositionIncrease | IPositionDecrease)[]> = pos
-        ? now([...pos.position.link.increaseList, ...pos.position.link.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp) ))
+        ? now([...pos.link.increaseList, ...pos.link.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp) ))
         : now([])
 
       return $Table({

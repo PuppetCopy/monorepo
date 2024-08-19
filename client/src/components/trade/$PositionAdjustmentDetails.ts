@@ -9,7 +9,7 @@ import * as GMX from "gmx-middleware-const"
 import { IPriceCandle, OrderType, getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, resolveAddress } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { IMirrorPositionOpen, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorSeed, latestPriceMap } from "puppet-middleware-utils"
 import { $alert, $alertTooltip, $anchor, $infoLabeledValue, $infoTooltipLabel } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -51,7 +51,7 @@ export const $PositionAdjustmentDetails = (config: IPositionAdjustmentDetails) =
 
   [approveTrading, approveTradingTether]: Behavior<PointerEvent, true>,
   [requestTokenSpend, requestTokenSpendTether]: Behavior<walletLink.IWalletClient, IApproveSpendReturn>,
-  [clickResetPosition, clickResetPositionTether]: Behavior<any, IMirrorPositionOpen | null>,
+  [clickResetPosition, clickResetPositionTether]: Behavior<any, IMirrorSeed | null>,
   [clickProposeTrade, clickProposeTradeTether]: Behavior<walletLink.IWalletClient>,
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 
@@ -365,7 +365,7 @@ export const $PositionAdjustmentDetails = (config: IPositionAdjustmentDetails) =
                     if (_params.isIncrease) {
                       modLabel = 'Increase'
                     } else {
-                      modLabel = (_params.sizeDeltaUsd + _params.mirrorPosition.position.sizeInUsd === 0n) ? 'Close' : 'Reduce'
+                      modLabel = (_params.sizeDeltaUsd + _params.mirrorPosition.sizeInUsd === 0n) ? 'Close' : 'Reduce'
                     }
                   } else {
                     modLabel = 'Open'

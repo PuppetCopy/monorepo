@@ -73,13 +73,12 @@ Executes the buyback of revenue tokens using the protocol's accumulated fees.
 
 
 ```solidity
-function buybackRevenue(address source, address depositor, address receiver, IERC20 revenueToken, uint amount) external auth;
+function buybackRevenue(address depositor, address receiver, IERC20 revenueToken, uint amount) external auth;
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
-|`source`|`address`|The source address from which the buyback is initiated.|
 |`depositor`|`address`|The address that deposits the buyback token.|
 |`receiver`|`address`|The address that will receive the revenue token.|
 |`revenueToken`|`IERC20`|The address of the revenue token to be bought back.|

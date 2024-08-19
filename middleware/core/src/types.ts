@@ -1,62 +1,49 @@
-import { ILogTxType, ILogTypeId, IPosition, IPositionListSummary } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId, IPositionAbstract, IPositionListSummary } from "gmx-middleware-utils"
 import * as viem from "viem"
 
 
 
-export interface IMirrorPositionRequest {
+export interface IMirrorRequest {
   puppets: readonly viem.Address[]
   trader: viem.Address
-  tradeRoute: viem.Address
-  routeTypeKey: viem.Hex
+  subaccount: viem.Address
   positionKey: viem.Hex
   isIncrease: boolean;
   requestKey: viem.Hex
 }
 
 
-
-export interface IExecutePosition extends ILogTxType<'ExecutePosition'> {
-  link: IMirrorPositionLink
-  performanceFeePaid: bigint
-  tradeRoute: viem.Address
-  requestKey: viem.Hex
-  isExecuted: boolean
-  isIncrease: boolean
-}
-
-export interface ISharesIncrease extends ILogTxType<'SharesIncrease'> {
-  link: IMirrorPositionLink
-  puppetsShares: bigint[]
-  traderShares: bigint
-  totalSupply: bigint
-  tradeRoute: viem.Address
-  requestKey: viem.Hex
-}
-
-export interface IMirrorPositionLink extends ILogTypeId<'MirrorPositionLink'> {
-  shareIncreaseList: ISharesIncrease[]
+export interface MirrorReduceSize extends ILogTxType<'MirrorReduceSize'> {
+  id: string
+  sizeDelta: bigint
 }
 
 
-export interface IMirrorPosition<TypeName extends 'MirrorPositionOpen' | 'MirrorPositionSettled' = 'MirrorPositionOpen' | 'MirrorPositionSettled'> extends ILogTxType<TypeName> {
-  link: IMirrorPositionLink
-  position: IPosition<TypeName extends 'MirrorPositionOpen' ? 'PositionOpen' : 'PositionSettled'>
+
+export interface IMirrorLink extends ILogTxType<'MirrorLink'> {
+  id: string
+  reduceSizeList: MirrorReduceSize[]
+}
+
+export interface IMirrorMatch extends ILogTxType<'Mirror'> {
+  link: IMirrorLink
 
   trader: viem.Address
-  tradeRoute: viem.Address
 
-  puppets: viem.Address[]
-
-  puppetsShares: bigint[]
-  traderShares: bigint
-  totalSupply: bigint
+  puppetList: viem.Address[]
+  collateralList: bigint[]
+  cumulativeTransactionCost: bigint
 
   routeTypeKey: viem.Hex
-  tradeRouteKey: viem.Hex
 }
 
-export interface IMirrorPositionOpen extends IMirrorPosition<'MirrorPositionOpen'> { }
-export interface IMirrorPositionSettled extends IMirrorPosition<'MirrorPositionSettled'> {}
+
+export interface IMirrorAbstract<TypeName extends 'PositionOpen' | 'PositionSettled' = 'PositionOpen' | 'PositionSettled'> extends IPositionAbstract<TypeName> {
+  mirror: IMirrorMatch
+}
+
+export interface IMirrorSeed extends IMirrorAbstract<'PositionOpen'> { }
+export interface IMirror extends IMirrorAbstract<'PositionSettled'> { }
 
 
 export interface ISubscribeTradeRoute extends ILogTxType<'SubscribeTradeRoute'> {
@@ -69,12 +56,12 @@ export interface ISubscribeTradeRoute extends ILogTxType<'SubscribeTradeRoute'> 
 }
 
 export interface IPuppetPositionOpen extends ILogTxType<'PuppetPositionOpen'> {
-  position: IMirrorPositionOpen
+  position: IMirrorSeed
   puppetTradeRoute: IPuppetTradeRoute
 }
 
 export interface IPuppetPositionSettled extends ILogTxType<'PuppetPositionSettled'> {
-  position: IMirrorPositionSettled
+  position: IMirror
   puppetTradeRoute: IPuppetTradeRoute
 }
 
@@ -89,11 +76,8 @@ export interface IPuppetTradeRoute extends ILogTypeId<'PuppetTradeRoute'> {
   subscribeList: ISubscribeTradeRoute[]
 }
 
-export interface IMirrorPositionListSummary extends IPositionListSummary {
-  // routeTypeKey?: viem.Hex
+export interface IMirrorListSummary extends IPositionListSummary {
   puppets: viem.Address[]
-  // account: viem.Address
-  // tradeList: (IPositionMirrorSlot | IPositionMirrorSettled)[]
 }
 
 export interface ISetRouteType extends ILogTypeId<'SetRouteType'> {
@@ -102,6 +86,28 @@ export interface ISetRouteType extends ILogTypeId<'SetRouteType'> {
   indexToken: viem.Address
   isLong: boolean
   // data: viem.Hex
+}
+
+
+export interface IAccountSummary extends ILogTypeId<'AccountSummary'> {
+  account: viem.Address
+  interval: bigint
+  timestamp: bigint
+
+  puppets: bigint
+
+  cumulativeSizeUsd: bigint
+  cumulativeCollateralUsd: bigint
+
+  maxSizeUsd: bigint
+  maxCollateralUsd: bigint
+
+  pnl: bigint
+  roi: bigint
+
+  winCount: bigint
+  lossCount: bigint
+  successRate: bigint
 }
 
 

@@ -36,7 +36,7 @@ interface IRouteSubscribeDrawer extends IComponentPageParams {
 export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => component((
   [requestChangeSubscription, requestChangeSubscriptionTether]: Behavior<walletLink.IWalletClient, IBatchSubscribeReturnType>,
   [clickClose, clickCloseTether]: Behavior<any>,
-  [clickRemoveSubsc, clickRemoveSubscTether]: Behavior<any, IChangeSubscription >,
+  [clickRemoveSubsc, clickRemoveSubscTether]: Behavior<any, IChangeSubscription>,
   [openDepositPopover, openDepositPopoverTether]: Behavior<any>,
   [requestDepositAsset, requestDepositAssetTether]: Behavior<Promise<bigint>>, // delta amount
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
@@ -58,7 +58,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
   }, walletClientQuery)
 
   const depositAmountQuery = mergeArray([
-    initialDepositAmountQuery,  
+    initialDepositAmountQuery,
     map(async params => {
       return await params.initialDepositAmountQuery + await params.requestDepositAsset
     }, combineObject({ initialDepositAmountQuery, requestDepositAsset }))
@@ -76,7 +76,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
 
   const depositToken = GMX.ARBITRUM_ADDRESS.USDC
   const depositTokenDescription = getTokenDescription(depositToken)
-  
+
 
   return [
     switchMap(isOpen => {
@@ -100,7 +100,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
           ),
 
           switchMap(params => {
-            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.routeTypeKey)) as [viem.Hex, IChangeSubscription[]][]
+            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.trader)) as [viem.Hex, IChangeSubscription[]][]
 
             return $column(layoutSheet.spacing)(
               ...routeMap.map(([routeTypeKey, subscList]) => {
@@ -134,7 +134,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                             $iconCircular($xCross)
                           ),
                           $row(style({ width: '32px' }))(
-                            $text(style({ backgroundColor: colorAlpha(iconColorParams.fill, .1), marginLeft: `-30px`, borderRadius: '6px', padding: '6px 12px 6px 22px', color: iconColorParams.fill,  }))(iconColorParams.label),  
+                            $text(style({ backgroundColor: colorAlpha(iconColorParams.fill, .1), marginLeft: `-30px`, borderRadius: '6px', padding: '6px 12px 6px 22px', color: iconColorParams.fill, }))(iconColorParams.label),
                           ),
 
                           // switchMap(amount => {
@@ -148,7 +148,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
 
                           $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry)), true),
                           $infoLabeledValue('Allowance', $text(`${readablePercentage(modSubsc.allowance)}`), true),
-                                
+
                         )
                       })
                     )
@@ -186,7 +186,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                   }),
                 )),
             })({}),
-            
+
             $node(),
             $SubmitBar({
               walletClientQuery,
@@ -205,7 +205,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
           )
         )
       ))
-      
+
     }, openIfEmpty),
 
     {
@@ -213,7 +213,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
       modifySubscriptionList: mergeArray([
         snapshot((list, modify) => {
           const index = list.findIndex(x =>
-            x.routeTypeKey === modify.routeTypeKey && x.trader === modify.trader
+            x.trader === modify.trader
           )
           const newList = [...list]
 

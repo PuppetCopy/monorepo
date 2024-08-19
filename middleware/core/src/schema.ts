@@ -1,87 +1,62 @@
-import { schema as gmxSchema, ISchema } from "gmx-middleware-utils"
-import { IExecutePosition, IMirrorPositionLink, IMirrorPositionOpen, IMirrorPositionSettled, IPuppetPositionOpen, IPuppetPositionSettled, IPuppetTradeRoute, ISharesIncrease, ISubscribeTradeRoute, ISetRouteType } from "./types.js"
+import { schema as gmxSchema, IPosition, IPositionOpen, ISchema } from "gmx-middleware-utils"
+import { IMirrorSeed, IMirror, IPuppetPositionOpen, IPuppetPositionSettled, IPuppetTradeRoute, ISubscribeTradeRoute, ISetRouteType, IAccountSummary, IMirrorLink, MirrorReduceSize, IMirrorMatch } from "./types.js"
 
 
-const executePosition: ISchema<Omit<IExecutePosition, 'link'>> = {
+
+const mirrorReduceSize: ISchema<MirrorReduceSize> = {
   id: 'string',
 
-  performanceFeePaid: 'uint',
-  tradeRoute: 'address',
-  requestKey: 'string',
-  isExecuted: 'bool',
-  isIncrease: 'bool',
+  sizeDelta: 'uint',
 
-  blockTimestamp: 'uint',
-  transactionHash: 'string',
+  // blockTimestamp: 'uint',
+  // transactionHash: 'string',
 
-  __typename: 'ExecutePosition',
-}
-
-const sharesIncrease: ISchema<Omit<ISharesIncrease, 'link'>> = {
-  id: 'string',
-
-  puppetsShares: 'uint[]',
-  traderShares: 'uint',
-  totalSupply: 'uint',
-  tradeRoute: 'address',
-
-  requestKey: 'string',
-
-  blockTimestamp: 'uint',
-  transactionHash: 'string',
-
-  __typename: 'SharesIncrease',
+  __typename: 'MirrorReduceSize',
 }
 
 
-const mirrorPositionLink: ISchema<IMirrorPositionLink> = {
+const mirrorLink: ISchema<IMirrorLink> = {
   id: 'string',
-  shareIncreaseList: sharesIncrease,
 
-  __typename: 'MirrorPositionLink',
+  reduceSizeList: mirrorReduceSize,
+
+  __typename: 'MirrorLink',
 }
-const mirrorPositionOpen: ISchema<IMirrorPositionOpen> = {
-  id: 'string',
-  link: mirrorPositionLink,
 
-  position: gmxSchema.positionOpen,
+
+
+const mirror: ISchema<IMirrorMatch> = {
+  link: mirrorLink,
 
   trader: 'address',
-  tradeRoute: 'address',
-  puppets: `address[]`,
-  puppetsShares: 'uint[]',
-  traderShares: 'uint',
-  totalSupply: 'uint',
+  puppetList: `address[]`,
+  collateralList: 'uint[]',
+  cumulativeTransactionCost: 'uint',
 
-  routeTypeKey: 'string',
-  tradeRouteKey: 'string',
-
-  blockTimestamp: 'uint',
-  transactionHash: 'string',
-
-  __typename: 'MirrorPositionOpen',
+  __typename: 'MirrorMatch',
 }
 
-const mirrorPositionSettled: ISchema<IMirrorPositionSettled> = {
-  id: 'string',
-  link: mirrorPositionLink,
 
-  position: gmxSchema.positionSettled,
+const mirrorPositionOpen: ISchema<IMirrorSeed | IPositionOpen> = {
+  ...gmxSchema.positionOpen,
 
-  trader: 'address',
-  tradeRoute: 'address',
-  puppets: `address[]`,
-  puppetsShares: 'uint[]',
-  traderShares: 'uint',
-  totalSupply: 'uint',
-
-  routeTypeKey: 'string',
-  tradeRouteKey: 'string',
+  mirror: mirror,
 
   blockTimestamp: 'uint',
   transactionHash: 'string',
 
-  __typename: 'MirrorPositionSettled',
+  __typename: 'PositionOpen',
+}
+
+const mirrorPosition: ISchema<IMirror | IPosition> = {
+  ...gmxSchema.position,
+
+  mirror: mirror,
+
+  blockTimestamp: 'uint',
+  transactionHash: 'string',
+
+  __typename: 'Position',
 }
 
 const puppetPositionOpen: ISchema<Omit<IPuppetPositionOpen, 'puppetTradeRoute'>> = {
@@ -95,7 +70,7 @@ const puppetPositionOpen: ISchema<Omit<IPuppetPositionOpen, 'puppetTradeRoute'>>
   __typename: 'PuppetPositionOpen',
 }
 
-const puppetPositionSettled: ISchema<Omit<IPuppetPositionSettled, 'puppetTradeRoute'>> = {
+const puppetPosition: ISchema<Omit<IPuppetPositionSettled, 'puppetTradeRoute'>> = {
   id: 'string',
   position: mirrorPositionOpen,
   // puppetTradeRoute: puppetTradeRoute,
@@ -130,7 +105,7 @@ const puppetTradeRoute: ISchema<IPuppetTradeRoute> = {
   trader: 'address',
   tradeRoute: 'address',
 
-  settledList: puppetPositionSettled,
+  settledList: puppetPosition,
   openList: puppetPositionOpen,
   subscribeList: subscribeTradeRoute,
 
@@ -150,16 +125,47 @@ const setRouteType: ISchema<ISetRouteType> = {
 
 
 
+const accountSummarySeed: ISchema<IAccountSummary> = {
+  id: 'string',
+  account: 'address',
+  interval: 'uint',
+  timestamp: 'uint',
+
+  puppets: 'uint',
+
+  cumulativeSizeUsd: 'uint',
+  cumulativeCollateralUsd: 'uint',
+
+  maxSizeUsd: 'uint',
+  maxCollateralUsd: 'uint',
+
+  pnl: 'uint',
+  roi: 'uint',
+
+  winCount: 'uint',
+  lossCount: 'uint',
+  successRate: 'uint',
+
+  __typename: 'AccountSummarySeed',
+}
+
+const AccountSummary: ISchema<IAccountSummary> = {
+  ...accountSummarySeed,
+
+  __typename: 'AccountSummary',
+}
 
 
-export const schema = { 
+
+
+
+export const schema = {
   mirrorPositionOpen,
-  executePosition,
-  sharesIncrease,
-  mirrorPositionLink, mirrorPositionSettled,
+  mirrorReduceSize,
+  mirrorLink, mirrorPosition,
 
-  puppetTradeRoute, puppetPositionSettled, puppetPositionOpen,
+  puppetTradeRoute, puppetPosition, puppetPositionOpen,
 
-  subscribeTradeRoute, setRouteType
+  subscribeTradeRoute, setRouteType, accountSummarySeed, AccountSummary,
 }
 

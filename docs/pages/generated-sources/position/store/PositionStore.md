@@ -152,6 +152,7 @@ struct RequestMatch {
 
 ```solidity
 struct RequestAdjustment {
+    bytes32 positionKey;
     uint[] puppetCollateralDeltaList;
     uint sizeDelta;
     uint collateralDelta;

@@ -1,25 +1,38 @@
 # ExecuteDecreasePosition
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/logic/ExecuteDecreasePosition.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/ExecuteDecreasePosition.sol)
+
+**Inherits:**
+Permission, EIP712
+
+
+## State Variables
+### callConfig
+
+```solidity
+CallConfig callConfig;
+```
 
 
 ## Functions
+### constructor
+
+
+```solidity
+constructor(IAuthority _authority, CallConfig memory _callConfig) Permission(_authority) EIP712("Position Router", "1");
+```
+
 ### decrease
 
 
 ```solidity
-function decrease(CallConfig calldata callConfig, bytes32 key, GmxPositionUtils.Props calldata order, bytes calldata eventData) external;
+function decrease(bytes32 key, GmxPositionUtils.Props calldata order, bytes calldata eventData) external auth;
 ```
 
 ### _decrease
 
 
 ```solidity
-function _decrease(
-    CallConfig calldata callConfig,
-    GmxPositionUtils.Props calldata order,
-    CallParams memory callParams,
-    PositionStore.RequestAdjustment memory request
-) internal;
+function _decrease(GmxPositionUtils.Props calldata order, CallParams memory callParams, PositionStore.RequestAdjustment memory request) internal;
 ```
 
 ### getDistribution
@@ -32,7 +45,27 @@ function getDistribution(uint performanceFeeRate, uint traderPerformanceFeeShare
     returns (uint performanceFee, uint traderPerformanceCutoffFee, uint amountOutAfterFee);
 ```
 
+### setConfig
+
+
+```solidity
+function setConfig(CallConfig memory _callConfig) external auth;
+```
+
+### _setConfig
+
+
+```solidity
+function _setConfig(CallConfig memory _callConfig) internal;
+```
+
 ## Events
+### ExecuteIncreasePosition__SetConfig
+
+```solidity
+event ExecuteIncreasePosition__SetConfig(uint timestamp, CallConfig callConfig);
+```
+
 ### ExecuteDecreasePosition__DecreasePosition
 
 ```solidity

@@ -1,22 +1,41 @@
 # RequestIncreasePosition
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/logic/RequestIncreasePosition.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/RequestIncreasePosition.sol)
+
+**Inherits:**
+Permission, EIP712, ReentrancyGuardTransient
+
+
+## State Variables
+### callConfig
+
+```solidity
+CallConfig callConfig;
+```
 
 
 ## Functions
+### constructor
+
+
+```solidity
+constructor(IAuthority _authority, CallConfig memory _callConfig) Permission(_authority) EIP712("Increase Position", "1");
+```
+
 ### proxyIncrease
 
 
 ```solidity
-function proxyIncrease(CallConfig memory callConfig, PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList)
-    internal;
+function proxyIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList, address user) external payable auth;
 ```
 
 ### traderIncrease
 
 
 ```solidity
-function traderIncrease(CallConfig memory callConfig, PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList)
-    internal;
+function traderIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList, address user)
+    external
+    payable
+    auth;
 ```
 
 ### increase
@@ -24,10 +43,10 @@ function traderIncrease(CallConfig memory callConfig, PositionUtils.TraderCallPa
 
 ```solidity
 function increase(
-    CallConfig memory callConfig,
     PositionStore.RequestAdjustment memory request,
     PositionUtils.TraderCallParams calldata traderCallParams,
-    address[] calldata puppetList
+    address[] calldata puppetList,
+    address subaccountAddress
 ) internal;
 ```
 
@@ -36,7 +55,6 @@ function increase(
 
 ```solidity
 function matchUp(
-    CallConfig memory callConfig,
     PositionStore.RequestAdjustment memory request,
     MatchCallParams memory callParams,
     PositionUtils.TraderCallParams calldata traderCallParams,
@@ -49,7 +67,6 @@ function matchUp(
 
 ```solidity
 function adjust(
-    CallConfig memory callConfig,
     PositionStore.RequestAdjustment memory request,
     PositionStore.MirrorPosition memory mirrorPosition,
     AdjustCallParams memory callParams,
@@ -62,7 +79,6 @@ function adjust(
 
 ```solidity
 function _createOrder(
-    CallConfig memory callConfig,
     PositionStore.RequestAdjustment memory request,
     PositionUtils.TraderCallParams calldata traderCallParams,
     address subaccountAddress,
@@ -75,40 +91,60 @@ function _createOrder(
 
 ```solidity
 function _reducePuppetSizeDelta(
-    CallConfig memory callConfig,
     PositionUtils.TraderCallParams calldata traderCallParams,
     address subaccountAddress,
-    uint puppetReduceSizeDelta
+    uint puppetReduceSizeDelta,
+    bytes32 positionKey
 ) internal returns (bytes32 requestKey);
 ```
 
+### setConfig
+
+
+```solidity
+function setConfig(CallConfig memory _callConfig) external auth;
+```
+
+### _setConfig
+
+
+```solidity
+function _setConfig(CallConfig memory _callConfig) internal;
+```
+
 ## Events
+### RequestIncreasePosition__SetConfig
+
+```solidity
+event RequestIncreasePosition__SetConfig(uint timestamp, CallConfig callConfig);
+```
+
 ### RequestIncreasePosition__Match
 
 ```solidity
-event RequestIncreasePosition__Match(address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, address[] puppetList);
-```
-
-### RequestIncreasePosition__Request
-
-```solidity
-event RequestIncreasePosition__Request(
-    PositionStore.RequestAdjustment request,
+event RequestIncreasePosition__Match(
+    address trader,
     address subaccount,
     bytes32 positionKey,
     bytes32 requestKey,
-    uint sizeDelta,
-    uint collateralDelta,
+    uint transactionCost,
+    address[] puppetList,
     uint[] puppetCollateralDeltaList
+);
+```
+
+### RequestIncreasePosition__Adjust
+
+```solidity
+event RequestIncreasePosition__Adjust(
+    address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, uint transactionCost, uint[] puppetCollateralDeltaList
 );
 ```
 
 ### RequestIncreasePosition__RequestReducePuppetSize
 
 ```solidity
-event RequestIncreasePosition__RequestReducePuppetSize(
-    address trader, address subaccount, bytes32 requestKey, bytes32 reduceRequestKey, uint sizeDelta
-);
+event RequestIncreasePosition__RequestReducePuppetSize(address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, uint sizeDelta);
 ```
 
 ## Errors
@@ -134,6 +170,12 @@ error RequestIncreasePosition__UnsortedPuppetList();
 
 ```solidity
 error RequestIncreasePosition__DuplicatesInPuppetList();
+```
+
+### RequestIncreasePosition__SenderNotMatchingTrader
+
+```solidity
+error RequestIncreasePosition__SenderNotMatchingTrader();
 ```
 
 ## Structs
@@ -162,7 +204,6 @@ struct CallConfig {
 ```solidity
 struct MatchCallParams {
     address subaccountAddress;
-    bytes32 positionKey;
     PuppetStore.Rule[] ruleList;
     uint[] activityList;
     uint[] balanceList;
@@ -176,7 +217,6 @@ struct MatchCallParams {
 ```solidity
 struct AdjustCallParams {
     address subaccountAddress;
-    bytes32 positionKey;
     PuppetStore.Rule[] ruleList;
     uint[] activityList;
     uint[] depositList;

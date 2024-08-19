@@ -5,8 +5,8 @@ import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, mergeArray } from "@most/core"
 import { Stream } from "@most/types"
 import { StateStream, filterNull } from "common-utils"
-import { IMarket } from "gmx-middleware-utils"
-import { IMirrorPositionOpen, latestPriceMap } from "puppet-middleware-utils"
+import { getMarketToken, IMarket } from "gmx-middleware-utils"
+import { IMirrorSeed, latestPriceMap } from "puppet-middleware-utils"
 import { $IntermediatePromise } from "ui-components"
 import * as viem from "viem"
 import { $entry, $positionPnl, $sizeAndLiquidation } from "../../common/$common.js"
@@ -20,15 +20,15 @@ import { ITradeParams } from "./$PositionEditor.js"
 
 interface IPositionListDetails {
   chain: viem.Chain
-  openPositionListQuery: Stream<Promise<IMirrorPositionOpen[]>>
+  openPositionListQuery: Stream<Promise<IMirrorSeed[]>>
   tradeState: StateStream<ITradeParams>
   $container: NodeComposeFn<$Node>
   requestTrade: Stream<IRequestTrade>
-  mirrorPosition: Stream<IMirrorPositionOpen | null>
+  mirrorPosition: Stream<IMirrorSeed | null>
 }
 export const $PositionListDetails = (config: IPositionListDetails) => component((
-  [switchPosition, switchPositionTether]: Behavior<any, IMirrorPositionOpen>,
-  [clickClose, clickCloseTeter]: Behavior<any, IMirrorPositionOpen>,
+  [switchPosition, switchPositionTether]: Behavior<any, IMirrorSeed>,
+  [clickClose, clickCloseTeter]: Behavior<any, IMirrorSeed>,
 
   [changeMarket, changeMarketTether]: Behavior<IMarket>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean>,
@@ -44,7 +44,8 @@ export const $PositionListDetails = (config: IPositionListDetails) => component(
         $$done: map(posList => {
           return $column(layoutSheet.spacing, style({ flex: 1 }))(
             ...posList.map(mp => {
-              const positionMarkPrice = map(pm => pm[mp.position.indexToken].min, latestPriceMap)
+
+
               // const cumulativeFee = vault.read('cumulativeFundingRates', pos.collateralToken)
               // const pnl = map(params => {
               //   const delta = getPnL(pos.isLong, pos.averagePrice, params.positionMarkPrice.min, pos.size)
@@ -61,7 +62,7 @@ export const $PositionListDetails = (config: IPositionListDetails) => component(
                   $ButtonPrimary({
                     $content: $entry(mp),
                     $container: $defaultMiniButtonSecondary(
-                      styleBehavior(map(activePositionSlot => ({ backgroundColor: activePositionSlot.position.key === mp.position.key ? pallete.primary : pallete.middleground }), filterNull(mirrorPosition))),
+                      styleBehavior(map(activePositionSlot => ({ backgroundColor: activePositionSlot.key === mp.key ? pallete.primary : pallete.middleground }), filterNull(mirrorPosition))),
                       style({ borderRadius: '20px', borderColor: 'transparent',  })
                     )
                   })({
@@ -69,7 +70,7 @@ export const $PositionListDetails = (config: IPositionListDetails) => component(
                       constant(mp),
                     )
                   }),
-                  $sizeAndLiquidation(mp, positionMarkPrice),
+                  $sizeAndLiquidation(mp),
                   $positionPnl(mp),
                   $ButtonSecondary({
                     $content: $text('Close'),
@@ -105,8 +106,8 @@ export const $PositionListDetails = (config: IPositionListDetails) => component(
         switchPosition,
         // clickClose
       ]),
-      changeMarketToken: map((posSlot) => posSlot.position.market, switchPosition),
-      switchIsLong: map(params => params.switchPosition.position.isLong, combineObject({ switchPosition })),
+      changeMarketToken: map((posSlot) => posSlot.market, switchPosition),
+      switchIsLong: map(params => params.switchPosition.isLong, combineObject({ switchPosition })),
       switchIsIncrease: mergeArray([
         constant(true, switchPosition),
         constant(false, clickClose)

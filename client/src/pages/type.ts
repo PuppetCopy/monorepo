@@ -3,7 +3,7 @@ import { Stream } from '@most/types'
 import { IntervalTime } from 'common-utils'
 import * as GMX from 'gmx-middleware-const'
 import { IPriceTickListMap } from 'gmx-middleware-utils'
-import { IMirrorPositionOpen, IMirrorPositionSettled, ISetRouteType } from 'puppet-middleware-utils'
+import { IMirrorSeed, IMirror, ISetRouteType } from 'puppet-middleware-utils'
 import * as viem from 'viem'
 import * as walletLink from "wallet"
 
@@ -34,8 +34,8 @@ export interface IUserActivityParams {
 }
 
 export interface IPositionActivityParams {
-  settledPositionListQuery: Stream<Promise<IMirrorPositionSettled[]>>
-  openPositionListQuery: Stream<Promise<IMirrorPositionOpen[]>>
+  settledPositionListQuery: Stream<Promise<IMirror[]>>
+  openPositionListQuery: Stream<Promise<IMirrorSeed[]>>
 }
 
 

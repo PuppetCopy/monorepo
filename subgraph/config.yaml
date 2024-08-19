@@ -17,7 +17,7 @@ contracts:
       - event: EventLog2
 networks:
   - id: 42161
-    start_block: 243453838
+    start_block: 244150002
     contracts:
       - name: GMX_EventEmitter #A reference to the global contract definition
         address: 0xC8ee91A54287DB53897056e12D9819156D3822Fb

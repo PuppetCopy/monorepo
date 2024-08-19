@@ -57,7 +57,7 @@ export async function writeBatchSubscribe(
   const allowances = subscribeParamList.map(x => x.allowance)
   const expiries = subscribeParamList.map(x => x.expiry)
   const traders = subscribeParamList.map(a => a.trader)
-  const routeTypeKeys = subscribeParamList.map(x => x.routeTypeKey)
+  const routeTypeKeys = subscribeParamList.map(x => x.trader)
 
   return walletLink.writeContract({
     ...contractDefs.Orchestrator,

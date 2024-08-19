@@ -3,13 +3,13 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map } from "@most/core"
 import { getTimeSince, readableDate } from "common-utils"
-import { IMirrorPosition, IMirrorPositionOpen, IMirrorPositionSettled, getParticiapntMpPortion, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorAbstract, IMirrorSeed, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { arbitrum } from "viem/chains"
 import { $entry, $positionPnl, $puppets, $size, $sizeAndLiquidation } from "../../common/$common.js"
 import { $txnIconLink } from "../../common/elements/$common"
-import { isPositionSettled } from "gmx-middleware-utils"
+import { IPosition, IPositionAbstract, IPositionOpen, isPositionSettled } from "gmx-middleware-utils"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -18,22 +18,21 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $c
 )
 
 
-export const slotSizeColumn = <T extends IMirrorPositionOpen>(puppet?: viem.Address): TableColumn<T> => ({
+export const slotSizeColumn = <T extends IMirrorSeed>(puppet?: viem.Address): TableColumn<T> => ({
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {
-    const latestPrice = map(pm => pm[mp.position.indexToken].min, latestPriceMap)
 
-    return $sizeAndLiquidation(mp, latestPrice, puppet)
+    return $sizeAndLiquidation(mp, puppet)
   })
 })
 
-export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> => ({
+export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorSeed> => ({
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {
-    const size = getParticiapntMpPortion(mp, mp.position.maxSizeUsd, puppet)
-    const collateral = getParticiapntMpPortion(mp, mp.position.maxCollateralUsd, puppet)
+    const size = getParticiapntPortion(mp, mp.maxSizeUsd, puppet)
+    const collateral = getParticiapntPortion(mp, mp.maxCollateralUsd, puppet)
 
     return $size(size, collateral)
   })
@@ -42,22 +41,22 @@ export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPos
 
 
 
-export const entryColumn: TableColumn<IMirrorPositionSettled | IMirrorPositionOpen> = {
+export const entryColumn: TableColumn<IPositionAbstract> = {
   $head: $text('Entry'),
   $bodyCallback: map(pos => {
     return $entry(pos)
   })
 }
 
-export const puppetsColumn = <T extends {puppets: readonly `0x${string}`[]}>(click: Tether<INode, string>): TableColumn<T> => ({
+export const puppetsColumn = <T extends IMirrorAbstract>(click: Tether<INode, string>): TableColumn<T> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
-    return $puppets(pos.puppets, click)
+    return $puppets(pos.mirror?.puppetList, click)
   })
 })
 
-export const pnlColumn = <T extends IMirrorPositionOpen>(puppet?: viem.Address): TableColumn<T> => ({
+export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorAbstract> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '90px',
   columnOp: style({ placeContent: 'flex-end' }),
@@ -67,7 +66,7 @@ export const pnlColumn = <T extends IMirrorPositionOpen>(puppet?: viem.Address):
 })
 
 
-export const positionTimeColumn: TableColumn<IMirrorPositionSettled | IMirrorPositionOpen>  = {
+export const positionTimeColumn: TableColumn<IPosition | IPositionOpen>  = {
   $head: $text('Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map((pos) => {

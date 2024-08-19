@@ -17,16 +17,13 @@ import { $Dropdown } from "../form/$Dropdown"
 
 interface IRouteSubscriptionEditor {
   expiry: bigint
-  tradeRoute: viem.Hex
   trader: viem.Address
-  routeTypeKey: viem.Hex
   routeTypeList?: ISetRouteType[]
 }
 
 export interface IChangeSubscription {
   expiry: bigint
   allowance: bigint
-  routeTypeKey: viem.Hex
   trader: viem.Address
   previousSubscriptionExpiry: bigint
 }
@@ -39,7 +36,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
   [changeRouteTypeKey, changeRouteTypeKeyTether]: Behavior<any, viem.Hex>,
 ) => {
 
-  const { trader, routeTypeList, tradeRoute, walletClientQuery } = config
+  const { trader, routeTypeList,  walletClientQuery } = config
 
   const allowance = mergeArray([
     switchMap(async walletQuery => {
@@ -48,7 +45,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
         return ''
       }
 
-      const amount = await readPuppetAllowance(wallet, wallet.account.address, config.tradeRoute)
+      const amount = await readPuppetAllowance(wallet, wallet.account.address)
       return amount || ''
     }, walletClientQuery),
     inputAllowance
@@ -60,7 +57,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
     inputEndDate
   ])
 
-  const routeTypeKey = startWith(config.routeTypeKey, changeRouteTypeKey)
+  const routeTypeKey = startWith('0x', changeRouteTypeKey)
   
   const form = combineObject({
     allowance,

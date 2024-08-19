@@ -14,10 +14,6 @@ importers:
       envio:
         specifier: 2.0.1
         version: 2.0.1
-    optionalDependencies:
-      generated:
-        specifier: ./generated
-        version: link:generated
     devDependencies:
       '@types/chai':
         specifier: ^4.3.11
@@ -54,7 +50,7 @@ importers:
         version: 0.2.0
       '@rescript/react':
         specifier: 0.12.1
-        version: 0.12.1(react-dom@18.3.1)(react@18.2.0)
+        version: 0.12.1(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       '@ryyppy/rescript-promise':
         specifier: 2.1.0
         version: 2.1.0
@@ -78,10 +74,10 @@ importers:
         version: 3.2.0(react@18.2.0)
       ink-big-text:
         specifier: 1.2.0
-        version: 1.2.0(ink@3.2.0)(react@18.2.0)
+        version: 1.2.0(ink@3.2.0(react@18.2.0))(react@18.2.0)
       ink-spinner:
         specifier: 4.0.3
-        version: 4.0.3(ink@3.2.0)(react@18.2.0)
+        version: 4.0.3(ink@3.2.0(react@18.2.0))(react@18.2.0)
       js-sdsl:
         specifier: 4.4.2
         version: 4.4.2
@@ -108,7 +104,7 @@ importers:
         version: 11.1.0
       rescript-envsafe:
         specifier: 4.2.0
-        version: 4.2.0(rescript-schema@8.0.0)(rescript@11.1.0)
+        version: 4.2.0(rescript-schema@8.0.0(rescript@11.1.0))(rescript@11.1.0)
       rescript-express:
         specifier: 0.4.1
         version: 0.4.1(express@4.19.2)
@@ -1525,7 +1521,7 @@ snapshots:
 
   '@opentelemetry/api@1.9.0': {}
 
-  '@rescript/react@0.12.1(react-dom@18.3.1)(react@18.2.0)':
+  '@rescript/react@0.12.1(react-dom@18.3.1(react@18.2.0))(react@18.2.0)':
     dependencies:
       react: 18.2.0
       react-dom: 18.3.1(react@18.2.0)
@@ -1569,7 +1565,7 @@ snapshots:
   '@types/yoga-layout@1.9.2': {}
 
   abitype@0.9.8(typescript@5.5.4):
-    dependencies:
+    optionalDependencies:
       typescript: 5.5.4
 
   abort-controller@3.0.0:
@@ -1792,6 +1788,7 @@ snapshots:
   debug@4.3.4(supports-color@8.1.1):
     dependencies:
       ms: 2.1.2
+    optionalDependencies:
       supports-color: 8.1.1
 
   decamelize@4.0.0: {}
@@ -2054,14 +2051,14 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  ink-big-text@1.2.0(ink@3.2.0)(react@18.2.0):
+  ink-big-text@1.2.0(ink@3.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       cfonts: 2.10.1
       ink: 3.2.0(react@18.2.0)
       prop-types: 15.8.1
       react: 18.2.0
 
-  ink-spinner@4.0.3(ink@3.2.0)(react@18.2.0):
+  ink-spinner@4.0.3(ink@3.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       cli-spinners: 2.9.2
       ink: 3.2.0(react@18.2.0)
@@ -2436,7 +2433,7 @@ snapshots:
 
   require-directory@2.1.1: {}
 
-  rescript-envsafe@4.2.0(rescript-schema@8.0.0)(rescript@11.1.0):
+  rescript-envsafe@4.2.0(rescript-schema@8.0.0(rescript@11.1.0))(rescript@11.1.0):
     dependencies:
       rescript: 11.1.0
       rescript-schema: 8.0.0(rescript@11.1.0)
@@ -2682,8 +2679,9 @@ snapshots:
       '@scure/bip39': 1.2.1
       abitype: 0.9.8(typescript@5.5.4)
       isows: 1.0.3(ws@8.13.0)
-      typescript: 5.5.4
       ws: 8.13.0
+    optionalDependencies:
+      typescript: 5.5.4
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate

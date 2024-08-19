@@ -9,13 +9,16 @@ import { getBasisPoints, getTokenUsd, lst, readableLeverage, readablePercentage,
 import { TOKEN_SYMBOL } from "gmx-middleware-const"
 import {
   getEntryPrice,
+  getMarketToken,
   getRoughLiquidationPrice,
   getTokenDescription, IAbstractPositionParams,
   IMarket,
+  IPosition,
+  IPositionAbstract,
   isPositionSettled,
   liquidationWeight
 } from "gmx-middleware-utils"
-import { getOpenMpPnL, getParticiapntMpPortion, getSettledMpPnL, IMirrorPosition, IMirrorPositionListSummary, IMirrorPositionOpen, IMirrorPositionSettled, latestPriceMap } from "puppet-middleware-utils"
+import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorAbstract, IMirrorListSummary, IMirrorSeed, IMirror, latestPriceMap } from "puppet-middleware-utils"
 import { $bear, $bull, $infoLabel, $infoTooltip, $Link, $tokenIconMap } from "ui-components"
 import * as viem from "viem"
 import { $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
@@ -40,7 +43,7 @@ export const $midContainer = $column(
 
 export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-    $text(readableUsd(size)),   
+    $text(readableUsd(size)),
     $divider,
     $leverage(size, collateral),
   )
@@ -58,18 +61,21 @@ export const $routeIntent = (isLong: boolean, indexToken: viem.Address) => {
   )
 }
 
-export const $entry = (mp: IMirrorPosition) => {
-  const indexDescription = getTokenDescription(mp.position.indexToken)
+export const $entry = (mp: IPositionAbstract) => {
+  const indexToken = getMarketToken(mp.market).indexToken
+  const indexDescription = getTokenDescription(indexToken)
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'center', placeContent: 'center', fontSize: '.85rem' }))(
-    $routeIntent(mp.position.isLong, mp.position.indexToken),
-    $text(readableUsd(getEntryPrice(mp.position.sizeInUsd, mp.position.sizeInTokens, indexDescription))),
+    $routeIntent(mp.isLong, indexToken),
+    $text(readableUsd(getEntryPrice(mp.sizeInUsd, mp.sizeInTokens, indexDescription))),
   )
 }
 
 export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
+  const indexToken = pos.indexToken
+  // const indexToken = getMarketToken(pos.market).indexToken
   const indexDescription = getTokenDescription(pos.indexToken)
   const collateralDescription = getTokenDescription(pos.collateralToken)
-  
+
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
     $icon({
       svgOps: style({ borderRadius: '50%', padding: '4px', marginRight: '-20px', zIndex: 0, alignItems: 'center', fill: pallete.message, backgroundColor: pallete.horizon }),
@@ -77,11 +83,11 @@ export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
       viewBox: '0 0 32 32',
       width: '24px'
     }),
-    $tokenIcon(pos.indexToken, { width: '36px' }),
+    $tokenIcon(indexToken, { width: '36px' }),
     displayLabel
       ? $column(layoutSheet.spacingTiny)(
         $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
-        $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
+        // $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
       )
       : empty(),
   )
@@ -126,31 +132,33 @@ export const $tokenIcon = (indexToken: viem.Address, IIcon: { width: string } = 
   })
 }
 
-export const $sizeAndLiquidation = (mp: IMirrorPositionOpen, markPrice: Stream<bigint>, puppet?: viem.Address) => {
-  const sizeInUsd = getParticiapntMpPortion(mp, mp.position.sizeInUsd, puppet)
-  const collateralInToken = getParticiapntMpPortion(mp, mp.position.collateralAmount, puppet)
-  const collateralUsd = getTokenUsd(mp.position.link.increaseList[0].collateralTokenPriceMin, collateralInToken)
+export const $sizeAndLiquidation = (mp: IMirrorSeed, puppet?: viem.Address) => {
+  const sizeInUsd = getParticiapntPortion(mp, mp.sizeInUsd, puppet)
+  const collateralInToken = getParticiapntPortion(mp, mp.collateralAmount, puppet)
+  const collateralUsd = getTokenUsd(mp.link.increaseList[0].collateralTokenPriceMin, collateralInToken)
+  const indexToken = getMarketToken(mp.market).indexToken
+  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'flex-end' }))(
     $text(readableUsd(sizeInUsd)),
-    $liquidationSeparator(mp.position.isLong, mp.position.sizeInUsd, mp.position.sizeInTokens, mp.position.collateralAmount, markPrice),
+    $liquidationSeparator(mp.isLong, mp.sizeInUsd, mp.sizeInTokens, mp.collateralAmount, latestPrice),
     $leverage(sizeInUsd, collateralUsd),
   )
 }
 
 
 export const $puppets = (
-  puppets: readonly viem.Address[],
+  puppets?: readonly viem.Address[],
   click?: Tether<INode, string>
 ) => {
 
   // const positionMarkPrice = tradeReader.getLatestPrice(now(pos.indexToken))
   // const cumulativeFee = tradeReader.vault.read('cumulativeFundingRates', pos.collateralToken)
 
-  if (puppets.length === 0) {
+  if (!puppets || puppets.length === 0) {
     return $text(style({ fontSize: '0.85rem', color: pallete.foreground }))('-')
   }
-                
+
   return $row(style({ cursor: 'pointer' }))(
     ...puppets.map(address => {
       if (!click) {
@@ -159,7 +167,7 @@ export const $puppets = (
         )
       }
 
-      
+
       return click(nodeEvent('click'), map(() => {
         const url = `/app/profile/puppet/${address}`
 
@@ -175,7 +183,7 @@ export const $puppets = (
   )
 }
 
-export const $positionPnl = (mp: IMirrorPositionOpen, puppet?: viem.Address) => {
+export const $positionPnl = (mp: IMirrorAbstract, puppet?: viem.Address) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
     $positionSlotPnl(mp, puppet),
     $seperator2,
@@ -230,18 +238,18 @@ export const $PnlPercentageValue = (pnl: Stream<bigint> | bigint, collateral: bi
   )
 }
 
-export const $positionSlotPnl = (mp: IMirrorPositionOpen | IMirrorPositionSettled, puppet?: viem.Address) => {
+export const $positionSlotPnl = (mp: IMirrorSeed | IMirror, puppet?: viem.Address) => {
+  const indexToken = getMarketToken(mp.market).indexToken
+  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
-  const latestPrice = map(pm => pm[mp.position.indexToken].max, latestPriceMap)
-
-  const isSettled = isPositionSettled(mp.position)
+  const isSettled = isPositionSettled(mp)
   const value = isSettled
     ? getSettledMpPnL(mp, puppet)
     : map(price => {
       const openPnl = getOpenMpPnL(mp, price, puppet)
-      return mp.position.realisedPnlUsd + openPnl // - mp.position.cumulativeFee
+      return mp.realisedPnlUsd + openPnl // - mp.position.cumulativeFee
     }, latestPrice)
-    
+
 
   const displayColor = skipRepeats(map(value => {
     return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
@@ -255,16 +263,17 @@ export const $positionSlotPnl = (mp: IMirrorPositionOpen | IMirrorPositionSettle
     )
 }
 
-export const $positionOpenRoi = (mp: IMirrorPositionOpen | IMirrorPositionSettled, puppet?: viem.Address) => {
-  const lstIncrease = lst(mp.position.link.increaseList)
-  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.position.maxCollateralToken)
-  const latestPrice = map(pm => pm[mp.position.indexToken].max, latestPriceMap)
+export const $positionOpenRoi = (mp: IMirrorSeed | IMirror, puppet?: viem.Address) => {
+  const indexToken = getMarketToken(mp.market).indexToken
+  const lstIncrease = lst(mp.link.increaseList)
+  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralToken)
+  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
-  const roi = isPositionSettled(mp.position)
-    ? readablePercentage(getBasisPoints(mp.position.realisedPnlUsd, collateralUsd))
+  const roi = isPositionSettled(mp)
+    ? readablePercentage(getBasisPoints(mp.realisedPnlUsd, collateralUsd))
     : map(markPrice => {
       const delta = getOpenMpPnL(mp, markPrice, puppet)
-      return readablePercentage(getBasisPoints(mp.position.realisedPnlUsd + delta, collateralUsd))
+      return readablePercentage(getBasisPoints(mp.realisedPnlUsd + delta, collateralUsd))
     }, latestPrice)
   return $text(style({ fontSize: '.85rem' }))(roi)
 }
@@ -297,7 +306,7 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
       ? $column(layoutSheet.flex)(
         $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol),
         $text(style({ fontSize: '.75rem', color: pallete.foreground }))(`${longTokenDescription.symbol}/${shortTokenDescription.symbol}`),
-      ): empty(),
+      ) : empty(),
   )
 }
 
@@ -317,7 +326,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 //   // const totalMarginFee = getMarginFees(pos.cumulativeSize)
 
 //   const update = lst(mp.updates)
-  
+
 //   return $column(layoutSheet.spacing, style({ minWidth: '250px' }))(
 //     $row(style({ placeContent: 'space-between' }))(
 //       $text('Net breakdown'),
@@ -328,7 +337,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 //       ),
 //     ),
 //     $column(layoutSheet.spacingSmall)(
-      
+
 //       // $row(style({ placeContent: 'space-between' }))(
 //       //   $text(style({ color: pallete.foreground }))('Margin Fee'),
 //       //   $pnlValue(-totalMarginFee)
@@ -369,15 +378,12 @@ interface ITraderDisplay {
 
 interface ITraderRouteDisplay extends IWalletPageParams {
   trader: viem.Address
-  routeTypeKey: viem.Hex
-  tradeRoute: viem.Hex
-  summary: IMirrorPositionListSummary
-  positionParams: IAbstractPositionParams
+  summary: IMirrorListSummary
 }
 
 
 
-export const $TraderDisplay =  (config: ITraderDisplay) => component((
+export const $TraderDisplay = (config: ITraderDisplay) => component((
   [click, clickTether]: Behavior<any, viem.Address>,
 ) => {
 
@@ -387,7 +393,7 @@ export const $TraderDisplay =  (config: ITraderDisplay) => component((
     $Link({
       $content: $profileDisplay({
         address: trader,
-      // $profileContainer: $defaultBerry(style({ width: '50px' }))
+        // $profileContainer: $defaultBerry(style({ width: '50px' }))
       }),
       route: route.create({ fragment: 'baseRoute' }),
       url: `/app/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`
@@ -399,12 +405,12 @@ export const $TraderDisplay =  (config: ITraderDisplay) => component((
 
 
 
-export const $TraderRouteDisplay =  (config: ITraderRouteDisplay) => component((
+export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, bigint>,
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
 
-  const { walletClientQuery, summary, positionParams, routeTypeKey, tradeRoute, trader } = config
+  const { walletClientQuery, summary, trader } = config
 
   const puppetSubscriptionParams = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -413,7 +419,7 @@ export const $TraderRouteDisplay =  (config: ITraderRouteDisplay) => component((
       return 0n
     }
 
-    const expiry = await readPuppetSubscriptionExpiry(wallet, wallet.account.address, trader, positionParams.collateralToken, positionParams.indexToken, positionParams.isLong)
+    const expiry = await readPuppetSubscriptionExpiry(wallet, wallet.account.address, trader, '0x', '0x', false)
 
     return expiry
   }, walletClientQuery)
@@ -422,19 +428,19 @@ export const $TraderRouteDisplay =  (config: ITraderRouteDisplay) => component((
     $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
       $Popover({
         open: map(expiry => {
-          return $RouteSubscriptionEditor({ expiry, trader, tradeRoute, routeTypeKey, walletClientQuery })({
+          return $RouteSubscriptionEditor({ expiry, trader, walletClientQuery })({
             modifySubscriber: modifySubscribeListTether()
-          }) 
+          })
         }, popRouteSubscriptionEditor),
         dismiss: modifySubscribeList,
         $target: switchMap(expiry => {
           return $ButtonSecondary({
             $content: $row(layoutSheet.spacingTiny, style({ alignItems: 'center' }))(
-              $route(positionParams, false),
+              // $route({ collateralToken: collateralToken, indexToken: collateralToken, isLong: true }, false),
               $puppets(summary.puppets),
               $icon({ $content: $puppetLogo, width: '26px', svgOps: style({ backgroundColor: pallete.background, borderRadius: '50%', padding: '4px', border: `1px solid ${pallete.message}`, marginRight: '-18px' }), viewBox: '0 0 32 32' }),
             ),
-            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '6px 2px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' })) 
+            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '6px 2px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' }))
           })({
             click: popRouteSubscriptionEditorTether(constant(expiry))
           })

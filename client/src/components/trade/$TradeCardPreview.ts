@@ -7,12 +7,12 @@ import { Stream } from "@most/types"
 import { $Baseline, $bear, $bull, $infoTooltipLabel, IMarker } from "ui-components"
 import { filterNull, parseReadableNumber, readableUsd, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams, Time } from "lightweight-charts"
-import { IMirrorPositionSettled, IMirrorPositionOpen } from "puppet-middleware-utils"
+import { IMirror, IMirrorSeed } from "puppet-middleware-utils"
 import { IPerformanceTimeline, getPerformanceTimeline } from "./$ProfilePerformanceGraph.js"
 
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
-  mp: IMirrorPositionSettled | IMirrorPositionOpen,
+  mp: IMirror | IMirrorSeed,
   $container?: NodeComposeFn<$Node>,
   chartConfig?: DeepPartial<ChartOptions>
   latestPrice: Stream<bigint>
@@ -25,8 +25,8 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
   [accountPreviewClick, accountPreviewClickTether]: Behavior<string, string>,
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
 ) => {
-  const openPositionList = config.mp.__typename === 'MirrorPositionOpen' ? [config.mp] : []
-  const settledPositionList = config.mp.__typename === 'MirrorPositionSettled' ? [config.mp] : []
+  const openPositionList = config.mp.__typename === 'PositionOpen' ? [config.mp] : []
+  const settledPositionList = config.mp.__typename === 'Position' ? [config.mp] : []
   const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
   const timeline = getPerformanceTimeline({ ...config, openPositionList, settledPositionList })
   const pnlCrossHairTimeChange = replayLatest(multicast(startWith(null, skipRepeatsWith(((xsx, xsy) => xsx.time === xsy.time), crosshairMove))))
@@ -54,7 +54,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
       shape: 'circle'
     }
   })
-  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.position.link.decreaseList).map((pos): IMarker => {
+  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
     return {
       position: 'inBar',
       color: colorAlpha(pallete.message, .15),
@@ -80,7 +80,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
               $row(
                 style({ borderRadius: '2px', padding: '4px', backgroundColor: pallete.message, })(
                   $icon({
-                    $content: config.mp.position.isLong ? $bull : $bear,
+                    $content: config.mp.isLong ? $bull : $bear,
                     width: '38px',
                     fill: pallete.background,
                     viewBox: '0 0 32 32',
