@@ -1,8 +1,6 @@
-import { GMX_EventEmitter, handlerContext, PositionSettled, PositionOpen } from "generated"
+import { GMX_EventEmitter, handlerContext, Position } from "generated"
 import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, OrderStatus, PLATFORM_STAT_INTERVAL, PRICEFEED_INTERVAL_LIST } from "./const"
 import { getAddressItem, getUintItem, getBytes32Item, EventLog, getAddressItemList, getBoolItem, getIntItem, toBasisPoints } from "./utils"
-
-
 
 // Handler for the NewGreeting event
 GMX_EventEmitter.EventLog1.handler(async ({ event, context }) => {
@@ -35,7 +33,7 @@ const orderStatusMap = {
 
 GMX_EventEmitter.EventLog2.handler(async ({ event, context }) => {
   if (event.params.eventName == "OrderCreated") {
-    context.PositionRequest.set({
+    context.RequestPosition.set({
       account: getAddressItem(event, 0),
       receiver: getAddressItem(event, 1),
       callbackContract: getAddressItem(event, 2),
@@ -127,22 +125,17 @@ async function updatePriceCandle(interval: bigint, timestamp: bigint, token: str
 }
 
 async function onPositionIncrease(event: EventLog, context: handlerContext) {
-  const orderId = getBytes32Item(event, 0)
-  const request = context.PositionRequest.get(orderId)
+  const orderKey = getBytes32Item(event, 0)
+  const request = context.RequestPosition.get(orderKey)
 
   if (!request) {
     context.log.error("PositionRequest not found")
     return
   }
 
-  const account = getAddressItem(event, 0)
-  const market = getAddressItem(event, 1)
-  const collateralToken = getAddressItem(event, 2)
-
-  const orderKey = getBytes32Item(event, 0)
   const positionKey = getBytes32Item(event, 1)
 
-  const openSlot = await context.PositionOpen.get(positionKey)
+  let positionRef = await context.PositionRef.get(positionKey)
 
   const sizeInUsd = getUintItem(event, 0)
   const sizeInTokens = getUintItem(event, 1)
@@ -152,26 +145,44 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
   const collateralTokenPriceMax = getUintItem(event, 10)
   const collateralUsd = collateralAmount * collateralTokenPriceMax
 
-  let positionLinkId
-  if (!openSlot) {
-    context.PositionLink.set({
-      key: positionKey,
+  let position
+
+  if (positionRef) {
+    const storedPosition = await context.Position.get(positionRef.position_id)
+
+    if (!storedPosition) {
+      context.log.error("Position not found")
+      return
+    }
+
+
+    position = {
+      ...storedPosition,
+      sizeInUsd: storedPosition.sizeInUsd + sizeInUsd,
+      sizeInTokens: storedPosition.sizeInTokens + sizeInTokens,
+      collateralAmount: storedPosition.collateralAmount + collateralAmount,
+
+      cumulativeSizeUsd: storedPosition.cumulativeSizeUsd + sizeInUsd,
+      cumulativeSizeToken: storedPosition.cumulativeSizeToken + sizeInTokens,
+      cumulativeCollateralUsd: storedPosition.cumulativeCollateralUsd + collateralUsd,
+      cumulativeCollateralToken: storedPosition.cumulativeCollateralToken + collateralAmount,
+
+      maxSizeUsd: storedPosition.maxSizeUsd > storedPosition.sizeInUsd ? storedPosition.maxSizeUsd : storedPosition.sizeInUsd,
+      maxSizeToken: storedPosition.maxSizeToken > storedPosition.maxSizeToken ? storedPosition.maxSizeToken : storedPosition.maxSizeToken,
+      maxCollateralToken: storedPosition.maxCollateralToken > storedPosition.collateralAmount ? storedPosition.maxCollateralToken : storedPosition.collateralAmount,
+      maxCollateralUsd: storedPosition.maxCollateralUsd > collateralUsd ? storedPosition.maxCollateralUsd : collateralUsd
+    }
+  } else {
+    positionRef = { id: positionKey, position_id: orderKey }
+    context.PositionRef.set(positionRef)
+
+    position = {
       id: orderKey,
-    })
-
-
-    positionLinkId = orderKey
-
-    context.PositionOpen.set({
-      id: positionKey,
-      link_id: orderKey,
       key: positionKey,
 
-      mirror_id: undefined,
-
-      account: account,
-      market: market,
-      collateralToken: collateralToken,
+      account: getAddressItem(event, 0),
+      market: getAddressItem(event, 1),
+      collateralToken: getAddressItem(event, 2),
 
       sizeInUsd: sizeInUsd,
       sizeInTokens: sizeInTokens,
@@ -191,41 +202,25 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
 
       realisedPnlUsd: 0n,
 
-      blockNumber: event.block.number,
-      blockTimestamp: event.block.timestamp,
-      transactionHash: event.transaction.hash,
-      logIndex: event.transaction.transactionIndex
-    })
-  } else {
-    positionLinkId = openSlot.link_id
+      isSettled: false,
+      // mirror_id: undefined,
 
-
-    context.PositionOpen.set({
-      ...openSlot,
-      sizeInUsd: openSlot.sizeInUsd + sizeInUsd,
-      sizeInTokens: openSlot.sizeInTokens + sizeInTokens,
-      collateralAmount: openSlot.collateralAmount + collateralAmount,
-
-      cumulativeSizeUsd: openSlot.cumulativeSizeUsd + sizeInUsd,
-      cumulativeSizeToken: openSlot.cumulativeSizeToken + sizeInTokens,
-      cumulativeCollateralUsd: openSlot.cumulativeCollateralUsd + collateralUsd,
-      cumulativeCollateralToken: openSlot.cumulativeCollateralToken + collateralAmount,
-
-      maxSizeUsd: openSlot.maxSizeUsd > openSlot.sizeInUsd ? openSlot.maxSizeUsd : openSlot.sizeInUsd,
-      maxSizeToken: openSlot.maxSizeToken > openSlot.maxSizeToken ? openSlot.maxSizeToken : openSlot.maxSizeToken,
-      maxCollateralToken: openSlot.maxCollateralToken > openSlot.collateralAmount ? openSlot.maxCollateralToken : openSlot.collateralAmount,
-      maxCollateralUsd: openSlot.maxCollateralUsd > collateralUsd ? openSlot.maxCollateralUsd : collateralUsd
-    })
+      // link_id: orderKey,
+    }
   }
 
-  context.PositionIncrease.set({
-    id: orderId,
-    // feeCollected_id: orderId,
-    link_id: positionLinkId,
+  context.Position.set(position)
 
-    account: account,
-    market: market,
-    collateralToken: collateralToken,
+  context.PositionIncrease.set({
+    id: orderKey,
+    positionKey: position.key,
+
+    // feeCollected_id: orderId,
+    // position_id: positionKey,
+
+    account: position.account,
+    market: position.market,
+    collateralToken: position.collateralToken,
 
     sizeInUsd: sizeInUsd,
     sizeInTokens: sizeInTokens,
@@ -249,33 +244,40 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
 
     isLong: isLong,
 
-    orderKey: orderKey,
-    positionKey: positionKey,
+    orderKey: position.key,
+    // positionKey: positionKey,
 
     blockNumber: event.block.number,
     blockTimestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
-    logIndex: event.transaction.transactionIndex
+    logIndex: event.transaction.transactionIndex,
+
+    position_id: positionRef.id,
+
+    // link_id: position.link_id
   })
 
 }
 
 async function onPositionDecrease(event: EventLog, context: handlerContext) {
-  const orderId = getBytes32Item(event, 0)
-
-  const account = getAddressItem(event, 0)
-  const market = getAddressItem(event, 1)
-  const collateralToken = getAddressItem(event, 2)
-
   const orderKey = getBytes32Item(event, 0)
   const positionKey = getBytes32Item(event, 1)
 
-  const openPosition = await context.PositionOpen.get(positionKey)
+  let positionRef = await context.PositionRef.get(positionKey)
 
-  if (!openPosition) {
-    context.log.error("PositionOpen not found")
+
+  if (!positionRef) {
+    context.log.error("PositionRef not found")
     return
   }
+
+  const storedPosition = await context.Position.get(positionRef?.id)
+
+  if (!storedPosition) {
+    context.log.error("Position not found")
+    return
+  }
+
 
   const sizeInUsd = getUintItem(event, 0)
   const sizeInTokens = getUintItem(event, 1)
@@ -283,41 +285,43 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
 
   const basePnlUsd = getIntItem(event, 1)
 
+  let position
 
   if (sizeInTokens > 0) {
-    context.PositionOpen.set({
-      ...openPosition,
-      sizeInUsd: openPosition.sizeInUsd - sizeInUsd,
-      sizeInTokens: openPosition.sizeInTokens - sizeInTokens,
-      collateralAmount: openPosition.collateralAmount - collateralAmount,
+    position = {
+      ...storedPosition,
+      sizeInUsd: storedPosition.sizeInUsd - sizeInUsd,
+      sizeInTokens: storedPosition.sizeInTokens - sizeInTokens,
+      collateralAmount: storedPosition.collateralAmount - collateralAmount,
 
-      realisedPnlUsd: openPosition.realisedPnlUsd + basePnlUsd,
-    })
+      realisedPnlUsd: storedPosition.realisedPnlUsd + basePnlUsd,
+    }
   } else {
+    context.PositionRef.deleteUnsafe(positionKey)
 
-    const settled = {
-      ...openPosition,
-      realisedPnlUsd: openPosition.realisedPnlUsd + basePnlUsd,
+    position = {
+      ...storedPosition,
+      id: storedPosition.id,
+      realisedPnlUsd: storedPosition.realisedPnlUsd + basePnlUsd,
     }
 
-    context.PositionSettled.set(settled)
-    context.PositionOpen.deleteUnsafe(positionKey)
+    // context.Position.deleteUnsafe(positionKey)
 
     for (let index = 0; index < PLATFORM_STAT_INTERVAL.length; index++) {
       const interval = PLATFORM_STAT_INTERVAL[index]
-      await updateAccountSummary(context, event, interval, ADDRESS_ZERO, settled)
+      await updatePlatformPositionStats(context, event, interval, ADDRESS_ZERO, position)
     }
-
   }
 
-  context.PositionDecrease.set({
-    id: orderId,
-    // feeCollected_id: orderId,
-    link_id: openPosition.link_id,
+  context.Position.set(position)
 
-    account: account,
-    market: market,
-    collateralToken: collateralToken,
+  context.PositionDecrease.set({
+    id: orderKey,
+    // feeCollected_id: orderId,
+
+    account: position.account,
+    market: position.market,
+    collateralToken: position.collateralToken,
 
     sizeInUsd: sizeInUsd,
     sizeInTokens: sizeInTokens,
@@ -349,7 +353,10 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
     blockNumber: event.block.number,
     blockTimestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
-    logIndex: event.transaction.transactionIndex
+    logIndex: event.transaction.transactionIndex,
+
+    position_id: positionRef.id,
+
   })
 
 
@@ -357,15 +364,14 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
 
 
 
-async function updateAccountSummary(context: handlerContext, event: EventLog, interval: bigint, account: string, position: PositionSettled) {
+async function updatePlatformPositionStats(context: handlerContext, event: EventLog, interval: bigint, account: string, position: Position) {
   const timestamp = (BigInt(event.block.timestamp) / interval) * interval
   const id = `${account}:${interval}`
-  const seed = await context.AccountSummary.get(id)
+  const seed = await context.PlatofrmPositionStats.get(id)
 
   if (seed) {
-    context.AccountSummary.set({
+    context.PlatofrmPositionStats.set({
       id,
-      account,
 
       interval,
       timestamp,
@@ -383,9 +389,8 @@ async function updateAccountSummary(context: handlerContext, event: EventLog, in
     })
   } else {
 
-    context.AccountSummary.set({
+    context.PlatofrmPositionStats.set({
       id,
-      account,
 
       interval,
       timestamp,

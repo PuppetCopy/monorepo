@@ -1,9 +1,9 @@
 import { combineArray, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMarketToken, getPositionPnlUsd } from "gmx-middleware-utils"
+import { getMarketToken, getPositionPnlUsd, IPositionAbstract } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { latestPriceMap } from "./graph.js"
-import { IMirrorAbstract, IMirrorListSummary, IMirrorSeed, IMirror } from "./types.js"
+import { IMirrorListSummary } from "./types.js"
 import { factor, lst } from "common-utils"
 
 
@@ -30,7 +30,7 @@ import { factor, lst } from "common-utils"
 // }
 
 export function accountSettledPositionListSummary(
-  tradeList: (IMirror | IMirrorSeed)[],
+  tradeList: IPositionAbstract[],
   puppet?: viem.Address,
 ): IMirrorListSummary {
 

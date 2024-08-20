@@ -1,4 +1,4 @@
-import { ILogTxType, ILogTypeId, IPositionAbstract, IPositionListSummary } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId, IPositionOpen, IPositionAbstract, IPositionListSummary } from "gmx-middleware-utils"
 import * as viem from "viem"
 
 
@@ -13,68 +13,62 @@ export interface IMirrorRequest {
 }
 
 
-export interface MirrorReduceSize extends ILogTxType<'MirrorReduceSize'> {
-  id: string
-  sizeDelta: bigint
-}
+// export interface MirrorReduceSize extends ILogTxType<'MirrorReduceSize'> {
+//   id: string
+//   sizeDelta: bigint
+// }
 
 
 
-export interface IMirrorLink extends ILogTxType<'MirrorLink'> {
-  id: string
-  reduceSizeList: MirrorReduceSize[]
-}
+// export interface IMirrorLink extends ILogTxType<'MirrorLink'> {
+//   id: string
+//   reduceSizeList: MirrorReduceSize[]
+// }
 
-export interface IMirrorMatch extends ILogTxType<'Mirror'> {
-  link: IMirrorLink
+
+
+// export interface IMirrorAbstract extends ILogTxType<'Mirror'> {
+//   key: viem.Hex
+//   account: viem.Address
+
+//   trader: viem.Address
+//   subaccount: viem.Address
+//   positionKey: viem.Hex
+
+//   cumulativeTransactionCost: bigint
+//   amountOut: bigint
+//   profit: bigint
+//   totalPerformanceFee: bigint
+//   traderPerformanceCutoffFee: bigint
+
+//   requestList: IMirrorRequest[]
+//   puppetPositionList: IPuppetPosition[]
+
+//   position: IPositionAbstract
+// }
+
+export interface IPuppetPosition extends ILogTxType<'PuppetPosition'> {
+  account: viem.Address
 
   trader: viem.Address
+  collateralToken: viem.Address
 
-  puppetList: viem.Address[]
-  collateralList: bigint[]
-  cumulativeTransactionCost: bigint
+  subaccount: viem.Address
+  positionKey: viem.Hex
 
-  routeTypeKey: viem.Hex
+  collateral: bigint
+
+  position: IPositionAbstract
+  // mirror: IMirror
 }
 
 
-export interface IMirrorAbstract<TypeName extends 'PositionOpen' | 'PositionSettled' = 'PositionOpen' | 'PositionSettled'> extends IPositionAbstract<TypeName> {
-  mirror: IMirrorMatch
+// export interface IMirrorSeed extends IMirrorAbstract { }
+export interface IMirror extends IPositionAbstract {
+  puppetPositionList: IPuppetPosition[]
 }
 
-export interface IMirrorSeed extends IMirrorAbstract<'PositionOpen'> { }
-export interface IMirror extends IMirrorAbstract<'PositionSettled'> { }
 
-
-export interface ISubscribeTradeRoute extends ILogTxType<'SubscribeTradeRoute'> {
-  allowance: bigint
-  subscriptionExpiry: bigint
-  trader: viem.Address
-  puppet: viem.Address
-  tradeRoute: viem.Address
-  routeTypeKey: viem.Hex
-}
-
-export interface IPuppetPositionOpen extends ILogTxType<'PuppetPositionOpen'> {
-  position: IMirrorSeed
-  puppetTradeRoute: IPuppetTradeRoute
-}
-
-export interface IPuppetPositionSettled extends ILogTxType<'PuppetPositionSettled'> {
-  position: IMirror
-  puppetTradeRoute: IPuppetTradeRoute
-}
-
-export interface IPuppetTradeRoute extends ILogTypeId<'PuppetTradeRoute'> {
-  routeTypeKey: viem.Hex
-  puppet: viem.Address
-  trader: viem.Address
-  tradeRoute: viem.Address
-
-  openList: IPuppetPositionOpen[]
-  settledList: IPuppetPositionSettled[]
-  subscribeList: ISubscribeTradeRoute[]
-}
 
 export interface IMirrorListSummary extends IPositionListSummary {
   puppets: viem.Address[]
@@ -109,16 +103,4 @@ export interface IAccountSummary extends ILogTypeId<'AccountSummary'> {
   lossCount: bigint
   successRate: bigint
 }
-
-
-export type IPuppetSubscritpionParams = {
-  allowance: bigint
-  subscriptionExpiry: bigint
-  routeTypeKey: viem.Hex
-  trader: viem.Address
-}
-
-
-export type IAccountToRouteMap<T> = Record<viem.Address, Record<viem.Hex, T>>
-
 

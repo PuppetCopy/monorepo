@@ -1,4 +1,4 @@
-import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle, IPriceCandleSeed, IPositionOpen } from "../types.js"
+import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPositionOpen, IPriceCandle, IPriceCandleSeed } from "../types.js"
 import { ISchema } from "./query.js"
 
 
@@ -83,7 +83,7 @@ const orderCreated: ISchema<IOrderCreated> = {
   __typename: 'OrderCreated',
 }
 
-const orderStatus: ISchema<IOrderStatus> ={
+const orderStatus: ISchema<IOrderStatus> = {
   id: 'string',
 
   order: orderCreated,
@@ -126,7 +126,7 @@ const positionIncrease: ISchema<IPositionIncrease> = {
   collateralDeltaAmount: 'int256',
   priceImpactUsd: 'int256',
   priceImpactAmount: 'int256',
-  
+
   isLong: 'bool',
 
   orderKey: 'uint256',
@@ -168,7 +168,7 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   priceImpactUsd: 'int256',
   basePnlUsd: 'int256',
   uncappedBasePnlUsd: 'int256',
-  
+
   isLong: 'bool',
 
   orderKey: 'uint256',
@@ -238,13 +238,14 @@ const positionLink: ISchema<IPositionLink> = {
   increaseList: positionIncrease,
   decreaseList: positionDecrease,
   // feeUpdateList: positionFeeUpdate,
- 
+
   __typename: 'PositionLink',
 }
 
-const positionAbstract = {
+
+const position: ISchema<IPositionOpen> = {
   id: 'string',
-  link: positionLink,
+  // link: positionLink,
 
   key: 'string',
 
@@ -270,32 +271,9 @@ const positionAbstract = {
 
   isLong: 'bool',
 
-  blockTimestamp: 'uint256',
-  transactionHash: 'string',
-} as const
-
-const positionOpen: ISchema<IPositionOpen> = {
-  ...positionAbstract,
-  __typename: 'PositionOpen',
-}
-const position: ISchema<IPosition> = { 
-  ...positionAbstract,
-  __typename: 'PositionSettled',
+  __typename: 'Position',
 }
 
-const priceCandleSeed: ISchema<IPriceCandleSeed> = {
-  id: 'string',
-  token: 'address',
-  interval: 'string',
-  timestamp: 'number',
-
-  o: 'uint',
-  h: 'uint',
-  l: 'uint',
-  c: 'uint',
-
-  __typename: 'PriceCandleSeed',
-}
 
 const priceCandle: ISchema<IPriceCandle> = {
   id: 'string',
@@ -312,12 +290,10 @@ const priceCandle: ISchema<IPriceCandle> = {
 }
 
 
-export const schema = { 
+export const schema = {
   orderCreated, orderStatus, positionFeesCollected,
-  position, positionOpen, positionLink,
-  
-  positionIncrease, positionDecrease,
+  position, positionLink, positionFeeUpdate,
 
-  priceCandleSeed, priceCandle,
+  positionIncrease, positionDecrease, priceCandle,
 }
 

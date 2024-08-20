@@ -1,0 +1,766 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_authority",
+        "type": "address",
+        "internalType": "contract IAuthority"
+      },
+      {
+        "name": "_callConfig",
+        "type": "tuple",
+        "internalType": "struct RequestIncreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "wnt",
+            "type": "address",
+            "internalType": "contract IWNT"
+          },
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "router",
+            "type": "address",
+            "internalType": "contract Router"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "puppetStore",
+            "type": "address",
+            "internalType": "contract PuppetStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "limitPuppetList",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "minimumMatchAmount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tokenTransferGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "authority",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IAuthority"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "canCall",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "signatureHash",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "eip712Domain",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "fields",
+        "type": "bytes1",
+        "internalType": "bytes1"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "version",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "chainId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "verifyingContract",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "extensions",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "permissionMap",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "signatureHash",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "proxyIncrease",
+    "inputs": [
+      {
+        "name": "traderCallParams",
+        "type": "tuple",
+        "internalType": "struct PositionUtils.TraderCallParams",
+        "components": [
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "market",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "collateralToken",
+            "type": "address",
+            "internalType": "contract IERC20"
+          },
+          {
+            "name": "isLong",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "executionFee",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "acceptablePrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "triggerPrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "puppetList",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "removePermission",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "functionSig",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setConfig",
+    "inputs": [
+      {
+        "name": "_callConfig",
+        "type": "tuple",
+        "internalType": "struct RequestIncreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "wnt",
+            "type": "address",
+            "internalType": "contract IWNT"
+          },
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "router",
+            "type": "address",
+            "internalType": "contract Router"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "puppetStore",
+            "type": "address",
+            "internalType": "contract PuppetStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "limitPuppetList",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "minimumMatchAmount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tokenTransferGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setPermission",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "functionSig",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "traderIncrease",
+    "inputs": [
+      {
+        "name": "traderCallParams",
+        "type": "tuple",
+        "internalType": "struct PositionUtils.TraderCallParams",
+        "components": [
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "market",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "collateralToken",
+            "type": "address",
+            "internalType": "contract IERC20"
+          },
+          {
+            "name": "isLong",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "executionFee",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "acceptablePrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "triggerPrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "puppetList",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "event",
+    "name": "EIP712DomainChanged",
+    "inputs": [],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestIncreasePosition__Adjust",
+    "inputs": [
+      {
+        "name": "trader",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "subaccount",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "positionKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "requestKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "puppetCollateralDeltaList",
+        "type": "uint256[]",
+        "indexed": false,
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "transactionCost",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestIncreasePosition__Match",
+    "inputs": [
+      {
+        "name": "trader",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "subaccount",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "positionKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "requestKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "puppetList",
+        "type": "address[]",
+        "indexed": false,
+        "internalType": "address[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestIncreasePosition__ReducePuppetSize",
+    "inputs": [
+      {
+        "name": "trader",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "subaccount",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "positionKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "requestKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "sizeDelta",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestIncreasePosition__SetConfig",
+    "inputs": [
+      {
+        "name": "timestamp",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "callConfig",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct RequestIncreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "wnt",
+            "type": "address",
+            "internalType": "contract IWNT"
+          },
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "router",
+            "type": "address",
+            "internalType": "contract Router"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "puppetStore",
+            "type": "address",
+            "internalType": "contract PuppetStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "limitPuppetList",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "minimumMatchAmount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tokenTransferGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "TransferUtils__TokenTransferReverted",
+    "inputs": [
+      {
+        "name": "reason",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "returndata",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "Auth_Unauthorized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ExternalCallUtils__EmptyReceiver",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidShortString",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MathOverflowedMulDiv",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestIncreasePosition__DuplicatesInPuppetList",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestIncreasePosition__MatchRequestPending",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestIncreasePosition__PuppetListLimitExceeded",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestIncreasePosition__SenderNotMatchingTrader",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestIncreasePosition__UnsortedPuppetList",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "StringTooLong",
+    "inputs": [
+      {
+        "name": "str",
+        "type": "string",
+        "internalType": "string"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "TransferUtils__EmptyHoldingAddress",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "TransferUtils__EmptyTokenTranferGasLimit",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "TransferUtils__TokenTransferError",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "receiver",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  }
+]

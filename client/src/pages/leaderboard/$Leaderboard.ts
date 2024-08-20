@@ -5,7 +5,7 @@ import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, empty, map, startWith } from "@most/core"
 import { Stream } from "@most/types"
 import { IntervalTime, getBasisPoints, getMappedValue, groupArrayMany, pagingQuery, readablePercentage, switchMap, unixTimestampNow } from "common-utils"
-import { IPriceTickListMap } from "gmx-middleware-utils"
+import { IPriceTickListMap, isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
 import { IMirrorSeed, IMirrorListSummary, IMirror, ISetRouteType, accountSettledPositionListSummary, openPositionListPnl, queryTraderPositionOpen, queryTraderPositionSettled } from "puppet-middleware-utils"
 import { ISortBy, ScrollRequest, TableColumn, TablePageResponse } from "ui-components"
 import { uiStorage } from "ui-storage"
@@ -79,9 +79,6 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
           return false
         }
 
-        if (mp.__typename === 'PositionOpen') {
-          return true
-        }
 
         return mp.blockTimestamp > filterStartTime
       })
@@ -90,8 +87,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
       const tradeListEntries = Object.values(tradeListMap)
       const filterestPosList: ITableRow[] = tradeListEntries.map(positionList => {
         const summary = accountSettledPositionListSummary(positionList)
-        const openPositionList = positionList.filter(mp => mp.__typename === 'PositionOpen') as IMirrorSeed[]
-        const settledPositionList = positionList.filter(mp => mp.__typename === 'PositionSettled') as IMirror[]
+        const openPositionList = positionList.filter(isPositionOpen) as IMirrorSeed[]
+        const settledPositionList = positionList.filter(isPositionSettled) as IMirror[]
 
         return { account: positionList[0].mirror?.trader || positionList[0].account, summary, openPositionList, settledPositionList, positionList, pricefeedMap }
       })

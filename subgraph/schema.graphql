@@ -11,43 +11,20 @@ type PriceCandle {
   c: BigInt!
 }
 
-type RequestMatchMirrorPosition {
-  id: Bytes!
-  trader: Bytes!
-  subaccount: Bytes!
-  positionKey: Bytes!
-  requestKey: Bytes!
-
-  cumulativeTransactionCost: BigInt!
-  puppetList: [Bytes!]!
-  puppetCollateralDeltaList: [BigInt!]!
-
-  position: Position!
-}
-
 type RequestAdjustMirrorPosition {
-  id: Bytes!
+  id: Bytes! # requestKey
   trader: Bytes!
   subaccount: Bytes!
   positionKey: Bytes!
   requestKey: Bytes!
 
-  cumulativeTransactionCost: BigInt!
   puppetList: [Bytes!]!
-  puppetCollateralDeltaList: [BigInt!]!
-
+  # mirror: MirrorPosition!
   position: Position!
-}
 
-type RequestReduceMirrorPosition {
-  id: Bytes!
-  trader: Bytes!
-  subaccount: Bytes!
-  positionKey: Bytes!
-  requestKey: Bytes!
-  sizeDelta: BigInt!
-
-  position: Position!
+  blockNumber: Int!
+  blockTimestamp: Int!
+  transactionHash: Bytes!
 }
 
 type PuppetPosition {
@@ -56,13 +33,35 @@ type PuppetPosition {
   account: Bytes!
 
   trader: Bytes!
+  collateralToken: Bytes!
+
   subaccount: Bytes!
   positionKey: Bytes!
 
   collateral: BigInt!
 
   position: Position!
+  # mirror: MirrorPosition!
 }
+
+# type MirrorPosition {
+#   id: Bytes!
+#   key: Bytes!
+#   account: Bytes!
+
+#   trader: Bytes!
+#   subaccount: Bytes!
+#   positionKey: Bytes!
+
+#   cumulativeTransactionCost: BigInt!
+#   amountOut: BigInt!
+#   profit: BigInt!
+#   totalPerformanceFee: BigInt!
+#   traderPerformanceCutoffFee: BigInt!
+
+#   requestList: [RequestAdjustMirrorPosition!]! @derivedFrom(field: "position")
+#   puppetPositionList: [PuppetPosition!]! @derivedFrom(field: "position")
+# }
 
 type RequestPosition {
   id: Bytes!
@@ -93,6 +92,8 @@ type RequestPosition {
   isLong: Boolean!
   shouldUnwrapNativeToken: Boolean!
   isFrozen: Boolean!
+
+  # link: PositionLink!
 }
 
 type PositionIncrease {
@@ -176,28 +177,15 @@ type PositionDecrease {
 
   logIndex: Int!
 
+  # position: Position!
+
   position: Position!
 }
 
-type MirrorPosition {
+type PositionRef {
   id: Bytes!
-  key: Bytes!
-  account: Bytes!
-
-  trader: Bytes!
-  subaccount: Bytes!
-  positionKey: Bytes!
-
-  collateral: BigInt!
-
-  match: RequestMatchMirrorPosition!
-
-  adjustList: [RequestAdjustMirrorPosition!]! @derivedFrom(field: "position")
-
-  puppetPositionList: [PuppetPosition!]! @derivedFrom(field: "position")
-  reduceSizeList: [MirrorPositionReduceSize!]! @derivedFrom(field: "position")
-
   position: Position!
+  # mirror: MirrorPosition
 }
 
 type Position {
@@ -227,16 +215,12 @@ type Position {
 
   #
 
-  isSettled: Boolean!
-
-  blockNumber: Int!
-  blockTimestamp: Int!
-  transactionHash: Bytes!
-
-  mirrorPosition: MirrorPosition!
-
   increaseList: [PositionIncrease!]! @derivedFrom(field: "position")
   decreaseList: [PositionDecrease!]! @derivedFrom(field: "position")
+  puppetPositionList: [PuppetPosition!]! @derivedFrom(field: "position")
+
+  isSettled: Boolean!
+  # mirror: MirrorPosition
 }
 
 type PlatofrmPositionStats {

@@ -1,0 +1,506 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_authority",
+        "type": "address",
+        "internalType": "contract IAuthority"
+      },
+      {
+        "name": "_callConfig",
+        "type": "tuple",
+        "internalType": "struct RequestDecreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "authority",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IAuthority"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "canCall",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "signatureHash",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "eip712Domain",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "fields",
+        "type": "bytes1",
+        "internalType": "bytes1"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "version",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "chainId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "verifyingContract",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "extensions",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "permissionMap",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "signatureHash",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "proxyDecrease",
+    "inputs": [
+      {
+        "name": "traderCallParams",
+        "type": "tuple",
+        "internalType": "struct PositionUtils.TraderCallParams",
+        "components": [
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "market",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "collateralToken",
+            "type": "address",
+            "internalType": "contract IERC20"
+          },
+          {
+            "name": "isLong",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "executionFee",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "acceptablePrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "triggerPrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "removePermission",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "functionSig",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setConfig",
+    "inputs": [
+      {
+        "name": "_callConfig",
+        "type": "tuple",
+        "internalType": "struct RequestDecreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setPermission",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "functionSig",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "traderDecrease",
+    "inputs": [
+      {
+        "name": "traderCallParams",
+        "type": "tuple",
+        "internalType": "struct PositionUtils.TraderCallParams",
+        "components": [
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "market",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "collateralToken",
+            "type": "address",
+            "internalType": "contract IERC20"
+          },
+          {
+            "name": "isLong",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "executionFee",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "collateralDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "sizeDelta",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "acceptablePrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "triggerPrice",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "EIP712DomainChanged",
+    "inputs": [],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestDecreasePosition__Decrease",
+    "inputs": [
+      {
+        "name": "trader",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "subaccount",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "positionKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "requestKey",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "traderCollateralDelta",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestDecreasePosition__SetConfig",
+    "inputs": [
+      {
+        "name": "timestamp",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "callConfig",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct RequestDecreasePosition.CallConfig",
+        "components": [
+          {
+            "name": "gmxExchangeRouter",
+            "type": "address",
+            "internalType": "contract IGmxExchangeRouter"
+          },
+          {
+            "name": "positionStore",
+            "type": "address",
+            "internalType": "contract PositionStore"
+          },
+          {
+            "name": "subaccountStore",
+            "type": "address",
+            "internalType": "contract SubaccountStore"
+          },
+          {
+            "name": "gmxOrderReciever",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gmxOrderVault",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "referralCode",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "callbackGasLimit",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "Auth_Unauthorized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidShortString",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestDecreasePosition__SubaccountNotFound",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "StringTooLong",
+    "inputs": [
+      {
+        "name": "str",
+        "type": "string",
+        "internalType": "string"
+      }
+    ]
+  }
+]

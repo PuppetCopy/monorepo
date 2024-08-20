@@ -13,7 +13,7 @@ import {
   getRoughLiquidationPrice,
   getTokenDescription, IAbstractPositionParams,
   IMarket,
-  IPosition,
+  IPositionOpen,
   IPositionAbstract,
   isPositionSettled,
   liquidationWeight

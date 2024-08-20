@@ -36,7 +36,7 @@ export type ILogTxType<T extends string> = ILogTypeId<T> & {
 export type ILogArgs<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.GetEventArgs<TAbi, TEventName, { Required: true }>
 export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.Log<bigint, number, false, ExtractAbiEvent<TAbi, TEventName>, true, TAbi, TEventName> // ILogIndex & ILogOrdered & viem.GetEventArgs<TAbi, TEventName, { Required: true }>
 export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogOrdered & Omit<ILogEvent<TAbi, TEventName>, 'data'>
-export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> & ILogArgs<TAbi, TEventName> 
+export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> & ILogArgs<TAbi, TEventName>
 
 
 export interface ITokenDescription {
@@ -75,39 +75,38 @@ export interface IAbstractPositionParams {
 }
 
 
-
-
-export interface IPositionAbstract<TypeName extends 'PositionOpen' | 'PositionSettled' = 'PositionOpen' | 'PositionSettled'> extends ILogTxType<TypeName> {
-  link: IPositionLink
-
+export interface IPositionAbstract extends ILogTxType<'Position'> {
+  // link: IPositionLink
   key: viem.Hex
-
   account: viem.Address
   market: viem.Address
   collateralToken: viem.Address
-
   sizeInUsd: bigint
   sizeInTokens: bigint
   collateralAmount: bigint
   realisedPnlUsd: bigint
-
   cumulativeSizeUsd: bigint
   cumulativeSizeToken: bigint
   cumulativeCollateralUsd: bigint
   cumulativeCollateralToken: bigint
-
   maxSizeUsd: bigint
   maxSizeToken: bigint
   maxCollateralUsd: bigint
   maxCollateralToken: bigint
-
   isLong: boolean
+
+  increaseList: IPositionIncrease[]
+  decreaseList: IPositionDecrease[]
+
+  isSettled: boolean
 }
 
-export type IPositionOpen = IPositionAbstract<'PositionOpen'>
-export type IPosition = IPositionAbstract<'PositionSettled'>
-
-
+export type IPositionSeed = IPositionAbstract & {
+  isSettled: false
+}
+export type IPositionOpen = IPositionAbstract & {
+  isSettled: true
+}
 
 
 
@@ -165,8 +164,8 @@ export type IPriceLatestMap = Record<viem.Address, IPriceCandleDto>
 export type IPriceCandleListMap = Record<viem.Address, IPriceCandleDto[]>
 export type IPriceOracleMap = Record<viem.Address, IOraclePrice>
 
-export interface IPriceCandle extends IPriceCandleDto, ILogTypeId<'PriceCandle'> {}
-export interface IPriceCandleSeed extends IPriceCandleDto, ILogTypeId<'PriceCandleSeed'> {}
+export interface IPriceCandle extends IPriceCandleDto, ILogTypeId<'PriceCandle'> { }
+export interface IPriceCandleSeed extends IPriceCandleDto, ILogTypeId<'PriceCandleSeed'> { }
 
 
 
@@ -199,7 +198,7 @@ export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEnt
 
 
 export type StreamInputArray<T extends readonly unknown[]> = {
-  [P in keyof T]: Stream<T[P]>;
+  [P in keyof T]: Stream<T[P]>
 }
 
 export type StreamInput<T> = {
@@ -345,7 +344,7 @@ export interface IPriceMinMax {
 }
 
 
-    
+
 export interface IPositionFees {
   referral: PositionReferralFees
   funding: IPositionFundingFees
@@ -449,7 +448,7 @@ export interface IPositionLink extends ILogTypeId<'PositionLink'> {
 }
 
 
-export type IPositionIncrease =  ILogTxType<'PositionIncrease'> & IPositionAddresses & IPositionNumbers & {
+export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddresses & IPositionNumbers & {
   link?: IPositionLink
   order: IOrderStatus
   feeCollected: IPositionFeesCollected
@@ -470,7 +469,7 @@ export type IPositionIncrease =  ILogTxType<'PositionIncrease'> & IPositionAddre
   collateralDeltaAmount: bigint
   priceImpactUsd: bigint
   priceImpactAmount: bigint
-  
+
   isLong: boolean
 
   orderKey: viem.Hex

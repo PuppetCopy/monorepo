@@ -9,7 +9,7 @@ import * as viem from 'viem'
 import { arbitrum } from "viem/chains"
 import { $entry, $positionPnl, $puppets, $size, $sizeAndLiquidation } from "../../common/$common.js"
 import { $txnIconLink } from "../../common/elements/$common"
-import { IPosition, IPositionAbstract, IPositionOpen, isPositionSettled } from "gmx-middleware-utils"
+import { IPositionOpen, IPositionAbstract, IPositionSeed, isPositionSettled } from "gmx-middleware-utils"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -66,7 +66,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorAbstract> =
 })
 
 
-export const positionTimeColumn: TableColumn<IPosition | IPositionOpen>  = {
+export const positionTimeColumn: TableColumn<IPositionOpen | IPositionSeed>  = {
   $head: $text('Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map((pos) => {

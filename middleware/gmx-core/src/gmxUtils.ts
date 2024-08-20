@@ -9,7 +9,7 @@ import {
   mapArrayBy
 } from "gmx-middleware-const"
 import * as viem from "viem"
-import { ILogEvent, IPosition, IPositionOpen, ITokenDescription } from "./types.js"
+import { ILogEvent, IPositionOpen, IPositionAbstract, IPositionSeed, ITokenDescription } from "./types.js"
 import { TEMP_INDEX_TOKEN_MARKET_MAP } from "./common"
 
 
@@ -39,12 +39,12 @@ export function getMarginFees(size: bigint) {
   return size * MARGIN_FEE_BASIS_POINTS / BASIS_POINTS_DIVISOR
 }
 
-export function isPositionSettled(trade: IPositionOpen | IPosition): trade is IPosition {
-  return trade.__typename === 'Position'
+export function isPositionSettled(trade: IPositionAbstract): trade is IPositionOpen {
+  return trade.isSettled === true
 }
 
-export function isPositionOpen(trade: IPositionOpen | IPosition): trade is IPosition {
-  return trade.__typename === 'PositionOpen'
+export function isPositionOpen(trade: IPositionSeed | IPositionOpen): trade is IPositionOpen {
+  return trade.isSettled === false
 }
 
 
