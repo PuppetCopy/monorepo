@@ -36,25 +36,48 @@ export default defineConfig({
         link: '/pages/generated-sources/contracts',
         items: [
           {
+            text: 'Public',
+            items: [
+              {
+                text: 'PositionRouter',
+                link: '/pages/generated-sources/PositionRouter',
+              },
+              {
+                text: 'PuppetRouter',
+                link: '/pages/generated-sources/PuppetRouter',
+              },
+              {
+                text: 'RewardRouter',
+                link: '/pages/generated-sources/RewardRouter',
+              },
+            ]
+          },
+          {
+            text: 'Core',
+            items: [
+
+              {
+                text: 'PuppetToken.sol',
+                link: '/pages/generated-sources/tokenomics/PuppetToken',
+              },
+              {
+                text: 'ContributeLogic.sol',
+                link: '/pages/generated-sources/tokenomics/ContributeLogic',
+              },
+              {
+                text: 'RewardLogic.sol',
+                link: '/pages/generated-sources/tokenomics/RewardLogic',
+              },
+              {
+                text: 'VotingEscrowLogic.sol',
+                link: '/pages/generated-sources/tokenomics/VotingEscrowLogic',
+              }
+            ]
+          },
+          {
             text: 'License',
             link: '/pages/generated-sources/license',
           },
-          {
-            text: 'PuppetToken.sol',
-            link: '/pages/generated-sources/tokenomics/PuppetToken',
-          },
-          {
-            text: 'VotingEscrow.sol',
-            link: '/pages/generated-sources/tokenomics/VotingEscrow',
-          },
-          {
-            text: 'RevenueLogic.sol',
-            link: '/pages/generated-sources/tokenomics/RevenueLogic',
-          },
-          {
-            text: 'RewardLogic.sol',
-            link: '/pages/generated-sources/tokenomics/RewardLogic',
-          }
         ]
       }
     ],

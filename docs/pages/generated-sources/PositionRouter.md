@@ -1,15 +1,15 @@
 # PositionRouter
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/PositionRouter.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/PositionRouter.sol)
 
 **Inherits:**
-Permission, EIP712, ReentrancyGuardTransient, IGmxOrderCallbackReceiver
+CoreContract, ReentrancyGuardTransient, IGmxOrderCallbackReceiver
 
 
 ## State Variables
-### callConfig
+### config
 
 ```solidity
-CallConfig callConfig;
+Config config;
 ```
 
 
@@ -25,16 +25,22 @@ PositionStore positionStore;
 
 
 ```solidity
-constructor(IAuthority _authority, PositionStore _positionStore, CallConfig memory _callConfig)
-    Permission(_authority)
-    EIP712("Position Router", "1");
+constructor(
+    IAuthority _authority,
+    EventEmitter _eventEmitter,
+    PositionStore _positionStore,
+    Config memory _config
+) CoreContract("PositionRouter", "1", _authority, _eventEmitter);
 ```
 
 ### requestTraderIncrease
 
 
 ```solidity
-function requestTraderIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList) external nonReentrant;
+function requestTraderIncrease(
+    PositionUtils.TraderCallParams calldata traderCallParams,
+    address[] calldata puppetList
+) external nonReentrant;
 ```
 
 ### requestTraderDecrease
@@ -48,38 +54,54 @@ function requestTraderDecrease(PositionUtils.TraderCallParams calldata traderCal
 
 
 ```solidity
-function requestProxyIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList, address user)
-    external
-    nonReentrant
-    auth;
+function requestProxyIncrease(
+    PositionUtils.TraderCallParams calldata traderCallParams,
+    address[] calldata puppetList,
+    address user
+) external nonReentrant auth;
 ```
 
 ### requestProxyDecrease
 
 
 ```solidity
-function requestProxyDecrease(PositionUtils.TraderCallParams calldata traderCallParams, address user) external nonReentrant auth;
+function requestProxyDecrease(
+    PositionUtils.TraderCallParams calldata traderCallParams,
+    address user
+) external nonReentrant auth;
 ```
 
 ### afterOrderExecution
 
 
 ```solidity
-function afterOrderExecution(bytes32 key, GmxPositionUtils.Props calldata order, bytes calldata eventData) external nonReentrant auth;
+function afterOrderExecution(
+    bytes32 key,
+    GmxPositionUtils.Props calldata order,
+    bytes calldata eventData
+) external nonReentrant auth;
 ```
 
 ### afterOrderCancellation
 
 
 ```solidity
-function afterOrderCancellation(bytes32 key, GmxPositionUtils.Props calldata order, bytes calldata eventData) external nonReentrant auth;
+function afterOrderCancellation(
+    bytes32 key,
+    GmxPositionUtils.Props calldata order,
+    bytes calldata eventData
+) external nonReentrant auth;
 ```
 
 ### afterOrderFrozen
 
 
 ```solidity
-function afterOrderFrozen(bytes32 key, GmxPositionUtils.Props calldata order, bytes calldata eventData) external nonReentrant auth;
+function afterOrderFrozen(
+    bytes32 key,
+    GmxPositionUtils.Props calldata order,
+    bytes calldata eventData
+) external nonReentrant auth;
 ```
 
 ### executeUnhandledExecutionCallback
@@ -91,10 +113,33 @@ function executeUnhandledExecutionCallback(bytes32 key) external nonReentrant au
 
 ### setConfig
 
+Set the mint rate limit for the token.
+
 
 ```solidity
-function setConfig(CallConfig memory _callConfig) external auth;
+function setConfig(Config calldata _config) external auth;
 ```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`_config`|`Config`|The new rate limit configuration.|
+
+
+### _setConfig
+
+*Internal function to set the configuration.*
+
+
+```solidity
+function _setConfig(Config memory _config) internal;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`_config`|`Config`|The configuration to set.|
+
 
 ### storeUnhandledCallback
 
@@ -106,26 +151,6 @@ function storeUnhandledCallback(
     bytes32 key,
     bytes calldata eventData
 ) internal auth;
-```
-
-### _setConfig
-
-
-```solidity
-function _setConfig(CallConfig memory _callConfig) internal;
-```
-
-## Events
-### PositionRouter__SetConfig
-
-```solidity
-event PositionRouter__SetConfig(uint timestamp, CallConfig callConfig);
-```
-
-### PositionRouter__UnhandledCallback
-
-```solidity
-event PositionRouter__UnhandledCallback(GmxPositionUtils.OrderExecutionStatus status, bytes32 key, GmxPositionUtils.Props order, bytes eventData);
 ```
 
 ## Errors
@@ -142,15 +167,15 @@ error PositionRouter__SenderNotMatchingTrader();
 ```
 
 ## Structs
-### CallConfig
+### Config
 
 ```solidity
-struct CallConfig {
-    RequestIncreasePosition requestIncrease;
-    ExecuteIncreasePosition executeIncrease;
-    RequestDecreasePosition requestDecrease;
-    ExecuteDecreasePosition executeDecrease;
-    ExecuteRevertedAdjustment executeRevertedAdjustment;
+struct Config {
+    RequestIncreasePositionLogic requestIncrease;
+    ExecuteIncreasePositionLogic executeIncrease;
+    RequestDecreasePositionLogic requestDecrease;
+    ExecuteDecreasePositionLogic executeDecrease;
+    ExecuteRevertedAdjustmentLogic executeRevertedAdjustment;
 }
 ```
 

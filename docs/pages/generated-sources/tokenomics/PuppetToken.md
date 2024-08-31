@@ -1,14 +1,16 @@
 # PuppetToken
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/tokenomics/PuppetToken.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/PuppetToken.sol)
 
 **Inherits:**
-Permission, ERC20, IERC20Mintable
+CoreContract, ERC20, IERC20Mintable
 
-An ERC20 token with a mint rate limit designed to mitigate and provide feedback of a potential critical faults or bugs in the minting process.
+An ERC20 token with a mint rate limit designed to mitigate and provide feedback of a
+potential critical faults or bugs in the minting process.
 
-*The limit restricts the quantity of new tokens that can be minted within a given timeframe, proportional to the existing supply.
-The mintCore function in the contract is designed to allocate tokens to the core contributors over time, with the allocation amount decreasing
-as more time passes from the deployment of the contract. This is intended to gradually transfer governance power and incentivises broader ownership.*
+*The limit restricts the quantity of new tokens that can be minted within a given timeframe, proportional to the
+existing supply. The mintCore function in the contract is designed to allocate tokens to the core contributors over
+time, with the allocation amount decreasing as more time passes from the deployment of the contract. This is
+intended to gradually transfer governance power and incentivises broader ownership.*
 
 
 ## State Variables
@@ -78,17 +80,24 @@ uint public mintedCoreAmount = 0;
 ## Functions
 ### constructor
 
-Initializes the contract with authority, configuration, and initial receiver of genesis mint.
+Initializes the contract with authority, configuration, and initial receiver of
+genesis mint.
 
 
 ```solidity
-constructor(IAuthority _authority, Config memory _config, address receiver) Permission(_authority) ERC20("Puppet Test", "PUPPET-TEST");
+constructor(
+    IAuthority _authority,
+    EventEmitter _eventEmitter,
+    Config memory _config,
+    address receiver
+) ERC20("Puppet Test", "PUPPET-TEST") CoreContract("PuppetToken", "1", _authority, _eventEmitter);
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
 |`_authority`|`IAuthority`|The authority contract for permission checks.|
+|`_eventEmitter`|`EventEmitter`||
 |`_config`|`Config`|The initial configuration for mint rate limit.|
 |`receiver`|`address`|The address to receive the genesis mint amount.|
 
@@ -260,20 +269,6 @@ function _setConfig(Config memory _config) internal;
 
 
 ## Events
-### Puppet__SetConfig
-Emitted when the configuration is set or updated.
-
-
-```solidity
-event Puppet__SetConfig(Config config);
-```
-
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`config`|`Config`|The new configuration.|
-
 ### Puppet__MintCore
 Emitted when tokens are minted to the core.
 

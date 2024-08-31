@@ -1,5 +1,5 @@
 # PuppetStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/puppet/store/PuppetStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/puppet/store/PuppetStore.sol)
 
 **Inherits:**
 BankStore
@@ -39,8 +39,12 @@ mapping(address puppet => mapping(address trader => uint) name) public fundingAc
 
 
 ```solidity
-constructor(IAuthority _authority, Router _router, IERC20[] memory _tokenAllowanceCapList, uint[] memory _tokenAllowanceConfigList)
-    BankStore(_authority, _router);
+constructor(
+    IAuthority _authority,
+    Router _router,
+    IERC20[] memory _tokenAllowanceCapList,
+    uint[] memory _tokenAllowanceConfigList
+) BankStore(_authority, _router);
 ```
 
 ### getTokenAllowanceCap
@@ -82,7 +86,12 @@ function increaseBalance(IERC20 _token, address _depositor, uint _value) externa
 
 
 ```solidity
-function increaseBalanceList(IERC20 _token, address _depositor, address[] calldata _accountList, uint[] calldata _valueList) external auth;
+function increaseBalanceList(
+    IERC20 _token,
+    address _depositor,
+    address[] calldata _accountList,
+    uint[] calldata _valueList
+) external auth;
 ```
 
 ### decreaseBalance
@@ -110,7 +119,12 @@ function setRule(bytes32 _key, Rule calldata _rule) external auth;
 
 
 ```solidity
-function decreaseBalanceList(IERC20 _token, address _receiver, address[] calldata _accountList, uint[] calldata _valueList) external auth;
+function decreaseBalanceList(
+    IERC20 _token,
+    address _receiver,
+    address[] calldata _accountList,
+    uint[] calldata _valueList
+) external auth;
 ```
 
 ### getRuleList
@@ -138,7 +152,11 @@ function getFundingActivityList(address trader, address[] calldata puppetList) e
 
 
 ```solidity
-function setFundingActivityList(address trader, address[] calldata puppetList, uint[] calldata _timeList) external auth;
+function setFundingActivityList(
+    address trader,
+    address[] calldata puppetList,
+    uint[] calldata _timeList
+) external auth;
 ```
 
 ### setFundingActivity
@@ -159,10 +177,11 @@ function getFundingActivity(address puppet, address trader) external view return
 
 
 ```solidity
-function getBalanceAndActivityList(IERC20 collateralToken, address trader, address[] calldata _puppetList)
-    external
-    view
-    returns (Rule[] memory _ruleList, uint[] memory _fundingActivityList, uint[] memory _valueList);
+function getBalanceAndActivityList(
+    IERC20 collateralToken,
+    address trader,
+    address[] calldata _puppetList
+) external view returns (Rule[] memory _ruleList, uint[] memory _fundingActivityList, uint[] memory _valueList);
 ```
 
 ### decreaseBalanceAndSetActivityList

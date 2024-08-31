@@ -20,5 +20,5 @@ Bun.js is a fast all-in-one JavaScript runtime and a project manager. Follow the
 
 This project is licensed under multiple licenses:
 
-- For the BSL-licensed parts, see local [LICENSE-BSL](LICENSE) file for details.
+- For the BSL-licensed parts, see local [LICENSE-BSL](LICENSE.md) file for details.
 - For the MIT-licensed parts, see the [LICENSE-MIT (WIKI)](https://en.wikipedia.org/wiki/MIT_License) for details.

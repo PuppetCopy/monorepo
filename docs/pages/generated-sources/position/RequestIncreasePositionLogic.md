@@ -1,15 +1,15 @@
-# RequestIncreasePosition
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/RequestIncreasePosition.sol)
+# RequestIncreasePositionLogic
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/position/RequestIncreasePositionLogic.sol)
 
 **Inherits:**
-Permission, EIP712, ReentrancyGuardTransient
+CoreContract
 
 
 ## State Variables
-### callConfig
+### config
 
 ```solidity
-CallConfig callConfig;
+Config config;
 ```
 
 
@@ -18,24 +18,33 @@ CallConfig callConfig;
 
 
 ```solidity
-constructor(IAuthority _authority, CallConfig memory _callConfig) Permission(_authority) EIP712("Increase Position", "1");
+constructor(
+    IAuthority _authority,
+    EventEmitter _eventEmitter,
+    Config memory _config
+) CoreContract("RequestIncreasePositionLogic", "1", _authority, _eventEmitter);
 ```
 
 ### proxyIncrease
 
 
 ```solidity
-function proxyIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList, address user) external payable auth;
+function proxyIncrease(
+    PositionUtils.TraderCallParams calldata traderCallParams,
+    address[] calldata puppetList,
+    address user
+) external payable auth;
 ```
 
 ### traderIncrease
 
 
 ```solidity
-function traderIncrease(PositionUtils.TraderCallParams calldata traderCallParams, address[] calldata puppetList, address user)
-    external
-    payable
-    auth;
+function traderIncrease(
+    PositionUtils.TraderCallParams calldata traderCallParams,
+    address[] calldata puppetList,
+    address user
+) external payable auth;
 ```
 
 ### increase
@@ -81,8 +90,7 @@ function adjust(
 function _createOrder(
     PositionStore.RequestAdjustment memory request,
     PositionUtils.TraderCallParams calldata traderCallParams,
-    address subaccountAddress,
-    bytes32 positionKey
+    address subaccountAddress
 ) internal returns (bytes32 requestKey);
 ```
 
@@ -102,87 +110,45 @@ function _reducePuppetSizeDelta(
 
 
 ```solidity
-function setConfig(CallConfig memory _callConfig) external auth;
-```
-
-### _setConfig
-
-
-```solidity
-function _setConfig(CallConfig memory _callConfig) internal;
-```
-
-## Events
-### RequestIncreasePosition__SetConfig
-
-```solidity
-event RequestIncreasePosition__SetConfig(uint timestamp, CallConfig callConfig);
-```
-
-### RequestIncreasePosition__Match
-
-```solidity
-event RequestIncreasePosition__Match(
-    address trader,
-    address subaccount,
-    bytes32 positionKey,
-    bytes32 requestKey,
-    uint transactionCost,
-    address[] puppetList,
-    uint[] puppetCollateralDeltaList
-);
-```
-
-### RequestIncreasePosition__Adjust
-
-```solidity
-event RequestIncreasePosition__Adjust(
-    address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, uint transactionCost, uint[] puppetCollateralDeltaList
-);
-```
-
-### RequestIncreasePosition__RequestReducePuppetSize
-
-```solidity
-event RequestIncreasePosition__RequestReducePuppetSize(address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, uint sizeDelta);
+function setConfig(Config memory _config) public auth;
 ```
 
 ## Errors
-### RequestIncreasePosition__PuppetListLimitExceeded
+### RequestIncreasePositionLogic__PuppetListLimitExceeded
 
 ```solidity
-error RequestIncreasePosition__PuppetListLimitExceeded();
+error RequestIncreasePositionLogic__PuppetListLimitExceeded();
 ```
 
-### RequestIncreasePosition__MatchRequestPending
+### RequestIncreasePositionLogic__MatchRequestPending
 
 ```solidity
-error RequestIncreasePosition__MatchRequestPending();
+error RequestIncreasePositionLogic__MatchRequestPending();
 ```
 
-### RequestIncreasePosition__UnsortedPuppetList
+### RequestIncreasePositionLogic__UnsortedPuppetList
 
 ```solidity
-error RequestIncreasePosition__UnsortedPuppetList();
+error RequestIncreasePositionLogic__UnsortedPuppetList();
 ```
 
-### RequestIncreasePosition__DuplicatesInPuppetList
+### RequestIncreasePositionLogic__DuplicatesInPuppetList
 
 ```solidity
-error RequestIncreasePosition__DuplicatesInPuppetList();
+error RequestIncreasePositionLogic__DuplicatesInPuppetList();
 ```
 
-### RequestIncreasePosition__SenderNotMatchingTrader
+### RequestIncreasePositionLogic__SenderNotMatchingTrader
 
 ```solidity
-error RequestIncreasePosition__SenderNotMatchingTrader();
+error RequestIncreasePositionLogic__SenderNotMatchingTrader();
 ```
 
 ## Structs
-### CallConfig
+### Config
 
 ```solidity
-struct CallConfig {
+struct Config {
     IWNT wnt;
     IGmxExchangeRouter gmxExchangeRouter;
     Router router;

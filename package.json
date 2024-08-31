@@ -2,14 +2,14 @@
   "name": "puppet-monorepo",
   "license": "BSL-1.1 and MIT",
   "private": true,
-  "description": "Puppet Frontend Monorepo",
+  "description": "Puppet Monorepo",
   "packageManager": "bun@1.1.22",
   "keywords": [
-    "puppet",
+    "Puppet",
     "Copy Trading",
-    "dex",
-    "ethereum",
-    "arbitrum",
+    "DEX",
+    "Ethereum",
+    "Arbitrum",
     "DeFi"
   ],
   "workspaces": [

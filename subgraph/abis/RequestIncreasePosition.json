@@ -465,28 +465,28 @@
         "internalType": "address"
       },
       {
-        "name": "positionKey",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      },
-      {
         "name": "requestKey",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"
       },
       {
-        "name": "puppetCollateralDeltaList",
-        "type": "uint256[]",
+        "name": "positionKey",
+        "type": "bytes32",
         "indexed": false,
-        "internalType": "uint256[]"
+        "internalType": "bytes32"
       },
       {
         "name": "transactionCost",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
+      },
+      {
+        "name": "puppetCollateralDeltaList",
+        "type": "uint256[]",
+        "indexed": false,
+        "internalType": "uint256[]"
       }
     ],
     "anonymous": false
@@ -508,13 +508,13 @@
         "internalType": "address"
       },
       {
-        "name": "positionKey",
+        "name": "requestKey",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"
       },
       {
-        "name": "requestKey",
+        "name": "positionKey",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"
@@ -524,6 +524,12 @@
         "type": "address[]",
         "indexed": false,
         "internalType": "address[]"
+      },
+      {
+        "name": "puppetCollateralDeltaList",
+        "type": "uint256[]",
+        "indexed": false,
+        "internalType": "uint256[]"
       }
     ],
     "anonymous": false
@@ -545,13 +551,13 @@
         "internalType": "address"
       },
       {
-        "name": "positionKey",
+        "name": "requestKey",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"
       },
       {
-        "name": "requestKey",
+        "name": "positionKey",
         "type": "bytes32",
         "indexed": false,
         "internalType": "bytes32"

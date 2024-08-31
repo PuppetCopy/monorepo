@@ -1,8 +1,7 @@
 import { GMX_EventEmitter, handlerContext, Position } from "generated"
 import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, OrderStatus, PLATFORM_STAT_INTERVAL, PRICEFEED_INTERVAL_LIST } from "./const"
-import { getAddressItem, getUintItem, getBytes32Item, EventLog, getAddressItemList, getBoolItem, getIntItem, toBasisPoints } from "./utils"
+import { getAddressItem, getUintItem, getBytes32Item, GmxEvent, getAddressItemList, getBoolItem, getIntItem, toBasisPoints } from "./utils"
 
-// Handler for the NewGreeting event
 GMX_EventEmitter.EventLog1.handler(async ({ event, context }) => {
   if (event.params.eventName == "OraclePriceUpdate") {
     await onOraclePriceUpdate(event, context)
@@ -76,7 +75,7 @@ GMX_EventEmitter.EventLog2.handler(async ({ event, context }) => {
 
 
 
-async function onOraclePriceUpdate(event: EventLog, context: handlerContext) {
+async function onOraclePriceUpdate(event: GmxEvent, context: handlerContext) {
   const token = getAddressItem(event, 0)
   const price = getUintItem(event, 1)
   const timestamp = getUintItem(event, 2)
@@ -124,7 +123,7 @@ async function updatePriceCandle(interval: bigint, timestamp: bigint, token: str
 
 }
 
-async function onPositionIncrease(event: EventLog, context: handlerContext) {
+async function onPositionIncrease(event: GmxEvent, context: handlerContext) {
   const orderKey = getBytes32Item(event, 0)
   const request = context.RequestPosition.get(orderKey)
 
@@ -199,13 +198,8 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
       maxCollateralUsd: collateralUsd,
 
       isLong: isLong,
-
       realisedPnlUsd: 0n,
-
-      isSettled: false,
-      // mirror_id: undefined,
-
-      // link_id: orderKey,
+      isSettled: false
     }
   }
 
@@ -214,9 +208,6 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
   context.PositionIncrease.set({
     id: orderKey,
     positionKey: position.key,
-
-    // feeCollected_id: orderId,
-    // position_id: positionKey,
 
     account: position.account,
     market: position.market,
@@ -243,9 +234,7 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
     priceImpactAmount: getIntItem(event, 2),
 
     isLong: isLong,
-
     orderKey: position.key,
-    // positionKey: positionKey,
 
     blockNumber: event.block.number,
     blockTimestamp: event.block.timestamp,
@@ -253,13 +242,11 @@ async function onPositionIncrease(event: EventLog, context: handlerContext) {
     logIndex: event.transaction.transactionIndex,
 
     position_id: positionRef.id,
-
-    // link_id: position.link_id
   })
 
 }
 
-async function onPositionDecrease(event: EventLog, context: handlerContext) {
+async function onPositionDecrease(event: GmxEvent, context: handlerContext) {
   const orderKey = getBytes32Item(event, 0)
   const positionKey = getBytes32Item(event, 1)
 
@@ -364,7 +351,7 @@ async function onPositionDecrease(event: EventLog, context: handlerContext) {
 
 
 
-async function updatePlatformPositionStats(context: handlerContext, event: EventLog, interval: bigint, account: string, position: Position) {
+async function updatePlatformPositionStats(context: handlerContext, event: GmxEvent, interval: bigint, account: string, position: Position) {
   const timestamp = (BigInt(event.block.timestamp) / interval) * interval
   const id = `${account}:${interval}`
   const seed = await context.PlatofrmPositionStats.get(id)

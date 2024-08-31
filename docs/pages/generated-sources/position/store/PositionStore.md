@@ -1,5 +1,5 @@
 # PositionStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/store/PositionStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/position/store/PositionStore.sol)
 
 **Inherits:**
 BankStore
@@ -153,7 +153,7 @@ struct RequestMatch {
 ```solidity
 struct RequestAdjustment {
     bytes32 positionKey;
-    uint[] puppetCollateralDeltaList;
+    uint[] collateralDeltaList;
     uint sizeDelta;
     uint collateralDelta;
     uint transactionCost;

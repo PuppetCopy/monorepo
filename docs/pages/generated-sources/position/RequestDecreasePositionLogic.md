@@ -1,15 +1,15 @@
-# RequestDecreasePosition
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/position/RequestDecreasePosition.sol)
+# RequestDecreasePositionLogic
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/position/RequestDecreasePositionLogic.sol)
 
 **Inherits:**
-Permission, EIP712
+CoreContract
 
 
 ## State Variables
-### callConfig
+### config
 
 ```solidity
-CallConfig callConfig;
+Config config;
 ```
 
 
@@ -18,7 +18,11 @@ CallConfig callConfig;
 
 
 ```solidity
-constructor(IAuthority _authority, CallConfig memory _callConfig) Permission(_authority) EIP712("Position Router", "1");
+constructor(
+    IAuthority _authority,
+    EventEmitter _eventEmitter,
+    Config memory _config
+) CoreContract("RequestDecreasePositionLogic", "1", _authority, _eventEmitter);
 ```
 
 ### traderDecrease
@@ -50,43 +54,46 @@ function decrease(
 
 ### setConfig
 
+Set the mint rate limit for the token.
+
 
 ```solidity
-function setConfig(CallConfig memory _callConfig) external auth;
+function setConfig(Config calldata _config) external auth;
 ```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`_config`|`Config`|The new rate limit configuration.|
+
 
 ### _setConfig
 
+*Internal function to set the configuration.*
+
 
 ```solidity
-function _setConfig(CallConfig memory _callConfig) internal;
+function _setConfig(Config memory _config) internal;
 ```
+**Parameters**
 
-## Events
-### RequestDecreasePosition__SetConfig
+|Name|Type|Description|
+|----|----|-----------|
+|`_config`|`Config`|The configuration to set.|
 
-```solidity
-event RequestDecreasePosition__SetConfig(uint timestamp, CallConfig callConfig);
-```
-
-### RequestDecreasePosition__Request
-
-```solidity
-event RequestDecreasePosition__Request(address trader, address subaccount, bytes32 positionKey, bytes32 requestKey, uint traderCollateralDelta);
-```
 
 ## Errors
-### RequestDecreasePosition__SubaccountNotFound
+### RequestDecreasePositionLogic__SubaccountNotFound
 
 ```solidity
-error RequestDecreasePosition__SubaccountNotFound(address user);
+error RequestDecreasePositionLogic__SubaccountNotFound(address user);
 ```
 
 ## Structs
-### CallConfig
+### Config
 
 ```solidity
-struct CallConfig {
+struct Config {
     IGmxExchangeRouter gmxExchangeRouter;
     PositionStore positionStore;
     SubaccountStore subaccountStore;

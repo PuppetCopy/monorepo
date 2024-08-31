@@ -1,36 +1,43 @@
 # RewardStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/9c0e4bd812e2fadc24247bdb9759d2c34c92a190/src/tokenomics/store/RewardStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/store/RewardStore.sol)
 
 **Inherits:**
-Auth
+BankStore
 
 
 ## State Variables
-### userEmissionRewardMap
+### cumulativeRewardPerToken
 
 ```solidity
-mapping(IERC20 token => mapping(address user => UserEmissionCursor)) userEmissionRewardMap;
+uint public cumulativeRewardPerToken;
 ```
 
 
-### tokenEmissionRewardPerTokenCursorMap
+### userRewardCursorMap
 
 ```solidity
-mapping(IERC20 => uint) tokenEmissionRewardPerTokenCursorMap;
+mapping(address user => UserRewardCursor) userRewardCursorMap;
 ```
 
 
-### tokenEmissionRateMap
+### rewardRate
 
 ```solidity
-mapping(IERC20 => uint) tokenEmissionRateMap;
+uint public rewardRate;
 ```
 
 
-### tokenEmissionTimestampMap
+### lastDistributionTimestamp
 
 ```solidity
-mapping(IERC20 => uint) tokenEmissionTimestampMap;
+uint public lastDistributionTimestamp;
+```
+
+
+### emissionRate
+
+```solidity
+EmissionRate public emissionRate;
 ```
 
 
@@ -39,79 +46,74 @@ mapping(IERC20 => uint) tokenEmissionTimestampMap;
 
 
 ```solidity
-constructor(IAuthority _authority, Router _router) Auth(_authority);
+constructor(IAuthority _authority, Router _router) BankStore(_authority, _router);
 ```
 
-### getTokenEmissionRewardPerTokenCursor
+### incrementCumulativePerContribution
 
 
 ```solidity
-function getTokenEmissionRewardPerTokenCursor(IERC20 _token) external view returns (uint);
+function incrementCumulativePerContribution(uint _value) external auth returns (uint);
 ```
 
-### increaseTokenEmissionRewardPerTokenCursor
+### getUserRewardCursor
 
 
 ```solidity
-function increaseTokenEmissionRewardPerTokenCursor(IERC20 _token, uint _amount) external auth returns (uint);
+function getUserRewardCursor(address _user) external view returns (UserRewardCursor memory);
 ```
 
-### getTokenEmissionRate
+### setUserRewardCursor
 
 
 ```solidity
-function getTokenEmissionRate(IERC20 _token) external view returns (uint);
+function setUserRewardCursor(address _user, UserRewardCursor calldata cursor) external auth;
 ```
 
-### setTokenEmissionRate
+### setRewardRate
 
 
 ```solidity
-function setTokenEmissionRate(IERC20 _token, uint _value) external auth;
+function setRewardRate(uint _value) external auth;
 ```
 
-### getTokenEmissionTimestamp
+### setLastDistributionTimestamp
 
 
 ```solidity
-function getTokenEmissionTimestamp(IERC20 _token) external view returns (uint);
+function setLastDistributionTimestamp(uint _value) external auth;
 ```
 
-### setTokenEmissionTimestamp
+### setEmissionRate
 
 
 ```solidity
-function setTokenEmissionTimestamp(IERC20 _token, uint _value) external auth;
+function setEmissionRate(EmissionRate calldata _value) external auth;
 ```
 
-### getUserEmissionReward
+### getEmissionRate
 
 
 ```solidity
-function getUserEmissionReward(IERC20 _token, address _user) external view returns (UserEmissionCursor memory);
-```
-
-### setUserEmissionReward
-
-
-```solidity
-function setUserEmissionReward(IERC20 _token, address _user, UserEmissionCursor calldata cursor) external auth;
-```
-
-## Errors
-### RewardStore__InvalidLength
-
-```solidity
-error RewardStore__InvalidLength();
+function getEmissionRate() external view returns (EmissionRate memory);
 ```
 
 ## Structs
-### UserEmissionCursor
+### UserRewardCursor
 
 ```solidity
-struct UserEmissionCursor {
+struct UserRewardCursor {
     uint rewardPerToken;
     uint accruedReward;
+}
+```
+
+### EmissionRate
+
+```solidity
+struct EmissionRate {
+    uint twa;
+    uint timestamp;
 }
 ```
 

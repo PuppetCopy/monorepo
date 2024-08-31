@@ -5,43 +5,49 @@ field_selection:
   transaction_fields:
     - "hash"
     - "transactionIndex"
+event_decoder: "viem"
 #Global contract definitions that must contain all definitions except
 #addresses. Now you can share a single handler/abi/event definitions
 #for contracts across multiple chains
 contracts:
   - name: GMX_EventEmitter
-    abi_file_path: ./abis/EventEmitter.json
+    abi_file_path: ./abis/GMX_EventEmitter.json
     handler: ./src/gmx.ts
     events:
       - event: EventLog1
       - event: EventLog2
 
-  - name: Puppet_RequestIncreasePosition
-    abi_file_path: ./abis/RequestIncreasePosition.json
+  - name: Puppet_EventEmitter
+    abi_file_path: ./abis/Puppet_EventEmitter.json
     handler: ./src/puppet.ts
     events:
-      - event: RequestIncreasePosition__Match
-      - event: RequestIncreasePosition__Adjust
-      - event: RequestIncreasePosition__ReducePuppetSize
-      - event: RequestIncreasePosition__SetConfig
-  - name: Puppet_RequestDecreasePosition
-    abi_file_path: ./abis/RequestDecreasePosition.json
-    handler: ./src/puppet.ts
-    events:
-      - event: RequestDecreasePosition__Decrease
-      - event: RequestDecreasePosition__SetConfig
-  - name: Puppet_ExecuteIncreasePosition
-    abi_file_path: ./abis/ExecuteIncreasePosition.json
-    handler: ./src/puppet.ts
-    events:
-      - event: ExecuteIncreasePosition__Execute
-      - event: ExecuteIncreasePosition__SetConfig
-  - name: Puppet_ExecuteDecreasePosition
-    abi_file_path: ./abis/ExecuteDecreasePosition.json
-    handler: ./src/puppet.ts
-    events:
-      - event: ExecuteDecreasePosition__Execute
-      - event: ExecuteDecreasePosition__SetConfig
+      - event: Event
+  # - name: Puppet_RequestIncreasePosition
+  #   abi_file_path: ./abis/RequestIncreasePosition.json
+  #   handler: ./src/puppet.ts
+  #   events:
+  #     - event: RequestIncreasePosition__Match
+  #     - event: RequestIncreasePosition__Adjust
+  #     - event: RequestIncreasePosition__ReducePuppetSize
+  #     - event: RequestIncreasePosition__SetConfig
+  # - name: Puppet_RequestDecreasePosition
+  #   abi_file_path: ./abis/RequestDecreasePosition.json
+  #   handler: ./src/puppet.ts
+  #   events:
+  #     - event: RequestDecreasePosition__Decrease
+  #     - event: RequestDecreasePosition__SetConfig
+  # - name: Puppet_ExecuteIncreasePosition
+  #   abi_file_path: ./abis/ExecuteIncreasePosition.json
+  #   handler: ./src/puppet.ts
+  #   events:
+  #     - event: ExecuteIncreasePosition__Execute
+  #     - event: ExecuteIncreasePosition__SetConfig
+  # - name: Puppet_ExecuteDecreasePosition
+  #   abi_file_path: ./abis/ExecuteDecreasePosition.json
+  #   handler: ./src/puppet.ts
+  #   events:
+  #     - event: ExecuteDecreasePosition__Execute
+  #     - event: ExecuteDecreasePosition__SetConfig
 networks:
   - id: 42161
     start_block: 244610000
@@ -49,11 +55,13 @@ networks:
       - name: GMX_EventEmitter
         address: 0xC8ee91A54287DB53897056e12D9819156D3822Fb
 
-      - name: Puppet_RequestIncreasePosition
+      - name: Puppet_EventEmitter
         address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
-      - name: Puppet_RequestDecreasePosition
-        address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
-      - name: Puppet_ExecuteIncreasePosition
-        address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
-      - name: Puppet_ExecuteDecreasePosition
-        address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
+      # - name: Puppet_RequestIncreasePosition
+      #   address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
+      # - name: Puppet_RequestDecreasePosition
+      #   address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
+      # - name: Puppet_ExecuteIncreasePosition
+      #   address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C
+      # - name: Puppet_ExecuteDecreasePosition
+      #   address: 0xf92402bB795Fd7CD08fb83839689DB79099C8c9C

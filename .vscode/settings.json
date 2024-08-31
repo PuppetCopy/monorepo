@@ -12,13 +12,10 @@
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "solidity.formatter": "forge",
-  "security.olympix.project.includePath": "/src",
+  "security.olympix.project.includePath": "/contracts/src",
   "security.olympix.project.analyzeWholeProject": false,
   "[solidity]": {
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
   },
-  "typescript.format.enable": true,
-  "[toml]": {
-    "editor.defaultFormatter": "tamasfe.even-better-toml"
-  }
+  "typescript.format.enable": true
 }

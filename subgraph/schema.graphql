@@ -11,12 +11,40 @@ type PriceCandle {
   c: BigInt!
 }
 
+type RequestIncreasePosition__Match {
+  id: Bytes! # requestKey
+  trader: Bytes!
+  subaccount: Bytes!
+  positionKey: Bytes!
+
+  puppetList: [Bytes!]!
+  puppetCollateralDeltaList: [BigInt!]!
+
+  blockNumber: Int!
+  blockTimestamp: Int!
+  transactionHash: Bytes!
+}
+
+type RequestIncreasePosition__Adjust {
+  id: Bytes! # requestKey
+  trader: Bytes!
+  subaccount: Bytes!
+  positionKey: Bytes!
+
+  transactionCost: BigInt!
+
+  puppetCollateralDeltaList: [BigInt!]!
+
+  blockNumber: Int!
+  blockTimestamp: Int!
+  transactionHash: Bytes!
+}
+
 type RequestAdjustMirrorPosition {
   id: Bytes! # requestKey
   trader: Bytes!
   subaccount: Bytes!
   positionKey: Bytes!
-  requestKey: Bytes!
 
   puppetList: [Bytes!]!
   # mirror: MirrorPosition!
@@ -41,7 +69,6 @@ type PuppetPosition {
   collateral: BigInt!
 
   position: Position!
-  # mirror: MirrorPosition!
 }
 
 # type MirrorPosition {

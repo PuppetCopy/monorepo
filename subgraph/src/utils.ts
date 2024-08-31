@@ -1,64 +1,64 @@
-import { EventLog as EventLogCtx, GMX_EventEmitter_EventLog1_eventArgs } from "generated";
+import { EventLog, GMX_EventEmitter_EventLog1_eventArgs } from "generated";
 import { BASIS_POINTS_DIVISOR } from "./const";
 
-export type EventLog = EventLogCtx<GMX_EventEmitter_EventLog1_eventArgs>
+export type GmxEvent = EventLog<GMX_EventEmitter_EventLog1_eventArgs>
 export type Mutable<T> = {
   -readonly [K in keyof T]: T[K];
 }
 
-export function getAddressItem(log: EventLog, idx: number) {
+export function getAddressItem(log: GmxEvent, idx: number) {
   return log.params.eventData[0][0][idx][1]
 }
 
-export function getAddressItemList(log: EventLog, idx: number) {
+export function getAddressItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[0][1][idx][1]
 }
 
-export function getUintItem(log: EventLog, idx: number) {
+export function getUintItem(log: GmxEvent, idx: number) {
   return log.params.eventData[1][0][idx][1]
 }
 
-export function getUintItemList(log: EventLog, idx: number) {
+export function getUintItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[1][1][idx][1]
 }
 
-export function getIntItem(log: EventLog, idx: number) {
+export function getIntItem(log: GmxEvent, idx: number) {
   return log.params.eventData[2][0][idx][1]
 }
 
-export function getIntItemList(log: EventLog, idx: number) {
+export function getIntItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[2][1][idx][1]
 }
 
-export function getBoolItem(log: EventLog, idx: number) {
+export function getBoolItem(log: GmxEvent, idx: number) {
   return log.params.eventData[3][0][idx][1]
 }
 
-export function getBoolItemList(log: EventLog, idx: number) {
+export function getBoolItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[3][1][idx][1]
 }
 
-export function getBytes32Item(log: EventLog, idx: number) {
+export function getBytes32Item(log: GmxEvent, idx: number) {
   return log.params.eventData[4][0][idx][1]
 }
 
-export function getBytes32ItemList(log: EventLog, idx: number) {
+export function getBytes32ItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[4][1][idx][1]
 }
 
-export function getBytesItem(log: EventLog, idx: number) {
+export function getBytesItem(log: GmxEvent, idx: number) {
   return log.params.eventData[5][0][idx][1]
 }
 
-export function getBytesItemList(log: EventLog, idx: number) {
+export function getBytesItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[5][1][idx][1]
 }
 
-export function getStringItem(log: EventLog, idx: number) {
+export function getStringItem(log: GmxEvent, idx: number) {
   return log.params.eventData[6][0][idx][1]
 }
 
-export function getStringItemList(log: EventLog, idx: number) {
+export function getStringItemList(log: GmxEvent, idx: number) {
   return log.params.eventData[6][1][idx][1]
 }
 
