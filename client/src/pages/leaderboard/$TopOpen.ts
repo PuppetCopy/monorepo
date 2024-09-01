@@ -21,7 +21,7 @@
 
 
 
-//   type IPositionOpen = IPositionMirrorOpen & {
+//   type IPosition = IPositionMirrorOpen & {
 //     pnl: bigint
 //   }
 
@@ -44,7 +44,7 @@
 //   const exploreStore = storage.createStoreScope(rootStoreScope, 'topOpen' as const)
 
 
-//   const sortBy = storage.replayWrite(exploreStore, { direction: 'desc', selector: 'pnl' } as ISortBy<IPositionOpen>, sortByChange, 'sortBy')
+//   const sortBy = storage.replayWrite(exploreStore, { direction: 'desc', selector: 'pnl' } as ISortBy<IPosition>, sortByChange, 'sortBy')
 //   const routeList = map(list => list.map(rt => {
 //     const matchedMemType = ROUTE_DESCRIPTION.find(rtd => getRouteTypeKey(rt.collateralToken, rt.indexToken, rt.isLong) === getRouteTypeKey(rtd.collateralToken, rtd.indexToken, rtd.isLong))
 
@@ -82,7 +82,7 @@
 //           return { ...pos, pnl }
 //         })
 
-//       return pagingQuery({ ...params.sortBy, ...req }, flattenMapMap as IPositionOpen[])
+//       return pagingQuery({ ...params.sortBy, ...req }, flattenMapMap as IPosition[])
 //     }, paging)
 
 
@@ -143,7 +143,7 @@
 //                 })
 //               },
 //               entryColumn,
-//               puppetsColumn<IPositionOpen>(routeChangeTether),
+//               puppetsColumn<IPosition>(routeChangeTether),
 //               {
 //                 ...slotSizeColumn(config.processData),
 //                 sortBy: 'maxSizeUsd'

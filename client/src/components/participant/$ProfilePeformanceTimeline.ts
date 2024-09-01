@@ -11,7 +11,7 @@ import * as viem from "viem"
 import { $LastAtivity } from "../$LastActivity.js"
 import { $labelDisplay } from "ui-components"
 import { $route } from "../../common/$common.js"
-import { IPositionActivityParams, IUserActivityParams, IUserPositionPageParams } from "../../pages/type.js"
+import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { $DropMultiSelect } from "../form/$Dropdown.js"
 import { getPerformanceTimeline } from "../trade/$ProfilePerformanceGraph.js"
 
@@ -21,13 +21,13 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, selectedTradeRouteList, puppet, priceTickMapQuery, routeTypeListQuery, settledPositionListQuery, openPositionListQuery } = config
+  const { activityTimeframe, selectedTradeRouteList, puppet, priceTickMapQuery, settledPositionListQuery, openPositionListQuery } = config
 
   const positionParams = multicast(snapshot(async (params, sampleParams) => {
     const settledPositionList = await sampleParams.settledPositionListQuery
     const openPositionList = await params.openPositionListQuery
 
-    const timeline = getPerformanceTimeline({ 
+    const timeline = getPerformanceTimeline({
       ...params,
       puppet, settledPositionList, openPositionList,
       tickCount: 100,
@@ -36,7 +36,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
     })
 
     return { timeline, openPositionList, settledPositionList }
-  }, combineObject({ activityTimeframe, routeTypeListQuery, priceTickMapQuery, openPositionListQuery }), combineObject({ settledPositionListQuery })))
+  }, combineObject({ activityTimeframe, priceTickMapQuery, openPositionListQuery }), combineObject({ settledPositionListQuery })))
 
 
   return [
@@ -129,7 +129,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
               shape: 'circle'
             }
           })
-          const settledMarkerList = params.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
+          const settledMarkerList = params.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
             return {
               position: 'inBar',
               color: colorAlpha(pallete.message, .5),

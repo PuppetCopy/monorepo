@@ -8,7 +8,7 @@ import { awaitPromises, constant, empty, map, merge, mergeArray, multicast, now,
 import { Stream } from "@most/types"
 import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import { ISetRouteType, queryLatestPriceTick, queryRouteTypeList, subgraphStatus } from "puppet-middleware-utils"
+import { ISetRouteType, queryLatestPriceTick, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
@@ -107,7 +107,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
   const selectedTradeRouteList = replayLatest(multicast(uiStorage.replayWrite(storeDb.store.global, selectTradeRouteList, 'selectedTradeRouteList')))
 
-  const routeTypeListQuery = now(queryRouteTypeList(subgraphClient))
   const priceTickMapQuery = replayLatest(queryLatestPriceTick(subgraphClient, { activityTimeframe, selectedTradeRouteList }, 50))
 
   const subgraphStatusStream = subgraphStatus(subgraphClient)
@@ -200,7 +199,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, routeTypeListQuery, providerClientQuery, activityTimeframe, selectedTradeRouteList, priceTickMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, selectedTradeRouteList, priceTickMapQuery, walletClientQuery })({
                     changeWallet: changeWalletTether(),
                     modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
@@ -211,7 +210,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedTradeRouteList, priceTickMapQuery, routeTypeListQuery })({
+                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedTradeRouteList, priceTickMapQuery })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectTradeRouteList: selectTradeRouteListTether(),
                     routeChange: changeRouteTether(),
@@ -221,7 +220,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, routeTypeListQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectTradeRouteList: selectTradeRouteListTether(),
@@ -264,7 +263,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   return $Trade({
                     providerClientQuery,
                     walletClientQuery,
-                    routeTypeListQuery,
                     chain: chain, referralCode: BLUEBERRY_REFFERAL_CODE, parentRoute: tradeRoute
                   })({
                     changeWallet: changeWalletTether(),
@@ -318,7 +316,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
             $RouteSubscriptionDrawer({
               providerClientQuery,
               walletClientQuery,
-              routeTypeListQuery,
               modifySubscriptionList: replayLatest(modifySubscriptionList, []),
               modifySubscriber,
             })({

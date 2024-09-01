@@ -362,7 +362,7 @@
 //       positionSlot.totalSupply = args.totalSupply
 
 //       // positionSlot.position.cumulativeFee += args.fee
-//       // positionSlot.position.link.decreaseList.push({ ...value.args, blockTimestamp: seed.approximatedTimestamp, transactionHash: value.transactionHash, __typename: 'DecreasePosition' })
+//       // positionSlot.position.decreaseList.push({ ...value.args, blockTimestamp: seed.approximatedTimestamp, transactionHash: value.transactionHash, __typename: 'DecreasePosition' })
 
 //       return seed
 //     },

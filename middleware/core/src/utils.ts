@@ -1,41 +1,21 @@
 import { combineArray, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMarketToken, getPositionPnlUsd, IPositionAbstract } from "gmx-middleware-utils"
+import { getMarketToken, getPositionPnlUsd } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { latestPriceMap } from "./graph.js"
-import { IMirrorListSummary } from "./types.js"
-import { factor, lst } from "common-utils"
+import { IMirrorListSummary, IMirrorPosition, IPosition, IPuppetPosition } from "./types.js"
+import { factor } from "common-utils"
 
-
-// export function extractPricefeedFromPositionList(
-//   positionList: (IMirrorPositionOpen | IMirrorPositionSettled)[]
-// ): IPricetickListMap {
-//   const pricefeedMap: IPricetickListMap = {}
-
-//   for (const mp of positionList) {
-//     const indexToken = mp.position.indexToken
-
-//     const adjustmentList = [...mp.position.link.increaseList, ...mp.position.link.decreaseList]
-//     for (const update of adjustmentList) {
-//       pricefeedMap[indexToken] ??= []
-//       pricefeedMap[indexToken].push({ 
-//         timestamp: Number(update.blockTimestamp),
-//         price: update.indexTokenPriceMin,
-//         token: indexToken
-//       })
-//     }
-//   }
-
-//   return pricefeedMap
-// }
 
 export function accountSettledPositionListSummary(
-  tradeList: IPositionAbstract[],
+  tradeList: IPosition[],
   puppet?: viem.Address,
 ): IMirrorListSummary {
-
+  const fst = tradeList[0]
+  const account = isMirrorPosition(fst) ? fst.mirror.trader : fst.account
 
   const seedAccountSummary: IMirrorListSummary = {
+    account,
     size: 0n,
     collateral: 0n,
     cumulativeLeverage: 0n,
@@ -60,7 +40,7 @@ export function accountSettledPositionListSummary(
     const avgSize = size / idxBn
     const avgCollateral = collateral / idxBn
 
-    // const lstFeeUpdate = lst(next.link.feeUpdateList)
+    // const lstFeeUpdate = lst(next.feeUpdateList)
 
     const fee = seed.fee + getParticiapntPortion(next, 0n, puppet)
     // const fee = seed.fee + getParticiapntPortion(next, lstFeeUpdate.totalCostAmount, puppet)
@@ -69,9 +49,10 @@ export function accountSettledPositionListSummary(
     const winCount = seed.winCount + (next.realisedPnlUsd > 0n ? 1 : 0)
     const lossCount = seed.lossCount + (next.realisedPnlUsd <= 0n ? 1 : 0)
 
-    const puppets = next.mirror ? [...seed.puppets, ...next.mirror.puppetList.filter(x => !seed.puppets.includes(x))] : seed.puppets
+    const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.mirror.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
 
     return {
+      account: seed.account,
       size,
       collateral,
       cumulativeLeverage,
@@ -89,8 +70,12 @@ export function accountSettledPositionListSummary(
   return summary
 }
 
+export function isMirrorPosition(mp: IPosition): mp is IMirrorPosition {
+  return 'mirror' in mp && mp.mirror !== null
+}
+
 export function openPositionListPnl(
-  tradeList: IMirrorSeed[],
+  tradeList: IPosition[],
   puppet?: viem.Address,
 ): Stream<bigint> {
 
@@ -110,38 +95,31 @@ export function openPositionListPnl(
   }, pnlList)
 }
 
-export function getPuppetShare(collateralList: readonly bigint[], puppets: readonly viem.Address[], puppet: viem.Address): bigint {
-  const idx = puppets.indexOf(puppet)
+export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Address): bigint {
+  const position = puppetList.find(p => p.account === puppet)
 
-  if (idx == -1) throw new Error("Puppet not found")
+  if (!position) throw new Error("Puppet not found")
 
-  const share = collateralList[idx]
-
-  if (share === undefined) throw new Error("Puppet share not found")
-
-  return share
+  return position.collateral
 }
 
-export function getParticiapntCollateral(mp: IMirrorAbstract, puppet?: viem.Address): bigint {
-  if (!mp.mirror || !puppet) return mp.collateralAmount
-  if (mp.mirror.puppetList.indexOf(puppet) === -1) throw new Error("Account is not a participant")
-
-  return getPuppetShare(mp.mirror.collateralList, mp.mirror.puppetList, puppet)
+export function getParticiapntCollateral(mp: IMirrorPosition, puppet?: viem.Address): bigint {
+  return puppet ? getPuppetShare(mp.mirror.puppetList, puppet) : mp.collateralAmount
 }
 
-export function getParticiapntPortion(mp: IMirrorAbstract, totalAmount: bigint, puppet?: viem.Address): bigint {
-  const share = getParticiapntCollateral(mp, puppet)
+export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: viem.Address): bigint {
+  const share = isMirrorPosition(mp) ? getParticiapntCollateral(mp, puppet) : mp.collateralAmount
 
   return getPortion(mp.collateralAmount, share, totalAmount)
 }
 
-export function getSettledMpPnL(mp: IMirrorAbstract, puppet?: viem.Address): bigint {
+export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
   const realisedPnl = getParticiapntPortion(mp, mp.realisedPnlUsd, puppet)
 
   return realisedPnl
 }
 
-export function getOpenMpPnL(mp: IMirrorSeed | IMirror, markPrice: bigint, puppet?: viem.Address): bigint {
+export function getOpenMpPnL(mp: IPosition, markPrice: bigint, puppet?: viem.Address): bigint {
   const pnl = getPositionPnlUsd(mp.isLong, mp.sizeInUsd, mp.sizeInTokens, markPrice)
   const openPnl = getParticiapntPortion(mp, pnl, puppet)
   const realisedPnl = getSettledMpPnL(mp, puppet)
@@ -159,8 +137,8 @@ export function getPortion(supply: bigint, share: bigint, amount: bigint): bigin
   }
 }
 
-export function getLastAdjustment(mp: IMirrorAbstract) {
-  const allAdjustmentList = [...mp.link.increaseList, ...mp.link.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp))
+export function getLastAdjustment(mp: IPosition) {
+  const allAdjustmentList = [...mp.increaseList, ...mp.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp))
 
   if (allAdjustmentList.length === 0) {
     throw new Error("position has no updates")

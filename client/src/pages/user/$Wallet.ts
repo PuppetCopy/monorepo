@@ -2,16 +2,15 @@ import { Behavior, combineObject } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
-import { constant, empty, map } from "@most/core"
-import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, getTimeSince, readableFactorPercentage, readableTokenAmount, readableUnitAmount, readableUsd, switchMap } from "common-utils"
+import { map } from "@most/core"
+import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, readableTokenAmount, readableUsd, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { ISetRouteType, queryPuppetTradeRoute, queryTraderPositionOpen, queryTraderPositionSettled } from "puppet-middleware-utils"
+import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltipLabel, $intermediateMessage } from "ui-components"
 import { uiStorage } from "ui-storage"
 import { $heading3 } from "../../common/$text"
 import { $card, $responsiveFlex } from "../../common/elements/$common"
-import { $IntermediateConnectButton } from "../../components/$ConnectWallet.js"
 import { $VestingDetails } from "../../components/$VestingDetails"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import * as storeDb from "../../const/store.js"
@@ -20,9 +19,6 @@ import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
 import { $WalletPuppet } from "./$WalletPuppet.js"
-import { $ButtonSecondary } from "../../components/form/$Button"
-import { getTokenDescription } from "gmx-middleware-utils"
-import { ARBITRUM_ADDRESS } from "gmx-middleware-const"
 import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
 import { subgraphClient } from "../../common/graphClient"
 
@@ -54,7 +50,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
 ) => {
 
   const {
-    route, walletClientQuery, routeTypeListQuery, providerClientQuery,
+    route, walletClientQuery, providerClientQuery,
     activityTimeframe, selectedTradeRouteList, priceTickMapQuery 
   } = config
 
@@ -128,8 +124,8 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
             selectTradeRouteList: selectTradeRouteListTether(),
           })
         } else if (params.profileMode === IWalletTab.TRADER) {
-          const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { activityTimeframe, selectedTradeRouteList, address })
-          const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
+          const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, selectedTradeRouteList, address })
+          const openPositionListQuery = queryPosition(subgraphClient, { address, selectedTradeRouteList })
 
           return $column(layoutSheet.spacingTiny)(
             $TraderPage({ ...config, openPositionListQuery, settledPositionListQuery })({ 

@@ -9,8 +9,8 @@ import {
   mapArrayBy
 } from "gmx-middleware-const"
 import * as viem from "viem"
-import { ILogEvent, IPositionOpen, IPositionAbstract, IPositionSeed, ITokenDescription } from "./types.js"
-import { TEMP_INDEX_TOKEN_MARKET_MAP } from "./common"
+import { ILogEvent, IPosition, ITokenDescription } from "./types.js"
+import { TEMP_INDEX_TOKEN_MARKET_MAP, TEMP_MARKET_TOKEN_MARKET_MAP } from "./common"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
@@ -39,11 +39,11 @@ export function getMarginFees(size: bigint) {
   return size * MARGIN_FEE_BASIS_POINTS / BASIS_POINTS_DIVISOR
 }
 
-export function isPositionSettled(trade: IPositionAbstract): trade is IPositionOpen {
+export function isPositionSettled(trade: IPosition): boolean {
   return trade.isSettled === true
 }
 
-export function isPositionOpen(trade: IPositionSeed | IPositionOpen): trade is IPositionOpen {
+export function isPositionOpen(trade: IPosition | IPosition): trade is IPosition {
   return trade.isSettled === false
 }
 
@@ -78,7 +78,7 @@ export function validateIdentityName(name: string) {
 }
 
 export function getMarketToken(market: viem.Address) {
-  return getMappedValue(TEMP_INDEX_TOKEN_MARKET_MAP, market)
+  return getMappedValue(TEMP_MARKET_TOKEN_MARKET_MAP, market)
 }
 
 export function getTokenDescription(token: viem.Address): ITokenDescription {
@@ -157,8 +157,8 @@ export const abiParamParseMap = {
   'string[]': (x: string[]) => x.map(String),
   number: Number,
   'number[]': (x: number[]) => x.map(Number),
-  'int': Number,
-  'int[]': (x: string[]) => x.map(Number),
+  'int': BigInt,
+  'int[]': (x: string[]) => x.map(BigInt),
   address: viem.getAddress,
   'address[]': (arrx: string[]) => arrx.map(x => viem.getAddress(x)),
   bool: Boolean,

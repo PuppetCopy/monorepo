@@ -1,21 +1,18 @@
 import { Behavior, combineObject } from "@aelea/core"
-import { $element, $text, component, style } from "@aelea/dom"
+import { $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, empty, map, startWith } from "@most/core"
 import { Stream } from "@most/types"
 import { IntervalTime, getBasisPoints, getMappedValue, groupArrayMany, pagingQuery, readablePercentage, switchMap, unixTimestampNow } from "common-utils"
 import { IPriceTickListMap, isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
-import { IMirrorSeed, IMirrorListSummary, IMirror, ISetRouteType, accountSettledPositionListSummary, openPositionListPnl, queryTraderPositionOpen, queryTraderPositionSettled } from "puppet-middleware-utils"
+import { IMirrorListSummary, ISetRouteType, accountSettledPositionListSummary, openPositionListPnl, queryPosition, IPosition } from "puppet-middleware-utils"
 import { ISortBy, ScrollRequest, TableColumn, TablePageResponse } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $labelDisplay } from "ui-components"
-import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $route, $size } from "../../common/$common.js"
+import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $size } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
 import { $CardTable } from "../../components/$common"
-import { $DropMultiSelect } from "../../components/form/$Dropdown.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { $ProfilePerformanceGraph } from "../../components/trade/$ProfilePerformanceGraph.js"
@@ -29,10 +26,9 @@ import { subgraphClient } from "../../common/graphClient"
 
 type ITableRow = {
   summary: IMirrorListSummary
-  account: viem.Address
-  openPositionList: IMirrorSeed[]
-  settledPositionList: IMirror[]
-  positionList: (IMirror | IMirrorSeed)[]
+  openPositionList: IPosition[]
+  settledPositionList: IPosition[]
+  positionList: IPosition[]
   pricefeedMap: IPriceTickListMap
 }
 
@@ -50,7 +46,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   [switchIsLong, switchIsLongTether]: Behavior<boolean | null>,
 ) => {
 
-  const { activityTimeframe, selectedTradeRouteList, walletClientQuery, priceTickMapQuery, route, routeTypeListQuery } = config
+  const { activityTimeframe, selectedTradeRouteList, walletClientQuery, priceTickMapQuery, route } = config
 
   const sortBy = uiStorage.replayWrite(storeDb.store.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(storeDb.store.leaderboard, switchIsLong, 'isLong')
@@ -59,42 +55,39 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   const pageParms = map(params => {
     const requestPage = { ...params.sortBy, offset: 0, pageSize: 20 }
     const page = startWith(requestPage, scrollRequest)
-    const openPositionListQuery = queryTraderPositionOpen(subgraphClient, {})
-    const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { activityTimeframe: params.activityTimeframe })
+    const positionListQuery = queryPosition(subgraphClient, {})
 
 
     const dataSource: Stream<TablePageResponse<ITableRow>> = awaitPromises(map(async reqParams => {
-      const openPositionList = await reqParams.openPositionListQuery
-      const settledPositionList = await reqParams.settledPositionListQuery
+      const positionList = await reqParams.positionListQuery
       const pricefeedMap = await params.priceTickMapQuery
-      const allPositionList = [...openPositionList, ...settledPositionList]
       const filterStartTime = unixTimestampNow() - params.activityTimeframe
 
-      const filteredList = allPositionList.filter(mp => {
+      const filteredList = positionList.filter(mp => {
         if (params.isLong !== null && params.isLong !== mp.isLong) {
           return false
         }
 
-        if (params.selectedTradeRouteList.length && params.selectedTradeRouteList.findIndex(rt => rt.routeTypeKey === mp.mirror.routeTypeKey) === -1) {
+        if (params.selectedTradeRouteList.length) {
           return false
         }
 
 
-        return mp.blockTimestamp > filterStartTime
+        return mp.increaseList[0].blockTimestamp > filterStartTime
       })
 
       const tradeListMap = groupArrayMany(filteredList, a => a.key)
       const tradeListEntries = Object.values(tradeListMap)
       const filterestPosList: ITableRow[] = tradeListEntries.map(positionList => {
         const summary = accountSettledPositionListSummary(positionList)
-        const openPositionList = positionList.filter(isPositionOpen) as IMirrorSeed[]
-        const settledPositionList = positionList.filter(isPositionSettled) as IMirror[]
+        const openPositionList = positionList.filter(isPositionOpen) as IPosition[]
+        const settledPositionList = positionList.filter(isPositionSettled) as IPosition[]
 
-        return { account: positionList[0].mirror?.trader || positionList[0].account, summary, openPositionList, settledPositionList, positionList, pricefeedMap }
+        return { summary, openPositionList, settledPositionList, positionList, pricefeedMap }
       })
 
       return pagingQuery({ ...reqParams.page, ...reqParams }, filterestPosList)
-    }, combineObject({ page, openPositionListQuery, settledPositionListQuery })))
+    }, combineObject({ page, positionListQuery })))
 
 
     return { ...params, dataSource }
@@ -108,25 +101,25 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
       $card2(style({ padding: "0", gap: 0 }))(
         $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'flex-start' }))(
-          $DropMultiSelect({
-            // $container: $row(layoutSheet.spacingTiny, style({ display: 'flex', position: 'relative' })),
-            $input: $element('input')(style({ width: '100px' })),
-            $label: $labelDisplay(style({ color: pallete.foreground }))('Route'),
-            placeholder: 'All / Select',
-            getId: item => item.routeTypeKey,
-            $$chip: map(tr => $route(tr, false)),
-            selector: {
-              list: awaitPromises(routeTypeListQuery),
-              $$option: map(tr => {
-                return style({
-                  padding: '8px'
-                }, $route(tr, true))
-              })
-            },
-            value: selectedTradeRouteList
-          })({
-            select: selectTradeRouteListTether()
-          }),
+          // $DropMultiSelect({
+          //   // $container: $row(layoutSheet.spacingTiny, style({ display: 'flex', position: 'relative' })),
+          //   $input: $element('input')(style({ width: '100px' })),
+          //   $label: $labelDisplay(style({ color: pallete.foreground }))('Route'),
+          //   placeholder: 'All / Select',
+          //   getId: item => item.routeTypeKey,
+          //   $$chip: map(tr => $route(tr, false)),
+          //   selector: {
+          //     list: awaitPromises(routeTypeListQuery),
+          //     $$option: map(tr => {
+          //       return style({
+          //         padding: '8px'
+          //       }, $route(tr, true))
+          //     })
+          //   },
+          //   value: selectedTradeRouteList
+          // })({
+          //   select: selectTradeRouteListTether()
+          // }),
 
           // $ButtonToggle({
           //   // $container: $row(layoutSheet.spacingSmall),
@@ -198,14 +191,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 return $row(style({ alignItems: 'center' }))(
                   $TraderDisplay({
                     route: config.route,
-                    trader: pos.account,
+                    trader: pos.summary.account,
                   })({
                     click: routeChangeTether()
                   }),
                   $TraderRouteDisplay({
                     walletClientQuery,
                     summary: pos.summary,
-                    trader: pos.account
+                    trader: pos.summary.account
                   })({
                     modifySubscribeList: modifySubscriberTether()
                   }),

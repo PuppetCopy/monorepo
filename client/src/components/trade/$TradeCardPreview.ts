@@ -7,12 +7,12 @@ import { Stream } from "@most/types"
 import { $Baseline, $bear, $bull, $infoTooltipLabel, IMarker } from "ui-components"
 import { filterNull, parseReadableNumber, readableUsd, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams, Time } from "lightweight-charts"
-import { IMirror, IMirrorSeed } from "puppet-middleware-utils"
+import { IPosition } from "puppet-middleware-utils"
 import { IPerformanceTimeline, getPerformanceTimeline } from "./$ProfilePerformanceGraph.js"
 
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
-  mp: IMirror | IMirrorSeed,
+  mp: IPosition,
   $container?: NodeComposeFn<$Node>,
   chartConfig?: DeepPartial<ChartOptions>
   latestPrice: Stream<bigint>
@@ -25,7 +25,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
   [accountPreviewClick, accountPreviewClickTether]: Behavior<string, string>,
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
 ) => {
-  const openPositionList = config.mp.__typename === 'PositionOpen' ? [config.mp] : []
+  const openPositionList = config.mp.__typename === 'Position' ? [config.mp] : []
   const settledPositionList = config.mp.__typename === 'Position' ? [config.mp] : []
   const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
   const timeline = getPerformanceTimeline({ ...config, openPositionList, settledPositionList })
@@ -54,7 +54,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
       shape: 'circle'
     }
   })
-  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
+  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
     return {
       position: 'inBar',
       color: colorAlpha(pallete.message, .15),

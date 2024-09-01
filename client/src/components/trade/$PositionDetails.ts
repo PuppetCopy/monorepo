@@ -37,7 +37,7 @@ export const $PositionDetails = (config: IPositionAdjustmentHistory) => componen
   return [
     switchMap(pos => {
       const dataSource: Stream<(IPositionIncrease | IPositionDecrease)[]> = pos
-        ? now([...pos.link.increaseList, ...pos.link.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp) ))
+        ? now([...pos.increaseList, ...pos.decreaseList].sort((a, b) => Number(b.blockTimestamp - a.blockTimestamp) ))
         : now([])
 
       return $Table({

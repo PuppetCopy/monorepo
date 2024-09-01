@@ -11,7 +11,7 @@ import {
   unixTimestampNow
 } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
-import { IMirrorSeed, IMirror, getParticiapntPortion } from "puppet-middleware-utils"
+import {  IMirror, getParticiapntPortion, IPosition, IMirrorPosition } from "puppet-middleware-utils"
 import * as viem from "viem"
 import { IPositionDecrease, IPositionIncrease, IPriceTickListMap, IPricetick, getMarketToken, getPositionPnlUsd } from "gmx-middleware-utils"
 
@@ -19,7 +19,7 @@ import { IPositionDecrease, IPositionIncrease, IPriceTickListMap, IPricetick, ge
 
 type IPerformanceTickUpdateTick = {
   update: IPositionIncrease | IPositionDecrease
-  mp: IMirror | IMirrorSeed
+  mp: IPosition
   timestamp: number
 }
 
@@ -30,8 +30,8 @@ type ITimelinePositionOpen = IPerformanceTickUpdateTick & {
 
 export interface IPerformanceTimeline {
   puppet?: viem.Address
-  openPositionList: IMirrorSeed[]
-  settledPositionList: IMirror[]
+  openPositionList: IPosition[]
+  settledPositionList: IPosition[]
   priceTickMap: IPriceTickListMap
   tickCount: number
   activityTimeframe: IntervalTime
@@ -58,10 +58,10 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
   const startTime = timeNow - config.activityTimeframe
   const openAdjustList: IPerformanceTickUpdateTick[] = config.openPositionList
     .flatMap((mp): IPerformanceTickUpdateTick[] => {
-      const tickList = [...mp.link.increaseList, ...mp.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime)
+      const tickList = [...mp.increaseList, ...mp.decreaseList].filter(update => Number(update.blockTimestamp) > startTime)
 
       if (tickList.length === 0) {
-        const update = mp.link.increaseList[mp.link.increaseList.length - 1]
+        const update = mp.increaseList[mp.increaseList.length - 1]
 
         return [{ update, mp, timestamp: startTime }]
       }
@@ -70,7 +70,7 @@ export function getPerformanceTimeline(config: IPerformanceTimeline) {
     })
 
   const settledAdjustList: IPerformanceTickUpdateTick[] = config.settledPositionList.flatMap(mp => {
-    return [...mp.link.increaseList, ...mp.link.decreaseList].filter(update => Number(update.blockTimestamp) > startTime).map(update => ({ update, mp, timestamp: Number(update.blockTimestamp) }))
+    return [...mp.increaseList, ...mp.decreaseList].filter(update => Number(update.blockTimestamp) > startTime).map(update => ({ update, mp, timestamp: Number(update.blockTimestamp) }))
   })
 
   const uniqueIndexTokenList = [...new Set([...config.openPositionList, ...config.settledPositionList].map(mp => getMarketToken(mp.market).indexToken))]
@@ -146,7 +146,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
       shape: 'circle'
     }
   })
-  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.link.decreaseList).map((pos): IMarker => {
+  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
     return {
       position: 'inBar',
       color: colorAlpha(pallete.message, .15),

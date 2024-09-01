@@ -13,12 +13,11 @@ import {
   getRoughLiquidationPrice,
   getTokenDescription, IAbstractPositionParams,
   IMarket,
-  IPositionOpen,
-  IPositionAbstract,
+  IPosition,
   isPositionSettled,
   liquidationWeight
 } from "gmx-middleware-utils"
-import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorAbstract, IMirrorListSummary, IMirrorSeed, IMirror, latestPriceMap } from "puppet-middleware-utils"
+import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, IMirrorListSummary, latestPriceMap } from "puppet-middleware-utils"
 import { $bear, $bull, $infoLabel, $infoTooltip, $Link, $tokenIconMap } from "ui-components"
 import * as viem from "viem"
 import { $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
@@ -61,7 +60,7 @@ export const $routeIntent = (isLong: boolean, indexToken: viem.Address) => {
   )
 }
 
-export const $entry = (mp: IPositionAbstract) => {
+export const $entry = (mp: IPosition) => {
   const indexToken = getMarketToken(mp.market).indexToken
   const indexDescription = getTokenDescription(indexToken)
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'center', placeContent: 'center', fontSize: '.85rem' }))(
@@ -93,7 +92,7 @@ export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
   )
 }
 
-// export const $settledSizeDisplay = (pos: IPositionSettled) => {
+// export const $settledSizeDisplay = (pos: IPosition) => {
 //   const indexToken = getMappedValue(GMX.MARKET_INDEX_TOKEN_MAP, mp.position.market)
 
 //   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
@@ -135,7 +134,7 @@ export const $tokenIcon = (indexToken: viem.Address, IIcon: { width: string } = 
 export const $sizeAndLiquidation = (mp: IMirrorSeed, puppet?: viem.Address) => {
   const sizeInUsd = getParticiapntPortion(mp, mp.sizeInUsd, puppet)
   const collateralInToken = getParticiapntPortion(mp, mp.collateralAmount, puppet)
-  const collateralUsd = getTokenUsd(mp.link.increaseList[0].collateralTokenPriceMin, collateralInToken)
+  const collateralUsd = getTokenUsd(mp.increaseList[0].collateralTokenPriceMin, collateralInToken)
   const indexToken = getMarketToken(mp.market).indexToken
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
@@ -183,7 +182,7 @@ export const $puppets = (
   )
 }
 
-export const $positionPnl = (mp: IMirrorAbstract, puppet?: viem.Address) => {
+export const $positionPnl = (mp: IMirrorPosition, puppet?: viem.Address) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
     $positionSlotPnl(mp, puppet),
     $seperator2,
@@ -265,7 +264,7 @@ export const $positionSlotPnl = (mp: IMirrorSeed | IMirror, puppet?: viem.Addres
 
 export const $positionOpenRoi = (mp: IMirrorSeed | IMirror, puppet?: viem.Address) => {
   const indexToken = getMarketToken(mp.market).indexToken
-  const lstIncrease = lst(mp.link.increaseList)
+  const lstIncrease = lst(mp.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralToken)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
@@ -353,7 +352,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 //       //   $text(style({ color: pallete.foreground, flex: 1 }))('Total Fees'),
 //       //   $pnlValue(
 //       //     map(cumFee => {
-//       //       const fstUpdate = pos.link.updateList[0]
+//       //       const fstUpdate = pos.updateList[0]
 //       //       const entryFundingRate = fstUpdate.entryFundingRate
 
 //       //       const fee = getFundingFee(entryFundingRate, cumFee, pos.size) + pos.cumulativeFee

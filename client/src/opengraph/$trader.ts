@@ -4,7 +4,7 @@ import { now } from "@most/core"
 import { Stream } from "@most/types"
 import { IntervalTime } from "common-utils"
 import { IPriceTickListMap } from "gmx-middleware-utils"
-import { ISetRouteType, queryTraderPositionOpen, queryTraderPositionSettled } from "puppet-middleware-utils"
+import { ISetRouteType, queryPosition, queryPosition } from "puppet-middleware-utils"
 import * as viem from 'viem'
 import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 import { $TraderSummary } from "../components/participant/$Summary.js"
@@ -24,8 +24,8 @@ export const $trader = (config: ITrader) => {
   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
   const selectedTradeRouteList = now([])
 
-  const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
-  const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
+  const settledPositionListQuery = queryPosition(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+  const openPositionListQuery = queryPosition(subgraphClient, { address, selectedTradeRouteList })
   
 
   return $column(layoutSheet.spacingBig, style({ placeContent: 'space-between', flex: 1 }))(

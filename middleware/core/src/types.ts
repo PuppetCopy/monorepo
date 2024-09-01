@@ -1,6 +1,5 @@
-import { ILogTxType, ILogTypeId, IPositionOpen, IPositionAbstract, IPositionListSummary } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId, IPositionListSummary, IPosition as IGmxPosition } from "gmx-middleware-utils"
 import * as viem from "viem"
-
 
 
 export interface IMirrorRequest {
@@ -12,65 +11,45 @@ export interface IMirrorRequest {
   requestKey: viem.Hex
 }
 
-
-// export interface MirrorReduceSize extends ILogTxType<'MirrorReduceSize'> {
-//   id: string
-//   sizeDelta: bigint
-// }
-
-
-
-// export interface IMirrorLink extends ILogTxType<'MirrorLink'> {
-//   id: string
-//   reduceSizeList: MirrorReduceSize[]
-// }
-
-
-
-// export interface IMirrorAbstract extends ILogTxType<'Mirror'> {
-//   key: viem.Hex
-//   account: viem.Address
-
-//   trader: viem.Address
-//   subaccount: viem.Address
-//   positionKey: viem.Hex
-
-//   cumulativeTransactionCost: bigint
-//   amountOut: bigint
-//   profit: bigint
-//   totalPerformanceFee: bigint
-//   traderPerformanceCutoffFee: bigint
-
-//   requestList: IMirrorRequest[]
-//   puppetPositionList: IPuppetPosition[]
-
-//   position: IPositionAbstract
-// }
-
 export interface IPuppetPosition extends ILogTxType<'PuppetPosition'> {
-  account: viem.Address
-
-  trader: viem.Address
-  collateralToken: viem.Address
-
-  subaccount: viem.Address
+  key: viem.Hex
   positionKey: viem.Hex
+
+  account: viem.Address
+  market: viem.Address
+  collateralToken: viem.Address
 
   collateral: bigint
 
-  position: IPositionAbstract
-  // mirror: IMirror
+  position: IPosition
+}
+
+export interface IMirror extends ILogTypeId<'MirrorPosition'> {
+  key: viem.Hex
+  positionKey: viem.Hex
+
+  trader: viem.Address
+
+  cumulativeTransactionCost: bigint
+  amountOut: bigint
+  profit: bigint
+  totalPerformanceFee: bigint
+  traderPerformanceCutoffFee: bigint
+
+  puppetList: IPuppetPosition[]
+}
+
+export interface IMirrorPosition extends IGmxPosition {
+  mirror: IMirror
 }
 
 
-// export interface IMirrorSeed extends IMirrorAbstract { }
-export interface IMirror extends IPositionAbstract {
-  puppetPositionList: IPuppetPosition[]
-}
+export type IPosition = IMirrorPosition | IGmxPosition
 
 
 
 export interface IMirrorListSummary extends IPositionListSummary {
+  account: viem.Address
   puppets: viem.Address[]
 }
 

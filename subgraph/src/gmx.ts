@@ -30,6 +30,7 @@ const orderStatusMap = {
   OrderFrozen: OrderStatus.FROZEN
 }
 
+
 GMX_EventEmitter.EventLog2.handler(async ({ event, context }) => {
   if (event.params.eventName == "OrderCreated") {
     context.RequestPosition.set({
@@ -144,7 +145,7 @@ async function onPositionIncrease(event: GmxEvent, context: handlerContext) {
   const collateralTokenPriceMax = getUintItem(event, 10)
   const collateralUsd = collateralAmount * collateralTokenPriceMax
 
-  let position
+  let position: Position
 
   if (positionRef) {
     const storedPosition = await context.Position.get(positionRef.position_id)
@@ -197,6 +198,8 @@ async function onPositionIncrease(event: GmxEvent, context: handlerContext) {
       maxCollateralToken: collateralAmount,
       maxCollateralUsd: collateralUsd,
 
+      mirror_id: undefined,
+
       isLong: isLong,
       realisedPnlUsd: 0n,
       isSettled: false
@@ -241,7 +244,7 @@ async function onPositionIncrease(event: GmxEvent, context: handlerContext) {
     transactionHash: event.transaction.hash,
     logIndex: event.transaction.transactionIndex,
 
-    position_id: positionRef.id,
+    position_id: positionRef.position_id,
   })
 
 }
@@ -342,7 +345,7 @@ async function onPositionDecrease(event: GmxEvent, context: handlerContext) {
     transactionHash: event.transaction.hash,
     logIndex: event.transaction.transactionIndex,
 
-    position_id: positionRef.id,
+    position_id: positionRef.position_id,
 
   })
 

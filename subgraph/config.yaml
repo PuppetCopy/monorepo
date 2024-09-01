@@ -21,7 +21,7 @@ contracts:
     abi_file_path: ./abis/Puppet_EventEmitter.json
     handler: ./src/puppet.ts
     events:
-      - event: Event
+      - event: LogEvent
   # - name: Puppet_RequestIncreasePosition
   #   abi_file_path: ./abis/RequestIncreasePosition.json
   #   handler: ./src/puppet.ts
@@ -50,7 +50,7 @@ contracts:
   #     - event: ExecuteDecreasePosition__SetConfig
 networks:
   - id: 42161
-    start_block: 244610000
+    start_block: 248930000
     contracts:
       - name: GMX_EventEmitter
         address: 0xC8ee91A54287DB53897056e12D9819156D3822Fb

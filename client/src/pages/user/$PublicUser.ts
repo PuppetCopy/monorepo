@@ -4,7 +4,7 @@ import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
 import { map, mergeArray, multicast, now } from "@most/core"
 import { ETH_ADDRESS_REGEXP, IntervalTime } from "common-utils"
-import { ISetRouteType, queryPuppetTradeRoute, queryTraderPositionOpen, queryTraderPositionSettled } from "puppet-middleware-utils"
+import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'
 import { $PuppetProfile } from "./$PuppetProfile.js"
@@ -42,7 +42,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ title: 'Trader', fragment: ETH_ADDRESS_REGEXP })
   const puppetRoute = profileAddressRoute.create({ fragment: 'puppet' }).create({ title: 'Puppet', fragment: ETH_ADDRESS_REGEXP })
 
-  
+
   const options: IRouteOption[] = [
     {
       label: 'Puppet',
@@ -83,8 +83,8 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
               const urlFragments = document.location.pathname.split('/')
               const address = viem.getAddress(urlFragments[urlFragments.length - 1])
 
-              const settledPositionListQuery = queryTraderPositionSettled(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
-              const openPositionListQuery = queryTraderPositionOpen(subgraphClient, { address, selectedTradeRouteList })
+              const settledPositionListQuery = queryPosition(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+              const openPositionListQuery = queryPosition(subgraphClient, { address, selectedTradeRouteList })
 
               return $column(layoutSheet.spacingBig)(
                 $TraderSummary({ ...config, address, settledPositionListQuery, openPositionListQuery })({}),
@@ -115,7 +115,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                 return tradeList
               }, puppetTradeRouteListQuery)
 
-              return  $column(layoutSheet.spacingBig)(
+              return $column(layoutSheet.spacingBig)(
                 $PuppetSummary({ ...config, address, puppet: address, openPositionListQuery, settledPositionListQuery })({}),
 
                 $column(layoutSheet.spacingTiny)(
@@ -131,13 +131,13 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                     modifySubscriber: modifySubscriberTether()
                   }),
                 ),
-   
+
               ).run(sink, scheduler)
             },
           }
         ),
       ),
-      
+
       $node(),
       $node(),
 

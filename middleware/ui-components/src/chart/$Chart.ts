@@ -82,6 +82,7 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
     //   }
     // },
     layout: {
+      attributionLogo: false,
       textColor: pallete.message,
       background: {
         color: 'transparent'

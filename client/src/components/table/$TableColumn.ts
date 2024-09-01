@@ -3,13 +3,13 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map } from "@most/core"
 import { getTimeSince, readableDate } from "common-utils"
-import { IMirrorAbstract, IMirrorSeed, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorPosition, IMirrorSeed, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { arbitrum } from "viem/chains"
 import { $entry, $positionPnl, $puppets, $size, $sizeAndLiquidation } from "../../common/$common.js"
 import { $txnIconLink } from "../../common/elements/$common"
-import { IPositionOpen, IPositionAbstract, IPositionSeed, isPositionSettled } from "gmx-middleware-utils"
+import { IPosition, IPositionAbstract, IPosition, isPositionSettled } from "gmx-middleware-utils"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -48,7 +48,7 @@ export const entryColumn: TableColumn<IPositionAbstract> = {
   })
 }
 
-export const puppetsColumn = <T extends IMirrorAbstract>(click: Tether<INode, string>): TableColumn<T> => ({
+export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, string>): TableColumn<T> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
@@ -56,7 +56,7 @@ export const puppetsColumn = <T extends IMirrorAbstract>(click: Tether<INode, st
   })
 })
 
-export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorAbstract> => ({
+export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '90px',
   columnOp: style({ placeContent: 'flex-end' }),
@@ -66,7 +66,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorAbstract> =
 })
 
 
-export const positionTimeColumn: TableColumn<IPositionOpen | IPositionSeed>  = {
+export const positionTimeColumn: TableColumn<IPosition | IPosition>  = {
   $head: $text('Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map((pos) => {

@@ -17,7 +17,7 @@ import {
 import { CandlestickData, Coordinate, LineStyle, Time } from "lightweight-charts"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { IMirrorSeed, getLastAdjustment, latestPriceMap, queryLatestTokenPriceFeed, queryTraderPositionOpen } from "puppet-middleware-utils"
+import { IMirrorSeed, getLastAdjustment, latestPriceMap, queryLatestTokenPriceFeed, queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $CandleSticks, $infoLabel, $infoLabeledValue, $intermediate$node, $intermediateMessage, $target } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
@@ -226,7 +226,7 @@ export const $Trade = (config: ITradeComponent) => component((
       return now(Promise.resolve([] as IMirrorSeed[]))
     }
 
-    return queryTraderPositionOpen(subgraphClient, { address: wallet.account.address })
+    return queryPosition(subgraphClient, { address: wallet.account.address })
   }, awaitPromises(walletClientQuery))))
 
 

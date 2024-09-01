@@ -1,57 +1,48 @@
 import { schema as gmxSchema, ISchema } from "gmx-middleware-utils"
-import { IPuppetPosition, ISetRouteType, IAccountSummary } from "./types.js"
+import { IMirror, IMirrorPosition, IPuppetPosition, ISetRouteType } from "./types.js"
 
 
 
-// const mirrorReduceSize: ISchema<MirrorReduceSize> = {
-//   id: 'string',
-
-//   sizeDelta: 'uint',
-
-//   // blockTimestamp: 'uint',
-//   // transactionHash: 'string',
-
-//   __typename: 'MirrorReduceSize',
-// }
-
-// const mirrorLink: ISchema<IMirrorLink> = {
-//   id: 'string',
-
-//   reduceSizeList: mirrorReduceSize,
-
-//   __typename: 'MirrorLink',
-// }
-
-// const mirror: ISchema<IMirrorMatch> = {
-//   link: mirrorLink,
-
-//   trader: 'address',
-//   puppetList: `address[]`,
-//   collateralList: 'uint[]',
-//   cumulativeTransactionCost: 'uint',
-
-//   __typename: 'Position',
-// }
-
-const puppetPosition: ISchema<Omit<IPuppetPosition, 'puppetTradeRoute'>> = {
+const puppetPosition: ISchema<IPuppetPosition> = {
   id: 'string',
-
-  collateralToken: 'address',
-
-  trader: 'address',
-  subaccount: 'address',
+  key: 'string',
   positionKey: 'string',
+
+  account: 'address',
+  market: 'address',
+  collateralToken: 'address',
 
   collateral: 'uint',
 
-  // mirror: mirror,
-  position: gmxSchema.position,
+  // position: mirror,
 
-  __typename: 'PuppetPositionSettled',
+  __typename: 'PuppetPosition',
 }
 
+const mirror: ISchema<IMirror> = {
+  id: 'string',
+  key: 'string',
+  positionKey: 'string',
 
+  trader: 'address',
 
+  cumulativeTransactionCost: 'uint',
+  amountOut: 'uint',
+  profit: 'uint',
+  totalPerformanceFee: 'uint',
+  traderPerformanceCutoffFee: 'uint',
+
+  puppetList: puppetPosition,
+
+  __typename: 'MirrorPosition',
+}
+
+const mirrorPosition: ISchema<IMirrorPosition> = {
+  ...gmxSchema.position,
+  mirror,
+
+  __typename: 'Position',
+}
 
 const setRouteType: ISchema<ISetRouteType> = {
   id: 'string',
@@ -66,45 +57,7 @@ const setRouteType: ISchema<ISetRouteType> = {
 
 
 
-const accountSummarySeed: ISchema<IAccountSummary> = {
-  id: 'string',
-  account: 'address',
-  interval: 'uint',
-  timestamp: 'uint',
-
-  puppets: 'uint',
-
-  cumulativeSizeUsd: 'uint',
-  cumulativeCollateralUsd: 'uint',
-
-  maxSizeUsd: 'uint',
-  maxCollateralUsd: 'uint',
-
-  pnl: 'uint',
-  roi: 'uint',
-
-  winCount: 'uint',
-  lossCount: 'uint',
-  successRate: 'uint',
-
-  __typename: 'AccountSummarySeed',
-}
-
-const AccountSummary: ISchema<IAccountSummary> = {
-  ...accountSummarySeed,
-
-  __typename: 'AccountSummary',
-}
-
-
-
-
 
 export const schema = {
-  puppetPosition,
-  setRouteType, accountSummarySeed, AccountSummary,
-
-  // mirrorReduceSize,
-
-  // mirrorLink, mirror
+  puppetPosition, mirrorPosition, setRouteType,
 }

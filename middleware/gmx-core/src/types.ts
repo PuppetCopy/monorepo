@@ -75,8 +75,7 @@ export interface IAbstractPositionParams {
 }
 
 
-export interface IPositionAbstract extends ILogTxType<'Position'> {
-  // link: IPositionLink
+export interface IPosition extends ILogTypeId<'Position'> {
   key: viem.Hex
   account: viem.Address
   market: viem.Address
@@ -99,13 +98,6 @@ export interface IPositionAbstract extends ILogTxType<'Position'> {
   decreaseList: IPositionDecrease[]
 
   isSettled: boolean
-}
-
-export type IPositionSeed = IPositionAbstract & {
-  isSettled: false
-}
-export type IPositionOpen = IPositionAbstract & {
-  isSettled: true
 }
 
 

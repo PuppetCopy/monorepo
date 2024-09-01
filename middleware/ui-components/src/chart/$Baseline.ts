@@ -43,6 +43,7 @@ export const $Baseline = (config: IBaselineChart) => {
 
   const chartConfig: DeepPartial<ChartOptions> = {
     layout: {
+      attributionLogo: false,
       background: {
         color: 'transparent'
       },

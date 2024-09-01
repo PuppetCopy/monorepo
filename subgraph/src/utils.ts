@@ -72,3 +72,6 @@ export function applyBasisPoints(bps: bigint, value: bigint): bigint {
   return value * bps / BASIS_POINTS_DIVISOR
 }
 
+export function target(contractName: string, eventName: string, version = "1") {
+  return `${contractName}${eventName}${version}`
+}

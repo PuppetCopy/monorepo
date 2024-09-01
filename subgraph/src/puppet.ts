@@ -1,30 +1,18 @@
-import { Puppet_EventEmitter, EventLog, handlerContext, Puppet_EventEmitter_Event_eventArgs, Position, RequestIncreasePosition__Match } from "generated"
+import { Puppet_EventEmitter, EventLog, handlerContext, Puppet_EventEmitter_LogEvent_eventArgs } from "generated"
 import { decodeAbiParameters, type Hex } from "viem"
 import { parseAbiParameters } from "abitype"
+import { target } from "./utils"
 
 type EventHandlerMap = {
-  [key: string]: (_1: EventLog<any>, context: handlerContext) => void
+  [key: string]: (_1: EventLog<Puppet_EventEmitter_LogEvent_eventArgs>, context: handlerContext) => void
 }
 
-type DeepReadonly<T> =
-  T extends (infer R)[] ? DeepReadonlyArray<R> :
-  T extends Function ? T :
-  T extends object ? DeepReadonlyObject<T> :
-  T
-
-interface DeepReadonlyArray<T> extends ReadonlyArray<DeepReadonly<T>> { }
-
-type DeepReadonlyObject<T> = {
-  readonly [P in keyof T]: DeepReadonly<T[P]>;
-}
-
-type DeepIncreaseMatch = DeepReadonly<RequestIncreasePosition__Match> & {}
 
 const eventHandlerMapped: EventHandlerMap = {
-  RequestIncreasePosition__Match: async (event: EventLog<Puppet_EventEmitter_Event_eventArgs>, context) => {
+  [target('RequestIncreasePositionLogic', 'matchUp')]: async (event, context) => {
 
     const [
-      account,
+      trader,
       subaccount,
       requestKey,
       positionKey,
@@ -32,19 +20,19 @@ const eventHandlerMapped: EventHandlerMap = {
       collateralDeltaList
     ] = decodeAbiParameters(
       parseAbiParameters('address, address, bytes32, bytes32, address[], uint[]'),
-      event.params.data
+      event.params.data as Hex
     )
 
     context.RequestIncreasePosition__Match.set({
 
 
       id: requestKey,
-      trader: account,
+      trader,
       subaccount,
       positionKey,
 
-      puppetList: puppetList,
-      puppetCollateralDeltaList: collateralDeltaList,
+      puppetList: puppetList as any,
+      puppetCollateralDeltaList: collateralDeltaList as any,
 
       blockNumber: event.block.number,
       blockTimestamp: event.block.timestamp,
@@ -53,7 +41,7 @@ const eventHandlerMapped: EventHandlerMap = {
 
 
   },
-  RequestIncreasePosition__Adjust: async (event: EventLog<Puppet_EventEmitter_Event_eventArgs>, context) => {
+  [target('RequestIncreasePositionLogic', 'adjust')]: async (event, context) => {
     const [
       account,
       subaccount,
@@ -79,7 +67,7 @@ const eventHandlerMapped: EventHandlerMap = {
       transactionHash: event.block.hash
     })
   },
-  ExecuteIncreasePosition__Execute: async (event: EventLog<Puppet_EventEmitter_Event_eventArgs>, context) => {
+  [target('ExecuteIncreasePositionLogic', 'execute')]: async (event, context) => {
     const [
       account,
       subaccount,
@@ -113,13 +101,12 @@ const eventHandlerMapped: EventHandlerMap = {
         id: requestKey,
         key: positionKey,
         account: address,
+        market: '0x',
 
-        trader: match.trader,
         collateralToken: '0x',
 
         collateral: match.puppetCollateralDeltaList[index],
 
-        subaccount: match.subaccount,
         positionKey: positionRef.id,
         position_id: positionRef.position_id,
       })
@@ -130,6 +117,6 @@ const eventHandlerMapped: EventHandlerMap = {
   },
 }
 
-Puppet_EventEmitter.Event.handler(async ({ event, context }) => eventHandlerMapped[event.params.name](event, context))
+Puppet_EventEmitter.LogEvent.handler(async ({ event, context }) => eventHandlerMapped[target(event.params.name, event.params.method, event.params.version)](event, context))
 
 

@@ -1,4 +1,4 @@
-import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPositionOpen, IPriceCandle, IPriceCandleSeed } from "../types.js"
+import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle, IPriceCandleSeed } from "../types.js"
 import { ISchema } from "./query.js"
 
 
@@ -243,7 +243,7 @@ const positionLink: ISchema<IPositionLink> = {
 }
 
 
-const position: ISchema<IPositionOpen> = {
+const position: ISchema<IPosition> = {
   id: 'string',
   // link: positionLink,
 
@@ -270,6 +270,11 @@ const position: ISchema<IPositionOpen> = {
   maxCollateralUsd: 'uint256',
 
   isLong: 'bool',
+
+  increaseList: positionIncrease,
+  decreaseList: positionDecrease,
+
+  isSettled: 'bool',
 
   __typename: 'Position',
 }
