@@ -50,7 +50,7 @@ contracts:
   #     - event: ExecuteDecreasePosition__SetConfig
 networks:
   - id: 42161
-    start_block: 249421661
+    start_block: 244150000
     contracts:
       - name: GMX_EventEmitter
         address: 0xC8ee91A54287DB53897056e12D9819156D3822Fb
