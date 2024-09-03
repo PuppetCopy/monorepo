@@ -5,8 +5,8 @@ import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, mergeArray } from "@most/core"
 import { Stream } from "@most/types"
 import { StateStream, filterNull } from "common-utils"
-import { getMarketToken, IMarket } from "gmx-middleware-utils"
-import { IMirrorSeed, latestPriceMap } from "puppet-middleware-utils"
+import { IMarket } from "gmx-middleware-utils"
+import { IMirrorPosition } from "puppet-middleware-utils"
 import { $IntermediatePromise } from "ui-components"
 import * as viem from "viem"
 import { $entry, $positionPnl, $sizeAndLiquidation } from "../../common/$common.js"
@@ -20,22 +20,22 @@ import { ITradeParams } from "./$PositionEditor.js"
 
 interface IPositionListDetails {
   chain: viem.Chain
-  openPositionListQuery: Stream<Promise<IMirrorSeed[]>>
+  positionListQuery: Stream<Promise<IMirrorPosition[]>>
   tradeState: StateStream<ITradeParams>
   $container: NodeComposeFn<$Node>
   requestTrade: Stream<IRequestTrade>
-  mirrorPosition: Stream<IMirrorSeed | null>
+  mirrorPosition: Stream<IMirrorPosition | null>
 }
 export const $PositionListDetails = (config: IPositionListDetails) => component((
-  [switchPosition, switchPositionTether]: Behavior<any, IMirrorSeed>,
-  [clickClose, clickCloseTeter]: Behavior<any, IMirrorSeed>,
+  [switchPosition, switchPositionTether]: Behavior<any, IMirrorPosition>,
+  [clickClose, clickCloseTeter]: Behavior<any, IMirrorPosition>,
 
   [changeMarket, changeMarketTether]: Behavior<IMarket>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean>,
   [switchIsIncrease, switchIsIncreaseTether]: Behavior<boolean>,
 ) => {
 
-  const { chain, openPositionListQuery, tradeState, $container, requestTrade, mirrorPosition } = config
+  const { chain, positionListQuery, tradeState, $container, requestTrade, mirrorPosition } = config
 
 
   return [
@@ -97,7 +97,7 @@ export const $PositionListDetails = (config: IPositionListDetails) => component(
             })
           )
         }),
-        query: config.openPositionListQuery
+        query: config.positionListQuery
       })({}),
     ),
 

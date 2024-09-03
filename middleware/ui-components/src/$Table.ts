@@ -4,14 +4,13 @@ import { $column, $icon, $row, layoutSheet, screenUtils } from "@aelea/ui-compon
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, now, switchLatest } from "@most/core"
 import { Stream } from "@most/types"
-import { $QuantumScroll, IScrollPagable, QuantumScroll, ScrollRequest } from "./$QuantumScroll.js"
+import { $QuantumScroll, IScrollPagable, QuantumScroll, IQuantumScrollPage } from "./$QuantumScroll.js"
 
 
 
 export type TablePageResponse<T> = T[] | Omit<IScrollPagable, '$items'> & { page: T[] }
 
 export interface TableOption<T> {
-
   columns: TableColumn<T>[]
   gridTemplateColumns?: string
   dataSource: Stream<TablePageResponse<T>>
@@ -44,7 +43,7 @@ export interface TableColumn<T> {
 }
 
 export interface IPageRequest {
-  page: ScrollRequest,
+  page: IQuantumScrollPage,
   pageSize: number
 }
 
@@ -87,7 +86,7 @@ export const $Table = <T>({
   $between = empty(),
   $sortArrowDown = $caretDown
 }: TableOption<T>) => component((
-  [scrollRequest, scrollRequestTether]: Behavior<ScrollRequest, ScrollRequest>,
+  [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage, IQuantumScrollPage>,
   [sortByChange, sortByChangeTether]: Behavior<INode, string>
 ) => {
 

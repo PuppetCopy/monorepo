@@ -9,7 +9,7 @@ import * as GMX from "gmx-middleware-const"
 import { IPriceCandle, OrderType, getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, resolveAddress } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { IMirrorSeed, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
 import { $alert, $alertTooltip, $anchor, $infoLabeledValue, $infoTooltipLabel } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -51,7 +51,7 @@ export const $PositionAdjustmentDetails = (config: IPositionAdjustmentDetails) =
 
   [approveTrading, approveTradingTether]: Behavior<PointerEvent, true>,
   [requestTokenSpend, requestTokenSpendTether]: Behavior<walletLink.IWalletClient, IApproveSpendReturn>,
-  [clickResetPosition, clickResetPositionTether]: Behavior<any, IMirrorSeed | null>,
+  [clickResetPosition, clickResetPositionTether]: Behavior<any, IMirrorPosition | null>,
   [clickProposeTrade, clickProposeTradeTether]: Behavior<walletLink.IWalletClient>,
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 

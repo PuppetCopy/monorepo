@@ -5,7 +5,6 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, empty, map, multicast, now, skipRepeatsWith, snapshot, startWith, switchLatest } from "@most/core"
 import { IntervalTime, filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
-import { ISetRouteType } from "puppet-middleware-utils"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "ui-components"
 import * as viem from "viem"
 import { $LastAtivity } from "../$LastActivity.js"
@@ -14,58 +13,58 @@ import { $route } from "../../common/$common.js"
 import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { $DropMultiSelect } from "../form/$Dropdown.js"
 import { getPerformanceTimeline } from "../trade/$ProfilePerformanceGraph.js"
+import { isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
 
 export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, selectedTradeRouteList, puppet, priceTickMapQuery, settledPositionListQuery, openPositionListQuery } = config
+  const { activityTimeframe, collateralTokenList, puppet, priceTickMapQuery, positionListQuery } = config
 
-  const positionParams = multicast(snapshot(async (params, sampleParams) => {
-    const settledPositionList = await sampleParams.settledPositionListQuery
-    const openPositionList = await params.openPositionListQuery
-
+  const positionParams = multicast(map(async (params) => {
+    const positionList = await params.positionListQuery
     const timeline = getPerformanceTimeline({
       ...params,
-      puppet, settledPositionList, openPositionList,
+      puppet,
+      positionList,
       tickCount: 100,
       activityTimeframe: params.activityTimeframe,
       priceTickMap: await params.priceTickMapQuery
     })
 
-    return { timeline, openPositionList, settledPositionList }
-  }, combineObject({ activityTimeframe, priceTickMapQuery, openPositionListQuery }), combineObject({ settledPositionListQuery })))
+    return { timeline, positionList }
+  }, combineObject({ priceTickMapQuery, positionListQuery, activityTimeframe })))
 
 
   return [
     $column(style({ width: '100%', padding: 0, height: '200px', placeContent: 'center' }))(
       $row(style({ position: 'absolute', top: '10px', left: '16px', right: '16px', alignSelf: 'center', zIndex: 11, alignItems: 'flex-start' }))(
         $row(style({ flex: 1 }))(
-          $DropMultiSelect({
-            // $container: $row(layoutSheet.spacingTiny, style({ display: 'flex', position: 'relative' })),
-            $input: $element('input')(style({ width: '100px' })),
-            $label: $labelDisplay(style({ color: pallete.foreground }))('Routes'),
-            placeholder: 'All / Select',
-            getId: item => item.routeTypeKey,
-            $$chip: map(rt => $route(rt, false)),
-            selector: {
-              list: awaitPromises(routeTypeListQuery),
-              $$option: map(rt => {
-                return style({
-                  padding: '8px'
-                }, $route(rt))
-              })
-            },
-            value: selectedTradeRouteList
-          })({
-            select: selectTradeRouteListTether()
-          }),
+          // $DropMultiSelect({
+          //   // $container: $row(layoutSheet.spacingTiny, style({ display: 'flex', position: 'relative' })),
+          //   $input: $element('input')(style({ width: '100px' })),
+          //   $label: $labelDisplay(style({ color: pallete.foreground }))('Routes'),
+          //   placeholder: 'All / Select',
+          //   getId: item => item.routeTypeKey,
+          //   $$chip: map(rt => $route(rt, false)),
+          //   selector: {
+          //     list: awaitPromises(routeTypeListQuery),
+          //     $$option: map(rt => {
+          //       return style({
+          //         padding: '8px'
+          //       }, $route(rt))
+          //     })
+          //   },
+          //   value: collateralToken
+          // })({
+          //   select: selectCollateralTokenListTether()
+          // }),
         ),
         switchLatest(awaitPromises(map(async paramsQuery => {
           const params = await paramsQuery
-          const positionCount = params.settledPositionList.length + params.openPositionList.length
+          const positionCount = params.positionList.length
 
           if (positionCount === 0) {
             return empty()
@@ -111,7 +110,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
       $IntermediatePromise({
         query: positionParams,
         $$done: map(params => {
-          const positionCount = params.settledPositionList.length + params.openPositionList.length
+          const positionCount = params.positionList.length
 
           if (positionCount === 0) {
             return $row(layoutSheet.spacingTiny, style({ textAlign: 'center', placeSelf: 'center', }))(
@@ -119,7 +118,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
             )
           }
 
-          const openMarkerList = params.openPositionList.map((pos): IMarker => {
+          const openMarkerList = params.positionList.filter(isPositionOpen).map((pos): IMarker => {
             const pnl = params.timeline[params.timeline.length - 1].value
             return {
               position: 'inBar',
@@ -129,7 +128,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
               shape: 'circle'
             }
           })
-          const settledMarkerList = params.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
+          const settledMarkerList = params.positionList.filter(isPositionSettled).flatMap(pos => pos.decreaseList).map((pos): IMarker => {
             return {
               position: 'inBar',
               color: colorAlpha(pallete.message, .5),
@@ -186,6 +185,6 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
       })({}),
     ),
 
-    { selectTradeRouteList, changeActivityTimeframe }
+    { selectCollateralTokenList, changeActivityTimeframe }
   ]
 })

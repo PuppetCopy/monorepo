@@ -5,6 +5,7 @@ import { Stream } from "@most/types"
 import { erc20Abi } from "abitype/abis"
 import { ADDRESS_ZERO, ITokenDescription, IntervalTime, USD_DECIMALS, filterNull, getDenominator, getMappedValue, parseFixed } from "common-utils"
 import * as GMX from "gmx-middleware-const"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { IPriceCandleDto, IRequestPricefeedApi, ITokenSymbol, getTokenDescription, hashData, resolveAddress } from "gmx-middleware-utils"
 import * as PUPPET from "puppet-middleware-const"
 import { getRouteAddressKey, getTradeRouteKey } from "puppet-middleware-utils"
@@ -38,14 +39,14 @@ export interface ITokenInfo {
 }
 
 
-const derievedSymbolMapping: { [k: string]: ITokenSymbol } = {
-  [GMX.TOKEN_SYMBOL.WETH]: GMX.TOKEN_SYMBOL.ETH,
-  [GMX.TOKEN_SYMBOL.WBTC]: GMX.TOKEN_SYMBOL.BTC,
-  [GMX.TOKEN_SYMBOL.BTCB]: GMX.TOKEN_SYMBOL.BTC,
-  [GMX.TOKEN_SYMBOL.WBTCE]: GMX.TOKEN_SYMBOL.BTC,
-  [GMX.TOKEN_SYMBOL.WAVAX]: GMX.TOKEN_SYMBOL.AVAX,
-  [GMX.TOKEN_SYMBOL.SOL]: GMX.TOKEN_SYMBOL.SOL,
-}
+const derievedSymbolMapping = {
+  [TOKEN_DESCRIPTION_MAP.WETH.symbol]: 'ETH',
+  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: 'BTC',
+  [TOKEN_DESCRIPTION_MAP.BTCB.symbol]: 'BTC',
+  [TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: 'BTC',
+  [TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: 'AVAX',
+  [TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL',
+} as const
 
 const gmxIoPricefeedIntervalLabel = {
   [IntervalTime.MIN5]: '5m',

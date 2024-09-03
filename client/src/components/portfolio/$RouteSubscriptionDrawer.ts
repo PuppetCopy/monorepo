@@ -142,7 +142,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                           // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
 
                           $profileDisplay({
-                            address: modSubsc.trader,
+                            account: modSubsc.trader,
                             // $profileContainer: $defaultBerry(style({ width: '50px' }))
                           }),
 

@@ -3,7 +3,7 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map } from "@most/core"
 import { getTimeSince, readableDate } from "common-utils"
-import { IMirrorPosition, IMirrorSeed, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorPosition, IMirrorPosition, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { arbitrum } from "viem/chains"
@@ -18,7 +18,7 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $c
 )
 
 
-export const slotSizeColumn = <T extends IMirrorSeed>(puppet?: viem.Address): TableColumn<T> => ({
+export const slotSizeColumn = <T extends IMirrorPosition>(puppet?: viem.Address): TableColumn<T> => ({
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {
@@ -27,7 +27,7 @@ export const slotSizeColumn = <T extends IMirrorSeed>(puppet?: viem.Address): Ta
   })
 })
 
-export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorSeed> => ({
+export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> => ({
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {

@@ -10,7 +10,7 @@ import * as viem from "viem"
 
 
 export interface IAccountPreview {
-  address: viem.Address
+  account: viem.Address
   labelSize?: string
   profileSize?: number
 }
@@ -24,21 +24,21 @@ export interface IProfilePreview extends IAccountPreview {
 
 
 export const $profileDisplay = (config: IProfilePreview) => {
-  const { $container = $row, address, showAddress = true, profileSize = 50, $labelContainer } = config
+  const { $container = $row, account, showAddress = true, profileSize = 50, $labelContainer } = config
 
   return $container(layoutSheet.spacingSmall, style({ alignItems: 'center', textDecoration: 'none' }))(
     $profileAvatar(config),
-    showAddress ? $AccountLabel(address, $labelContainer) : empty(),
+    showAddress ? $AccountLabel(account, $labelContainer) : empty(),
   )
 }
 
 
 export const $profileAvatar = (config: IAccountPreview) => {
-  const { address, profileSize = 50 } = config
-  const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: address.toLowerCase() })))
+  const { account, profileSize = 50 } = config
+  const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: account.toLowerCase() })))
 
   return $row(style({ width: `${profileSize}px`, borderRadius: '50%', overflow: 'hidden', height: `${profileSize}px` }))(
-    $jazzicon(address),
+    $jazzicon(account),
     // switchMap(profile => {
     //   return profile && profile.profile
     //     ? $berryByToken(profile.profile) as any

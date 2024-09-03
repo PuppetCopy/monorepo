@@ -8,8 +8,8 @@ export interface IResponsePageApi<T> extends IRequestPagePositionApi {
   page: T[]
 }
 
-export interface IRequestSortApi<T> {
-  selector: keyof T
+export interface IRequestSortApi {
+  selector: string
   direction: 'desc' | 'asc'
 }
 
@@ -25,7 +25,6 @@ export type NonNullableStruct<T> = {
 export interface ITokenDescription {
   name: string
   symbol: string
-  isUsd: boolean
   decimals: number
 }
 

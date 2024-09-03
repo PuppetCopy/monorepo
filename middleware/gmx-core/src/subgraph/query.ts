@@ -39,8 +39,13 @@ export type PrettifyT<T> = {
 } & {};
 
 
+export type IQueryFilterCoercion<T> = {
+  _and?: IQueryFilter<T> | IQueryFilter<T>[]
+  _or?: IQueryFilter<T> | IQueryFilter<T>[]
+  _not?: IQueryFilter<T> | IQueryFilter<T>[]
+}
 
-export type IQueryFilter<T> = {
+export type IQueryFilter<T> = IQueryFilterCoercion<T> & {
   [K in keyof T]?: {
     _eq?: string | number | boolean
     _gt?: string | number | boolean
@@ -56,10 +61,14 @@ export type IQueryOrderBy<T> = {
 }
 
 
-export interface IQuerySubgraph<Type extends GqlType<any>, TQuery> {
+export interface IQuerySubgraph<
+  Type extends GqlType<any>,
+  TQueryFilter extends IQueryFilter<Type>,
+  TQuery
+> {
   schema: ISchema<Type>
   document?: TQuery | undefined
-  filter?: IQueryFilter<Type>
+  filter?: TQueryFilter
   startBlock?: bigint
 
   first?: number
@@ -68,9 +77,13 @@ export interface IQuerySubgraph<Type extends GqlType<any>, TQuery> {
 }
 
 
-export const querySubgraph = <Type extends GqlType<any>, TQuery>(
+export const querySubgraph = <
+  Type extends GqlType<any>,
+  TQueryFilter extends IQueryFilter<Type>,
+  TQuery
+>(
   client: Client,
-  params: IQuerySubgraph<Type, TQuery>,
+  params: IQuerySubgraph<Type, TQueryFilter, TQuery>,
   context?: Partial<OperationContext>,
 ): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
 
@@ -130,8 +143,11 @@ function parseFilterObject(query: any) {
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
 
-    if (value instanceof Object) {
-      fields.push(`${key}: { ${parseFilterObject(value)} }`)
+    if (value instanceof Array) {
+      if (value.length === 0) return
+      fields.push(`${key}: [${value.map(arrVal => `{${parseFilterObject(arrVal) }}`).join(' ')}]`)
+    } else if (value instanceof Object) {
+      fields.push(`${key}: { ${parseFilterObject(value)} }`)      
     } else if (value !== undefined) {
       fields.push(`${key}: ${value}`)
     }

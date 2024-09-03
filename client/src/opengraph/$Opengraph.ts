@@ -35,8 +35,8 @@ export const $Opengraph = (parentRoute: router.Route) => component(() => {
   const url = new URL(document.location.href)
 
   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
-  const selectedTradeRouteList = now([])
-  const priceTickMapQuery = queryLatestPriceTick(subgraphClient, { activityTimeframe, selectedTradeRouteList })
+  const collateralToken = now([])
+  const priceTickMapQuery = queryLatestPriceTick(subgraphClient, { activityTimeframe, collateralToken })
   const routeTypeListQuery = now(queryRouteTypeList(subgraphClient))
 
   // use playwright pushstate events as trigger to change route

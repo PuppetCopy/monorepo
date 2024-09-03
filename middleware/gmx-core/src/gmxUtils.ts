@@ -10,7 +10,7 @@ import {
 } from "gmx-middleware-const"
 import * as viem from "viem"
 import { ILogEvent, IPosition, ITokenDescription } from "./types.js"
-import { TEMP_INDEX_TOKEN_MARKET_MAP, TEMP_MARKET_TOKEN_MARKET_MAP } from "./common"
+import { MARKET_TOKEN_MAP } from "./common"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
@@ -77,8 +77,8 @@ export function validateIdentityName(name: string) {
 
 }
 
-export function getMarketToken(market: viem.Address) {
-  return getMappedValue(TEMP_MARKET_TOKEN_MARKET_MAP, market)
+export function getMarketIndexToken(market: viem.Address) {
+  return getMappedValue(MARKET_TOKEN_MAP, market)
 }
 
 export function getTokenDescription(token: viem.Address): ITokenDescription {

@@ -7,18 +7,17 @@ import { constant, empty, filter, join, map, mergeArray, until } from "@most/cor
 import { Stream } from '@most/types'
 
 
-export type ScrollRequest = {
+export type IQuantumScrollPage = {
   pageSize: number
   offset: number
 }
 
-export type IScrollPagable = ScrollRequest & {
+export type IScrollPagable = IQuantumScrollPage & {
   $items: $Branch[]
 }
 
 
 export interface QuantumScroll {
-  // scrollRequest?: Stream<ScrollRequest>
   insertAscending?: boolean
   dataSource: Stream<IScrollPagable>
   $container?: NodeComposeFn<$Node>
@@ -42,7 +41,7 @@ export const $QuantumScroll = ({
   insertAscending = false,
   // scrollRequest = empty()
 }: QuantumScroll) => component((
-  [nextScrollRequest, nextScrollRequestTether]: Behavior<any, ScrollRequest>,
+  [nextScrollRequest, nextScrollRequestTether]: Behavior<any, IQuantumScrollPage>,
 ) => {
 
 

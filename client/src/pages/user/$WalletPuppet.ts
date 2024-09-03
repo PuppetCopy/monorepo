@@ -38,10 +38,10 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
   [requestWithdrawAsset, requestWithdrawAssetTether]: Behavior<Promise<bigint>>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, priceTickMapQuery, providerClientQuery, puppetTradeRouteListQuery, openPositionListQuery, settledPositionListQuery, selectedTradeRouteList, routeTypeListQuery, route } = config
+  const { activityTimeframe, walletClientQuery, priceTickMapQuery, providerClientQuery, puppetTradeRouteListQuery, positionListQuery, collateralTokenList, routeTypeListQuery, route } = config
 
   const initialDepositAmountQuery = map(async walletQuery => {
     const wallet = await walletQuery
@@ -72,7 +72,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
     $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
       $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
         $ProfilePeformanceTimeline({ ...config })({
-          selectTradeRouteList: selectTradeRouteListTether(),
+          selectCollateralTokenList: selectCollateralTokenListTether(),
           changeActivityTimeframe: changeActivityTimeframeTether(),
         }),
       ),
@@ -185,12 +185,12 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
               )
             })
           )
-        }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, routeTypeListQuery, walletClientQuery })))),
+        }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectCollateralTokenList, routeTypeListQuery, walletClientQuery })))),
       ),
     ),
     
     {
-      changeRoute, modifySubscriber, changeActivityTimeframe, selectTradeRouteList
+      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralTokenList
     }
   ]
 })

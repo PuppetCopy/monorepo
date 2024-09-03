@@ -4,8 +4,8 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { map, now } from "@most/core"
 import { Stream } from "@most/types"
 import { StateStream, getMappedValue, getTimeSince, getTokenUsd, readableDate, readableTokenPrice, readableUsd, switchMap, unixTimestampNow } from "common-utils"
-import { IPositionDecrease, IPositionIncrease, IPriceCandle, TEMP_MARKET_TOKEN_MARKET_MAP, getTokenDescription } from "gmx-middleware-utils"
-import { IMirrorSeed } from "puppet-middleware-utils"
+import { IPositionDecrease, IPositionIncrease, IPriceCandle, getMarketIndexToken, getTokenDescription } from "gmx-middleware-utils"
+import { IMirrorPosition } from "puppet-middleware-utils"
 import { $Table, $infoLabel, $txHashRef } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -20,7 +20,7 @@ interface IPositionAdjustmentHistory extends IWalletPageParams {
   pricefeed: Stream<IPriceCandle[]>
   tradeConfig: StateStream<ITradeConfig> // ITradeParams
   tradeState: StateStream<ITradeParams>
-  mirrorPosition: Stream<IMirrorSeed | null>
+  mirrorPosition: Stream<IMirrorPosition | null>
 }
 
 
@@ -32,7 +32,6 @@ export const $PositionDetails = (config: IPositionAdjustmentHistory) => componen
 
   const { chain, walletClientQuery, pricefeed, tradeConfig, tradeState, mirrorPosition } = config
 
-  // const settledPositionListQuery = queryTraderPositionSettled({ address, activityTimeframe, selectedTradeRouteList })
 
   return [
     switchMap(pos => {
@@ -73,8 +72,8 @@ export const $PositionDetails = (config: IPositionAdjustmentHistory) => componen
             columnOp: O(style({ flex: 1 })),
             $bodyCallback: map((pos) => {
               const direction = pos.__typename === 'PositionIncrease' ? '↑' : '↓'
-              const marketIndexToken = getMappedValue(TEMP_MARKET_TOKEN_MARKET_MAP, pos.market)
-              const tokendescription = getTokenDescription(marketIndexToken.indexToken)
+              const indexToken = getMarketIndexToken(pos.market)
+              const tokendescription = getTokenDescription(indexToken)
 
               return $row(layoutSheet.spacingSmall)(
                 $txHashRef(pos.transactionHash, config.chain),

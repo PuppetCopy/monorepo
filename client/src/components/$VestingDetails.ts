@@ -5,7 +5,7 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { combine, constant, map, mergeArray, multicast, now, sample, snapshot, startWith, take } from "@most/core"
 import { Stream } from "@most/types"
 import { BASIS_POINTS_DIVISOR, IntervalTime, combineState, filterNull, getMappedValue, readableDate, readableTokenAmountLabel, switchMap, unixTimestampNow } from "common-utils"
-import { ARBITRUM_ADDRESS } from "gmx-middleware-const"
+import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
@@ -102,7 +102,7 @@ export const $VestingDetails = (config: IVestingDetails) => component((
           $text('Locked'),
           $intermediateMessage(
             map(async lockQuery => {
-              return readableTokenAmountLabel(PUPPET.PUPPET_TOKEN_DESCRIPTION, (await lockQuery).amount)
+              return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, (await lockQuery).amount)
             }, lockDetails)
           ),
         )
@@ -270,7 +270,7 @@ export const $VestingDetails = (config: IVestingDetails) => component((
           $$option: combine((selected, value) => {
           // userGeneratedRevenueInUsdQuery
 
-            const rewardAmount = readableTokenAmountLabel(PUPPET.PUPPET_TOKEN_DESCRIPTION, 100000000000000000000n)
+            const rewardAmount = readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, 100000000000000000000n)
 
             return $row(layoutSheet.spacingSmall)(
               $text(String(value)),
@@ -297,7 +297,7 @@ export const $VestingDetails = (config: IVestingDetails) => component((
       //       $$option: combine((selected, value) => {
       //         // userGeneratedRevenueInUsdQuery
 
-      //         const rewardAmount = readableTokenAmountLabel(PUPPET.PUPPET_TOKEN_DESCRIPTION, 134270000000000000000n)
+      //         const rewardAmount = readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, 134270000000000000000n)
 
       //         return $row(layoutSheet.spacingSmall)(
       //           $text(String(value)),

@@ -36,7 +36,7 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
               
     return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
       address
-        ? $profileDisplay({ address })
+        ? $profileDisplay({ account })
         : style({ cursor: 'pointer' }, $disconnectedWalletDisplay()),
 
       $seperator2,

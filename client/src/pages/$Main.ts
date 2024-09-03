@@ -3,36 +3,33 @@ import { $element, $node, $text, component, eventElementTarget, style, styleBeha
 import * as router from '@aelea/router'
 import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { BLUEBERRY_REFFERAL_CODE } from "@gambitdao/gbc-middleware"
-import { awaitPromises, constant, empty, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
+import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
 import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import { ISetRouteType, queryLatestPriceTick, subgraphStatus } from "puppet-middleware-utils"
+import { queryLatestPriceTick, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { arbitrum } from "viem/chains"
+import * as walletLink from "wallet"
 import { $midContainer } from "../common/$common.js"
+import { $heading2 } from "../common/$text"
+import { subgraphClient } from "../common/graphClient"
 import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
-import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer.js"
 import { IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor"
 import * as storeDb from "../const/store.js"
 import { store } from "../const/store.js"
 import { newUpdateInvoke } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
-import * as walletLink from "wallet"
+import { $Admin } from "./$Admin"
 import { $Home } from "./$Home.js"
-import { $Trade } from "./$Trade.js"
 import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
-import { $heading2 } from "../common/$text"
-import { $Admin } from "./$Admin"
-import { subgraphClient } from "../common/graphClient"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -45,23 +42,16 @@ interface IApp {
   baseRoute?: string
 }
 
-
 export const chains = [arbitrum] as const
 
 
-// const storage = createStorage({ storage: window.localStorage, key: 'walletLink' })
-// const llamaRpc = import.meta.env.VITE_LLAMANODES_PROJECT_ID || '01HCB0CBBH06TE3XSM6ZE4YYAD'
-
-export const publicTransportMap = {
+export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMap'] = {
   [arbitrum.id]: viem.fallback([
     viem.webSocket('wss://arb-mainnet.g.alchemy.com/v2/RBsflxWv6IhITsLxAWcQlhCqSuxV7Low'),
     viem.http('https://arb1.arbitrum.io/rpc')
   ]),
   // [CHAIN.AVALANCHE]: avaGlobalProvider,
 }
-
-
-
 
 
 
@@ -72,7 +62,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   [clickUpdateVersion, clickUpdateVersionTether]: Behavior<any, bigint>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 ) => {
@@ -105,9 +95,9 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const isDesktopScreen = skipRepeats(map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))))
 
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
-  const selectedTradeRouteList = replayLatest(multicast(uiStorage.replayWrite(storeDb.store.global, selectTradeRouteList, 'selectedTradeRouteList')))
+  const collateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectCollateralTokenList, 'collateralTokenList')
 
-  const priceTickMapQuery = replayLatest(queryLatestPriceTick(subgraphClient, { activityTimeframe, selectedTradeRouteList }, 50))
+  const priceTickMapQuery = replayLatest(multicast(queryLatestPriceTick(subgraphClient, { activityTimeframe, collateralTokenList })))
 
   const subgraphStatusStream = subgraphStatus(subgraphClient)
   const subgraphBeaconStatusColor = map(status => {
@@ -119,7 +109,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
   //  fromPromise(indexDb.get(store.global, 'wallet'))
-
 
   const changeWalletProviderRdns = map(detail => {
     return detail ? detail.info.rdns : null
@@ -199,20 +188,20 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, selectedTradeRouteList, priceTickMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, collateralTokenList, priceTickMapQuery, walletClientQuery })({
                     changeWallet: changeWalletTether(),
                     modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectTradeRouteList: selectTradeRouteListTether(),
+                    selectCollateralTokenList: selectCollateralTokenListTether(),
                   })
                 )
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedTradeRouteList, priceTickMapQuery })({
+                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, collateralTokenList, priceTickMapQuery })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectTradeRouteList: selectTradeRouteListTether(),
+                    selectCollateralTokenList: selectCollateralTokenListTether(),
                     routeChange: changeRouteTether(),
                     modifySubscriber: modifySubscriberTether(),
                   }))
@@ -220,10 +209,10 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, priceTickMapQuery, activityTimeframe, collateralTokenList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectTradeRouteList: selectTradeRouteListTether(),
+                    selectCollateralTokenList: selectCollateralTokenListTether(),
                     changeRoute: changeRouteTether(),
                   }))
                 )
@@ -257,17 +246,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                     $node(style({ height: '100px' }))(),
                   )
                 ),
-              ),
-              router.match(tradeRoute)(
-                switchMap(chain => {
-                  return $Trade({
-                    providerClientQuery,
-                    walletClientQuery,
-                    chain: chain, referralCode: BLUEBERRY_REFFERAL_CODE, parentRoute: tradeRoute
-                  })({
-                    changeWallet: changeWalletTether(),
-                  })
-                }, awaitPromises(chainQuery))
               ),
               $row(layoutSheet.spacing, style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
                 $row(
@@ -313,15 +291,15 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
           ),
 
           $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
-            $RouteSubscriptionDrawer({
-              providerClientQuery,
-              walletClientQuery,
-              modifySubscriptionList: replayLatest(modifySubscriptionList, []),
-              modifySubscriber,
-            })({
-              changeWallet: changeWalletTether(),
-              modifySubscriptionList: modifySubscriptionListTether()
-            })
+            // $RouteSubscriptionDrawer({
+            //   providerClientQuery,
+            //   walletClientQuery,
+            //   modifySubscriptionList: replayLatest(modifySubscriptionList, []),
+            //   modifySubscriber,
+            // })({
+            //   changeWallet: changeWalletTether(),
+            //   modifySubscriptionList: modifySubscriptionListTether()
+            // })
           )
         )
       ),

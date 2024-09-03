@@ -261,7 +261,7 @@ async function onPositionDecrease(event: GmxEvent, context: handlerContext) {
     return
   }
 
-  const storedPosition = await context.Position.get(positionRef?.id)
+  const storedPosition = await context.Position.get(positionRef?.position_id)
 
   if (!storedPosition) {
     context.log.error("Position not found")

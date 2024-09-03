@@ -25,10 +25,10 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, providerClientQuery, priceTickMapQuery, puppetTradeRouteListQuery, selectedTradeRouteList, routeTypeListQuery, route } = config
+  const { activityTimeframe, walletClientQuery, providerClientQuery, priceTickMapQuery, puppetTradeRouteListQuery, collateralTokenList, routeTypeListQuery, route } = config
 
   return [
 
@@ -36,7 +36,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
       $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
           $ProfilePeformanceTimeline({ ...config })({
-            selectTradeRouteList: selectTradeRouteListTether(),
+            selectCollateralTokenList: selectCollateralTokenListTether(),
             changeActivityTimeframe: changeActivityTimeframeTether(),
           }),
         ),
@@ -80,13 +80,13 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
               //   )
               // })
             )
-          }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectedTradeRouteList, routeTypeListQuery })))),
+          }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, collateralToken, routeTypeListQuery })))),
         ),
       ),
     ),
     
     {
-      changeRoute, modifySubscriber, changeActivityTimeframe, selectTradeRouteList
+      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralToken
     }
   ]
 })

@@ -15,7 +15,7 @@ import { Stream } from "@most/types"
 import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream, switchMap } from "common-utils"
 import * as GMX from "gmx-middleware-const"
 import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress, TEMP_MARKET_LIST } from "gmx-middleware-utils"
-import { IMirrorSeed, ISetRouteType, latestPriceMap } from "puppet-middleware-utils"
+import { IMirrorPosition, ISetRouteType, latestPriceMap } from "puppet-middleware-utils"
 import {
   $bear, $bull,
   $ButtonToggle,
@@ -46,7 +46,7 @@ export interface ITradeParams {
   tradeRoute: viem.Address | null
   routeTypeKey: viem.Hex
 
-  mirrorPosition: IMirrorSeed | null
+  mirrorPosition: IMirrorPosition | null
   netPositionValueUsd: bigint
   isTradingEnabled: boolean
   primarySpendAmount: bigint | null

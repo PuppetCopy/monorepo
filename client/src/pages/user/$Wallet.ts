@@ -21,6 +21,8 @@ import { $TraderPage } from "./$Trader.js"
 import { $WalletPuppet } from "./$WalletPuppet.js"
 import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
 import { subgraphClient } from "../../common/graphClient"
+import * as viem from 'viem'
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -44,14 +46,14 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 
   [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>,
 ) => {
 
   const {
     route, walletClientQuery, providerClientQuery,
-    activityTimeframe, selectedTradeRouteList, priceTickMapQuery 
+    activityTimeframe, collateralTokenList, priceTickMapQuery 
   } = config
 
   const profileMode = uiStorage.replayWrite(storeDb.store.wallet, selectProfileMode, 'selectedTab')
@@ -105,7 +107,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
         }, walletClientQuery)
 
         if (params.profileMode === IWalletTab.PUPPET) {
-          const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+          const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
           
           const settledPositionListQuery = map(async tradeRoute => {
             return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
@@ -115,20 +117,20 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
           }, puppetTradeRouteListQuery)
 
           return $WalletPuppet({
-            walletClientQuery, route, priceTickMapQuery, openPositionListQuery, settledPositionListQuery, puppetTradeRouteListQuery,
-            activityTimeframe, selectedTradeRouteList, routeTypeListQuery, providerClientQuery,
+            walletClientQuery, route, priceTickMapQuery, positionListQuery, puppetTradeRouteListQuery,
+            activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
           })({
             changeRoute: changeRouteTether(),
             modifySubscriber: modifySubscriberTether(),
             changeActivityTimeframe: changeActivityTimeframeTether(),
-            selectTradeRouteList: selectTradeRouteListTether(),
+            selectCollateralTokenList: selectCollateralTokenListTether(),
           })
         } else if (params.profileMode === IWalletTab.TRADER) {
-          const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, selectedTradeRouteList, address })
-          const openPositionListQuery = queryPosition(subgraphClient, { address, selectedTradeRouteList })
+          const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
+          const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
 
           return $column(layoutSheet.spacingTiny)(
-            $TraderPage({ ...config, openPositionListQuery, settledPositionListQuery })({ 
+            $TraderPage({ ...config, positionListQuery })({ 
               changeActivityTimeframe: changeActivityTimeframeTether(),
             })
           ) 
@@ -175,7 +177,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                       const provider = await providerQuery
                       const puppetSupply = readTotalEmitted(provider)
 
-                      return readableTokenAmount(PUPPET.PUPPET_TOKEN_DESCRIPTION, await puppetSupply)
+                      return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply)
                     }, providerClientQuery)
                   ),
                 )
@@ -223,7 +225,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
     ),
 
     {
-      modifySubscriber, changeActivityTimeframe, selectTradeRouteList, changeRoute, changeWallet
+      modifySubscriber, changeActivityTimeframe, selectCollateralTokenList, changeRoute, changeWallet
     }
   ]
 })

@@ -1,11 +1,11 @@
 import { combineObject, fromCallback, replayLatest } from "@aelea/core"
 import { constant, map, mergeArray, multicast, now, startWith } from "@most/core"
 import { disposeWith } from "@most/disposable"
-import { type Stream } from "@most/types"
+import type { Stream } from "@most/types"
 import { EthereumProvider } from "@walletconnect/ethereum-provider"
-import type { EIP1193Provider } from "mipd"
-import { createPublicClient, type Account, type Chain, type CustomTransport, type EIP1193EventMap, type PublicClient, type Transport, type WalletClient, createWalletClient,  custom, fallback,  getAddress } from "viem"
 import { switchMap } from "common-utils"
+import type { EIP1193Provider } from "mipd"
+import { createPublicClient, createWalletClient, custom, fallback, getAddress, type Account, type Chain, type CustomTransport, type EIP1193EventMap, type PublicClient, type Transport, type WalletClient } from "viem"
 
 
 export type IPublicProvider = PublicClient<Transport, Chain>
@@ -20,11 +20,12 @@ export interface IWalletLink {
 
 
 
-interface IWalletLinkConfig {
-  publicTransportMap: Partial<Record<number, Transport>>
+export interface IWalletLinkConfig {
+  publicTransportMap: { [chainId: number]: Transport }
   walletProvider: Stream<EIP1193Provider | null>,
   chainQuery: Stream<Promise<Chain>>,
 }
+
 
 
 export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
@@ -44,7 +45,7 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
     })
 
     return startWith(provider, mergeArray([disconnect, reEmitProvider]))
-  }, config.walletProvider )
+  }, config.walletProvider)
 
   const providerList = Object.values(publicTransportMap)
   if (providerList.length === 0) {
@@ -79,7 +80,7 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
     // })
 
     // const chainId = await params.walletProvider.request({ method: 'eth_chainId' })
-    
+
 
     if (accountList.length === 0) {
       return null

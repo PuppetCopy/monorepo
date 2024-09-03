@@ -74,14 +74,14 @@ export const readableNumber = curry2((formatOptions: Intl.NumberFormatOptions, a
   const absAmount = Math.abs(Number(ammount))
   const digitOptions = absAmount >= 1000 ? readableLargeNumber : absAmount >= 1 ? readableAccountingNumber : readableTinyNumber
 
-  return Intl.NumberFormat("en-US", { ...digitOptions, ...formatOptions,  }).format(ammount)
+  return Intl.NumberFormat("en-US", { ...digitOptions, ...formatOptions, }).format(ammount)
 })
 
 const intlOptions: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'short', day: '2-digit' }
 
-export const readableUnitAmount = readableNumber({ })
+export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)
-export const readableUSD = readableNumber({ })
+export const readableUSD = readableNumber({})
 export const readablePercentage = (amount: bigint) => readableUnitAmount(formatFixed(amount, 2)) + '%'
 export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(amount, FACTOR_PERCISION) * 100) + '%'
 export const readableLeverage = (a: bigint, b: bigint) => (b ? readableUnitAmount(formatFixed(a * BASIS_POINTS_DIVISOR / b, 4)) : 0n) + 'x'
@@ -100,7 +100,7 @@ export function readableFileSize(sizeBytes: number | bigint): string {
   let size = Math.abs(Number(sizeBytes))
 
   let u = 0
-  while(size >= BYTES_PER_KB && u < UNITS.length-1) {
+  while (size >= BYTES_PER_KB && u < UNITS.length - 1) {
     size /= BYTES_PER_KB
     ++u
   }
@@ -282,7 +282,7 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
     if (prev.time > nextTime) {
       throw new Error('source is not sorted')
     }
-    
+
 
     const intervalSlot = Math.floor(nextTime / interval)
     const squashPrev = timeslotMap[intervalSlot]
@@ -322,26 +322,22 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
 }
 
 
-function defaultComperator<T>(queryParams: IRequestSortApi<T>) {
-  return function (a: T, b: T) {
-    return queryParams.direction === 'desc'
-      ? Number(b[queryParams.selector]) - Number(a[queryParams.selector])
-      : Number(a[queryParams.selector]) - Number(b[queryParams.selector])
-  }
+function defaultComperator(queryParams: IRequestSortApi) {
+  return (a: any, b: any) => queryParams.direction === 'desc'
+    ? Number(b[queryParams.selector]) - Number(a[queryParams.selector])
+    : Number(a[queryParams.selector]) - Number(b[queryParams.selector])
 }
 
-export function pagingQuery<T, ReqParams extends IRequestPagePositionApi & (IRequestSortApi<T> | object)>(
-  queryParams: ReqParams,
+export type IPagingQueryParams = IRequestPagePositionApi & IRequestSortApi
+
+export function pagingQuery<T, TParams extends IPagingQueryParams>(
+  queryParams: TParams,
   res: T[],
-  customComperator?: (a: T, b: T) => number
+  customComperator: (a: T, b: T) => number = defaultComperator(queryParams)
 ): IResponsePageApi<T> {
   let list = res
   if ('selector' in queryParams) {
-    const comperator = typeof customComperator === 'function'
-      ? customComperator
-      : defaultComperator(queryParams)
-
-    list = res.sort(comperator)
+    list = res.sort(customComperator)
   }
 
   const { pageSize, offset } = queryParams
@@ -560,7 +556,7 @@ export function invertColor(hex: string, bw = true) {
   return "#" + padZero((255 - r).toString(16)) + padZero((255 - g).toString(16)) + padZero((255 - b).toString(16))
 }
 
-export function getClosestNumber<T extends readonly number[]> (arr: T, chosen: number): T[number] {
+export function getClosestNumber<T extends readonly number[]>(arr: T, chosen: number): T[number] {
   return arr.reduce((a, b) => b - chosen < chosen - a ? b : a)
 }
 
@@ -612,7 +608,7 @@ export function getShortHash(name: string, obj: any) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i)
     hash |= 0 // Convert to 32bit integer
   }
-    
+
   return `${name}-${hash.toString(16)}`
 }
 

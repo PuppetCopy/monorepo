@@ -12,7 +12,7 @@ import { IPositionActivityParams } from "../../pages/type"
 
 
 export interface IAccountSummary extends IPositionActivityParams {
-  address: viem.Address
+  account: viem.Address
   puppet?: viem.Address
 }
 
@@ -20,13 +20,13 @@ export interface IAccountSummary extends IPositionActivityParams {
 export const $TraderSummary = (config: IAccountSummary) => component((
 ) => {
 
-  const { address, openPositionListQuery, settledPositionListQuery, puppet } = config
+  const { account, positionListQuery, puppet } = config
 
   const metricsQuery = multicast(map(async params => {
-    const allPositions = [...await params.settledPositionListQuery, ...await params.openPositionListQuery]
+    const allPositions = await params.positionListQuery
 
     return accountSettledPositionListSummary(allPositions, puppet)
-  }, combineState({ openPositionListQuery, settledPositionListQuery })))
+  }, combineState({ positionListQuery })))
 
   return [
 
@@ -34,7 +34,7 @@ export const $TraderSummary = (config: IAccountSummary) => component((
       $node(style({ display: 'flex', flexDirection: screenUtils.isDesktopScreen ? 'row' : 'column', gap: screenUtils.isDesktopScreen ? '56px' : '26px', zIndex: 10, placeContent: 'center', alignItems: 'center', padding: '0 8px' }))(
         $row(
           $profileDisplay({
-            address,
+            account,
             labelSize: '22px',
             profileSize: screenUtils.isDesktopScreen ? 90 : 90
           })
@@ -82,13 +82,13 @@ export const $TraderSummary = (config: IAccountSummary) => component((
 
 export const $PuppetSummary = (config: IAccountSummary) => component(() => {
 
-  const { address, openPositionListQuery, settledPositionListQuery, puppet,  } = config
+  const { account, positionListQuery, puppet,  } = config
 
   const metricsQuery = multicast(map(async params => {
-    const allPositions = [...await params.settledPositionListQuery, ...await params.openPositionListQuery]
+    const allPositions = await params.positionListQuery
 
     return accountSettledPositionListSummary(allPositions, puppet)
-  }, combineState({ openPositionListQuery, settledPositionListQuery })))
+  }, combineState({ positionListQuery })))
 
   return [
 
@@ -96,7 +96,7 @@ export const $PuppetSummary = (config: IAccountSummary) => component(() => {
       $node(style({ display: 'flex', flexDirection: screenUtils.isDesktopScreen ? 'row' : 'column', gap: screenUtils.isDesktopScreen ? '56px' : '26px', zIndex: 10, placeContent: 'center', alignItems: 'center', padding: '0 8px' }))(
         $row(
           $profileDisplay({
-            address,
+            account,
             labelSize: '22px',
             profileSize: screenUtils.isDesktopScreen ? 90 : 90
           })

@@ -6,10 +6,10 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
 import { getBasisPoints, getTokenUsd, lst, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
-import { TOKEN_SYMBOL } from "gmx-middleware-const"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import {
   getEntryPrice,
-  getMarketToken,
+  getMarketIndexToken,
   getRoughLiquidationPrice,
   getTokenDescription, IAbstractPositionParams,
   IMarket,
@@ -48,23 +48,14 @@ export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) 
   )
 }
 
-export const $routeIntent = (isLong: boolean, indexToken: viem.Address) => {
-  return $row(style({ alignItems: 'center' }))(
-    $icon({
-      svgOps: style({ borderRadius: '50%', padding: '4px', marginRight: '-6px', zIndex: 0, alignItems: 'center', fill: pallete.message, backgroundColor: pallete.horizon }),
-      $content: isLong ? $bull : $bear,
-      viewBox: '0 0 32 32',
-      width: '26px'
-    }),
-    $tokenIcon(indexToken, { width: '28px' }),
-  )
-}
 
 export const $entry = (mp: IPosition) => {
-  const indexToken = getMarketToken(mp.market).indexToken
+  const indexToken = getMarketIndexToken(mp.market)
   const indexDescription = getTokenDescription(indexToken)
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'center', placeContent: 'center', fontSize: '.85rem' }))(
-    $routeIntent(mp.isLong, indexToken),
+    $tokenIcon(indexToken, { width: '28px' }),
+    // $text(mp.market),
+    // $text(indexToken),
     $text(readableUsd(getEntryPrice(mp.sizeInUsd, mp.sizeInTokens, indexDescription))),
   )
 }
@@ -92,32 +83,24 @@ export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
   )
 }
 
-// export const $settledSizeDisplay = (pos: IPosition) => {
-//   const indexToken = getMappedValue(GMX.MARKET_INDEX_TOKEN_MAP, mp.position.market)
+export const $tokenLabeled = (indexToken: viem.Address, displayLabel = true) => {
+  const indexDescription = getTokenDescription(indexToken)
 
-//   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-//     $text(readableFixedUSD30(pos.maxSizeUsd)),
-//     $seperator2,
-//     $row(layoutSheet.spacingSmall, style({ fontSize: '.85rem', placeContent: 'center' }))(
-//       $leverage(pos.maxSizeUsd, pos.maxCollateralUsd),
-//       $row(layoutSheet.spacingTiny, style({ alignItems: 'center' }))(
-//         $icon({
-//           fill: isPositionSettled(pos) ? pallete.negative : undefined,
-//           $content: $skull,
-//           viewBox: '0 0 32 32',
-//           width: '12px'
-//         }),
-//         $text(readableFixedUSD30(pos.averagePrice)),
-//       ),
-//     )
-//   )
-// }
-
+  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+    $tokenIcon(indexToken, { width: '36px' }),
+    displayLabel
+      ? $column(layoutSheet.spacingTiny)(
+        $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
+        // $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
+      )
+      : empty(),
+  )
+}
 
 
 export const $tokenIcon = (indexToken: viem.Address, IIcon: { width: string } = { width: '24px' }) => {
   const tokenDesc = getTokenDescription(indexToken)
-  const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[TOKEN_SYMBOL.GMX]
+  const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[TOKEN_DESCRIPTION_MAP.PUPPET.symbol]
 
   if (!$token) {
     throw new Error('Unable to find matched token')
@@ -131,11 +114,11 @@ export const $tokenIcon = (indexToken: viem.Address, IIcon: { width: string } = 
   })
 }
 
-export const $sizeAndLiquidation = (mp: IMirrorSeed, puppet?: viem.Address) => {
+export const $sizeAndLiquidation = (mp: IMirrorPosition, puppet?: viem.Address) => {
   const sizeInUsd = getParticiapntPortion(mp, mp.sizeInUsd, puppet)
   const collateralInToken = getParticiapntPortion(mp, mp.collateralAmount, puppet)
   const collateralUsd = getTokenUsd(mp.increaseList[0].collateralTokenPriceMin, collateralInToken)
-  const indexToken = getMarketToken(mp.market).indexToken
+  const indexToken = getMarketIndexToken(mp.market)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'flex-end' }))(
@@ -159,22 +142,22 @@ export const $puppets = (
   }
 
   return $row(style({ cursor: 'pointer' }))(
-    ...puppets.map(address => {
+    ...puppets.map(account => {
       if (!click) {
         return style({ marginRight: '-12px', border: '2px solid black' })(
-          $profileAvatar({ address, profileSize: 25 })
+          $profileAvatar({ account, profileSize: 25 })
         )
       }
 
 
       return click(nodeEvent('click'), map(() => {
-        const url = `/app/profile/puppet/${address}`
+        const url = `/app/profile/puppet/${account}`
 
         history.pushState({}, '', url)
         return url
       }))(
         style({ marginRight: '-12px', border: '2px solid black' })(
-          $profileAvatar({ address, profileSize: 25 })
+          $profileAvatar({ account, profileSize: 25 })
         )
       )
     }),
@@ -184,9 +167,9 @@ export const $puppets = (
 
 export const $positionPnl = (mp: IMirrorPosition, puppet?: viem.Address) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-    $positionSlotPnl(mp, puppet),
+    $settledpositionPnl(mp, puppet),
     $seperator2,
-    $positionOpenRoi(mp, puppet),
+    $openPositionRoi(mp, puppet),
   )
 }
 
@@ -237,8 +220,8 @@ export const $PnlPercentageValue = (pnl: Stream<bigint> | bigint, collateral: bi
   )
 }
 
-export const $positionSlotPnl = (mp: IMirrorSeed | IMirror, puppet?: viem.Address) => {
-  const indexToken = getMarketToken(mp.market).indexToken
+export const $settledpositionPnl = (mp: IPosition, puppet?: viem.Address) => {
+  const indexToken = getMarketIndexToken(mp.market)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
   const isSettled = isPositionSettled(mp)
@@ -262,8 +245,8 @@ export const $positionSlotPnl = (mp: IMirrorSeed | IMirror, puppet?: viem.Addres
     )
 }
 
-export const $positionOpenRoi = (mp: IMirrorSeed | IMirror, puppet?: viem.Address) => {
-  const indexToken = getMarketToken(mp.market).indexToken
+export const $openPositionRoi = (mp: IPosition, puppet?: viem.Address) => {
+  const indexToken = getMarketIndexToken(mp.market)
   const lstIncrease = lst(mp.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralToken)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
@@ -391,7 +374,7 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
   return [
     $Link({
       $content: $profileDisplay({
-        address: trader,
+        account: trader,
         // $profileContainer: $defaultBerry(style({ width: '50px' }))
       }),
       route: route.create({ fragment: 'baseRoute' }),
@@ -434,12 +417,13 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
         dismiss: modifySubscribeList,
         $target: switchMap(expiry => {
           return $ButtonSecondary({
-            $content: $row(layoutSheet.spacingTiny, style({ alignItems: 'center' }))(
-              // $route({ collateralToken: collateralToken, indexToken: collateralToken, isLong: true }, false),
-              $puppets(summary.puppets),
-              $icon({ $content: $puppetLogo, width: '26px', svgOps: style({ backgroundColor: pallete.background, borderRadius: '50%', padding: '4px', border: `1px solid ${pallete.message}`, marginRight: '-18px' }), viewBox: '0 0 32 32' }),
-            ),
-            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '6px 2px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' }))
+            $content: summary.puppets.length
+              ? $row(style({ alignItems: 'center' }))($puppets(summary.puppets))
+              : $row(style({ alignItems: 'center' }))(
+                $icon({ $content: $puppetLogo, width: '18px', viewBox: '0 0 32 32' }),
+                $text('Copy')
+              ),
+            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '8px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' }))
           })({
             click: popRouteSubscriptionEditorTether(constant(expiry))
           })

@@ -155,16 +155,16 @@ export const $MainMenu = (config: MainMenu) => component((
         })({
           click: routeChangeTether()
         }),
-        $pageLink({
-          $content: $row(layoutSheet.spacing, style({ alignItems: 'center', cursor: 'pointer',  borderRadius: '50px', pointerEvents: 'none' }))(
-            $icon({ $content: $gmxLogo, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
-            $text(style({ fontSize: '1.15rem' }))('Trade')
-          ), 
-          route: route.create({ fragment: 'trade' }),
-          url: '/app/trade',
-        })({
-          click: routeChangeTether()
-        }),
+        // $pageLink({
+        //   $content: $row(layoutSheet.spacing, style({ alignItems: 'center', cursor: 'pointer',  borderRadius: '50px', pointerEvents: 'none' }))(
+        //     $icon({ $content: $gmxLogo, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
+        //     $text(style({ fontSize: '1.15rem' }))('Trade')
+        //   ), 
+        //   route: route.create({ fragment: 'trade' }),
+        //   url: '/app/trade',
+        // })({
+        //   click: routeChangeTether()
+        // }),
       ),
 
       $row(layoutSheet.spacingBig, style({ flex: 1, placeContent: 'flex-end', alignItems: 'center' }))(

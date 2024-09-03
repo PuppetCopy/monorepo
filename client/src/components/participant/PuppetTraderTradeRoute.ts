@@ -7,7 +7,7 @@ import { constant, empty, map, multicast, snapshot, startWith } from "@most/core
 import { IntervalTime, pagingQuery, readableLeverage, readableUsd, switchMap, unixTimestampNow } from "common-utils"
 import { IPriceTickListMap } from "gmx-middleware-utils"
 import { IPuppetTradeRoute, ISetRouteType, accountSettledPositionListSummary, openPositionListPnl } from "puppet-middleware-utils"
-import { $Table, $caretDown, $infoLabeledValue, ScrollRequest } from "ui-components"
+import { $Table, $caretDown, $infoLabeledValue, IQuantumScrollPage } from "ui-components"
 import { $Popover } from "../$Popover"
 import { $TraderDisplay, $pnlDisplay, $puppets } from "../../common/$common.js"
 import { $puppetLogo } from "../../common/$icons"
@@ -31,7 +31,7 @@ export const $PuppetTraderTradeRoute = (config: IPuppetTraderTradeRoute) => comp
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, bigint>,
   [changeRoute, changeRouteTether]: Behavior<string, string>,
-  [scrollRequest, scrollRequestTether]: Behavior<ScrollRequest>,
+  [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
   [toggleHistoryPanel, toggleHistoryPanelTether]: Behavior<any, boolean>,
 
 ) => {

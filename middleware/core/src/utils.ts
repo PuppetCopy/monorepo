@@ -1,6 +1,6 @@
 import { combineArray, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMarketToken, getPositionPnlUsd } from "gmx-middleware-utils"
+import { getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { latestPriceMap } from "./graph.js"
 import { IMirrorListSummary, IMirrorPosition, IPosition, IPuppetPosition } from "./types.js"
@@ -82,7 +82,7 @@ export function openPositionListPnl(
   if (tradeList.length === 0) return now(0n)
 
   const pnlList = tradeList.map(mp => {
-    const indexToken = getMarketToken(mp.market).indexToken
+    const indexToken = getMarketIndexToken(mp.market)
     return map(pm => {
       const markPrice = pm[indexToken].max
       const pnl = getOpenMpPnL(mp, markPrice, puppet)

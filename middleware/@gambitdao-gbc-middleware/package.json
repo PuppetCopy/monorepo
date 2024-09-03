@@ -24,9 +24,9 @@
         "@most/types": "^1.1.0",
         "isomorphic-fetch": "^3.0.0",
         "@types/isomorphic-fetch": "^0.0.39",
-        "@urql/core": "^5.0.5",
-        "abitype": "^1.0.0",
-        "graphql": "^16.8.1",
-        "viem": "^2.7.9"
+        "@urql/core": "5.0.6",
+        "abitype": "1.0.6",
+        "graphql": "^16.9.0",
+        "viem": "2.21.1"
     }
 }

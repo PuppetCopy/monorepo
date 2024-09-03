@@ -1,4 +1,4 @@
-import { schema as gmxSchema, ISchema } from "gmx-middleware-utils"
+import { schema as gmxSchema, IPriceCandle, ISchema } from "gmx-middleware-utils"
 import { IMirror, IMirrorPosition, IPuppetPosition, ISetRouteType } from "./types.js"
 
 
@@ -55,9 +55,15 @@ const setRouteType: ISchema<ISetRouteType> = {
   __typename: 'SetRouteType',
 }
 
-
+const priceCandle: ISchema<IPriceCandle> = {
+  id: 'string',
+  timestamp: 'int',
+  token: 'address',
+  c: 'int',
+  __typename: 'PriceCandle',
+}
 
 
 export const schema = {
-  puppetPosition, mirrorPosition, setRouteType,
+  priceCandle, puppetPosition, mirrorPosition, setRouteType,
 }

@@ -32,11 +32,11 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   [selectProfileMode, selectProfileModeTether]: Behavior<IRouteOption, IRouteOption>,
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectTradeRouteList, selectTradeRouteListTether]: Behavior<ISetRouteType[]>,
+  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 
 ) => {
 
-  const { route, routeTypeListQuery, activityTimeframe, selectedTradeRouteList, priceTickMapQuery, } = config
+  const { route, activityTimeframe, collateralTokenList, priceTickMapQuery, } = config
 
   const profileAddressRoute = config.route
   const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ title: 'Trader', fragment: ETH_ADDRESS_REGEXP })
@@ -81,16 +81,14 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
           {
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
-              const address = viem.getAddress(urlFragments[urlFragments.length - 1])
-
-              const settledPositionListQuery = queryPosition(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
-              const openPositionListQuery = queryPosition(subgraphClient, { address, selectedTradeRouteList })
+              const account = viem.getAddress(urlFragments[urlFragments.length - 1])
+              const positionListQuery = queryPosition(subgraphClient, { account, activityTimeframe, collateralTokenList })
 
               return $column(layoutSheet.spacingBig)(
-                $TraderSummary({ ...config, address, settledPositionListQuery, openPositionListQuery })({}),
+                $TraderSummary({ ...config, account, positionListQuery })({}),
 
-                $TraderPage({ ...config, settledPositionListQuery, openPositionListQuery, })({
-                  selectTradeRouteList: selectTradeRouteListTether(),
+                $TraderPage({ ...config, positionListQuery, })({
+                  selectCollateralTokenList: selectCollateralTokenListTether(),
                   changeRoute: changeRouteTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                 })
@@ -103,7 +101,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const address = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, selectedTradeRouteList })
+              const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralTokenList })
 
               const settledPositionListQuery = map(async trList => {
                 const tradeList = (await trList).flatMap(p => p.settledList.map(x => x.position))
@@ -116,7 +114,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
               }, puppetTradeRouteListQuery)
 
               return $column(layoutSheet.spacingBig)(
-                $PuppetSummary({ ...config, address, puppet: address, openPositionListQuery, settledPositionListQuery })({}),
+                $PuppetSummary({ ...config, account, puppet: address, positionListQuery })({}),
 
                 $column(layoutSheet.spacingTiny)(
                   $PuppetProfile({
@@ -127,7 +125,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                   })({
                     changeRoute: changeRouteTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectTradeRouteList: selectTradeRouteListTether(),
+                    selectCollateralTokenList: selectCollateralTokenListTether(),
                     modifySubscriber: modifySubscriberTether()
                   }),
                 ),
@@ -144,7 +142,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
     ),
 
     {
-      selectTradeRouteList, modifySubscriber, changeActivityTimeframe,
+      selectCollateralTokenList, modifySubscriber, changeActivityTimeframe,
       changeRoute: mergeArray([
         changeRoute,
         map(option => {

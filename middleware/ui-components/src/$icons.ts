@@ -1,5 +1,5 @@
 import { $svg, attr } from "@aelea/dom"
-import { TOKEN_SYMBOL } from "gmx-middleware-const"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 
 export const $path = $svg('path')
 
@@ -188,35 +188,35 @@ export const $sol = $svg('g')(
 
 
 export const $tokenIconMap = {
-  [TOKEN_SYMBOL.PUPPET]: $puppet,
-  [TOKEN_SYMBOL.GMX]: $gmx,
-  [TOKEN_SYMBOL.ESGMX]: $gmx,
-  [TOKEN_SYMBOL.GLP]: $glp,
+  [TOKEN_DESCRIPTION_MAP.PUPPET.symbol]: $puppet,
+  [TOKEN_DESCRIPTION_MAP.GMX.symbol]: $gmx,
+  [TOKEN_DESCRIPTION_MAP.ESGMX.symbol]: $gmx,
+  [TOKEN_DESCRIPTION_MAP.GLP.symbol]: $glp,
 
-  [TOKEN_SYMBOL.ARB]: $arb,
-  [TOKEN_SYMBOL.SOL]: $sol,
-  [TOKEN_SYMBOL.SynDOGE]: $doge,
-  [TOKEN_SYMBOL.SynBTC]: $btc,
-  [TOKEN_SYMBOL.SynLTC]: $ltc,
-  [TOKEN_SYMBOL.SynXRP]: $xrp,
+  [TOKEN_DESCRIPTION_MAP.ARB.symbol]: $arb,
+  [TOKEN_DESCRIPTION_MAP.SOL.symbol]: $sol,
+  [TOKEN_DESCRIPTION_MAP.SynDOGE.symbol]: $doge,
+  [TOKEN_DESCRIPTION_MAP.SynBTC.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.SynLTC.symbol]: $ltc,
+  [TOKEN_DESCRIPTION_MAP.SynXRP.symbol]: $xrp,
   
 
-  [TOKEN_SYMBOL.BTC]: $btc,
-  [TOKEN_SYMBOL.WBTC]: $btc,
-  [TOKEN_SYMBOL.WBTCE]: $btc,
-  [TOKEN_SYMBOL.BTCB]: $btc,
-  [TOKEN_SYMBOL.ETH]: $eth,
-  [TOKEN_SYMBOL.WETH]: $eth,
-  [TOKEN_SYMBOL.UNI]: $uni,
-  [TOKEN_SYMBOL.LINK]: $link,
-  [TOKEN_SYMBOL.AVAX]: $avax,
-  [TOKEN_SYMBOL.WAVAX]: $avax,
+  // [TOKEN_DESCRIPTION_MAP.BTC.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.BTCB.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.ETH.symbol]: $eth,
+  [TOKEN_DESCRIPTION_MAP.WETH.symbol]: $eth,
+  [TOKEN_DESCRIPTION_MAP.UNI.symbol]: $uni,
+  [TOKEN_DESCRIPTION_MAP.LINK.symbol]: $link,
+  [TOKEN_DESCRIPTION_MAP.AVAX.symbol]: $avax,
+  [TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: $avax,
 
-  [TOKEN_SYMBOL.DAI]: $dai,
-  [TOKEN_SYMBOL.USDC]: $usdc,
-  [TOKEN_SYMBOL.USDCE]: $usdc,
-  [TOKEN_SYMBOL.USDT]: $usdt,
-  [TOKEN_SYMBOL.FRAX]: $frax,
-  [TOKEN_SYMBOL.MIM]: $usd,
+  [TOKEN_DESCRIPTION_MAP.DAI.symbol]: $dai,
+  [TOKEN_DESCRIPTION_MAP.USDC.symbol]: $usdc,
+  [TOKEN_DESCRIPTION_MAP.USDCE.symbol]: $usdc,
+  [TOKEN_DESCRIPTION_MAP.USDT.symbol]: $usdt,
+  [TOKEN_DESCRIPTION_MAP.FRAX.symbol]: $frax,
+  [TOKEN_DESCRIPTION_MAP.MIM.symbol]: $usd,
 }
 

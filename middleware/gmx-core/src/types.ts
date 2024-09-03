@@ -1,12 +1,11 @@
 import { Stream } from "@most/types"
 import { Abi, ExtractAbiEvent } from "abitype"
 import { IntervalTime } from "common-utils"
-import { TOKEN_SYMBOL } from "gmx-middleware-const"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import * as GMX from "gmx-middleware-const"
 import * as viem from "viem"
 
-
-export type ITokenSymbol = keyof typeof TOKEN_SYMBOL
+export type ITokenSymbol = keyof typeof TOKEN_DESCRIPTION_MAP
 
 export interface IIdentifiableEntity {
   id: string
@@ -42,7 +41,6 @@ export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = s
 export interface ITokenDescription {
   name: string
   symbol: ITokenSymbol
-  isUsd: boolean
   decimals: number
 }
 
