@@ -141,7 +141,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 const activityTimeframe = positionList.filter.activityTimeframe!
 
 
-                return { summary, openPositionList, settledPositionList, positionList: positionList.list, activityTimeframe }
+                return { summary, openPositionList, settledPositionList, positionList: list, activityTimeframe }
               })
 
               return pagingQuery(
