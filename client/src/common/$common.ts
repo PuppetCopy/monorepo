@@ -223,8 +223,8 @@ export const $PnlPercentageValue = (pnl: Stream<bigint> | bigint, collateral: bi
 export const $settledpositionPnl = (mp: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(mp.market)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
-
   const isSettled = isPositionSettled(mp)
+
   const value = isSettled
     ? getSettledMpPnL(mp, puppet)
     : map(price => {
@@ -360,7 +360,7 @@ interface ITraderDisplay {
 
 interface ITraderRouteDisplay extends IWalletPageParams {
   trader: viem.Address
-  summary: IMirrorListSummary
+  puppets: viem.Address[]
 }
 
 
@@ -392,7 +392,7 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
 
-  const { walletClientQuery, summary, trader } = config
+  const { walletClientQuery, puppets, trader } = config
 
   const puppetSubscriptionParams = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -417,8 +417,8 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
         dismiss: modifySubscribeList,
         $target: switchMap(expiry => {
           return $ButtonSecondary({
-            $content: summary.puppets.length
-              ? $row(style({ alignItems: 'center' }))($puppets(summary.puppets))
+            $content: puppets.length
+              ? $row(style({ alignItems: 'center' }))($puppets(puppets))
               : $row(style({ alignItems: 'center' }))(
                 $icon({ $content: $puppetLogo, width: '18px', viewBox: '0 0 32 32' }),
                 $text('Copy')

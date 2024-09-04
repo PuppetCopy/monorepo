@@ -1,4 +1,4 @@
-import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle, IPriceCandleSeed } from "../types.js"
+import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle } from "../types.js"
 import { ISchema } from "./query.js"
 
 
@@ -46,7 +46,7 @@ const positionFeesCollected: ISchema<IPositionFeesCollected> = {
 
   isIncrease: 'bool',
 
-  blockTimestamp: 'uint256',
+  blockTimestamp: 'number',
   transactionHash: 'string',
 
   __typename: 'PositionFeesCollected',
@@ -92,7 +92,7 @@ const orderStatus: ISchema<IOrderStatus> = {
   statusType: 'uint256',
   message: 'string',
 
-  blockTimestamp: 'uint256',
+  blockTimestamp: 'number',
   transactionHash: 'string',
 
   __typename: 'OrderStatus',
@@ -132,7 +132,7 @@ const positionIncrease: ISchema<IPositionIncrease> = {
   orderKey: 'uint256',
   positionKey: 'uint256',
 
-  blockTimestamp: 'uint256',
+  blockTimestamp: 'number',
   transactionHash: 'string',
 
   __typename: 'PositionIncrease',
@@ -174,7 +174,7 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   orderKey: 'uint256',
   positionKey: 'uint256',
 
-  blockTimestamp: 'uint256',
+  blockTimestamp: 'number',
   transactionHash: 'string',
 
   __typename: 'PositionDecrease',
@@ -224,7 +224,7 @@ const positionFeeUpdate: ISchema<IPositionFeesCollected> = {
 
   isIncrease: 'bool',
 
-  blockTimestamp: 'uint256',
+  blockTimestamp: 'number',
   transactionHash: 'string',
 
   __typename: 'PositionFeesCollected',
@@ -245,19 +245,17 @@ const positionLink: ISchema<IPositionLink> = {
 
 const position: ISchema<IPosition> = {
   id: 'string',
-  // link: positionLink,
-
   key: 'string',
 
   account: 'address',
   market: 'address',
   collateralToken: 'address',
-  // indexToken: 'address',
 
   sizeInUsd: 'uint256',
   sizeInTokens: 'uint256',
   collateralAmount: 'uint256',
   realisedPnlUsd: 'uint256',
+  pnlUsd: 'uint256',
 
   cumulativeSizeUsd: 'uint256',
   cumulativeSizeToken: 'uint256',
@@ -274,7 +272,8 @@ const position: ISchema<IPosition> = {
   increaseList: positionIncrease,
   decreaseList: positionDecrease,
 
-  isSettled: 'bool',
+  openTimestamp: 'number',
+  settledTimestamp: 'number',
 
   __typename: 'Position',
 }

@@ -36,7 +36,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
 
 ) => {
 
-  const { route, activityTimeframe, collateralTokenList, priceTickMapQuery, } = config
+  const { route, activityTimeframe, collateralTokenList, pricefeedMapQuery, } = config
 
   const profileAddressRoute = config.route
   const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ title: 'Trader', fragment: ETH_ADDRESS_REGEXP })

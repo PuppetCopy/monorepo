@@ -1,38 +1,29 @@
 import { Behavior, combineObject } from "@aelea/core"
 import { $element, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { awaitPromises, empty, map, startWith } from "@most/core"
+import { pallete } from "@aelea/ui-components-theme"
+import { empty, map, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { ADDRESS_ZERO, IPagingQueryParams, IntervalTime, getBasisPoints, getMappedValue, groupArrayMany, pagingQuery, readablePercentage, switchMap } from "common-utils"
-import { IPriceTickListMap, isPositionOpen, isPositionSettled, MARKET_TOKEN_MAP } from "gmx-middleware-utils"
-import { IMirrorListSummary, accountSettledPositionListSummary, openPositionListPnl, queryPosition, IPosition } from "puppet-middleware-utils"
-import { $bear, $bull, $ButtonToggle, $icon, $labelDisplay, ISortBy, IQuantumScrollPage, TableColumn, TablePageResponse, $IntermediatePromise, $infoLabel } from "ui-components"
+import { ADDRESS_ZERO, IntervalTime, getBasisPoints, getMappedValue, groupArrayMany, pagingQuery, readablePercentage } from "common-utils"
+import { MARKET_TOKEN_MAP } from "gmx-middleware-utils"
+import { ILeaderboardSummary, leaderboardSummary, queryLeaderboardPosition } from "puppet-middleware-utils"
+import { $ButtonToggle, $IntermediatePromise, $bear, $bull, $icon, $infoLabel, $labelDisplay, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $size, $tokenIcon, $tokenLabeled } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
+import { subgraphClient } from "../../common/graphClient"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
 import { $CardTable } from "../../components/$common"
+import { $DropMultiSelect } from "../../components/form/$Dropdown"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
-import { $ProfilePerformanceGraph } from "../../components/trade/$ProfilePerformanceGraph.js"
+import { $LeaderboardPerformanceTimeline } from "../../components/trade/$ProfilePerformanceGraph"
 import * as storeDb from "../../const/store.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { subgraphClient } from "../../common/graphClient"
-import { $DropMultiSelect } from "../../components/form/$Dropdown"
-import { pallete } from "@aelea/ui-components-theme"
 
 
-
-
-type ITableRow = {
-  summary: IMirrorListSummary
-  openPositionList: IPosition[]
-  settledPositionList: IPosition[]
-  positionList: IPosition[]
-  activityTimeframe: IntervalTime
-}
 
 
 export const $Leaderboard = (config: IUserActivityPageParams) => component((
@@ -48,21 +39,20 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
 ) => {
 
-  const { activityTimeframe, collateralTokenList, walletClientQuery, priceTickMapQuery, route } = config
+  const { activityTimeframe, collateralTokenList, walletClientQuery, pricefeedMapQuery, route } = config
 
   const sortBy = uiStorage.replayWrite(storeDb.store.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(storeDb.store.leaderboard, switchIsLong, 'isLong')
 
-  const positionListQuery = queryPosition(subgraphClient, { collateralTokenList, activityTimeframe, isLong })
-
-
+  const positionListQuery = queryLeaderboardPosition(subgraphClient, { collateralTokenList, activityTimeframe, isLong })
 
   const tableParams = map(async pageParams => {
     const positionList = await pageParams.positionListQuery
-    const pricefeed = await pageParams.priceTickMapQuery
+    const pricefeedMap = await pageParams.pricefeedMapQuery
+    const activityTimeframe = pageParams.activityTimeframe
 
-    return { positionList, pricefeed, sortBy: pageParams.sortBy }
-  }, combineObject({ sortBy, positionListQuery, priceTickMapQuery }))
+    return { positionList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
+  }, combineObject({ sortBy, positionListQuery, pricefeedMapQuery, activityTimeframe }))
 
 
 
@@ -119,8 +109,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
           $$done: map(params => {
 
             const positionList = params.positionList
-            if (positionList.list.length === 0) {
-              return $column(layoutSheet.spacingSmall, style({padding: '30px'}))(
+            if (positionList.length === 0) {
+              return $column(layoutSheet.spacingSmall, style({ padding: '30px' }))(
                 $text('No positions found'),
                 $infoLabel(`Try changing filters or selecting a different markets`),
               )
@@ -129,32 +119,22 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-            const dataSource: Stream<TablePageResponse<ITableRow>> = map(scroll => {
+            const dataSource: Stream<TablePageResponse<ILeaderboardSummary>> = map(scroll => {
 
-              const tradeListMap = groupArrayMany(positionList.list, a => a.account)
-              const tradeListEntries = Object.values(tradeListMap)
-
-              const filterestPosList: ITableRow[] = tradeListEntries.map(list => {
-                const summary = accountSettledPositionListSummary(list)
-                const openPositionList = list.filter(isPositionOpen) as IPosition[]
-                const settledPositionList = list.filter(isPositionSettled) as IPosition[]
-                const activityTimeframe = positionList.filter.activityTimeframe!
-
-
-                return { summary, openPositionList, settledPositionList, positionList: list, activityTimeframe }
-              })
+              const tradeListMap = groupArrayMany(positionList, a => a.account)
+              const filterestPosList = leaderboardSummary(positionList)
 
               return pagingQuery(
                 { ...params.sortBy, ...scroll },
                 filterestPosList,
-                (a, b) => params.sortBy.direction === 'desc'
-                  ? Number(b.summary.pnl) - Number(a.summary.pnl)
-                  : Number(a.summary.pnl) - Number(b.summary.pnl)
+                (a: any, b: any) => params.sortBy.direction === 'desc'
+                  ? Number(b[params.sortBy.selector]) - Number(a[params.sortBy.selector])
+                  : Number(a[params.sortBy.selector]) - Number(b[params.sortBy.selector])
               )
             }, paging)
-    
 
-            const columns: TableColumn<ITableRow>[] = [
+
+            const columns: TableColumn<ILeaderboardSummary>[] = [
               {
                 $head: $text('Trader'),
                 gridTemplate: screenUtils.isDesktopScreen ? '160px' : '120px',
@@ -164,14 +144,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
                     $TraderDisplay({
                       route: config.route,
-                      trader: pos.summary.account,
+                      trader: pos.account,
                     })({
                       click: routeChangeTether()
                     }),
                     $TraderRouteDisplay({
                       walletClientQuery,
-                      summary: pos.summary,
-                      trader: pos.summary.account
+                      puppets: pos.puppets,
+                      trader: pos.account
                     })({
                       modifySubscribeList: modifySubscriberTether()
                     }),
@@ -191,9 +171,9 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     $head: $text('Win / Loss'),
                     gridTemplate: '90px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                    $bodyCallback: map((pos: ITableRow) => {
+                    $bodyCallback: map((pos: ILeaderboardSummary) => {
                       return $row(
-                        $text(`${pos.summary.winCount} / ${pos.summary.lossCount}`)
+                        $text(`${pos.winCount} / ${pos.lossCount}`)
                       )
                     })
                   },
@@ -207,7 +187,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 sortBy: 'size',
                 columnOp: style({ placeContent: 'flex-end' }),
                 $bodyCallback: map((pos) => {
-                  return $size(pos.summary.size, pos.summary.collateral)
+                  return $size(pos.size, pos.collateral)
                 })
               },
 
@@ -217,15 +197,12 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 sortBy: 'pnl',
                 columnOp: style({ placeContent: 'flex-end' }),
                 $bodyCallback: map(tr => {
-                  const pnl = map(openPnl => tr.summary.pnl + openPnl, openPositionListPnl(tr.openPositionList))
 
                   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-                    $pnlDisplay(pnl),
+                    $pnlDisplay(tr.pnl),
                     $seperator2,
                     $text(style({ fontSize: '.85rem' }))(
-                      map(pnl => {
-                        return readablePercentage(getBasisPoints(pnl, tr.summary.collateral))
-                      }, pnl)
+                      readablePercentage(getBasisPoints(tr.pnl, tr.collateral))
                     ),
                   )
                 })
@@ -237,15 +214,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     columnOp: style({ placeContent: 'flex-end' }),
                     $head: $text(map(tf => `Last ${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} activity`, activityTimeframe)),
                     gridTemplate: '140px',
-                    $bodyCallback: map((pos: ITableRow) => {
+                    $bodyCallback: map((pos: ILeaderboardSummary) => {
 
                       return screenUtils.isDesktopScreen
-                        ? $ProfilePerformanceGraph({
+                        ? $LeaderboardPerformanceTimeline({
                           $container: $row(style({ position: 'relative', width: `180px`, height: `80px`, margin: '-16px 0' })),
                           tickCount: 50,
-                          priceTickMap: params.pricefeed,
-                          positionList: pos.positionList,
-                          activityTimeframe: pos.activityTimeframe,
+                          list: pos.positionList,
+                          activityTimeframe: params.activityTimeframe,
                         })({})
                         : empty()
                     })

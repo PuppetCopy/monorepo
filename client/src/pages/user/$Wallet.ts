@@ -4,25 +4,25 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { map } from "@most/core"
 import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, readableTokenAmount, readableUsd, switchMap } from "common-utils"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
+import { queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltipLabel, $intermediateMessage } from "ui-components"
 import { uiStorage } from "ui-storage"
+import * as viem from 'viem'
 import { $heading3 } from "../../common/$text"
 import { $card, $responsiveFlex } from "../../common/elements/$common"
+import { subgraphClient } from "../../common/graphClient"
 import { $VestingDetails } from "../../components/$VestingDetails"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import * as storeDb from "../../const/store.js"
-import {  readPuppetPriceInUsd, } from "../../logic/puppetRead"
+import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
+import { readPuppetPriceInUsd, } from "../../logic/puppetRead"
 import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
 import { $WalletPuppet } from "./$WalletPuppet.js"
-import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
-import { subgraphClient } from "../../common/graphClient"
-import * as viem from 'viem'
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -53,7 +53,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
 
   const {
     route, walletClientQuery, providerClientQuery,
-    activityTimeframe, collateralTokenList, priceTickMapQuery 
+    activityTimeframe, collateralTokenList, pricefeedMapQuery 
   } = config
 
   const profileMode = uiStorage.replayWrite(storeDb.store.wallet, selectProfileMode, 'selectedTab')
@@ -117,7 +117,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
           }, puppetTradeRouteListQuery)
 
           return $WalletPuppet({
-            walletClientQuery, route, priceTickMapQuery, positionListQuery, puppetTradeRouteListQuery,
+            walletClientQuery, route, pricefeedMapQuery, positionListQuery, puppetTradeRouteListQuery,
             activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
           })({
             changeRoute: changeRouteTether(),

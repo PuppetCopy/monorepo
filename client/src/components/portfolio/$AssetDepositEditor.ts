@@ -72,7 +72,7 @@ export const $AssetDepositEditor = (config: IAssetDepositEditor) => component((
   const maxBalance = sample(walletBalance, clickMaxDeposit)
   const amount = startWith(0n, mergeArray([
     maxBalance,
-    map(str => parseFixed(str, indexToken.decimals), inputDepositAmount)
+    map(str => parseFixed(indexToken.decimals, str), inputDepositAmount)
   ]))
 
 

@@ -21,13 +21,16 @@ export interface ILogOrdered {
   orderId: number
 }
 
-export type ILogTypeId<T extends string> = {
+export type ILogType<T extends string> = {
   __typename: T
+}
+
+export type ILogTypeId<T extends string> = ILogType<T> & {
   id: string
 }
 
 export type ILogTxType<T extends string> = ILogTypeId<T> & {
-  blockTimestamp: bigint
+  blockTimestamp: number
   transactionHash: viem.Hex
 }
 
@@ -82,6 +85,8 @@ export interface IPosition extends ILogTypeId<'Position'> {
   sizeInTokens: bigint
   collateralAmount: bigint
   realisedPnlUsd: bigint
+  pnlUsd: bigint
+
   cumulativeSizeUsd: bigint
   cumulativeSizeToken: bigint
   cumulativeCollateralUsd: bigint
@@ -90,12 +95,14 @@ export interface IPosition extends ILogTypeId<'Position'> {
   maxSizeToken: bigint
   maxCollateralUsd: bigint
   maxCollateralToken: bigint
+
   isLong: boolean
 
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
 
-  isSettled: boolean
+  openTimestamp: number
+  settledTimestamp: number
 }
 
 
@@ -133,7 +140,7 @@ export interface IPriceTimeline {
 }
 
 
-export interface IPriceCandleDto {
+export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
   token: viem.Address
   interval: IntervalTime
   timestamp: number
@@ -149,13 +156,12 @@ export interface IPricetick {
 }
 
 export type IPriceTickListMap = Record<viem.Address, IPricetick[]>
-export type IPriceLatestMap = Record<viem.Address, IPriceCandleDto>
-
-export type IPriceCandleListMap = Record<viem.Address, IPriceCandleDto[]>
+export type IPricefeedMap = Record<viem.Address, IPriceCandle[]>
 export type IPriceOracleMap = Record<viem.Address, IOraclePrice>
 
-export interface IPriceCandle extends IPriceCandleDto, ILogTypeId<'PriceCandle'> { }
-export interface IPriceCandleSeed extends IPriceCandleDto, ILogTypeId<'PriceCandleSeed'> { }
+
+export type ILatestPriceMap = Record<viem.Address, IPricetick>
+
 
 
 

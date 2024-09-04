@@ -103,7 +103,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
 
       $FieldLabeled({
         label: 'Allow %',
-        value: map(x => x ? formatFixed(x, 4) * 100 : '', allowance),
+        value: map(x => x ? formatFixed(4, x) * 100 : '', allowance),
         labelWidth: 100,
         hint: `% allocated per adjustment. 1-10% is recommended`,
       })({

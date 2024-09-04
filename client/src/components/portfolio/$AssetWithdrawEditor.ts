@@ -47,7 +47,7 @@ export const $AssetWithdrawEditor = (config: IAssetWithdrawEditor) => component(
           placeholder: 'Enter amount',
           hint: switchMap(async balance => `Balance: ${readableTokenAmountLabel(tokenDescription, await balance)}`, balanceQuery),
         })({
-          change: inputDepositAmountTether(map(str => parseFixed(str, indexToken.decimals)))
+          change: inputDepositAmountTether(map(str => parseFixed(indexToken.decimals, str)))
         }),
 
         $ButtonSecondary({

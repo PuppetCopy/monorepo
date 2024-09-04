@@ -2,12 +2,12 @@ import { replayLatest } from '@aelea/core'
 import { map, multicast } from '@most/core'
 import { Stream } from '@most/types'
 import { type Client } from '@urql/core'
-import { IntervalTime, StateParams, combineState, getClosestNumber, groupArrayManyMap, periodicRun, unixTimestampNow } from 'common-utils'
+import { IntervalTime, StateParams, combineState, getClosestNumber, groupArrayMany, groupArrayManyMap, periodicRun, unixTimestampNow } from 'common-utils'
 import * as GMX from "gmx-middleware-const"
-import { IPriceOracleMap, IPriceTickListMap, ISchema, isPositionSettled, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
+import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IPriceTickListMap, IQueryFilter, ISchema, isPositionSettled, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
 import * as viem from "viem"
-import __tempTradeRouteDoc from './__temp_tradeRouteDoc.js'
 import { schema } from './schema.js'
+import { ILeaderboardPosition, IMirrorPosition } from './types'
 
 
 export interface IQueryPositionParams {
@@ -17,71 +17,137 @@ export interface IQueryPositionParams {
   activityTimeframe?: IntervalTime
 }
 
+export type IQueryRquest<T> = Stream<Promise<{
+  list: T[]
+  filter: IQueryPositionParams
+}>>
+
+export function getPositionFilters(filter: IQueryPositionParams): IQueryFilter<IMirrorPosition> {
+
+  const filters: IQueryFilter<IMirrorPosition> = {}
+
+  if (filter.account) {
+    filters.account = {
+      _eq: `"${filter.account}"`
+    }
+  }
+
+  if (filter.isLong !== undefined) {
+    filters.isLong = {
+      _eq: filter.isLong
+    }
+  }
+
+
+  const orFilters = []
+
+  if (filter.collateralTokenList) {
+    orFilters.push(
+      ...filter.collateralTokenList.map(token => ({
+        collateralToken: {
+          _eq: `"${token}"`
+        }
+      }))
+    )
+  }
+
+  if (filter.activityTimeframe) {
+    const timestampFilter = unixTimestampNow() - filter.activityTimeframe
+
+    orFilters.push({
+      settledTimestamp: {
+        _gte: timestampFilter
+      }
+    })
+    orFilters.push({
+      openTimestamp: {
+        _gte: timestampFilter
+      }
+    })
+  }
+
+
+  if (orFilters.length) {
+    filters._or = orFilters
+  }
+
+
+  return filters
+}
+
 export function queryPosition<TStateParams extends StateParams<IQueryPositionParams>>(
   subgraphClient: Client,
   queryParams: TStateParams
 ) {
-  return map(async filter => {
-    const response = await querySubgraph(subgraphClient, {
+  return map(
+    filter => querySubgraph(subgraphClient, {
       schema: schema.mirrorPosition,
-      filter: {
-        isLong: { _eq: filter.isLong },
-        account: {
-          _eq: filter.account ? `"${filter.account}"` : undefined
-        },
-        _or: filter.collateralTokenList?.map(token => ({
-          collateralToken: {
-            _eq: `"${token}"`
-          }
-        })),
-      },
+      filter: getPositionFilters(filter),
+    }),
+    combineState(queryParams)
+  )
+}
+
+export function queryLeaderboardPosition<TStateParams extends StateParams<IQueryPositionParams>>(
+  subgraphClient: Client,
+  queryParams: TStateParams
+) {
+  return map(async (filter) => {
+    const list = await querySubgraph(subgraphClient, {
+      schema: schema.leaderboardPosition,
+      filter: getPositionFilters(filter)
     })
 
-    const activityTimeframe = filter.activityTimeframe
-    const list = activityTimeframe ? response.filter(x => isPositionSettled(x) ? x.increaseList[0].blockTimestamp > unixTimestampNow() - activityTimeframe : true) : response
-
-    return { list, filter }
+    return list
   }, combineState(queryParams))
 }
 
 
 
-export function queryLatestPriceTick(
+export function queryPricefeed(
   subgraphClient: Client,
   queryParams: StateParams<{
-    collateralTokenList: viem.Address[]
+    tokenList?: viem.Address[]
     activityTimeframe: IntervalTime
   }>,
   estTickAmout = 20
 ) {
   return map(async params => {
+    const filter: IQueryFilter<IPriceCandle> = {
+      // _or: params.tokenList.map(token => ({
+      //   token: {
+      //     _eq: `"${token}"`
+      //   }
+      // })),
+      interval: {
+        _eq: getClosestNumber(GMX.PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)
+      },
+      timestamp: {
+        _gte: unixTimestampNow() - params.activityTimeframe
+      },
+    }
+
+    if (params?.tokenList?.length) {
+      filter._or = params.tokenList.map(token => ({
+        token: {
+          _eq: `"${token}"`
+        }
+      }))
+    }
+
+
+
+
     const candleListQuery = querySubgraph(subgraphClient, {
       schema: schema.priceCandle,
-      filter: {
-        _or: params.collateralTokenList.map(token => ({
-          token: {
-            _eq: `"${token}"`
-          }
-        })),
-        interval: {
-          _eq: getClosestNumber(GMX.PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)
-        },
-        timestamp: {
-          _gte: unixTimestampNow() - params.activityTimeframe
-        },
-      },
+      filter,
       orderBy: {
         timestamp: 'desc',
       },
     })
 
-    const candleList = [
-      ...await candleListQuery,
-      // ...Object.values(await querySignedPrices()).map(x => ({ timestamp: Number(x.timestamp), c: x.max, token: x.token }))
-    ]
-    const mapped: IPriceTickListMap = groupArrayManyMap(candleList, x => viem.getAddress(x.token), x => {
-      return { timestamp: Number(x.timestamp), price: x.c }
-    })
+
+    const mapped: IPricefeedMap = groupArrayMany(await candleListQuery, x => viem.getAddress(x.token))
 
     return mapped
   }, combineState(queryParams))

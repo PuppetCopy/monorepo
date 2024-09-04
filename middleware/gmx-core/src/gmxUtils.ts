@@ -40,11 +40,11 @@ export function getMarginFees(size: bigint) {
 }
 
 export function isPositionSettled(trade: IPosition): boolean {
-  return trade.isSettled === true
+  return trade.settledTimestamp !== 0
 }
 
 export function isPositionOpen(trade: IPosition | IPosition): trade is IPosition {
-  return trade.isSettled === false
+  return trade.settledTimestamp === 0
 }
 
 
@@ -61,7 +61,7 @@ export function getFundingFee(entryFundingRate: bigint, cumulativeFundingRate: b
 
 export function liquidationWeight(isLong: boolean, liquidationPrice: bigint, markPrice: bigint) {
   const weight = isLong ? getBasisPoints(liquidationPrice, markPrice) : getBasisPoints(markPrice, liquidationPrice)
-  const value = easeInExpo(formatFixed(weight, 4))
+  const value = easeInExpo(formatFixed(4, weight))
   return value > 1 ? 1 : value
 }
 

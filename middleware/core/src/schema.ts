@@ -1,5 +1,5 @@
 import { schema as gmxSchema, IPriceCandle, ISchema } from "gmx-middleware-utils"
-import { IMirror, IMirrorPosition, IPuppetPosition, ISetRouteType } from "./types.js"
+import { ILeaderboardPosition, IMirror, IMirrorPosition, IPuppetPosition, ISetRouteType } from "./types.js"
 
 
 
@@ -13,8 +13,6 @@ const puppetPosition: ISchema<IPuppetPosition> = {
   collateralToken: 'address',
 
   collateral: 'uint',
-
-  // position: mirror,
 
   __typename: 'PuppetPosition',
 }
@@ -44,6 +42,19 @@ const mirrorPosition: ISchema<IMirrorPosition> = {
   __typename: 'Position',
 }
 
+const leaderboardPosition: ISchema<ILeaderboardPosition> = {
+  account: 'address',
+  isLong: 'bool',
+  sizeInTokens: 'uint',
+  sizeInUsd: 'uint',
+  maxCollateralUsd: 'uint',
+  realisedPnlUsd: 'int',
+  
+  settledTimestamp: 'number',
+  
+  __typename: 'Position',
+}
+
 const setRouteType: ISchema<ISetRouteType> = {
   id: 'string',
   collateralToken: 'address',
@@ -65,5 +76,5 @@ const priceCandle: ISchema<IPriceCandle> = {
 
 
 export const schema = {
-  priceCandle, puppetPosition, mirrorPosition, setRouteType,
+  priceCandle, puppetPosition, mirrorPosition, setRouteType, leaderboardPosition
 }

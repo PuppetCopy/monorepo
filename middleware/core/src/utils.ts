@@ -1,10 +1,10 @@
 import { combineArray, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware-utils"
+import { getMarketIndexToken, getPositionPnlUsd, IPricefeedMap } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { latestPriceMap } from "./graph.js"
-import { IMirrorListSummary, IMirrorPosition, IPosition, IPuppetPosition } from "./types.js"
-import { factor } from "common-utils"
+import { ILeaderboardPosition, ILeaderboardSummary, IMirrorListSummary, IMirrorPosition, IPosition, IPuppetPosition } from "./types.js"
+import { factor, getMappedValue } from "common-utils"
 
 
 export function accountSettledPositionListSummary(
@@ -26,8 +26,8 @@ export function accountSettledPositionListSummary(
 
     fee: 0n,
     lossCount: 0,
-    pnl: 0n,
     winCount: 0,
+    pnl: 0n,
   }
 
   const summary = tradeList.reduce((seed, next, idx): IMirrorListSummary => {
@@ -44,10 +44,10 @@ export function accountSettledPositionListSummary(
 
     const fee = seed.fee + getParticiapntPortion(next, 0n, puppet)
     // const fee = seed.fee + getParticiapntPortion(next, lstFeeUpdate.totalCostAmount, puppet)
-    const pnl = seed.pnl + getParticiapntPortion(next, next.realisedPnlUsd, puppet)
+    const pnl = seed.pnl + getParticiapntPortion(next, next.pnlUsd, puppet)
 
-    const winCount = seed.winCount + (next.realisedPnlUsd > 0n ? 1 : 0)
-    const lossCount = seed.lossCount + (next.realisedPnlUsd <= 0n ? 1 : 0)
+    const winCount = seed.winCount + (next.pnlUsd > 0n ? 1 : 0)
+    const lossCount = seed.lossCount + (next.pnlUsd <= 0n ? 1 : 0)
 
     const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.mirror.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
 
@@ -68,6 +68,55 @@ export function accountSettledPositionListSummary(
 
 
   return summary
+}
+
+export function leaderboardSummary(tradeList: ILeaderboardPosition[]): ILeaderboardSummary[] {
+  const map: { [k: viem.Address]: ILeaderboardSummary } = {}
+
+  for (const next of tradeList) {
+    const summary = map[next.account] || {
+      account: next.account,
+      size: 0n,
+      collateral: 0n,
+      maxCollateral: 0n,
+      maxSize: 0n,
+      leverage: 0n,
+      lossCount: 0,
+      totalCount: 0,
+      winCount: 0,
+      pnl: 0n,
+      puppets: [],
+      positionList: [],
+    }
+
+    summary.totalCount = summary.winCount + summary.lossCount
+    summary.size += next.sizeInUsd
+    summary.collateral += next.maxCollateralUsd
+    summary.maxCollateral = next.maxCollateralUsd > summary.maxCollateral ? next.maxCollateralUsd : summary.maxCollateral
+    summary.maxSize = next.sizeInUsd > summary.maxSize ? next.sizeInUsd : summary.maxSize
+    summary.leverage = summary.maxSize / summary.maxCollateral
+    summary.pnl += next.realisedPnlUsd
+
+    if (next.realisedPnlUsd > 0n) {
+      summary.winCount += 1
+    } else {
+      summary.lossCount += 1
+    }
+
+    summary.puppets = []
+
+    map[next.account] = summary
+  }
+
+
+  return Object.values(map)
+}
+
+
+function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): bigint {
+  const feed = getMappedValue(priceFeed, token)
+
+  return feed[feed.length - 1].c
 }
 
 export function isMirrorPosition(mp: IPosition): mp is IMirrorPosition {

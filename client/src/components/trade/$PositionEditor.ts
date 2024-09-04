@@ -112,8 +112,8 @@ interface IPositionEditorConfig extends IPositionEditorAbstractParams {
 
 
 const BOX_SPACING = 24
-const LIMIT_LEVERAGE_NORMAL = formatFixed(GMX.MAX_LEVERAGE_FACTOR, 4)
-const MIN_LEVERAGE_NORMAL = formatFixed(GMX.MIN_LEVERAGE_FACTOR, 4) / LIMIT_LEVERAGE_NORMAL
+const LIMIT_LEVERAGE_NORMAL = formatFixed(4, GMX.MAX_LEVERAGE_FACTOR)
+const MIN_LEVERAGE_NORMAL = formatFixed(4, GMX.MIN_LEVERAGE_FACTOR) / LIMIT_LEVERAGE_NORMAL
 
 export const $PositionEditor = (config: IPositionEditorConfig) => component((
   [clickSettingsPopover, clickSettingsPopoverTether]: Behavior<any, boolean>,
@@ -337,7 +337,7 @@ export const $PositionEditor = (config: IPositionEditorConfig) => component((
 
               $FieldLabeled({
                 label: 'Slippage %',
-                value: map(x => formatFixed(x, 4) * 100, config.tradeConfig.slippage),
+                value: map(x => formatFixed(4, x) * 100, config.tradeConfig.slippage),
                 hint: 'the difference between the expected price of the trade and the execution price',
                 // inputOp: style({ width: '60px', maxWidth: '60px', textAlign: 'right', fontWeight: 'normal' }),
                 validation: map(n => {
@@ -359,7 +359,7 @@ export const $PositionEditor = (config: IPositionEditorConfig) => component((
 
               $FieldLabeled({
                 label: 'Execution Fee Buffer %',
-                value: map(x => formatFixed(x, 4) * 100, config.tradeConfig.executionFeeBuffer),
+                value: map(x => formatFixed(4, x) * 100, config.tradeConfig.executionFeeBuffer),
                 hint: 'higher value to handle potential increases in gas price during order execution',
                 // inputOp: style({ width: '60px', maxWidth: '60px', textAlign: 'right', fontWeight: 'normal' }),
                 validation: map(n => {
@@ -554,7 +554,7 @@ export const $PositionEditor = (config: IPositionEditorConfig) => component((
                   }
 
                   const val = parseReadableNumber(target.value)
-                  const parsedInput = parseFixed(val, state.primaryDescription.decimals)
+                  const parsedInput = parseFixed(state.primaryDescription.decimals, val)
 
                   return parsedInput
                 }, combineObject({ primaryDescription, primaryPrice }), src),
@@ -757,7 +757,7 @@ export const $PositionEditor = (config: IPositionEditorConfig) => component((
                     return 0n
                   }
 
-                  const parsedInput = parseFixed(parseReadableNumber(target.value), params.indexDescription.decimals)
+                  const parsedInput = parseFixed(params.indexDescription.decimals, parseReadableNumber(target.value))
 
                   return getTokenUsd(params.marketPrice.indexTokenPrice.min, parsedInput)
                 }, combineObject({ indexDescription, marketPrice }), src),

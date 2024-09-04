@@ -12,7 +12,7 @@ import { $labelDisplay } from "ui-components"
 import { $route } from "../../common/$common.js"
 import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { $DropMultiSelect } from "../form/$Dropdown.js"
-import { getPerformanceTimeline } from "../trade/$ProfilePerformanceGraph.js"
+import { getPosolitionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
 import { isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
 
 export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
@@ -21,17 +21,17 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, collateralTokenList, puppet, priceTickMapQuery, positionListQuery } = config
+  const { activityTimeframe, collateralTokenList, puppet, pricefeedMapQuery, positionListQuery } = config
 
   const positionParams = multicast(map(async (params) => {
     const positionList = await params.positionListQuery
-    const timeline = getPerformanceTimeline({
+    const timeline = getPosolitionListTimelinePerformance({
       ...params,
       puppet,
-      positionList,
+      list,
       tickCount: 100,
       activityTimeframe: params.activityTimeframe,
-      priceTickMap: await params.priceTickMapQuery
+      pricefeedMap: await params.priceTickMapQuery
     })
 
     return { timeline, positionList }

@@ -1,10 +1,10 @@
 import * as router from '@aelea/router'
 import { Stream } from '@most/types'
 import { IntervalTime } from 'common-utils'
-import { IPriceTickListMap } from 'gmx-middleware-utils'
-import { IMirror, IMirrorPosition, ISetRouteType } from 'puppet-middleware-utils'
-import * as walletLink from "wallet"
+import { IPricefeedMap } from 'gmx-middleware-utils'
+import { IMirrorPosition } from 'puppet-middleware-utils'
 import * as viem from 'viem'
+import * as walletLink from "wallet"
 
 
 export interface IWalletPageParams {
@@ -22,7 +22,7 @@ export interface IPageParams extends IComponentPageParams {
 export interface IUserActivityParams {
   collateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
-  priceTickMapQuery: Stream<Promise<IPriceTickListMap>>
+  pricefeedMapQuery: Stream<Promise<IPricefeedMap>>
 }
 
 export interface IUserActivityPageParams extends IPageParams, IUserActivityParams {

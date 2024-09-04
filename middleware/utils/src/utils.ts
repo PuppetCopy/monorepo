@@ -82,16 +82,16 @@ const intlOptions: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'short
 export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)
 export const readableUSD = readableNumber({})
-export const readablePercentage = (amount: bigint) => readableUnitAmount(formatFixed(amount, 2)) + '%'
-export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(amount, FACTOR_PERCISION) * 100) + '%'
-export const readableLeverage = (a: bigint, b: bigint) => (b ? readableUnitAmount(formatFixed(a * BASIS_POINTS_DIVISOR / b, 4)) : 0n) + 'x'
-export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(ammount, USD_DECIMALS))
-export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) => readableNumber({ signDisplay: "exceptZero" })(formatFixed(ammount, decimals))
-export const readableTokenAmountFromUsdAmount = (decimals: number, price: bigint, amount: bigint) => readableUnitAmount(formatFixed(getTokenAmount(price, amount), decimals))
+export const readablePercentage = (amount: bigint) => readableUnitAmount(formatFixed(2, amount)) + '%'
+export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(FACTOR_PERCISION, amount) * 100) + '%'
+export const readableLeverage = (a: bigint, b: bigint) => (b ? readableUnitAmount(formatFixed(4, a * BASIS_POINTS_DIVISOR / b)) : 0n) + 'x'
+export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(USD_DECIMALS, ammount))
+export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) => readableNumber({ signDisplay: "exceptZero" })(formatFixed(decimals, ammount))
+export const readableTokenAmountFromUsdAmount = (decimals: number, price: bigint, amount: bigint) => readableUnitAmount(formatFixed(decimals, getTokenAmount(price, amount)))
 export const readableTokenUsd = (price: bigint, amount: bigint) => readableUsd(getTokenUsd(price, amount))
-export const readableTokenAmount = (tokenDesc: ITokenDescription, amount: bigint) => readableUnitAmount(formatFixed(amount, tokenDesc.decimals))
+export const readableTokenAmount = (tokenDesc: ITokenDescription, amount: bigint) => readableUnitAmount(formatFixed(tokenDesc.decimals, amount))
 export const readableTokenAmountLabel = (tokenDesc: ITokenDescription, amount: bigint) => readableTokenAmount(tokenDesc, amount) + ' ' + tokenDesc.symbol
-export const readableTokenPrice = (decimals: number, amount: bigint) => readableAccountingAmount(formatFixed(amount, USD_DECIMALS - decimals))
+export const readableTokenPrice = (decimals: number, amount: bigint) => readableAccountingAmount(formatFixed(USD_DECIMALS - decimals, amount))
 
 const UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte']
 const BYTES_PER_KB = 1000
@@ -141,7 +141,7 @@ function getMultiplier(decimals: number): string {
   throw new Error("invalid decimal size")
 }
 
-export function formatFixed(value: bigint, decimals: number): number {
+export function formatFixed(decimals: number, value: bigint): number {
   const multiplier = getMultiplier(decimals)
   const multiplierBn = BigInt(multiplier)
   let parsedValue = ''
@@ -171,7 +171,7 @@ export function formatFixed(value: bigint, decimals: number): number {
   return Number(parsedValue)
 }
 
-export function parseFixed(input: string | number, decimals = 18) {
+export function parseFixed(decimals: number, input: string | number) {
   let value = typeof input === 'number' ? String(input) : input
 
   const multiplier = getMultiplier(decimals)
@@ -250,7 +250,8 @@ export interface IFillGap<T, R, RTime extends R & TimelineTime = R & TimelineTim
 
 export function createTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime>(config: IFillGap<T, R, RTime>) {
   const {
-    source, seed,
+    source,
+    seed,
     seedMap,
     gapMap = prev => prev,
     squashMap = seedMap,
@@ -261,13 +262,15 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
     return []
   }
 
-  const lstSrc = source[source.length - 1]
+  const sortedSource = source.filter(update => getTime(update) > seed.time).sort((a, b) => getTime(a) - getTime(b))
+
+  const lstSrc = sortedSource[sortedSource.length - 1]
   const lstTime = getTime(lstSrc)
   if (seed.time > lstTime) {
     throw new Error('seed time is greater than last time, source is not sorted')
   }
 
-  const interval = config.interval ?? Math.floor((lstTime - seed.time) / source.length)
+  const interval = config.interval ?? Math.floor((lstTime - seed.time) / sortedSource.length)
   const seedSlot = Math.floor(seed.time / interval)
   const normalizedSeed = { ...seed, time: seedSlot * interval } as RTime
 
@@ -275,7 +278,7 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
     [seedSlot]: normalizedSeed
   }
 
-  return source.reduce((timeline: RTime[], next: T) => {
+  return sortedSource.reduce((timeline: RTime[], next: T) => {
     // ensure previous time is always less than next time
     const prev = timeline[timeline.length - 1]
     const nextTime = getTime(next)
@@ -437,17 +440,18 @@ export function groupArrayByKey<A, B extends string | symbol | number>(list: A[]
 }
 
 
-export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(list: A[], getKey: (v: A) => B, mapFn: (v: A, key: B) => R) {
+export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(list: A[], getKey: (v: A) => B, mapFn: (v: A, key: B, seed: number) => R) {
   const gmap = {} as { [P in B]: R }
 
-  for (const item of list) {
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
     const key = getKey(item)
 
     if (key === undefined) {
       throw new Error(`key is undefined`)
     }
 
-    gmap[key] = mapFn(item, key)
+    gmap[key] = mapFn(item, key, i)
   }
 
   return gmap
@@ -575,11 +579,11 @@ export function div(a: bigint, b: bigint): bigint {
 }
 
 export function formatDiv(a: bigint, b: bigint): number {
-  return formatFixed(a * BASIS_POINTS_DIVISOR / b, 4)
+  return formatFixed(4, a * BASIS_POINTS_DIVISOR / b)
 }
 
 export function parseBps(a: number | string): bigint {
-  return parseFixed(a, 4)
+  return parseFixed(4, a)
 }
 
 export function getAdjustedDelta(size: bigint, sizeDeltaUsd: bigint, pnl: bigint) {

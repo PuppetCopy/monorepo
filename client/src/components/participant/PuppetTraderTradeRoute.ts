@@ -131,7 +131,7 @@ export const $PuppetTraderTradeRoute = (config: IPuppetTraderTradeRoute) => comp
           ? $ProfilePerformanceGraph({
             puppet: config.puppetTradeRoute.puppet,
             $container: $column(style({ width: '300px', padding: 0, height: '75px', position: 'relative', margin: '-16px 0' })),
-            priceTickMap,
+            pricefeedMap,
             openPositionList,
             settledPositionList,
             tickCount: 100,

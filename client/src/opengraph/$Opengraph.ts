@@ -3,7 +3,7 @@ import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
 import { map, now } from "@most/core"
 import { IntervalTime } from "common-utils"
-import { queryLatestPriceTick, queryRouteTypeList } from "puppet-middleware-utils"
+import { queryPricefeed, queryRouteTypeList } from "puppet-middleware-utils"
 import { $rootContainer } from "../pages/common"
 import { $trader } from "./$trader"
 import { Stream } from "@most/types"
@@ -36,7 +36,7 @@ export const $Opengraph = (parentRoute: router.Route) => component(() => {
 
   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
   const collateralToken = now([])
-  const priceTickMapQuery = queryLatestPriceTick(subgraphClient, { activityTimeframe, collateralToken })
+  const priceTickMapQuery = queryPricefeed(subgraphClient, { activityTimeframe, collateralToken })
   const routeTypeListQuery = now(queryRouteTypeList(subgraphClient))
 
   // use playwright pushstate events as trigger to change route

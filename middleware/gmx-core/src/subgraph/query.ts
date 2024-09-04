@@ -86,30 +86,33 @@ export const querySubgraph = <
   params: IQuerySubgraph<Type, TQueryFilter, TQuery>,
   context?: Partial<OperationContext>,
 ): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
+  const typename = params.schema.__typename
+  if (typename === undefined) {
+    throw new Error('No __typename in schema')
+  }
 
-  const typeName = params.schema.__typename as string
   const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
   const orderByFilterParam = params.orderBy ? parseFilterObject({ order_by: params.orderBy }) : ''
   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
   const filter = orderByFilterParam || whereClause ? `( ${orderByFilterParam} ${whereClause})` : ''
 
-  const entry = `${typeName}${filter} { ${fieldStructure} }`
+  const entry = `${typename}${filter} { ${fieldStructure} }`
 
   const newLogsFilter = client.query(`{ ${entry} }`, {}, context)
     .then(response => {
-      if (response.error) throw new Error(`${typeName} query error: ${response.error.message}`)
+      if (response.error) throw new Error(`${typename} query error: ${response.error.message}`)
 
-      if (!(typeName in response.data)) {
-        throw new Error(`No ${typeName} found in subgraph response`)
+      if (!(typename as string in response.data)) {
+        throw new Error(`No ${typename} found in subgraph response`)
       }
 
-      const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[typeName]
+      const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[typename]
 
       if (list instanceof Array) {
         return list.map(item => parseQueryResults(item, params.schema))
       }
 
-      throw new Error(`No ${typeName} found in subgraph response`)
+      throw new Error(`No ${typename} found in subgraph response`)
     })
 
   return newLogsFilter as any

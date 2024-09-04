@@ -7,7 +7,7 @@ import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWit
 import { Stream } from "@most/types"
 import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import { queryLatestPriceTick, subgraphStatus } from "puppet-middleware-utils"
+import { queryPricefeed, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
@@ -97,7 +97,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
   const collateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectCollateralTokenList, 'collateralTokenList')
 
-  const priceTickMapQuery = replayLatest(multicast(queryLatestPriceTick(subgraphClient, { activityTimeframe, collateralTokenList })))
+  const pricefeedMapQuery = replayLatest(multicast(queryPricefeed(subgraphClient, { activityTimeframe })))
 
   const subgraphStatusStream = subgraphStatus(subgraphClient)
   const subgraphBeaconStatusColor = map(status => {
@@ -188,7 +188,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, collateralTokenList, priceTickMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, collateralTokenList, pricefeedMapQuery, walletClientQuery })({
                     changeWallet: changeWalletTether(),
                     modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
@@ -199,7 +199,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, collateralTokenList, priceTickMapQuery })({
+                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, collateralTokenList, pricefeedMapQuery })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectCollateralTokenList: selectCollateralTokenListTether(),
                     routeChange: changeRouteTether(),
@@ -209,7 +209,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, priceTickMapQuery, activityTimeframe, collateralTokenList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, collateralTokenList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectCollateralTokenList: selectCollateralTokenListTether(),

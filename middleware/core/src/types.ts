@@ -1,4 +1,4 @@
-import { ILogTxType, ILogTypeId, IPositionListSummary, IPosition as IGmxPosition } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId, IPositionListSummary, IPosition as IGmxPosition, ILogType } from "gmx-middleware-utils"
 import * as viem from "viem"
 
 
@@ -43,6 +43,16 @@ export interface IMirrorPosition extends IGmxPosition {
   mirror: IMirror
 }
 
+export interface ILeaderboardPosition extends ILogType<'Position'> {
+  account: viem.Address
+  realisedPnlUsd: bigint
+  sizeInTokens: bigint
+  sizeInUsd: bigint
+  maxCollateralUsd: bigint
+  isLong: boolean
+  settledTimestamp: number
+}
+
 
 export type IPosition = IMirrorPosition | IGmxPosition
 
@@ -51,6 +61,26 @@ export type IPosition = IMirrorPosition | IGmxPosition
 export interface IMirrorListSummary extends IPositionListSummary {
   account: viem.Address
   puppets: viem.Address[]
+}
+
+export interface ILeaderboardSummary {
+  account: viem.Address
+  size: bigint
+  collateral: bigint
+  maxSize: bigint
+  maxCollateral: bigint
+
+
+  leverage: bigint
+
+  lossCount: number
+  winCount: number
+  totalCount: number
+  pnl: bigint
+
+  puppets: viem.Address[]
+
+  positionList: ILeaderboardPosition[]
 }
 
 export interface ISetRouteType extends ILogTypeId<'SetRouteType'> {

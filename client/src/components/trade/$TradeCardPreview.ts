@@ -8,7 +8,7 @@ import { $Baseline, $bear, $bull, $infoTooltipLabel, IMarker } from "ui-componen
 import { filterNull, parseReadableNumber, readableUsd, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams, Time } from "lightweight-charts"
 import { IPosition } from "puppet-middleware-utils"
-import { IPerformanceTimeline, getPerformanceTimeline } from "./$ProfilePerformanceGraph.js"
+import { IPerformanceTimeline, getPosolitionListTimelinePerformance } from "./$ProfilePerformanceGraph.js"
 
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
@@ -25,10 +25,9 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
   [accountPreviewClick, accountPreviewClickTether]: Behavior<string, string>,
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
 ) => {
-  const openPositionList = config.mp.__typename === 'Position' ? [config.mp] : []
-  const settledPositionList = config.mp.__typename === 'Position' ? [config.mp] : []
+
   const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
-  const timeline = getPerformanceTimeline({ ...config, openPositionList, settledPositionList })
+  const timeline = getPosolitionListTimelinePerformance({ ...config, list: [config.mp] })
   const pnlCrossHairTimeChange = replayLatest(multicast(startWith(null, skipRepeatsWith(((xsx, xsy) => xsx.time === xsy.time), crosshairMove))))
 
   const hoverChartPnl = filterNull(map(params => {
@@ -44,27 +43,27 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
 
 
 
-  const openMarkerList = config.openPositionList.map((pos): IMarker => {
-    const pnl = timeline[timeline.length - 1].value
-    return {
-      position: 'inBar',
-      color: pnl < 0 ? pallete.negative : pallete.positive,
-      time: unixTimestampNow() as Time,
-      size: 1.5,
-      shape: 'circle'
-    }
-  })
-  const settledMarkerList = config.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
-    return {
-      position: 'inBar',
-      color: colorAlpha(pallete.message, .15),
-      time: Number(pos.blockTimestamp) as Time,
-      size: 0.1,
-      shape: 'circle'
-    }
-  })
+  // const openMarkerList = config.openPositionList.map((pos): IMarker => {
+  //   const pnl = timeline[timeline.length - 1].value
+  //   return {
+  //     position: 'inBar',
+  //     color: pnl < 0 ? pallete.negative : pallete.positive,
+  //     time: unixTimestampNow() as Time,
+  //     size: 1.5,
+  //     shape: 'circle'
+  //   }
+  // })
+  // const settledMarkerList = config.settledPositionList.flatMap(pos => pos.decreaseList).map((pos): IMarker => {
+  //   return {
+  //     position: 'inBar',
+  //     color: colorAlpha(pallete.message, .15),
+  //     time: Number(pos.blockTimestamp) as Time,
+  //     size: 0.1,
+  //     shape: 'circle'
+  //   }
+  // })
 
-  const allMarkerList = [...settledMarkerList, ...openMarkerList].sort((a, b) => Number(a.time) - Number(b.time))
+  // const allMarkerList = [...settledMarkerList, ...openMarkerList].sort((a, b) => Number(a.time) - Number(b.time))
 
 
 
@@ -167,7 +166,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
             ),
           ),
           $Baseline({
-            markers: now(allMarkerList),
+            // markers: now(allMarkerList),
             chartConfig: {
               leftPriceScale: {
                 autoScale: true,

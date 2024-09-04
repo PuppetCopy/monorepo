@@ -6,7 +6,7 @@ import { erc20Abi } from "abitype/abis"
 import { ADDRESS_ZERO, ITokenDescription, IntervalTime, USD_DECIMALS, filterNull, getDenominator, getMappedValue, parseFixed } from "common-utils"
 import * as GMX from "gmx-middleware-const"
 import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { IPriceCandleDto, IRequestPricefeedApi, ITokenSymbol, getTokenDescription, hashData, resolveAddress } from "gmx-middleware-utils"
+import { IRequestPricefeedApi, ITokenSymbol, getTokenDescription, hashData, resolveAddress } from "gmx-middleware-utils"
 import * as PUPPET from "puppet-middleware-const"
 import { getRouteAddressKey, getTradeRouteKey } from "puppet-middleware-utils"
 import * as viem from "viem"
@@ -126,7 +126,7 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
     return prev === 0 ? next : (prev + next) / 2
   }, 0, allSources))
 
-  return map(ev => parseFixed(ev, USD_DECIMALS) / getDenominator(tokendescription.decimals), avgPrice)
+  return map(ev => parseFixed(USD_DECIMALS, ev) / getDenominator(tokendescription.decimals), avgPrice)
 }
 
 
@@ -189,17 +189,17 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
 
 
 
-export const getGmxIoPricefeed = async (queryParams: IRequestPricefeedApi): Promise<IPriceCandleDto[]> => {
-  const tokenDesc = getTokenDescription(queryParams.tokenAddress)
-  const intervalLabel = getMappedValue(gmxIoPricefeedIntervalLabel, queryParams.interval)
-  const symbol = derievedSymbolMapping[tokenDesc.symbol] || tokenDesc.symbol
-  const res = fetch(`https://stats.gmx.io/api/candles/${symbol}?preferableChainId=${queryParams.chain}&period=${intervalLabel}&from=${queryParams.from}&preferableSource=fast`)
-    .then(async res => {
-      const parsed = await res.json()
-      return parsed.prices.map((json: any) => ({ o: parseFixed(json.o, 30), h: parseFixed(json.h, 30), l: parseFixed(json.l, 30), c: parseFixed(json.c, 30), timestamp: json.t }))
-    })
-  return res
-}
+// export const getGmxIoPricefeed = async (queryParams: IRequestPricefeedApi): Promise<IPriceLatest[]> => {
+//   const tokenDesc = getTokenDescription(queryParams.tokenAddress)
+//   const intervalLabel = getMappedValue(gmxIoPricefeedIntervalLabel, queryParams.interval)
+//   const symbol = derievedSymbolMapping[tokenDesc.symbol] || tokenDesc.symbol
+//   const res = fetch(`https://stats.gmx.io/api/candles/${symbol}?preferableChainId=${queryParams.chain}&period=${intervalLabel}&from=${queryParams.from}&preferableSource=fast`)
+//     .then(async res => {
+//       const parsed = await res.json()
+//       return parsed.prices.map((json: any) => ({ o: parseFixed(json.o, 30), h: parseFixed(json.h, 30), l: parseFixed(json.l, 30), c: parseFixed(json.c, 30), timestamp: json.t }))
+//     })
+//   return res
+// }
 
 export async function getTraderTradeRoute(
   provider: walletLink.IClient,
