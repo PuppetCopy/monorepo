@@ -22,68 +22,68 @@ export type IQueryRquest<T> = Stream<Promise<{
   filter: IQueryPositionParams
 }>>
 
-export function getPositionFilters(filter: IQueryPositionParams): IQueryFilter<IMirrorPosition> {
 
-  const filters: IQueryFilter<IMirrorPosition> = {}
-
-  if (filter.account) {
-    filters.account = {
-      _eq: `"${filter.account}"`
-    }
-  }
-
-  if (filter.isLong !== undefined) {
-    filters.isLong = {
-      _eq: filter.isLong
-    }
-  }
-
-
-  const orFilters = []
-
-  if (filter.collateralTokenList) {
-    orFilters.push(
-      ...filter.collateralTokenList.map(token => ({
-        collateralToken: {
-          _eq: `"${token}"`
-        }
-      }))
-    )
-  }
-
-  if (filter.activityTimeframe) {
-    const timestampFilter = unixTimestampNow() - filter.activityTimeframe
-
-    orFilters.push({
-      settledTimestamp: {
-        _gte: timestampFilter
-      }
-    })
-    orFilters.push({
-      openTimestamp: {
-        _gte: timestampFilter
-      }
-    })
-  }
-
-
-  if (orFilters.length) {
-    filters._or = orFilters
-  }
-
-
-  return filters
-}
 
 export function queryPosition<TStateParams extends StateParams<IQueryPositionParams>>(
   subgraphClient: Client,
   queryParams: TStateParams
 ) {
   return map(
-    filter => querySubgraph(subgraphClient, {
-      schema: schema.mirrorPosition,
-      filter: getPositionFilters(filter),
-    }),
+    filterParams => {
+
+      const filter: IQueryFilter<IMirrorPosition> = {}
+
+      if (filterParams.account) {
+        filter.account = {
+          _eq: `"${filterParams.account}"`
+        }
+      }
+
+      if (filterParams.isLong !== undefined) {
+        filter.isLong = {
+          _eq: filterParams.isLong
+        }
+      }
+
+
+      const orFilters = []
+
+      if (filterParams.collateralTokenList) {
+        orFilters.push(
+          ...filterParams.collateralTokenList.map(token => ({
+            collateralToken: {
+              _eq: `"${token}"`
+            }
+          }))
+        )
+      }
+
+      if (filterParams.activityTimeframe) {
+        const timestampFilter = unixTimestampNow() - filterParams.activityTimeframe
+
+        orFilters.push({
+          settledTimestamp: {
+            _gte: timestampFilter
+          }
+        })
+        orFilters.push({
+          openTimestamp: {
+            _gte: timestampFilter
+          }
+        })
+      }
+
+
+      if (orFilters.length) {
+        filter._or = orFilters
+      }
+
+      return querySubgraph(subgraphClient, {
+
+        schema: schema.mirrorPosition,
+        filter: filter,
+      })
+    },
     combineState(queryParams)
   )
 }
@@ -92,10 +92,60 @@ export function queryLeaderboardPosition<TStateParams extends StateParams<IQuery
   subgraphClient: Client,
   queryParams: TStateParams
 ) {
-  return map(async (filter) => {
+  return map(async filterParams => {
+    const filter: IQueryFilter<IMirrorPosition> = {}
+
+    if (filterParams.account) {
+      filter.account = {
+        _eq: `"${filterParams.account}"`
+      }
+    }
+
+    if (filterParams.isLong !== undefined) {
+      filter.isLong = {
+        _eq: filterParams.isLong
+      }
+    }
+
+
+    const orFilters = []
+
+    if (filterParams.collateralTokenList) {
+      orFilters.push(
+        ...filterParams.collateralTokenList.map(token => ({
+          collateralToken: {
+            _eq: `"${token}"`
+          }
+        }))
+      )
+    }
+
+    if (filterParams.activityTimeframe) {
+      const timestampFilter = unixTimestampNow() - filterParams.activityTimeframe
+
+      // filter.settledTimestamp = {
+      //   _gte: timestampFilter
+      // }
+
+      filter.openTimestamp = {
+        _gte: timestampFilter
+      }
+    }
+
+
+    if (orFilters.length) {
+      filter._or = orFilters
+    }
+
+    // filter.account = {
+    //   _eq: '"0x62D428bC7AE77d0ACC7bbeA9c497a945Bf7f58B1"'
+    // }
+
+
+
     const list = await querySubgraph(subgraphClient, {
       schema: schema.leaderboardPosition,
-      filter: getPositionFilters(filter)
+      filter
     })
 
     return list
@@ -114,11 +164,7 @@ export function queryPricefeed(
 ) {
   return map(async params => {
     const filter: IQueryFilter<IPriceCandle> = {
-      // _or: params.tokenList.map(token => ({
-      //   token: {
-      //     _eq: `"${token}"`
-      //   }
-      // })),
+ 
       interval: {
         _eq: getClosestNumber(GMX.PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)
       },
@@ -134,9 +180,7 @@ export function queryPricefeed(
         }
       }))
     }
-
-
-
+    
 
     const candleListQuery = querySubgraph(subgraphClient, {
       schema: schema.priceCandle,

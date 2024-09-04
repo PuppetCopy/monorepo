@@ -258,11 +258,11 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
     getTime
   } = config
 
-  if (source.length === 0) {
+  const sortedSource = source.filter(update => getTime(update) > seed.time).sort((a, b) => getTime(a) - getTime(b))
+
+  if (sortedSource.length === 0) {
     return []
   }
-
-  const sortedSource = source.filter(update => getTime(update) > seed.time).sort((a, b) => getTime(a) - getTime(b))
 
   const lstSrc = sortedSource[sortedSource.length - 1]
   const lstTime = getTime(lstSrc)

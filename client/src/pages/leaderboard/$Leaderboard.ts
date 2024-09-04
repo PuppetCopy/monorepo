@@ -122,7 +122,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
             const dataSource: Stream<TablePageResponse<ILeaderboardSummary>> = map(scroll => {
 
               const tradeListMap = groupArrayMany(positionList, a => a.account)
-              const filterestPosList = leaderboardSummary(positionList)
+              const filterestPosList = leaderboardSummary(params.pricefeedMap, positionList)
 
               return pagingQuery(
                 { ...params.sortBy, ...scroll },
@@ -184,10 +184,10 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   $text('Size'),
                   $text(style({ fontSize: '.85rem' }))('Leverage'),
                 ),
-                sortBy: 'size',
+                sortBy: 'maxSize',
                 columnOp: style({ placeContent: 'flex-end' }),
                 $bodyCallback: map((pos) => {
-                  return $size(pos.size, pos.collateral)
+                  return $size(pos.maxSize, pos.maxCollateral)
                 })
               },
 
@@ -221,6 +221,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                           $container: $row(style({ position: 'relative', width: `180px`, height: `80px`, margin: '-16px 0' })),
                           tickCount: 50,
                           list: pos.positionList,
+                          pricefeedMap: params.pricefeedMap,
                           activityTimeframe: params.activityTimeframe,
                         })({})
                         : empty()

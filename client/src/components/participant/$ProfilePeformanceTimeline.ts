@@ -24,18 +24,18 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
   const { activityTimeframe, collateralTokenList, puppet, pricefeedMapQuery, positionListQuery } = config
 
   const positionParams = multicast(map(async (params) => {
-    const positionList = await params.positionListQuery
+    const list = await params.positionListQuery
     const timeline = getPosolitionListTimelinePerformance({
       ...params,
       puppet,
       list,
       tickCount: 100,
       activityTimeframe: params.activityTimeframe,
-      pricefeedMap: await params.priceTickMapQuery
+      pricefeedMap: await params.pricefeedMapQuery
     })
 
-    return { timeline, positionList }
-  }, combineObject({ priceTickMapQuery, positionListQuery, activityTimeframe })))
+    return { timeline, list }
+  }, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe })))
 
 
   return [
@@ -64,7 +64,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
         ),
         switchLatest(awaitPromises(map(async paramsQuery => {
           const params = await paramsQuery
-          const positionCount = params.positionList.length
+          const positionCount = params.list.length
 
           if (positionCount === 0) {
             return empty()
@@ -110,7 +110,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
       $IntermediatePromise({
         query: positionParams,
         $$done: map(params => {
-          const positionCount = params.positionList.length
+          const positionCount = params.list.length
 
           if (positionCount === 0) {
             return $row(layoutSheet.spacingTiny, style({ textAlign: 'center', placeSelf: 'center', }))(
@@ -118,7 +118,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
             )
           }
 
-          const openMarkerList = params.positionList.filter(isPositionOpen).map((pos): IMarker => {
+          const openMarkerList = params.list.filter(isPositionOpen).map((pos): IMarker => {
             const pnl = params.timeline[params.timeline.length - 1].value
             return {
               position: 'inBar',
@@ -128,7 +128,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
               shape: 'circle'
             }
           })
-          const settledMarkerList = params.positionList.filter(isPositionSettled).flatMap(pos => pos.decreaseList).map((pos): IMarker => {
+          const settledMarkerList = params.list.filter(isPositionSettled).flatMap(pos => pos.decreaseList).map((pos): IMarker => {
             return {
               position: 'inBar',
               color: colorAlpha(pallete.message, .5),

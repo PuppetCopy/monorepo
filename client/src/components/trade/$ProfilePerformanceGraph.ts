@@ -44,7 +44,7 @@ function getTime(item: IPositionIncrease | IPositionDecrease | IPricetickWithInd
 export function getPosolitionListTimelinePerformance(config: IPerformanceTimeline) {
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
-  const adjustList: (IPositionIncrease | IPositionDecrease)[] = config.list.flatMap(mp => [...mp.increaseList, ...mp.decreaseList])
+  const adjustList: (IPositionIncrease | IPositionDecrease)[] = config.list.flatMap(mp => [...mp.increaseList, ...mp.decreaseList]).sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList.flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
 
@@ -72,13 +72,13 @@ export function getPosolitionListTimelinePerformance(config: IPerformanceTimelin
         openPnl = openPnlMap[indexToken]
 
         if (!openPnl) {
-          throw new Error('OpenPnl not found')
+          return acc
         }
 
         openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
       } else {
         indexToken = getMarketIndexToken(next.market)
-        openPnl = openPnlMap[indexToken] = { ...acc.openPnlMap[indexToken] }
+        openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
 
         if (next.__typename === 'PositionIncrease') {
           openPnl.isLong = next.isLong
@@ -195,6 +195,7 @@ export interface ILeaderboardPerformanceTimeline {
   activityTimeframe: IntervalTime
   puppet?: viem.Address
   list: ILeaderboardPosition[]
+  pricefeedMap: IPricefeedMap
   tickCount: number
   chartConfig?: DeepPartial<ChartOptions>
 }
@@ -202,25 +203,57 @@ export interface ILeaderboardPerformanceTimeline {
 export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPerformanceTimeline) {
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
+  const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
+  const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList.flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
 
-  const seed = {
+  const seed: IGraphLTick = {
     value: 0,
     realisedPnl: 0n,
+    openPnlMap: {},
     time: startTime,
   }
 
-  return createTimeline({
-    source: config.list,
+  const timeline = createTimeline({
+    source: [...config.list, ...priceUpdateTicks],
     seed,
     seedMap: (acc, next) => {
+      let value = acc.value
+      let realisedPnl = acc.realisedPnl
+      let indexToken: viem.Address
+      let openPnl: OpenPnl
 
-      const realisedPnl = acc.realisedPnl + next.realisedPnlUsd
-      const value = formatFixed(30, realisedPnl)
+      const openPnlMap: Record<viem.Hex, OpenPnl> = { ...acc.openPnlMap }
 
-      return { realisedPnl, value }
+      if ('price' in next) {
+        indexToken = next.indexToken
+        openPnl = openPnlMap[indexToken]
+
+        if (!openPnl) {
+          return acc
+        }
+
+        openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
+        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
+      } else if (next.__typename === 'Position' && next.sizeInTokens > 0n) {
+        indexToken = getMarketIndexToken(next.market)
+        
+        openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
+
+        openPnl.isLong = next.isLong
+        openPnl.sizeInTokens = next.sizeInTokens
+        openPnl.sizeInUsd = next.sizeInUsd
+
+        realisedPnl += next.realisedPnlUsd
+
+        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
+      }
+
+      return { openPnlMap, realisedPnl, value }
     },
-    getTime: src => src.settledTimestamp,
+    getTime: src => 'openTimestamp' in src ? src.openTimestamp : src.timestamp,
   })
+  
+  return timeline
 }
 
 export const $LeaderboardPerformanceTimeline = (config: ILeaderboardPerformanceTimeline & { $container: NodeComposeFn<$Node> }) => component((
@@ -233,7 +266,7 @@ export const $LeaderboardPerformanceTimeline = (config: ILeaderboardPerformanceT
       return {
         position: 'inBar',
         color: colorAlpha(pallete.message, .15),
-        time: pos.settledTimestamp as Time,
+        time: pos.openTimestamp as Time,
         size: 0.1,
         shape: 'circle'
       }

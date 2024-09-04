@@ -40,10 +40,7 @@ export function accountSettledPositionListSummary(
     const avgSize = size / idxBn
     const avgCollateral = collateral / idxBn
 
-    // const lstFeeUpdate = lst(next.feeUpdateList)
-
     const fee = seed.fee + getParticiapntPortion(next, 0n, puppet)
-    // const fee = seed.fee + getParticiapntPortion(next, lstFeeUpdate.totalCostAmount, puppet)
     const pnl = seed.pnl + getParticiapntPortion(next, next.pnlUsd, puppet)
 
     const winCount = seed.winCount + (next.pnlUsd > 0n ? 1 : 0)
@@ -70,7 +67,7 @@ export function accountSettledPositionListSummary(
   return summary
 }
 
-export function leaderboardSummary(tradeList: ILeaderboardPosition[]): ILeaderboardSummary[] {
+export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILeaderboardPosition[]): ILeaderboardSummary[] {
   const map: { [k: viem.Address]: ILeaderboardSummary } = {}
 
   for (const next of tradeList) {
@@ -90,12 +87,11 @@ export function leaderboardSummary(tradeList: ILeaderboardPosition[]): ILeaderbo
     }
 
     summary.totalCount = summary.winCount + summary.lossCount
-    summary.size += next.sizeInUsd
     summary.collateral += next.maxCollateralUsd
     summary.maxCollateral = next.maxCollateralUsd > summary.maxCollateral ? next.maxCollateralUsd : summary.maxCollateral
-    summary.maxSize = next.sizeInUsd > summary.maxSize ? next.sizeInUsd : summary.maxSize
+    summary.maxSize = next.maxSizeUsd > summary.maxSize ? next.maxSizeUsd : summary.maxSize
     summary.leverage = summary.maxSize / summary.maxCollateral
-    summary.pnl += next.realisedPnlUsd
+    summary.pnl += next.sizeInTokens > 0n ? next.realisedPnlUsd : next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market)))
 
     if (next.realisedPnlUsd > 0n) {
       summary.winCount += 1
@@ -104,6 +100,7 @@ export function leaderboardSummary(tradeList: ILeaderboardPosition[]): ILeaderbo
     }
 
     summary.puppets = []
+    summary.positionList.push(next)
 
     map[next.account] = summary
   }

@@ -11,7 +11,7 @@ import { IntervalTime } from "common-utils"
 
 
 export const LAST_ACTIVITY_LABEL_MAP = {
-  // [IntervalTime.HR24]: '24h',
+  [IntervalTime.HR24]: '24h',
   [IntervalTime.DAY7]: '7d',
   [IntervalTime.MONTH]: '28d',
   [IntervalTime.YEAR]: '14w',

@@ -46,11 +46,16 @@ export interface IMirrorPosition extends IGmxPosition {
 export interface ILeaderboardPosition extends ILogType<'Position'> {
   account: viem.Address
   realisedPnlUsd: bigint
+  maxSizeUsd: bigint
+  maxCollateralUsd: bigint
+
+  market: viem.Address
   sizeInTokens: bigint
   sizeInUsd: bigint
-  maxCollateralUsd: bigint
   isLong: boolean
-  settledTimestamp: number
+
+  // settledTimestamp: number
+  openTimestamp: number
 }
 
 
@@ -65,7 +70,6 @@ export interface IMirrorListSummary extends IPositionListSummary {
 
 export interface ILeaderboardSummary {
   account: viem.Address
-  size: bigint
   collateral: bigint
   maxSize: bigint
   maxCollateral: bigint
@@ -79,7 +83,6 @@ export interface ILeaderboardSummary {
   pnl: bigint
 
   puppets: viem.Address[]
-
   positionList: ILeaderboardPosition[]
 }
 
@@ -91,25 +94,4 @@ export interface ISetRouteType extends ILogTypeId<'SetRouteType'> {
   // data: viem.Hex
 }
 
-
-export interface IAccountSummary extends ILogTypeId<'AccountSummary'> {
-  account: viem.Address
-  interval: bigint
-  timestamp: bigint
-
-  puppets: bigint
-
-  cumulativeSizeUsd: bigint
-  cumulativeCollateralUsd: bigint
-
-  maxSizeUsd: bigint
-  maxCollateralUsd: bigint
-
-  pnl: bigint
-  roi: bigint
-
-  winCount: bigint
-  lossCount: bigint
-  successRate: bigint
-}
 

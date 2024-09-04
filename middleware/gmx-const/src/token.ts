@@ -239,7 +239,7 @@ export const TOKEN_DESCRIPTION_LIST = [
     name: "Stacks",
     symbol: TOKEN_SYMBOL.STX,
     decimals: 6,
-    debugger: 10n ** 6n
+    denominator: 10n ** 6n
   }
 
 ] as const

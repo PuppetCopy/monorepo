@@ -44,13 +44,18 @@ const mirrorPosition: ISchema<IMirrorPosition> = {
 
 const leaderboardPosition: ISchema<ILeaderboardPosition> = {
   account: 'address',
+  // isLong: 'bool',
+  maxSizeUsd: 'uint',
+  maxCollateralUsd: 'uint',
+  realisedPnlUsd: 'int',
+
+  market: 'address',
   isLong: 'bool',
   sizeInTokens: 'uint',
   sizeInUsd: 'uint',
-  maxCollateralUsd: 'uint',
-  realisedPnlUsd: 'int',
-  
-  settledTimestamp: 'number',
+
+  openTimestamp: 'number',
+  // settledTimestamp: 'number',
   
   __typename: 'Position',
 }
@@ -68,9 +73,9 @@ const setRouteType: ISchema<ISetRouteType> = {
 
 const priceCandle: ISchema<IPriceCandle> = {
   id: 'string',
-  timestamp: 'int',
   token: 'address',
   c: 'int',
+  timestamp: 'number',
   __typename: 'PriceCandle',
 }
 
