@@ -101,125 +101,125 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
         $node(style({ flex: 1 }))(),
       ),
 
-      switchMap(params => {
-        const address = switchMap(async walletQuery => {
-          return (await walletQuery)?.account.address || ADDRESS_ZERO
-        }, walletClientQuery)
+      // switchMap(params => {
+      //   const address = switchMap(async walletQuery => {
+      //     return (await walletQuery)?.account.address || ADDRESS_ZERO
+      //   }, walletClientQuery)
 
-        if (params.profileMode === IWalletTab.PUPPET) {
-          const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
+      //   if (params.profileMode === IWalletTab.PUPPET) {
+      //     const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
           
-          const settledPositionListQuery = map(async tradeRoute => {
-            return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
-          }, puppetTradeRouteListQuery)
-          const openPositionListQuery = map(async tradeRoute => {
-            return (await tradeRoute).map(x => x.openList).flatMap(pp => pp.map(x => x.position))
-          }, puppetTradeRouteListQuery)
+      //     const settledPositionListQuery = map(async tradeRoute => {
+      //       return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
+      //     }, puppetTradeRouteListQuery)
+      //     const openPositionListQuery = map(async tradeRoute => {
+      //       return (await tradeRoute).map(x => x.openList).flatMap(pp => pp.map(x => x.position))
+      //     }, puppetTradeRouteListQuery)
 
-          return $WalletPuppet({
-            walletClientQuery, route, pricefeedMapQuery, positionListQuery, puppetTradeRouteListQuery,
-            activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
-          })({
-            changeRoute: changeRouteTether(),
-            modifySubscriber: modifySubscriberTether(),
-            changeActivityTimeframe: changeActivityTimeframeTether(),
-            selectCollateralTokenList: selectCollateralTokenListTether(),
-          })
-        } else if (params.profileMode === IWalletTab.TRADER) {
-          const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
-          const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
+      //     return $WalletPuppet({
+      //       walletClientQuery, route, pricefeedMapQuery, positionListQuery, puppetTradeRouteListQuery,
+      //       activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
+      //     })({
+      //       changeRoute: changeRouteTether(),
+      //       modifySubscriber: modifySubscriberTether(),
+      //       changeActivityTimeframe: changeActivityTimeframeTether(),
+      //       selectCollateralTokenList: selectCollateralTokenListTether(),
+      //     })
+      //   } else if (params.profileMode === IWalletTab.TRADER) {
+      //     const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
+      //     const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
 
-          return $column(layoutSheet.spacingTiny)(
-            $TraderPage({ ...config, positionListQuery })({ 
-              changeActivityTimeframe: changeActivityTimeframeTether(),
-            })
-          ) 
-        }
+      //     return $column(layoutSheet.spacingTiny)(
+      //       $TraderPage({ ...config, positionListQuery })({ 
+      //         changeActivityTimeframe: changeActivityTimeframeTether(),
+      //       })
+      //     ) 
+      //   }
 
 
-        return $card(layoutSheet.spacingBig)(
+      //   return $card(layoutSheet.spacingBig)(
           
-          $responsiveFlex(layoutSheet.spacingBig)(
+      //     $responsiveFlex(layoutSheet.spacingBig)(
 
-            $VestingDetails({ ...config, puppetTokenPriceInUsd })({
-              changeWallet: changeWalletTether()
-            }),
+      //       $VestingDetails({ ...config, puppetTokenPriceInUsd })({
+      //         changeWallet: changeWalletTether()
+      //       }),
             
-            $seperator2,
-            $column(layoutSheet.spacing, style({ flex: 1 }))(
-              $heading3('Protocol Flywheel'),
-              style({ placeContent: 'space-between' })(
-                $infoLabeledValue(
-                  'Price',
-                  $intermediateMessage(
-                    map(async puppetPrice => {
-                      const price = puppetPrice * getDenominator(24)
+      //       $seperator2,
+      //       $column(layoutSheet.spacing, style({ flex: 1 }))(
+      //         $heading3('Protocol Flywheel'),
+      //         style({ placeContent: 'space-between' })(
+      //           $infoLabeledValue(
+      //             'Price',
+      //             $intermediateMessage(
+      //               map(async puppetPrice => {
+      //                 const price = puppetPrice * getDenominator(24)
 
-                      return readableUsd(price)
-                    }, puppetTokenPriceInUsd)
-                  )
-                )
-              ),
-              style({ placeContent: 'space-between' })(
-                $infoLabeledValue(
-                  $infoTooltipLabel('This week revenue amount that will be distributed anyone who locked their PUPPET', 'Current Revenue'),
-                  $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                    $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`($36,137)`),
-                    $text(`21,383 / Week`)
-                  ),
-                )
-              ),
-              style({ placeContent: 'space-between' })(
-                $infoLabeledValue(
-                  $infoTooltipLabel('Total amount of PUPPET that has been emitted over the lifetime of the protocol. Each subsequent year, the number of new tokens minted will decrease by about 16%,', 'Total Emitted'),
-                  $intermediateMessage(
-                    map(async providerQuery => {
-                      const provider = await providerQuery
-                      const puppetSupply = readTotalEmitted(provider)
+      //                 return readableUsd(price)
+      //               }, puppetTokenPriceInUsd)
+      //             )
+      //           )
+      //         ),
+      //         style({ placeContent: 'space-between' })(
+      //           $infoLabeledValue(
+      //             $infoTooltipLabel('This week revenue amount that will be distributed anyone who locked their PUPPET', 'Current Revenue'),
+      //             $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+      //               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`($36,137)`),
+      //               $text(`21,383 / Week`)
+      //             ),
+      //           )
+      //         ),
+      //         style({ placeContent: 'space-between' })(
+      //           $infoLabeledValue(
+      //             $infoTooltipLabel('Total amount of PUPPET that has been emitted over the lifetime of the protocol. Each subsequent year, the number of new tokens minted will decrease by about 16%,', 'Total Emitted'),
+      //             $intermediateMessage(
+      //               map(async providerQuery => {
+      //                 const provider = await providerQuery
+      //                 const puppetSupply = readTotalEmitted(provider)
 
-                      return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply)
-                    }, providerClientQuery)
-                  ),
-                )
-              ),
-              // style({ placeContent: 'space-between' })(
-              //   $infoLabeledValue(
-              //     $infoTooltipLabel('The total value of all PUPPET in circulation', 'Market Cap'),
-              //     $text('10,000,000'),
-              //   )
-              // ),
-              $seperator2,
-              style({ placeContent: 'space-between' })(
-                $infoLabeledValue(
-                  $text('Average lock time'),
-                  $intermediateMessage(
-                    map(async providerQuery => {
-                      const provider = await providerQuery
-                      const contractMap = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-                      const puppetBalanceInVeContract = readBalanceOf(provider, contractMap.PuppetToken.address, contractMap.VotingEscrow.address)
-                      const lockedSupply = readLockSupply(provider)
-                      const globalLockFactor = factor(await lockedSupply, await puppetBalanceInVeContract)
-                      const globalLockTimespan = applyFactor(globalLockFactor, BigInt(PUPPET.MAX_LOCKUP_SCHEDULE))
+      //                 return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply)
+      //               }, providerClientQuery)
+      //             ),
+      //           )
+      //         ),
+      //         // style({ placeContent: 'space-between' })(
+      //         //   $infoLabeledValue(
+      //         //     $infoTooltipLabel('The total value of all PUPPET in circulation', 'Market Cap'),
+      //         //     $text('10,000,000'),
+      //         //   )
+      //         // ),
+      //         $seperator2,
+      //         style({ placeContent: 'space-between' })(
+      //           $infoLabeledValue(
+      //             $text('Average lock time'),
+      //             $intermediateMessage(
+      //               map(async providerQuery => {
+      //                 const provider = await providerQuery
+      //                 const contractMap = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
+      //                 const puppetBalanceInVeContract = readBalanceOf(provider, contractMap.PuppetToken.address, contractMap.VotingEscrow.address)
+      //                 const lockedSupply = readLockSupply(provider)
+      //                 const globalLockFactor = factor(await lockedSupply, await puppetBalanceInVeContract)
+      //                 const globalLockTimespan = applyFactor(globalLockFactor, BigInt(PUPPET.MAX_LOCKUP_SCHEDULE))
 
-                      return countdownFn(PUPPET.MAX_LOCKUP_SCHEDULE, PUPPET.MAX_LOCKUP_SCHEDULE - Number(globalLockTimespan))
-                    }, providerClientQuery)
-                  ),
-                )
-              ),
-              style({ placeContent: 'space-between' })(
-                $infoLabeledValue(
-                  $text('Exit / Lock'),
-                  $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                    $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`(66% Lock)`),
-                    $text(`14,112 / 28,654`)
-                  ),
-                )
-              ),
-            ),
+      //                 return countdownFn(PUPPET.MAX_LOCKUP_SCHEDULE, PUPPET.MAX_LOCKUP_SCHEDULE - Number(globalLockTimespan))
+      //               }, providerClientQuery)
+      //             ),
+      //           )
+      //         ),
+      //         style({ placeContent: 'space-between' })(
+      //           $infoLabeledValue(
+      //             $text('Exit / Lock'),
+      //             $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+      //               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`(66% Lock)`),
+      //               $text(`14,112 / 28,654`)
+      //             ),
+      //           )
+      //         ),
+      //       ),
             
-          ),
-        )
-      }, combineObject({ profileMode }))
+      //     ),
+      //   )
+      // }, combineObject({ profileMode }))
 
 
     ),

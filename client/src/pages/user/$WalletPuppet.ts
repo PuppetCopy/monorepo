@@ -6,7 +6,7 @@ import { Stream } from "@most/types"
 import { IntervalTime, groupArrayMany, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
 import * as GMX from 'gmx-middleware-const'
 import { getTokenDescription } from "gmx-middleware-utils"
-import { IPuppetTradeRoute, ISetRouteType, getParticiapntPortion } from "puppet-middleware-utils"
+import {  getParticiapntPortion } from "puppet-middleware-utils"
 import { $infoTooltipLabel, $intermediateMessage } from "ui-components"
 import * as viem from "viem"
 import { $route } from "../../common/$common.js"
@@ -15,7 +15,6 @@ import { $card, $card2, $responsiveFlex } from "../../common/elements/$common.js
 import { $Popover } from "../../components/$Popover.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../../components/form/$Button.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { $PuppetTraderTradeRoute } from "../../components/participant/PuppetTraderTradeRoute.js"
 import { $AssetDepositEditor } from "../../components/portfolio/$AssetDepositEditor.js"
 import { $AssetWithdrawEditor } from "../../components/portfolio/$AssetWithdrawEditor.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
@@ -25,7 +24,7 @@ import { IUserPositionPageParams } from "../type.js"
 
 
 interface IWalletPuppet extends IUserPositionPageParams {
-  puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
+  // puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
 }
 
 export const $WalletPuppet = (config: IWalletPuppet) => component((
@@ -41,7 +40,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
   [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, pricefeedMapQuery, providerClientQuery, puppetTradeRouteListQuery, positionListQuery, collateralTokenList, routeTypeListQuery, route } = config
+  const { activityTimeframe, walletClientQuery, pricefeedMapQuery, providerClientQuery, positionListQuery, collateralTokenList, route } = config
 
   const initialDepositAmountQuery = map(async walletQuery => {
     const wallet = await walletQuery
@@ -131,61 +130,61 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
             })({}),
           ),
         ),
-        switchLatest(awaitPromises(map(async params => {
-          const wallet = await params.walletClientQuery
+        // switchLatest(awaitPromises(map(async params => {
+        //   const wallet = await params.walletClientQuery
 
-          if (wallet === null) {
-            return $text('Connect wallet to view activity')
-          }
+        //   if (wallet === null) {
+        //     return $text('Connect wallet to view activity')
+        //   }
 
-          const puppetTradeRouteList = await params.puppetTradeRouteListQuery
-          const priceTickMap = await params.priceTickMapQuery
-          const routeTypeList = await params.routeTypeListQuery
+        //   const puppetTradeRouteList = await params.puppetTradeRouteListQuery
+        //   const priceTickMap = await params.priceTickMapQuery
+        //   const routeTypeList = await params.routeTypeListQuery
 
-          if (puppetTradeRouteList.length === 0) {
-            return $text('No activity found')
-          }
+        //   if (puppetTradeRouteList.length === 0) {
+        //     return $text('No activity found')
+        //   }
 
-          const usedBalance = puppetTradeRouteList.flatMap(route => route.openList).reduce((acc, pos) => {
-            const collateralUsd = getParticiapntPortion(pos.position, pos.position.maxCollateralUsd, wallet.account.address)
-            return acc + collateralUsd
-          }, 0n)
+        //   const usedBalance = puppetTradeRouteList.flatMap(route => route.openList).reduce((acc, pos) => {
+        //     const collateralUsd = getParticiapntPortion(pos.position, pos.position.maxCollateralUsd, wallet.account.address)
+        //     return acc + collateralUsd
+        //   }, 0n)
 
-          const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [viem.Address, IPuppetTradeRoute[]][]
+        //   const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [viem.Address, IPuppetTradeRoute[]][]
 
-          return $column(layoutSheet.spacingBig, style({ width: '100%' }))(
-            ...tradeRouteList.map(([routeTypeKey, traderPuppetTradeRouteList]) => {
-              const routeType = routeTypeList.find(route => route.routeTypeKey === routeTypeKey)!
+        //   return $column(layoutSheet.spacingBig, style({ width: '100%' }))(
+        //     ...tradeRouteList.map(([routeTypeKey, traderPuppetTradeRouteList]) => {
+        //       const routeType = routeTypeList.find(route => route.routeTypeKey === routeTypeKey)!
 
-              return $column(layoutSheet.spacing)(
-                $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-                  $route(routeType),
-                  $responsiveFlex(layoutSheet.spacingSmall)(
-                    $infoTooltipLabel($text('The available amount ready to be matched against'), 'Used balance'),
-                    $text(readableUsd(usedBalance))
-                  ),
-                  $node(style({ flex: 1 }))(),
-                ),
+        //       return $column(layoutSheet.spacing)(
+        //         $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
+        //           $route(routeType),
+        //           $responsiveFlex(layoutSheet.spacingSmall)(
+        //             $infoTooltipLabel($text('The available amount ready to be matched against'), 'Used balance'),
+        //             $text(readableUsd(usedBalance))
+        //           ),
+        //           $node(style({ flex: 1 }))(),
+        //         ),
 
-                $column(style({ paddingLeft: '16px' }))(
-                  $row(layoutSheet.spacing)(
-                    $seperator2,
+        //         $column(style({ paddingLeft: '16px' }))(
+        //           $row(layoutSheet.spacing)(
+        //             $seperator2,
 
-                    $column(layoutSheet.spacing, style({ flex: 1 }))( 
-                      ...traderPuppetTradeRouteList.map(puppetTradeRoute => {
-                        return $PuppetTraderTradeRoute({ route, walletClientQuery, puppetTradeRoute, providerClientQuery, routeTypeList, activityTimeframe: params.activityTimeframe, priceTickMap })({
-                          modifySubscriber: modifySubscriberTether(),
-                          changeRoute: changeRouteTether(),
-                        })
-                      })
-                    ),
-                  ),
-                  $seperator2,
-                ),
-              )
-            })
-          )
-        }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectCollateralTokenList, routeTypeListQuery, walletClientQuery })))),
+        //             $column(layoutSheet.spacing, style({ flex: 1 }))( 
+        //               ...traderPuppetTradeRouteList.map(puppetTradeRoute => {
+        //                 return $PuppetTraderTradeRoute({ route, walletClientQuery, puppetTradeRoute, providerClientQuery, routeTypeList, activityTimeframe: params.activityTimeframe, priceTickMap })({
+        //                   modifySubscriber: modifySubscriberTether(),
+        //                   changeRoute: changeRouteTether(),
+        //                 })
+        //               })
+        //             ),
+        //           ),
+        //           $seperator2,
+        //         ),
+        //       )
+        //     })
+        //   )
+        // }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectCollateralTokenList, routeTypeListQuery, walletClientQuery })))),
       ),
     ),
     

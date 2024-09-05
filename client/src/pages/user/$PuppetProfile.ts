@@ -1,23 +1,16 @@
-import { Behavior, combineObject } from "@aelea/core"
-import { $text, component, style } from "@aelea/dom"
-import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { awaitPromises, map, switchLatest } from "@most/core"
-import { Stream } from "@most/types"
-import { IntervalTime, groupArrayMany } from "common-utils"
-import { IPuppetTradeRoute, ISetRouteType } from "puppet-middleware-utils"
+import { Behavior } from "@aelea/core"
+import { component, style } from "@aelea/dom"
+import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
+import { IntervalTime } from "common-utils"
 import * as viem from "viem"
-import { $route } from "../../common/$common.js"
-import { $heading3 } from "../../common/$text.js"
 import { $card, $card2 } from "../../common/elements/$common.js"
-import { $seperator2 } from "../common.js"
-import { IUserPositionPageParams } from "../type.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { $PuppetTraderTradeRoute } from "../../components/participant/PuppetTraderTradeRoute.js"
+import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { IUserPositionPageParams } from "../type.js"
 
 
 export interface IPuppetProfile extends IUserPositionPageParams {
-  puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
+  // puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
 }
 
 export const $PuppetProfile = (config: IPuppetProfile) => component((
@@ -28,7 +21,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
   [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, puppetTradeRouteListQuery, collateralTokenList, routeTypeListQuery, route } = config
+  const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, collateralTokenList, route } = config
 
   return [
 
@@ -41,52 +34,52 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
           }),
         ),
 
-        $column(layoutSheet.spacing)(
-          $heading3('Active Trader Routes'),
-          switchLatest(awaitPromises(map(async params => {
+        // $column(layoutSheet.spacing)(
+        //   $heading3('Active Trader Routes'),
+        //   switchLatest(awaitPromises(map(async params => {
 
-            const puppetTradeRouteList = await params.puppetTradeRouteListQuery
-            const priceTickMap = await params.priceTickMapQuery
-            const routeTypeList = await params.routeTypeListQuery
+        //     const puppetTradeRouteList = await params.puppetTradeRouteListQuery
+        //     const priceTickMap = await params.priceTickMapQuery
+        //     const routeTypeList = await params.routeTypeListQuery
 
-            if (puppetTradeRouteList.length === 0) {
-              return $text('No activity found')
-            }
+        //     if (puppetTradeRouteList.length === 0) {
+        //       return $text('No activity found')
+        //     }
 
 
-            const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [viem.Address, IPuppetTradeRoute[]][]
+        //     const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [viem.Address, IPuppetTradeRoute[]][]
 
-            return $column(layoutSheet.spacingBig, style({ width: '100%' }))(
-              // ...tradeRouteList.map(([routeTypeKey, traderPuppetTradeRouteList]) => {
-              //   const routeType = routeTypeList.find(route => route.routeTypeKey === routeTypeKey)!
+        //     return $column(layoutSheet.spacingBig, style({ width: '100%' }))(
+        //       // ...tradeRouteList.map(([routeTypeKey, traderPuppetTradeRouteList]) => {
+        //       //   const routeType = routeTypeList.find(route => route.routeTypeKey === routeTypeKey)!
 
-              //   return $column(layoutSheet.spacing)(
-              //     $route(routeType),
+        //       //   return $column(layoutSheet.spacing)(
+        //       //     $route(routeType),
 
-              //     $column(style({ paddingLeft: '16px' }))(
-              //       $row(layoutSheet.spacing)(
-              //         $seperator2,
-              //         $column(layoutSheet.spacing, style({ flex: 1 }))( 
-              //           ...traderPuppetTradeRouteList.map(puppetTradeRoute => {
-              //             return $PuppetTraderTradeRoute({ route, puppetTradeRoute, providerClientQuery, routeTypeList, walletClientQuery, activityTimeframe: params.activityTimeframe, priceTickMap })({
-              //               modifySubscriber: modifySubscriberTether(),
-              //               changeRoute: changeRouteTether(),
-              //             })
-              //           })
-              //         ),
-              //       ),
-              //       $seperator2,
-              //     ),
-              //   )
-              // })
-            )
-          }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, collateralToken, routeTypeListQuery })))),
-        ),
+        //       //     $column(style({ paddingLeft: '16px' }))(
+        //       //       $row(layoutSheet.spacing)(
+        //       //         $seperator2,
+        //       //         $column(layoutSheet.spacing, style({ flex: 1 }))( 
+        //       //           ...traderPuppetTradeRouteList.map(puppetTradeRoute => {
+        //       //             return $PuppetTraderTradeRoute({ route, puppetTradeRoute, providerClientQuery, routeTypeList, walletClientQuery, activityTimeframe: params.activityTimeframe, priceTickMap })({
+        //       //               modifySubscriber: modifySubscriberTether(),
+        //       //               changeRoute: changeRouteTether(),
+        //       //             })
+        //       //           })
+        //       //         ),
+        //       //       ),
+        //       //       $seperator2,
+        //       //     ),
+        //       //   )
+        //       // })
+        //     )
+        //   }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, collateralToken, routeTypeListQuery })))),
+        // ),
       ),
     ),
     
     {
-      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralToken
+      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralTokenList
     }
   ]
 })

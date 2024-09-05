@@ -52,6 +52,7 @@ export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) 
 export const $entry = (mp: IPosition) => {
   const indexToken = getMarketIndexToken(mp.market)
   const indexDescription = getTokenDescription(indexToken)
+  
   return $column(layoutSheet.spacingTiny, style({ alignItems: 'center', placeContent: 'center', fontSize: '.85rem' }))(
     $tokenIcon(indexToken, { width: '28px' }),
     // $text(mp.market),
@@ -130,7 +131,7 @@ export const $sizeAndLiquidation = (mp: IMirrorPosition, puppet?: viem.Address) 
 
 
 export const $puppets = (
-  puppets?: readonly viem.Address[],
+  puppets?: viem.Address[],
   click?: Tether<INode, string>
 ) => {
 

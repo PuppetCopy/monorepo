@@ -3,13 +3,11 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map } from "@most/core"
 import { getTimeSince, readableDate } from "common-utils"
-import { IMirrorPosition, IMirrorPosition, IMirror, getParticiapntPortion, latestPriceMap } from "puppet-middleware-utils"
+import { IPosition } from "gmx-middleware-utils"
+import { IMirrorPosition, getParticiapntPortion } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
-import { arbitrum } from "viem/chains"
 import { $entry, $positionPnl, $puppets, $size, $sizeAndLiquidation } from "../../common/$common.js"
-import { $txnIconLink } from "../../common/elements/$common"
-import { IPosition, IPositionAbstract, IPosition, isPositionSettled } from "gmx-middleware-utils"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -41,7 +39,7 @@ export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPos
 
 
 
-export const entryColumn: TableColumn<IPositionAbstract> = {
+export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),
   $bodyCallback: map(pos => {
     return $entry(pos)
@@ -52,7 +50,7 @@ export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, st
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
-    return $puppets(pos.mirror?.puppetList, click)
+    return $puppets(pos.mirror?.puppetList.map(m => m.account) || [], click)
   })
 })
 
@@ -71,13 +69,13 @@ export const positionTimeColumn: TableColumn<IPosition | IPosition>  = {
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map((pos) => {
     // const isSettled = isPositionSettled(pos)
-    const timestamp = Number(pos.blockTimestamp)
+    const timestamp = Number(pos.settledTimestamp || pos.openTimestamp)
 
     return $column(layoutSheet.spacingTiny)(
       $text(readableDate(timestamp)),
       $row(layoutSheet.spacingSmall)(
         $text(style({ fontSize: '.85rem' }))(getTimeSince(timestamp)),
-        $txnIconLink(pos.transactionHash, arbitrum)
+        // $txnIconLink(pos.transactionHash, arbitrum)
       )
     )
   })

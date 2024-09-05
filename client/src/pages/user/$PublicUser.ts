@@ -96,44 +96,44 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             },
           }
         ),
-        router.match(puppetRoute)(
-          {
-            run(sink, scheduler) {
-              const urlFragments = document.location.pathname.split('/')
-              const address = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralTokenList })
+        // router.match(puppetRoute)(
+        //   {
+        //     run(sink, scheduler) {
+        //       const urlFragments = document.location.pathname.split('/')
+        //       const address = viem.getAddress(urlFragments[urlFragments.length - 1])
+        //       const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralTokenList })
 
-              const settledPositionListQuery = map(async trList => {
-                const tradeList = (await trList).flatMap(p => p.settledList.map(x => x.position))
-                return tradeList
-              }, puppetTradeRouteListQuery)
+        //       const settledPositionListQuery = map(async trList => {
+        //         const tradeList = (await trList).flatMap(p => p.settledList.map(x => x.position))
+        //         return tradeList
+        //       }, puppetTradeRouteListQuery)
 
-              const openPositionListQuery = map(async trList => {
-                const tradeList = (await trList).flatMap(p => p.openList.map(x => x.position))
-                return tradeList
-              }, puppetTradeRouteListQuery)
+        //       const openPositionListQuery = map(async trList => {
+        //         const tradeList = (await trList).flatMap(p => p.openList.map(x => x.position))
+        //         return tradeList
+        //       }, puppetTradeRouteListQuery)
 
-              return $column(layoutSheet.spacingBig)(
-                $PuppetSummary({ ...config, account, puppet: address, positionListQuery })({}),
+        //       return $column(layoutSheet.spacingBig)(
+        //         $PuppetSummary({ ...config, account, puppet: address, positionListQuery })({}),
 
-                $column(layoutSheet.spacingTiny)(
-                  $PuppetProfile({
-                    ...config,
-                    openPositionListQuery,
-                    settledPositionListQuery,
-                    puppetTradeRouteListQuery,
-                  })({
-                    changeRoute: changeRouteTether(),
-                    changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectCollateralTokenList: selectCollateralTokenListTether(),
-                    modifySubscriber: modifySubscriberTether()
-                  }),
-                ),
+        //         $column(layoutSheet.spacingTiny)(
+        //           $PuppetProfile({
+        //             ...config,
+        //             openPositionListQuery,
+        //             settledPositionListQuery,
+        //             puppetTradeRouteListQuery,
+        //           })({
+        //             changeRoute: changeRouteTether(),
+        //             changeActivityTimeframe: changeActivityTimeframeTether(),
+        //             selectCollateralTokenList: selectCollateralTokenListTether(),
+        //             modifySubscriber: modifySubscriberTether()
+        //           }),
+        //         ),
 
-              ).run(sink, scheduler)
-            },
-          }
-        ),
+        //       ).run(sink, scheduler)
+        //     },
+        //   }
+        // ),
       ),
 
       $node(),

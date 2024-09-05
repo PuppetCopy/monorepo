@@ -76,6 +76,7 @@ export function getPosolitionListTimelinePerformance(config: IPerformanceTimelin
         }
 
         openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
+        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
       } else {
         indexToken = getMarketIndexToken(next.market)
         openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
@@ -234,9 +235,8 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
 
         openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
         value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
-      } else if (next.__typename === 'Position' && next.sizeInTokens > 0n) {
+      } else if (next.__typename === 'Position') {
         indexToken = getMarketIndexToken(next.market)
-        
         openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
 
         openPnl.isLong = next.isLong
@@ -252,7 +252,7 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
     },
     getTime: src => 'openTimestamp' in src ? src.openTimestamp : src.timestamp,
   })
-  
+
   return timeline
 }
 
