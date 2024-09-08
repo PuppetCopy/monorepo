@@ -37,14 +37,6 @@ const walletConnectProviderQuery: Stream<EIP6963ProviderDetail> = fromPromise(pr
     walletConnectProvider.on('disconnect', async () => {
       window.location.reload()
     })
-
-    // await walletConnectProvider.enable().catch(() => {})
-
-    // if (!walletConnectProvider.session)  {
-    //   await walletConnectProvider.signer.disconnect()
-    //   await walletConnectProvider.disconnect()
-    // } else {
-    // }
   }
 
   const provider = walletConnectProvider as EIP1193Provider

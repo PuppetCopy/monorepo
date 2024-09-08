@@ -10,13 +10,13 @@ Puppet's smart contracts integrate a simple emissions model. Tokens are minted a
 - **Revenue-Driven Buyback**: Revenue is used to buy back tokens, distributed to users who commit to long-term locking
 - **Foundation Emission**: Earns a share of the tokens minted based on protocol performance, share factor decreases over time to promote decentralization
 
-*Flywheel Diagram*
+> Flywheel Diagram
 
 ![Flywheel](/assets/flywheel.png){data-zoomable}
 
 ## Revenue-Driven Emissions
 
-Tokens are minted and distributed to active participants as the protocol generates more revenue. This ensures that the token supply directly reflects the protocol's growth and usage, avoiding arbitrary or excessive inflation that could deter new participants
+Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated, earn a corresponding amount in PUPPET tokens. This ensures that the token supply directly reflects the protocol's growth and usage, avoiding arbitrary or excessive inflation that could deter new participants
 
 ## Reward Options
 
@@ -24,7 +24,7 @@ Puppet offers flexible reward options to cater to different types of users:
 
 ### Lock In
 
-For every dollar of revenue generated, earn a corresponding amount in PUPPET tokens, Users can lock their tokens as vePUPPET for up to two years. Longer lockups yield greater bonuses, with increased rewards generated through revenue and governance rights. This option is ideal for long-term investors who believe in the protocol's future and are willing to commit their tokens for extended periods
+Users can lock their tokens as vePUPPET for up to two years. Longer lockups yield greater rewards, with increased rewards generated through revenue and governance rights. This option is ideal for long-term investors who believe in the protocol's future and are willing to commit their tokens for extended periods
 
 ### Cash Out
 

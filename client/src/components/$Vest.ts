@@ -1,14 +1,14 @@
 import { Behavior, combineObject, replayLatest } from "@aelea/core"
-import { $element, $node, $text, component, style } from "@aelea/dom"
+import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { awaitPromises, constant, debounce, map, mergeArray, multicast, never, now, periodic, sample, snapshot, startWith, take, throttle } from "@most/core"
+import { pallete } from "@aelea/ui-components-theme"
+import { awaitPromises, debounce, map, mergeArray, multicast, now, periodic, snapshot } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, BASIS_POINTS_DIVISOR, combineState, filterNull, getDuration, getMappedValue, readableDate, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
+import { applyFactor, combineState, getDuration, getMappedValue, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { $ButtonToggle, $Checkbox, $defaulButtonToggleContainer, $hintAdjustment, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText, $labeledhintAdjustment, intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -16,10 +16,8 @@ import { $heading2 } from "../common/$text"
 import { $labeledDivider } from "../common/elements/$common"
 import { store } from "../const/store"
 import tokenomicsReader from "../logic/tokenomicsReader"
-import { IComponentPageParams, IEarningsPlan, IVested } from "../pages/type"
-import { $Popover } from "./$Popover"
+import { IComponentPageParams, IVested } from "../pages/type"
 import { $defaultSliderThumb, $Slider } from "./$Slider"
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from "./form/$Button"
 import { $SubmitBar } from "./form/$Form"
 
 function calcDurationMultiplier(baseMultiplier: bigint, duration: bigint) {
@@ -52,27 +50,12 @@ interface IVestingDetails extends IComponentPageParams {
 
 export const $Vest = (config: IVestingDetails) => component((
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-
-  [overlayClick, overlayClickTether]: Behavior<any>,
   [requestTx, requestTxTether]: Behavior<walletLink.IWalletClient, any>,
-
-  [changePopoverScheduleFactor, changePopoverScheduleFactorTether]: Behavior<any, number>,
-  [changePopoverMaintainSchedule, changePopoverMaintainScheduleTether]: Behavior<boolean>,
-  [savePopoverLockSchedule, savePopoverLockScheduleTether]: Behavior<any>,
-
   [checkCashoutMode, checkCashoutModeTether]: Behavior<boolean>,
-  [changeCompoundContributionReward, changeCompoundContributionRewardTether]: Behavior<boolean>,
-  [changeCompoundLockReward, changeCompoundLockRewardTether]: Behavior<boolean>,
-  [changeCompoundVestedReward, changeCompoundVestedRewardTether]: Behavior<boolean>,
   [changeScheduleFactor, changeScheduleFactorTether]: Behavior<number>,
 ) => {
 
-
   const { providerClientQuery, walletClientQuery, puppetTokenPriceInUsd } = config
-
-
-
-
 
 
   const durationBaseMultiplierQuery = replayLatest(multicast(map(async walletQuery => {
@@ -119,7 +102,6 @@ export const $Vest = (config: IVestingDetails) => component((
     return tokenomicsReader.PuppetVoteToken.balanceOf(wallet, wallet.account.address)
   }, walletClientQuery)))
 
-
   const lockDurationQuery = replayLatest(multicast(map(async walletQuery => {
     const wallet = await walletQuery
 
@@ -142,9 +124,6 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
   const cashout = uiStorage.replayWrite(store.earnings, checkCashoutMode, 'cashout')
-  // const compoundContributionReward = uiStorage.replayWrite(store.earnings, changeCompoundContributionReward, 'compoundContributionReward')
-  // const compoundLockReward = uiStorage.replayWrite(store.earnings, changeCompoundLockReward, 'compoundLockReward')
-  // const compoundVestedReward = uiStorage.replayWrite(store.earnings, changeCompoundVestedReward, 'compoundVestedReward')
   const lockSchedule = switchMap(isCashout => {
     if (isCashout) return now(0)
 
@@ -200,9 +179,11 @@ export const $Vest = (config: IVestingDetails) => component((
   return [
     $column(layoutSheet.spacing, style({ flex: 1 }))(
 
-      style({ placeContent: 'space-between', alignItems: 'center' })(
+      style({ alignItems: 'center' })(
         $row(
           $heading2('Locked'),
+          $infoTooltip(`Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens`)
+
           // style({ placeContent: 'space-between' })(
           //   $infoLabeledValue(
           //     $text('Switch Plan'),
@@ -357,7 +338,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
       style({ placeContent: 'space-between' })(
         $labeledhintAdjustment({
-          tooltip: 'Voting Power is the amount of voting power you have in the governance system. The more tokens you lock, the more voting power you have.',
+          tooltip: `Voting Power is the amount of voting power you have in the governance system. higher Voting Power tokens yield more rewards.`,
           label: 'Voting Power',
           color: now(pallete.positive),
           change: switchMap(async (paramsQuery) => {

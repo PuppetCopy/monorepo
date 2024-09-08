@@ -203,12 +203,10 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                     $intermediateText(
                       map(async providerQuery => {
                         const provider = await providerQuery
-                        const totalSupplyQuery = tokenomics.PuppetToken.totalSupply(provider)
-                        const vTokenSupplyQuery = tokenomics.PuppetVoteToken.totalSupply(provider)
-                        const cashedOut = await totalSupplyQuery - PUPPET.INITIAL_SUPPLY - await vTokenSupplyQuery
+                        // const totalSupply = await tokenomics.PuppetToken.totalSupply(provider)
+                        const vTokenSupply = await tokenomics.PuppetVoteToken.totalSupply(provider)
 
-
-                        return `${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await vTokenSupplyQuery)} / ${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, cashedOut)}`
+                        return `${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, vTokenSupply)}`
                       }, providerClientQuery)
                     ),
                   )

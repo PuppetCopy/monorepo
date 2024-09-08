@@ -47,10 +47,7 @@ export const store = uiStorage.createStoreDefinition('root', 4, {
   },
   earnings: {
     initialState: {
-      cashout: true,
-      compoundContributionReward: true,
-      compoundLockReward: true,
-      compoundVestedReward: true,
+      cashout: false,
       scheduleFactor: 1,
     }
   }
