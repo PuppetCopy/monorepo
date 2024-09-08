@@ -34,7 +34,21 @@ export interface IPositionActivityParams {
 
 export interface IUserPositionPageParams extends IPageParams, IPositionActivityParams, IUserActivityParams { }
 
+export interface IVested {
+  amount: bigint
+  remainingDuration: bigint
+  lastAccruedTime: bigint
+  accrued: bigint
+}
 
+export interface IEarningsPlan {
+  compoundMode: boolean
+  compoundLockRewards: boolean
+  compoundVestedRewards: boolean
+  // claimLockRewards: boolean
+  // claimVestedRewards: boolean
+  scheduleFactor: number
+}
 
 export enum ITradeFocusMode {
   collateral,
@@ -48,13 +62,3 @@ export enum IWalletTab {
   EARN = "Earn"
 }
 
-export enum VestingLockMode {
-  NONE = 'None',
-  CONTINUOUS = 'Auto Lock',
-  SHORT_TERM = 'Short Term',
-}
-
-export enum SelectedOption {
-  LOCK = 'Lock',
-  EXIT = 'Exit',
-}

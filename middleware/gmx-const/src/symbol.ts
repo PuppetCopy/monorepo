@@ -1,6 +1,7 @@
 
 export const TOKEN_SYMBOL = {
   PUPPET: 'PUPPET',
+  VEPUPPET: 'vePUPPET',
   GMX: 'GMX',
   GLP: "GLP",
   ETH: 'ETH',

@@ -60,7 +60,7 @@ export const $AssetWithdrawEditor = (config: IAssetWithdrawEditor) => component(
       
       $SubmitBar({
         walletClientQuery,
-        $content: $text('Withdraw'),
+        $submitContent: $text('Withdraw'),
         disabled: map(val => val === 0n, amount),
         txQuery: requestDepositAsset
       })({

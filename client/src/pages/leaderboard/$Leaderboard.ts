@@ -93,7 +93,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 il === undefined
                   ? empty()
                   : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
-                $text(il === undefined ? 'All' : il ? 'Long' : 'Short'),
+                $text(il === undefined ? 'Both' : il ? 'Long' : 'Short'),
               )
             })
           })({

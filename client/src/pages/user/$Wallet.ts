@@ -2,27 +2,31 @@ import { Behavior, combineObject } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
-import { map } from "@most/core"
-import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, readableTokenAmount, readableUsd, switchMap } from "common-utils"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { map, mergeArray, now, snapshot, startWith } from "@most/core"
+import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, parseFixed, readableTokenAmount, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
+import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
 import { queryPosition } from "puppet-middleware-utils"
-import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltipLabel, $intermediateMessage } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltipLabel, $intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from 'viem'
-import { $heading3 } from "../../common/$text"
+import { $heading2, $heading3 } from "../../common/$text"
 import { $card, $responsiveFlex } from "../../common/elements/$common"
 import { subgraphClient } from "../../common/graphClient"
-import { $VestingDetails } from "../../components/$VestingDetails"
+import { $Vest } from "../../components/$Vest.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import * as storeDb from "../../const/store.js"
-import { readBalanceOf, readLockSupply, readTotalEmitted } from "../../logic/commonRead"
-import { readPuppetPriceInUsd, } from "../../logic/puppetRead"
+import { readBalanceOf } from "../../logic/commonRead"
 import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
 import { $WalletPuppet } from "./$WalletPuppet.js"
+import { $SubmitBar } from "../../components/form/$Form"
+import * as walletLink from "wallet"
+import { $AssetDepositEditor } from "../../components/portfolio/$AssetDepositEditor"
+import { readAddressTokenBalance } from "../../logic/traderRead"
+import tokenomics from "../../logic/tokenomicsReader.js"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -53,8 +57,9 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
 
   const {
     route, walletClientQuery, providerClientQuery,
-    activityTimeframe, collateralTokenList, pricefeedMapQuery 
+    activityTimeframe, collateralTokenList, pricefeedMapQuery
   } = config
+
 
   const profileMode = uiStorage.replayWrite(storeDb.store.wallet, selectProfileMode, 'selectedTab')
 
@@ -62,8 +67,9 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
   const puppetTokenPriceInUsd = switchMap(async providerQuery => {
     const provider = await providerQuery
 
-    return await readPuppetPriceInUsd(provider)
+    return 0n
   }, providerClientQuery)
+
 
 
 
@@ -101,126 +107,259 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
         $node(style({ flex: 1 }))(),
       ),
 
-      // switchMap(params => {
-      //   const address = switchMap(async walletQuery => {
-      //     return (await walletQuery)?.account.address || ADDRESS_ZERO
-      //   }, walletClientQuery)
+      switchMap(params => {
+        const address = switchMap(async walletQuery => {
+          return (await walletQuery)?.account.address || ADDRESS_ZERO
+        }, walletClientQuery)
 
-      //   if (params.profileMode === IWalletTab.PUPPET) {
-      //     const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
-          
-      //     const settledPositionListQuery = map(async tradeRoute => {
-      //       return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
-      //     }, puppetTradeRouteListQuery)
-      //     const openPositionListQuery = map(async tradeRoute => {
-      //       return (await tradeRoute).map(x => x.openList).flatMap(pp => pp.map(x => x.position))
-      //     }, puppetTradeRouteListQuery)
+        // if (params.profileMode === IWalletTab.PUPPET) {
+        //   const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
 
-      //     return $WalletPuppet({
-      //       walletClientQuery, route, pricefeedMapQuery, positionListQuery, puppetTradeRouteListQuery,
-      //       activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
-      //     })({
-      //       changeRoute: changeRouteTether(),
-      //       modifySubscriber: modifySubscriberTether(),
-      //       changeActivityTimeframe: changeActivityTimeframeTether(),
-      //       selectCollateralTokenList: selectCollateralTokenListTether(),
-      //     })
-      //   } else if (params.profileMode === IWalletTab.TRADER) {
-      //     const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
-      //     const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
+        //   const settledPositionListQuery = map(async tradeRoute => {
+        //     return (await tradeRoute).map(x => x.settledList).flatMap(pp => pp.map(x => x.position))
+        //   }, puppetTradeRouteListQuery)
+        //   const openPositionListQuery = map(async tradeRoute => {
+        //     return (await tradeRoute).map(x => x.openList).flatMap(pp => pp.map(x => x.position))
+        //   }, puppetTradeRouteListQuery)
 
-      //     return $column(layoutSheet.spacingTiny)(
-      //       $TraderPage({ ...config, positionListQuery })({ 
-      //         changeActivityTimeframe: changeActivityTimeframeTether(),
-      //       })
-      //     ) 
-      //   }
+        //   return $WalletPuppet({
+        //     walletClientQuery, route, pricefeedMapQuery, positionListQuery, puppetTradeRouteListQuery,
+        //     activityTimeframe, collateralTokenList, routeTypeListQuery, providerClientQuery,
+        //   })({
+        //     changeRoute: changeRouteTether(),
+        //     modifySubscriber: modifySubscriberTether(),
+        //     changeActivityTimeframe: changeActivityTimeframeTether(),
+        //     selectCollateralTokenList: selectCollateralTokenListTether(),
+        //   })
+        // } else if (params.profileMode === IWalletTab.TRADER) {
+        //   const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
+        //   const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
+
+        //   return $column(layoutSheet.spacingTiny)(
+        //     $TraderPage({ ...config, positionListQuery })({ 
+        //       changeActivityTimeframe: changeActivityTimeframeTether(),
+        //     })
+        //   ) 
+        // }
 
 
-      //   return $card(layoutSheet.spacingBig)(
-          
-      //     $responsiveFlex(layoutSheet.spacingBig)(
+        return $column(layoutSheet.spacingBig)(
+          $card(layoutSheet.spacingBig)(
 
-      //       $VestingDetails({ ...config, puppetTokenPriceInUsd })({
-      //         changeWallet: changeWalletTether()
-      //       }),
-            
-      //       $seperator2,
-      //       $column(layoutSheet.spacing, style({ flex: 1 }))(
-      //         $heading3('Protocol Flywheel'),
-      //         style({ placeContent: 'space-between' })(
-      //           $infoLabeledValue(
-      //             'Price',
-      //             $intermediateMessage(
-      //               map(async puppetPrice => {
-      //                 const price = puppetPrice * getDenominator(24)
+            $responsiveFlex(layoutSheet.spacingBig)(
 
-      //                 return readableUsd(price)
-      //               }, puppetTokenPriceInUsd)
-      //             )
-      //           )
-      //         ),
-      //         style({ placeContent: 'space-between' })(
-      //           $infoLabeledValue(
-      //             $infoTooltipLabel('This week revenue amount that will be distributed anyone who locked their PUPPET', 'Current Revenue'),
-      //             $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-      //               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`($36,137)`),
-      //               $text(`21,383 / Week`)
-      //             ),
-      //           )
-      //         ),
-      //         style({ placeContent: 'space-between' })(
-      //           $infoLabeledValue(
-      //             $infoTooltipLabel('Total amount of PUPPET that has been emitted over the lifetime of the protocol. Each subsequent year, the number of new tokens minted will decrease by about 16%,', 'Total Emitted'),
-      //             $intermediateMessage(
-      //               map(async providerQuery => {
-      //                 const provider = await providerQuery
-      //                 const puppetSupply = readTotalEmitted(provider)
+              $Vest({ ...config, puppetTokenPriceInUsd })({
+                changeWallet: changeWalletTether()
+              }),
 
-      //                 return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply)
-      //               }, providerClientQuery)
-      //             ),
-      //           )
-      //         ),
-      //         // style({ placeContent: 'space-between' })(
-      //         //   $infoLabeledValue(
-      //         //     $infoTooltipLabel('The total value of all PUPPET in circulation', 'Market Cap'),
-      //         //     $text('10,000,000'),
-      //         //   )
-      //         // ),
-      //         $seperator2,
-      //         style({ placeContent: 'space-between' })(
-      //           $infoLabeledValue(
-      //             $text('Average lock time'),
-      //             $intermediateMessage(
-      //               map(async providerQuery => {
-      //                 const provider = await providerQuery
-      //                 const contractMap = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-      //                 const puppetBalanceInVeContract = readBalanceOf(provider, contractMap.PuppetToken.address, contractMap.VotingEscrow.address)
-      //                 const lockedSupply = readLockSupply(provider)
-      //                 const globalLockFactor = factor(await lockedSupply, await puppetBalanceInVeContract)
-      //                 const globalLockTimespan = applyFactor(globalLockFactor, BigInt(PUPPET.MAX_LOCKUP_SCHEDULE))
+              $seperator2,
+              $column(layoutSheet.spacing, style({ flex: 1 }))(
+                $heading2('Protocol Flywheel'),
+                // style({ placeContent: 'space-between' })(
+                //   $infoLabeledValue(
+                //     'Price',
+                //     $intermediateText(
+                //       map(async puppetPrice => {
+                //         const price = puppetPrice * getDenominator(24)
 
-      //                 return countdownFn(PUPPET.MAX_LOCKUP_SCHEDULE, PUPPET.MAX_LOCKUP_SCHEDULE - Number(globalLockTimespan))
-      //               }, providerClientQuery)
-      //             ),
-      //           )
-      //         ),
-      //         style({ placeContent: 'space-between' })(
-      //           $infoLabeledValue(
-      //             $text('Exit / Lock'),
-      //             $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-      //               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(`(66% Lock)`),
-      //               $text(`14,112 / 28,654`)
-      //             ),
-      //           )
-      //         ),
-      //       ),
-            
-      //     ),
-      //   )
-      // }, combineObject({ profileMode }))
+                //         return readableUsd(price)
+                //       }, puppetTokenPriceInUsd)
+                //     )
+                //   )
+                // ),
+                style({ placeContent: 'space-between' })(
+                  $infoLabeledValue(
+                    $infoTooltipLabel(`Protocol fees Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Buyback'),
+                    $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+                      // $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
+                      $text(readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
+                    ),
+                  )
+                ),
+                style({ placeContent: 'space-between' })(
+                  $infoLabeledValue(
+                    $infoTooltipLabel(`Tokens are minted and distributed to active participants as the protocol generates more revenue. This ensures that the token supply directly reflects the protocol's growth and usage`, 'Total Rewarded'),
+                    $intermediateText(
+                      map(async providerQuery => {
+                        const provider = await providerQuery
+                        const puppetSupply = tokenomics.PuppetToken.totalSupply(provider)
 
+
+                        return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply - PUPPET.INITIAL_SUPPLY)
+                      }, providerClientQuery)
+                    ),
+                  )
+                ),
+                // style({ placeContent: 'space-between' })(
+                //   $infoLabeledValue(
+                //     $infoTooltipLabel('The total value of all PUPPET in circulation', 'Market Cap'),
+                //     $text('10,000,000'),
+                //   )
+                // ),
+                $seperator2,
+                style({ placeContent: 'space-between' })(
+                  $infoLabeledValue(
+                    $text('Locked In / Cashed Out'),
+                    $intermediateText(
+                      map(async providerQuery => {
+                        const provider = await providerQuery
+                        const totalSupplyQuery = tokenomics.PuppetToken.totalSupply(provider)
+                        const vTokenSupplyQuery = tokenomics.PuppetVoteToken.totalSupply(provider)
+                        const cashedOut = await totalSupplyQuery - PUPPET.INITIAL_SUPPLY - await vTokenSupplyQuery
+
+
+                        return `${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await vTokenSupplyQuery)} / ${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, cashedOut)}`
+                      }, providerClientQuery)
+                    ),
+                  )
+                )
+              ),
+
+            ),
+          ),
+        )
+      }, combineObject({ profileMode })),
+
+      $node(),
+
+      component((
+        [inputDepositAmount, inputDepositAmountTether]: Behavior<string, bigint>,
+        [submitContribute, submitContributeTether]: Behavior<walletLink.IWalletClient, any>,
+
+        [inputBuybackAmount, inputBuybackAmountTether]: Behavior<string, bigint>,
+        [submitBuyback, submitBuybackTether]: Behavior<walletLink.IWalletClient, any>,
+
+      ) => {
+
+        const walletBalance = switchMap(async walletQuery => {
+          const wallet = await walletQuery
+
+          if (wallet == null) {
+            return 0n
+          }
+
+          return readAddressTokenBalance(wallet, ARBITRUM_ADDRESS.USDC, wallet.account.address)
+        }, walletClientQuery)
+
+        const contributedUsdcQuery = switchMap(async walletClientQuery => {
+          const wallet = await walletClientQuery
+
+          if (wallet == null) {
+            return 0n
+          }
+
+          return tokenomics.ContributeStore.tokenContribution(wallet, ARBITRUM_ADDRESS.USDC)
+        }, walletClientQuery)
+
+        const usdcBuybackQuote = map(async walletClientQuery => {
+          const wallet = await walletClientQuery
+
+          if (wallet == null) {
+            return 0n
+          }
+
+          return tokenomics.ContributeStore.buybackQuote(wallet, ARBITRUM_ADDRESS.USDC)
+        }, walletClientQuery)
+
+
+
+
+        return [
+          $card(layoutSheet.spacingBig, style({ placeSelf: 'center', maxWidth: '600px', width: '100%', flex: 1 }))(
+            $heading2('Contribution Tooling (Testnet)'),
+            $seperator2,
+
+            $column(layoutSheet.spacing)(
+              $text('Contribute USDC to the Protocol'),
+              $FieldLabeled({
+                label: 'Amount',
+                placeholder: 'Enter amount',
+                hint: map(amount => `Balance: ${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.USDC, amount)}`, walletBalance),
+              })({
+                change: inputDepositAmountTether(map(value => {
+                  return parseFixed(TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
+                }))
+              })
+            ),
+
+
+
+            $SubmitBar({
+              spend: {
+                token: ARBITRUM_ADDRESS.USDC,
+                spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+              },
+              txQuery: submitContribute,
+              walletClientQuery,
+              $submitContent: $text('User Contribute USDC'),
+            })({
+              changeWallet: changeWalletTether(),
+              click: submitContributeTether(
+                snapshot(async (params, wallet) => {
+                  return walletLink.writeContract({
+                    ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).StubPublicContribute,
+                    walletClient: wallet,
+                    functionName: 'contribute',
+                    args: [ARBITRUM_ADDRESS.USDC, params.inputDepositAmount] as const
+                  })
+                }, combineObject({ inputDepositAmount }))
+              )
+            }),
+
+            $seperator2,
+            $text('Swap your PUPPET tokens in return for USDC accrued from contributions'),
+
+            $infoLabeledValue(
+              $text('Accrued USDC for sale'),
+              $text(map(amount => `${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.USDC, amount)}`, contributedUsdcQuery)),
+            ),
+            $infoLabeledValue(
+              $text('Offered Quote'),
+              $intermediateText(
+                map(async durationQuery => {
+                  return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, await durationQuery)
+                }, usdcBuybackQuote)
+              ),
+            ),
+
+            $column(layoutSheet.spacing)(
+              $FieldLabeled({
+                label: 'Amount',
+                placeholder: 'Enter amount'
+              })({
+                change: inputBuybackAmountTether(map(value => {
+                  return parseFixed(TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
+                }))
+              })
+            ),
+
+            $SubmitBar({
+              spend: {
+                token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
+                spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+              },
+              txQuery: submitBuyback,
+              walletClientQuery,
+              $submitContent: $text('Buyback'),
+            })({
+              changeWallet: changeWalletTether(),
+              click: submitBuybackTether(
+                snapshot(async (params, wallet) => {
+
+                  return walletLink.writeContract({
+                    ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter,
+                    walletClient: wallet,
+                    functionName: 'buyback',
+                    args: [ARBITRUM_ADDRESS.USDC, wallet.account.address, params.inputBuybackAmount]
+                  })
+                }, combineObject({ inputBuybackAmount }))
+              )
+            })
+
+
+          ),
+        ]
+      })({})
 
     ),
 

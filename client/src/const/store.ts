@@ -1,6 +1,6 @@
 
 import * as GMX from 'gmx-middleware-const'
-import { IWalletTab, ITradeFocusMode, SelectedOption } from '../pages/type.js'
+import { IWalletTab, ITradeFocusMode } from '../pages/type.js'
 import { ISortBy } from 'ui-components'
 import { MARKET_TOKEN_MAP } from 'gmx-middleware-utils'
 import * as viem from 'viem'
@@ -13,7 +13,7 @@ export const store = uiStorage.createStoreDefinition('root', 4, {
     initialState: {
       chain: arbitrum.id,
       wallet: null as null | string,
-      activityTimeframe: IntervalTime.DAY7,
+      activityTimeframe: IntervalTime.WEEK,
       collateralTokenList: [] as viem.Address[],
     }
   },
@@ -27,7 +27,7 @@ export const store = uiStorage.createStoreDefinition('root', 4, {
       executionFeeBuffer: 3000n,
       primaryToken: GMX.ARBITRUM_ADDRESS.USDC,
       isUsdCollateralToken: true,
-      feeRateIntervalDisplay: IntervalTime.MIN60,
+      feeRateIntervalDisplay: IntervalTime.HR,
       leverage: GMX.MAX_LEVERAGE_FACTOR / 4n,
       tradeRoute: null as viem.Address | null,
       marketToken: Object.values(MARKET_TOKEN_MAP)[0],
@@ -43,12 +43,15 @@ export const store = uiStorage.createStoreDefinition('root', 4, {
   wallet: {
     initialState: {
       selectedTab: IWalletTab.PUPPET,
-      maintainSchedule: null as boolean | null,
-      option: SelectedOption.LOCK,
+    }
+  },
+  earnings: {
+    initialState: {
+      cashout: true,
+      compoundContributionReward: true,
+      compoundLockReward: true,
+      compoundVestedReward: true,
       scheduleFactor: 1,
-      claimRevenue: true,
-      lockTokens: true,
-      claimTokens: true,
     }
   }
 })

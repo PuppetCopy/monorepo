@@ -12,7 +12,7 @@ export async function writeApproveSpend(
   token: Address,
   amount = MAX_UINT256,
   contractDefs = getMappedValue(PUPPET.CONTRACT, walletClient.chain.id),
-  spender = contractDefs.Orchestrator.address
+  spender = contractDefs.Router.address
 ): walletLink.IWriteContractReturn<typeof erc20Abi, 'Approval'> {
   return walletLink.writeContract({
     walletClient,

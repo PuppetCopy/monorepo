@@ -69,7 +69,6 @@ export const $ButtonSecondary = (config: IButtonCore) => {
 
 
 export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
-  walletClientQuery: Stream<Promise<walletLink.IWalletClient | null>>
   txQuery: Stream<Promise<any>>
   alert?: Stream<string | null>
 }
@@ -77,67 +76,58 @@ export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
 
 
 export const $Submit = (config: IButtonPrimaryCtx) => component((
-  [click, clickTether]: Behavior<PointerEvent, walletLink.IWalletClient>,
+  [click, clickTether]: Behavior<PointerEvent, PointerEvent>,
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 ) => {
 
-  const { alert = now(null), $content, txQuery, disabled = now(false), walletClientQuery } = config
+  const { alert = now(null), txQuery, disabled = now(false) } = config
 
   const isTxPending = recoverWith(() => now(false), map(s => s.state === PromiseStatus.PENDING, promiseState(txQuery)))
   const isRequestPending = startWith(false, isTxPending)
   
 
   return [
-    $IntermediateConnectButton({
-      walletClientQuery,
-      $$display: map(wallet => {
-        return $ButtonCore({
-          $container: $defaultButtonPrimary(style({
-            position: 'relative',
-            overflow: 'hidden',
-          })),
-          disabled: combineArray(params => {
-            return params.alert !== null || params.disabled || params.isRequestPending
-          }, combineObject({ disabled, isRequestPending, alert })),
-          $content: $row(
-            $node(
-              style({
-                inset: 0,
-                width: '200%',
-                visibility: 'hidden',
-                animation: `borderRotate .75s linear infinite`,
-                position: 'absolute',
-                background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`,
-              }),
-              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
-            )(),
-            $node(
-              style({
-                inset: '2px',
-                position: 'absolute',
-                visibility: 'hidden',
-                background: colorAlpha(pallete.background, .9),
-                borderRadius: '30px',
-              }),
-              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
-            )(),
-            style({ position: 'relative' })(
-              config.$content
-            )
-          )
-        })({
-          click: clickTether(
-            constant(wallet)
-          )
-        })
-      })
+    $ButtonCore({
+      $container: $defaultButtonPrimary(style({
+        position: 'relative',
+        overflow: 'hidden',
+      })),
+      disabled: combineArray(params => {
+        return params.alert !== null || params.disabled || params.isRequestPending
+      }, combineObject({ disabled, isRequestPending, alert })),
+      $content: $row(
+        $node(
+          style({
+            inset: 0,
+            width: '200%',
+            visibility: 'hidden',
+            animation: `borderRotate .75s linear infinite`,
+            position: 'absolute',
+            background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`,
+          }),
+          styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+        )(),
+        $node(
+          style({
+            inset: '2px',
+            position: 'absolute',
+            visibility: 'hidden',
+            background: colorAlpha(pallete.background, .9),
+            borderRadius: '30px',
+          }),
+          styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+        )(),
+        style({ position: 'relative' })(
+          config.$content
+        )
+      )
     })({
-      changeWallet: changeWalletTether()
+      click: clickTether()
     }),
 
 
     {
-      click: multicast(click), changeWallet
+      click: multicast(click)
     }
   ]
 })

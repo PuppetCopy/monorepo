@@ -7,20 +7,20 @@ import { mapArrayBy } from "./utils.js"
 
 export const TOKEN_DESCRIPTION_LIST = [
   {
-    name: "GLP",
-    symbol: TOKEN_SYMBOL.GLP,
+    name: "Puppet",
+    symbol: TOKEN_SYMBOL.PUPPET,
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "vePuppet",
+    symbol: TOKEN_SYMBOL.VEPUPPET,
     decimals: 18,
     denominator: 10n ** 18n
   },
   {
     name: "GMX",
     symbol: TOKEN_SYMBOL.GMX,
-    decimals: 18,
-    denominator: 10n ** 18n
-  },
-  {
-    name: "Escrow GMX",
-    symbol: TOKEN_SYMBOL.ESGMX,
     decimals: 18,
     denominator: 10n ** 18n
   },
@@ -230,12 +230,6 @@ export const TOKEN_DESCRIPTION_LIST = [
     denominator: 10n ** 18n
   },
   {
-    name: "Puppet",
-    symbol: TOKEN_SYMBOL.PUPPET,
-    decimals: 18,
-    denominator: 10n ** 18n
-  },
-  {
     name: "Stacks",
     symbol: TOKEN_SYMBOL.STX,
     decimals: 6,
@@ -261,10 +255,7 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
 
   [ARBITRUM_ADDRESS.NATIVE_TOKEN]: TOKEN_DESCRIPTION_MAP.WETH,
 
-  [ARBITRUM_ADDRESS.GLP]: TOKEN_DESCRIPTION_MAP.GLP,
   [ARBITRUM_ADDRESS.GMX]: TOKEN_DESCRIPTION_MAP.GMX,
-  [ARBITRUM_ADDRESS.ES_GMX]: TOKEN_DESCRIPTION_MAP.ESGMX,
-
   [ARBITRUM_ADDRESS.LINK]: TOKEN_DESCRIPTION_MAP.LINK,
   [ARBITRUM_ADDRESS.UNI]: TOKEN_DESCRIPTION_MAP.UNI,
   [ARBITRUM_ADDRESS.WBTC]: TOKEN_DESCRIPTION_MAP.WBTC,
@@ -302,10 +293,6 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
 
 
   [AVALANCHE_ADDRESS.NATIVE_TOKEN]: TOKEN_DESCRIPTION_MAP.AVAX,
-
-  [AVALANCHE_ADDRESS.GMX]: TOKEN_DESCRIPTION_MAP.GMX,
-  [AVALANCHE_ADDRESS.GLP]: TOKEN_DESCRIPTION_MAP.GLP,
-  [AVALANCHE_ADDRESS.ES_GMX]: TOKEN_DESCRIPTION_MAP.ESGMX,
 
   [AVALANCHE_ADDRESS.WBTCE]: TOKEN_DESCRIPTION_MAP.WBTC,
   [AVALANCHE_ADDRESS.BTCB]: TOKEN_DESCRIPTION_MAP.BTCB,

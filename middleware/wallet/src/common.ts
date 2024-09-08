@@ -1,6 +1,6 @@
 
 import * as abitype from "abitype"
-import { 
+import {
   readContract as viemReadContract, writeContract as viemWriteContract,
   type WriteContractParameters, simulateContract, waitForTransactionReceipt
 } from "viem/actions"
@@ -24,8 +24,8 @@ export type IWriteContractParams<
   TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
   TChain extends Chain,
   TEventName extends | ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined,
-> = Omit<WriteContractParameters<TAbi, TFunctionName, TArgs, TChain>, 'account'> & {eventName?: TEventName, walletClient: IWalletClient}
-export async function writeContract <
+> = Omit<WriteContractParameters<TAbi, TFunctionName, TArgs, TChain>, 'account'> & { eventName?: TEventName, walletClient: IWalletClient }
+export async function writeContract<
   const TAbi extends abitype.Abi,
   TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
   TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
@@ -35,6 +35,8 @@ export async function writeContract <
 
   try {
     const walletClient = writeParams.walletClient
+
+    // const hash = await viemWriteContract(writeParams.walletClient, { ...writeParams, account: walletClient.account } as any)
     const sim = await simulateContract(writeParams.walletClient, { ...writeParams, account: walletClient.account } as any)
     const hash = await viemWriteContract(writeParams.walletClient, sim.request)
     const transactionReceipt = await waitForTransactionReceipt(walletClient, { hash })
@@ -43,15 +45,15 @@ export async function writeContract <
       abi: writeParams.abi,
       logs: transactionReceipt.logs as any,
     })
-  
-    return { events, transactionReceipt } 
+
+    return { events, transactionReceipt }
   } catch (error) {
     console.error(error)
     throw error
   }
 }
 
-export async function readContract <
+export async function readContract<
   TAbi extends abitype.Abi,
   TFunctionName extends ContractFunctionName<TAbi, 'view'>,
   TArgs extends ContractFunctionArgs<TAbi, 'view', TFunctionName>

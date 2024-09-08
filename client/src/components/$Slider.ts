@@ -1,5 +1,5 @@
 import { Behavior, combineObject } from "@aelea/core"
-import { $Node, $text, IBranch, component, drawLatest, eventElementTarget, nodeEvent, style, styleBehavior, styleInline } from "@aelea/dom"
+import { $Node, $text, IBranch, NodeComposeFn, component, drawLatest, eventElementTarget, nodeEvent, style, styleBehavior, styleInline } from "@aelea/dom"
 import { $column, $row, Input, observer } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { join, map, mergeArray, now, snapshot, until } from "@most/core"
@@ -10,6 +10,7 @@ export interface ISliderParams extends Input<number> {
   step?: number
 
   $thumb?: $Node
+  $container?: NodeComposeFn<$Node>
   disabled?: Stream<boolean>
   min?: Stream<number>
   max?: Stream<number>
@@ -30,14 +31,17 @@ export const $defaultSliderThumb = $row(
     userSelect: 'none',
     fontSize: '.75rem',
     alignItems: 'center',
+    pointerEvents: 'all',
     placeContent: 'center',
     transition: 'border 250ms ease-in',
-    border: '2px solid red',
+    border: `2px solid ${pallete.primary}`,
     // borderWidth: '2px',
     width: 38 + 'px',
     height: 38 + 'px'
   })
 )
+
+export const $sliderDefaultContainer = $column(style({ minHeight: '26px', zIndex: 0, touchAction: 'none', placeContent: 'center', cursor: 'pointer' }))
 
 export const $Slider = ({
   value,
@@ -47,6 +51,7 @@ export const $Slider = ({
   min = now(0),
   max = now(1),
   $thumb,
+  $container = $sliderDefaultContainer
 }: ISliderParams) => component((
   [changeSliderDimension, changeSliderDimensionTether]: Behavior<IBranch<HTMLInputElement>, ResizeObserverEntry>,
   [thumbePositionDelta, thumbePositionDeltaTether]: Behavior<IBranch<HTMLInputElement>, number>
@@ -114,7 +119,7 @@ export const $Slider = ({
           const gutterColor = colorAlpha(pallete.background, .35)
           const minArea = `${colorAlpha(params.color, .35)} ${params.min * 100}%,`
           const valArea = `${params.color} ${params.min * 100}% ${params.value * 100}%,`
-          const freeArea = `${invertColor(pallete.message) } ${params.value * 100}% ${params.max * 100}%,`
+          const freeArea = `${invertColor(pallete.message)} ${params.value * 100}% ${params.max * 100}%,`
           const maxArea = `${gutterColor} ${params.max * 100}%`
 
           const background = `linear-gradient(90deg, ${minArea} ${valArea} ${freeArea} ${maxArea}`
@@ -125,17 +130,19 @@ export const $Slider = ({
           styleInline(map(val => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
           style({ width: '0px', top: '50%', position: 'absolute', transition: 'left 175ms cubic-bezier(0.25, 0.8, 0.25, 1) 0s', alignItems: 'center', placeContent: 'center' }),
         )(
-          $thumb ? $thumb : $defaultSliderThumb(
-            styleBehavior(map(params => {
-              return params.disabled
-                ? { borderColor: 'transparent', pointerEvents: params.disabled ? 'none' : 'all' }
-                : { borderColor: params.color, pointerEvents: 'all' }
-            }, combineObject({ disabled, color }))),
-          )(
-            $text(style({ paddingTop: '2px' }))(
-              map(n => Math.floor(n * 100) + '%', value)
-            )
-          ) 
+          styleBehavior(map(params => {
+            return params.disabled
+              ? { borderColor: colorAlpha(pallete.foreground, .2), pointerEvents: params.disabled ? 'none' : 'all' }
+              : { borderColor: params.color }
+          }, combineObject({ disabled, color })))(
+            $thumb
+              ? $thumb
+              : $defaultSliderThumb(
+                $text(style({ paddingTop: '2px' }))(
+                  map(n => Math.floor(n * 100) + '%', value)
+                )
+              )
+          )
         )
       )
     ),

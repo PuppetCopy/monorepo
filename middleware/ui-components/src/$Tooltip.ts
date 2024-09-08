@@ -89,6 +89,7 @@ export const $Tooltip = ({
           ),
           style({
             zIndex: 5160,
+            whiteSpace: 'pre-wrap',
             position: 'absolute',
             visibility: 'hidden',
             padding: '8px',

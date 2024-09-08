@@ -190,8 +190,6 @@ export const $sol = $svg('g')(
 export const $tokenIconMap = {
   [TOKEN_DESCRIPTION_MAP.PUPPET.symbol]: $puppet,
   [TOKEN_DESCRIPTION_MAP.GMX.symbol]: $gmx,
-  [TOKEN_DESCRIPTION_MAP.ESGMX.symbol]: $gmx,
-  [TOKEN_DESCRIPTION_MAP.GLP.symbol]: $glp,
 
   [TOKEN_DESCRIPTION_MAP.ARB.symbol]: $arb,
   [TOKEN_DESCRIPTION_MAP.SOL.symbol]: $sol,

@@ -51,9 +51,9 @@ const derievedSymbolMapping = {
 const gmxIoPricefeedIntervalLabel = {
   [IntervalTime.MIN5]: '5m',
   [IntervalTime.MIN15]: '15m',
-  [IntervalTime.MIN60]: '1h',
+  [IntervalTime.HR]: '1h',
   [IntervalTime.HR4]: '4h',
-  [IntervalTime.HR24]: '1d',
+  [IntervalTime.DAY]: '1d',
 }
 
 
@@ -150,7 +150,7 @@ export async function readAddressTokenBalance(provider: walletLink.IClient, toke
     functionName: 'balanceOf',
     args: [address]
   }).catch(() => 0n)
-  
+
   return erc20
 }
 
@@ -243,13 +243,3 @@ export async function readMinExecutionFee(wallet: walletLink.IClient): Promise<b
 }
 
 
-export async function readTokenSpendAmount(provider: walletLink.IClient, token: viem.Address, spender: viem.Address, address: viem.Address): Promise<bigint> {
-  const allowedSpendAmount = await walletLink.readContract({
-    provider,
-    address: token,
-    abi: erc20Abi,
-    functionName: 'allowance',
-    args: [address, spender]
-  })
-  return allowedSpendAmount
-}

@@ -25,10 +25,10 @@ export const FUNDING_RATE_PRECISION = 1000000n
 export const PRICEFEED_INTERVAL = [
   IntervalTime.MIN5,
   IntervalTime.MIN15,
-  IntervalTime.MIN60,
+  IntervalTime.HR,
   IntervalTime.HR6,
-  IntervalTime.HR24,
-  IntervalTime.DAY7,
+  IntervalTime.DAY,
+  IntervalTime.WEEK,
 ] as const
 
 export const TRADE_CONTRACT_MAPPING = {

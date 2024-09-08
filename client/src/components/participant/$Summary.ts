@@ -4,7 +4,7 @@ import { pallete } from "@aelea/ui-components-theme"
 import { map, multicast } from "@most/core"
 import { combineState, readableLeverage, readableUsd } from "common-utils"
 import { accountSettledPositionListSummary } from "puppet-middleware-utils"
-import { $intermediate$node } from "ui-components"
+import { intermediateText } from "ui-components"
 import * as viem from 'viem'
 import { $profileDisplay } from "../$AccountProfile.js"
 import { $heading2 } from "../../common/$text.js"
@@ -41,37 +41,37 @@ export const $TraderSummary = (config: IAccountSummary) => component((
         ),
         $row(layoutSheet.spacingBig, style({ alignItems: 'flex-end' }))(
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(`${summary.winCount} / ${summary.lossCount}`)
+                return `${summary.winCount} / ${summary.lossCount}`
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Win / Loss'))
           ),
 
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(readableUsd(summary.avgCollateral))
+                return readableUsd(summary.avgCollateral)
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Avg Collateral'))
           ),
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(readableLeverage(summary.avgSize, summary.avgCollateral))
+                return readableLeverage(summary.avgSize, summary.avgCollateral)
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Avg Leverage'))
           )
-      
+
         ),
       )
     ),
@@ -82,7 +82,7 @@ export const $TraderSummary = (config: IAccountSummary) => component((
 
 export const $PuppetSummary = (config: IAccountSummary) => component(() => {
 
-  const { account, positionListQuery, puppet,  } = config
+  const { account, positionListQuery, puppet, } = config
 
   const metricsQuery = multicast(map(async params => {
     const allPositions = await params.positionListQuery
@@ -103,34 +103,34 @@ export const $PuppetSummary = (config: IAccountSummary) => component(() => {
         ),
         $row(layoutSheet.spacingBig, style({ alignItems: 'flex-end' }))(
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(`${summary.winCount} / ${summary.lossCount}`)
+                return `${summary.winCount} / ${summary.lossCount}`
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Win / Loss'))
           ),
 
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(readableUsd(summary.avgCollateral))
+                return readableUsd(summary.avgCollateral)
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Avg Collateral'))
           ),
           $metricRow(
-            $intermediate$node(
+            $heading2(intermediateText(
               map(async summaryQuery => {
                 const summary = await summaryQuery
 
-                return $heading2(readableLeverage(summary.avgSize, summary.avgCollateral))
+                return readableLeverage(summary.avgSize, summary.avgCollateral)
               }, metricsQuery)
-            ),
+            )),
             $metricLabel($text('Avg Leverage'))
           )
         ),

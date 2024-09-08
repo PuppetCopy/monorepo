@@ -7,7 +7,7 @@ import { IntervalTime, groupArrayMany, readableTokenAmountLabel, readableUsd, sw
 import * as GMX from 'gmx-middleware-const'
 import { getTokenDescription } from "gmx-middleware-utils"
 import {  getParticiapntPortion } from "puppet-middleware-utils"
-import { $infoTooltipLabel, $intermediateMessage } from "ui-components"
+import { $infoTooltipLabel, $intermediateText } from "ui-components"
 import * as viem from "viem"
 import { $route } from "../../common/$common.js"
 import { $heading3 } from "../../common/$text.js"
@@ -109,7 +109,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
               $target: $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
                 $responsiveFlex(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
                   $infoTooltipLabel($text('The available amount ready to be matched against'), 'Available balance'),
-                  $intermediateMessage(map(async amount => {
+                  $intermediateText(map(async amount => {
                     return readableTokenAmountLabel(depositTokenDescription, await amount)
                   }, depositAmountQuery))
                 ),

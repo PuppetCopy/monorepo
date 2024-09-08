@@ -9,7 +9,7 @@ import * as GMX from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { ISetRouteType } from "puppet-middleware-utils"
-import { $check, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateMessage, $target, $xCross } from "ui-components"
+import { $check, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText, $target, $xCross } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
 import { $profileDisplay } from "../$AccountProfile.js"
@@ -176,7 +176,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                 $responsiveFlex(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
                   $infoTooltipLabel($text('The amount utialised by traders you subscribe'), 'Balance'),
                   // $text(readableTokenAmountLabel(depositTokenDescription, amount))
-                  $intermediateMessage(map(async amount => readableTokenAmountLabel(depositTokenDescription, await amount), depositAmountQuery)
+                  $intermediateText(map(async amount => readableTokenAmountLabel(depositTokenDescription, await amount), depositAmountQuery)
                   ),
                   $ButtonSecondary({
                     $container: $defaultMiniButtonSecondary,
@@ -190,7 +190,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
             $node(),
             $SubmitBar({
               walletClientQuery,
-              $content: $text(screenUtils.isDesktopScreen ? 'Save Changes' : 'Save'),
+              $submitContent: $text(screenUtils.isDesktopScreen ? 'Save Changes' : 'Save'),
               txQuery: requestChangeSubscription,
               alert: validationError
             })({

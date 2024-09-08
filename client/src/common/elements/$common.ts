@@ -1,12 +1,14 @@
-import { $Branch, $text, attr, style } from "@aelea/dom"
+import { $Branch, $Node, $text, attr, style } from "@aelea/dom"
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete, theme } from "@aelea/ui-components-theme"
 import { IToken } from "@gambitdao/gbc-middleware"
+import { empty } from "@most/core"
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from "common-utils"
-import { $anchor, $calendar, $caretDblDown, $ethScan } from "ui-components"
+import { $anchor, $calendar, $caretDblDown, $ethScan, $infoLabel } from "ui-components"
 import * as viem from "viem"
 import { $berryByToken } from "../../components/$common.js"
 import { $trash } from "./$icons.js"
+import { isStream } from "@aelea/core"
 
 export const $TrashBtn = $ButtonIcon($trash)
 
@@ -15,7 +17,7 @@ export const boxShadow = theme.name === 'dark'
   : 'rgb(0 0 0 / 25%) 0px 0px 1px, rgb(59 60 74 / 15%) 0px 15px 20px, rgb(0 0 0 / 8%) 0px 1px 12px'
 
 export const $card = $column(layoutSheet.spacing,
-  style({ borderRadius: '20px', boxShadow: boxShadow, padding: screenUtils.isDesktopScreen ? '36px': '12px', backgroundColor: pallete.background })
+  style({ borderRadius: '20px', boxShadow: boxShadow, padding: screenUtils.isDesktopScreen ? '36px' : '12px', backgroundColor: pallete.background })
 )
 
 
@@ -44,12 +46,12 @@ function convertMsToGoogleCalendarDate(ms: Date) {
 }
 
 
-export const $labeledDivider = (label: string) => {
+export const $labeledDivider = (label: string | $Node, displayIcon = true) => {
   return $row(layoutSheet.spacing, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, .2)}` }))(),
-    $row(layoutSheet.spacingSmall, style({ color: pallete.foreground, alignItems: 'center' }))(
-      $text(style({ fontSize: '.85rem' }))(label),
-      $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground }),
+    $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+      isStream(label) ? label : $text(style({ fontSize: '.85rem' }))(label),
+      displayIcon ? $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground }) : empty(),
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, .2)}` }))(),
   )

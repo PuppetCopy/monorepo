@@ -22,7 +22,7 @@
 //   $defaultTableRowContainer,
 //   $hintAdjustment, $infoLabel,
 //   $infoTooltipLabel,
-//   $intermediateMessage,
+//   $intermediateText,
 //   $moreDots,
 //   $tokenIconMap, $tokenLabelFromSummary
 // } from "ui-components"
@@ -471,8 +471,8 @@
 //                   return $row(style({ placeContent: 'space-between', flex: 1 }))(
 //                     $tokenLabelFromSummary(tokenDesc),
 //                     $column(style({ alignItems: 'flex-end' }))(
-//                       $intermediateMessage(map(async amount => readableTokenAmountLabel(tokenDesc, await amount), balanceAmountQuery)),
-//                       $intermediateMessage(map(async params => {
+//                       $intermediateText(map(async amount => readableTokenAmountLabel(tokenDesc, await amount), balanceAmountQuery)),
+//                       $intermediateText(map(async params => {
 //                         const price = params.latestPriceMap[token]
 //                         return readableTokenUsd(price.max, await params.balanceAmountQuery)
 //                       }, combineObject({ balanceAmountQuery, latestPriceMap }))),

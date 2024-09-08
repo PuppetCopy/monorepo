@@ -21,7 +21,7 @@ export const COMPETITION_METRIC_LIST = ['pnl', 'roi'] as const
 export const COMPETITION_START_MONTH = 1
 export const COMPETITION_START_YEAR = 2023
 
-export const TOURNAMENT_DURATION = IntervalTime.HR24 * 25 + IntervalTime.MIN60 * 16
+export const TOURNAMENT_DURATION = IntervalTime.DAY * 25 + IntervalTime.HR * 16
 export const TOURNAMENT_START = Date.UTC(date.getUTCFullYear(), date.getUTCMonth()) / 1000
 export const TOURNAMENT_END = TOURNAMENT_START + TOURNAMENT_DURATION
 
@@ -44,7 +44,7 @@ export const BI_18_PRECISION = 10n ** 18n
 export const BI_30_PRECISION = 10n ** 30n
 
 export const REWARD_DISTRIBUTOR = {
-  distributionPeriod: IntervalTime.DAY7,
+  distributionPeriod: IntervalTime.WEEK,
   activityPeriod: IntervalTime.MONTH,
 }
 

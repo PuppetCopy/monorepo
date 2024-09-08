@@ -124,11 +124,11 @@ export const $infoTooltipLabel = (text: string | $Node, label?: string | $Node) 
   )
 }
 
-export const $infoTooltip = (text: string | $Node, color = pallete.foreground, size = '24px' ) => {
+export const $infoTooltip = (text: string | $Node, color = pallete.foreground, size = '24px') => {
   return $Tooltip({
     $dropContainer: $defaultDropContainer,
     $content: isStream(text) ? text : $text(text),
-    $anchor: $icon({ 
+    $anchor: $icon({
       $content: $info, viewBox: '0 0 32 32', fill: color,
       svgOps: style({ width: size, height: size, padding: '2px 4px' })
     }),
@@ -182,38 +182,44 @@ export function $txHashRef(txHash: string, chain: Chain = arbitrum) {
 
 
 interface IHintAdjustment {
-  label?: string
   color?: Stream<string>
-  tooltip?: string | $Node
-  val: Stream<string>
+  $val: $Node | string
   change: Stream<string>
 }
 
-export const $hintAdjustment = ({ change, color, val, label, tooltip }: IHintAdjustment) => {
+interface ILabeledHintAdjustment extends IHintAdjustment {
+  label?: string
+  tooltip?: string | $Node
+}
+
+export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   const displayChange = skipRepeats(map(str => !!str, startWith('', change)))
   const arrowColor = color ?? now(pallete.foreground)
 
+  return $row(layoutSheet.spacingTiny, style({ lineHeight: 1, alignItems: 'center' }))(
+    styleBehavior(map(str => str ? { color: pallete.foreground } : {}, change), isStream($val) ? $val : $text($val)),
+
+    $icon({
+      $content: $arrowRight,
+      width: '10px',
+      svgOps: styleBehavior(map(params => {
+        return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
+      }, combineObject({ displayChange, arrowColor }))),
+      viewBox: '0 0 32 32'
+    }),
+
+    $text(map(str => str ?? '', change)),
+  )
+}
+
+export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: ILabeledHintAdjustment) => {
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
     tooltip
       ? $infoTooltipLabel(tooltip, label)
       : label
         ? $text(style({ color: pallete.foreground }))(label) : empty(),
 
-    $row(layoutSheet.spacingTiny, style({ lineHeight: 1, alignItems: 'center' }))(
-      $text(style({ color: pallete.foreground }))(val),
-
-      $icon({
-        $content: $arrowRight,
-        width: '10px',
-        svgOps: styleBehavior(map(params => {
-          return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
-        }, combineObject({ displayChange, arrowColor }))),
-        viewBox: '0 0 32 32'  
-      }),
-      
-      $text(map(str => str ?? '', change)),
-    ),
-    
+    $hintAdjustment({ change, color, $val }),
   )
 }
 
@@ -234,22 +240,16 @@ export const $icon = ({ $content, width = '24px', viewBox = `0 0 32 32`, fill = 
   )
 )
 
-export const $intermediate$node = (querySrc: Stream<Promise<$Node>>, hint = '-'): $Node => {
-  const state = promiseState(querySrc)
-  return switchMap(res => {
-    if (res.state === PromiseStatus.DONE) {
-      return res.value
-    }
 
-    return $text(hint)
-  }, state)
+export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): $Node => {
+  return $text(intermediateText(querySrc, hint))
 }
 
-export const $intermediateMessage = (querySrc: Stream<Promise<string>>, hint = '-'): $Node => {
+export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): Stream<string> => {
   const text = switchMap(res => {
     return startWith(hint, fromPromise(res))
   }, querySrc)
-  return $text(text)
+  return text
 }
 export const $label = $element('label')(
   layoutSheet.spacingSmall,

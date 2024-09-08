@@ -26,7 +26,7 @@ export const $Admin = (config: IAdminPageParams) => component((
 
       //   $infoLabeledValue(
       //     'Epoch',
-      //     $intermediateMessage(
+      //     $intermediateText(
       //       map(async providerQuery => {
       //         const provider = await providerQuery
       //         const newLocal = await readEpochInfo(provider)

@@ -5,11 +5,11 @@ import { map, now, switchLatest } from "@most/core"
 import { readableTokenAmountLabel, switchMap } from "common-utils"
 import * as GMX from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
-import { $infoLabel, $intermediate$node } from "ui-components"
+import { $infoLabel, intermediateText } from "ui-components"
+import { readPuppetDepositAmount } from "../logic/puppetRead.js"
 import { $seperator2 } from "../pages/common"
 import { IWalletPageParams } from "../pages/type"
 import { $disconnectedWalletDisplay, $profileDisplay } from "./$AccountProfile.js"
-import { readPuppetDepositAmount } from "../logic/puppetRead.js"
 
 export interface IWalletDisplay extends IWalletPageParams {
 }
@@ -45,11 +45,11 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
         $infoLabel(
           'Balance'
         ),
-        $intermediate$node(
-          map(async amount => {
-            return $text(style({ whiteSpace: 'nowrap' }))(readableTokenAmountLabel(depositTokenDescription, await amount))
-          }, depositQuery)
-        ),
+        $text(style({ whiteSpace: 'nowrap' }))(
+          intermediateText(map(async amount => {
+            return readableTokenAmountLabel(depositTokenDescription, await amount)
+          }, depositQuery))
+        )
       )
     ) 
   }, walletClientQuery))

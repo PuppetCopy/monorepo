@@ -1,4 +1,3 @@
-
 export const ARBITRUM_ADDRESS = {
   NATIVE_TOKEN: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
   WBTC: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
@@ -70,8 +69,6 @@ export const ARBITRUM_ADDRESS = {
   PositionManager: "0x87a4088Bd721F83b6c2E5102e2FA47022Cb1c831",
 
   UniswapGmxEthPool: "0x80A9ae39310abf666A87C743d6ebBD0E8C42158E",
-} as const
+} as const;
 
-export type ArbitrumAddress = typeof ARBITRUM_ADDRESS
-
-
+export type ArbitrumAddress = typeof ARBITRUM_ADDRESS;

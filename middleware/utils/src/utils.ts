@@ -11,13 +11,13 @@ export enum IntervalTime {
   MIN5 = 300,
   MIN15 = 900,
   MIN30 = 1800,
-  MIN60 = 3600,
+  HR = 3600,
   HR2 = 7200,
   HR4 = 14400,
   HR6 = 21600,
   HR8 = 28800,
-  HR24 = 86400,
-  DAY7 = 604800,
+  DAY = 86400,
+  WEEK = 604800,
   MONTH = 2628000,
   MONTH2 = 5256000,
   YEAR = 31536000
@@ -480,11 +480,31 @@ export function easeInExpo(x: number) {
 const intervals = [
   { label: 'year', seconds: IntervalTime.MONTH * 12 },
   { label: 'month', seconds: IntervalTime.MONTH },
-  { label: 'day', seconds: IntervalTime.HR24 },
-  { label: 'hr', seconds: IntervalTime.MIN * 60 },
+  { label: 'day', seconds: IntervalTime.DAY },
+  { label: 'hr', seconds: IntervalTime.HR },
   { label: 'min', seconds: IntervalTime.MIN },
   { label: 'sec', seconds: IntervalTime.SEC }
 ] as const
+
+export function getDuration(time: number, threshold = IntervalTime.MONTH, none = 'None') {
+  let remainingTime = time;
+  let durationString = '';
+
+  for (const interval of intervals) {
+    if (interval.seconds <= remainingTime) {
+      const count = Math.floor(remainingTime / interval.seconds);
+      remainingTime -= count * interval.seconds;
+      durationString += `${count} ${interval.label}${count !== 1 ? 's' : ''} `;
+
+      // Stop if remaining time is below the threshold
+      if (remainingTime < threshold) {
+        break;
+      }
+    }
+  }
+
+  return durationString.trim() || none;
+}
 
 export function getTimeSince(time: number, suffix = 'ago') {
   const timeDelta = unixTimestampNow() - time
@@ -518,11 +538,11 @@ export function countdownFn(targetDate: number | bigint, now: number | bigint) {
 export function getIntervalBasedOnTimeframe(maxColumns: number, from: number, to: number) {
   const delta = to - from
 
-  const interval = maxColumns < delta / IntervalTime.DAY7
-    ? IntervalTime.DAY7 : maxColumns < delta / IntervalTime.HR24
-      ? IntervalTime.HR24 : maxColumns < delta / IntervalTime.HR4
-        ? IntervalTime.HR4 : maxColumns < delta / IntervalTime.MIN60
-          ? IntervalTime.MIN60 : maxColumns < delta / IntervalTime.MIN15
+  const interval = maxColumns < delta / IntervalTime.WEEK
+    ? IntervalTime.WEEK : maxColumns < delta / IntervalTime.DAY
+      ? IntervalTime.DAY : maxColumns < delta / IntervalTime.HR4
+        ? IntervalTime.HR4 : maxColumns < delta / IntervalTime.HR
+          ? IntervalTime.HR : maxColumns < delta / IntervalTime.MIN15
             ? IntervalTime.MIN15 : IntervalTime.MIN5
 
   return interval

@@ -4,8 +4,9 @@ import { Input, designSheet, layoutSheet } from '@aelea/ui-components'
 import { pallete } from '@aelea/ui-components-theme'
 import { empty, filter, map, merge, mergeArray, multicast, never, now, startWith, switchLatest, tap } from '@most/core'
 import { dismissOp, interactionOp } from './common.js'
+import { Optional } from 'common-utils'
 
-export interface Field extends Input<string | number> {
+export interface Field extends Optional<Input<string>, 'value'> {
   $input?: NodeComposeFn<any, HTMLInputElement>
 }
 

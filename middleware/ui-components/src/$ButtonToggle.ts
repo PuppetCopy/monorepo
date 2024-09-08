@@ -45,7 +45,7 @@ export const $ButtonToggle = <T>({ options, selected, $$option = defaultOption, 
             map(selectedOpt => {
               return selectedOpt === opt
                 ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, cursor: 'default' }
-                : null
+                : { color: pallete.foreground }
             }, selected)
           )
         )(
