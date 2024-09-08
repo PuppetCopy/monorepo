@@ -2,7 +2,7 @@ import { Behavior, combineObject, replayLatest } from "@aelea/core"
 import { $element, $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { awaitPromises, constant, debounce, map, mergeArray, multicast, never, now, periodic, sample, snapshot, startWith, take } from "@most/core"
+import { awaitPromises, constant, debounce, map, mergeArray, multicast, never, now, periodic, sample, snapshot, startWith, take, throttle } from "@most/core"
 import { Stream } from "@most/types"
 import { applyFactor, BASIS_POINTS_DIVISOR, combineState, filterNull, getDuration, getMappedValue, readableDate, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
@@ -156,7 +156,6 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
 
-
   const claimableState = replayLatest(multicast(map(async params => {
     const claimableContributionReward = await params.claimableContributionQuery
     const claimableLockReward = await params.claimableLockRewardQuery
@@ -175,6 +174,8 @@ export const $Vest = (config: IVestingDetails) => component((
     const nextLockAmount = lockAmount + totalClaimable
     const nextLockDuration = lockAmount > 0 ? (lockAmount * lockDuration + totalClaimable * lockDurationDelta) / nextLockAmount : lockDurationDelta
 
+    console.log('lockDurationDelta', lockDurationDelta)
+
     return {
       cashout: params.cashout, lockAmount: await params.lockAmountQuery,
       vestedAmount, vested, totalClaimable, lockDuration, nextLockAmount, nextLockDuration,
@@ -183,7 +184,6 @@ export const $Vest = (config: IVestingDetails) => component((
   }, combineState({
     baselineEmissionRateQuery, durationBaseMultiplierQuery, lockSchedule, puppetTokenPriceInUsd,
     claimableContributionQuery, claimableLockRewardQuery, vestedCursorQuery, cashout, lockAmountQuery, lockDurationQuery
-    // compoundMode, compoundContributionReward, compoundLockReward, compoundVestedReward
   }))))
 
   // const sliderFactor = mergeArray([

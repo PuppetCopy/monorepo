@@ -1,22 +1,17 @@
 
-import { Behavior, combineObject, isStream } from "@aelea/core"
-import { $Node, $text, component, style } from "@aelea/dom"
+import { Behavior } from "@aelea/core"
+import { $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { empty, fromPromise, map, mergeArray, sample, startWith } from "@most/core"
-import { Stream } from "@most/types"
-import { erc20Abi } from "abitype/abis"
+import { map, mergeArray, sample, startWith } from "@most/core"
 import { getMappedValue, parseFixed, readableTokenAmount, readableTokenAmountLabel, switchMap } from "common-utils"
 import * as GMX from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
-import * as PUPPET from "puppet-middleware-const"
 import { $FieldLabeled } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
-import { IApproveSpendReturn, writeApproveSpend } from "../../logic/commonWrite.js"
-import { IDepositFundsReturnType } from "../../logic/puppetWrite.js"
 import { readAddressTokenBalance } from "../../logic/traderRead.js"
 import { IComponentPageParams } from "../../pages/type.js"
-import { $ButtonSecondary, $defaultMiniButtonSecondary, $Submit } from "../form/$Button.js"
+import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 
 
 interface IAssetDepositEditor extends IComponentPageParams {
@@ -24,7 +19,7 @@ interface IAssetDepositEditor extends IComponentPageParams {
 }
 
 export const $AssetDepositEditor = (config: IAssetDepositEditor) => component((
-  [requestDepositAsset, requestDepositAssetTether]: Behavior<walletLink.IWalletClient, IDepositFundsReturnType>,
+  [requestDepositAsset, requestDepositAssetTether]: Behavior<walletLink.IWalletClient, any>,
   [inputDepositAmount, inputDepositAmountTether]: Behavior<string>,
   [clickMaxDeposit, clickMaxDepositTether]: Behavior<any>,
 ) => {

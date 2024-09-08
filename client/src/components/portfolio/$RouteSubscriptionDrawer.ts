@@ -17,7 +17,6 @@ import { $Popover } from "../$Popover.js"
 import { $route } from "../../common/$common.js"
 import { $heading3 } from "../../common/$text.js"
 import { $card2, $iconCircular, $responsiveFlex } from "../../common/elements/$common.js"
-import { IBatchSubscribeReturnType, writeBatchSubscribe } from "../../logic/puppetWrite.js"
 import { $seperator2 } from "../../pages/common.js"
 import { IComponentPageParams } from "../../pages/type.js"
 import { fadeIn } from "../../transitions/enter.js"
@@ -34,7 +33,7 @@ interface IRouteSubscribeDrawer extends IComponentPageParams {
 }
 
 export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => component((
-  [requestChangeSubscription, requestChangeSubscriptionTether]: Behavior<walletLink.IWalletClient, IBatchSubscribeReturnType>,
+  [requestChangeSubscription, requestChangeSubscriptionTether]: Behavior<walletLink.IWalletClient, any>,
   [clickClose, clickCloseTether]: Behavior<any>,
   [clickRemoveSubsc, clickRemoveSubscTether]: Behavior<any, IChangeSubscription>,
   [openDepositPopover, openDepositPopoverTether]: Behavior<any>,
@@ -197,8 +196,8 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
               changeWallet: changeWalletTether(),
               click: requestChangeSubscriptionTether(
                 snapshot((list, w3p) => {
-                  const tx = writeBatchSubscribe(w3p, list)
-                  return tx
+                  // const tx = writeBatchSubscribe(w3p, list)
+                  // return tx
                 }, modifySubscriptionList)
               )
             }),

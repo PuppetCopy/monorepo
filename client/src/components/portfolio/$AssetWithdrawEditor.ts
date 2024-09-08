@@ -10,7 +10,6 @@ import { getTokenDescription } from "gmx-middleware-utils"
 import * as viem from "viem"
 import * as walletLink from "wallet"
 import { $FieldLabeled } from "ui-components"
-import { IWithdrawFundsReturnType, writeWithdrawFunds } from "../../logic/puppetWrite.js"
 import { IComponentPageParams } from "../../pages/type.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 import { $SubmitBar } from "../form/$Form"
@@ -23,7 +22,7 @@ interface IAssetWithdrawEditor extends IComponentPageParams {
 }
 
 export const $AssetWithdrawEditor = (config: IAssetWithdrawEditor) => component((
-  [requestDepositAsset, requestDepositAssetTether]: Behavior<walletLink.IWalletClient, IWithdrawFundsReturnType>,
+  [requestDepositAsset, requestDepositAssetTether]: Behavior<walletLink.IWalletClient, any>,
   [inputDepositAmount, inputDepositAmountTether]: Behavior<string, bigint>,
   [clickMaxDeposit, clickMaxDepositTether]: Behavior<any>,
 ) => {
@@ -66,7 +65,7 @@ export const $AssetWithdrawEditor = (config: IAssetWithdrawEditor) => component(
       })({
         click: requestDepositAssetTether(
           snapshot((params, w3p) => {
-            return writeWithdrawFunds(w3p, token, params.amount)
+            // return writeWithdrawFunds(w3p, token, params.amount)
           }, combineObject({ amount })),
           multicast
         )
