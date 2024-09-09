@@ -26,7 +26,7 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) => compone
   return [
 
     $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-      $infoTooltipLabel('Positions that had been opened within timeframe of both open and settled', 'Last Activity:'),
+      $infoTooltipLabel('Open and Settled position filtered from the time they were opened', 'Last Activity:'),
       $row(layoutSheet.spacing)(
         ...options.map(([interval, label]) => {
           return $anchor(

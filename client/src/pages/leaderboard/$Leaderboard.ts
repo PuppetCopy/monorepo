@@ -166,12 +166,13 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   //   })
                   // },
                   {
-                    $head: $text('Win / Loss'),
+                    $head: $text('Win/Loss/Open'),
                     gridTemplate: '90px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
                     $bodyCallback: map((pos: ILeaderboardSummary) => {
-                      return $row(
+                      return $row(layoutSheet.spacingSmall)(
                         $text(`${pos.winCount} / ${pos.lossCount}`)
+
                       )
                     })
                   },

@@ -2,55 +2,6 @@ import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected,
 import { ISchema } from "./query.js"
 
 
-const positionFeesCollected: ISchema<IPositionFeesCollected> = {
-  id: 'string',
-
-  orderKey: 'string',
-  positionKey: 'string',
-  referralCode: 'string',
-
-  market: 'address',
-  collateralToken: 'address',
-  affiliate: 'address',
-  trader: 'address',
-  uiFeeReceiver: 'address',
-
-  collateralTokenPriceMin: 'uint256',
-  collateralTokenPriceMax: 'uint256',
-  tradeSizeUsd: 'uint256',
-  totalRebateFactor: 'uint256',
-  traderDiscountFactor: 'uint256',
-  totalRebateAmount: 'uint256',
-  traderDiscountAmount: 'uint256',
-  affiliateRewardAmount: 'uint256',
-  fundingFeeAmount: 'uint256',
-  claimableLongTokenAmount: 'uint256',
-  claimableShortTokenAmount: 'uint256',
-  latestFundingFeeAmountPerSize: 'uint256',
-  latestLongTokenClaimableFundingAmountPerSize: 'uint256',
-  latestShortTokenClaimableFundingAmountPerSize: 'uint256',
-  borrowingFeeUsd: 'uint256',
-  borrowingFeeAmount: 'uint256',
-  borrowingFeeReceiverFactor: 'uint256',
-  borrowingFeeAmountForFeeReceiver: 'uint256',
-  positionFeeFactor: 'uint256',
-  protocolFeeAmount: 'uint256',
-  positionFeeReceiverFactor: 'uint256',
-  feeReceiverAmount: 'uint256',
-  feeAmountForPool: 'uint256',
-  positionFeeAmountForPool: 'uint256',
-  positionFeeAmount: 'uint256',
-  totalCostAmount: 'uint256',
-  uiFeeReceiverFactor: 'uint256',
-  uiFeeAmount: 'uint256',
-
-  isIncrease: 'bool',
-
-  blockTimestamp: 'number',
-  transactionHash: 'string',
-
-  __typename: 'PositionFeesCollected',
-}
 
 const orderCreated: ISchema<IOrderCreated> = {
   id: 'string',
@@ -97,11 +48,44 @@ const orderStatus: ISchema<IOrderStatus> = {
 
   __typename: 'OrderStatus',
 }
+const positionCollectedUpdate: ISchema<IPositionFeesCollected> = {
+  id: 'string',
+  positionKey: 'string',
+  affiliate: 'address',
+
+  totalRebateFactor: 'uint256',
+  traderDiscountFactor: 'uint256',
+  totalRebateAmount: 'uint256',
+  traderDiscountAmount: 'uint256',
+  affiliateRewardAmount: 'uint256',
+  fundingFeeAmount: 'uint256',
+  claimableLongTokenAmount: 'uint256',
+  claimableShortTokenAmount: 'uint256',
+  latestFundingFeeAmountPerSize: 'uint256',
+  latestLongTokenClaimableFundingAmountPerSize: 'uint256',
+  latestShortTokenClaimableFundingAmountPerSize: 'uint256',
+  borrowingFeeUsd: 'uint256',
+  borrowingFeeAmount: 'uint256',
+  borrowingFeeReceiverFactor: 'uint256',
+  borrowingFeeAmountForFeeReceiver: 'uint256',
+  positionFeeFactor: 'uint256',
+  protocolFeeAmount: 'uint256',
+  positionFeeReceiverFactor: 'uint256',
+  feeReceiverAmount: 'uint256',
+  feeAmountForPool: 'uint256',
+  positionFeeAmountForPool: 'uint256',
+  positionFeeAmount: 'uint256',
+  totalCostAmount: 'uint256',
+  uiFeeReceiverFactor: 'uint256',
+  uiFeeAmount: 'uint256',
+
+  blockTimestamp: 'number',
+  transactionHash: 'string',
+  __typename: 'PositionFeesCollected',
+}
 
 const positionIncrease: ISchema<IPositionIncrease> = {
   id: 'string',
-  // order: orderStatus,
-  // feeCollected: positionFeesCollected,
 
   account: 'address',
   market: 'address',
@@ -129,20 +113,18 @@ const positionIncrease: ISchema<IPositionIncrease> = {
 
   isLong: 'bool',
 
-  orderKey: 'uint256',
-  positionKey: 'uint256',
+  positionKey: 'string',
 
   blockTimestamp: 'number',
   transactionHash: 'string',
+  feeCollected: positionCollectedUpdate,
 
   __typename: 'PositionIncrease',
 }
 
 const positionDecrease: ISchema<IPositionDecrease> = {
   id: 'string',
-  // order: orderStatus,
-  // feeCollected: positionFeesCollected,
-
+  positionKey: 'string',
   account: 'address',
   market: 'address',
   collateralToken: 'address',
@@ -171,65 +153,15 @@ const positionDecrease: ISchema<IPositionDecrease> = {
 
   isLong: 'bool',
 
-  orderKey: 'uint256',
-  positionKey: 'uint256',
 
   blockTimestamp: 'number',
   transactionHash: 'string',
+  feeCollected: positionCollectedUpdate,
 
   __typename: 'PositionDecrease',
 }
 
-const positionFeeUpdate: ISchema<IPositionFeesCollected> = {
-  id: 'string',
 
-  orderKey: 'uint256',
-  positionKey: 'uint256',
-  referralCode: 'string',
-
-  market: 'address',
-  collateralToken: 'address',
-  affiliate: 'address',
-  trader: 'address',
-  uiFeeReceiver: 'address',
-
-  collateralTokenPriceMin: 'uint256',
-  collateralTokenPriceMax: 'uint256',
-  tradeSizeUsd: 'uint256',
-  totalRebateFactor: 'uint256',
-  traderDiscountFactor: 'uint256',
-  totalRebateAmount: 'uint256',
-  traderDiscountAmount: 'uint256',
-  affiliateRewardAmount: 'uint256',
-  fundingFeeAmount: 'uint256',
-  claimableLongTokenAmount: 'uint256',
-  claimableShortTokenAmount: 'uint256',
-  latestFundingFeeAmountPerSize: 'uint256',
-  latestLongTokenClaimableFundingAmountPerSize: 'uint256',
-  latestShortTokenClaimableFundingAmountPerSize: 'uint256',
-  borrowingFeeUsd: 'uint256',
-  borrowingFeeAmount: 'uint256',
-  borrowingFeeReceiverFactor: 'uint256',
-  borrowingFeeAmountForFeeReceiver: 'uint256',
-  positionFeeFactor: 'uint256',
-  protocolFeeAmount: 'uint256',
-  positionFeeReceiverFactor: 'uint256',
-  feeReceiverAmount: 'uint256',
-  feeAmountForPool: 'uint256',
-  positionFeeAmountForPool: 'uint256',
-  positionFeeAmount: 'uint256',
-  totalCostAmount: 'uint256',
-  uiFeeReceiverFactor: 'uint256',
-  uiFeeAmount: 'uint256',
-
-  isIncrease: 'bool',
-
-  blockTimestamp: 'number',
-  transactionHash: 'string',
-
-  __typename: 'PositionFeesCollected',
-
-}
 
 const positionLink: ISchema<IPositionLink> = {
   id: 'string',
@@ -293,8 +225,8 @@ const priceCandle: ISchema<IPriceCandle> = {
 
 
 export const schema = {
-  orderCreated, orderStatus, positionFeesCollected,
-  position, positionLink, positionFeeUpdate,
+  orderCreated, orderStatus, positionCollectedUpdate,
+  position, positionLink,
 
   positionIncrease, positionDecrease, priceCandle,
 }

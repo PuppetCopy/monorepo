@@ -72,13 +72,9 @@ export interface ILeaderboardSummary {
   collateral: bigint
   maxSize: bigint
   maxCollateral: bigint
-
-
   leverage: bigint
-
   lossCount: number
   winCount: number
-  totalCount: number
   pnl: bigint
 
   puppets: viem.Address[]

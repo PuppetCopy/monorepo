@@ -181,7 +181,7 @@ export const $Vest = (config: IVestingDetails) => component((
       style({ alignItems: 'center' })(
         $row(
           $heading2('Locked'),
-          $infoTooltip(`Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens`)
+          $infoTooltip(`Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens`)
 
           // style({ placeContent: 'space-between' })(
           //   $infoLabeledValue(

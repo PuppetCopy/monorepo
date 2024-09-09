@@ -263,39 +263,25 @@ export interface PositionReferralFees {
 }
 
 
-export interface IPositionFeesCollected extends ILogTxType<'PositionFeeUpdate'> {
-  orderKey: viem.Hex
-  positionKey: viem.Hex
-  referralCode: viem.Hex
-
-  market: viem.Address
-  collateralToken: viem.Address
+export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollected'> {
   affiliate: viem.Address
-  trader: viem.Address
-  uiFeeReceiver: viem.Address
-
-  collateralTokenPriceMin: bigint
-  collateralTokenPriceMax: bigint
-  tradeSizeUsd: bigint
+  positionKey: viem.Address
 
   totalRebateFactor: bigint
   traderDiscountFactor: bigint
   totalRebateAmount: bigint
   traderDiscountAmount: bigint
   affiliateRewardAmount: bigint
-
   fundingFeeAmount: bigint
   claimableLongTokenAmount: bigint
   claimableShortTokenAmount: bigint
   latestFundingFeeAmountPerSize: bigint
   latestLongTokenClaimableFundingAmountPerSize: bigint
   latestShortTokenClaimableFundingAmountPerSize: bigint
-
   borrowingFeeUsd: bigint
   borrowingFeeAmount: bigint
   borrowingFeeReceiverFactor: bigint
   borrowingFeeAmountForFeeReceiver: bigint
-
   positionFeeFactor: bigint
   protocolFeeAmount: bigint
   positionFeeReceiverFactor: bigint
@@ -306,8 +292,6 @@ export interface IPositionFeesCollected extends ILogTxType<'PositionFeeUpdate'> 
   totalCostAmount: bigint
   uiFeeReceiverFactor: bigint
   uiFeeAmount: bigint
-
-  isIncrease: boolean
 }
 
 
@@ -447,7 +431,7 @@ export interface IPositionLink extends ILogTypeId<'PositionLink'> {
 export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddresses & IPositionNumbers & {
   link?: IPositionLink
   order: IOrderStatus
-  feeCollected: IPositionFeesCollected
+  positionKey: viem.Hex
 
   account: viem.Address
   market: viem.Address
@@ -468,15 +452,14 @@ export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddres
 
   isLong: boolean
 
-  orderKey: viem.Hex
-  positionKey: viem.Hex
+  feeCollected: IPositionFeesCollected
 }
 
 
 export type IPositionDecrease = ILogTxType<'PositionDecrease'> & IPositionAddresses & IPositionNumbers & {
   link?: IPositionLink
   order: IOrderStatus
-  feeCollected: IPositionFeesCollected
+  positionKey: viem.Hex
 
   executionPrice: bigint
   indexTokenPriceMax: bigint
@@ -495,8 +478,7 @@ export type IPositionDecrease = ILogTxType<'PositionDecrease'> & IPositionAddres
 
   isLong: boolean
 
-  orderKey: viem.Hex
-  positionKey: viem.Hex
+  feeCollected: IPositionFeesCollected
 }
 
 export type IOraclePrice = IPriceMinMax & {

@@ -12,7 +12,7 @@ import { $labelDisplay } from "ui-components"
 import { $route, $tokenIcon, $tokenLabeled } from "../../common/$common.js"
 import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { $DropMultiSelect } from "../form/$Dropdown.js"
-import { getPosolitionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
+import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
 import { getMarketIndexToken, isPositionOpen, isPositionSettled, MARKET_TOKEN_MAP } from "gmx-middleware-utils"
 import { IPosition } from "puppet-middleware-utils"
 
@@ -27,7 +27,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
   const newLocal = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
   const positionParams = multicast(map(async (params) => {
     const list = await params.positionListQuery
-    const timeline = getPosolitionListTimelinePerformance({
+    const timeline = getPositionListTimelinePerformance({
       ...params,
       puppet,
       list,

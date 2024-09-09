@@ -2,12 +2,12 @@ import { replayLatest } from '@aelea/core'
 import { map, multicast } from '@most/core'
 import { Stream } from '@most/types'
 import { type Client } from '@urql/core'
-import { IntervalTime, StateParams, combineState, getClosestNumber, groupArrayMany, groupArrayManyMap, periodicRun, unixTimestampNow } from 'common-utils'
+import { combineState, getClosestNumber, groupArrayMany, IntervalTime, periodicRun, StateParams, unixTimestampNow } from 'common-utils'
 import * as GMX from "gmx-middleware-const"
-import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IPriceTickListMap, IQueryFilter, ISchema, isPositionSettled, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
+import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IQueryFilter, ISchema, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { schema } from './schema.js'
-import { ILeaderboardPosition, IMirrorPosition } from './types'
+import { IMirrorPosition } from './types'
 
 
 export interface IQueryPositionParams {
@@ -138,7 +138,7 @@ export function queryLeaderboardPosition<TStateParams extends StateParams<IQuery
     }
 
     // filter.account = {
-    //   _eq: '"0xaea8E3Bd369217CC6E3e6AbdDf0dA318fBA8E59b"'
+    //   _eq: '"0xeb597492cF49926647c3C753F88f0F8858556dFA"'
     // }
 
 

@@ -1,6 +1,6 @@
 import { combineArray, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMarketIndexToken, getPositionPnlUsd, IPricefeedMap } from "gmx-middleware-utils"
+import { getMarketIndexToken, getPositionPnlUsd, IPriceCandle, IPricefeedMap } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { latestPriceMap } from "./graph.js"
 import { ILeaderboardPosition, ILeaderboardSummary, IMirrorListSummary, IMirrorPosition, IPosition, IPuppetPosition } from "./types.js"
@@ -40,7 +40,7 @@ export function accountSettledPositionListSummary(
     const pnl = seed.pnl + getParticiapntPortion(next, next.pnlUsd, puppet)
 
     const winCount = seed.winCount + (next.pnlUsd > 0n ? 1 : 0)
-    const lossCount = seed.lossCount + (next.pnlUsd <= 0n ? 1 : 0)
+    const lossCount = seed.lossCount + (next.pnlUsd < 0n ? 1 : 0)
 
     const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.mirror.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
 
@@ -62,7 +62,7 @@ export function accountSettledPositionListSummary(
   return summary
 }
 
-export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILeaderboardPosition[]): ILeaderboardSummary[] {
+export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILeaderboardPosition[]): ILeaderboardSummary[] {
   const map: { [k: viem.Address]: ILeaderboardSummary } = {}
 
   for (const next of tradeList) {
@@ -74,14 +74,12 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILead
       maxSize: 0n,
       leverage: 0n,
       lossCount: 0,
-      totalCount: 0,
       winCount: 0,
       pnl: 0n,
       puppets: [],
       positionList: [],
     }
 
-    summary.totalCount = summary.winCount + summary.lossCount
     summary.collateral += next.maxCollateralUsd
     summary.maxCollateral = next.maxCollateralUsd > summary.maxCollateral ? next.maxCollateralUsd : summary.maxCollateral
     summary.maxSize = next.maxSizeUsd > summary.maxSize ? next.maxSizeUsd : summary.maxSize
@@ -89,19 +87,24 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILead
 
     if (next.sizeInTokens === 0n) {
       summary.pnl += next.realisedPnlUsd
-    } else {
-      const latestPrice = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
 
-      if (latestPrice !== null) {
-        summary.pnl += next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, latestPrice)
-      }
+      summary.winCount += next.realisedPnlUsd > 0n ? 1 : 0
+      summary.lossCount += next.realisedPnlUsd < 0n ? 1 : 0
+    } else {
+      const priceCandle = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
+
+      // if (next.openTimestamp > priceCandle.timestamp) {
+      //   throw new Error("PriceDeed is not up to date")
+      // }
+
+      const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
+
+      summary.pnl += pnl
+      summary.winCount += pnl > 0n ? 1 : 0
+      summary.lossCount += pnl < 0n ? 1 : 0
     }
 
-    if (next.realisedPnlUsd > 0n) {
-      summary.winCount += 1
-    } else {
-      summary.lossCount += 1
-    }
+
 
     summary.puppets = []
     summary.positionList.push(next)
@@ -114,10 +117,15 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILead
 }
 
 
-function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): bigint | null {
+export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): IPriceCandle {
   const feed = getMappedValue(priceFeed, token)
 
-  return feed[0]?.c || null
+  if (feed.length === 0) {
+    throw new Error("Price feed not found")
+  }
+
+  // get the latest price based on timestamp from unsorted array
+  return feed[0]
 }
 
 export function isMirrorPosition(mp: IPosition): mp is IMirrorPosition {

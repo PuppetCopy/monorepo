@@ -2,10 +2,10 @@ import { Behavior } from "@aelea/core"
 import { $Node, NodeComposeFn, component, style } from "@aelea/dom"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { now, skipRepeatsWith } from "@most/core"
-import { IntervalTime, createTimeline, formatFixed, unixTimestampNow } from "common-utils"
+import { IntervalTime, USD_DECIMALS, createTimeline, formatFixed, unixTimestampNow } from "common-utils"
 import { IPositionDecrease, IPositionIncrease, IPricefeedMap, IPricetick, getMarketIndexToken, getPositionPnlUsd, isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
-import { ILeaderboardPosition, IPosition } from "puppet-middleware-utils"
+import { ILeaderboardPosition, IPosition, getLatestPriceFeedPrice } from "puppet-middleware-utils"
 import { $Baseline, IMarker } from "ui-components"
 import * as viem from "viem"
 
@@ -21,18 +21,11 @@ export interface IPerformanceTimeline {
 }
 
 type OpenPnl = {
-  isLong: boolean
+  update: { sizeInUsd: bigint, sizeInTokens: bigint, isLong: boolean }
+  indexToken: viem.Address
   pnl: bigint
-  sizeInUsd: bigint
-  sizeInTokens: bigint
 }
 
-interface IGraphLTick {
-  realisedPnl: bigint
-  openPnlMap: Record<viem.Hex, OpenPnl>
-  value: number
-  time: number
-}
 
 type IPricetickWithIndexToken = IPricetick & { indexToken: viem.Address }
 
@@ -41,7 +34,7 @@ function getTime(item: IPositionIncrease | IPositionDecrease | IPricetickWithInd
   return 'price' in item ? item.timestamp : item.blockTimestamp
 }
 
-export function getPosolitionListTimelinePerformance(config: IPerformanceTimeline) {
+export function getPositionListTimelinePerformance(config: IPerformanceTimeline) {
   if (config.list.length === 0) {
     return []
   }
@@ -52,62 +45,52 @@ export function getPosolitionListTimelinePerformance(config: IPerformanceTimelin
   const adjustList: (IPositionIncrease | IPositionDecrease)[] = config.list.flatMap(mp => [...mp.increaseList, ...mp.decreaseList]).sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
-    .flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
+    .flatMap(indexToken =>
+      config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? []
+    )
     .filter(tick => tick.timestamp > initialPositionTime)
-
-  const seed: IGraphLTick = {
-    value: 0,
-    realisedPnl: 0n,
-    openPnlMap: {},
-    time: startTime,
-  }
 
   const data = createTimeline({
     source: [...adjustList, ...priceUpdateTicks],
-    seed,
+    seed: {
+      value: 0,
+      realisedPnl: 0n,
+      openPnlMap: {},
+      time: startTime,
+    },
     getTime,
     seedMap: (acc, next) => {
-      let value = acc.value
       let realisedPnl = acc.realisedPnl
-      let indexToken: viem.Address
       let openPnl: OpenPnl
 
-      const openPnlMap: Record<viem.Hex, OpenPnl> = { ...acc.openPnlMap }
+      const openPnlMap: Record<viem.Hex, OpenPnl> = acc.openPnlMap
 
       if ('price' in next) {
-        indexToken = next.indexToken
-        openPnl = openPnlMap[indexToken]
+        for (const positionKey in openPnlMap) {
+          const openPnl = openPnlMap[positionKey as viem.Hex]
 
-        if (!openPnl) {
-          return acc
+          if (next.indexToken === openPnl.indexToken) {
+            openPnl.pnl = getPositionPnlUsd(openPnl.update.isLong, openPnl.update.sizeInUsd, openPnl.update.sizeInTokens, next.price)
+          }
         }
 
-        openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
-        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
       } else {
-        indexToken = getMarketIndexToken(next.market)
-        openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
+        const indexToken = getMarketIndexToken(next.market)
+        openPnl = openPnlMap[next.positionKey] ??= { pnl: 0n, update: next, indexToken }
 
         if (next.__typename === 'PositionIncrease') {
-          openPnl.isLong = next.isLong
-          openPnl.sizeInTokens += next.sizeDeltaInTokens
-          openPnl.sizeInUsd += next.sizeDeltaUsd
-
-          openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.indexTokenPriceMax)
+          openPnl.update = next
+          openPnl.pnl = getPositionPnlUsd(openPnl.update.isLong, openPnl.update.sizeInUsd, openPnl.update.sizeInTokens, next.indexTokenPriceMax)
         } else {
-          openPnl.sizeInTokens -= next.sizeDeltaInTokens
-          openPnl.sizeInUsd -= next.sizeDeltaUsd
+          openPnl.update = next
           realisedPnl += next.basePnlUsd
 
-          openPnl.pnl = openPnl.sizeInTokens > 0n ? getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.indexTokenPriceMax) : 0n
+          openPnl.pnl = openPnl.update.sizeInTokens > 0n ? getPositionPnlUsd(openPnl.update.isLong, openPnl.update.sizeInUsd, openPnl.update.sizeInTokens, next.indexTokenPriceMax) : 0n
         }
-
-
       }
 
       const aggregatedOpenPnl = Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n)
-
-      value = formatFixed(30, realisedPnl + aggregatedOpenPnl)
+      const value = formatFixed(USD_DECIMALS, realisedPnl + aggregatedOpenPnl)
 
       return { openPnlMap, realisedPnl, value }
     },
@@ -120,7 +103,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
 ) => {
 
-  const timeline = getPosolitionListTimelinePerformance(config)
+  const timeline = getPositionListTimelinePerformance(config)
 
   const openMarkerList = config.list.filter(isPositionOpen).map((pos): IMarker => {
     const pnl = timeline[timeline.length - 1].value
@@ -203,8 +186,8 @@ export interface ILeaderboardPerformanceTimeline {
   activityTimeframe: IntervalTime
   puppet?: viem.Address
   list: ILeaderboardPosition[]
-  pricefeedMap: IPricefeedMap
   tickCount: number
+  pricefeedMap: IPricefeedMap
   chartConfig?: DeepPartial<ChartOptions>
 }
 
@@ -212,13 +195,11 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
   if (config.list.length === 0) {
     return []
   }
-  
+
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
-  const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
-  const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList.flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
 
-  const seed: IGraphLTick = {
+  const seed = {
     value: 0,
     realisedPnl: 0n,
     openPnlMap: {},
@@ -227,42 +208,24 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
 
   const timeline = createTimeline({
     ticks: config.tickCount,
-    source: [...config.list, ...priceUpdateTicks],
+    source: config.list,
     seed,
     seedMap: (acc, next) => {
-      let value = acc.value
-      let realisedPnl = acc.realisedPnl
-      let indexToken: viem.Address
-      let openPnl: OpenPnl
-
-      const openPnlMap: Record<viem.Hex, OpenPnl> = { ...acc.openPnlMap }
-
-      if ('price' in next) {
-        indexToken = next.indexToken
-        openPnl = openPnlMap[indexToken]
-
-        if (!openPnl) {
-          return acc
-        }
-
-        openPnl.pnl = getPositionPnlUsd(openPnl.isLong, openPnl.sizeInUsd, openPnl.sizeInTokens, next.price)
-        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
-      } else if (next.__typename === 'Position') {
-        indexToken = getMarketIndexToken(next.market)
-        openPnl = openPnlMap[indexToken] ??= { pnl: 0n, sizeInTokens: 0n, sizeInUsd: 0n, isLong: next.isLong }
-
-        openPnl.isLong = next.isLong
-        openPnl.sizeInTokens = next.sizeInTokens
-        openPnl.sizeInUsd = next.sizeInUsd
-
-        realisedPnl += next.realisedPnlUsd
-
-        value = formatFixed(30, realisedPnl + Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n))
+      if (next.sizeInTokens === 0n) {
+        return { value: acc.value + formatFixed(USD_DECIMALS, next.realisedPnlUsd) }
       }
 
-      return { openPnlMap, realisedPnl, value }
+      const priceCandle = getLatestPriceFeedPrice(config.pricefeedMap, getMarketIndexToken(next.market))
+
+      // if (next.openTimestamp > priceCandle.timestamp) {
+      //   throw new Error("PriceDeed is not up to date")
+      // }
+
+      const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
+
+      return { value: acc.value + formatFixed(USD_DECIMALS, pnl) }
     },
-    getTime: src => 'openTimestamp' in src ? src.openTimestamp : src.timestamp,
+    getTime: src => src.openTimestamp,
   })
 
   return timeline

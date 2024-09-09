@@ -8,7 +8,7 @@ import { $Baseline, $bear, $bull, $infoTooltipLabel, IMarker } from "ui-componen
 import { filterNull, parseReadableNumber, readableUsd, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams, Time } from "lightweight-charts"
 import { IPosition } from "puppet-middleware-utils"
-import { IPerformanceTimeline, getPosolitionListTimelinePerformance } from "./$ProfilePerformanceGraph.js"
+import { IPerformanceTimeline, getPositionListTimelinePerformance } from "./$ProfilePerformanceGraph.js"
 
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
@@ -27,7 +27,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) => component((
 ) => {
 
   const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
-  const timeline = getPosolitionListTimelinePerformance({ ...config, list: [config.mp] })
+  const timeline = getPositionListTimelinePerformance({ ...config, list: [config.mp] })
   const pnlCrossHairTimeChange = replayLatest(multicast(startWith(null, skipRepeatsWith(((xsx, xsy) => xsx.time === xsy.time), crosshairMove))))
 
   const hoverChartPnl = filterNull(map(params => {

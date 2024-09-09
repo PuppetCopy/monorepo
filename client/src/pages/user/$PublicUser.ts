@@ -95,7 +95,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                     return list
                   }
 
-                  return list.filter(pos => marketList.includes(getMarketIndexToken(pos.market)))
+                  return list.filter(pos => marketList.includes(getMarketIndexToken(pos.market))).sort((a, b) => b.openTimestamp - a.openTimestamp)
                 }, query)
               }, filteredMarketList)
 

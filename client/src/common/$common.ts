@@ -3,13 +3,13 @@ import { $text, component, INode, nodeEvent, style, styleInline } from "@aelea/d
 import * as router from '@aelea/router'
 import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, empty, map, skipRepeats } from "@most/core"
+import { constant, empty, map, now, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getMappedValue, getTokenUsd, lst, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableTokenUsd, readableUSD, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
 import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { getEntryPrice, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IAbstractPositionParams, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
+import { getEntryPrice, getFundingFee, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IAbstractPositionParams, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
 import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
-import { $bear, $bull, $infoLabel, $infoTooltip, $Link, $tokenIconMap, $Tooltip } from "ui-components"
+import { $bear, $bull, $infoLabel, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
 import { $Popover } from "../components/$Popover.js"
@@ -50,7 +50,7 @@ export const $entry = (mp: IPosition) => {
       $content: $text(style({ fontSize: '.85rem' }))(getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getMarketIndexToken(mp.market)).symbol),
       $anchor: $tokenIcon(indexToken, { width: '36px' }),
     })({}),
-    $column(
+    $column(layoutSheet.spacingTiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((mp.isLong ? 'LONG' : 'SHORT'))),
       $text(style({ fontSize: '.85rem' }))(readableUsd(getEntryPrice(mp, indexDescription))),
     )
@@ -157,11 +157,11 @@ export const $puppets = (
   )
 }
 
-export const $positionPnl = (mp: IMirrorPosition, puppet?: viem.Address) => {
+export const $positionPnlAndSize = (mp: IMirrorPosition, puppet?: viem.Address) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-    $settledpositionPnl(mp, puppet),
+    $positionPnl(mp, puppet),
     $seperator2,
-    $openPositionRoi(mp, puppet),
+    $positionRoi(mp, puppet),
   )
 }
 
@@ -212,7 +212,7 @@ export const $PnlPercentageValue = (pnl: Stream<bigint> | bigint, collateral: bi
   )
 }
 
-export const $settledpositionPnl = (mp: IPosition, puppet?: viem.Address) => {
+export const $positionPnl = (mp: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(mp.market)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
   const isSettled = isPositionSettled(mp)
@@ -232,12 +232,14 @@ export const $settledpositionPnl = (mp: IPosition, puppet?: viem.Address) => {
   return isSettled
     ? $pnlDisplay(value)
     : $row(style({ alignItems: 'center' }))(
-      switchMap(color => style({ backgroundColor: colorAlpha(color, .1), borderRadius: '50%' })($infoTooltip('WIP', color, '18px')), displayColor),
+      switchMap(color => {
+        return style({ backgroundColor: colorAlpha(color, .1), borderRadius: '50%' })($infoTooltip($openPositionBreakdown(mp), color, '18px'))
+      }, displayColor),
       $pnlDisplay(value),
     )
 }
 
-export const $openPositionRoi = (mp: IPosition, puppet?: viem.Address) => {
+export const $positionRoi = (mp: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(mp.market)
   const lstIncrease = lst(mp.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralToken)
@@ -267,6 +269,18 @@ export function $liquidationSeparator(isLong: boolean, sizeUsd: bigint, sizeInTo
   )
 }
 
+export function $positionTimestamp(pos: IPosition) {
+  const timestamp = Number(pos.settledTimestamp || pos.openTimestamp)
+
+  return $column(layoutSheet.spacingTiny)(
+    $text(readableDate(timestamp)),
+    $row(layoutSheet.spacingSmall)(
+      $text(style({ fontSize: '.85rem' }))(getTimeSince(timestamp))
+    )
+  )
+}
+
+
 
 export const $marketLabel = (market: IMarket, showLabel = true) => {
   const indexTokenDescription = getTokenDescription(market.indexToken)
@@ -295,55 +309,45 @@ export const $marketSmallLabel = (market: IMarket) => {
 }
 
 
-// export const $openPositionPnlBreakdown = (mp: IPositionMirrorOpen, marketInfo: IMarketInfo) => {
-//   // const pendingFundingFee = getFundingFee(pos.entryFundingRate, cumulativeTokenFundingRates, pos.size)
-//   // const totalMarginFee = getMarginFees(pos.cumulativeSize)
+export const $openPositionBreakdown = (mp: IPosition) => {
+  // const pendingFundingFee = getFundingFee(mp.entryFundingRate, cumulativeTokenFundingRates, mp.size)
+  const totalMarginFee = getMarginFees(mp.cumulativeSizeUsd)
 
-//   const update = lst(mp.updates)
+  const updateList = [...mp.increaseList, ...mp.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
+  const latestUpdate = lst(updateList)
 
-//   return $column(layoutSheet.spacing, style({ minWidth: '250px' }))(
-//     $row(style({ placeContent: 'space-between' }))(
-//       $text('Net breakdown'),
+  const totalPositionFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalBorrowingFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalFundingFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
-//       $row(layoutSheet.spacingTiny)(
-//         $text(style({ color: pallete.foreground, flex: 1 }))('Collateral'),
-//         $text(readableTokenUsd(update["collateralTokenPrice.max"], update.collateralAmount))
-//       ),
-//     ),
-//     $column(layoutSheet.spacingSmall)(
 
-//       // $row(style({ placeContent: 'space-between' }))(
-//       //   $text(style({ color: pallete.foreground }))('Margin Fee'),
-//       //   $pnlValue(-totalMarginFee)
-//       // ),
-//       // $row(style({ placeContent: 'space-between' }))(
-//       //   $text(style({ color: pallete.foreground }))('Borrow Fee'),
-//       //   $pnlValue(
-//       //     -(pendingFundingFee + pos.cumulativeFee - totalMarginFee)
-//       //   )
-//       // ),
-//       $labeledDivider('Realised'),
-//       // $row(layoutSheet.spacingTiny)(
-//       //   $text(style({ color: pallete.foreground, flex: 1 }))('Total Fees'),
-//       //   $pnlValue(
-//       //     map(cumFee => {
-//       //       const fstUpdate = pos.updateList[0]
-//       //       const entryFundingRate = fstUpdate.entryFundingRate
+  return $column(layoutSheet.spacingSmall, style({ minWidth: '250px' }))(
+    $text('Net breakdown'),
 
-//       //       const fee = getFundingFee(entryFundingRate, cumFee, pos.size) + pos.cumulativeFee
-
-//       //       return -fee
-//       //     }, cumulativeTokenFundingRates)
-//       //   )
-//       // ),
-//       $row(style({ placeContent: 'space-between' }))(
-//         $text(style({ color: pallete.foreground }))('PnL'),
-//         $pnlValue(now(mp.realisedPnl))
-//       ),
-
-//     )
-//   )
-// }
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground, flex: 1 }))('Collateral'),
+      $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax))
+    ),
+    $labeledDivider('Realised'),
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground }))('Position Fee'),
+      $pnlDisplay(-totalPositionFeeAmount)
+    ),
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground }))('Borrowing Fee'),
+      $pnlDisplay(-totalBorrowingFeeAmount)
+    ),
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground }))('Funding Fee'),
+      $pnlDisplay(-totalFundingFeeAmount)
+    ),
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground }))('PnL'),
+      // $pnlValue(now(mp.realisedPnl))
+      $pnlDisplay(mp.realisedPnlUsd)
+    ),
+  )
+}
 
 interface ITraderDisplay {
   trader: viem.Address
