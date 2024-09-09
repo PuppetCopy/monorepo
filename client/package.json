@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bunx --bun vite",
-    "build:vite": "bun run build:tsc:all && bunx --bun vite build",
+    "build": "bun run build:tsc:all && bunx --bun vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
     "clean:rimraf": "rimraf dist && tsc -build --clean",
     "preview": "bunx --bun vite preview",

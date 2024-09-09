@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "bun docgen && vitepress dev",
     "preview": "bun docgen && vitepress preview",
-    "build": "vitepress build",
+    "build": "bunx --bun vitepress build",
     "docgen": "bun ./docgen.ts"
   },
   "dependencies": {
