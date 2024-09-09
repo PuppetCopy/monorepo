@@ -4,7 +4,7 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, map, mergeArray, multicast, now, periodic, snapshot } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, getDuration, getMappedValue, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
+import { applyFactor, combineState, getDuration, getMappedValue, getVestingCursor, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
@@ -16,7 +16,7 @@ import { $heading2 } from "../common/$text"
 import { $labeledDivider } from "../common/elements/$common"
 import { store } from "../const/store"
 import tokenomicsReader from "../logic/tokenomicsReader"
-import { IComponentPageParams, IVested } from "../pages/type"
+import { IComponentPageParams } from "../pages/type"
 import { $defaultSliderThumb, $Slider } from "./$Slider"
 import { $SubmitBar } from "./form/$Form"
 
@@ -26,21 +26,7 @@ function calcDurationMultiplier(baseMultiplier: bigint, duration: bigint) {
   return numerator / BigInt(PUPPET.MAX_LOCK_SCHEDULE ** 2);
 }
 
-function getVestingCursor(vested: IVested): IVested {
-  const now = BigInt(unixTimestampNow())
-  const timeElapsed = now - vested.lastAccruedTime
-  const accruedDelta = timeElapsed >= vested.remainingDuration
-    ? vested.amount
-    : timeElapsed * vested.amount / vested.remainingDuration
 
-  vested.remainingDuration = timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
-  vested.amount -= accruedDelta
-  vested.accrued += accruedDelta
-
-  vested.lastAccruedTime = now
-
-  return vested
-}
 
 
 interface IVestingDetails extends IComponentPageParams {
@@ -89,11 +75,6 @@ export const $Vest = (config: IVestingDetails) => component((
     return tokenomicsReader.RewardLogic.claimable(wallet, wallet.account.address)
   }, walletClientQuery)))
 
-  const claimableContributionRewardQuery = replayLatest(multicast(map(async params => {
-    // return await params.claimableContributionQuery
-    return applyFactor(await params.claimableContributionQuery, await params.baselineEmissionRateQuery)
-  }, combineObject({ claimableContributionQuery, baselineEmissionRateQuery }))))
-
   const lockAmountQuery = replayLatest(multicast(map(async walletQuery => {
     const wallet = await walletQuery
 
@@ -135,6 +116,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
 
+
   const claimableState = replayLatest(multicast(map(async params => {
     const claimableContributionReward = await params.claimableContributionQuery
     const claimableLockReward = await params.claimableLockRewardQuery
@@ -145,7 +127,7 @@ export const $Vest = (config: IVestingDetails) => component((
     const lockDurationDelta = BigInt(Math.floor(params.lockSchedule * PUPPET.MAX_LOCK_SCHEDULE))
     const vestedDurationBonusMultiplier = calcDurationMultiplier(await params.durationBaseMultiplierQuery, lockDurationDelta)
     const lockDurationBonusInVest = applyFactor(totalClaimable, vestedDurationBonusMultiplier)
-    const vestedAmount = vested ? vested.amount - vested.accrued : 0n
+    const vestedAmount = vested ? getVestingCursor(vested).accrued : 0n
 
     const lockAmount = await params.lockAmountQuery
     const lockDuration = await params.lockDurationQuery
@@ -430,9 +412,14 @@ export const $Vest = (config: IVestingDetails) => component((
             disabled: map(val => val === true, cashout),
             value: lockSchedule,
             $thumb: $defaultSliderThumb(style({ width: '60px' }))(
-              $text(map(duration => {
-                return `${readableUnitAmount((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)}%`
-              }, slideDuration))
+              $text(
+                switchMap((durationMultiplier) => {
+                  return map(duration => {
+                    durationMultiplier
+                    return `${readableUnitAmount((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)}%`
+                  }, slideDuration)
+                }, awaitPromises(durationBaseMultiplierQuery))
+              )
             )
           })({
             change: changeScheduleFactorTether(),
@@ -493,10 +480,6 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
       ),
-
-
-      // $node(),
-
 
 
       $SubmitBar({
@@ -572,8 +555,6 @@ export const $Vest = (config: IVestingDetails) => component((
           }, claimableState)
         )
       })
-
-
 
     ),
 

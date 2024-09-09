@@ -197,13 +197,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 columnOp: style({ placeContent: 'flex-end' }),
                 $bodyCallback: map(tr => {
 
-                  return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-                    $pnlDisplay(tr.pnl),
-                    $seperator2,
-                    $text(style({ fontSize: '.85rem' }))(
-                      readablePercentage(getBasisPoints(tr.pnl, tr.collateral))
-                    ),
-                  )
+                  return $PnlAndRoi(tr)
                 })
               },
 
@@ -258,4 +252,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
 
 
+
+function $PnlAndRoi(tr: ILeaderboardSummary) {
+  return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
+    $pnlDisplay(tr.pnl),
+    $seperator2,
+    $text(style({ fontSize: '.85rem' }))(
+      readablePercentage(getBasisPoints(tr.pnl, tr.collateral))
+    )
+  )
+}
 

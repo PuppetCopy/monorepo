@@ -1,12 +1,10 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "outDir": ".dist/esm",
+    "outDir": "dist/esm",
     "rootDir": "src",
-    "declarationDir": ".dist/types",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "declarationDir": "dist/types",
+    "emitDeclarationOnly": false,
     "lib": [
       "DOM",
       "ESNext"

@@ -30,3 +30,9 @@ export interface ITokenDescription {
 
 
 
+export interface IVested {
+  amount: bigint
+  remainingDuration: bigint
+  lastAccruedTime: bigint
+  accrued: bigint
+}

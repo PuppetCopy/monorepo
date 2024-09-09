@@ -51,6 +51,8 @@ export default {
       readContract(provider, { ...contractDefs.ContributeLogic, functionName: 'config', args: [] }),
   },
   VotingEscrowLogic: {
+    claimable: (provider: walletLink.IClient, user: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
+      readContract(provider, { ...contractDefs.VotingEscrowLogic, functionName: 'getClaimable', args: [user] }),
     baseMultiplier: (provider: walletLink.IClient, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
       readContract(provider, { ...contractDefs.VotingEscrowLogic, functionName: 'config', args: [] }),
   },

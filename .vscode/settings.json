@@ -1,12 +1,14 @@
 {
   "npm.packageManager": "bun",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    // "**/dist": true
+  },
   "search.exclude": {
-    "**/dist": true,
     "**/node_modules": true,
-    "**/lib": true,
-    "**/generated": true,
-    "**/generated-sources": true,
-    "**/tsconfig.tsbuildinfo": true
+    "**/*.code-search": true,
+    "**/dist": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,

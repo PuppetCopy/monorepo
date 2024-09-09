@@ -34,12 +34,7 @@ export interface IPositionActivityParams {
 
 export interface IUserPositionPageParams extends IPageParams, IPositionActivityParams, IUserActivityParams { }
 
-export interface IVested {
-  amount: bigint
-  remainingDuration: bigint
-  lastAccruedTime: bigint
-  accrued: bigint
-}
+
 
 export interface IEarningsPlan {
   compoundMode: boolean

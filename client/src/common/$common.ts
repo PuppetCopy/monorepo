@@ -328,6 +328,10 @@ export const $openPositionBreakdown = (mp: IPosition) => {
       $text(style({ color: pallete.foreground, flex: 1 }))('Collateral'),
       $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax))
     ),
+    $row(style({ placeContent: 'space-between' }))(
+      $text(style({ color: pallete.foreground, flex: 1 }))('Open Pnl'),
+      $pnlDisplay(getOpenMpPnL(mp, latestUpdate.indexTokenPriceMax))
+    ),
     $labeledDivider('Realised'),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground }))('Position Fee'),

@@ -25,10 +25,6 @@ export default defineConfig({
   publicDir: 'public',
   plugins: [
     VitePWA({
-      // workbox: {
-      //   cleanupOutdatedCaches: true
-      // },
-      // outDir: '.dist',
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
       injectManifest: {

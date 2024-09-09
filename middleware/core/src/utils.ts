@@ -180,9 +180,8 @@ export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
 export function getOpenMpPnL(mp: IPosition, markPrice: bigint, puppet?: viem.Address): bigint {
   const pnl = getPositionPnlUsd(mp.isLong, mp.sizeInUsd, mp.sizeInTokens, markPrice)
   const openPnl = getParticiapntPortion(mp, pnl, puppet)
-  const realisedPnl = getSettledMpPnL(mp, puppet)
 
-  return realisedPnl + openPnl
+  return openPnl
 }
 
 export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {

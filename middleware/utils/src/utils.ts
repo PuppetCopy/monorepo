@@ -1,6 +1,6 @@
 import { curry2 } from "@most/prelude"
 import * as viem from "viem"
-import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription } from "./types.js"
+import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription, IVested } from "./types.js"
 import { BASIS_POINTS_DIVISOR, FACTOR_PERCISION, USD_DECIMALS } from "./const.js"
 export * as GraphQL from '@urql/core'
 
@@ -638,3 +638,18 @@ export function getShortHash(name: string, obj: any) {
 }
 
 
+export function getVestingCursor(vested: IVested): IVested {
+  const now = BigInt(unixTimestampNow())
+  const timeElapsed = now - vested.lastAccruedTime
+  const accruedDelta = timeElapsed >= vested.remainingDuration
+    ? vested.amount
+    : timeElapsed * vested.amount / vested.remainingDuration
+
+  vested.remainingDuration = timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
+  vested.amount -= accruedDelta
+  vested.accrued += accruedDelta
+
+  vested.lastAccruedTime = now
+
+  return vested
+}

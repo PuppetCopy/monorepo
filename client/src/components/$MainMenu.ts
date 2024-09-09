@@ -195,18 +195,7 @@ export const $MainMenuMobile = (config: MainMenu) => component((
 ) => {
 
   const { walletClientQuery, route, showAccount = true } = config
-
   const routeChangeMulticast = multicast(routeChange)
-
-
-  const $govItem = (label: string, $iconPath: $Node, description: string) => $row(layoutSheet.spacing)(
-    $icon({ $content: $iconPath, width: '36px', svgOps: style({ minWidth: '36px' }), viewBox: '0 0 32 32' }),
-    $column(layoutSheet.spacingTiny)(
-      $text(label),
-      $text(style({ color: pallete.foreground, fontSize: '.85rem' }))(description)
-    )
-  )
-
 
 
   const $popoverPageLink = ($iconPath: $Branch<SVGPathElement>, text: string | Stream<string>) => $row(style({ alignItems: 'center', cursor: 'pointer' }))(
@@ -214,15 +203,6 @@ export const $MainMenuMobile = (config: MainMenu) => component((
     $text(text)
   )
 
-
-  const $treasuryLinks = [
-    $Link({ $content: $govItem('Treasury', $bagOfCoinsCircle, 'GBC Community-Led Portfolio'), url: '/app/treasury', route: route })({
-      click: routeChangeTether()
-    }),
-    $anchor(style({ textDecoration: 'none' }), attr({ href: 'https://snapshot.org/#/gbc-nft.eth' }))(
-      $govItem('Governance', $fileCheckCircle, 'Treasury Governance, 1 GBC = 1 Voting Power')
-    ),
-  ]
 
   const $circleButtonAnchor = $anchor(
     style({ padding: '0 4px', border: `2px solid ${colorAlpha(pallete.foreground, .25)}`, display: 'flex', borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' })
