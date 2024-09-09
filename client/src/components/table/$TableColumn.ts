@@ -64,7 +64,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> =
 })
 
 
-export const positionTimeColumn: TableColumn<IPosition | IPosition>  = {
+export const timeColumn: TableColumn<IPosition | IPosition>  = {
   $head: $text('Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map((pos) => {

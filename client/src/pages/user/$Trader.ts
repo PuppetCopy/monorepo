@@ -3,14 +3,13 @@ import { $text, component, style } from "@aelea/dom"
 import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { map, startWith } from "@most/core"
 import { IntervalTime, pagingQuery } from "common-utils"
-import { ISetRouteType } from "puppet-middleware-utils"
 import { $IntermediatePromise, $Table, $infoLabel, IQuantumScrollPage, ISortBy } from "ui-components"
-import { $card, $card2 } from "../../common/elements/$common.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
-import { entryColumn, pnlColumn, positionTimeColumn, puppetsColumn, settledSizeColumn } from "../../components/table/$TableColumn.js"
-import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IUserPositionPageParams } from "../type.js"
 import * as viem from 'viem'
+import { $card, $card2 } from "../../common/elements/$common.js"
+import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
+import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { entryColumn, pnlColumn, puppetsColumn, settledSizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
+import { IUserPositionPageParams } from "../type.js"
 
 
 export const $TraderPage = (config: IUserPositionPageParams) => component((
@@ -20,7 +19,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
 
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
@@ -35,7 +34,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
       $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
           $ProfilePeformanceTimeline({ ...config })({
-            selectCollateralTokenList: selectCollateralTokenListTether(),
+            selectMarketTokenList: selectMarketTokenListTether(),
             changeActivityTimeframe: changeActivityTimeframeTether(),
           })
         ),
@@ -59,7 +58,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
             return $Table({
               dataSource,
               columns: [
-                // ...screenUtils.isDesktopScreen ? [positionTimeColumn] : [],
+                ...screenUtils.isDesktopScreen ? [timeColumn] : [],
                 entryColumn,
                 puppetsColumn(changeRouteTether),
                 settledSizeColumn(),
@@ -73,7 +72,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
         })({}),
       ),
     ),
-    { changeRoute, changeActivityTimeframe, selectCollateralTokenList, modifySubscribeList }
+    { changeRoute, changeActivityTimeframe, selectMarketTokenList, modifySubscribeList }
   ]
 })
 

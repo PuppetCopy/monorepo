@@ -64,7 +64,6 @@ export type IPosition = IMirrorPosition | IGmxPosition
 
 
 export interface IMirrorListSummary extends IPositionListSummary {
-  account: viem.Address
   puppets: viem.Address[]
 }
 

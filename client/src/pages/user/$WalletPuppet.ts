@@ -37,7 +37,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
   [requestWithdrawAsset, requestWithdrawAssetTether]: Behavior<Promise<bigint>>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
   const { activityTimeframe, walletClientQuery, pricefeedMapQuery, providerClientQuery, positionListQuery, collateralTokenList, route } = config
@@ -71,7 +71,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
     $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
       $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
         $ProfilePeformanceTimeline({ ...config })({
-          selectCollateralTokenList: selectCollateralTokenListTether(),
+          selectMarketTokenList: selectMarketTokenListTether(),
           changeActivityTimeframe: changeActivityTimeframeTether(),
         }),
       ),
@@ -184,12 +184,12 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
         //       )
         //     })
         //   )
-        // }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectCollateralTokenList, routeTypeListQuery, walletClientQuery })))),
+        // }, combineObject({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, selectMarketTokenList, routeTypeListQuery, walletClientQuery })))),
       ),
     ),
     
     {
-      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralTokenList
+      changeRoute, modifySubscriber, changeActivityTimeframe, selectMarketTokenList
     }
   ]
 })

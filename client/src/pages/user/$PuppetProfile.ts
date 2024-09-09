@@ -18,7 +18,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
   const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, collateralTokenList, route } = config
@@ -29,7 +29,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
       $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
           $ProfilePeformanceTimeline({ ...config })({
-            selectCollateralTokenList: selectCollateralTokenListTether(),
+            selectMarketTokenList: selectMarketTokenListTether(),
             changeActivityTimeframe: changeActivityTimeframeTether(),
           }),
         ),
@@ -79,7 +79,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
     ),
     
     {
-      changeRoute, modifySubscriber, changeActivityTimeframe, selectCollateralTokenList
+      changeRoute, modifySubscriber, changeActivityTimeframe, selectMarketTokenList
     }
   ]
 })

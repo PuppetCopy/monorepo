@@ -63,7 +63,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   [clickUpdateVersion, clickUpdateVersionTether]: Behavior<any, bigint>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 ) => {
@@ -96,7 +96,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const isDesktopScreen = skipRepeats(map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))))
 
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
-  const collateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectCollateralTokenList, 'collateralTokenList')
+  const collateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectMarketTokenList, 'collateralTokenList')
 
   const pricefeedMapQuery = replayLatest(multicast(queryPricefeed(subgraphClient, { activityTimeframe })))
 
@@ -194,7 +194,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                     modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectCollateralTokenList: selectCollateralTokenListTether(),
+                    selectMarketTokenList: selectMarketTokenListTether(),
                   })
                 )
               ),
@@ -202,7 +202,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                 $midContainer(
                   fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, collateralTokenList, pricefeedMapQuery })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectCollateralTokenList: selectCollateralTokenListTether(),
+                    selectMarketTokenList: selectMarketTokenListTether(),
                     routeChange: changeRouteTether(),
                     modifySubscriber: modifySubscriberTether(),
                   }))
@@ -213,7 +213,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, collateralTokenList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectCollateralTokenList: selectCollateralTokenListTether(),
+                    // selectMarketTokenList: selectMarketTokenListTether(),
                     changeRoute: changeRouteTether(),
                   }))
                 )

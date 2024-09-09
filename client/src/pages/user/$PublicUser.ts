@@ -2,8 +2,8 @@ import { Behavior } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
-import { map, mergeArray, multicast, now } from "@most/core"
-import { ETH_ADDRESS_REGEXP, IntervalTime } from "common-utils"
+import { map, mergeArray, multicast, now, startWith } from "@most/core"
+import { ETH_ADDRESS_REGEXP, IntervalTime, switchMap } from "common-utils"
 import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'
@@ -13,6 +13,7 @@ import { IChangeSubscription } from "../../components/portfolio/$RouteSubscripti
 import { IPageParams, IUserActivityPageParams, IUserPositionPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
 import { subgraphClient } from "../../common/graphClient"
+import { getMarketIndexToken } from "gmx-middleware-utils"
 
 
 
@@ -32,7 +33,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   [selectProfileMode, selectProfileModeTether]: Behavior<IRouteOption, IRouteOption>,
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
 ) => {
 
@@ -82,13 +83,30 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const account = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const positionListQuery = queryPosition(subgraphClient, { account, activityTimeframe, collateralTokenList })
+              const filteredMarketList = startWith([], selectMarketTokenList)
+              
+              const positionListQuery = switchMap(marketList => {
+                const query = queryPosition(subgraphClient, { account, activityTimeframe, collateralTokenList })
+
+                return map(async listQuery => {
+                  const list = await listQuery
+
+                  if (marketList.length === 0) {
+                    return list
+                  }
+
+                  return list.filter(pos => marketList.includes(getMarketIndexToken(pos.market)))
+                }, query)
+              }, filteredMarketList)
+
+
+
 
               return $column(layoutSheet.spacingBig)(
                 $TraderSummary({ ...config, account, positionListQuery })({}),
 
                 $TraderPage({ ...config, positionListQuery, })({
-                  selectCollateralTokenList: selectCollateralTokenListTether(),
+                  selectMarketTokenList: selectMarketTokenListTether(),
                   changeRoute: changeRouteTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                 })
@@ -125,7 +143,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
         //           })({
         //             changeRoute: changeRouteTether(),
         //             changeActivityTimeframe: changeActivityTimeframeTether(),
-        //             selectCollateralTokenList: selectCollateralTokenListTether(),
+        //             selectMarketTokenList: selectMarketTokenListTether(),
         //             modifySubscriber: modifySubscriberTether()
         //           }),
         //         ),
@@ -142,7 +160,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
     ),
 
     {
-      selectCollateralTokenList, modifySubscriber, changeActivityTimeframe,
+      modifySubscriber, changeActivityTimeframe,
       changeRoute: mergeArray([
         changeRoute,
         map(option => {

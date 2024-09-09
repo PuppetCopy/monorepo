@@ -50,7 +50,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
   [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>,
 ) => {
@@ -129,7 +129,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
         //     changeRoute: changeRouteTether(),
         //     modifySubscriber: modifySubscriberTether(),
         //     changeActivityTimeframe: changeActivityTimeframeTether(),
-        //     selectCollateralTokenList: selectCollateralTokenListTether(),
+        //     selectMarketTokenList: selectMarketTokenListTether(),
         //   })
         // } else if (params.profileMode === IWalletTab.TRADER) {
         //   const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
@@ -169,7 +169,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                 // ),
                 style({ placeContent: 'space-between' })(
                   $infoLabeledValue(
-                    $infoTooltipLabel(`Protocol fees Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Buyback'),
+                    $infoTooltipLabel(`Protocol fees Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Bought-back'),
                     $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
                       // $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
                       $text(readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
@@ -199,7 +199,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                 $seperator2,
                 style({ placeContent: 'space-between' })(
                   $infoLabeledValue(
-                    $text('Locked In / Cashed Out'),
+                    $text('Locked In (vePUPPET)'),
                     $intermediateText(
                       map(async providerQuery => {
                         const provider = await providerQuery
@@ -362,7 +362,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
     ),
 
     {
-      modifySubscriber, changeActivityTimeframe, selectCollateralTokenList, changeRoute, changeWallet
+      modifySubscriber, changeActivityTimeframe, selectMarketTokenList, changeRoute, changeWallet
     }
   ]
 })

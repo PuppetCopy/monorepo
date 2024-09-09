@@ -5,28 +5,19 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getTokenUsd, lst, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import {
-  getEntryPrice,
-  getMarketIndexToken,
-  getRoughLiquidationPrice,
-  getTokenDescription, IAbstractPositionParams,
-  IMarket,
-  IPosition,
-  isPositionSettled,
-  liquidationWeight
-} from "gmx-middleware-utils"
-import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, IMirrorListSummary, latestPriceMap } from "puppet-middleware-utils"
-import { $bear, $bull, $infoLabel, $infoTooltip, $Link, $tokenIconMap } from "ui-components"
+import { getBasisPoints, getMappedValue, getTokenUsd, lst, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { getEntryPrice, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IAbstractPositionParams, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
+import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
+import { $bear, $bull, $infoLabel, $infoTooltip, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
 import { $Popover } from "../components/$Popover.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button.js"
 import { $RouteSubscriptionEditor, IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor.js"
-import { IWalletTab, IWalletPageParams } from "../pages/type.js"
 import { readPuppetSubscriptionExpiry } from "../logic/puppetRead"
 import { $seperator2 } from "../pages/common.js"
+import { IWalletPageParams, IWalletTab } from "../pages/type.js"
 import { $puppetLogo } from "./$icons"
 
 
@@ -52,18 +43,23 @@ export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) 
 export const $entry = (mp: IPosition) => {
   const indexToken = getMarketIndexToken(mp.market)
   const indexDescription = getTokenDescription(indexToken)
-  
-  return $column(layoutSheet.spacingTiny, style({ alignItems: 'center', placeContent: 'center', fontSize: '.85rem' }))(
-    $tokenIcon(indexToken, { width: '28px' }),
-    // $text(mp.market),
-    // $text(indexToken),
-    $text(readableUsd(getEntryPrice(mp.sizeInUsd, mp.sizeInTokens, indexDescription))),
+
+  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+    $Tooltip({
+      // $dropContainer: $defaultDropContainer,
+      $content: $text(style({ fontSize: '.85rem' }))(getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getMarketIndexToken(mp.market)).symbol),
+      $anchor: $tokenIcon(indexToken, { width: '36px' }),
+    })({}),
+    $column(
+      $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((mp.isLong ? 'LONG' : 'SHORT'))),
+      $text(style({ fontSize: '.85rem' }))(readableUsd(getEntryPrice(mp, indexDescription))),
+    )
+
   )
 }
 
 export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
   const indexToken = pos.indexToken
-  // const indexToken = getMarketToken(pos.market).indexToken
   const indexDescription = getTokenDescription(pos.indexToken)
   const collateralDescription = getTokenDescription(pos.collateralToken)
 
@@ -84,17 +80,12 @@ export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
   )
 }
 
-export const $tokenLabeled = (indexToken: viem.Address, displayLabel = true) => {
+export const $tokenLabeled = (indexToken: viem.Address) => {
   const indexDescription = getTokenDescription(indexToken)
 
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
     $tokenIcon(indexToken, { width: '36px' }),
-    displayLabel
-      ? $column(layoutSheet.spacingTiny)(
-        $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
-        // $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
-      )
-      : empty(),
+    $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
   )
 }
 

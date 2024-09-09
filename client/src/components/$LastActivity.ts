@@ -2,7 +2,7 @@ import { $text, component, nodeEvent, style, styleBehavior } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map } from "@most/core"
-import { $anchor } from "ui-components"
+import { $anchor, $infoTooltipLabel } from "ui-components"
 import * as store from "../const/store.js"
 import { Behavior } from "@aelea/core"
 import * as GMX from "gmx-middleware-const"
@@ -26,7 +26,7 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) => compone
   return [
 
     $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-      $text(style({ color: pallete.foreground, lineHeight: '38px' }))('Last Activity:'),
+      $infoTooltipLabel('Positions that had been opened within timeframe of both open and settled', 'Last Activity:'),
       $row(layoutSheet.spacing)(
         ...options.map(([interval, label]) => {
           return $anchor(

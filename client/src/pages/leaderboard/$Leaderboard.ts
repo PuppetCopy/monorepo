@@ -33,7 +33,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
-  [selectCollateralTokenList, selectCollateralTokenListTether]: Behavior<viem.Address[]>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
   [routeChange, routeChangeTether]: Behavior<any, string>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
@@ -78,7 +78,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
             },
             value: collateralTokenList
           })({
-            select: selectCollateralTokenListTether()
+            select: selectMarketTokenListTether()
           }),
 
           $ButtonToggle({
@@ -120,8 +120,6 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
             const dataSource: Stream<TablePageResponse<ILeaderboardSummary>> = map(scroll => {
-
-              const tradeListMap = groupArrayMany(positionList, a => a.account)
               const filterestPosList = leaderboardSummary(params.pricefeedMap, positionList)
 
               return pagingQuery(
@@ -219,7 +217,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                       return screenUtils.isDesktopScreen
                         ? $LeaderboardPerformanceTimeline({
                           $container: $row(style({ position: 'relative', width: `180px`, height: `80px`, margin: '-16px 0' })),
-                          tickCount: 50,
+                          tickCount: 25,
                           list: pos.positionList,
                           pricefeedMap: params.pricefeedMap,
                           activityTimeframe: params.activityTimeframe,
@@ -246,7 +244,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
     ),
 
     {
-      routeChange, modifySubscriber, changeActivityTimeframe, selectCollateralTokenList,
+      routeChange, modifySubscriber, changeActivityTimeframe, selectMarketTokenList,
       // unSubscribeSelectedTraders: snapshot((params, trader) => {
       //   const selectedIdx = params.selection.indexOf(trader)
       //   selectedIdx === -1 ? params.selection.push(trader) : params.selection.splice(selectedIdx, 1)

@@ -11,11 +11,7 @@ export function accountSettledPositionListSummary(
   tradeList: IPosition[],
   puppet?: viem.Address,
 ): IMirrorListSummary {
-  const fst = tradeList[0]
-  const account = isMirrorPosition(fst) ? fst.mirror.trader : fst.account
-
   const seedAccountSummary: IMirrorListSummary = {
-    account,
     size: 0n,
     collateral: 0n,
     cumulativeLeverage: 0n,
@@ -49,7 +45,6 @@ export function accountSettledPositionListSummary(
     const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.mirror.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
 
     return {
-      account: seed.account,
       size,
       collateral,
       cumulativeLeverage,
@@ -91,7 +86,16 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILead
     summary.maxCollateral = next.maxCollateralUsd > summary.maxCollateral ? next.maxCollateralUsd : summary.maxCollateral
     summary.maxSize = next.maxSizeUsd > summary.maxSize ? next.maxSizeUsd : summary.maxSize
     summary.leverage = summary.maxSize / summary.maxCollateral
-    summary.pnl += next.sizeInTokens > 0n ? next.realisedPnlUsd : next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market)))
+
+    if (next.sizeInTokens === 0n) {
+      summary.pnl += next.realisedPnlUsd
+    } else {
+      const latestPrice = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
+
+      if (latestPrice !== null) {
+        summary.pnl += next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, latestPrice)
+      }
+    }
 
     if (next.realisedPnlUsd > 0n) {
       summary.winCount += 1
@@ -110,10 +114,10 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap ,tradeList: ILead
 }
 
 
-function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): bigint {
+function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): bigint | null {
   const feed = getMappedValue(priceFeed, token)
 
-  return feed[feed.length - 1].c
+  return feed[0]?.c || null
 }
 
 export function isMirrorPosition(mp: IPosition): mp is IMirrorPosition {

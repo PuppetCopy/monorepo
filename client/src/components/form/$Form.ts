@@ -162,34 +162,36 @@ export const $ApproveSpend = (config: IApproveSpend) => component((
   ])
 
   return [
-    switchMap(params => {
-      if (params.allowance >= params.amount) {
-        return $content || empty()
-      }
-      
+    $row(
+      switchMap(params => {
+        if (params.allowance >= params.amount) {
+          return $content || empty()
+        }
 
-      return $ButtonCore({
-        disabled,
-        $container: $defaultButtonPrimary(style({
-          position: 'relative',
-          overflow: 'hidden',
-        })),
-        $content: $label ? isStream($label) ? $label : $text($label) : $text('Approve spend'),
-      })({
-        click: approveTokenSpendTether(
-          map(async () => {
-            return walletLink.writeContract({
-              walletClient,
-              address: token,
-              abi: erc20Abi,
-              eventName: 'Approval',
-              functionName: 'approve',
-              args: [spender, params.amount] as const
+
+        return $ButtonCore({
+          disabled,
+          $container: $defaultButtonPrimary(style({
+            position: 'relative',
+            overflow: 'hidden',
+          })),
+          $content: $label ? isStream($label) ? $label : $text($label) : $text('Approve spend'),
+        })({
+          click: approveTokenSpendTether(
+            map(async () => {
+              return walletLink.writeContract({
+                walletClient,
+                address: token,
+                abi: erc20Abi,
+                eventName: 'Approval',
+                functionName: 'approve',
+                args: [spender, params.amount] as const
+              })
             })
-          })
-        )
-      })
-    }, combineObject({ allowance, amount: amount ?? now(MAX_UINT256) })),
+          )
+        })
+      }, combineObject({ allowance, amount: amount ?? now(MAX_UINT256) }))
+    ),
     {
       approveTokenSpend
     }

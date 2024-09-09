@@ -153,7 +153,6 @@ export const $Vest = (config: IVestingDetails) => component((
     const nextLockAmount = lockAmount + totalClaimable
     const nextLockDuration = lockAmount > 0 ? (lockAmount * lockDuration + totalClaimable * lockDurationDelta) / nextLockAmount : lockDurationDelta
 
-    console.log('lockDurationDelta', lockDurationDelta)
 
     return {
       cashout: params.cashout, lockAmount: await params.lockAmountQuery,

@@ -235,8 +235,8 @@ export type TimelineTime = {
   time: number
 }
 
-export interface IFillGap<T, R, RTime extends R & TimelineTime = R & TimelineTime> {
-  interval?: number
+export interface ICreateTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime> {
+  ticks?: number
   getTime: (t: T) => number
   seed: R & TimelineTime
   source: T[]
@@ -248,14 +248,15 @@ export interface IFillGap<T, R, RTime extends R & TimelineTime = R & TimelineTim
 
 
 
-export function createTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime>(config: IFillGap<T, R, RTime>) {
+export function createTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime>(config: ICreateTimeline<T, R, RTime>) {
   const {
     source,
     seed,
     seedMap,
     gapMap = prev => prev,
     squashMap = seedMap,
-    getTime
+    getTime,
+    ticks = 90
   } = config
 
   const sortedSource = source.filter(update => getTime(update) > seed.time).sort((a, b) => getTime(a) - getTime(b))
@@ -270,7 +271,7 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
     throw new Error('seed time is greater than last time, source is not sorted')
   }
 
-  const interval = config.interval ?? Math.floor((lstTime - seed.time) / sortedSource.length)
+  const interval = Math.floor((lstTime - seed.time) / ticks)
   const seedSlot = Math.floor(seed.time / interval)
   const normalizedSeed = { ...seed, time: seedSlot * interval } as RTime
 

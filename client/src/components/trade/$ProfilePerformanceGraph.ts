@@ -42,11 +42,18 @@ function getTime(item: IPositionIncrease | IPositionDecrease | IPricetickWithInd
 }
 
 export function getPosolitionListTimelinePerformance(config: IPerformanceTimeline) {
+  if (config.list.length === 0) {
+    return []
+  }
+
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
+  const initialPositionTime = config.list.map(pos => pos.openTimestamp).reduce((a, b) => Math.min(a, b), config.list[0].openTimestamp)
   const adjustList: (IPositionIncrease | IPositionDecrease)[] = config.list.flatMap(mp => [...mp.increaseList, ...mp.decreaseList]).sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
-  const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList.flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
+  const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
+    .flatMap(indexToken => config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? [])
+    .filter(tick => tick.timestamp > initialPositionTime)
 
   const seed: IGraphLTick = {
     value: 0,
@@ -202,6 +209,10 @@ export interface ILeaderboardPerformanceTimeline {
 }
 
 export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPerformanceTimeline) {
+  if (config.list.length === 0) {
+    return []
+  }
+  
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
   const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
@@ -215,6 +226,7 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
   }
 
   const timeline = createTimeline({
+    ticks: config.tickCount,
     source: [...config.list, ...priceUpdateTicks],
     seed,
     seedMap: (acc, next) => {
