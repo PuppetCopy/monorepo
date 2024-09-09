@@ -8,7 +8,7 @@
         "dist"
     ],
     "scripts": {
-        "clean": "rm -fr dist/*",
+        "clean:tsc": "rm -fr dist/*",
         "build:tsc": "bun tsc -b"
     },
     "dependencies": {
