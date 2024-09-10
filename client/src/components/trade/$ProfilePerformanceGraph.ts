@@ -198,34 +198,53 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
 
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
-
-  const seed = {
-    value: 0,
-    realisedPnl: 0n,
-    openPnlMap: {},
-    time: startTime,
-  }
+  const initialPositionTime = config.list.map(pos => pos.openTimestamp).reduce((a, b) => Math.min(a, b), config.list[0].openTimestamp)
+  const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
+  const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
+    .flatMap(indexToken =>
+      config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.timestamp })) ?? []
+    )
+    .filter(tick => tick.timestamp > initialPositionTime)
 
   const timeline = createTimeline({
     ticks: config.tickCount,
-    source: config.list,
-    seed,
+    source: [...config.list, ...priceUpdateTicks],
+    seed: {
+      value: 0,
+      realisedPnl: 0n,
+      openPnlMap: {},
+      time: startTime,
+    },
     seedMap: (acc, next) => {
-      if (next.sizeInTokens === 0n) {
-        return { value: acc.value + formatFixed(USD_DECIMALS, next.realisedPnlUsd) }
+      let realisedPnl = acc.realisedPnl
+      let openPnl: OpenPnl
+
+      const openPnlMap: Record<viem.Hex, OpenPnl> = acc.openPnlMap
+
+      if ('price' in next) {
+        for (const positionKey in openPnlMap) {
+          const openPnl = openPnlMap[positionKey as viem.Hex]
+
+          if (next.indexToken === openPnl.indexToken) {
+            openPnl.pnl = getPositionPnlUsd(openPnl.update.isLong, openPnl.update.sizeInUsd, openPnl.update.sizeInTokens, next.price)
+          }
+        }
+
+      } else {
+        const indexToken = getMarketIndexToken(next.market)
+        openPnl = openPnlMap[`${next.account}:${next.market}:${next.isLong}:${next.openTimestamp}`] ??= { pnl: 0n, update: next, indexToken }
+
+        if (next.__typename === 'Position') {
+          openPnl.update = next
+        }
       }
 
-      const priceCandle = getLatestPriceFeedPrice(config.pricefeedMap, getMarketIndexToken(next.market))
+      const aggregatedOpenPnl = Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n)
+      const value = formatFixed(USD_DECIMALS, realisedPnl + aggregatedOpenPnl)
 
-      // if (next.openTimestamp > priceCandle.timestamp) {
-      //   throw new Error("PriceDeed is not up to date")
-      // }
-
-      const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
-
-      return { value: acc.value + formatFixed(USD_DECIMALS, pnl) }
+      return { openPnlMap, realisedPnl, value }
     },
-    getTime: src => src.openTimestamp,
+    getTime: src => 'price' in src ? src.timestamp : src.openTimestamp,
   })
 
   return timeline
@@ -237,7 +256,7 @@ export const $LeaderboardPerformanceTimeline = (config: ILeaderboardPerformanceT
 
   const timeline = getLeaderboardPositionTimelinePerformance(config)
   const markerList = config.list
-    .map((pos): IMarker => {
+    .map(pos => {
       return {
         position: 'inBar',
         color: colorAlpha(pallete.message, .15),
@@ -253,7 +272,7 @@ export const $LeaderboardPerformanceTimeline = (config: ILeaderboardPerformanceT
     config.$container(
       $Baseline({
         containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
-        markers: now(markerList),
+        markers: now(markerList as IMarker[]),
         chartConfig: {
           width: 100,
           leftPriceScale: {
