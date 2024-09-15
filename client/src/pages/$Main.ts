@@ -44,7 +44,7 @@ interface IApp {
 
 export const chains = [arbitrum] as const
 
-
+` `
 export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMap'] = {
   [arbitrum.id]: viem.fallback([
     viem.webSocket('wss://arb-mainnet.g.alchemy.com/v2/sI7JV4ahbI8oNlOosnZ7klOi8vsxdVwm'),

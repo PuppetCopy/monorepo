@@ -138,7 +138,7 @@ export function queryLeaderboardPosition<TStateParams extends StateParams<IQuery
     }
 
     // filter.account = {
-    //   _eq: '"0xeb597492cF49926647c3C753F88f0F8858556dFA"'
+    //   _eq: '"0x5dCD4b840CBC72408316E0a43cBB2a6B5812E929"'
     // }
 
 

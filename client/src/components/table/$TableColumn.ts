@@ -29,8 +29,8 @@ export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPos
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {
-    const size = getParticiapntPortion(mp, mp.maxSizeUsd, puppet)
-    const collateral = getParticiapntPortion(mp, mp.maxCollateralUsd, puppet)
+    const size = getParticiapntPortion(mp, mp.maxSizeInUsd, puppet)
+    const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
 
     return $size(size, collateral)
   })

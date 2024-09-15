@@ -91,10 +91,10 @@ export interface IPosition extends ILogTypeId<'Position'> {
   cumulativeSizeToken: bigint
   cumulativeCollateralUsd: bigint
   cumulativeCollateralToken: bigint
-  maxSizeUsd: bigint
-  maxSizeToken: bigint
-  maxCollateralUsd: bigint
-  maxCollateralToken: bigint
+
+  maxSizeInUsd: bigint
+  maxSizeInTokens: bigint
+  maxCollateralInUsd: bigint
 
   isLong: boolean
 

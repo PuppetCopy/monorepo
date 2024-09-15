@@ -166,7 +166,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   //   })
                   // },
                   {
-                    $head: $text('Win/Loss/Open'),
+                    $head: $text('Win/Loss'),
                     gridTemplate: '90px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
                     $bodyCallback: map((pos: ILeaderboardSummary) => {
@@ -258,7 +258,7 @@ function $PnlAndRoi(tr: ILeaderboardSummary) {
     $pnlDisplay(tr.pnl),
     $seperator2,
     $text(style({ fontSize: '.85rem' }))(
-      readablePercentage(getBasisPoints(tr.pnl, tr.collateral))
+      readablePercentage(getBasisPoints(tr.pnl, tr.maxCollateral))
     )
   )
 }

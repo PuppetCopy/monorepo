@@ -30,7 +30,7 @@ constructor(
 
 ```solidity
 function proxyIncrease(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList,
     address user
 ) external payable auth;
@@ -41,7 +41,7 @@ function proxyIncrease(
 
 ```solidity
 function traderIncrease(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList,
     address user
 ) external payable auth;
@@ -53,7 +53,7 @@ function traderIncrease(
 ```solidity
 function increase(
     PositionStore.RequestAdjustment memory request,
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList,
     address subaccountAddress
 ) internal;
@@ -66,7 +66,7 @@ function increase(
 function matchUp(
     PositionStore.RequestAdjustment memory request,
     MatchCallParams memory callParams,
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList
 ) internal;
 ```
@@ -79,7 +79,7 @@ function adjust(
     PositionStore.RequestAdjustment memory request,
     PositionStore.MirrorPosition memory mirrorPosition,
     AdjustCallParams memory callParams,
-    PositionUtils.TraderCallParams calldata traderCallParams
+    PositionUtils.OrderMirrorPosition calldata order
 ) internal;
 ```
 
@@ -89,7 +89,7 @@ function adjust(
 ```solidity
 function _createOrder(
     PositionStore.RequestAdjustment memory request,
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address subaccountAddress
 ) internal returns (bytes32 requestKey);
 ```
@@ -99,7 +99,7 @@ function _createOrder(
 
 ```solidity
 function _reducePuppetSizeDelta(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address subaccountAddress,
     uint puppetReduceSizeDelta,
     bytes32 positionKey

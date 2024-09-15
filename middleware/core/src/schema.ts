@@ -45,8 +45,10 @@ const mirrorPosition: ISchema<IMirrorPosition> = {
 const leaderboardPosition: ISchema<ILeaderboardPosition> = {
   account: 'address',
   // isLong: 'bool',
-  maxSizeUsd: 'uint',
-  maxCollateralUsd: 'uint',
+  maxSizeInUsd: 'uint',
+  maxCollateralInUsd: 'uint',
+  maxSizeInTokens: 'uint',
+
   realisedPnlUsd: 'int',
 
   market: 'address',

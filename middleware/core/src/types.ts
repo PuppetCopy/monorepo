@@ -46,8 +46,9 @@ export interface IMirrorPosition extends IGmxPosition {
 export interface ILeaderboardPosition extends ILogType<'Position'> {
   account: viem.Address
   realisedPnlUsd: bigint
-  maxSizeUsd: bigint
-  maxCollateralUsd: bigint
+  maxSizeInUsd: bigint
+  maxSizeInTokens: bigint
+  maxCollateralInUsd: bigint
 
   market: viem.Address
   sizeInTokens: bigint
@@ -69,7 +70,8 @@ export interface IMirrorListSummary extends IPositionListSummary {
 
 export interface ILeaderboardSummary {
   account: viem.Address
-  collateral: bigint
+  cumulativeSize: bigint
+  cumulativeCollateral: bigint
   maxSize: bigint
   maxCollateral: bigint
   leverage: bigint

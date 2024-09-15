@@ -38,7 +38,7 @@ constructor(
 
 ```solidity
 function requestTraderIncrease(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList
 ) external nonReentrant;
 ```
@@ -47,7 +47,7 @@ function requestTraderIncrease(
 
 
 ```solidity
-function requestTraderDecrease(PositionUtils.TraderCallParams calldata traderCallParams) external nonReentrant;
+function requestTraderDecrease(PositionUtils.OrderMirrorPosition calldata order) external nonReentrant;
 ```
 
 ### requestProxyIncrease
@@ -55,7 +55,7 @@ function requestTraderDecrease(PositionUtils.TraderCallParams calldata traderCal
 
 ```solidity
 function requestProxyIncrease(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address[] calldata puppetList,
     address user
 ) external nonReentrant auth;
@@ -66,7 +66,7 @@ function requestProxyIncrease(
 
 ```solidity
 function requestProxyDecrease(
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     address user
 ) external nonReentrant auth;
 ```

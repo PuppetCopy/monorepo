@@ -2,7 +2,7 @@ import { arbitrum } from "viem/chains";
 
 import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
-import datastore from "./abi/datastore.js";
+import puppetStore from "./abi/puppetStore";
 import dictator from "./abi/dictator.js";
 import eventEmitter from "./abi/eventEmitter.js";
 import puppetToken from "./abi/puppetToken.js";
@@ -14,6 +14,10 @@ import router from "./abi/router.js";
 import votingEscrowLogic from "./abi/votingEscrowLogic.js";
 import votingEscrowStore from "./abi/votingEscrowStore.js";
 import stubPublicContribute from "./abi/stubPublicContribute.js";
+import positionStore from "./abi/positionStore";
+import puppetRouter from "./abi/puppetRouter";
+import positionRouter from "./abi/positionRouter";
+import puppetLogic from "./abi/puppetLogic";
 
 
 export const CONTRACT = {
@@ -66,9 +70,25 @@ export const CONTRACT = {
       address: "0x8192468Ab9852391734fA4862581Bb8D96168CE3",
       abi: rewardRouter,
     },
-    Datastore: {
+    PuppetStore: {
       address: "0x75236b405F460245999F70bc06978AB2B4116920",
-      abi: datastore,
+      abi: puppetStore,
+    },
+    PositionStore: {
+      address: "0x5F5C9d9272b4Bae556e0F83BE2c488B6E77F03EC",
+      abi: positionStore,
+    },
+    PuppetRouter: {
+      address: "0x8F7d6b64264968D7b61DebbEAE6331af230fa860",
+      abi: puppetRouter
+    },
+    PositionRouter: {
+      address: "0xe24B30FB459656425c8215eDf555585fc6b1F711",
+      abi: positionRouter
+    },
+    PuppetLogic: {
+      address: "0x3E0894BE6984Ff281e0dd142F3606734F7A9CE94",
+      abi: puppetLogic,
     },
 
     // TODO: Remove these as they are used for testing

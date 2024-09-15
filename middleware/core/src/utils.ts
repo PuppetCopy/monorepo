@@ -29,9 +29,9 @@ export function accountSettledPositionListSummary(
   const summary = tradeList.reduce((seed, next, idx): IMirrorListSummary => {
     const idxBn = BigInt(idx) + 1n
 
-    const size = seed.size + getParticiapntPortion(next, next.maxSizeUsd, puppet)
-    const collateral = seed.collateral + getParticiapntPortion(next, next.maxCollateralUsd, puppet)
-    const cumulativeLeverage = seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeUsd, next.maxCollateralUsd), puppet)
+    const size = seed.size + getParticiapntPortion(next, next.maxSizeInUsd, puppet)
+    const collateral = seed.collateral + getParticiapntPortion(next, next.maxCollateralInUsd, puppet)
+    const cumulativeLeverage = seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeInUsd, next.maxCollateralInUsd), puppet)
 
     const avgSize = size / idxBn
     const avgCollateral = collateral / idxBn
@@ -66,10 +66,10 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
   const map: { [k: viem.Address]: ILeaderboardSummary } = {}
 
   for (const next of tradeList) {
-    const summary = map[next.account] || {
+    const summary = map[next.account] ??= {
       account: next.account,
-      size: 0n,
-      collateral: 0n,
+      cumulativeCollateral: 0n,
+      cumulativeSize: 0n,
       maxCollateral: 0n,
       maxSize: 0n,
       leverage: 0n,
@@ -80,9 +80,10 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
       positionList: [],
     }
 
-    summary.collateral += next.maxCollateralUsd
-    summary.maxCollateral = next.maxCollateralUsd > summary.maxCollateral ? next.maxCollateralUsd : summary.maxCollateral
-    summary.maxSize = next.maxSizeUsd > summary.maxSize ? next.maxSizeUsd : summary.maxSize
+    summary.cumulativeCollateral += next.maxCollateralInUsd
+    summary.cumulativeSize += next.maxSizeInTokens
+    summary.maxCollateral = next.maxCollateralInUsd > summary.maxCollateral ? next.maxCollateralInUsd : summary.maxCollateral
+    summary.maxSize = next.maxSizeInUsd > summary.maxSize ? next.maxSizeInUsd : summary.maxSize
     summary.leverage = summary.maxSize / summary.maxCollateral
 
     if (next.sizeInTokens === 0n) {

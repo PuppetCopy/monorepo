@@ -194,8 +194,9 @@ const position: ISchema<IPosition> = {
   cumulativeCollateralUsd: 'uint256',
   cumulativeCollateralToken: 'uint256',
 
-  maxSizeUsd: 'uint256',
-  maxCollateralUsd: 'uint256',
+  maxSizeInUsd: 'uint256',
+  maxSizeInTokens: 'uint256',
+  maxCollateralInUsd: 'uint256',
 
   isLong: 'bool',
 

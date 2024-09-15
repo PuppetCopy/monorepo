@@ -217,7 +217,6 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
     },
     seedMap: (acc, next) => {
       let realisedPnl = acc.realisedPnl
-      let openPnl: OpenPnl
 
       const openPnlMap: Record<viem.Hex, OpenPnl> = acc.openPnlMap
 
@@ -225,18 +224,14 @@ export function getLeaderboardPositionTimelinePerformance(config: ILeaderboardPe
         for (const positionKey in openPnlMap) {
           const openPnl = openPnlMap[positionKey as viem.Hex]
 
-          if (next.indexToken === openPnl.indexToken) {
+          if (openPnl && next.indexToken === openPnl.indexToken) {
             openPnl.pnl = getPositionPnlUsd(openPnl.update.isLong, openPnl.update.sizeInUsd, openPnl.update.sizeInTokens, next.price)
           }
         }
 
       } else {
         const indexToken = getMarketIndexToken(next.market)
-        openPnl = openPnlMap[`${next.account}:${next.market}:${next.isLong}:${next.openTimestamp}`] ??= { pnl: 0n, update: next, indexToken }
-
-        if (next.__typename === 'Position') {
-          openPnl.update = next
-        }
+        openPnlMap[`${next.account}:${next.market}:${next.isLong}:${next.openTimestamp}`] ??= { pnl: 0n, indexToken, update: { isLong: next.isLong, sizeInTokens: next.maxSizeInTokens, sizeInUsd: next.maxSizeInUsd } }
       }
 
       const aggregatedOpenPnl = Object.values(openPnlMap).reduce((acc, next) => acc + next.pnl, 0n)

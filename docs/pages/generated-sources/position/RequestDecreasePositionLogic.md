@@ -29,14 +29,14 @@ constructor(
 
 
 ```solidity
-function traderDecrease(PositionUtils.TraderCallParams calldata traderCallParams, address user) external auth;
+function traderDecrease(PositionUtils.OrderMirrorPosition calldata order, address user) external auth;
 ```
 
 ### proxyDecrease
 
 
 ```solidity
-function proxyDecrease(PositionUtils.TraderCallParams calldata traderCallParams, address user) external auth;
+function proxyDecrease(PositionUtils.OrderMirrorPosition calldata order, address user) external auth;
 ```
 
 ### decrease
@@ -46,7 +46,7 @@ function proxyDecrease(PositionUtils.TraderCallParams calldata traderCallParams,
 function decrease(
     PositionStore.RequestAdjustment memory request,
     PositionStore.MirrorPosition memory mirrorPosition,
-    PositionUtils.TraderCallParams calldata traderCallParams,
+    PositionUtils.OrderMirrorPosition calldata order,
     Subaccount subaccount,
     address subaccountAddress
 ) internal;
