@@ -1,6 +1,3 @@
 [submodule "contracts"]
 	path = contracts
 	url = https://github.com/GMX-Blueberry-Club/puppet-contracts.git
-[submodule "subgraph"]
-	path = subgraph
-	url = https://github.com/PuppetCopy/subgraph
