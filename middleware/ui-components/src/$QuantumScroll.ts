@@ -3,8 +3,9 @@ import { Behavior } from '@aelea/core'
 import { $Branch, $Node, $custom, $text, NodeComposeFn, component, style } from '@aelea/dom'
 import { $column, layoutSheet, observer } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
-import { constant, empty, filter, join, map, mergeArray, until } from "@most/core"
+import { constant, empty, filter, join, map, mergeArray, now, recoverWith, until } from "@most/core"
 import { Stream } from '@most/types'
+import { $alert, $alertNegativeContainer } from './$common'
 
 
 export type IQuantumScrollPage = {
@@ -84,8 +85,9 @@ export const $QuantumScroll = ({
       map(node => ({ ...node, insertAscending })),
     )(
       join(mergeArray([
-        // constant(scrollRequest),
-        $itemLoader
+        recoverWith(err => {
+          return now($alertNegativeContainer(style({ alignSelf: 'center', margin: '10px' }))($text(String(err.message || ('reason' in err ? err.cause : 'unknown error')))))
+        }, $itemLoader)
       ])),
     ),
 

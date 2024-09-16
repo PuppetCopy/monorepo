@@ -92,17 +92,18 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
       summary.winCount += next.realisedPnlUsd > 0n ? 1 : 0
       summary.lossCount += next.realisedPnlUsd < 0n ? 1 : 0
     } else {
-      const priceCandle = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
 
-      // if (next.openTimestamp > priceCandle.timestamp) {
-      //   throw new Error("PriceDeed is not up to date")
-      // }
+      try {
+        const priceCandle = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
+        const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
+        summary.pnl += pnl
+        summary.winCount += pnl > 0n ? 1 : 0
+        summary.lossCount += pnl < 0n ? 1 : 0
+      } catch (e) {
+        console.error(e)
+        continue
+      }
 
-      const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
-
-      summary.pnl += pnl
-      summary.winCount += pnl > 0n ? 1 : 0
-      summary.lossCount += pnl < 0n ? 1 : 0
     }
 
 
