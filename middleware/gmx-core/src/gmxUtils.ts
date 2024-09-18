@@ -1,5 +1,5 @@
 import { AbiEvent } from "abitype"
-import { factor, getBasisPoints, BASIS_POINTS_DIVISOR, easeInExpo, formatFixed, getMappedValue, getPriceDelta } from "common-utils"
+import { factor, getBasisPoints, BASIS_POINTS_DIVISOR, easeInExpo, formatFixed, getMappedValue, getPriceDelta, ITokenDescription } from "common-utils"
 import {
   CHAIN_ADDRESS_MAP,
   CHAIN_NATIVE_DESCRIPTION,
@@ -9,7 +9,7 @@ import {
   mapArrayBy
 } from "gmx-middleware-const"
 import * as viem from "viem"
-import { ILogEvent, IPosition, ITokenDescription } from "./types.js"
+import { ILogEvent, IPosition } from "./types.js"
 import { MARKET_TOKEN_MAP } from "./common"
 
 
@@ -171,6 +171,13 @@ export function getPositionKey(account: viem.Address, market: viem.Address, coll
   return hashData(
     ["address", "address", "address", "bool"],
     [account, market, collateralToken, isLong]
+  )
+}
+
+export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+  return hashData(
+    ["address", "address", "address"],
+    [collateralToken, puppet, trader]
   )
 }
 

@@ -42,7 +42,7 @@ export function accountSettledPositionListSummary(
     const winCount = seed.winCount + (next.pnlUsd > 0n ? 1 : 0)
     const lossCount = seed.lossCount + (next.pnlUsd < 0n ? 1 : 0)
 
-    const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.mirror.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
+    const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
 
     return {
       size,
@@ -76,8 +76,9 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
       lossCount: 0,
       winCount: 0,
       pnl: 0n,
-      puppets: [],
+      puppets: [`0xDDfC0a12fD323Ac34AD149e1473Eb6f91155fDD6`, `0x30fd54C890f250d260c4D7DAEAd65925492936e0`, `0x7E2b0609D7daa78596F6CEAA4CcD6733C471E552`],
       positionList: [],
+      indexTokenList: [],
     }
 
     summary.cumulativeCollateral += next.maxCollateralInUsd
@@ -106,9 +107,14 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
 
     }
 
+    const indexToken = getMarketIndexToken(next.market)
+
+    if (summary.indexTokenList.indexOf(indexToken) === -1) {
+      summary.indexTokenList.push(indexToken)
+    }
 
 
-    summary.puppets = []
+    // summary.puppets = []
     summary.positionList.push(next)
 
     map[next.account] = summary
@@ -164,7 +170,7 @@ export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Addre
 }
 
 export function getParticiapntCollateral(mp: IMirrorPosition, puppet?: viem.Address): bigint {
-  return puppet ? getPuppetShare(mp.mirror.puppetList, puppet) : mp.collateralAmount
+  return puppet ? getPuppetShare(mp.puppetList, puppet) : mp.collateralAmount
 }
 
 export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: viem.Address): bigint {

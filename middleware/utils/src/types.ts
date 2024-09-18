@@ -26,6 +26,7 @@ export interface ITokenDescription {
   name: string
   symbol: string
   decimals: number
+  denominator: bigint
 }
 
 

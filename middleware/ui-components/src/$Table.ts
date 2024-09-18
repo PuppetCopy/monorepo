@@ -63,7 +63,7 @@ export const $defaultTableCell = $row(
 export const $defaultTableHeaderCell = $defaultTableCell(
   style({  alignItems: 'center', color: pallete.foreground, })
 )
-export const $defaultTableRowContainer = $node(screenUtils.isDesktopScreen ? layoutSheet.spacing : layoutSheet.spacingSmall)
+export const $defaultTableRowContainer = $node(screenUtils.isDesktopScreen ? layoutSheet.spacingBig : layoutSheet.spacing)
 
 
 

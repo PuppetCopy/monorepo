@@ -1,4 +1,4 @@
-import { ILogTxType, ILogTypeId, IPositionListSummary, IPosition as IGmxPosition, ILogType } from "gmx-middleware-utils"
+import { IPosition as IGmxPosition, ILogTxType, ILogType, ILogTypeId } from "gmx-middleware-utils"
 import * as viem from "viem"
 
 
@@ -24,33 +24,22 @@ export interface IPuppetPosition extends ILogTxType<'PuppetPosition'> {
   position: IPosition
 }
 
-export interface IMirror extends ILogTypeId<'MirrorPosition'> {
-  key: viem.Hex
-  positionKey: viem.Hex
-
-  trader: viem.Address
-
-  cumulativeTransactionCost: bigint
-  amountOut: bigint
-  profit: bigint
-  totalPerformanceFee: bigint
-  traderPerformanceCutoffFee: bigint
+export interface IMirrorPosition extends ILogTypeId<'MirrorPosition'>, Omit<IGmxPosition, '__typename'> {
+  position: IGmxPosition
 
   puppetList: IPuppetPosition[]
-}
-
-export interface IMirrorPosition extends IGmxPosition {
-  mirror: IMirror
+  collateralList: bigint[]
 }
 
 export interface ILeaderboardPosition extends ILogType<'Position'> {
   account: viem.Address
+  market: viem.Address
+
   realisedPnlUsd: bigint
   maxSizeInUsd: bigint
   maxSizeInTokens: bigint
   maxCollateralInUsd: bigint
 
-  market: viem.Address
   sizeInTokens: bigint
   sizeInUsd: bigint
   isLong: boolean
@@ -64,8 +53,18 @@ export type IPosition = IMirrorPosition | IGmxPosition
 
 
 
-export interface IMirrorListSummary extends IPositionListSummary {
+export interface IMirrorListSummary {
   puppets: viem.Address[]
+  size: bigint
+  collateral: bigint
+  fee: bigint
+  pnl: bigint
+  cumulativeLeverage: bigint
+  avgSize: bigint
+  avgCollateral: bigint
+
+  winCount: number
+  lossCount: number
 }
 
 export interface ILeaderboardSummary {
@@ -79,16 +78,11 @@ export interface ILeaderboardSummary {
   winCount: number
   pnl: bigint
 
+  indexTokenList: viem.Address[]
   puppets: viem.Address[]
   positionList: ILeaderboardPosition[]
 }
 
-export interface ISetRouteType extends ILogTypeId<'SetRouteType'> {
-  routeTypeKey: viem.Hex
-  collateralToken: viem.Address
-  indexToken: viem.Address
-  isLong: boolean
-  // data: viem.Hex
-}
+
 
 

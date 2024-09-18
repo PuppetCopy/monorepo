@@ -41,13 +41,6 @@ export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extend
 export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> & ILogArgs<TAbi, TEventName>
 
 
-export interface ITokenDescription {
-  name: string
-  symbol: ITokenSymbol
-  decimals: number
-}
-
-
 export interface IEnsRegistration {
   id: string
   labelName: string
@@ -60,19 +53,6 @@ export interface IEnsRegistration {
       texts: string[]
     }
   }
-}
-
-export interface ITransaction {
-  token: ITokenDescription,
-  from: viem.Address
-  to: viem.Address
-  value: bigint
-}
-
-export interface IAbstractPositionParams {
-  collateralToken: viem.Address
-  indexToken: viem.Address
-  isLong: boolean
 }
 
 
@@ -106,40 +86,6 @@ export interface IPosition extends ILogTypeId<'Position'> {
 }
 
 
-
-export interface IStake extends ILogTxType<"Stake"> {
-  id: string
-  account: viem.Address
-  contract: string
-  token: string
-  amount: bigint
-  amountUsd: bigint
-  timestamp: number
-}
-
-
-export interface IPositionListSummary {
-  size: bigint
-  collateral: bigint
-  fee: bigint
-  pnl: bigint
-  cumulativeLeverage: bigint
-  avgSize: bigint
-  avgCollateral: bigint
-
-  winCount: number
-  lossCount: number
-}
-
-
-export interface IPriceTimeline {
-  id: string
-  value: bigint
-  tokenAddress: viem.Address
-  timestamp: string
-}
-
-
 export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
   token: viem.Address
   interval: IntervalTime
@@ -164,7 +110,6 @@ export type ILatestPriceMap = Record<viem.Address, IPricetick>
 
 
 
-
 export interface IChainParamApi {
   chain: number
 }
@@ -174,10 +119,6 @@ export interface IRequestTimerangeApi {
   from: number
   to: number
 }
-
-
-
-
 
 
 export type IRequestAccountApi = IChainParamApi & { account: viem.Address }

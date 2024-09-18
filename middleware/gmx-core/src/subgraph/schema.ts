@@ -34,20 +34,6 @@ const orderCreated: ISchema<IOrderCreated> = {
   __typename: 'OrderCreated',
 }
 
-const orderStatus: ISchema<IOrderStatus> = {
-  id: 'string',
-
-  order: orderCreated,
-
-  orderType: 'uint256',
-  statusType: 'uint256',
-  message: 'string',
-
-  blockTimestamp: 'number',
-  transactionHash: 'string',
-
-  __typename: 'OrderStatus',
-}
 const positionCollectedUpdate: ISchema<IPositionFeesCollected> = {
   id: 'string',
   positionKey: 'string',
@@ -161,20 +147,6 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   __typename: 'PositionDecrease',
 }
 
-
-
-const positionLink: ISchema<IPositionLink> = {
-  id: 'string',
-  key: 'uint256',
-
-  increaseList: positionIncrease,
-  decreaseList: positionDecrease,
-  // feeUpdateList: positionFeeUpdate,
-
-  __typename: 'PositionLink',
-}
-
-
 const position: ISchema<IPosition> = {
   id: 'string',
   key: 'string',
@@ -208,8 +180,6 @@ const position: ISchema<IPosition> = {
 
   __typename: 'Position',
 }
-
-
 const priceCandle: ISchema<IPriceCandle> = {
   id: 'string',
   token: 'address',
@@ -226,9 +196,7 @@ const priceCandle: ISchema<IPriceCandle> = {
 
 
 export const schema = {
-  orderCreated, orderStatus, positionCollectedUpdate,
-  position, positionLink,
-
+  orderCreated, positionCollectedUpdate, position,
   positionIncrease, positionDecrease, priceCandle,
 }
 

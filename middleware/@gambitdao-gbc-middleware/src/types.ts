@@ -1,5 +1,5 @@
 import { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, IntervalTime } from "common-utils"
-import { IEnsRegistration, IPositionListSummary, IPriceCandle, IRequestTimerangeApi } from "gmx-middleware-utils"
+import { IEnsRegistration, IPriceCandle, IRequestTimerangeApi } from "gmx-middleware-utils"
 
 export type IPrice = {
   priceUsd: bigint
@@ -103,7 +103,7 @@ export interface IYieldInterval extends IAsset {
 }
 
 
-export interface IBlueberryLadder extends IPositionListSummary {
+export interface IBlueberryLadder {
   profile: IOwner | null
   rank: number
   score: bigint
