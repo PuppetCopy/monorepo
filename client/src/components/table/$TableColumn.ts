@@ -7,7 +7,7 @@ import { IPosition } from "gmx-middleware-utils"
 import { IMirrorPosition, getParticiapntPortion } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
-import { $entry, $positionPnl, $positionTimestamp, $puppets, $size, $sizeAndLiquidation } from "../../common/$common.js"
+import { $entry, $positionPnl, $positionTimestamp, $puppetList, $size, $sizeAndLiquidation } from "../../common/$common.js"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -50,7 +50,7 @@ export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, st
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
-    return $puppets(pos.mirror?.puppetList.map(m => m.account) || [], click)
+    return $puppetList(pos.puppetList.map(m => m.account) || [], click)
   })
 })
 

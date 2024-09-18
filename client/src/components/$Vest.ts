@@ -1,14 +1,14 @@
-import { Behavior, combineObject, replayLatest } from "@aelea/core"
+import { Behavior, replayLatest } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, map, mergeArray, multicast, now, periodic, snapshot } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, getDuration, getMappedValue, getVestingCursor, readableTokenAmountLabel, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
+import { applyFactor, combineState, getDuration, getMappedValue, getVestingCursor, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -57,7 +57,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.ContributeLogic.baselineEmissionRate(wallet)
+    return tokenomicsReader.ContributeLogic.getConfig(wallet)
   }, walletClientQuery)))
 
   const claimableContributionQuery = replayLatest(multicast(map(async walletQuery => {
@@ -65,14 +65,14 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.ContributeLogic.claimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address)
+    return tokenomicsReader.ContributeLogic.getClaimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address)
   }, walletClientQuery)))
   const claimableLockRewardQuery = replayLatest(multicast(map(async walletQuery => {
     const wallet = await walletQuery
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.RewardLogic.claimable(wallet, wallet.account.address)
+    return tokenomicsReader.RewardLogic.getClaimable(wallet, wallet.account.address)
   }, walletClientQuery)))
 
   const lockAmountQuery = replayLatest(multicast(map(async walletQuery => {
@@ -80,7 +80,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.PuppetVoteToken.balanceOf(wallet, wallet.account.address)
+    return tokenomicsReader.PuppetVoteToken.getBalanceOf(wallet, wallet.account.address)
   }, walletClientQuery)))
 
   const lockDurationQuery = replayLatest(multicast(map(async walletQuery => {
@@ -88,7 +88,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.VotingEscrowStore.lockDuration(wallet, wallet.account.address)
+    return tokenomicsReader.VotingEscrowStore.getLockDuration(wallet, wallet.account.address)
   }, walletClientQuery)))
 
   const vestedCursorQuery = replayLatest(multicast(snapshot(async walletQuery => {
@@ -96,7 +96,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return null
 
-    const vested = await tokenomicsReader.VotingEscrowStore.vested(wallet, wallet.account.address)
+    const vested = await tokenomicsReader.VotingEscrowStore.getVested(wallet, wallet.account.address)
     return getVestingCursor(vested)
   }, walletClientQuery, periodic(1000))))
 

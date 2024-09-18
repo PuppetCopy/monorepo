@@ -1,5 +1,5 @@
 import { style, stylePseudo } from "@aelea/dom"
-import { $column } from "@aelea/ui-components"
+import { $column, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { IAttributeBackground, IAttributeBadge, IAttributeMappings, IBerryDisplayTupleMap, IToken, getBerryFromItems, getLabItemTupleIndex, tokenIdAttributeTuple } from "@gambitdao/gbc-middleware"
 import { $Table, $defaultTableCell, $defaultTableRowContainer, $defaultVScrollContainer, $infoLabeledValue, $spinner, TableOption } from "ui-components"
@@ -13,7 +13,7 @@ export interface ICardTable<T> extends TableOption<T> {
 export const $CardTable = <T>(config: TableOption<T>) => {
   return $Table({
     $container: $column(style({ borderTop: `1px solid ${colorAlpha(pallete.foreground, .2)}` })),
-    $cell: $defaultTableCell(style({ padding: '18px 0' })),
+    $cell: $defaultTableCell(style({ padding: '0', height: '80px' })),
     scrollConfig: {
       $container: $defaultVScrollContainer(style({ gap: '2px' })),
       $loader: style({ placeContent: 'center', margin: '0 1px', background: pallete.background, flexDirection: 'row-reverse', padding: '16px 0' })(
@@ -25,10 +25,10 @@ export const $CardTable = <T>(config: TableOption<T>) => {
         )
       )
     },
-    $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: '8px 18px' })),
+    $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 18px' : '8px' })),
     $rowContainer: $defaultTableRowContainer(
       stylePseudo(':last-child', { borderRadius: '0 0 18px 18px', marginBottom: '2px' }),
-      style({ background: pallete.background, padding: '0 26px' })
+      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 18px' : '8px' })
     ),
     // $bodyRowContainer: $defaultTableRowContainer(
     //   style({ margin: '0 1px' })

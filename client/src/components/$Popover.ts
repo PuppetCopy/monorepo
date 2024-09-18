@@ -34,7 +34,7 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
     ),
     styleBehavior(
       zip(([contentRect], [targetRect]) => {
-        const screenWidth = targetRect.rootBounds!.width
+        const screenWidth = targetRect.rootBounds ? targetRect.rootBounds.width : window.innerWidth
         const targetBound = targetRect.intersectionRect
         const bottomSpcace = window.innerHeight - targetBound.bottom
         const goDown = bottomSpcace > targetBound.bottom

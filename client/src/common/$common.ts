@@ -5,20 +5,22 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
 import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IAbstractPositionParams, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
+import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getRuleKey, getTokenDescription, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
 import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
-import { $bear, $bull, $infoLabel, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
+import { $infoLabel, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
-import { $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
+import { $AccountLabel, $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
 import { $Popover } from "../components/$Popover.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button.js"
 import { $RouteSubscriptionEditor, IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor.js"
-import { readPuppetSubscriptionExpiry } from "../logic/puppetRead"
 import { $seperator2 } from "../pages/common.js"
 import { IWalletPageParams, IWalletTab } from "../pages/type.js"
 import { $puppetLogo } from "./$icons"
+import puppetReader from "../logic/puppetReader"
+import { $caretDown } from "./elements/$icons"
+import { $responsiveFlex } from "./elements/$common"
 
 
 export const $midContainer = $column(
@@ -48,7 +50,7 @@ export const $entry = (mp: IPosition) => {
     $Tooltip({
       // $dropContainer: $defaultDropContainer,
       $content: $text(style({ fontSize: '.85rem' }))(getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getMarketIndexToken(mp.market)).symbol),
-      $anchor: $tokenIcon(indexToken, { width: '36px' }),
+      $anchor: $tokenIcon(indexDescription, { width: '36px' }),
     })({}),
     $column(layoutSheet.spacingTiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((mp.isLong ? 'LONG' : 'SHORT'))),
@@ -58,40 +60,28 @@ export const $entry = (mp: IPosition) => {
   )
 }
 
-export const $route = (pos: IAbstractPositionParams, displayLabel = true) => {
-  const indexToken = pos.indexToken
-  const indexDescription = getTokenDescription(pos.indexToken)
-  const collateralDescription = getTokenDescription(pos.collateralToken)
+export const $route = (indexTokenDescription: ITokenDescription, collateralTokenDescription: ITokenDescription, displayLabel = true) => {
 
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-    $icon({
-      svgOps: style({ borderRadius: '50%', padding: '4px', marginRight: '-20px', zIndex: 0, alignItems: 'center', fill: pallete.message, backgroundColor: pallete.horizon }),
-      $content: pos.isLong ? $bull : $bear,
-      viewBox: '0 0 32 32',
-      width: '24px'
-    }),
-    $tokenIcon(indexToken, { width: '36px' }),
+    $tokenIcon(indexTokenDescription, { width: '36px' }),
     displayLabel
       ? $column(layoutSheet.spacingTiny)(
-        $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
+        $text(style({ fontSize: '1rem' }))(`${indexTokenDescription.symbol}`),
         // $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
       )
       : empty(),
   )
 }
 
-export const $tokenLabeled = (indexToken: viem.Address) => {
-  const indexDescription = getTokenDescription(indexToken)
-
+export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-    $tokenIcon(indexToken, { width: '36px' }),
+    $tokenIcon(indexDescription, { width: '36px' }),
     $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
   )
 }
 
 
-export const $tokenIcon = (indexToken: viem.Address, IIcon: { width: string } = { width: '24px' }) => {
-  const tokenDesc = getTokenDescription(indexToken)
+export const $tokenIcon = (tokenDesc: ITokenDescription, IIcon: { width: string } = { width: '24px' }) => {
   const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[TOKEN_DESCRIPTION_MAP.PUPPET.symbol]
 
   if (!$token) {
@@ -121,7 +111,7 @@ export const $sizeAndLiquidation = (mp: IMirrorPosition, puppet?: viem.Address) 
 }
 
 
-export const $puppets = (
+export const $puppetList = (
   puppets?: viem.Address[],
   click?: Tether<INode, string>
 ) => {
@@ -242,7 +232,7 @@ export const $positionPnl = (mp: IPosition, puppet?: viem.Address) => {
 export const $positionRoi = (mp: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(mp.market)
   const lstIncrease = lst(mp.increaseList)
-  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralToken)
+  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralInUsd)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
   const roi = isPositionSettled(mp)
@@ -355,16 +345,9 @@ export const $openPositionBreakdown = (mp: IPosition) => {
 
 interface ITraderDisplay {
   trader: viem.Address
-  route: router.Route
-}
-
-interface ITraderRouteDisplay extends IWalletPageParams {
-  trader: viem.Address
+  route: router.Route,
   puppets: viem.Address[]
 }
-
-
-
 export const $TraderDisplay = (config: ITraderDisplay) => component((
   [click, clickTether]: Behavior<any, viem.Address>,
 ) => {
@@ -373,10 +356,21 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
 
   return [
     $Link({
-      $content: $profileDisplay({
-        account: trader,
-        // $profileContainer: $defaultBerry(style({ width: '50px' }))
-      }),
+      $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center', textDecoration: 'none' }))(
+        $profileAvatar({ ...config, account: trader }),
+        $column(
+          $AccountLabel(trader),
+          $row(style({ alignItems: 'center' }))(
+            ...config.puppets.map(account => {
+
+              return style({ marginRight: '-12px', border: '2px solid black' })(
+                $profileAvatar({ account, profileSize: 25 })
+              )
+            }),
+            $text(style({ gap: '8px', marginLeft: '16px' }))(`+${config.puppets.length}`)
+          )
+        )
+      ),
       route: route.create({ fragment: 'baseRoute' }),
       url: `/app/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`
     })({ click: clickTether() }),
@@ -387,12 +381,16 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
 
 
 
+interface ITraderRouteDisplay extends IWalletPageParams {
+  trader: viem.Address
+  indexTokenList: viem.Address[]
+}
 export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, bigint>,
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
 
-  const { walletClientQuery, puppets, trader } = config
+  const { walletClientQuery, trader, indexTokenList } = config
 
   const puppetSubscriptionParams = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -401,9 +399,12 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
       return 0n
     }
 
-    const expiry = await readPuppetSubscriptionExpiry(wallet, wallet.account.address, trader, '0x', '0x', false)
 
-    return expiry
+    // puppetReader.PuppetStore.getAllocationRuleList(wallet, getRuleKey())
+
+    // const expiry = await readPuppetSubscriptionExpiry(wallet, wallet.account.address, trader, '0x', '0x', false)
+
+    return 0n
   }, walletClientQuery)
 
   return [
@@ -417,13 +418,26 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
         dismiss: modifySubscribeList,
         $target: switchMap(expiry => {
           return $ButtonSecondary({
-            $content: puppets.length
-              ? $row(style({ alignItems: 'center' }))($puppets(puppets))
-              : $row(style({ alignItems: 'center' }))(
-                $icon({ $content: $puppetLogo, width: '18px', viewBox: '0 0 32 32' }),
-                $text('Copy')
+            $content: $responsiveFlex(style({ alignItems: 'center', gap: '6px' }))(
+              $row(style({ alignItems: 'center' }))(
+                ...indexTokenList.map(account => {
+
+                  return style({  })(
+                    $tokenIcon(getTokenDescription(account), { width: '25px' })
+                  )
+                }),
               ),
-            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '8px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' }))
+              $seperator2,
+
+              $row(style({ gap: '8px' }))(
+                $row(
+                  $text(`Copy`),
+                  $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '1px', minWidth: '18px' }), viewBox: '0 0 32 32' }),
+                )
+              ),
+
+            ),
+            $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '8px', height: 'auto', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, .25) }))
           })({
             click: popRouteSubscriptionEditorTether(constant(expiry))
           })

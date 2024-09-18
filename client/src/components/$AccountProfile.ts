@@ -24,10 +24,10 @@ export interface IProfilePreview extends IAccountPreview {
 
 
 export const $profileDisplay = (config: IProfilePreview) => {
-  const { $container = $row, account, showAddress = true, profileSize = 50, $labelContainer } = config
+  const { $container = $row, account, showAddress = true, profileSize = 45, $labelContainer } = config
 
   return $container(layoutSheet.spacingSmall, style({ alignItems: 'center', textDecoration: 'none' }))(
-    $profileAvatar(config),
+    $profileAvatar({ ...config, profileSize }),
     showAddress ? $AccountLabel(account, $labelContainer) : empty(),
   )
 }
@@ -56,7 +56,7 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
       $text(style({ fontWeight: 800, color: pallete.foreground }))('?')
     ),
     $column(style({ whiteSpace: 'nowrap', fontSize: '.85rem', alignItems: 'center' }))(
-      $text(style({  }))('0x----'),
+      $text(style({}))('0x----'),
       $text(style({ fontSize: '1.55em', lineHeight: 1 }))('----')
     )
   )
@@ -64,9 +64,9 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
 
 
 export const $AccountLabel = (address: string, $container = $column) => {
-  return $container(style({ alignItems: 'center' }))(
-    $text(style({ fontSize: '64%' }))(address.slice(0, 6)),
-    $text(style({  }))(address.slice(address.length - 4, address.length))
+  return $container(style({ alignItems: 'center', flexDirection: 'row' }))(
+    $text(style({ fontSize: '.85em', color: pallete.foreground }))(`${address.slice(0, 6)}...`),
+    $text(style({ fontSize: '.85em', fontWeight: 'bold' }))(address.slice(-4)),
   )
 }
 

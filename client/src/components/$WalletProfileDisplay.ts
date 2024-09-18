@@ -6,7 +6,6 @@ import { applyFactor, combineState, getVestingCursor, readableTokenAmountLabel, 
 import * as GMX from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
 import { $infoLabel, intermediateText } from "ui-components"
-import { readPuppetDepositAmount } from "../logic/puppetRead.js"
 import { $seperator2 } from "../pages/common"
 import { IWalletPageParams } from "../pages/type"
 import { $disconnectedWalletDisplay, $profileDisplay } from "./$AccountProfile.js"
@@ -30,14 +29,11 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
       return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
         $disconnectedWalletDisplay(),
         $seperator2,
-        style({ fontSize: '.85rem', color: pallete.foreground })($infoLabel('Click to Connect'))
+        style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Click to Connect'))
       )
     }
 
     const address = wallet.account.address
-    const depositQuery = now(address ? readPuppetDepositAmount(wallet, address) : Promise.resolve(0n))
-
-
 
     return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
       address
@@ -64,11 +60,11 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
 
               return readableTokenAmountLabel(GMX.TOKEN_DESCRIPTION_MAP.PUPPET, total)
             }, combineState({
-              baselineEmissionRateQuery: tokenomicsReader.ContributeLogic.baselineEmissionRate(wallet),
-              claimableContributionQuery: tokenomicsReader.ContributeLogic.claimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address),
-              claimableLockRewardQuery: tokenomicsReader.RewardLogic.claimable(wallet, wallet.account.address),
-              claimableVestedQuery: tokenomicsReader.VotingEscrowLogic.claimable(wallet, wallet.account.address),
-              vestedQuery: tokenomicsReader.VotingEscrowStore.vested(wallet, wallet.account.address),
+              baselineEmissionRateQuery: tokenomicsReader.ContributeLogic.getConfig(wallet),
+              claimableContributionQuery: tokenomicsReader.ContributeLogic.getClaimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address),
+              claimableLockRewardQuery: tokenomicsReader.RewardLogic.getClaimable(wallet, wallet.account.address),
+              claimableVestedQuery: tokenomicsReader.VotingEscrowLogic.getClaimable(wallet, wallet.account.address),
+              vestedQuery: tokenomicsReader.VotingEscrowStore.getVested(wallet, wallet.account.address),
             }))
           )
         )

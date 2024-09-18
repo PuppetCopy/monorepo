@@ -8,7 +8,6 @@ import { groupArrayMany, readableDate, readablePercentage, readableTokenAmountLa
 import * as GMX from "gmx-middleware-const"
 import { getTokenDescription } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import { ISetRouteType } from "puppet-middleware-utils"
 import { $check, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText, $target, $xCross } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -24,12 +23,10 @@ import { $ButtonCircular, $ButtonSecondary, $defaultMiniButtonSecondary } from "
 import { $SubmitBar } from "../form/$Form"
 import { $AssetDepositEditor } from "./$AssetDepositEditor.js"
 import { IChangeSubscription } from "./$RouteSubscriptionEditor"
-import { readPuppetDepositAmount } from "../../logic/puppetRead.js"
 
 interface IRouteSubscribeDrawer extends IComponentPageParams {
   modifySubscriber: Stream<IChangeSubscription>
   modifySubscriptionList: Stream<IChangeSubscription[]>
-  routeTypeListQuery: Stream<Promise<ISetRouteType[]>>
 }
 
 export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => component((
