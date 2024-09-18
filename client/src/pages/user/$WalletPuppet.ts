@@ -18,7 +18,7 @@ import { $ProfilePeformanceTimeline } from "../../components/participant/$Profil
 import { $AssetDepositEditor } from "../../components/portfolio/$AssetDepositEditor.js"
 import { $AssetWithdrawEditor } from "../../components/portfolio/$AssetWithdrawEditor.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
-import { readPuppetDepositAmount } from "../../logic/puppetRead.js"
+import { readPuppetDepositAmount } from "../../logic/puppetReader.js"
 import { $seperator2 } from "../common.js"
 import { IUserPositionPageParams } from "../type.js"
 

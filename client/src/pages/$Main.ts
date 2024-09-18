@@ -5,7 +5,7 @@ import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
+import { ITokenDescription, IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { queryPricefeed, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
@@ -30,6 +30,8 @@ import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
+import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer"
+import { getMarketIndexToken } from "gmx-middleware-utils"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -44,7 +46,6 @@ interface IApp {
 
 export const chains = [arbitrum] as const
 
-` `
 export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMap'] = {
   [arbitrum.id]: viem.fallback([
     viem.webSocket('wss://arb-mainnet.g.alchemy.com/v2/sI7JV4ahbI8oNlOosnZ7klOi8vsxdVwm'),
@@ -153,7 +154,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
       switchMap(cb => {
         return fadeIn(
           $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-            filterNull(constant(null, clickUpdateVersion)) as any,
+            filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
 
             $text('New version Available'),
             $ButtonSecondary({

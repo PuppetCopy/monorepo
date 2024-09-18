@@ -182,7 +182,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                     $intermediateText(
                       map(async providerQuery => {
                         const provider = await providerQuery
-                        const puppetSupply = tokenomics.PuppetToken.totalSupply(provider)
+                        const puppetSupply = tokenomics.PuppetToken.getTotalSupply(provider)
 
 
                         return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply - PUPPET.INITIAL_SUPPLY)
@@ -204,7 +204,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                       map(async providerQuery => {
                         const provider = await providerQuery
                         // const totalSupply = await tokenomics.PuppetToken.totalSupply(provider)
-                        const vTokenSupply = await tokenomics.PuppetVoteToken.totalSupply(provider)
+                        const vTokenSupply = await tokenomics.PuppetVoteToken.getTotalSupply(provider)
 
                         return `${readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, vTokenSupply)}`
                       }, providerClientQuery)
@@ -246,7 +246,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
             return 0n
           }
 
-          return tokenomics.ContributeStore.tokenContribution(wallet, ARBITRUM_ADDRESS.USDC)
+          return tokenomics.ContributeStore.getCursorBalance(wallet, ARBITRUM_ADDRESS.USDC)
         }, walletClientQuery)
 
         const usdcBuybackQuote = map(async walletClientQuery => {
@@ -256,7 +256,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
             return 0n
           }
 
-          return tokenomics.ContributeStore.buybackQuote(wallet, ARBITRUM_ADDRESS.USDC)
+          return tokenomics.ContributeStore.getBuybackQuote(wallet, ARBITRUM_ADDRESS.USDC)
         }, walletClientQuery)
 
 
