@@ -55,7 +55,7 @@ function setRule(
     IERC20 collateralToken,
     address puppet,
     address trader,
-    PuppetStore.Rule calldata ruleParams
+    PuppetStore.AllocationRule calldata ruleParams
 ) external auth;
 ```
 
@@ -67,7 +67,7 @@ function setRuleList(
     address puppet,
     address[] calldata traderList,
     IERC20[] calldata collateralTokenList,
-    PuppetStore.Rule[] calldata ruleParams
+    PuppetStore.AllocationRule[] calldata ruleParams
 ) external auth;
 ```
 
@@ -76,9 +76,9 @@ function setRuleList(
 
 ```solidity
 function _setRule(
-    PuppetStore.Rule memory storedRule,
-    PuppetStore.Rule calldata ruleParams
-) internal view returns (PuppetStore.Rule memory);
+    PuppetStore.AllocationRule memory storedRule,
+    PuppetStore.AllocationRule calldata ruleParams
+) internal view returns (PuppetStore.AllocationRule memory);
 ```
 
 ### isArrayContains

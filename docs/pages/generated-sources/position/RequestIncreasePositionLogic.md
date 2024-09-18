@@ -170,7 +170,7 @@ struct Config {
 ```solidity
 struct MatchCallParams {
     address subaccountAddress;
-    PuppetStore.Rule[] ruleList;
+    PuppetStore.AllocationRule[] ruleList;
     uint[] activityList;
     uint[] balanceList;
     uint puppetLength;
@@ -183,7 +183,7 @@ struct MatchCallParams {
 ```solidity
 struct AdjustCallParams {
     address subaccountAddress;
-    PuppetStore.Rule[] ruleList;
+    PuppetStore.AllocationRule[] ruleList;
     uint[] activityList;
     uint[] depositList;
     uint puppetLength;
