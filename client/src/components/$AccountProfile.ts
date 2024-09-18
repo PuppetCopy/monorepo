@@ -64,9 +64,9 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
 
 
 export const $AccountLabel = (address: string, $container = $column) => {
-  return $container(style({ alignItems: 'center', flexDirection: 'row' }))(
-    $text(style({ fontSize: '.85em', color: pallete.foreground }))(`${address.slice(0, 6)}...`),
-    $text(style({ fontSize: '.85em', fontWeight: 'bold' }))(address.slice(-4)),
+  return $container(style({ alignItems: 'flex-end', flexDirection: 'row' }))(
+    $text(style({ fontSize: '.85em', color: pallete.foreground }))(`${address.slice(0, 6)}..`),
+    $text(style({  }))(address.slice(-4)),
   )
 }
 

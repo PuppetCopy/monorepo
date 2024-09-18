@@ -4,11 +4,11 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, map, mergeArray, multicast, now, periodic, snapshot } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, getDuration, getMappedValue, getVestingCursor, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
+import { applyFactor, combineState, FACTOR_PERCISION, formatFixed, getDuration, getMappedValue, getVestingCursor, readableFactorPercentage, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $labeledhintAdjustment, intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import * as walletLink from "wallet"
@@ -17,7 +17,7 @@ import { $labeledDivider } from "../common/elements/$common"
 import { store } from "../const/store"
 import tokenomicsReader from "../logic/tokenomicsReader"
 import { IComponentPageParams } from "../pages/type"
-import { $defaultSliderThumb, $Slider } from "./$Slider"
+import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "./$Slider"
 import { $SubmitBar } from "./form/$Form"
 
 function calcDurationMultiplier(baseMultiplier: bigint, duration: bigint) {
@@ -160,177 +160,20 @@ export const $Vest = (config: IVestingDetails) => component((
   return [
     $column(layoutSheet.spacing, style({ flex: 1 }))(
 
-      style({ alignItems: 'center' })(
-        $row(
-          $heading2('Locked'),
-          $infoTooltip(`Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens`)
-
-          // style({ placeContent: 'space-between' })(
-          //   $infoLabeledValue(
-          //     $text('Switch Plan'),
-          //     $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-
-
-          //       $Popover({
-          //         open: map(params => {
-          //           const initMaintainState = take(1, map(maintain => maintain || maintain === null, compoundMode))
-          //           const popoverMaintainSchedule = mergeArray([initMaintainState, changePopoverMaintainSchedule])
-
-          //           return $column(layoutSheet.spacing, style({ width: '350px' }))(
-          //             $ButtonToggle({
-          //               $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
-          //               options: [true, false],
-          //               selected: popoverMaintainSchedule,
-          //               $$option: map(value => $text(value ? 'Compound' : 'Custom')),
-          //             })({
-          //               select: changePopoverMaintainScheduleTether()
-          //             }),
-
-          //             switchMap(maintain => {
-          //               if (maintain) {
-          //                 return $column(layoutSheet.spacing)(
-          //                   $text('Maximize rewards by compounding new rewards and maintaining 2 year lockup. this will increase your vested rewards and voting power emissions.'),
-
-          //                   // $element('ul')(layoutSheet.spacing, style({}))(
-          //                   //   $element('li')(style({ marginBottom: '10px' }))(
-          //                   //     $text(`Copy-trading`)
-          //                   //   ),
-          //                   //   $element('li')(style({ marginBottom: '10px' }))(
-          //                   //     $text(`Voting Power emissions`)
-          //                   //   ),
-          //                   //   $element('li')(style({ marginBottom: '10px' }))(
-          //                   //     $text(`Vested releases`)
-          //                   //   ),
-          //                   // ),
-
-
-          //                   $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-          //                     // $text('You can switch plan at any time.'),
-          //                     $node(style({ flex: 1 }))(),
-          //                     $ButtonSecondary({
-          //                       $content: $text('Save')
-          //                     })({
-          //                       click: savePopoverLockScheduleTether(
-          //                         checkCompoundModeTether(constant(true))
-          //                       )
-          //                     }),
-          //                   )
-          //                 )
-          //               }
-
-          //               const sliderFactor = mergeArray([
-          //                 lockSchedule,
-          //                 changePopoverScheduleFactor
-          //               ])
-
-          //               const slideDuration = map(factor => {
-          //                 return factor * PUPPET.MAX_LOCK_SCHEDULE
-          //               }, sliderFactor)
-
-          //               return $column(layoutSheet.spacing)(
-          //                 $text('Set a custom duration for the claimable rewards. this plan will adjust average your lockup duration'),
-
-
-          //                 // $Checkbox({ label: 'Claim Lock Rewards', value: claimLockRewards })({
-          //                 //   check: toggleClaimRevenueRewardTether()
-          //                 // }),
-          //                 // $Checkbox({ label: 'Copy-Trading', value: compoundLockReward })({
-          //                 //   check: changeCompoundLockRewardTether()
-          //                 // }),
-          //                 // $Checkbox({ label: 'Voting Power emissions', value: compoundLockReward })({
-          //                 //   check: changeCompoundLockRewardTether()
-          //                 // }),
-          //                 // // $Checkbox({ label: 'Claim Vested Rewards', value: claimLockRewards })({
-          //                 // //   check: toggleClaimRevenueRewardTether()
-          //                 // // }),
-          //                 // $Checkbox({ label: 'Vested releases', value: compoundVestedReward })({
-          //                 //   check: changeCompoundVestedRewardTether()
-          //                 // }),
-
-          //                 $Slider({
-          //                   color: map(val => colorAlpha(pallete.positive, val), sliderFactor),
-          //                   disabled: map(val => val === true, compoundMode),
-          //                   value: sliderFactor,
-          //                   $thumb: $defaultSliderThumb(style({ width: '60px' }))(
-          //                     $text(map(duration => {
-          //                       return `${readableUnitAmount((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)}%`
-          //                     }, slideDuration))
-          //                   )
-          //                 })({
-          //                   change: changePopoverScheduleFactorTether(),
-          //                 }),
-          //                 // $Slider({
-          //                 //   color: map(val => colorAlpha(pallete.positive, val), sliderFactor),
-          //                 //   disabled: map(val => val === true, maintainSchedule),
-          //                 //   value: sliderFactor,
-          //                 // })({
-          //                 //   change: changePopoverScheduleFactorTether(),
-          //                 // }),
-
-          //                 $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-          //                   $row(style({ alignItems: 'center' }))(
-          //                     $node(style({ flex: 1 }))(
-          //                       $infoLabeledValue(
-          //                         'Duration',
-          //                         $text(map(time => getDuration(time), slideDuration))
-          //                       )
-          //                     )
-          //                   ),
-          //                   $node(style({ flex: 1 }))(),
-
-          //                   $ButtonSecondary({
-          //                     $content: $text('Save')
-          //                   })({
-          //                     click: savePopoverLockScheduleTether(
-          //                       changeScheduleFactorTether(sample(changePopoverScheduleFactor)),
-          //                       checkCompoundModeTether(constant(false))
-          //                     )
-          //                   }),
-          //                 )
-          //               )
-          //             }, popoverMaintainSchedule),
-
-          //           )
-          //         }, overlayClick),
-          //         dismiss: savePopoverLockSchedule,
-          //         $target: $ButtonSecondary({
-          //           $container: $defaultMiniButtonSecondary,
-          //           $content: switchMap(maintain => {
-          //             if (maintain === null) {
-          //               return $text(style({ color: pallete.indeterminate }))('None')
-          //             }
-
-          //             return $text(maintain ? 'Compound' : 'Custom')
-          //           }, compoundMode)
-          //         })({
-          //           click: overlayClickTether()
-          //         })
-          //       })({
-          //         // overlayClick: overlayClickTether()
-          //       }),
-
-          //     ),
-          //   )
-          // ),
-        )
-      ),
-
-
-
       style({ placeContent: 'space-between' })(
         $labeledhintAdjustment({
-          tooltip: `Voting Power is the amount of voting power you have in the governance system. higher Voting Power tokens yield more rewards.`,
-          label: 'Voting Power',
+          tooltip: `Voting Power (vePUPPET) Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens.`,
+          label: $heading2('Voting Power'),
           color: now(pallete.positive),
           change: switchMap(async (paramsQuery) => {
             const params = await paramsQuery
             if (params.cashout) return ''
 
-            return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.vePUPPET, params.nextLockAmount)
+            return readableUnitAmount(params.nextLockAmount)
           }, claimableState),
           $val: $text(
             switchMap(async amount => {
-              return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.vePUPPET, await amount)
+              return readableUnitAmount(await amount)
             }, lockAmountQuery)
           ),
         })
@@ -403,28 +246,27 @@ export const $Vest = (config: IVestingDetails) => component((
       $node(),
 
       $infoLabeledValue(
-        $text('Duration'),
+        $infoTooltipLabel('The bonus % applied to the total claimable amount. the bonus will be vested and released over the average vesting duration', 'Vesting Bonus'),
 
-        $column(style({ width: '100%', marginLeft: '30px' }))(
-          $Slider({
-            $container: $defaultSliderThumb(style({ flex: 1 })),
-            // color: map(val => colorAlpha(pallete.positive, val), slideDuration),
-            disabled: map(val => val === true, cashout),
-            value: lockSchedule,
-            $thumb: $defaultSliderThumb(style({ width: '60px' }))(
-              $text(
-                switchMap((durationMultiplier) => {
-                  return map(duration => {
-                    durationMultiplier
-                    return `${readableUnitAmount((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)}%`
-                  }, slideDuration)
-                }, awaitPromises(durationBaseMultiplierQuery))
-              )
+        $Slider({
+          $container: $sliderDefaultContainer(style({ flex: 1 })),
+          // color: map(val => colorAlpha(pallete.positive, val), slideDuration),
+          disabled: map(val => val === true, cashout),
+          value: lockSchedule,
+          $thumb: $defaultSliderThumb(style({ width: '60px' }))(
+            $text(style({ fontWeight: 'bold' }))(
+              switchMap((durationMultiplier) => {
+                return map(duration => {
+                  const factor = formatFixed(FACTOR_PERCISION, durationMultiplier) * ((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)
+
+                  return `${readableUnitAmount(factor)}%`
+                }, slideDuration)
+              }, awaitPromises(durationBaseMultiplierQuery))
             )
-          })({
-            change: changeScheduleFactorTether(),
-          })
-        ),
+          )
+        })({
+          change: changeScheduleFactorTether(),
+        }),
       ),
 
       $column(layoutSheet.spacing)(
@@ -432,7 +274,7 @@ export const $Vest = (config: IVestingDetails) => component((
           $infoLabeledValue(
             $text('Claimable'),
 
-            $text(style({ placeContent: 'space-between', color: pallete.positive }))(intermediateText(
+            $text(style({ placeContent: 'space-between', fontWeight: 'bold', color: pallete.positive }))(intermediateText(
               map(async params => {
                 return '+' + readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, params.totalClaimable)
               }, awaitPromises(claimableState))

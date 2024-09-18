@@ -61,7 +61,7 @@ export const $Slider = ({
 
 
   return [
-    $column(style({ minHeight: '26px', zIndex: 0, touchAction: 'none', placeContent: 'center', cursor: 'pointer' }))(
+    $container(
       changeSliderDimensionTether(observer.resize({}), map(res => res[0])),
       thumbePositionDeltaTether(
         nodeEvent('pointerdown'),
@@ -76,9 +76,7 @@ export const $Slider = ({
 
 
             if (startFromBar) {
-              // @ts-ignore
               const initOffsetX = downEvent.layerX || downEvent.offsetX // Firefox uses layerX
-
               const initialOffset = now(Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max))
               const moveDelta = drawLatest(map(moveEvent => {
                 const deltaX = (moveEvent.clientX - downEvent.clientX) + initOffsetX
