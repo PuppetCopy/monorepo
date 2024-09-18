@@ -188,7 +188,7 @@ interface IHintAdjustment {
 }
 
 interface ILabeledHintAdjustment extends IHintAdjustment {
-  label?: string
+  label?: string | $Node
   tooltip?: string | $Node
 }
 
@@ -217,7 +217,7 @@ export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: 
     tooltip
       ? $infoTooltipLabel(tooltip, label)
       : label
-        ? $text(style({ color: pallete.foreground }))(label) : empty(),
+        ? $infoLabel(label) : empty(),
 
     $hintAdjustment({ change, color, $val }),
   )

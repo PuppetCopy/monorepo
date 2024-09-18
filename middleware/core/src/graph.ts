@@ -138,10 +138,8 @@ export function queryLeaderboardPosition<TStateParams extends StateParams<IQuery
     }
 
     // filter.account = {
-    //   _eq: '"0x5dCD4b840CBC72408316E0a43cBB2a6B5812E929"'
+    //   _eq: '"0xae932cE716b1450D35261672c97c30afa832F3C1"'
     // }
-
-
 
     const list = await querySubgraph(subgraphClient, {
       schema: schema.leaderboardPosition,

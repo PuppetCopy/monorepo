@@ -76,9 +76,10 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
       lossCount: 0,
       winCount: 0,
       pnl: 0n,
-      puppets: [`0xDDfC0a12fD323Ac34AD149e1473Eb6f91155fDD6`, `0x30fd54C890f250d260c4D7DAEAd65925492936e0`, `0x7E2b0609D7daa78596F6CEAA4CcD6733C471E552`],
+      puppets: [],
       positionList: [],
       indexTokenList: [],
+      collateralTokenList: [],
     }
 
     summary.cumulativeCollateral += next.maxCollateralInUsd
@@ -111,6 +112,10 @@ export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: ILead
 
     if (summary.indexTokenList.indexOf(indexToken) === -1) {
       summary.indexTokenList.push(indexToken)
+    }
+
+    if (summary.collateralTokenList.indexOf(next.collateralToken) === -1) {
+      summary.collateralTokenList.push(next.collateralToken)
     }
 
 

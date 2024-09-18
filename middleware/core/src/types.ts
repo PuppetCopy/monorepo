@@ -34,6 +34,7 @@ export interface IMirrorPosition extends ILogTypeId<'MirrorPosition'>, Omit<IGmx
 export interface ILeaderboardPosition extends ILogType<'Position'> {
   account: viem.Address
   market: viem.Address
+  collateralToken: viem.Address
 
   realisedPnlUsd: bigint
   maxSizeInUsd: bigint
@@ -79,6 +80,7 @@ export interface ILeaderboardSummary {
   pnl: bigint
 
   indexTokenList: viem.Address[]
+  collateralTokenList: viem.Address[]
   puppets: viem.Address[]
   positionList: ILeaderboardPosition[]
 }

@@ -1,29 +1,26 @@
 import { Behavior, combineObject } from "@aelea/core"
-import { $element, $text, component, style } from "@aelea/dom"
+import { $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, startWith } from "@most/core"
 import { Stream } from "@most/types"
 import { IntervalTime, getBasisPoints, getMappedValue, pagingQuery, readablePercentage } from "common-utils"
-import { getTokenDescription } from "gmx-middleware-utils"
-import { PUPPET_COLLATERAL_LIST } from "puppet-middleware-const"
 import { ILeaderboardSummary, leaderboardSummary, queryLeaderboardPosition } from "puppet-middleware-utils"
-import { $ButtonToggle, $IntermediatePromise, $bear, $bull, $icon, $infoLabel, $labelDisplay, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
+import { $ButtonToggle, $IntermediatePromise, $bear, $bull, $icon, $infoLabel, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $puppetList, $size, $tokenIcon, $tokenLabeled } from "../../common/$common.js"
+import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $size } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { subgraphClient } from "../../common/graphClient"
+import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
 import { $CardTable } from "../../components/$common"
-import { $DropMultiSelect } from "../../components/form/$Dropdown"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { $LeaderboardPerformanceTimeline } from "../../components/trade/$ProfilePerformanceGraph"
 import * as storeDb from "../../const/store.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 
 
 
@@ -138,12 +135,12 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 })
               },
               {
-                $head: $text('Copy'),
-                gridTemplate: '90px',
+                $head: $text('Trade Route'),
+                gridTemplate: '170px',
                 $bodyCallback: map(pos => {
                   return $TraderRouteDisplay({
                     walletClientQuery,
-                    indexTokenList: pos.indexTokenList,
+                    indexTokenList: pos.collateralTokenList,
                     trader: pos.account
                   })({
                     modifySubscribeList: modifySubscriberTether()
@@ -171,7 +168,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     ),
                     sortBy: 'maxSize',
                     columnOp: style({ placeContent: 'flex-end' }),
-                    $bodyCallback: map((pos) => {
+                    $bodyCallback: map((pos: ILeaderboardSummary) => {
                       return $size(pos.maxSize, pos.maxCollateral)
                     })
                   },
@@ -183,13 +180,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   ? $row(layoutSheet.spacingSmall)(
                     $tableHeader('PnL $', 'ROI %'),
                     $seperator2,
-                    $text(style({ alignSelf: 'center' }))(map(tf => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe))
+                    $text(style({ alignSelf: 'center' }))(
+                      map(tf => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
+                    )
                   )
                   : $tableHeader('PnL $', 'ROI %'),
                 sortBy: 'pnl',
                 gridTemplate: screenUtils.isDesktopScreen ? '200px' : '140px',
                 $bodyCallback: map(pos => {
-
                   return $row(style({ position: 'relative', flex: 1 }))(
                     $LeaderboardPerformanceTimeline({
                       $container: $row(style({ position: 'relative', pointerEvents: 'none', width: `100%`, height: `80px` })),
@@ -200,9 +198,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     })({}),
 
                     $row(style({ position: 'absolute', background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`, inset: 0, zIndex: 1, alignItems: 'center' }))(
-                      style({})(
-                        $PnlAndRoi(pos)
-                      )
+                      $PnlAndRoi(pos)
                     ),
                   )
                 })
