@@ -7,20 +7,18 @@ import { constant, empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
 import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
 import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getRuleKey, getTokenDescription, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
+import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
 import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
-import { $AccountLabel, $profileAvatar, $profileDisplay } from "../components/$AccountProfile.js"
+import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
 import { $Popover } from "../components/$Popover.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button.js"
 import { $RouteSubscriptionEditor, IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor.js"
 import { $seperator2 } from "../pages/common.js"
 import { IWalletPageParams, IWalletTab } from "../pages/type.js"
-import { $puppetLogo } from "./$icons"
-import puppetReader from "../logic/puppetReader"
-import { $caretDown } from "./elements/$icons"
 import { $responsiveFlex } from "./elements/$common"
+import { $caretDown } from "./elements/$icons"
 
 
 export const $midContainer = $column(
@@ -358,17 +356,22 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
     $Link({
       $content: $row(layoutSheet.spacingSmall, style({ alignItems: 'center', textDecoration: 'none' }))(
         $profileAvatar({ ...config, account: trader }),
-        $column(
+        $column(style({ gap: '3px' }))(
           $AccountLabel(trader),
-          $row(style({ alignItems: 'center' }))(
-            ...config.puppets.map(account => {
+          config.puppets.length > 0
+            ? $row(style({ alignItems: 'center' }))(
+              ...config.puppets.map(account => {
 
-              return style({ marginRight: '-12px', border: '2px solid black' })(
-                $profileAvatar({ account, profileSize: 25 })
-              )
-            }),
-            $text(style({ gap: '8px', marginLeft: '16px' }))(`+${config.puppets.length}`)
-          )
+                return style({ marginRight: '-12px', border: '2px solid black' })(
+                  $profileAvatar({ account, profileSize: 25 })
+                )
+              }),
+              $text(style({ gap: '8px', marginLeft: '16px' }))(`${config.puppets.length}`)
+            )
+            : $row(style({ alignItems: 'center' }))(
+              $text(style({ color: pallete.foreground, fontSize: '.75em' }))(`0 puppets`)
+            )
+
         )
       ),
       route: route.create({ fragment: 'baseRoute' }),
@@ -422,7 +425,7 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
               $row(style({ alignItems: 'center' }))(
                 ...indexTokenList.map(account => {
 
-                  return style({  })(
+                  return style({})(
                     $tokenIcon(getTokenDescription(account), { width: '25px' })
                   )
                 }),
