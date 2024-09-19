@@ -36,8 +36,8 @@ export const $defaultSliderThumb = $row(
     transition: 'border 250ms ease-in',
     border: `2px solid ${pallete.primary}`,
     // borderWidth: '2px',
-    width: 38 + 'px',
-    height: 38 + 'px'
+    width: '38px',
+    height: '38px'
   })
 )
 

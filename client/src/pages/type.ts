@@ -20,7 +20,7 @@ export interface IPageParams extends IComponentPageParams {
 }
 
 export interface IUserActivityParams {
-  collateralTokenList: Stream<viem.Address[]>
+  selectedCollateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
   pricefeedMapQuery: Stream<Promise<IPricefeedMap>>
 }

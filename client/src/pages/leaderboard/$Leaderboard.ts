@@ -38,12 +38,12 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
 ) => {
 
-  const { activityTimeframe, collateralTokenList, walletClientQuery, pricefeedMapQuery, route } = config
+  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, route } = config
 
   const sortBy = uiStorage.replayWrite(storeDb.store.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(storeDb.store.leaderboard, switchIsLong, 'isLong')
 
-  const positionListQuery = queryLeaderboardPosition(subgraphClient, { collateralTokenList, activityTimeframe, isLong })
+  const positionListQuery = queryLeaderboardPosition(subgraphClient, { selectedCollateralTokenList, activityTimeframe, isLong })
 
   const tableParams = map(async pageParams => {
     const positionList = await pageParams.positionListQuery
@@ -62,7 +62,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
       $card2(style({ padding: "0", gap: 0 }))(
         $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'flex-start' }))(
           $SelectCollateralToken({
-            collateralTokenList,
+            selectedList: selectedCollateralTokenList,
           })({
             selectMarketTokenList: selectMarketTokenListTether()
           }),
@@ -136,11 +136,12 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
               },
               {
                 $head: $text('Trade Route'),
-                gridTemplate: '170px',
+                gridTemplate: screenUtils.isDesktopScreen ? '210px' : '80px',
                 $bodyCallback: map(pos => {
                   return $TraderRouteDisplay({
                     walletClientQuery,
-                    indexTokenList: pos.collateralTokenList,
+                    selectedCollateralTokenList,
+                    collateralTokenList: pos.collateralTokenList,
                     trader: pos.account
                   })({
                     modifySubscribeList: modifySubscriberTether()
@@ -176,17 +177,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 : [],
               {
                 columnOp: style({ placeContent: 'flex-start' }),
-                $head: screenUtils.isDesktopScreen
-                  ? $row(layoutSheet.spacingSmall)(
-                    $tableHeader('PnL $', 'ROI %'),
-                    $seperator2,
-                    $text(style({ alignSelf: 'center' }))(
-                      map(tf => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
-                    )
+                $head: $row(layoutSheet.spacingSmall, style({ flex: 1, placeContent: 'space-between' }))(
+                  $tableHeader('PnL $', 'ROI %'),
+                  $text(style({ alignSelf: 'center' }))(
+                    map(tf => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
                   )
-                  : $tableHeader('PnL $', 'ROI %'),
+                ),
                 sortBy: 'pnl',
-                gridTemplate: screenUtils.isDesktopScreen ? '200px' : '140px',
+                gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
                 $bodyCallback: map(pos => {
                   return $row(style({ position: 'relative', flex: 1 }))(
                     $LeaderboardPerformanceTimeline({

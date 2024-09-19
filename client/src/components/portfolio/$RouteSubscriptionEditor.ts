@@ -3,7 +3,7 @@ import { Behavior, combineObject } from "@aelea/core"
 import { $element, $node, $text, attr, component, style, stylePseudo } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { empty, map, mergeArray, now, snapshot, startWith } from "@most/core"
+import { empty, map, mergeArray, never, now, snapshot, startWith } from "@most/core"
 import { IntervalTime, formatFixed, parseBps, switchMap, unixTimestampNow } from "common-utils"
 import * as viem from "viem"
 import { theme } from "../../assignThemeSync.js"
@@ -12,11 +12,13 @@ import { $route } from "../../common/$common"
 import { IWalletPageParams } from "../../pages/type.js"
 import { $ButtonSecondary } from "../form/$Button.js"
 import { $Dropdown } from "../form/$Dropdown"
+import { $SelectCollateralToken } from "../$CollateralTokenSelector"
+import { Stream } from "@most/types"
 
 interface IRouteSubscriptionEditor {
   expiry: bigint
   trader: viem.Address
-  routeTypeList?: ISetRouteType[]
+  selectedCollateralTokenList: Stream<viem.Address[]>
 }
 
 export interface IChangeSubscription {
@@ -31,21 +33,21 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
   [inputAllowance, inputAllowanceTether]: Behavior<any, bigint>,
   [clickUnsubscribe, clickUnsubscribeTether]: Behavior<any, IChangeSubscription>,
   [clickSubmit, clickSubmitTether]: Behavior<any, IChangeSubscription>,
-  [changeRouteTypeKey, changeRouteTypeKeyTether]: Behavior<any, viem.Hex>,
+  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 ) => {
 
-  const { trader, routeTypeList,  walletClientQuery } = config
+  const { trader, selectedCollateralTokenList,  walletClientQuery } = config
 
   const allowance = mergeArray([
-    switchMap(async walletQuery => {
-      const wallet = await walletQuery
-      if (wallet === null) {
-        return ''
-      }
+    // switchMap(async walletQuery => {
+    //   const wallet = await walletQuery
+    //   if (wallet === null) {
+    //     return ''
+    //   }
 
-      const amount = await readPuppetAllowance(wallet, wallet.account.address)
-      return amount || ''
-    }, walletClientQuery),
+    //   const amount = await readPuppetAllowance(wallet, wallet.account.address)
+    //   return amount || ''
+    // }, walletClientQuery),
     inputAllowance
   ])
 
@@ -55,7 +57,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
     inputEndDate
   ])
 
-  const routeTypeKey = startWith('0x', changeRouteTypeKey)
+  const routeTypeKey = startWith('0x', never())
   
   const form = combineObject({
     allowance,
@@ -71,33 +73,12 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
     $column(layoutSheet.spacing, style({ maxWidth: '350px' }))(
       $text('The following rules will apply to this trader whenever he opens and maintain a position'),
 
-      routeTypeList ? $Dropdown({
-        $container: $row(style({ borderRadius: '30px', backgroundColor: pallete.background, padding: '4px 8px', position: 'relative', border: `1px solid ${colorAlpha(pallete.foreground, .2)}`, cursor: 'pointer' })),
-        $selection: switchMap(key => {
-          const match = routeTypeList.find(route => route.routeTypeKey === key)
-
-          if (!match) {
-            throw new Error(`Route type key ${key} not found`)
-          }
-
-          return $route(match)
-        }, routeTypeKey),
-        selector: {
-          value: routeTypeKey,
-          $$option: map(key => {
-            const match = routeTypeList.find(route => route.routeTypeKey === key)!
-
-            return $route(match)
-          }),
-          list: routeTypeList.map(route => route.routeTypeKey),
-        }
+      $SelectCollateralToken({
+        selectedList: selectedCollateralTokenList,
       })({
-        select: changeRouteTypeKeyTether()
-      })
-        : empty(),
-      // ),
+        selectMarketTokenList: selectMarketTokenListTether()
+      }),
 
-      // $labeledDivider('Deposit rules'),
 
       $FieldLabeled({
         label: 'Allow %',
@@ -157,6 +138,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
     ),
 
     {
+      selectMarketTokenList,
       modifySubscriber: mergeArray([
         clickSubmit,
         clickUnsubscribe

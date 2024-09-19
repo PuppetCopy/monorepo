@@ -3,12 +3,12 @@ import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { map, mergeArray, now, snapshot, startWith } from "@most/core"
-import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, parseFixed, readableTokenAmount, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
+import { ADDRESS_ZERO, IntervalTime, applyFactor, countdownFn, factor, getDenominator, getMappedValue, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
 import { queryPosition } from "puppet-middleware-utils"
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltipLabel, $intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from 'viem'
 import { $heading2, $heading3 } from "../../common/$text"
@@ -57,7 +57,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
 
   const {
     route, walletClientQuery, providerClientQuery,
-    activityTimeframe, collateralTokenList, pricefeedMapQuery
+    activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery
   } = config
 
 
@@ -154,7 +154,10 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
 
               $seperator2,
               $column(layoutSheet.spacing, style({ flex: 1 }))(
-                $heading2('Protocol Flywheel'),
+                $row(style({ alignItems: 'center' }))(
+                  $heading3('Protocol Flywheel'),
+                  $infoTooltip(`Puppet's smart contracts integrate a simple emissions model. Tokens are minted and rewarded as the protocol's revenue grows, aligning token supply with actual usage.\nFor every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.`),
+                ),
                 // style({ placeContent: 'space-between' })(
                 //   $infoLabeledValue(
                 //     'Price',
@@ -169,7 +172,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                 // ),
                 style({ placeContent: 'space-between' })(
                   $infoLabeledValue(
-                    $infoTooltipLabel(`Protocol fees Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Bought-back'),
+                    $infoTooltipLabel(`Protocol revenue from Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Bought-back'),
                     $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
                       // $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
                       $text(readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
@@ -326,7 +329,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
                 placeholder: 'Enter amount'
               })({
                 change: inputBuybackAmountTether(map(value => {
-                  return parseFixed(TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
+                  return parseFixed(TOKEN_DESCRIPTION_MAP.USDC.decimals, parseReadableNumber(value))
                 }))
               })
             ),

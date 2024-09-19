@@ -3,10 +3,8 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
 import { awaitPromises, empty, now } from "@most/core"
-import { switchMap } from "common-utils"
-import { $jazzicon } from "../common/$avatar.js"
-import { $berryByToken } from "./$common.js"
 import * as viem from "viem"
+import { $jazzicon } from "../common/$avatar.js"
 
 
 export interface IAccountPreview {

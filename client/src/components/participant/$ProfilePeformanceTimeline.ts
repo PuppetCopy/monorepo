@@ -20,7 +20,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, collateralTokenList, puppet, pricefeedMapQuery, positionListQuery } = config
+  const { activityTimeframe, selectedCollateralTokenList, puppet, pricefeedMapQuery, positionListQuery } = config
 
   const newLocal = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
   const positionParams = multicast(map(async (params) => {
@@ -65,7 +65,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
                 }, $tokenLabeled(tr))
               })
             },
-            value: collateralTokenList
+            value: selectedCollateralTokenList
           })({
             select: selectMarketTokenListTether()
           }),

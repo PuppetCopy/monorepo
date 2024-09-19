@@ -3,7 +3,7 @@ import { $text, component, INode, nodeEvent, style, styleInline } from "@aelea/d
 import * as router from '@aelea/router'
 import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, empty, map, skipRepeats } from "@most/core"
+import { constant, empty, map, now, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
 import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
 import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
@@ -386,14 +386,15 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
 
 interface ITraderRouteDisplay extends IWalletPageParams {
   trader: viem.Address
-  indexTokenList: viem.Address[]
+  selectedCollateralTokenList: Stream<viem.Address[]>
+  collateralTokenList: viem.Address[]
 }
 export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, bigint>,
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
 
-  const { walletClientQuery, trader, indexTokenList } = config
+  const { walletClientQuery, trader, selectedCollateralTokenList, collateralTokenList } = config
 
   const puppetSubscriptionParams = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -414,7 +415,7 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
     $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
       $Popover({
         open: map(expiry => {
-          return $RouteSubscriptionEditor({ expiry, trader, walletClientQuery })({
+          return $RouteSubscriptionEditor({ expiry, trader, walletClientQuery, selectedCollateralTokenList: now(collateralTokenList) })({
             modifySubscriber: modifySubscribeListTether()
           })
         }, popRouteSubscriptionEditor),
@@ -423,7 +424,7 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
           return $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: '6px' }))(
               $row(style({ alignItems: 'center' }))(
-                ...indexTokenList.map(account => {
+                ...collateralTokenList.map(account => {
 
                   return style({})(
                     $tokenIcon(getTokenDescription(account), { width: '25px' })

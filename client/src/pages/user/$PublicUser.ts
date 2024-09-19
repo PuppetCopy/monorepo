@@ -2,18 +2,17 @@ import { Behavior } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
-import { map, mergeArray, multicast, now, startWith } from "@most/core"
+import { map, mergeArray, now, startWith } from "@most/core"
 import { ETH_ADDRESS_REGEXP, IntervalTime, switchMap } from "common-utils"
-import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
+import { getMarketIndexToken } from "gmx-middleware-utils"
+import { queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'
-import { $PuppetProfile } from "./$PuppetProfile.js"
-import { $PuppetSummary, $TraderSummary } from "../../components/participant/$Summary.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
-import { IPageParams, IUserActivityPageParams, IUserPositionPageParams } from "../type.js"
-import { $TraderPage } from "./$Trader.js"
 import { subgraphClient } from "../../common/graphClient"
-import { getMarketIndexToken } from "gmx-middleware-utils"
+import { $TraderSummary } from "../../components/participant/$Summary.js"
+import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { IPageParams, IUserActivityPageParams } from "../type.js"
+import { $TraderPage } from "./$Trader.js"
 
 
 
@@ -37,7 +36,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
 
 ) => {
 
-  const { route, activityTimeframe, collateralTokenList, pricefeedMapQuery, } = config
+  const { route, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, } = config
 
   const profileAddressRoute = config.route
   const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ title: 'Trader', fragment: ETH_ADDRESS_REGEXP })
@@ -86,7 +85,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
               const filteredMarketList = startWith([], selectMarketTokenList)
               
               const positionListQuery = switchMap(marketList => {
-                const query = queryPosition(subgraphClient, { account, activityTimeframe, collateralTokenList })
+                const query = queryPosition(subgraphClient, { account, activityTimeframe })
 
                 return map(async listQuery => {
                   const list = await listQuery

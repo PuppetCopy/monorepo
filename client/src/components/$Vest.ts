@@ -2,22 +2,24 @@ import { Behavior, replayLatest } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
-import { awaitPromises, debounce, map, mergeArray, multicast, now, periodic, snapshot } from "@most/core"
+import { awaitPromises, debounce, empty, map, mergeArray, multicast, now, periodic, sample, snapshot, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, FACTOR_PERCISION, formatFixed, getDuration, getMappedValue, getVestingCursor, readableFactorPercentage, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
+import { applyFactor, combineState, FACTOR_PERCISION, formatFixed, getDuration, getMappedValue, getVestingCursor, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-middleware-const"
-import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import * as walletLink from "wallet"
-import { $heading2 } from "../common/$text"
+import { $heading2, $heading3 } from "../common/$text"
 import { $labeledDivider } from "../common/elements/$common"
 import { store } from "../const/store"
 import tokenomicsReader from "../logic/tokenomicsReader"
 import { IComponentPageParams } from "../pages/type"
+import { $Popover } from "./$Popover"
 import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "./$Slider"
+import { $ButtonSecondary, $defaultMiniButtonSecondary } from "./form/$Button"
 import { $SubmitBar } from "./form/$Form"
 
 function calcDurationMultiplier(baseMultiplier: bigint, duration: bigint) {
@@ -39,6 +41,12 @@ export const $Vest = (config: IVestingDetails) => component((
   [requestTx, requestTxTether]: Behavior<walletLink.IWalletClient, any>,
   [checkCashoutMode, checkCashoutModeTether]: Behavior<boolean>,
   [changeScheduleFactor, changeScheduleFactorTether]: Behavior<number>,
+  [popoverInputAmount, popoverInputAmountTether]: Behavior<string, bigint>,
+  [popoverAddWallet, popoverAddWalletTether]: Behavior<any>,
+  [popoverWithdrawLocked, popoverWithdrawLockedTether]: Behavior<any>,
+  [popoverClickMaxDeposit, popoverClickMaxDepositTether]: Behavior<any>,
+  [popoverRequestWithdraw, popoverRequestWithdrawTether]: Behavior<walletLink.IWalletClient, any>,
+  [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: Behavior<any, bigint>,
 ) => {
 
   const { providerClientQuery, walletClientQuery, puppetTokenPriceInUsd } = config
@@ -101,7 +109,15 @@ export const $Vest = (config: IVestingDetails) => component((
   }, walletClientQuery, periodic(1000))))
 
 
+  const walletBalance = switchMap(async walletQuery => {
+    const wallet = await walletQuery
 
+    if (wallet == null) {
+      return 0n
+    }
+
+    return tokenomicsReader.PuppetToken.getBalanceOf(wallet, wallet.account.address)
+  }, walletClientQuery)
 
 
   const cashout = uiStorage.replayWrite(store.earnings, checkCashoutMode, 'cashout')
@@ -114,6 +130,8 @@ export const $Vest = (config: IVestingDetails) => component((
     ])
   }, cashout)
 
+  const includeDepositAmount = startWith(0n, popoverSaveDepositAmount)
+
 
 
 
@@ -124,25 +142,25 @@ export const $Vest = (config: IVestingDetails) => component((
     const claimableVestedReward = vested?.accrued ?? 0n
 
     const totalClaimable = applyFactor(await params.baselineEmissionRateQuery, claimableContributionReward) + claimableLockReward + claimableVestedReward
+    const lockAmountDelta = totalClaimable + params.includeDepositAmount
     const lockDurationDelta = BigInt(Math.floor(params.lockSchedule * PUPPET.MAX_LOCK_SCHEDULE))
     const vestedDurationBonusMultiplier = calcDurationMultiplier(await params.durationBaseMultiplierQuery, lockDurationDelta)
-    const lockDurationBonusInVest = applyFactor(totalClaimable, vestedDurationBonusMultiplier)
+    const lockDurationBonusInVest = applyFactor(lockAmountDelta, vestedDurationBonusMultiplier)
     const vestedAmount = vested ? getVestingCursor(vested).accrued : 0n
 
     const lockAmount = await params.lockAmountQuery
     const lockDuration = await params.lockDurationQuery
 
-    const nextLockAmount = lockAmount + totalClaimable
-    const nextLockDuration = lockAmount > 0 ? (lockAmount * lockDuration + totalClaimable * lockDurationDelta) / nextLockAmount : lockDurationDelta
-
+    const nextLockAmount = lockAmount + lockAmountDelta
+    const nextLockDuration = lockAmount > 0 ? (lockAmount * lockDuration + lockAmountDelta * lockDurationDelta) / nextLockAmount : lockDurationDelta
 
     return {
       cashout: params.cashout, lockAmount: await params.lockAmountQuery,
-      vestedAmount, vested, totalClaimable, lockDuration, nextLockAmount, nextLockDuration,
-      claimableContributionReward, claimableLockReward, claimableVestedReward, lockDurationBonusInVest, lockDurationDelta
+      vestedAmount, vested, totalClaimable, lockDuration, nextLockAmount, nextLockDuration, lockAmountDelta,
+      claimableContributionReward, claimableLockReward, claimableVestedReward, lockDurationBonusInVest, lockDurationDelta, includeDepositAmount: params.includeDepositAmount
     }
   }, combineState({
-    baselineEmissionRateQuery, durationBaseMultiplierQuery, lockSchedule, puppetTokenPriceInUsd,
+    baselineEmissionRateQuery, durationBaseMultiplierQuery, lockSchedule, puppetTokenPriceInUsd, includeDepositAmount,
     claimableContributionQuery, claimableLockRewardQuery, vestedCursorQuery, cashout, lockAmountQuery, lockDurationQuery
   }))))
 
@@ -155,27 +173,94 @@ export const $Vest = (config: IVestingDetails) => component((
     return factor * PUPPET.MAX_LOCK_SCHEDULE
   }, lockSchedule)
 
+  const lockedAmount = awaitPromises(lockAmountQuery)
 
+
+  // `Voting Power (vePUPPET) Tokens are tokens that were locked minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens.`
 
   return [
     $column(layoutSheet.spacing, style({ flex: 1 }))(
 
-      style({ placeContent: 'space-between' })(
+      $row(layoutSheet.spacing, style({ placeContent: 'space-between' }))(
+        $row(style({ alignItems: 'center' }))(
+          $heading3('Voting Power'),
+          $infoTooltip(`The amount of PUPPET tokens you have locked. Granting protocol revenue share and voting power.`),
+        ),
+        $node(style({ flex: 1 }))(),
+        $Popover({
+          open: map(() => {
+            const maxBalance = sample(lockedAmount, popoverClickMaxDeposit)
+            const withdrawAmount = mergeArray([popoverInputAmount, maxBalance])
+
+            return $column(layoutSheet.spacing, style({ width: '415px' }))(
+              $text('Withdraw locked tokens through vesting while renouncing Voting Power and Revenue share. vested tokens are released over time.'),
+              $row(layoutSheet.spacingSmall, style({ position: 'relative' }))(
+                $FieldLabeled({
+                  label: 'Amount',
+                  value: startWith('', map(amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
+                  placeholder: 'Enter amount',
+                  hint: map(amount => `Balance: ${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, lockedAmount),
+                })({
+                  change: popoverInputAmountTether(
+                    map(amount => {
+                      return parseFixed(TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
+                    })
+                  )
+                }),
+                $ButtonSecondary({
+                  $container: $defaultMiniButtonSecondary(style({ position: 'absolute', right: 0, bottom: '28px' })),
+                  $content: $text('Max'),
+                })({
+                  click: popoverClickMaxDepositTether()
+                })
+              ),
+
+              $SubmitBar({
+                disabled: map(amount => amount === 0n, lockedAmount),
+                spend: {
+                  token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
+                  spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+                  amount: lockedAmount
+                },
+                $container: $row(style({ width: '415px' })),
+                txQuery: popoverRequestWithdraw,
+                walletClientQuery,
+                $submitContent: $text('Vest')
+              })({
+                changeWallet: changeWalletTether(),
+                click: popoverRequestWithdrawTether(
+                  snapshot(async (amount, wallet) => {
+                    const rewardRouterContractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter
+
+                    return walletLink.writeContract({
+                      ...rewardRouterContractDefs,
+                      walletClient: wallet,
+                      functionName: 'vest',
+                      args: [amount, wallet.account.address]
+                    })
+                  }, withdrawAmount)
+                )
+              })
+            )
+          }, popoverWithdrawLocked),
+          $target: $ButtonSecondary({
+            $container: $defaultMiniButtonSecondary,
+            disabled: map(amount => amount === 0n, lockedAmount),
+            $content: $text('Withdraw')
+          })({
+            click: popoverWithdrawLockedTether()
+          }),
+          dismiss: popoverSaveDepositAmount
+        })({}),
         $labeledhintAdjustment({
-          tooltip: `Voting Power (vePUPPET) Tokens are minted and distributed to active participants as the protocol generates more revenue. For every dollar of revenue generated through Copy-Trading, earn a corresponding amount in PUPPET tokens.\nThere are 2 options to cater to different types of users:\n\nLock-In: lock your PUPPET for up to two years, Longer lockups yield greater rewards.\n\nCash-Out: For those who prefer immediate returns. immediately receive a portion of their revenue in PUPPET tokens.`,
-          label: $heading2('Voting Power'),
           color: now(pallete.positive),
           change: switchMap(async (paramsQuery) => {
             const params = await paramsQuery
             if (params.cashout) return ''
 
-            return readableUnitAmount(params.nextLockAmount)
+            return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
           }, claimableState),
-          $val: $text(
-            switchMap(async amount => {
-              return readableUnitAmount(await amount)
-            }, lockAmountQuery)
-          ),
+          $val: $text(switchMap(async amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await amount), lockAmountQuery)),
         })
       ),
       style({ placeContent: 'space-between' })(
@@ -223,7 +308,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
       $labeledDivider(
         $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-          $infoTooltip('Lock additional tokens. different duration will average the lockup duration.'),
+          $infoTooltip('lock PUPPET for up to two years, Longer lockups yield greater rewards. different duration will average the lockup duration.'),
           $ButtonToggle({
             $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
             options: [false, true],
@@ -238,38 +323,105 @@ export const $Vest = (config: IVestingDetails) => component((
           })({
             select: checkCashoutModeTether()
           }),
-          $infoTooltip(`Receive the claimable tokens directly to your wallet.`),
+          $infoTooltip(`Receive the claimable amount directly to wallet.`),
         ),
         false
       ),
 
       $node(),
 
-      $infoLabeledValue(
-        $infoTooltipLabel('The bonus % applied to the total claimable amount. the bonus will be vested and released over the average vesting duration', 'Vesting Bonus'),
+      $column(layoutSheet.spacing)(
 
-        $Slider({
-          $container: $sliderDefaultContainer(style({ flex: 1 })),
-          // color: map(val => colorAlpha(pallete.positive, val), slideDuration),
-          disabled: map(val => val === true, cashout),
-          value: lockSchedule,
-          $thumb: $defaultSliderThumb(style({ width: '60px' }))(
-            $text(style({ fontWeight: 'bold' }))(
-              switchMap((durationMultiplier) => {
-                return map(duration => {
-                  const factor = formatFixed(FACTOR_PERCISION, durationMultiplier) * ((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)
+        switchMap(isCashout => {
+          if (isCashout) return empty()
 
-                  return `${readableUnitAmount(factor)}%`
-                }, slideDuration)
-              }, awaitPromises(durationBaseMultiplierQuery))
+          const walletLockAmount = startWith(0n, popoverSaveDepositAmount)
+          return $column(layoutSheet.spacing)(
+            $row(layoutSheet.spacingBig)(
+              $infoTooltipLabel(
+                'The bonus % applied to the total claimable amount. the bonus will be vested and released over the average vesting duration',
+                'Vesting Bonus'
+              ),
+              $Slider({
+                $container: $sliderDefaultContainer(style({ flex: 1 })),
+                // color: map(val => colorAlpha(pallete.positive, val), slideDuration),
+                disabled: map(val => val === true, cashout),
+                value: lockSchedule,
+                $thumb: $defaultSliderThumb(style({ width: '60px', height: '32px' }))(
+                  $text(style({ fontWeight: 'bold' }))(
+                    switchMap((durationMultiplier) => {
+                      return map(duration => {
+                        const factor = formatFixed(FACTOR_PERCISION, durationMultiplier) * ((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)
+
+                        return `${readableUnitAmount(factor)}%`
+                      }, slideDuration)
+                    }, awaitPromises(durationBaseMultiplierQuery))
+                  )
+                )
+              })({
+                change: changeScheduleFactorTether(),
+              }),
+            ),
+            $row(layoutSheet.spacingBig, style({ placeContent: 'space-between' }))(
+              $infoTooltipLabel(
+                'Include wallet tokens to Lock-In together with claimable rewards if present',
+                'Wallet'
+              ),
+
+              $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
+                $Popover({
+                  open: map(() => {
+                    const maxBalance = sample(walletBalance, popoverClickMaxDeposit)
+
+                    return $column(layoutSheet.spacing)(
+                      $row(layoutSheet.spacingSmall, style({ position: 'relative' }))(
+                        $FieldLabeled({
+                          label: 'Amount',
+                          value: startWith('', map(amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
+                          placeholder: 'Enter amount',
+                          hint: map(amount => `Balance: ${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, walletBalance),
+                        })({
+                          change: popoverInputAmountTether(
+                            map(amount => {
+                              return parseFixed(TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
+                            })
+                          )
+                        }),
+                        $ButtonSecondary({
+                          $container: $defaultMiniButtonSecondary(style({ position: 'absolute', right: 0, bottom: '28px' })),
+                          $content: $text('Max'),
+                        })({
+                          click: popoverClickMaxDepositTether()
+                        })
+                      ),
+
+                      $row(
+                        $node(style({ flex: 1 }))(),
+                        $ButtonSecondary({
+                          $content: $text('Save'),
+                        })({
+                          click: popoverSaveDepositAmountTether(
+                            sample(mergeArray([popoverInputAmount, maxBalance]))
+                          )
+                        })
+                      )
+                    )
+                  }, popoverAddWallet),
+                  $target: $ButtonSecondary({
+                    $container: $defaultMiniButtonSecondary,
+                    disabled: map(amount => amount === 0n, walletBalance),
+                    $content: $text('Add')
+                  })({
+                    click: popoverAddWalletTether()
+                  }),
+                  dismiss: popoverSaveDepositAmount
+                })({}),
+                $text(style({ placeContent: 'space-between' }))(map(amount => readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount), walletLockAmount))
+              )
             )
           )
-        })({
-          change: changeScheduleFactorTether(),
-        }),
-      ),
+        }, cashout),
 
-      $column(layoutSheet.spacing)(
         style({ placeContent: 'space-between' })(
           $infoLabeledValue(
             $text('Claimable'),
@@ -325,7 +477,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
       $SubmitBar({
-        disabled: map(params => params.totalClaimable === 0n, awaitPromises(claimableState)),
+        disabled: map(params => params.lockAmountDelta === 0n, awaitPromises(claimableState)),
         spend: {
           token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
           spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
@@ -380,7 +532,7 @@ export const $Vest = (config: IVestingDetails) => component((
                 viem.encodeFunctionData({
                   ...rewardRouterContractDefs,
                   functionName: 'lock',
-                  args: [params.totalClaimable, params.lockDuration]
+                  args: [params.lockAmountDelta, params.lockDurationDelta]
                 })
               )
             }

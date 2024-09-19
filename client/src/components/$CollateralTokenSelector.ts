@@ -11,7 +11,7 @@ import { $tokenIcon, $tokenLabeled } from '../common/$common'
 import { $DropMultiSelect } from './form/$Dropdown'
 
 interface ISelectCollateralToken {
-  collateralTokenList: Stream<viem.Address[]>
+  selectedList: Stream<viem.Address[]>
   $container?: NodeComposeFn<$Node>
 }
 
@@ -22,7 +22,7 @@ export const $SelectCollateralToken = (config: ISelectCollateralToken) => compon
   return [
     $DropMultiSelect({
       $container: config.$container,
-      $input: $element('input')(style({ width: '100px' })),
+      $input: $element('input'),
       $label: $labelDisplay(style({ color: pallete.foreground }))('Collateral'),
       placeholder: 'All Tokens',
       $$chip: map(tr => $tokenIcon(getTokenDescription(tr))),
@@ -34,7 +34,7 @@ export const $SelectCollateralToken = (config: ISelectCollateralToken) => compon
           }, $tokenLabeled(getTokenDescription(tr)))
         })
       },
-      value: config.collateralTokenList
+      value: config.selectedList
     })({
       select: selectMarketTokenListTether()
     }),

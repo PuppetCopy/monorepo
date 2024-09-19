@@ -24,7 +24,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
   [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
 ) => {
 
-  const { activityTimeframe, collateralTokenList, positionListQuery } = config
+  const { activityTimeframe, selectedCollateralTokenList, positionListQuery } = config
 
   const sortBy = replayLatest(sortByChange, { direction: 'asc', selector: 'timestamp' } as const)
 

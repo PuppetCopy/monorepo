@@ -12,7 +12,7 @@ import { IMirrorPosition } from './types'
 
 export interface IQueryPositionParams {
   account?: viem.Address
-  collateralTokenList?: viem.Address[]
+  selectedCollateralTokenList?: viem.Address[]
   isLong?: boolean
   activityTimeframe?: IntervalTime
 }
@@ -48,9 +48,9 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
 
       const orFilters = []
 
-      if (filterParams.collateralTokenList) {
+      if (filterParams.selectedCollateralTokenList) {
         orFilters.push(
-          ...filterParams.collateralTokenList.map(token => ({
+          ...filterParams.selectedCollateralTokenList.map(token => ({
             collateralToken: {
               _eq: `"${token}"`
             }
@@ -110,9 +110,9 @@ export function queryLeaderboardPosition<TStateParams extends StateParams<IQuery
 
     const orFilters = []
 
-    if (filterParams.collateralTokenList) {
+    if (filterParams.selectedCollateralTokenList) {
       orFilters.push(
-        ...filterParams.collateralTokenList.map(token => ({
+        ...filterParams.selectedCollateralTokenList.map(token => ({
           collateralToken: {
             _eq: `"${token}"`
           }

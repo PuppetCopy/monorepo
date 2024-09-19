@@ -40,7 +40,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, pricefeedMapQuery, providerClientQuery, positionListQuery, collateralTokenList, route } = config
+  const { activityTimeframe, walletClientQuery, pricefeedMapQuery, providerClientQuery, positionListQuery, selectedCollateralTokenList, route } = config
 
   const initialDepositAmountQuery = map(async walletQuery => {
     const wallet = await walletQuery

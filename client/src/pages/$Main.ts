@@ -97,7 +97,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const isDesktopScreen = skipRepeats(map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))))
 
   const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
-  const collateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectMarketTokenList, 'collateralTokenList')
+  const selectedCollateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectMarketTokenList, 'collateralTokenList')
 
   const pricefeedMapQuery = replayLatest(multicast(queryPricefeed(subgraphClient, { activityTimeframe })))
 
@@ -190,7 +190,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, collateralTokenList, pricefeedMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
                     changeWallet: changeWalletTether(),
                     modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
@@ -201,7 +201,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, collateralTokenList, pricefeedMapQuery })({
+                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
                     routeChange: changeRouteTether(),
@@ -211,7 +211,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, collateralTokenList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery })({
                     modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     // selectMarketTokenList: selectMarketTokenListTether(),

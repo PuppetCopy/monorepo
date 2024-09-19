@@ -21,7 +21,7 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 ) => {
   
-  const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, collateralTokenList, route } = config
+  const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, selectedCollateralTokenList, route } = config
 
   return [
 

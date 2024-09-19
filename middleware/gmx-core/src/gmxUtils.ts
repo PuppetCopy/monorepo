@@ -10,7 +10,7 @@ import {
 } from "gmx-middleware-const"
 import * as viem from "viem"
 import { ILogEvent, IPosition } from "./types.js"
-import { MARKET_TOKEN_MAP } from "./common"
+import { MARKET_TOKEN_MAP } from "./marketMap.js"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
