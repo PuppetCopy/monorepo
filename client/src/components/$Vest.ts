@@ -184,7 +184,7 @@ export const $Vest = (config: IVestingDetails) => component((
       $row(layoutSheet.spacing, style({ placeContent: 'space-between' }))(
         $row(style({ alignItems: 'center' }))(
           $heading3('Voting Power'),
-          $infoTooltip(`The amount of PUPPET tokens you have locked. Granting protocol revenue share and voting power.`),
+          $infoTooltip(`The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.`),
         ),
         $node(style({ flex: 1 }))(),
         $Popover({
@@ -192,8 +192,8 @@ export const $Vest = (config: IVestingDetails) => component((
             const maxBalance = sample(lockedAmount, popoverClickMaxDeposit)
             const withdrawAmount = mergeArray([popoverInputAmount, maxBalance])
 
-            return $column(layoutSheet.spacing, style({ width: '415px' }))(
-              $text('Withdraw locked tokens through vesting while renouncing Voting Power and Revenue share. vested tokens are released over time.'),
+            return $column(layoutSheet.spacing, style({ width: '355px' }))(
+              $text('Withdraw locked tokens through vesting. renounce Voting Power and Revenue share.'),
               $row(layoutSheet.spacingSmall, style({ position: 'relative' }))(
                 $FieldLabeled({
                   label: 'Amount',
@@ -222,7 +222,6 @@ export const $Vest = (config: IVestingDetails) => component((
                   spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
                   amount: lockedAmount
                 },
-                $container: $row(style({ width: '415px' })),
                 txQuery: popoverRequestWithdraw,
                 walletClientQuery,
                 $submitContent: $text('Vest')
@@ -339,7 +338,7 @@ export const $Vest = (config: IVestingDetails) => component((
           return $column(layoutSheet.spacing)(
             $row(layoutSheet.spacingBig)(
               $infoTooltipLabel(
-                'The bonus % applied to the total claimable amount. the bonus will be vested and released over the average vesting duration',
+                'The bonus % applied to the total claimable amount. the bonus amount will undergo vesting and released over the picked duration',
                 'Vesting Bonus'
               ),
               $Slider({
