@@ -7,7 +7,7 @@ import { IPosition } from "gmx-middleware-utils"
 import { IMirrorPosition, getParticiapntPortion } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
-import { $entry, $positionPnl, $positionTimestamp, $puppetList, $size, $sizeAndLiquidation } from "../../common/$common.js"
+import { $entry, $positionPnl, $puppetList, $size, $sizeAndLiquidation } from "../../common/$common.js"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -50,7 +50,7 @@ export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, st
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
-    return $puppetList(pos.puppetList.map(m => m.account) || [], click)
+    return $puppetList(pos.puppetList?.map(m => m.account) || [], click)
   })
 })
 
@@ -67,6 +67,13 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> =
 export const timeColumn: TableColumn<IPosition>  = {
   $head: $text('Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
-  $bodyCallback: map($positionTimestamp)
+  $bodyCallback: map(pos => {
+    return $column(layoutSheet.spacingTiny)(
+      $text(readableDate(pos.settledTimestamp)),
+      $row(layoutSheet.spacingSmall)(
+        $text(style({ fontSize: '.85rem' }))(getTimeSince(pos.settledTimestamp))
+      )
+    )
+  })
 }
 
