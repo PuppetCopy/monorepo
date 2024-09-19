@@ -246,7 +246,14 @@ export const TOKEN_DESCRIPTION_LIST = [
     symbol: TOKEN_SYMBOL.tBTC,
     decimals: 18,
     denominator: 10n ** 18n
-  }
+  },
+  {
+    name: "wstETH",
+    symbol: TOKEN_SYMBOL.wstETH,
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  
 
 ] as const
 
@@ -290,6 +297,7 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   [ARBITRUM_ADDRESS.STX]: TOKEN_DESCRIPTION_MAP.STX,
   [ARBITRUM_ADDRESS.USDe]: TOKEN_DESCRIPTION_MAP.USDe,
   [ARBITRUM_ADDRESS.tBTC]: TOKEN_DESCRIPTION_MAP.tBTC,
+  [ARBITRUM_ADDRESS.wstETH]: TOKEN_DESCRIPTION_MAP.wstETH,
   
 
   [ARBITRUM_ADDRESS.SynDOGE]: TOKEN_DESCRIPTION_MAP.SynDOGE,

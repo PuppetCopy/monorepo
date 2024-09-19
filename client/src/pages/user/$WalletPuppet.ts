@@ -1,15 +1,12 @@
 import { Behavior, combineObject } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { awaitPromises, constant, map, mergeArray, switchLatest } from "@most/core"
-import { Stream } from "@most/types"
-import { IntervalTime, groupArrayMany, readableTokenAmountLabel, readableUsd, switchMap } from "common-utils"
+import { constant, map, mergeArray } from "@most/core"
+import { IntervalTime, readableTokenAmountLabel, switchMap } from "common-utils"
 import * as GMX from 'gmx-middleware-const'
 import { getTokenDescription } from "gmx-middleware-utils"
-import {  getParticiapntPortion } from "puppet-middleware-utils"
 import { $infoTooltipLabel, $intermediateText } from "ui-components"
 import * as viem from "viem"
-import { $route } from "../../common/$common.js"
 import { $heading3 } from "../../common/$text.js"
 import { $card, $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { $Popover } from "../../components/$Popover.js"
@@ -19,7 +16,6 @@ import { $AssetDepositEditor } from "../../components/portfolio/$AssetDepositEdi
 import { $AssetWithdrawEditor } from "../../components/portfolio/$AssetWithdrawEditor.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
 import { readPuppetDepositAmount } from "../../logic/puppetReader.js"
-import { $seperator2 } from "../common.js"
 import { IUserPositionPageParams } from "../type.js"
 
 

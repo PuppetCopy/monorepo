@@ -31,6 +31,7 @@ export const TOKEN_SYMBOL = {
   ATOM: "ATOM",
   DOT: "DOT",
   tBTC: "tBTC",
+  wstETH: "wstETH",
 
   USDT: "USDT",
   DAI: "DAI",
