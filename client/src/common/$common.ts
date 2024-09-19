@@ -5,11 +5,11 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, now, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { ADDRESS_ZERO, getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
 import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
 import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
-import { $infoLabel, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
+import { $infoLabel, $infoLabeledValue, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
 import { $Popover } from "../components/$Popover.js"
@@ -40,19 +40,39 @@ export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) 
 }
 
 
-export const $entry = (mp: IPosition) => {
-  const indexToken = getMarketIndexToken(mp.market)
+export const $entry = (pos: IPosition) => {
+  const indexToken = getMarketIndexToken(pos.market)
   const indexDescription = getTokenDescription(indexToken)
+  const collateralTokenDescription = getTokenDescription(pos.collateralToken)
 
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
     $Tooltip({
       // $dropContainer: $defaultDropContainer,
-      $content: $text(style({ fontSize: '.85rem' }))(getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getMarketIndexToken(mp.market)).symbol),
-      $anchor: $tokenIcon(indexDescription, { width: '36px' }),
+      $content: $column(layoutSheet.spacingSmall)(
+        $infoLabeledValue(
+          'Open Time',
+          $text(readableDate(pos.settledTimestamp))
+        ),
+        isPositionSettled(pos)
+          ? $infoLabeledValue(
+            'Settled Time',
+            $text(readableDate(pos.settledTimestamp))
+          )
+          : empty(),
+        $infoLabeledValue(
+          'Market',
+          $tokenLabeled(indexDescription)
+        ),
+        $infoLabeledValue(
+          'Collateral Token',
+          $tokenLabeled(collateralTokenDescription)
+        )
+      ),
+      $anchor: $route(indexDescription, collateralTokenDescription, false)
     })({}),
     $column(layoutSheet.spacingTiny)(
-      $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((mp.isLong ? 'LONG' : 'SHORT'))),
-      $text(style({ fontSize: '.85rem' }))(readableUsd(getEntryPrice(mp, indexDescription))),
+      $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((pos.isLong ? 'LONG' : 'SHORT'))),
+      $text(style({ fontSize: '.85rem' }))(readableUsd(getEntryPrice(pos, indexDescription))),
     )
 
   )
@@ -60,12 +80,21 @@ export const $entry = (mp: IPosition) => {
 
 export const $route = (indexTokenDescription: ITokenDescription, collateralTokenDescription: ITokenDescription, displayLabel = true) => {
 
-  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-    $tokenIcon(indexTokenDescription, { width: '36px' }),
+  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', position: 'relative' }))(
+    style({
+      width: '34px', height: '34x'
+    })(
+      $tokenIcon(indexTokenDescription)
+    ),
+    style({
+      width: '24px', height: '24x',
+      position: 'absolute', right: '26px', bottom: '5px',
+      backgroundColor: pallete.background,
+      border: `2px solid ${pallete.background}`, borderRadius: '50%'
+    })($tokenIcon(collateralTokenDescription)),
     displayLabel
       ? $column(layoutSheet.spacingTiny)(
-        $text(style({ fontSize: '1rem' }))(`${indexTokenDescription.symbol}`),
-        // $infoLabel($text(style({ fontSize: '.85rem' }))((pos.isLong ? 'Long' : 'Short'))),
+        $text(style({ fontSize: '1rem' }))(`${indexTokenDescription.symbol}`)
       )
       : empty(),
   )
@@ -73,14 +102,14 @@ export const $route = (indexTokenDescription: ITokenDescription, collateralToken
 
 export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-    $tokenIcon(indexDescription, { width: '36px' }),
+    style({ width: '18px', height: '18px' })($tokenIcon(indexDescription)),
     $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
   )
 }
 
 
-export const $tokenIcon = (tokenDesc: ITokenDescription, IIcon: { width: string } = { width: '24px' }) => {
-  const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[TOKEN_DESCRIPTION_MAP.PUPPET.symbol]
+export const $tokenIcon = (tokenDesc: ITokenDescription) => {
+  const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[ADDRESS_ZERO]
 
   if (!$token) {
     throw new Error('Unable to find matched token')
@@ -88,9 +117,8 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, IIcon: { width: string 
 
   return $icon({
     $content: $token,
-    svgOps: style({ fill: pallete.message }),
-    viewBox: '0 0 32 32',
-    width: IIcon.width
+    svgOps: style({ fill: pallete.message, width: '24px', height: '24px' }),
+    viewBox: '0 0 32 32'
   })
 }
 
@@ -257,16 +285,6 @@ export function $liquidationSeparator(isLong: boolean, sizeUsd: bigint, sizeInTo
   )
 }
 
-export function $positionTimestamp(pos: IPosition) {
-  const timestamp = Number(pos.settledTimestamp || pos.openTimestamp)
-
-  return $column(layoutSheet.spacingTiny)(
-    $text(readableDate(timestamp)),
-    $row(layoutSheet.spacingSmall)(
-      $text(style({ fontSize: '.85rem' }))(getTimeSince(timestamp))
-    )
-  )
-}
 
 
 
