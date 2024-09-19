@@ -238,8 +238,14 @@ export const TOKEN_DESCRIPTION_LIST = [
   {
     name: "USDe",
     symbol: TOKEN_SYMBOL.USDe,
-    decimals: 6,
-    denominator: 10n ** 6n
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "USDe",
+    symbol: TOKEN_SYMBOL.tBTC,
+    decimals: 18,
+    denominator: 10n ** 18n
   }
 
 ] as const
@@ -283,6 +289,7 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   [ARBITRUM_ADDRESS.ATOM]: TOKEN_DESCRIPTION_MAP.ATOM,
   [ARBITRUM_ADDRESS.STX]: TOKEN_DESCRIPTION_MAP.STX,
   [ARBITRUM_ADDRESS.USDe]: TOKEN_DESCRIPTION_MAP.USDe,
+  [ARBITRUM_ADDRESS.tBTC]: TOKEN_DESCRIPTION_MAP.tBTC,
   
 
   [ARBITRUM_ADDRESS.SynDOGE]: TOKEN_DESCRIPTION_MAP.SynDOGE,

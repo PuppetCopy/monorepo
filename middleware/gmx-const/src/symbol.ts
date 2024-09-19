@@ -30,6 +30,7 @@ export const TOKEN_SYMBOL = {
   SHIB: "SHIB",
   ATOM: "ATOM",
   DOT: "DOT",
+  tBTC: "tBTC",
 
   USDT: "USDT",
   DAI: "DAI",
