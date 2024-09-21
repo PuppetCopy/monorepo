@@ -1,4 +1,4 @@
-import { IOrderCreated, IOrderStatus, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPositionLink, IPosition, IPriceCandle } from "../types.js"
+import { IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IPriceCandle } from "../types.js"
 import { ISchema } from "./query.js"
 
 
@@ -147,44 +147,13 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   __typename: 'PositionDecrease',
 }
 
-const position: ISchema<IPosition> = {
-  id: 'string',
-  key: 'string',
 
-  account: 'address',
-  market: 'address',
-  collateralToken: 'address',
 
-  sizeInUsd: 'uint256',
-  sizeInTokens: 'uint256',
-  collateralAmount: 'uint256',
-  realisedPnlUsd: 'uint256',
-  pnlUsd: 'uint256',
-
-  cumulativeSizeUsd: 'uint256',
-  cumulativeSizeToken: 'uint256',
-  cumulativeCollateralUsd: 'uint256',
-  cumulativeCollateralToken: 'uint256',
-
-  maxSizeInUsd: 'uint256',
-  maxSizeInTokens: 'uint256',
-  maxCollateralInUsd: 'uint256',
-
-  isLong: 'bool',
-
-  increaseList: positionIncrease,
-  decreaseList: positionDecrease,
-
-  openTimestamp: 'number',
-  settledTimestamp: 'number',
-
-  __typename: 'Position',
-}
 const priceCandle: ISchema<IPriceCandle> = {
   id: 'string',
   token: 'address',
   interval: 'string',
-  timestamp: 'number',
+  slotTime: 'number',
 
   o: 'uint',
   h: 'uint',
@@ -195,8 +164,5 @@ const priceCandle: ISchema<IPriceCandle> = {
 }
 
 
-export const schema = {
-  orderCreated, positionCollectedUpdate, position,
-  positionIncrease, positionDecrease, priceCandle,
-}
+export const schema = { orderCreated, positionCollectedUpdate, positionIncrease, positionDecrease, priceCandle }
 

@@ -2,7 +2,7 @@ import * as router from '@aelea/router'
 import { Stream } from '@most/types'
 import { IntervalTime } from 'common-utils'
 import { IPricefeedMap } from 'gmx-middleware-utils'
-import { IMirrorPosition } from 'puppet-middleware-utils'
+import { IPosition } from 'puppet-middleware-utils'
 import * as viem from 'viem'
 import * as walletLink from "wallet"
 
@@ -29,7 +29,7 @@ export interface IUserActivityPageParams extends IPageParams, IUserActivityParam
 }
 
 export interface IPositionActivityParams {
-  positionListQuery: Stream<Promise<IMirrorPosition[]>>
+  positionListQuery: Stream<Promise<IPosition[]>>
 }
 
 export interface IUserPositionPageParams extends IPageParams, IPositionActivityParams, IUserActivityParams { }

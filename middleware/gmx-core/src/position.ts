@@ -3,7 +3,7 @@ import * as viem from "viem"
 import { applyFactor, BASIS_POINTS_DIVISOR, getDenominator, getMappedValue, getTokenUsd, ITokenDescription, PRECISION, WEI_PRECISION } from "common-utils"
 import { getPriceImpactForPosition } from "./price.js"
 import { getPoolUsdWithoutPnl } from "./market.js"
-import { IMarketPrice, IMarketInfo, IPositionFees, IPositionNumbers, PositionReferralFees, IPosition } from "./types.js"
+import { IMarketPrice, IMarketInfo, IPositionFees, IPositionNumbers, PositionReferralFees } from "./types.js"
 
 
 
@@ -109,11 +109,7 @@ export function getPositionFundingFees(positionFees: IPositionFees, position: IP
 }
 
 
-export function getEntryPrice(position: IPosition, tokenDesc: ITokenDescription) {
-  const initalAdjustment = position.increaseList[0]
 
-  return initalAdjustment.sizeInUsd / initalAdjustment.sizeInTokens * getDenominator(tokenDesc.decimals)
-}
 
 
 

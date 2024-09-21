@@ -1,4 +1,4 @@
-import { IPosition as IGmxPosition, ILogTxType, ILogType, ILogTypeId } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId, IPositionDecrease, IPositionIncrease } from "gmx-middleware-utils"
 import * as viem from "viem"
 
 
@@ -24,33 +24,74 @@ export interface IPuppetPosition extends ILogTxType<'PuppetPosition'> {
   position: IPosition
 }
 
-export interface IMirrorPosition extends ILogTypeId<'MirrorPosition'>, Omit<IGmxPosition, '__typename'> {
-  position: IGmxPosition
-
-  puppetList: IPuppetPosition[]
-  collateralList: bigint[]
-}
-
-export interface ILeaderboardPosition extends ILogType<'Position'> {
+export interface IPosition {
+  key: viem.Hex
   account: viem.Address
   market: viem.Address
   collateralToken: viem.Address
 
+  sizeInUsd: bigint
+  sizeInTokens: bigint
+  collateralInTokens: bigint
+  collateralInUsd: bigint
   realisedPnlUsd: bigint
+
+  cumulativeSizeToken: bigint
+  cumulativeSizeUsd: bigint
+  cumulativeCollateralToken: bigint
+  cumulativeCollateralUsd: bigint
+
   maxSizeInUsd: bigint
   maxSizeInTokens: bigint
   maxCollateralInUsd: bigint
+  maxCollateralInTokens: bigint
 
-  sizeInTokens: bigint
-  sizeInUsd: bigint
+  avgEntryPrice: bigint
+
   isLong: boolean
 
-  // settledTimestamp: number
+  increaseList: IPositionIncrease[]
+  decreaseList: IPositionDecrease[]
+
   openTimestamp: number
+  settledTimestamp: number
+
+  puppetList: IPuppetPosition[]
+  collateralList: bigint[]
+
+  lastUpdate: IPositionIncrease | IPositionDecrease
 }
 
 
-export type IPosition = IMirrorPosition | IGmxPosition
+export interface ITraderAccount extends ILogTypeId<'AccountLastAggregatedStats'> {
+  id: viem.Address
+
+  gbcId: number
+  puppets: number
+
+  increaseList: IPositionIncrease[]
+  decreaseList: IPositionDecrease[]
+  stats: IAccountLastAggregatedStats[]
+}
+
+export interface IAccountLastAggregatedStats extends ILogTypeId<'AccountLastAggregatedStats'> {
+  account: viem.Address
+  cumulativeSizeUsd: bigint
+  cumulativeCollateralUsd: bigint
+  maxSizeInUsd: bigint
+  maxCollateralInUsd: bigint
+  openPnl: bigint
+  realisedPnl: bigint
+  pnl: bigint
+  roi: bigint
+
+  interval: number
+  blockTimestamp: number
+
+  trader: ITraderAccount
+}
+
+
 
 
 
@@ -68,22 +109,7 @@ export interface IMirrorListSummary {
   lossCount: number
 }
 
-export interface ILeaderboardSummary {
-  account: viem.Address
-  cumulativeSize: bigint
-  cumulativeCollateral: bigint
-  maxSize: bigint
-  maxCollateral: bigint
-  leverage: bigint
-  lossCount: number
-  winCount: number
-  pnl: bigint
 
-  indexTokenList: viem.Address[]
-  collateralTokenList: viem.Address[]
-  puppets: viem.Address[]
-  positionList: ILeaderboardPosition[]
-}
 
 
 

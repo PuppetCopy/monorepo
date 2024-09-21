@@ -1,12 +1,13 @@
 import { Behavior, combineObject } from "@aelea/core"
 import { $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
-import { empty, map, startWith } from "@most/core"
-import { Stream } from "@most/types"
+import { colorAlpha, pallete } from "@aelea/ui-components-theme"
+import { empty, map, now, startWith } from "@most/core"
+import { Stream, Time } from "@most/types"
 import { IntervalTime, getBasisPoints, getMappedValue, pagingQuery, readablePercentage } from "common-utils"
-import { ILeaderboardSummary, leaderboardSummary, queryLeaderboardPosition } from "puppet-middleware-utils"
-import { $ButtonToggle, $IntermediatePromise, $bear, $bull, $icon, $infoLabel, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
+import { BaselineData, LineType } from "lightweight-charts"
+import { IAccountLastAggregatedStats, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
+import { $Baseline, $ButtonToggle, $IntermediatePromise, $bear, $bull, $icon, $infoLabel, IMarker, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $size } from "../../common/$common.js"
@@ -17,7 +18,7 @@ import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastAct
 import { $CardTable } from "../../components/$common"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
-import { $LeaderboardPerformanceTimeline } from "../../components/trade/$ProfilePerformanceGraph"
+import { getPositionListTimelinePerformance } from "../../components/trade/$ProfilePerformanceGraph"
 import * as storeDb from "../../const/store.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
@@ -43,16 +44,15 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
   const sortBy = uiStorage.replayWrite(storeDb.store.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(storeDb.store.leaderboard, switchIsLong, 'isLong')
 
-  const positionListQuery = queryLeaderboardPosition(subgraphClient, { selectedCollateralTokenList, activityTimeframe, isLong })
+  const accountStatsList = queryAccountLastAggregatedStats(subgraphClient, { activityTimeframe, sortBy })
 
   const tableParams = map(async pageParams => {
-    const positionList = await pageParams.positionListQuery
+    const accountStatsList = await pageParams.accountStatsList
     const pricefeedMap = await pageParams.pricefeedMapQuery
     const activityTimeframe = pageParams.activityTimeframe
 
-
-    return { positionList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
-  }, combineObject({ sortBy, positionListQuery, pricefeedMapQuery, activityTimeframe }))
+    return { accountStatsList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
+  }, combineObject({ sortBy, accountStatsList, pricefeedMapQuery, activityTimeframe }))
 
 
 
@@ -60,13 +60,10 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
     $column(layoutSheet.spacing, style({ paddingTop: '36px' }))(
 
       $card2(style({ padding: "0", gap: 0 }))(
-        $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'flex-start' }))(
-          $SelectCollateralToken({
-            selectedList: selectedCollateralTokenList,
-          })({
-            selectMarketTokenList: selectMarketTokenListTether()
+        $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }))(
+          $LastAtivity(activityTimeframe)({
+            changeActivityTimeframe: changeActivityTimeframeTether()
           }),
-
           $ButtonToggle({
             selected: isLong,
             options: [
@@ -85,41 +82,32 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
           })({
             select: switchIsLongTether()
           }),
-
-          $LastAtivity(activityTimeframe)({
-            changeActivityTimeframe: changeActivityTimeframeTether()
+          $SelectCollateralToken({
+            selectedList: selectedCollateralTokenList,
+          })({
+            selectMarketTokenList: selectMarketTokenListTether()
           }),
         ),
         $IntermediatePromise({
           query: tableParams,
           $$done: map(params => {
 
-            const positionList = params.positionList
-            if (positionList.length === 0) {
+            const accountStatsList = params.accountStatsList
+            if (accountStatsList.length === 0) {
               return $column(layoutSheet.spacingSmall, style({ padding: '30px' }))(
                 $text('No positions found'),
                 $infoLabel(`Try changing filters or selecting a different markets`),
               )
             }
 
-
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+            const dataSource: Stream<TablePageResponse<IAccountLastAggregatedStats>> = map(scroll => {
 
-            const dataSource: Stream<TablePageResponse<ILeaderboardSummary>> = map(scroll => {
-              const filterestPosList = leaderboardSummary(params.pricefeedMap, positionList)
-
-
-              return pagingQuery(
-                { ...params.sortBy, ...scroll },
-                filterestPosList,
-                (a: any, b: any) => params.sortBy.direction === 'desc'
-                  ? Number(b[params.sortBy.selector]) - Number(a[params.sortBy.selector])
-                  : Number(a[params.sortBy.selector]) - Number(b[params.sortBy.selector])
-              )
+              return pagingQuery(scroll, accountStatsList)
             }, paging)
 
 
-            const columns: TableColumn<ILeaderboardSummary>[] = [
+            const columns: TableColumn<IAccountLastAggregatedStats>[] = [
               {
                 $head: $text('Trader'),
                 gridTemplate: '155px',
@@ -127,8 +115,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 $bodyCallback: map(pos => {
                   return $TraderDisplay({
                     route: config.route,
-                    trader: pos.account,
-                    puppets: pos.puppets,
+                    trader: pos.trader.id,
+                    puppets: [],
                   })({
                     click: routeChangeTether()
                   })
@@ -141,8 +129,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   return $TraderRouteDisplay({
                     walletClientQuery,
                     selectedCollateralTokenList,
-                    collateralTokenList: pos.collateralTokenList,
-                    trader: pos.account
+                    collateralTokenList: [...new Set(pos.trader.increaseList.map(i => i.collateralToken))],
+                    trader: pos.trader.id
                   })({
                     modifySubscribeList: modifySubscriberTether()
                   })
@@ -155,9 +143,11 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     $head: $text('Win/Loss'),
                     gridTemplate: '70px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                    $bodyCallback: map((pos: ILeaderboardSummary) => {
+                    $bodyCallback: map((pos: IAccountLastAggregatedStats) => {
+                      const totalCount = pos.trader.increaseList.length + pos.trader.decreaseList.length
+                      const winCount = pos.trader.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
                       return $row(layoutSheet.spacingSmall)(
-                        $text(`${pos.winCount} / ${pos.lossCount}`)
+                        $text(`${winCount} / ${totalCount - winCount}`)
 
                       )
                     })
@@ -167,10 +157,10 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                       $text('Size'),
                       $text(style({ fontSize: '.85rem' }))('Leverage'),
                     ),
-                    sortBy: 'maxSize',
+                    sortBy: 'maxSizeInUsd',
                     columnOp: style({ placeContent: 'flex-end' }),
-                    $bodyCallback: map((pos: ILeaderboardSummary) => {
-                      return $size(pos.maxSize, pos.maxCollateral)
+                    $bodyCallback: map((pos: IAccountLastAggregatedStats) => {
+                      return $size(pos.maxSizeInUsd, pos.maxCollateralInUsd)
                     })
                   },
                 ]
@@ -186,18 +176,78 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 sortBy: 'pnl',
                 gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
                 $bodyCallback: map(pos => {
-                  return $row(style({ position: 'relative', flex: 1 }))(
-                    $LeaderboardPerformanceTimeline({
-                      $container: $row(style({ position: 'relative', pointerEvents: 'none', width: `100%`, height: `80px` })),
-                      tickCount: 25,
-                      list: pos.positionList,
-                      pricefeedMap: params.pricefeedMap,
-                      activityTimeframe: params.activityTimeframe,
-                    })({}),
+                  const adjustList = [...pos.trader.increaseList, ...pos.trader.decreaseList]
+                  const timeline = getPositionListTimelinePerformance({
+                    activityTimeframe: params.activityTimeframe,
+                    list: [...pos.trader.increaseList, ...pos.trader.decreaseList],
+                    pricefeedMap: params.pricefeedMap,
+                    tickCount: 25,
+                  })
 
-                    $row(style({ position: 'absolute', background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`, inset: 0, zIndex: 1, alignItems: 'center' }))(
-                      $PnlAndRoi(pos)
+                  const markerList = adjustList
+                    .map(pos => {
+                      return {
+                        position: 'inBar',
+                        color: colorAlpha(pallete.message, .15),
+                        time: pos.blockTimestamp as Time,
+                        size: 0.1,
+                        shape: 'circle'
+                      }
+                    })
+                    .sort((a, b) => Number(a.time) - Number(b.time))
+
+                  const pnl = timeline[timeline.length - 1].pnl
+                  return $row(style({ position: 'relative', flex: 1 }))(
+                    $row(style({ position: 'relative', pointerEvents: 'none', width: `100%`, height: `80px` }))(
+                      $Baseline({
+                        containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
+                        markers: now(markerList as IMarker[]),
+                        chartConfig: {
+                          width: 100,
+                          leftPriceScale: {
+                            // autoScale: true,
+                            ticksVisible: true,
+                            scaleMargins: {
+                              top: 0,
+                              bottom: 0,
+                            }
+                          },
+                          crosshair: {
+                            horzLine: {
+                              visible: false,
+                            },
+                            vertLine: {
+                              visible: false,
+                            }
+                          },
+                          // height: 150,
+                          // width: 100,
+                          timeScale: {
+                            visible: false
+                          },
+                          // ...config.chartConfig
+                        },
+                        data: timeline as any as BaselineData[],
+                        // containerOp: style({  inset: '0px 0px 0px 0px' }),
+                        baselineOptions: {
+                          baseValue: {
+                            price: 0,
+                            type: 'price',
+                          },
+                          lineWidth: 1,
+                          lineType: LineType.Curved,
+                        },
+                      })({}),
                     ),
+                    $row(style({ position: 'absolute', background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`, inset: 0, zIndex: 1, alignItems: 'center' }))(
+                      $column(layoutSheet.spacingTiny)(
+                        $pnlDisplay(pnl),
+                        $seperator2,
+                        $text(style({ fontSize: '.85rem' }))(
+                          readablePercentage(getBasisPoints(pnl, pos.maxCollateralInUsd))
+                        )
+                      )
+                    )
                   )
                 })
               },
@@ -237,18 +287,4 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
     }
   ]
 })
-
-
-
-
-
-function $PnlAndRoi(tr: ILeaderboardSummary) {
-  return $column(layoutSheet.spacingTiny)(
-    $pnlDisplay(tr.pnl),
-    $seperator2,
-    $text(style({ fontSize: '.85rem' }))(
-      readablePercentage(getBasisPoints(tr.pnl, tr.maxCollateral))
-    )
-  )
-}
 

@@ -8,7 +8,7 @@ import * as viem from 'viem'
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
-import { entryColumn, pnlColumn, puppetsColumn, settledSizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
+import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
 import { IUserPositionPageParams } from "../type.js"
 
 
@@ -61,7 +61,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
                 ...screenUtils.isDesktopScreen ? [timeColumn] : [],
                 entryColumn,
                 puppetsColumn(changeRouteTether),
-                settledSizeColumn(),
+                sizeColumn(),
                 pnlColumn(),
               ],
             })({

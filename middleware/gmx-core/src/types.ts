@@ -56,40 +56,10 @@ export interface IEnsRegistration {
 }
 
 
-export interface IPosition extends ILogTypeId<'Position'> {
-  key: viem.Hex
-  account: viem.Address
-  market: viem.Address
-  collateralToken: viem.Address
-  sizeInUsd: bigint
-  sizeInTokens: bigint
-  collateralAmount: bigint
-  realisedPnlUsd: bigint
-  pnlUsd: bigint
-
-  cumulativeSizeUsd: bigint
-  cumulativeSizeToken: bigint
-  cumulativeCollateralUsd: bigint
-  cumulativeCollateralToken: bigint
-
-  maxSizeInUsd: bigint
-  maxSizeInTokens: bigint
-  maxCollateralInUsd: bigint
-
-  isLong: boolean
-
-  increaseList: IPositionIncrease[]
-  decreaseList: IPositionDecrease[]
-
-  openTimestamp: number
-  settledTimestamp: number
-}
-
-
 export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
   token: viem.Address
   interval: IntervalTime
-  timestamp: number
+  slotTime: number
   o: bigint // open
   h: bigint // high
   l: bigint // low
@@ -158,25 +128,25 @@ export type ContractClientParams<
 > = ContractParams<TAbi, TAddress> & { client: viem.PublicClient<TTransport, TChain> }
 
 
-export enum OrderType {
+export const OrderType = {
   // the order will be cancelled if the minOutputAmount cannot be fulfilled
-  MarketSwap = 0,
+  MarketSwap: 0n,
   // @dev LimitSwap: swap token A to token B if the minOutputAmount can be fulfilled
-  LimitSwap = 1,
+  LimitSwap: 1n,
   // @dev MarketIncrease: increase position at the current market price
   // the order will be cancelled if the position cannot be increased at the acceptablePrice
-  MarketIncrease = 2,
+  MarketIncrease: 2n,
   // @dev LimitIncrease: increase position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  LimitIncrease = 3,
+  LimitIncrease: 3n,
   // @dev MarketDecrease: decrease position at the curent market price
   // the order will be cancelled if the position cannot be decreased at the acceptablePrice
-  MarketDecrease = 4,
+  MarketDecrease: 4n,
   // @dev LimitDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  LimitDecrease = 5,
+  LimitDecrease: 5n,
   // @dev StopLossDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  StopLossDecrease = 6,
+  StopLossDecrease: 6n,
   // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
-  Liquidation = 7,
+  Liquidation: 7n,
 }
 
 export enum DecreasePositionSwapType {
@@ -369,8 +339,8 @@ export interface IPositionLink extends ILogTypeId<'PositionLink'> {
 }
 
 
+
 export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddresses & IPositionNumbers & {
-  link?: IPositionLink
   order: IOrderStatus
   positionKey: viem.Hex
 
@@ -398,7 +368,6 @@ export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddres
 
 
 export type IPositionDecrease = ILogTxType<'PositionDecrease'> & IPositionAddresses & IPositionNumbers & {
-  link?: IPositionLink
   order: IOrderStatus
   positionKey: viem.Hex
 
@@ -412,7 +381,7 @@ export type IPositionDecrease = ILogTxType<'PositionDecrease'> & IPositionAddres
   collateralDeltaAmount: bigint
   valuesPriceImpactDiffUsd: bigint
   orderType: bigint
-
+  
   priceImpactUsd: bigint
   basePnlUsd: bigint
   uncappedBasePnlUsd: bigint

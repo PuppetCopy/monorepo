@@ -19,7 +19,7 @@ export enum IntervalTime {
   DAY = 86400,
   WEEK = 604800,
   MONTH = 2628000,
-  MONTH2 = 5256000,
+  QUARTER = 7884000,
   YEAR = 31536000
 }
 
@@ -332,21 +332,20 @@ function defaultComperator(queryParams: IRequestSortApi) {
     : Number(a[queryParams.selector]) - Number(b[queryParams.selector])
 }
 
-export type IPagingQueryParams = IRequestPagePositionApi & IRequestSortApi
+export type IPagingQueryParams = (IRequestPagePositionApi & IRequestSortApi) | IRequestPagePositionApi
 
 export function pagingQuery<T, TParams extends IPagingQueryParams>(
   queryParams: TParams,
   res: T[],
-  customComperator: (a: T, b: T) => number = defaultComperator(queryParams)
+  customComperator?: (a: T, b: T) => number
 ): IResponsePageApi<T> {
   let list = res
   if ('selector' in queryParams) {
-    list = res.sort(customComperator)
+    list = res.sort(customComperator ? customComperator : defaultComperator(queryParams))
   }
 
-  const { pageSize, offset } = queryParams
-  const page = list.slice(queryParams.offset, offset + pageSize)
-  return { offset, page, pageSize }
+  const page = list.slice(queryParams.offset, queryParams.offset + queryParams.pageSize)
+  return { ...queryParams, page }
 }
 
 

@@ -6,9 +6,9 @@ import { erc20Abi } from "abitype/abis"
 import { ADDRESS_ZERO, ITokenDescription, IntervalTime, USD_DECIMALS, filterNull, getDenominator, getMappedValue, parseFixed } from "common-utils"
 import * as GMX from "gmx-middleware-const"
 import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { IRequestPricefeedApi, ITokenSymbol, getTokenDescription, hashData, resolveAddress } from "gmx-middleware-utils"
+import { hashData, resolveAddress } from "gmx-middleware-utils"
 import * as PUPPET from "puppet-middleware-const"
-import { getRouteAddressKey, getTradeRouteKey } from "puppet-middleware-utils"
+import { } from "puppet-middleware-utils"
 import * as viem from "viem"
 import { getBalance } from "viem/actions"
 import * as walletLink from "wallet"
@@ -178,7 +178,6 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
   const res = await fetch(url)
   const json = await res.json()
 
-
   // @ts-ignore
   return Object.keys(json).reduce((seed, key) => {
     // @ts-ignore
@@ -201,34 +200,7 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
 //   return res
 // }
 
-export async function getTraderTradeRoute(
-  provider: walletLink.IClient,
-  trader: viem.Address,
-  collateralToken: viem.Address,
-  indexToken: viem.Address,
-  isLong: boolean,
-): Promise<viem.Address | null> {
-  const puppetContractMap = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-  const routeKey = getTradeRouteKey(trader, collateralToken, indexToken, isLong)
-  const routeAddressKey = getRouteAddressKey(routeKey)
 
-  try {
-    const queryAddress = await walletLink.readContract({
-      ...puppetContractMap.Datastore,
-      provider,
-      functionName: 'getAddress',
-      args: [routeAddressKey],
-    })
-
-    if (queryAddress === ADDRESS_ZERO) {
-      return null
-    }
-
-    return queryAddress
-  } catch (err) {
-    return null
-  }
-}
 
 export async function readMinExecutionFee(wallet: walletLink.IClient): Promise<bigint> {
   const puppetContractMap = getMappedValue(PUPPET.CONTRACT, wallet.chain.id)

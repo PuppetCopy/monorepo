@@ -29,6 +29,7 @@ export const PRICEFEED_INTERVAL = [
   IntervalTime.HR6,
   IntervalTime.DAY,
   IntervalTime.WEEK,
+  IntervalTime.MONTH,
 ] as const
 
 export const TRADE_CONTRACT_MAPPING = {

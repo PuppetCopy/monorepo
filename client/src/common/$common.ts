@@ -5,10 +5,9 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, now, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { ADDRESS_ZERO, getBasisPoints, getMappedValue, getTimeSince, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
-import { TOKEN_ADDRESS_DESCRIPTION_MAP, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { getEntryPrice, getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IMarket, IPosition, isPositionSettled, liquidationWeight } from "gmx-middleware-utils"
-import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
+import { ADDRESS_ZERO, getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware-utils"
+import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoLabeledValue, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
@@ -72,7 +71,7 @@ export const $entry = (pos: IPosition) => {
     })({}),
     $column(layoutSheet.spacingTiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((pos.isLong ? 'LONG' : 'SHORT'))),
-      $text(style({ fontSize: '.85rem' }))(readableUsd(getEntryPrice(pos, indexDescription))),
+      $text(style({ fontSize: '.85rem' }))(readableUsd(pos.avgEntryPrice)),
     )
 
   )
@@ -81,17 +80,20 @@ export const $entry = (pos: IPosition) => {
 export const $route = (indexTokenDescription: ITokenDescription, collateralTokenDescription: ITokenDescription, displayLabel = true) => {
 
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', position: 'relative' }))(
-    style({
-      width: '34px', height: '34x'
-    })(
-      $tokenIcon(indexTokenDescription)
+    $row(
+      style({
+        width: '38px', height: '34x'
+      })(
+        $tokenIcon(indexTokenDescription)
+      ),
+      style({
+        width: '32px', height: '24x',
+        marginLeft: `-12px`,
+        // position: 'absolute', left: '-6px', bottom: '-8px',
+        backgroundColor: pallete.background,
+        border: `1px solid ${pallete.background}`, borderRadius: '50%'
+      })($tokenIcon(collateralTokenDescription))
     ),
-    style({
-      width: '24px', height: '24x',
-      position: 'absolute', right: '26px', bottom: '5px',
-      backgroundColor: pallete.background,
-      border: `2px solid ${pallete.background}`, borderRadius: '50%'
-    })($tokenIcon(collateralTokenDescription)),
     displayLabel
       ? $column(layoutSheet.spacingTiny)(
         $text(style({ fontSize: '1rem' }))(`${indexTokenDescription.symbol}`)
@@ -121,21 +123,6 @@ export const $tokenIcon = (tokenDesc: ITokenDescription) => {
     viewBox: '0 0 32 32'
   })
 }
-
-export const $sizeAndLiquidation = (mp: IMirrorPosition, puppet?: viem.Address) => {
-  const sizeInUsd = getParticiapntPortion(mp, mp.sizeInUsd, puppet)
-  const collateralInToken = getParticiapntPortion(mp, mp.collateralAmount, puppet)
-  const collateralUsd = getTokenUsd(mp.increaseList[0].collateralTokenPriceMin, collateralInToken)
-  const indexToken = getMarketIndexToken(mp.market)
-  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
-
-  return $column(layoutSheet.spacingTiny, style({ alignItems: 'flex-end' }))(
-    $text(readableUsd(sizeInUsd)),
-    $liquidationSeparator(mp.isLong, mp.sizeInUsd, mp.sizeInTokens, mp.collateralAmount, latestPrice),
-    $leverage(sizeInUsd, collateralUsd),
-  )
-}
-
 
 export const $puppetList = (
   puppets?: viem.Address[],
@@ -173,7 +160,7 @@ export const $puppetList = (
   )
 }
 
-export const $positionPnlAndSize = (mp: IMirrorPosition, puppet?: viem.Address) => {
+export const $positionPnlAndSize = (mp: IPosition, puppet?: viem.Address) => {
   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
     $positionPnl(mp, puppet),
     $seperator2,
@@ -445,7 +432,9 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
                 ...collateralTokenList.map(account => {
 
                   return style({})(
-                    $tokenIcon(getTokenDescription(account), { width: '25px' })
+                    style({ width: '25px' })(
+                      $tokenIcon(getTokenDescription(account))
+                    )
                   )
                 }),
               ),

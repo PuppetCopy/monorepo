@@ -4,7 +4,7 @@ import { $NumberTicker, $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest, take } from "@most/core"
 import { IntervalTime, filterNull, parseReadableNumber, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
-import { getMarketIndexToken, isPositionOpen, isPositionSettled } from "gmx-middleware-utils"
+import { getMarketIndexToken } from "gmx-middleware-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, $labelDisplay, IMarker } from "ui-components"
 import * as viem from "viem"
@@ -13,6 +13,7 @@ import { $tokenIcon, $tokenLabeled } from "../../common/$common.js"
 import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { $DropMultiSelect } from "../form/$Dropdown.js"
 import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
+import { isPositionOpen, isPositionSettled } from "puppet-middleware-utils"
 
 export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
@@ -28,7 +29,7 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
     const timeline = getPositionListTimelinePerformance({
       ...params,
       puppet,
-      list,
+      list: list.flatMap(pos => [...pos.decreaseList, ...pos.increaseList]),
       tickCount: 100,
       activityTimeframe: params.activityTimeframe,
       pricefeedMap: await params.pricefeedMapQuery

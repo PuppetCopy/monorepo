@@ -3,11 +3,10 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map } from "@most/core"
 import { getTimeSince, readableDate } from "common-utils"
-import { IPosition } from "gmx-middleware-utils"
-import { IMirrorPosition, getParticiapntPortion } from "puppet-middleware-utils"
+import { IPosition, getParticiapntPortion } from "puppet-middleware-utils"
 import { TableColumn } from "ui-components"
 import * as viem from 'viem'
-import { $entry, $positionPnl, $puppetList, $size, $sizeAndLiquidation } from "../../common/$common.js"
+import { $entry, $positionPnl, $puppetList, $size } from "../../common/$common.js"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(
@@ -16,16 +15,7 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $c
 )
 
 
-export const slotSizeColumn = <T extends IMirrorPosition>(puppet?: viem.Address): TableColumn<T> => ({
-  $head: $tableHeader('Size', 'Leverage'),
-  columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
-  $bodyCallback: map(mp => {
-
-    return $sizeAndLiquidation(mp, puppet)
-  })
-})
-
-export const settledSizeColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> => ({
+export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
   $head: $tableHeader('Size', 'Leverage'),
   columnOp: O(layoutSheet.spacingTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map(mp => {
@@ -46,7 +36,7 @@ export const entryColumn: TableColumn<IPosition> = {
   })
 }
 
-export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, string>): TableColumn<T> => ({
+export const puppetsColumn = (click: Tether<INode, string>): TableColumn<IPosition> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
@@ -54,7 +44,7 @@ export const puppetsColumn = <T extends IMirrorPosition>(click: Tether<INode, st
   })
 })
 
-export const pnlColumn = (puppet?: viem.Address): TableColumn<IMirrorPosition> => ({
+export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '90px',
   columnOp: style({ placeContent: 'flex-end' }),

@@ -1,49 +1,43 @@
-import { schema as gmxSchema, IPriceCandle, ISchema } from "gmx-middleware-utils"
-import { ILeaderboardPosition, IMirrorPosition } from "./types.js"
+import { schema as gmxSchema, IPositionDecrease, IPositionIncrease, IPriceCandle, ISchema } from "gmx-middleware-utils"
+import { IAccountLastAggregatedStats, ITraderAccount } from "./types.js"
 
 
-// const puppetPosition: ISchema<IPuppetPosition> = {
-//   id: 'string',
-//   key: 'string',
-//   positionKey: 'string',
-
-//   account: 'address',
-//   market: 'address',
-//   collateralToken: 'address',
-
-//   collateral: 'uint',
-
-//   __typename: 'PuppetPosition',
-// }
-
-const mirrorPosition: ISchema<IMirrorPosition> = {
-  ...gmxSchema.position,
-
-  // position: gmxSchema.position,
-  // puppetList: 'string[]',
-  // collateralList: 'uint[]',
-
-  __typename: 'Position',
+const positionIncrease: ISchema<IPositionIncrease> = {
+  ...gmxSchema.positionIncrease
 }
 
-const leaderboardPosition: ISchema<ILeaderboardPosition> = {
-  account: 'address',
-  market: 'address',
-  collateralToken: 'address',
+const positionDecrease: ISchema<IPositionDecrease> = {
+  ...gmxSchema.positionDecrease
+}
 
-  maxSizeInUsd: 'uint',
+const traderAccount: ISchema<ITraderAccount> = {
+  id: 'string',
+  // gbcId: 'uint',
+
+  increaseList: gmxSchema.positionIncrease,
+  decreaseList: gmxSchema.positionDecrease,
+
+  __typename: 'TraderAccount',
+}
+
+const accountLastAggregatedStats: ISchema<IAccountLastAggregatedStats> = {
+  id: 'string',
+  account: 'string',
+
+  cumulativeSizeUsd: 'uint',
+  cumulativeCollateralUsd: 'uint',
   maxCollateralInUsd: 'uint',
-  maxSizeInTokens: 'uint',
-  realisedPnlUsd: 'int',
-  sizeInTokens: 'uint',
-  sizeInUsd: 'uint',
+  maxSizeInUsd: 'uint',
+  openPnl: 'uint',
+  realisedPnl: 'uint',
+  pnl: 'uint',
+  roi: 'uint',
 
-  isLong: 'bool',
+  blockTimestamp: 'number',
+  interval: 'number',
+  trader: traderAccount,
 
-  openTimestamp: 'number',
-  // settledTimestamp: 'number',
-
-  __typename: 'Position',
+  __typename: 'AccountLastAggregatedStats',
 }
 
 
@@ -51,9 +45,9 @@ const priceCandle: ISchema<IPriceCandle> = {
   id: 'string',
   token: 'address',
   c: 'int',
-  timestamp: 'number',
+  slotTime: 'number',
   __typename: 'PriceCandle',
 }
 
 
-export const schema = { priceCandle, mirrorPosition, leaderboardPosition }
+export const schema = { priceCandle, accountLastAggregatedStats, traderAccount, positionIncrease, positionDecrease }
