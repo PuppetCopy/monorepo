@@ -61,8 +61,10 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
       $card2(style({ padding: "0", gap: 0 }))(
         $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }))(
-          $LastAtivity(activityTimeframe)({
-            changeActivityTimeframe: changeActivityTimeframeTether()
+          $SelectCollateralToken({
+            selectedList: selectedCollateralTokenList,
+          })({
+            selectMarketTokenList: selectMarketTokenListTether()
           }),
           $ButtonToggle({
             selected: isLong,
@@ -82,10 +84,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
           })({
             select: switchIsLongTether()
           }),
-          $SelectCollateralToken({
-            selectedList: selectedCollateralTokenList,
-          })({
-            selectMarketTokenList: selectMarketTokenListTether()
+          $LastAtivity(activityTimeframe)({
+            changeActivityTimeframe: changeActivityTimeframeTether()
           }),
         ),
         $IntermediatePromise({

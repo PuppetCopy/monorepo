@@ -59,9 +59,9 @@ export const timeColumn: TableColumn<IPosition>  = {
   gridTemplate: 'minmax(110px, 120px)',
   $bodyCallback: map(pos => {
     return $column(layoutSheet.spacingTiny)(
-      $text(readableDate(pos.settledTimestamp)),
+      $text(readableDate(pos.openTimestamp)),
       $row(layoutSheet.spacingSmall)(
-        $text(style({ fontSize: '.85rem' }))(getTimeSince(pos.settledTimestamp))
+        $text(style({ fontSize: '.85rem' }))(getTimeSince(pos.openTimestamp))
       )
     )
   })

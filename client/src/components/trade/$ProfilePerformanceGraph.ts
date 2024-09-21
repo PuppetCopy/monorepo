@@ -1,16 +1,12 @@
 import { Behavior } from "@aelea/core"
-import { $Node, $text, NodeComposeFn, component, style } from "@aelea/dom"
-import { $column, $row, layoutSheet } from "@aelea/ui-components"
+import { $Node, NodeComposeFn, component, style } from "@aelea/dom"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { now, skipRepeatsWith } from "@most/core"
-import { IntervalTime, USD_DECIMALS, createTimeline, formatFixed, getBasisPoints, readablePercentage, unixTimestampNow } from "common-utils"
+import { IntervalTime, USD_DECIMALS, createTimeline, formatFixed, unixTimestampNow } from "common-utils"
 import { IPositionDecrease, IPositionIncrease, IPricefeedMap, IPricetick, getMarketIndexToken, getPositionPnlUsd, isUpdateDecrease, isUpdateIncrease } from "gmx-middleware-utils"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
 import { $Baseline, IMarker } from "ui-components"
 import * as viem from "viem"
-import { $pnlDisplay } from "../../common/$common"
-import { $seperator2 } from "../../pages/common"
-import { IAccountLastAggregatedStats } from "puppet-middleware-utils"
 
 
 

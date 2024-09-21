@@ -157,8 +157,11 @@ export function formatFixed(decimals: number, value: bigint): number {
     fraction = "0" + fraction
   }
 
-  const matchFractions = fraction.match(/^([0-9]*[1-9]|0)(0*)/)!
-  fraction = matchFractions[1]
+  const matchFractions = fraction.match(/^([0-9]*[1-9]|0)(0*)/)
+
+  if (matchFractions) {
+    fraction = matchFractions[1]
+  }
 
   const whole = (value / multiplierBn).toString()
 
