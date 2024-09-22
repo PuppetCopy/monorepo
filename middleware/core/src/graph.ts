@@ -75,6 +75,9 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
     const queryIncreaseList = querySubgraph(subgraphClient, {
       schema: schema.positionIncrease,
       filter: filter,
+      orderBy: {
+        blockTimestamp: 'desc'
+      }
     })
 
     const queryDecreaseList = querySubgraph(subgraphClient, {
@@ -82,7 +85,7 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
       filter: filter,
     })
 
-    return aggregatePositionList([...await queryIncreaseList, ...await queryDecreaseList])
+    return aggregatePositionList([...await queryIncreaseList, ...await queryDecreaseList]).sort((a, b) => b.openTimestamp - a.openTimestamp)
   },
     combineState(queryParams)
   )

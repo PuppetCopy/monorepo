@@ -26,7 +26,14 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
 
   const { activityTimeframe, selectedCollateralTokenList, positionListQuery } = config
 
-  const sortBy = replayLatest(sortByChange, { direction: 'asc', selector: 'timestamp' } as const)
+  const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
+
+  const tableParams = map(async params => {
+    const activityTimeframe = params.activityTimeframe
+    const positionList = await params.positionListQuery
+
+    return { positionList, sortBy: params.sortBy, activityTimeframe }
+  }, combineObject({ sortBy, positionListQuery, activityTimeframe }))
 
 
   return [
@@ -40,8 +47,9 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
         ),
 
         $IntermediatePromise({
-          query: positionListQuery,
-          $$done: map(list => {
+          query: tableParams,
+          $$done: map(params => {
+            const list = params.positionList
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
             if (list.length === 0) {
@@ -57,6 +65,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
 
             return $Table({
               dataSource,
+              sortBy: params.sortBy,
               columns: [
                 ...screenUtils.isDesktopScreen ? [timeColumn] : [],
                 entryColumn,

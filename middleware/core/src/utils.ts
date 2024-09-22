@@ -1,4 +1,4 @@
-import { factor, getDenominator, getMappedValue, ITokenDescription } from "common-utils"
+import { factor, getMappedValue } from "common-utils"
 import { getMarketIndexToken, getPositionPnlUsd, getTokenDescription, IPositionDecrease, IPositionIncrease, IPriceCandle, IPricefeedMap, isUpdateIncrease } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { IMirrorListSummary, IPosition, IPuppetPosition } from "./types.js"
@@ -60,9 +60,9 @@ export function accountSettledPositionListSummary(
 }
 
 
+
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
-  const sortedUpdateList = list.sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-  const isSettled = list[list.length - 1].sizeInTokens === 0n
+  const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
   const openPositionMap: { [k: viem.Hex]: IPosition } = {}
   const positionList: IPosition[] = []
 
@@ -131,7 +131,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       if (position.cumulativeCollateralUsd === 0n) {
         position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
         position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
-        position.maxSizeInTokens = next.sizeInTokens + next.sizeDeltaInTokens 
+        position.maxSizeInTokens = next.sizeInTokens + next.sizeDeltaInTokens
         position.maxSizeInUsd = next.sizeInUsd + next.sizeDeltaUsd
 
         position.cumulativeCollateralToken = position.maxCollateralInTokens
@@ -279,12 +279,7 @@ export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
   return realisedPnl
 }
 
-export function getOpenMpPnL(mp: IPosition, markPrice: bigint, puppet?: viem.Address): bigint {
-  const pnl = getPositionPnlUsd(mp.isLong, mp.lastUpdate.sizeInUsd, mp.lastUpdate.sizeInTokens, markPrice)
-  const openPnl = getParticiapntPortion(mp, pnl, puppet)
 
-  return openPnl
-}
 
 export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
   if (supply === 0n || amount == 0n) return amount

@@ -77,7 +77,7 @@ export const readableNumber = curry2((formatOptions: Intl.NumberFormatOptions, a
   return Intl.NumberFormat("en-US", { ...digitOptions, ...formatOptions, }).format(ammount)
 })
 
-const intlOptions: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'short', day: '2-digit' }
+const intlOptions: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'short', day: '2-digit', hour: '2-digit' }
 
 export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)

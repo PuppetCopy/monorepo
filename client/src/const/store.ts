@@ -5,7 +5,7 @@ import { uiStorage } from 'ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
 
-export const store = uiStorage.createStoreDefinition('root', 4, {
+export const store = uiStorage.createStoreDefinition('root', 5, {
   global: {
     initialState: {
       chain: arbitrum.id,

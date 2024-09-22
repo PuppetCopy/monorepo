@@ -6,8 +6,8 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, now, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
 import { ADDRESS_ZERO, getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
-import { getMarginFees, getMarketIndexToken, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware-utils"
-import { getOpenMpPnL, getParticiapntPortion, getSettledMpPnL, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
+import { getFundingAmount, getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware-utils"
+import { getSettledMpPnL, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoLabeledValue, $infoTooltip, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
@@ -44,28 +44,26 @@ export const $entry = (pos: IPosition) => {
   const indexDescription = getTokenDescription(indexToken)
   const collateralTokenDescription = getTokenDescription(pos.collateralToken)
 
+  const $label = $text(style({ width: '125px' }))
+
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
     $Tooltip({
       // $dropContainer: $defaultDropContainer,
-      $content: $column(layoutSheet.spacingSmall)(
+      $content: $column(layoutSheet.spacing)(
         $infoLabeledValue(
-          'Open Time',
-          $text(readableDate(pos.settledTimestamp))
-        ),
-        isPositionSettled(pos)
-          ? $infoLabeledValue(
-            'Settled Time',
-            $text(readableDate(pos.settledTimestamp))
-          )
-          : empty(),
-        $infoLabeledValue(
-          'Market',
+          $label('Market Token'),
           $tokenLabeled(indexDescription)
         ),
         $infoLabeledValue(
-          'Collateral Token',
+          $label('Collateral Token'),
           $tokenLabeled(collateralTokenDescription)
-        )
+        ),
+        isPositionSettled(pos)
+          ? $infoLabeledValue(
+            $label('Close Time'),
+            $text(style({ fontSize: '.85rem' }))(readableDate(pos.settledTimestamp))
+          )
+          : empty(),
       ),
       $anchor: $route(indexDescription, collateralTokenDescription, false)
     })({}),
@@ -160,29 +158,6 @@ export const $puppetList = (
   )
 }
 
-export const $positionPnlAndSize = (mp: IPosition, puppet?: viem.Address) => {
-  return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-    $positionPnl(mp, puppet),
-    $seperator2,
-    $positionRoi(mp, puppet),
-  )
-}
-
-// export const $stake = (processData: Stream<IGmxProcessState>, pos: IPositionMirrorOpen, account: viem.Address) => {
-//   // const cumulativeTokenFundingRates = contractReader(GMX.CONTRACT['42161'].Vault)('cumulativeFundingRates', pos.collateralToken)
-
-
-//   return $column(layoutSheet.spacingTiny, style({ textAlign: 'right' }))(
-//     style({ flexDirection: 'row-reverse' })(
-//       $infoTooltipLabel(
-//         $openPositionPnlBreakdown(pos, ff),
-//         $positionSlotPnl(pos, positionMarkPrice, account)
-//       )
-//     ),
-//     $seperator2,
-//     style({ fontSize: '.85rem' })($positionSlotRoi(pos, positionMarkPrice, account)),
-//   )
-// }
 
 export const $leverage = (size: bigint, collateral: bigint) => {
   return $text(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '0.85rem' }))(readableLeverage(size, collateral))
@@ -207,52 +182,18 @@ export const $pnlDisplay = (
   return $testStr(display)
 }
 
-export const $PnlPercentageValue = (pnl: Stream<bigint> | bigint, collateral: bigint, colorful = true) => {
-  return $column(
-    $pnlDisplay(pnl, colorful),
-    $seperator2,
-    $pnlDisplay(pnl, colorful),
-  )
-}
 
-export const $positionPnl = (mp: IPosition, puppet?: viem.Address) => {
-  const indexToken = getMarketIndexToken(mp.market)
-  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
-  const isSettled = isPositionSettled(mp)
-
-  const value = isSettled
-    ? getSettledMpPnL(mp, puppet)
-    : map(price => {
-      const openPnl = getOpenMpPnL(mp, price, puppet)
-      return mp.realisedPnlUsd + openPnl // - mp.position.cumulativeFee
-    }, latestPrice)
-
-
-  const displayColor = skipRepeats(map(value => {
-    return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
-  }, streamOf(value)))
-
-  return isSettled
-    ? $pnlDisplay(value)
-    : $row(style({ alignItems: 'center' }))(
-      switchMap(color => {
-        return style({ backgroundColor: colorAlpha(color, .1), borderRadius: '50%' })($infoTooltip($openPositionBreakdown(mp), color, '18px'))
-      }, displayColor),
-      $pnlDisplay(value),
-    )
-}
-
-export const $positionRoi = (mp: IPosition, puppet?: viem.Address) => {
-  const indexToken = getMarketIndexToken(mp.market)
-  const lstIncrease = lst(mp.increaseList)
-  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, mp.maxCollateralInUsd)
+export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
+  const indexToken = getMarketIndexToken(pos.market)
+  const lstIncrease = lst(pos.increaseList)
+  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, pos.maxCollateralInUsd)
   const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
-  const roi = isPositionSettled(mp)
-    ? readablePercentage(getBasisPoints(mp.realisedPnlUsd, collateralUsd))
+  const roi = isPositionSettled(pos)
+    ? readablePercentage(getBasisPoints(pos.realisedPnlUsd, collateralUsd))
     : map(markPrice => {
-      const delta = getOpenMpPnL(mp, markPrice, puppet)
-      return readablePercentage(getBasisPoints(mp.realisedPnlUsd + delta, collateralUsd))
+      const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
+      return readablePercentage(getBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
     }, latestPrice)
   return $text(style({ fontSize: '.85rem' }))(roi)
 }
@@ -302,17 +243,16 @@ export const $marketSmallLabel = (market: IMarket) => {
 }
 
 
-export const $openPositionBreakdown = (mp: IPosition) => {
-  // const pendingFundingFee = getFundingFee(mp.entryFundingRate, cumulativeTokenFundingRates, mp.size)
-  const totalMarginFee = getMarginFees(mp.cumulativeSizeUsd)
+export const $openPositionBreakdown = (pos: IPosition) => {
+  const indexToken = getMarketIndexToken(pos.market)
+  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
 
-  const updateList = [...mp.increaseList, ...mp.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-  const latestUpdate = lst(updateList)
-
+  const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const totalPositionFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
   const totalBorrowingFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
   const totalFundingFeeAmount = updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
+  const latestUpdate = pos.lastUpdate
 
   return $column(layoutSheet.spacingSmall, style({ minWidth: '250px' }))(
     $text('Net breakdown'),
@@ -323,11 +263,14 @@ export const $openPositionBreakdown = (mp: IPosition) => {
     ),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground, flex: 1 }))('Open Pnl'),
-      $pnlDisplay(getOpenMpPnL(mp, latestUpdate.indexTokenPriceMax))
+      $pnlDisplay(map(markPrice => {
+        return getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
+      }, latestPrice))
     ),
+
     $labeledDivider('Realised'),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('Position Fee'),
+      $text(style({ color: pallete.foreground }))('Margin Fee'),
       $pnlDisplay(-totalPositionFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
@@ -339,9 +282,9 @@ export const $openPositionBreakdown = (mp: IPosition) => {
       $pnlDisplay(-totalFundingFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('PnL'),
+      $text(style({ color: pallete.foreground }))('Realised Pnl'),
       // $pnlValue(now(mp.realisedPnl))
-      $pnlDisplay(mp.realisedPnlUsd)
+      $pnlDisplay(pos.realisedPnlUsd)
     ),
   )
 }

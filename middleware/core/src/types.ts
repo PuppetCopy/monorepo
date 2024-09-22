@@ -74,6 +74,14 @@ export interface ITraderAccount extends ILogTypeId<'AccountLastAggregatedStats'>
   stats: IAccountLastAggregatedStats[]
 }
 
+export type IPerformanceTimelineTick = {
+  value: number;
+  openPnl: bigint;
+  realisedPnl: bigint;
+  pnl: bigint;
+  time: number;
+}
+
 export interface IAccountLastAggregatedStats extends ILogTypeId<'AccountLastAggregatedStats'> {
   account: viem.Address
   cumulativeSizeUsd: bigint
@@ -89,6 +97,10 @@ export interface IAccountLastAggregatedStats extends ILogTypeId<'AccountLastAggr
   blockTimestamp: number
 
   trader: ITraderAccount
+}
+
+export interface IAccountLastAggregatedPerformance extends IAccountLastAggregatedStats {
+  timeline: IPerformanceTimelineTick[]
 }
 
 
