@@ -190,10 +190,11 @@ export const $tokenIconMap = {
 
   [TOKEN_DESCRIPTION_MAP.ARB.symbol]: $arb,
   [TOKEN_DESCRIPTION_MAP.SOL.symbol]: $sol,
-  [TOKEN_DESCRIPTION_MAP.SynDOGE.symbol]: $doge,
-  [TOKEN_DESCRIPTION_MAP.SynBTC.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.SynLTC.symbol]: $ltc,
-  [TOKEN_DESCRIPTION_MAP.SynXRP.symbol]: $xrp,
+  [TOKEN_DESCRIPTION_MAP.DOGE.symbol]: $doge,
+  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.tBTC.symbol]: $btc,
+  [TOKEN_DESCRIPTION_MAP.LTC.symbol]: $ltc,
+  [TOKEN_DESCRIPTION_MAP.XRP.symbol]: $xrp,
   
 
   // [TOKEN_DESCRIPTION_MAP.BTC.symbol]: $btc,

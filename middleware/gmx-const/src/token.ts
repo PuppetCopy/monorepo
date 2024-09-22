@@ -127,26 +127,20 @@ export const TOKEN_DESCRIPTION_LIST = [
     denominator: 10n ** 9n
   },
   {
-    name: "Synthetic Dogecoin",
-    symbol: TOKEN_SYMBOL.SynDOGE,
+    name: "Dogecoin",
+    symbol: TOKEN_SYMBOL.DOGE,
     decimals: 8,
     denominator: 10n ** 8n
   },
   {
-    name: "Synthetic Bitcoin",
-    symbol: TOKEN_SYMBOL.SynBTC,
+    name: "Litecoin",
+    symbol: TOKEN_SYMBOL.LTC,
     decimals: 8,
     denominator: 10n ** 8n
   },
   {
-    name: "Synthetic Litecoin",
-    symbol: TOKEN_SYMBOL.SynLTC,
-    decimals: 8,
-    denominator: 10n ** 8n
-  },
-  {
-    name: "Synthetic XRP",
-    symbol: TOKEN_SYMBOL.SynXRP,
+    name: "XRP",
+    symbol: TOKEN_SYMBOL.XRP,
     decimals: 6,
     denominator: 10n ** 6n
   },
@@ -300,10 +294,9 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   [ARBITRUM_ADDRESS.wstETH]: TOKEN_DESCRIPTION_MAP.wstETH,
   
 
-  [ARBITRUM_ADDRESS.SynDOGE]: TOKEN_DESCRIPTION_MAP.SynDOGE,
-  [ARBITRUM_ADDRESS.SynBTC]: TOKEN_DESCRIPTION_MAP.SynBTC,
-  [ARBITRUM_ADDRESS.SynLTC]: TOKEN_DESCRIPTION_MAP.SynLTC,
-  [ARBITRUM_ADDRESS.SynXRP]: TOKEN_DESCRIPTION_MAP.SynXRP,
+  [ARBITRUM_ADDRESS.DOGE]: TOKEN_DESCRIPTION_MAP.DOGE,
+  [ARBITRUM_ADDRESS.LTC]: TOKEN_DESCRIPTION_MAP.LTC,
+  [ARBITRUM_ADDRESS.XRP]: TOKEN_DESCRIPTION_MAP.XRP,
 
 
   [ARBITRUM_ADDRESS.DAI]: TOKEN_DESCRIPTION_MAP.DAI,

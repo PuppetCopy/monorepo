@@ -68,9 +68,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
 
           const currentPnl = getPositionPnlUsd(openPosition.update.isLong, openPosition.update.sizeInUsd, openPosition.update.sizeInTokens, next.price)
 
-          console.log(currentPnl - openPosition.pnl)
           nextTick.openPnl += currentPnl - openPosition.pnl
-
           openPosition.pnl = currentPnl
         })
 

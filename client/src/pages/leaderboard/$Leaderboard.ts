@@ -142,7 +142,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                   return $TraderRouteDisplay({
                     walletClientQuery,
                     selectedCollateralTokenList,
-                    collateralTokenList: [...new Set(pos.trader.increaseList.map(i => i.collateralToken))],
+                    collateralTokenList: [...new Set([...pos.trader.increaseList, ...pos.trader.decreaseList].map(i => i.collateralToken))],
                     trader: pos.trader.id
                   })({
                     modifySubscribeList: modifySubscriberTether()
