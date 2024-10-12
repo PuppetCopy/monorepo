@@ -1,154 +1,266 @@
 export default [
   {
-    inputs: [{ internalType: "address", name: "_owner", type: "address" }],
-    stateMutability: "nonpayable",
     type: "constructor",
-  },
-  {
-    inputs: [{ internalType: "address", name: "owner", type: "address" }],
-    name: "OwnableInvalidOwner",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "OwnableUnauthorizedAccount",
-    type: "error",
-  },
-  {
-    anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "previousOwner",
+        name: "_owner",
         type: "address",
-      },
-      {
-        indexed: true,
         internalType: "address",
-        name: "newOwner",
-        type: "address",
       },
     ],
-    name: "OwnershipTransferred",
-    type: "event",
+    stateMutability: "nonpayable",
   },
   {
-    anonymous: false,
+    type: "function",
+    name: "hasAccess",
     inputs: [
       {
-        indexed: false,
-        internalType: "address",
         name: "target",
         type: "address",
+        internalType: "contract Access",
       },
-      { indexed: false, internalType: "bool", name: "enabled", type: "bool" },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    name: "UpdateAccess",
-    type: "event",
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
   },
   {
-    anonymous: false,
+    type: "function",
+    name: "hasPermission",
     inputs: [
       {
-        indexed: false,
-        internalType: "address",
         name: "target",
         type: "address",
+        internalType: "contract Permission",
       },
       {
-        indexed: false,
-        internalType: "bytes4",
         name: "functionSig",
         type: "bytes4",
+        internalType: "bytes4",
       },
-      { indexed: false, internalType: "bool", name: "enabled", type: "bool" },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    name: "UpdatePermission",
-    type: "event",
-  },
-  {
-    inputs: [
-      { internalType: "contract Auth", name: "target", type: "address" },
-      { internalType: "address", name: "user", type: "address" },
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
-    name: "hasAccess",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      { internalType: "contract Permission", name: "target", type: "address" },
-      { internalType: "bytes4", name: "functionSig", type: "bytes4" },
-      { internalType: "address", name: "user", type: "address" },
-    ],
-    name: "hasPermission",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
     type: "function",
-  },
-  {
-    inputs: [],
     name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "contract Auth", name: "target", type: "address" },
-      { internalType: "address", name: "user", type: "address" },
-    ],
-    name: "removeAccess",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "contract Permission", name: "target", type: "address" },
-      { internalType: "bytes4", name: "functionSig", type: "bytes4" },
-      { internalType: "address", name: "user", type: "address" },
-    ],
-    name: "removePermission",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "removeAccess",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        internalType: "contract Access",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "removePermission",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        internalType: "contract Permission",
+      },
+      {
+        name: "functionSig",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "renounceOwnership",
+    inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [
-      { internalType: "contract Auth", name: "target", type: "address" },
-      { internalType: "address", name: "user", type: "address" },
-    ],
+    type: "function",
     name: "setAccess",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
-      { internalType: "contract Permission", name: "target", type: "address" },
-      { internalType: "bytes4", name: "functionSig", type: "bytes4" },
-      { internalType: "address", name: "user", type: "address" },
+      {
+        name: "target",
+        type: "address",
+        internalType: "contract Access",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    name: "setPermission",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
-    name: "transferOwnership",
+    type: "function",
+    name: "setPermission",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        internalType: "contract Permission",
+      },
+      {
+        name: "functionSig",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
     type: "function",
+    name: "transferOwnership",
+    inputs: [
+      {
+        name: "newOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
+      {
+        name: "previousOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "newOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "UpdateAccess",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      {
+        name: "enabled",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "UpdatePermission",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      {
+        name: "functionSig",
+        type: "bytes4",
+        indexed: false,
+        internalType: "bytes4",
+      },
+      {
+        name: "enabled",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "error",
+    name: "OwnableInvalidOwner",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "OwnableUnauthorizedAccount",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
   },
 ] as const;

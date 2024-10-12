@@ -5,8 +5,6 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, constant, empty, map, mergeArray, skipRepeats, snapshot } from "@most/core"
 import { Stream } from "@most/types"
 import { groupArrayMany, readableDate, readablePercentage, readableTokenAmountLabel, switchMap } from "common-utils"
-import * as GMX from "gmx-middleware-const"
-import { getTokenDescription } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { $check, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText, $target, $xCross } from "ui-components"
 import * as viem from "viem"
@@ -38,40 +36,30 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 ) => {
 
-  const { modifySubscriber, modifySubscriptionList, providerClientQuery, routeTypeListQuery, walletClientQuery } = config
+  const { modifySubscriber, modifySubscriptionList, providerClientQuery, walletClientQuery,  } = config
 
   const openIfEmpty = skipRepeats(map(l => l.length > 0, modifySubscriptionList))
 
 
-  const initialDepositAmountQuery = map(async walletQuery => {
-    const wallet = await walletQuery
+  // const initialDepositAmountQuery = map(async walletQuery => {
+  //   const wallet = await walletQuery
 
-    if (wallet === null) {
-      return 0n
-    }
+  //   if (wallet === null) {
+  //     return 0n
+  //   }
 
-    return readPuppetDepositAmount(wallet, wallet.account.address)
-  }, walletClientQuery)
+  //   return readPuppetDepositAmount(wallet, wallet.account.address)
+  // }, walletClientQuery)
 
-  const depositAmountQuery = mergeArray([
-    initialDepositAmountQuery,
-    map(async params => {
-      return await params.initialDepositAmountQuery + await params.requestDepositAsset
-    }, combineObject({ initialDepositAmountQuery, requestDepositAsset }))
-  ])
+  // const depositAmountQuery = mergeArray([
+  //   initialDepositAmountQuery,
+  //   map(async params => {
+  //     return await params.initialDepositAmountQuery + await params.requestDepositAsset
+  //   }, combineObject({ initialDepositAmountQuery, requestDepositAsset }))
+  // ])
 
 
 
-  const validationError = switchMap(async params => {
-    if (await params.depositAmountQuery === 0n) {
-      return 'You need to deposit funds to to enable mirroring'
-    }
-
-    return null
-  }, combineObject({ depositAmountQuery }))
-
-  const depositToken = GMX.ARBITRUM_ADDRESS.USDC
-  const depositTokenDescription = getTokenDescription(depositToken)
 
 
   return [
@@ -96,11 +84,10 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
           ),
 
           switchMap(params => {
-            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.trader)) as [viem.Hex, IChangeSubscription[]][]
+            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.expiry)) as [viem.Hex, IChangeSubscription[]][]
 
             return $column(layoutSheet.spacing)(
               ...routeMap.map(([routeTypeKey, subscList]) => {
-                const tradeRoute = params.routeTypeList.find(m => m.routeTypeKey === routeTypeKey)
 
                 if (!tradeRoute) {
                   return empty()
@@ -153,42 +140,42 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                 )
               })
             )
-          }, combineObject({ modifySubscriptionList, routeTypeList: awaitPromises(routeTypeListQuery) })),
+          }, combineObject({ modifySubscriptionList })),
 
 
           $row(layoutSheet.spacingSmall, style({ placeContent: 'space-between' }))(
-            $Popover({
-              open: constant(
-                $AssetDepositEditor({
-                  providerClientQuery,
-                  walletClientQuery,
-                  token: depositToken
-                })({
-                  requestDepositAsset: requestDepositAssetTether(),
-                }),
-                openDepositPopover
-              ),
-              $target: $row(layoutSheet.spacing)(
-                $responsiveFlex(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                  $infoTooltipLabel($text('The amount utialised by traders you subscribe'), 'Balance'),
-                  // $text(readableTokenAmountLabel(depositTokenDescription, amount))
-                  $intermediateText(map(async amount => readableTokenAmountLabel(depositTokenDescription, await amount), depositAmountQuery)
-                  ),
-                  $ButtonSecondary({
-                    $container: $defaultMiniButtonSecondary,
-                    $content: $text('Deposit')
-                  })({
-                    click: openDepositPopoverTether()
-                  }),
-                )),
-            })({}),
+            // $Popover({
+            //   open: constant(
+            //     $AssetDepositEditor({
+            //       providerClientQuery,
+            //       walletClientQuery,
+            //       token: depositToken
+            //     })({
+            //       requestDepositAsset: requestDepositAssetTether(),
+            //     }),
+            //     openDepositPopover
+            //   ),
+            //   $target: $row(layoutSheet.spacing)(
+            //     $responsiveFlex(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+            //       $infoTooltipLabel($text('The amount utialised by traders you subscribe'), 'Balance'),
+            //       // $text(readableTokenAmountLabel(depositTokenDescription, amount))
+            //       $intermediateText(map(async amount => readableTokenAmountLabel(depositTokenDescription, await amount), depositAmountQuery)
+            //       ),
+            //       $ButtonSecondary({
+            //         $container: $defaultMiniButtonSecondary,
+            //         $content: $text('Deposit')
+            //       })({
+            //         click: openDepositPopoverTether()
+            //       }),
+            //     )),
+            // })({}),
 
             $node(),
             $SubmitBar({
               walletClientQuery,
               $submitContent: $text(screenUtils.isDesktopScreen ? 'Save Changes' : 'Save'),
               txQuery: requestChangeSubscription,
-              alert: validationError
+              // alert: validationError
             })({
               changeWallet: changeWalletTether(),
               click: requestChangeSubscriptionTether(

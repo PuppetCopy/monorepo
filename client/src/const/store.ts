@@ -5,7 +5,7 @@ import { uiStorage } from 'ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
 
-export const store = uiStorage.createStoreDefinition('root', 5, {
+export const store = uiStorage.createStoreDefinition('root', 6, {
   global: {
     initialState: {
       chain: arbitrum.id,
@@ -16,7 +16,7 @@ export const store = uiStorage.createStoreDefinition('root', 5, {
   },
   leaderboard: {
     initialState: {
-      sortBy: { direction: 'desc', selector: 'pnl' } as ISortBy,
+      sortBy: { direction: 'desc', selector: 'roi' } as ISortBy,
       isLong: undefined as boolean | undefined,
     }
   },

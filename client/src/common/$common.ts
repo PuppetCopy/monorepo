@@ -182,6 +182,25 @@ export const $pnlDisplay = (
   return $testStr(display)
 }
 
+export const $roiDisplay = (
+  roiSrc: Stream<bigint> | bigint,
+  bold = true
+) => {
+  const roi = streamOf(roiSrc)
+  const display = map(value => readablePercentage(value), roi)
+  const displayColor = skipRepeats(map(value => {
+    return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
+  }, roi))
+
+  const colorStyle = styleInline(map(color => {
+    return { color }
+  }, displayColor))
+
+  const $testStr = $text(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))
+
+  return $testStr(display)
+}
+
 
 export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(pos.market)

@@ -25,6 +25,7 @@ export interface IChangeSubscription {
   expiry: bigint
   allowance: bigint
   trader: viem.Address
+  collateralToken: viem.Address
   previousSubscriptionExpiry: bigint
 }
 
@@ -112,16 +113,16 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
       $node(),
 
       $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
-        $ButtonSecondary({
-          $content: $text('Unsubscribe'),
-          disabled: now(!isSubscribed)
-        })({
-          click: clickUnsubscribeTether(
-            snapshot(params => {
-              return { ...params, previousSubscriptionExpiry: config.expiry, trader: config.trader, expiry: 0n,  }
-            }, form)
-          )
-        }),
+        // $ButtonSecondary({
+        //   $content: $text('Unsubscribe'),
+        //   disabled: now(!isSubscribed)
+        // })({
+        //   click: clickUnsubscribeTether(
+        //     snapshot(params => {
+        //       return { ...params, previousSubscriptionExpiry: config.expiry, trader: config.trader, expiry: 0n,  }
+        //     }, form)
+        //   )
+        // }),
 
         $ButtonSecondary({
           $content: $text('Subscribe'),

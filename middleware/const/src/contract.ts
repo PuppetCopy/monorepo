@@ -1,4 +1,5 @@
 import { arbitrum } from "viem/chains";
+import contractAddress from "contracts/deployments/addresses.json";
 
 import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
@@ -18,30 +19,44 @@ import positionStore from "./abi/positionStore";
 import puppetRouter from "./abi/puppetRouter";
 import positionRouter from "./abi/positionRouter";
 import puppetLogic from "./abi/puppetLogic";
-
+import { Address } from "viem";
 
 export const CONTRACT = {
   [arbitrum.id]: {
     Dictator: {
-      address: "0xECaC4151bF1d17eEC1e3b9bd3bc4a6f2e50E0AFA",
+      address: contractAddress[42161].Dictator as Address,
       abi: dictator,
     },
     EventEmitter: {
-      address: "0x3E62bDfCB20e8253478fe79981d46514949D2cF0",
+      address: contractAddress[42161].EventEmitter as Address,
       abi: eventEmitter,
     },
     PuppetToken: {
-      address: "0x5FeCb50777A594149D3e4A96C48CD1c0032c9972",
+      address: contractAddress[42161].PuppetToken as Address,
       abi: puppetToken,
     },
     PuppetVoteToken: {
-      address: "0x9e40F0fee198AD9A3b97275606336d923d7197d8",
+      address: contractAddress[42161].PuppetVoteToken as Address,
       abi: puppetVoteToken,
     },
     Router: {
-      address: "0x039597eF5b22cC810676512aA23394c95119a312",
+      address: contractAddress[42161].Router as Address,
       abi: router,
     },
+
+    PuppetStore: {
+      address: contractAddress[42161].PuppetStore as Address,
+      abi: puppetStore,
+    },
+    PuppetRouter: {
+      address: contractAddress[42161].PuppetRouter as Address,
+      abi: puppetRouter,
+    },
+    PuppetLogic: {
+      address: contractAddress[42161].PuppetLogic as Address,
+      abi: puppetLogic,
+    },
+
     ContributeStore: {
       address: "0xD8f35E3F2F58579d0AFC937913539c06932Ca13D",
       abi: contributeStore,
@@ -64,31 +79,19 @@ export const CONTRACT = {
     },
     RewardLogic: {
       address: "0xf560b1f2dE1eb62e93FBA01Ee13578AACB8Fcd52",
-      abi: rewardLogic
+      abi: rewardLogic,
     },
     RewardRouter: {
       address: "0x8192468Ab9852391734fA4862581Bb8D96168CE3",
       abi: rewardRouter,
     },
-    PuppetStore: {
-      address: "0x75236b405F460245999F70bc06978AB2B4116920",
-      abi: puppetStore,
-    },
     PositionStore: {
       address: "0x5F5C9d9272b4Bae556e0F83BE2c488B6E77F03EC",
       abi: positionStore,
     },
-    PuppetRouter: {
-      address: "0x8F7d6b64264968D7b61DebbEAE6331af230fa860",
-      abi: puppetRouter
-    },
     PositionRouter: {
       address: "0xe24B30FB459656425c8215eDf555585fc6b1F711",
-      abi: positionRouter
-    },
-    PuppetLogic: {
-      address: "0x3E0894BE6984Ff281e0dd142F3606734F7A9CE94",
-      abi: puppetLogic,
+      abi: positionRouter,
     },
 
     // TODO: Remove these as they are used for testing

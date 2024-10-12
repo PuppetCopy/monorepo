@@ -16,7 +16,7 @@ export default {
     getCoreShare: (provider: walletLink.IClient, user: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
       readContract(provider, { ...contractDefs.PuppetToken, functionName: 'getCoreShare', args: [] }),
     getLimitAmount: (provider: walletLink.IClient, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
-      readContract(provider, { ...contractDefs.PuppetToken, functionName: 'getLimitAmount', args: [] }),
+      readContract(provider, { ...contractDefs.PuppetToken, functionName: 'getEmissionRateLimit', args: [] }),
   },
   PuppetVoteToken: {
     getTotalSupply: (provider: walletLink.IClient, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
@@ -25,7 +25,7 @@ export default {
       readContract(provider, { ...contractDefs.PuppetVoteToken, functionName: 'balanceOf', args: [user] }),
   },
   ContributeStore: {
-    getUserContributionBalanceMap: (provider: walletLink.IClient, token: Address, user: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
+    getUserContributionBalance: (provider: walletLink.IClient, token: Address, user: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
       readContract(provider, { ...contractDefs.ContributeStore, functionName: 'getUserContributionBalanceMap', args: [token, user] }),
     getCursorBalance: (provider: walletLink.IClient, token: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
       readContract(provider, { ...contractDefs.ContributeStore, functionName: 'getCursorBalance', args: [token] }),
@@ -63,7 +63,11 @@ export default {
       readContract(provider, { ...contractDefs.RewardLogic, functionName: 'config', args: [] }),
     getPendingEmission: (provider: walletLink.IClient, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
       readContract(provider, { ...contractDefs.RewardLogic, functionName: 'getPendingEmission', args: [] }),
-  }
+  },
+  PuppetStore: {
+    getClaimable: (provider: walletLink.IClient, token: Address, user: Address, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
+      readContract(provider, { ...contractDefs.PuppetStore, functionName: 'getUserBalance', args: [token, user] }),
+  },
 }
 
 

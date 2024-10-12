@@ -30,6 +30,7 @@ import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
+import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -291,15 +292,15 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
           ),
 
           $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
-            // $RouteSubscriptionDrawer({
-            //   providerClientQuery,
-            //   walletClientQuery,
-            //   modifySubscriptionList: replayLatest(modifySubscriptionList, []),
-            //   modifySubscriber,
-            // })({
-            //   changeWallet: changeWalletTether(),
-            //   modifySubscriptionList: modifySubscriptionListTether()
-            // })
+            $RouteSubscriptionDrawer({
+              providerClientQuery,
+              walletClientQuery,
+              modifySubscriptionList: replayLatest(modifySubscriptionList, []),
+              modifySubscriber,
+            })({
+              changeWallet: changeWalletTether(),
+              modifySubscriptionList: modifySubscriptionListTether()
+            })
           )
         )
       ),

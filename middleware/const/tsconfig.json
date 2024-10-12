@@ -4,7 +4,8 @@
     "outDir": "dist/esm",
     "rootDir": "./src",
     "declarationDir": "dist/types",
-    "emitDeclarationOnly": false
+    "emitDeclarationOnly": false,
+    "allowSyntheticDefaultImports": true,
   },
   "references": [
     {

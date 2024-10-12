@@ -4,13 +4,17 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Stream, Time } from "@most/types"
-import { IntervalTime, getBasisPoints, getMappedValue, pagingQuery, readablePercentage } from "common-utils"
+import { IntervalTime, getBasisPoints, getMappedValue, pagingQuery, readablePercentage, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IAccountLastAggregatedPerformance, IAccountLastAggregatedStats, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
-import { $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull, $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer, $icon, $infoLabel, $infoLabeledValue, $spinner, IMarker, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse } from "ui-components"
+import {
+  $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
+  $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
+  $icon, $infoLabel, $infoLabeledValue, $spinner, IMarker, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse
+} from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $size } from "../../common/$common.js"
+import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $roiDisplay, $size } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { subgraphClient } from "../../common/graphClient"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
@@ -161,7 +165,6 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                       const winCount = pos.account.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
                       return $row(layoutSheet.spacingSmall)(
                         $text(`${winCount} / ${totalCount - winCount}`)
-
                       )
                     })
                   },
@@ -181,12 +184,12 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
               {
                 // columnOp: style({ placeContent: 'flex-start' }),
                 $head: $row(layoutSheet.spacingSmall, style({ flex: 1, placeContent: 'space-between' }))(
-                  $tableHeader('PnL $', 'ROI %'),
+                  $tableHeader('ROI %', 'PnL $'),
                   $text(style({ alignSelf: 'center' }))(
                     map(tf => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
                   )
                 ),
-                sortBy: 'pnl',
+                sortBy: 'roi',
                 gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
                 $bodyCallback: map(pos => {
                   const adjustList = [...pos.account.increaseList, ...pos.account.decreaseList]
@@ -246,11 +249,11 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     ),
                     $row(style({ position: 'absolute', background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`, inset: 0, zIndex: 1, alignItems: 'center' }))(
                       $column(layoutSheet.spacingTiny)(
-                        $pnlDisplay(pos.pnl),
+                        $roiDisplay(
+                          pos.roi
+                        ),
                         $seperator2,
-                        $text(style({ fontSize: '.85rem' }))(
-                          readablePercentage(getBasisPoints(pos.pnl, pos.maxCollateralInUsd))
-                        )
+                        $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl)),
                       )
                     )
                   )

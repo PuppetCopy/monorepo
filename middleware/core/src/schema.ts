@@ -3,7 +3,7 @@ import { IAccountLastAggregatedStats, IGbcToken, IOrderCreated, IPositionDecreas
 
 
 const gbcToken: ISchema<IGbcToken> = {
-  id: 'address',
+  id: 'number',
   __typename: 'GbcToken',
 }
 

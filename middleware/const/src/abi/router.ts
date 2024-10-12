@@ -1,1 +1,159 @@
-export default [{ "inputs": [{ "internalType": "contract IAuthority", "name": "_authority", "type": "address" }, { "internalType": "uint256", "name": "_trasnferGasLimit", "type": "uint256" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "Auth_Unauthorized", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "target", "type": "address" }], "name": "ExternalCallUtils__AddressEmptyCode", "type": "error" }, { "inputs": [], "name": "ExternalCallUtils__FailedInnerCall", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }], "name": "ExternalCallUtils__SafeERC20FailedOperation", "type": "error" }, { "inputs": [], "name": "authority", "outputs": [{ "internalType": "contract IAuthority", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bytes4", "name": "signatureHash", "type": "bytes4" }, { "internalType": "address", "name": "user", "type": "address" }], "name": "canCall", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bytes4", "name": "signatureHash", "type": "bytes4" }, { "internalType": "address", "name": "", "type": "address" }], "name": "permissionMap", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bytes4", "name": "functionSig", "type": "bytes4" }, { "internalType": "address", "name": "user", "type": "address" }], "name": "removePermission", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes4", "name": "functionSig", "type": "bytes4" }, { "internalType": "address", "name": "user", "type": "address" }], "name": "setPermission", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_trasnferGasLimit", "type": "uint256" }], "name": "setTransferGasLimit", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "token", "type": "address" }, { "internalType": "address", "name": "from", "type": "address" }, { "internalType": "address", "name": "to", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "transfer", "outputs": [], "stateMutability": "nonpayable", "type": "function" }] as const
+export default [
+  {
+    type: "constructor",
+    inputs: [
+      {
+        name: "_authority",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "authority",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "canCall",
+    inputs: [
+      {
+        name: "signatureHash",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "remove",
+    inputs: [
+      {
+        name: "functionSig",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "set",
+    inputs: [
+      {
+        name: "functionSig",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+      {
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setTransferGasLimit",
+    inputs: [
+      {
+        name: "_trasnferGasLimit",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transfer",
+    inputs: [
+      {
+        name: "token",
+        type: "address",
+        internalType: "contract IERC20",
+      },
+      {
+        name: "from",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "to",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "error",
+    name: "ExternalCallUtils__AddressEmptyCode",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "ExternalCallUtils__FailedInnerCall",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "ExternalCallUtils__SafeERC20FailedOperation",
+    inputs: [
+      {
+        name: "token",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "Permission__Unauthorized",
+    inputs: [],
+  },
+] as const;
