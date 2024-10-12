@@ -9,6 +9,9 @@
   "references": [
     {
       "path": "../gmx-core"
+    },
+    {
+      "path": "../gmx-const"
     }
   ]
 }
