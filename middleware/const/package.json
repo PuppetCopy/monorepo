@@ -13,7 +13,6 @@
     },
     "dependencies": {
         "viem": "2.21.3",
-        "gmx-middleware-const": "workspace:*",
-        "contracts": "workspace:*"
+        "gmx-middleware-const": "workspace:*"
     }
 }

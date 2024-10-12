@@ -19,41 +19,40 @@ import positionStore from "./abi/positionStore";
 import puppetRouter from "./abi/puppetRouter";
 import positionRouter from "./abi/positionRouter";
 import puppetLogic from "./abi/puppetLogic";
-import { Address } from "viem";
 
 export const CONTRACT = {
   [arbitrum.id]: {
     Dictator: {
-      address: contractAddress[42161].Dictator as Address,
+      address: "0x6474AF87CbF50cbdE88710b3DaF7247A22910AA1",
       abi: dictator,
     },
     EventEmitter: {
-      address: contractAddress[42161].EventEmitter as Address,
+      address: "0xfA3fA156d39235994Ed8b87DB6e0cBE74c942C41",
       abi: eventEmitter,
     },
     PuppetToken: {
-      address: contractAddress[42161].PuppetToken as Address,
+      address: "0x29e21E47E2a1C4128b789b1b49FEAB91dBD7A80A",
       abi: puppetToken,
     },
     PuppetVoteToken: {
-      address: contractAddress[42161].PuppetVoteToken as Address,
+      address: "0xFeDA7274a47e142170824A4AbC8CF6A38033A254",
       abi: puppetVoteToken,
     },
     Router: {
-      address: contractAddress[42161].Router as Address,
+      address: "0xFd5943807B3A9dB50DB8D0DAf4162E68f7139b2C",
       abi: router,
     },
 
     PuppetStore: {
-      address: contractAddress[42161].PuppetStore as Address,
+      address: "0xeA9D224D16E3a35a8EB78ada6BD8D157a5F22aC4",
       abi: puppetStore,
     },
     PuppetRouter: {
-      address: contractAddress[42161].PuppetRouter as Address,
+      address: "0x402bF957BfFa22936da3bb66809D1e6E841aa059",
       abi: puppetRouter,
     },
     PuppetLogic: {
-      address: contractAddress[42161].PuppetLogic as Address,
+      address: "0xd58c8E29F36c2f082d0d6f6C3f07a6B7A519B86a",
       abi: puppetLogic,
     },
 
