@@ -1,6 +1,4 @@
 import { arbitrum } from "viem/chains";
-import contractAddress from "contracts/deployments/addresses.json";
-
 import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
 import puppetStore from "./abi/puppetStore";

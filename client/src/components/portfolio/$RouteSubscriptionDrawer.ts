@@ -84,14 +84,10 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
           ),
 
           switchMap(params => {
-            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.expiry)) as [viem.Hex, IChangeSubscription[]][]
+            const routeMap = Object.entries(groupArrayMany(params.modifySubscriptionList, x => x.collateralToken)) as [viem.Hex, IChangeSubscription[]][]
 
             return $column(layoutSheet.spacing)(
-              ...routeMap.map(([routeTypeKey, subscList]) => {
-
-                if (!tradeRoute) {
-                  return empty()
-                }
+              ...routeMap.map(([collateralToken, subscList]) => {
 
 
                 return $column(style({ paddingLeft: '16px' }))(

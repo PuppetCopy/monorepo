@@ -75,15 +75,15 @@ export const $entry = (pos: IPosition) => {
   )
 }
 
-export const $route = (indexTokenDescription: ITokenDescription, collateralTokenDescription: ITokenDescription, displayLabel = true) => {
+export const $route = (collateralTokenDescription: ITokenDescription, displayLabel = true) => {
 
   return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', position: 'relative' }))(
     $row(
-      style({
-        width: '38px', height: '34x'
-      })(
-        $tokenIcon(indexTokenDescription)
-      ),
+      // style({
+      //   width: '38px', height: '34x'
+      // })(
+      //   $tokenIcon(indexTokenDescription)
+      // ),
       style({
         width: '32px', height: '24x',
         marginLeft: `-12px`,
@@ -94,7 +94,7 @@ export const $route = (indexTokenDescription: ITokenDescription, collateralToken
     ),
     displayLabel
       ? $column(layoutSheet.spacingTiny)(
-        $text(style({ fontSize: '1rem' }))(`${indexTokenDescription.symbol}`)
+        $text(style({ fontSize: '1rem' }))(`${collateralTokenDescription.symbol}`)
       )
       : empty(),
   )
