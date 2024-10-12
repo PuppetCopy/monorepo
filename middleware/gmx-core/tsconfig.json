@@ -8,7 +8,10 @@
   },
   "references": [
     {
-      "path": "../const"
+      "path": "../gmx-const"
     },
+    {
+      "path": "../utils"
+    }
   ]
 }
