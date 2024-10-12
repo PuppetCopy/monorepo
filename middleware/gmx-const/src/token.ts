@@ -247,7 +247,19 @@ export const TOKEN_DESCRIPTION_LIST = [
     decimals: 18,
     denominator: 10n ** 18n
   },
-  
+  {
+    name: "EIGEN",
+    symbol: TOKEN_SYMBOL.EIGEN,
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "SATS",
+    symbol: TOKEN_SYMBOL.SATS,
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+
 
 ] as const
 
@@ -292,7 +304,9 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   [ARBITRUM_ADDRESS.USDe]: TOKEN_DESCRIPTION_MAP.USDe,
   [ARBITRUM_ADDRESS.tBTC]: TOKEN_DESCRIPTION_MAP.tBTC,
   [ARBITRUM_ADDRESS.wstETH]: TOKEN_DESCRIPTION_MAP.wstETH,
-  
+  [ARBITRUM_ADDRESS.EIGEN]: TOKEN_DESCRIPTION_MAP.EIGEN,
+  [ARBITRUM_ADDRESS.SATS]: TOKEN_DESCRIPTION_MAP.SATS,
+
 
   [ARBITRUM_ADDRESS.DOGE]: TOKEN_DESCRIPTION_MAP.DOGE,
   [ARBITRUM_ADDRESS.LTC]: TOKEN_DESCRIPTION_MAP.LTC,

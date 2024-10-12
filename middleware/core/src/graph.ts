@@ -4,10 +4,10 @@ import { Stream } from '@most/types'
 import { type Client } from '@urql/core'
 import { combineState, getClosestNumber, groupArrayMany, IntervalTime, IRequestSortApi, periodicRun, StateParams, unixTimestampNow } from 'common-utils'
 import * as GMX from "gmx-middleware-const"
-import { IPositionDecrease, IPositionIncrease, IPriceCandle, IPricefeedMap, IPriceOracleMap, IQueryFilter, ISchema, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
+import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IQueryFilter, ISchema, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { schema } from './schema.js'
-import { IAccountLastAggregatedStats, IPosition } from './types'
+import { IAccountLastAggregatedStats, IPositionDecrease, IPositionIncrease } from './types'
 import { aggregatePositionList } from './utils'
 
 
@@ -33,10 +33,9 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
     const filter: IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
 
     if (filterParams.account) {
-      filter.account = {
+      filter.account_id = {
         _eq: `"${filterParams.account}"`
       }
-
     }
 
     if (filterParams.isLong !== undefined) {
@@ -66,7 +65,6 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
         }
       })
     }
-
 
     if (orFilters.length) {
       filter._or = orFilters
@@ -142,8 +140,8 @@ export function queryAccountLastAggregatedStats(
       filter._or = orFilters
     }
 
-    // filter.account = {
-    //   _eq: '"0x66925739dE62F4411aA31f49b20C5Bd46565C342"'
+    // filter.account_id = {
+    //   _eq: '"0x1B4E44f70D1D023784210a9c2F8b84eBD613c29C"'
     // }
 
 

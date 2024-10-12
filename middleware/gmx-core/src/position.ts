@@ -3,7 +3,7 @@ import * as viem from "viem"
 import { applyFactor, BASIS_POINTS_DIVISOR, getDenominator, getMappedValue, getTokenUsd, ITokenDescription, PRECISION, WEI_PRECISION } from "common-utils"
 import { getPriceImpactForPosition } from "./price.js"
 import { getPoolUsdWithoutPnl } from "./market.js"
-import { IMarketPrice, IMarketInfo, IPositionFees, IPositionNumbers, PositionReferralFees } from "./types.js"
+import { IMarketPrice, IMarketInfo, IPositionFees, PositionReferralFees, IPositionNumbers } from "./types.js"
 
 
 

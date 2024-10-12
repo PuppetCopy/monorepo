@@ -5,7 +5,7 @@ import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { ITokenDescription, IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
+import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { queryPricefeed, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
@@ -30,8 +30,6 @@ import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
-import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer"
-import { getMarketIndexToken } from "gmx-middleware-utils"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)

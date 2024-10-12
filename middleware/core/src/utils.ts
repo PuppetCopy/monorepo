@@ -1,14 +1,14 @@
 import { factor, getMappedValue } from "common-utils"
-import { getMarketIndexToken, getPositionPnlUsd, getTokenDescription, IPositionDecrease, IPositionIncrease, IPriceCandle, IPricefeedMap, isUpdateIncrease } from "gmx-middleware-utils"
+import { getMarketIndexToken, getTokenDescription, IPriceCandle, IPricefeedMap, OrderType } from "gmx-middleware-utils"
 import * as viem from "viem"
-import { IMirrorListSummary, IPosition, IPuppetPosition } from "./types.js"
+import { IPositionListSummary, IPosition, IPositionDecrease, IPositionIncrease, IPuppetPosition } from "./types.js"
 
 
 export function accountSettledPositionListSummary(
   positionList: IPosition[],
   puppet?: viem.Address,
-): IMirrorListSummary {
-  const seedAccountSummary: IMirrorListSummary = {
+): IPositionListSummary {
+  const seedAccountSummary: IPositionListSummary = {
     size: 0n,
     collateral: 0n,
     cumulativeLeverage: 0n,
@@ -23,7 +23,7 @@ export function accountSettledPositionListSummary(
     pnl: 0n,
   }
 
-  const summary = positionList.reduce((seed, next, idx): IMirrorListSummary => {
+  const summary = positionList.reduce((seed, next, idx): IPositionListSummary => {
     const idxBn = BigInt(idx) + 1n
 
     const size = seed.size + getParticiapntPortion(next, next.maxSizeInUsd, puppet)
@@ -63,52 +63,58 @@ export function accountSettledPositionListSummary(
 
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
   const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
-  const openPositionMap: { [k: viem.Hex]: IPosition } = {}
+  const openPositionMap = new Map<viem.Hex, IPosition>()
   const positionList: IPosition[] = []
 
   for (let index = 0; index < sortedUpdateList.length; index++) {
     const next = sortedUpdateList[index]
-    const position = openPositionMap[next.positionKey] ??= {
-      key: next.positionKey,
-      account: next.account,
-      market: next.market,
-      collateralToken: next.collateralToken,
+    let position = openPositionMap.get(next.positionKey)
 
-      sizeInUsd: 0n,
-      sizeInTokens: 0n,
-      collateralInTokens: 0n,
-      collateralInUsd: 0n,
-      realisedPnlUsd: 0n,
+    if (!position) {
+      position = {
+        key: next.positionKey,
+        account: next.account.id,
+        market: next.market,
+        collateralToken: next.collateralToken,
 
-      cumulativeSizeUsd: 0n,
-      cumulativeSizeToken: 0n,
-      cumulativeCollateralUsd: 0n,
-      cumulativeCollateralToken: 0n,
+        sizeInUsd: 0n,
+        sizeInTokens: 0n,
+        collateralInTokens: 0n,
+        collateralInUsd: 0n,
+        realisedPnlUsd: 0n,
 
-      maxSizeInUsd: 0n,
-      maxSizeInTokens: 0n,
-      maxCollateralInTokens: 0n,
-      maxCollateralInUsd: 0n,
+        cumulativeSizeUsd: 0n,
+        cumulativeSizeToken: 0n,
+        cumulativeCollateralUsd: 0n,
+        cumulativeCollateralToken: 0n,
 
-      avgEntryPrice: 0n,
+        maxSizeInUsd: 0n,
+        maxSizeInTokens: 0n,
+        maxCollateralInTokens: 0n,
+        maxCollateralInUsd: 0n,
 
-      isLong: next.isLong,
+        avgEntryPrice: 0n,
 
-      openTimestamp: next.blockTimestamp,
-      settledTimestamp: 0,
+        isLong: next.isLong,
 
-      puppetList: [],
-      increaseList: [],
-      decreaseList: [],
+        openTimestamp: next.blockTimestamp,
+        settledTimestamp: 0,
 
-      collateralList: [],
+        puppetList: [],
+        increaseList: [],
+        decreaseList: [],
 
-      lastUpdate: next,
+        collateralList: [],
+
+        lastUpdate: next,
+      }
+
+      openPositionMap.set(next.positionKey, position)
     }
 
     position.lastUpdate = next
 
-    if (isUpdateIncrease(next)) {
+    if (next.__typename === 'PositionIncrease') {
       position.sizeInUsd += next.sizeDeltaUsd
       position.sizeInTokens += next.sizeDeltaInTokens
       position.collateralInTokens += next.collateralDeltaAmount
@@ -147,8 +153,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
         position.settledTimestamp = next.blockTimestamp
 
         positionList.push(position)
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete openPositionMap[next.positionKey]
+        openPositionMap.delete(next.positionKey)
       }
     }
 
@@ -156,80 +161,25 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
   }
 
-  positionList.push(...Object.values(openPositionMap))
+  positionList.push(...openPositionMap.values())
   return positionList
 }
 
 
+export function isUpdateIncrease(update: IPositionIncrease | IPositionDecrease): update is IPositionIncrease {
+  return update.orderType === OrderType.MarketIncrease || update.orderType === OrderType.LimitIncrease
+}
 
+export function isUpdateDecrease(update: IPositionIncrease | IPositionDecrease): update is IPositionDecrease {
+  return update.orderType === OrderType.MarketDecrease
+    || update.orderType === OrderType.LimitDecrease
+    || update.orderType === OrderType.Liquidation
+    || update.orderType === OrderType.StopLossDecrease
+}
 
-// export function leaderboardSummary(pricefeedMap: IPricefeedMap, tradeList: IAccountLastAggregatedStats[]): ILeaderboardSummary[] {
-//   const map: { [k: viem.Address]: ILeaderboardSummary } = {}
-
-//   for (const next of tradeList) {
-//     const summary = map[next.account] ??= {
-//       account: next.account,
-//       cumulativeCollateral: 0n,
-//       cumulativeSize: 0n,
-//       maxCollateral: 0n,
-//       maxSize: 0n,
-//       leverage: 0n,
-//       lossCount: 0,
-//       winCount: 0,
-//       pnl: 0n,
-//       puppets: [],
-//       positionList: [],
-//       indexTokenList: [],
-//       collateralTokenList: [],
-//     }
-
-//     summary.cumulativeCollateral += next.maxCollateralInUsd
-//     summary.cumulativeSize += next.maxSizeInTokens
-//     summary.maxCollateral = next.maxCollateralInUsd > summary.maxCollateral ? next.maxCollateralInUsd : summary.maxCollateral
-//     summary.maxSize = next.maxSizeInUsd > summary.maxSize ? next.maxSizeInUsd : summary.maxSize
-//     summary.leverage = summary.maxSize / summary.maxCollateral
-
-//     if (next.sizeInTokens === 0n) {
-//       summary.pnl += next.realisedPnlUsd
-
-//       summary.winCount += next.realisedPnlUsd > 0n ? 1 : 0
-//       summary.lossCount += next.realisedPnlUsd < 0n ? 1 : 0
-//     } else {
-
-//       try {
-//         const priceCandle = getLatestPriceFeedPrice(pricefeedMap, getMarketIndexToken(next.market))
-//         const pnl = next.realisedPnlUsd + getPositionPnlUsd(next.isLong, next.sizeInUsd, next.sizeInTokens, priceCandle.c)
-//         summary.pnl += pnl
-//         summary.winCount += pnl > 0n ? 1 : 0
-//         summary.lossCount += pnl < 0n ? 1 : 0
-//       } catch (e) {
-//         console.error(e)
-//         continue
-//       }
-
-//     }
-
-//     const indexToken = getMarketIndexToken(next.market)
-
-//     if (summary.indexTokenList.indexOf(indexToken) === -1) {
-//       summary.indexTokenList.push(indexToken)
-//     }
-
-//     if (summary.collateralTokenList.indexOf(next.collateralToken) === -1) {
-//       summary.collateralTokenList.push(next.collateralToken)
-//     }
-
-
-//     // summary.puppets = []
-//     summary.positionList.push(next)
-
-//     map[next.account] = summary
-//   }
-
-
-//   return Object.values(map)
-// }
-
+export function isCloseUpdate(update: IPositionIncrease | IPositionDecrease): boolean {
+  return update.sizeInTokens === 0n
+}
 
 export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): IPriceCandle {
   const feed = getMappedValue(priceFeed, token)

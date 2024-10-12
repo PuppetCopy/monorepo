@@ -54,6 +54,15 @@ export type IQueryFilter<T> = IQueryFilterCoercion<T> & {
     _lte?: string | number | boolean
     _regexp?: string
   }
+} & {
+  [K in keyof T as T[K] extends { id: any } ? `${K & string}_id` : never]?: {
+    _eq?: string | number | boolean
+    _gt?: string | number | boolean
+    _gte?: string | number | boolean
+    _lt?: string | number | boolean
+    _lte?: string | number | boolean
+    _regexp?: string
+  }
 }
 
 export type IQueryOrderBy<T> = {

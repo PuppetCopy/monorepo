@@ -1,5 +1,5 @@
-import { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, IntervalTime } from "common-utils"
-import { IEnsRegistration, IPriceCandle, IRequestTimerangeApi } from "gmx-middleware-utils"
+import { IResponsePageApi } from "common-utils"
+import { IPriceCandle } from "gmx-middleware-utils"
 
 export type IPrice = {
   priceUsd: bigint
@@ -63,6 +63,20 @@ export type IBerryLabItems = {
   background: number;
   badge: number;
   custom: number;
+}
+
+export interface IEnsRegistration {
+  id: string
+  labelName: string
+  expiryDate: number
+  domain: {
+    resolvedAddress: {
+      id: string
+    }
+    resolver: {
+      texts: string[]
+    }
+  }
 }
 
 

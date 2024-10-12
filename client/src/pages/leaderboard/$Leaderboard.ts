@@ -52,7 +52,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
       const timeline = getPositionListTimelinePerformance({
         activityTimeframe: activityTimeframe,
-        list: [...stats.trader.increaseList, ...stats.trader.decreaseList],
+        list: [...stats.account.increaseList, ...stats.account.decreaseList],
         pricefeedMap,
         tickCount: 25,
       })
@@ -128,7 +128,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 $bodyCallback: map(pos => {
                   return $TraderDisplay({
                     route: config.route,
-                    trader: pos.trader.id,
+                    trader: pos.account.id,
                     puppets: [],
                   })({
                     click: routeChangeTether()
@@ -136,14 +136,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 })
               },
               {
-                $head: $text('Trade Route'),
-                gridTemplate: screenUtils.isDesktopScreen ? '210px' : '80px',
+                $head: $text('Collateral Route'),
+                gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                 $bodyCallback: map(pos => {
                   return $TraderRouteDisplay({
                     walletClientQuery,
                     selectedCollateralTokenList,
-                    collateralTokenList: [...new Set([...pos.trader.increaseList, ...pos.trader.decreaseList].map(i => i.collateralToken))],
-                    trader: pos.trader.id
+                    collateralTokenList: [...new Set([...pos.account.increaseList, ...pos.account.decreaseList].map(i => i.collateralToken))],
+                    trader: pos.account.id
                   })({
                     modifySubscribeList: modifySubscriberTether()
                   })
@@ -157,8 +157,8 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     gridTemplate: '70px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
                     $bodyCallback: map((pos: IAccountLastAggregatedStats) => {
-                      const totalCount = pos.trader.increaseList.length + pos.trader.decreaseList.length
-                      const winCount = pos.trader.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
+                      const totalCount = pos.account.decreaseList.length
+                      const winCount = pos.account.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
                       return $row(layoutSheet.spacingSmall)(
                         $text(`${winCount} / ${totalCount - winCount}`)
 
@@ -189,7 +189,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 sortBy: 'pnl',
                 gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
                 $bodyCallback: map(pos => {
-                  const adjustList = [...pos.trader.increaseList, ...pos.trader.decreaseList]
+                  const adjustList = [...pos.account.increaseList, ...pos.account.decreaseList]
 
 
                   const markerList = adjustList
@@ -270,7 +270,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
             return $Table({
               $headerContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),
-              $container: $defaultTableContainer(style({ backgroundColor: pallete.background, borderTop: `1px solid ${colorAlpha(pallete.foreground, .2)}`, padding: '36px' })),
+              $container: $defaultTableContainer(style({ backgroundColor: pallete.background, borderTop: `1px solid ${colorAlpha(pallete.foreground, .2)}`, padding: screenUtils.isDesktopScreen ? '36px' : '8px' })),
               $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
               scrollConfig: {
                 // $container: $defaultVScrollContainer(style({ gap: '2px' })),

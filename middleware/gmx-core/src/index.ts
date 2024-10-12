@@ -1,7 +1,6 @@
 
 export * from './types.js'
 export * from './subgraph/query.js'
-export * from './subgraph/schema.js'
 export * from './gmxUtils.js'
 export * from './marketMap.js'
 export * from './pool/tradingPools.js'

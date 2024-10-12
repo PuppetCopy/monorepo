@@ -43,7 +43,7 @@ function withdraw(IERC20 token, address receiver, uint amount) external nonReent
 
 
 ```solidity
-function setRule(IERC20 collateralToken, address trader, PuppetStore.AllocationRule calldata ruleParams) external nonReentrant;
+function setRule(IERC20 collateralToken, address trader, PuppetStore.AllocationRoundRule calldata ruleParams) external nonReentrant;
 ```
 
 ### setRuleList
@@ -51,7 +51,7 @@ function setRule(IERC20 collateralToken, address trader, PuppetStore.AllocationR
 
 ```solidity
 function setRuleList(
-    PuppetStore.AllocationRule[] calldata ruleParams,
+    PuppetStore.AllocationRoundRule[] calldata ruleParams,
     address[] calldata traderList,
     IERC20[] calldata collateralTokenList
 ) external nonReentrant;

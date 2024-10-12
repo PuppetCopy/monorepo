@@ -31,6 +31,8 @@ export const TOKEN_SYMBOL = {
   DOT: "DOT",
   tBTC: "tBTC",
   wstETH: "wstETH",
+  EIGEN: "EIGEN",
+  SATS: "SATS",
 
   USDT: "USDT",
   DAI: "DAI",

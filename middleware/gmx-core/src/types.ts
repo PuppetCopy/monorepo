@@ -1,8 +1,7 @@
-import { Stream } from "@most/types"
-import { Abi, ExtractAbiEvent } from "abitype"
+import { ExtractAbiEvent } from "abitype"
 import { IntervalTime } from "common-utils"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import * as GMX from "gmx-middleware-const"
+import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import * as viem from "viem"
 
 export type ITokenSymbol = keyof typeof TOKEN_DESCRIPTION_MAP
@@ -40,20 +39,6 @@ export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends strin
 export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogOrdered & Omit<ILogEvent<TAbi, TEventName>, 'data'>
 export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> & ILogArgs<TAbi, TEventName>
 
-
-export interface IEnsRegistration {
-  id: string
-  labelName: string
-  expiryDate: number
-  domain: {
-    resolvedAddress: {
-      id: string
-    }
-    resolver: {
-      texts: string[]
-    }
-  }
-}
 
 
 export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
@@ -101,32 +86,15 @@ export type IRequestPricefeedApi = IChainParamApi & IRequestTimerangeApi & { int
 export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity { }
 
 
-
-
-
-export type StreamInputArray<T extends readonly unknown[]> = {
-  [P in keyof T]: Stream<T[P]>
+export type IPositionNumbers = {
+  sizeInUsd: bigint
+  sizeInTokens: bigint
+  collateralAmount: bigint
+  borrowingFactor: bigint
+  fundingFeeAmountPerSize: bigint
+  longTokenClaimableFundingAmountPerSize: bigint
+  shortTokenClaimableFundingAmountPerSize: bigint
 }
-
-export type StreamInput<T> = {
-  [P in keyof T]: Stream<T[P]> | T[P]
-}
-
-export type ContractParams<
-  TAbi extends Abi,
-  TAddress extends viem.Address = viem.Address,
-> = {
-  abi: TAbi
-  address: TAddress
-}
-
-export type ContractClientParams<
-  TAbi extends Abi,
-  TAddress extends viem.Address = viem.Address,
-  TTransport extends viem.Transport = viem.Transport,
-  TChain extends viem.Chain = viem.Chain,
-> = ContractParams<TAbi, TAddress> & { client: viem.PublicClient<TTransport, TChain> }
-
 
 export const OrderType = {
   // the order will be cancelled if the minOutputAmount cannot be fulfilled
@@ -147,13 +115,8 @@ export const OrderType = {
   StopLossDecrease: 6n,
   // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
   Liquidation: 7n,
-}
+} as const
 
-export enum DecreasePositionSwapType {
-  NoSwap = 0,
-  SwapPnlTokenToCollateralToken = 1,
-  SwapCollateralTokenToPnlToken = 2,
-}
 
 export type IEventEmitterAbi = typeof GMX.CONTRACT['42161']['EventEmitter']['abi']
 
@@ -171,38 +134,6 @@ export interface PositionReferralFees {
   traderDiscountAmount: bigint
   affiliateRewardAmount: bigint
 
-}
-
-
-export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollected'> {
-  affiliate: viem.Address
-  positionKey: viem.Address
-
-  totalRebateFactor: bigint
-  traderDiscountFactor: bigint
-  totalRebateAmount: bigint
-  traderDiscountAmount: bigint
-  affiliateRewardAmount: bigint
-  fundingFeeAmount: bigint
-  claimableLongTokenAmount: bigint
-  claimableShortTokenAmount: bigint
-  latestFundingFeeAmountPerSize: bigint
-  latestLongTokenClaimableFundingAmountPerSize: bigint
-  latestShortTokenClaimableFundingAmountPerSize: bigint
-  borrowingFeeUsd: bigint
-  borrowingFeeAmount: bigint
-  borrowingFeeReceiverFactor: bigint
-  borrowingFeeAmountForFeeReceiver: bigint
-  positionFeeFactor: bigint
-  protocolFeeAmount: bigint
-  positionFeeReceiverFactor: bigint
-  feeReceiverAmount: bigint
-  feeAmountForPool: bigint
-  positionFeeAmountForPool: bigint
-  positionFeeAmount: bigint
-  totalCostAmount: bigint
-  uiFeeReceiverFactor: bigint
-  uiFeeAmount: bigint
 }
 
 
@@ -259,136 +190,6 @@ export interface IExecutionPriceResult {
   priceImpactUsd: bigint
   priceImpactDiffUsd: bigint
   executionPrice: bigint
-}
-
-export type IPositionAddresses = {
-  account: viem.Address
-  collateralToken: viem.Address
-  market: viem.Address
-}
-
-export type IPositionNumbers = {
-  sizeInUsd: bigint
-  sizeInTokens: bigint
-  collateralAmount: bigint
-  borrowingFactor: bigint
-  fundingFeeAmountPerSize: bigint
-  longTokenClaimableFundingAmountPerSize: bigint
-  shortTokenClaimableFundingAmountPerSize: bigint
-}
-
-
-export interface IPositionInfo {
-  position: {
-    addresses: IPositionAddresses,
-    numbers: IPositionNumbers
-    flags: {
-      isLong: boolean
-    }
-  }
-  fees: IPositionFees
-  executionPriceResult: IExecutionPriceResult
-  basePnlUsd: bigint
-  uncappedBasePnlUsd: bigint
-  pnlAfterPriceImpactUsd: bigint
-}
-
-export interface IOrderCreated extends ILogTypeId<'OrderCreated'> {
-  key: viem.Hex
-
-  account: viem.Address
-  receiver: viem.Address
-  callbackContract: viem.Address
-  uiFeeReceiver: viem.Address
-  market: viem.Address
-  initialCollateralToken: viem.Address
-
-  swapPath: viem.Address[]
-
-  orderType: bigint
-  decreasePositionSwapType: bigint
-  sizeDeltaUsd: bigint
-  initialCollateralDeltaAmount: bigint
-  triggerPrice: bigint
-  acceptablePrice: bigint
-  executionFee: bigint
-  callbackGasLimit: bigint
-  minOutputAmount: bigint
-  updatedAtBlock: bigint
-
-  isLong: boolean
-  shouldUnwrapNativeToken: boolean
-  isFrozen: boolean
-}
-
-
-export interface IOrderStatus extends ILogTxType<'OrderStatus'> {
-  order: IOrderCreated
-  orderType: bigint
-  statusType: bigint
-  message: string
-}
-
-export interface IPositionLink extends ILogTypeId<'PositionLink'> {
-  id: string
-  key: viem.Hex
-
-  increaseList: IPositionIncrease[]
-  decreaseList: IPositionDecrease[]
-  // feeUpdateList: IPositionFeesCollected[]
-}
-
-
-
-export type IPositionIncrease = ILogTxType<'PositionIncrease'> & IPositionAddresses & IPositionNumbers & {
-  order: IOrderStatus
-  positionKey: viem.Hex
-
-  account: viem.Address
-  market: viem.Address
-  collateralToken: viem.Address
-
-  executionPrice: bigint
-  indexTokenPriceMax: bigint
-  indexTokenPriceMin: bigint
-  collateralTokenPriceMax: bigint
-  collateralTokenPriceMin: bigint
-  sizeDeltaUsd: bigint
-  sizeDeltaInTokens: bigint
-  orderType: bigint
-
-  collateralDeltaAmount: bigint
-  priceImpactUsd: bigint
-  priceImpactAmount: bigint
-
-  isLong: boolean
-
-  feeCollected: IPositionFeesCollected
-}
-
-
-export type IPositionDecrease = ILogTxType<'PositionDecrease'> & IPositionAddresses & IPositionNumbers & {
-  order: IOrderStatus
-  positionKey: viem.Hex
-
-  executionPrice: bigint
-  indexTokenPriceMax: bigint
-  indexTokenPriceMin: bigint
-  collateralTokenPriceMax: bigint
-  collateralTokenPriceMin: bigint
-  sizeDeltaUsd: bigint
-  sizeDeltaInTokens: bigint
-  collateralDeltaAmount: bigint
-  valuesPriceImpactDiffUsd: bigint
-  orderType: bigint
-  
-  priceImpactUsd: bigint
-  basePnlUsd: bigint
-  uncappedBasePnlUsd: bigint
-
-  isLong: boolean
-
-  feeCollected: IPositionFeesCollected
 }
 
 export type IOraclePrice = IPriceMinMax & {
@@ -492,19 +293,6 @@ export interface IMarketInfo {
   usage: IMarketUsageInfo
 }
 
-
-export type IMarketCreatedEvent = ILogTxType<'MarketCreated'> & IMarket & {
-  salt: viem.Hex
-}
-
-
-export type IOraclePriceUpdateEvent = ILogTxType<'OraclePriceUpdate'> & {
-  token: viem.Address
-  maxPrice: bigint
-  minPrice: bigint
-  priceSourceType: bigint
-  timestamp: bigint
-}
 
 
 interface ICollateralType {

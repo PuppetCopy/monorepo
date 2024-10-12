@@ -1,9 +1,9 @@
 import { AbiEvent } from "abitype"
-import { factor, getBasisPoints, BASIS_POINTS_DIVISOR, easeInExpo, formatFixed, getMappedValue, getPriceDelta, ITokenDescription } from "common-utils"
-import { CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP, mapArrayBy } from "gmx-middleware-const"
+import { BASIS_POINTS_DIVISOR, easeInExpo, factor, formatFixed, getBasisPoints, getMappedValue, getPriceDelta, ITokenDescription } from "common-utils"
+import { CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, mapArrayBy, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP } from "gmx-middleware-const"
 import * as viem from "viem"
-import { ILogEvent, IPositionDecrease, IPositionIncrease, OrderType } from "./types.js"
 import { MARKET_TOKEN_MAP } from "./marketMap.js"
+import { ILogEvent } from "./types.js"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
@@ -32,20 +32,7 @@ export function getMarginFees(size: bigint) {
   return size * MARGIN_FEE_BASIS_POINTS / BASIS_POINTS_DIVISOR
 }
 
-export function isUpdateIncrease(update: IPositionIncrease | IPositionDecrease): update is IPositionIncrease {
-  return update.orderType === OrderType.MarketIncrease || update.orderType === OrderType.LimitIncrease
-}
 
-export function isUpdateDecrease(update: IPositionIncrease | IPositionDecrease): update is IPositionDecrease {
-  return update.orderType === OrderType.MarketDecrease
-    || update.orderType === OrderType.LimitDecrease
-    || update.orderType === OrderType.Liquidation
-    || update.orderType === OrderType.StopLossDecrease
-}
-
-export function isCloseUpdate(update: IPositionIncrease | IPositionDecrease): boolean {
-  return update.sizeInTokens === 0n
-}
 
 
 export function getFundingFee(entryFundingRate: bigint, cumulativeFundingRate: bigint, size: bigint) {
@@ -181,6 +168,19 @@ export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, 
   )
 }
 
+export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+  return hashData(
+    ["address", "address", "address"],
+    [collateralToken, puppet, trader]
+  )
+}
+export function getAllocationKey(matchKey: viem.Hex, cursor: bigint) {
+  return hashData(
+    ["bytes32", "uint"],
+    [matchKey, cursor]
+  )
+}
+
 export function hashData(types: string[], values: any) {
   const params = viem.parseAbiParameters(types)
   const hex = viem.encodeAbiParameters(params as any, values)
@@ -188,4 +188,5 @@ export function hashData(types: string[], values: any) {
   const hash = viem.keccak256(bytes)
   return hash
 }
+
 

@@ -58,7 +58,7 @@ const $caretDown = $svg('path')(attr({ d: 'M4.616.296c.71.32 1.326.844 2.038 1.1
 export const $defaultTableCell = $row(layoutSheet.spacingSmall, style({ padding: '6px 0', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' }))
 export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground, }))
 export const $defaultTableRowContainer = $node(screenUtils.isDesktopScreen ? layoutSheet.spacingBig : layoutSheet.spacing)
-export const $defaultTableContainer = $column(layoutSheet.spacingSmall)
+export const $defaultTableContainer = $column(layoutSheet.spacing)
 
 export const $Table = <T>({
   dataSource, columns, scrollConfig,

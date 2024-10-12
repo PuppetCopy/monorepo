@@ -83,7 +83,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
               const urlFragments = document.location.pathname.split('/')
               const account = viem.getAddress(urlFragments[urlFragments.length - 1])
               const filteredMarketList = startWith([], selectMarketTokenList)
-              
+
               const positionListQuery = switchMap(marketList => {
                 const query = queryPosition(subgraphClient, { account, activityTimeframe })
 
@@ -94,7 +94,9 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                     return list
                   }
 
-                  return list.filter(pos => marketList.includes(getMarketIndexToken(pos.market))).sort((a, b) => b.openTimestamp - a.openTimestamp)
+                  return list
+                    .filter(pos => marketList.includes(getMarketIndexToken(pos.market)))
+                    .sort((a, b) => b.openTimestamp - a.openTimestamp)
                 }, query)
               }, filteredMarketList)
 
