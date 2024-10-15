@@ -1,32 +1,33 @@
 
-import { Behavior, combineObject } from "@aelea/core"
+import { Behavior, combineObject, O } from "@aelea/core"
 import { $element, $node, $text, attr, component, style, stylePseudo } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { empty, map, mergeArray, never, now, snapshot, startWith } from "@most/core"
-import { IntervalTime, formatFixed, parseBps, switchMap, unixTimestampNow } from "common-utils"
+import { empty, map, mergeArray, now, snapshot, startWith } from "@most/core"
+import { combineState, formatFixed, getDuration, IntervalTime, parseBps, switchMap, unixTimestampNow } from "common-utils"
+import { IMatchRule } from "puppet-middleware-utils"
+import { $Checkbox, $FieldLabeled } from "ui-components"
+import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { theme } from "../../assignThemeSync.js"
-import { $FieldLabeled } from "ui-components"
-import { $route } from "../../common/$common"
+import { $labeledDivider } from "../../common/elements/$common"
+import localStore from "../../const/localStore"
 import { IWalletPageParams } from "../../pages/type.js"
 import { $ButtonSecondary } from "../form/$Button.js"
-import { $Dropdown } from "../form/$Dropdown"
-import { $SelectCollateralToken } from "../$CollateralTokenSelector"
-import { Stream } from "@most/types"
+import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown"
 
 interface IRouteSubscriptionEditor {
-  expiry: bigint
   trader: viem.Address
-  selectedCollateralTokenList: Stream<viem.Address[]>
+  collateralToken: viem.Address
+  matchRule?: IMatchRule
 }
 
 export interface IChangeSubscription {
   expiry: bigint
-  allowance: bigint
+  allowanceRate: bigint
+  throttleActivity: bigint
   trader: viem.Address
   collateralToken: viem.Address
-  previousSubscriptionExpiry: bigint
+  matchRule?: IMatchRule
 }
 
 export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWalletPageParams) => component((
@@ -34,112 +35,156 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
   [inputAllowance, inputAllowanceTether]: Behavior<any, bigint>,
   [clickUnsubscribe, clickUnsubscribeTether]: Behavior<any, IChangeSubscription>,
   [clickSubmit, clickSubmitTether]: Behavior<any, IChangeSubscription>,
-  [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+  [changeActivityThrottle, changeActivityThrottleTether]: Behavior<number, bigint>,
+  [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: Behavior<boolean>,
 ) => {
 
-  const { trader, selectedCollateralTokenList,  walletClientQuery } = config
+  const { trader, walletClientQuery, matchRule, collateralToken } = config
 
-  const allowance = mergeArray([
-    // switchMap(async walletQuery => {
-    //   const wallet = await walletQuery
-    //   if (wallet === null) {
-    //     return ''
-    //   }
+  const advancedRouteEditorEnabled = uiStorage.replayWrite(localStore.ruleEditor, changeAdvancedRouteEditorEnabled, 'advancedRouteEditorEnabled')
 
-    //   const amount = await readPuppetAllowance(wallet, wallet.account.address)
-    //   return amount || ''
-    // }, walletClientQuery),
-    inputAllowance
-  ])
 
-  
-  const expiry = mergeArray([
-    now(config.expiry ? config.expiry : BigInt(unixTimestampNow() + IntervalTime.YEAR)),
-    inputEndDate
-  ])
+  // const allowanceRate = mergeArray([
+  //   now(Number(config.matchRule?.allowanceRate || BigInt(1000))),
+  //   inputAllowance
+  // ])
 
-  const routeTypeKey = startWith('0x', never())
-  
-  const form = combineObject({
-    allowance,
-    expiry,
-    routeTypeKey
+  // const activityThrottle = mergeArray([
+  //   now(Number(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
+  //   changeActivityThrottle
+  // ])
+
+
+  // const expiry = mergeArray([
+  //   now(config.matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR)),
+  //   inputEndDate
+  // ])
+
+
+  const draft = combineObject({
+    allowanceRate: startWith(config.matchRule?.allowanceRate || BigInt(1000), inputAllowance),
+    throttleActivity: startWith(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR), changeActivityThrottle),
+    expiry: startWith(config.matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR), inputEndDate),
   })
 
+  const isSubscribed = matchRule && matchRule.expiry > BigInt(unixTimestampNow())
 
-  const isSubscribed = config.expiry !== 0n
-
-  
   return [
     $column(layoutSheet.spacing, style({ maxWidth: '350px' }))(
       $text('The following rules will apply to this trader whenever he opens and maintain a position'),
 
-      $SelectCollateralToken({
-        selectedList: selectedCollateralTokenList,
-      })({
-        selectMarketTokenList: selectMarketTokenListTether()
-      }),
-
-
       $FieldLabeled({
-        label: 'Allow %',
-        value: map(x => x ? `${formatFixed(4, x) * 100}` : '', allowance),
-        labelWidth: 100,
-        hint: `% allocated per adjustment. 1-10% is recommended`,
+        label: 'Match Allocation %',
+        value: map(x => x ? `${formatFixed(4, x) * 100}` : '', inputAllowance),
+        placeholder: `${formatFixed(4, config.matchRule?.allowanceRate || BigInt(1000)) * 100}`,
+        labelWidth: 150,
+        hint: `% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring`,
       })({
         change: inputAllowanceTether(
           map(x => parseBps(x / 100))
         )
       }),
 
-      $FieldLabeled({
-        label: 'Expiration',
-        $input: $element('input')(
-          attr({ type: 'date' }),
-          stylePseudo('::-webkit-calendar-picker-indicator', { filter: theme.name === 'dark' ? `invert(1)` : '' })
-        ),
-        hint: 'set a date when this rule will expire, default is 1 year',
-        placeholder: 'never',
-        labelWidth: 100,
-        value: map(time => {
-          return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
-        }, expiry),
-      })({
-        change: inputEndDateTether(
-          map(x => BigInt(new Date(x).getTime() / 1000))
+      style({ margin: '10px 0' })(
+        $labeledDivider(
+          $Checkbox({
+            value: advancedRouteEditorEnabled,
+            label: 'Advanced Rules',
+            // validation: now(true),
+          })({
+            check: changeAdvancedRouteEditorEnabledTether()
+          }),
         )
-      }),
+      ),
+
+      switchMap(isEnabled => {
+
+        if (!isEnabled) {
+          return empty()
+        }
+
+        return $column(layoutSheet.spacing)(
+
+          $Dropdown({
+            $selection: $FieldLabeled({
+              label: 'Activity throttle',
+              value: map(O(Number, getDuration), changeActivityThrottle),
+              placeholder: getDuration(Number(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
+              labelWidth: 150,
+              hint: `Ignore positions that are too close to each other in time`,
+            })({
+            }),
+            selector: {
+              value: now(3600),
+              $container: $defaultSelectContainer(style({ right: '0' })),
+              $$option: map(option => {
+                return $text(getDuration(Number(option)))
+              }),
+              list: [
+                IntervalTime.HR,
+                IntervalTime.HR2,
+                IntervalTime.HR6,
+                IntervalTime.DAY,
+                IntervalTime.WEEK
+              ]
+            }
+          })(({
+            select: changeActivityThrottleTether(map(BigInt))
+          })),
+
+          $FieldLabeled({
+            label: 'Expiration',
+            labelWidth: 150,
+            $input: $element('input')(
+              attr({ type: 'date' }),
+              stylePseudo('::-webkit-calendar-picker-indicator', { filter: theme.name === 'dark' ? `invert(1)` : '' })
+            ),
+            hint: 'set a date when this rule will expire, default is 1 year',
+            placeholder: 'never',
+            value: map(time => {
+              return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
+            }, inputEndDate),
+          })({
+            change: inputEndDateTether()
+          })
+        )
+      }, advancedRouteEditorEnabled),
 
       $node(),
 
       $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
-        // $ButtonSecondary({
-        //   $content: $text('Unsubscribe'),
-        //   disabled: now(!isSubscribed)
-        // })({
-        //   click: clickUnsubscribeTether(
-        //     snapshot(params => {
-        //       return { ...params, previousSubscriptionExpiry: config.expiry, trader: config.trader, expiry: 0n,  }
-        //     }, form)
-        //   )
-        // }),
+        $ButtonSecondary({
+          $content: $text('Unsubscribe'),
+          disabled: now(!isSubscribed)
+        })({
+          click: clickUnsubscribeTether(
+            map(() => {
+              if (!matchRule) {
+                throw new Error('No match rule')
+              }
+
+              const subs: IChangeSubscription = { ...matchRule, matchRule, collateralToken, trader, expiry: 0n }
+              return subs
+            })
+          )
+        }),
 
         $ButtonSecondary({
           $content: $text('Subscribe'),
-          disabled: map(params => !params.allowance, form)
+          disabled: map(params => !params.allowanceRate, draft)
         })({
           click: clickSubmitTether(
             snapshot(params => {
-              return { ...params, previousSubscriptionExpiry: config.expiry, trader: config.trader,  }
-            }, form)
+              const subsc: IChangeSubscription = { collateralToken, trader, ...params }
+              return subsc
+            }, draft)
           )
         })
-          
+
       )
     ),
 
     {
-      selectMarketTokenList,
       modifySubscriber: mergeArray([
         clickSubmit,
         clickUnsubscribe

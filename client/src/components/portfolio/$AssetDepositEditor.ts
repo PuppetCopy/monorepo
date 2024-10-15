@@ -24,6 +24,8 @@ export const $AssetDepositEditor = (config: IAssetDepositEditor) => component((
   [clickMaxDeposit, clickMaxDepositTether]: Behavior<any>,
 ) => {
 
+  
+
   const { walletClientQuery } = config
 
   const tokenDescription = getTokenDescription(config.token)
