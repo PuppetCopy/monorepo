@@ -14,7 +14,11 @@ export interface ISelect<T> {
 }
 
 
-export const $Select = <T>({ list, $$option, $container = $defaultSelectContainer }: ISelect<T>) => component((
+export const $Select = <T>({ 
+  list,
+  $$option,
+  $container = $defaultSelectContainer
+ }: ISelect<T>) => component((
   [select, selectTether]: Behavior<IBranch, T>
 ) => {
 

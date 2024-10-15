@@ -3,6 +3,7 @@ import { $Branch, $Node, $text, INode, NodeComposeFn, attrBehavior, component, n
 import { $row, Control, layoutSheet } from "@aelea/ui-components"
 import { constant, empty, fromPromise, map, mergeArray, multicast, now, startWith, switchLatest } from "@most/core"
 import { Stream } from "@most/types"
+import { erc20Abi } from "abitype/abis"
 import { MAX_UINT256, PromiseStateError, PromiseStatus, promiseState, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { $alertPositiveTooltip, $alertTooltip, $intermediateTooltip, $txHashRef } from "ui-components"
@@ -10,9 +11,9 @@ import * as viem from "viem"
 import * as walletLink from "wallet"
 import { $IntermediateConnectButton } from "../$ConnectWallet"
 import { $iconCircular } from "../../common/elements/$common.js"
-import { $defaultButtonPrimary, $Submit } from "./$Button"
+import { getContractErrorMessage } from "../../const/contractErrorMessage"
+import { $defaultButtonPrimary } from "./$Button"
 import { $ButtonCore } from "./$ButtonCore"
-import { erc20Abi } from "abitype/abis"
 
 interface ISpend {
   spender: viem.Address
@@ -68,13 +69,19 @@ export const $SubmitBar = (config: ISubmitBar) => component((
           const err = status.error
           let message: string | undefined
 
-          if (err instanceof viem.TransactionExecutionError) {
-            message = err.shortMessage || err.message
+          if (err instanceof viem.BaseError) {
+            const revertError = err.walk(err => err instanceof viem.ContractFunctionRevertedError)
+            if (revertError instanceof viem.ContractFunctionRevertedError) {
+
+              if (revertError.data) {
+                message = getContractErrorMessage(revertError.data)
+              } else {
+                message = err.shortMessage || err.message
+              }
+            }
           }
 
-          if (err instanceof viem.ContractFunctionExecutionError && err.cause instanceof viem.ContractFunctionRevertedError) {
-            message = err.cause.reason || err.cause.message
-          }
+   
 
           return $alertTooltip(
             $text(style({ whiteSpace: 'pre-wrap' }))(message || err.message || 'Transaction failed')
