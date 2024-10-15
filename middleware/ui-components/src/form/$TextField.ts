@@ -1,25 +1,17 @@
 import { Behavior, O } from "@aelea/core"
-import { $element, $text, NodeComposeFn, attr, component, style, stylePseudo } from "@aelea/dom"
+import { $element, $text, NodeComposeFn, attr, attrBehavior, component, style, stylePseudo } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { empty } from "@most/core"
+import { empty, map } from "@most/core"
 import { Stream } from "@most/types"
 import { $Field, Field } from "./$Field.js"
+import { streamOf } from "common-utils"
 
 
-export interface TextField extends Field {
-  label: string
-  hint?: string | Stream<string>
-  placeholder?: string
 
-  $label?: NodeComposeFn<any, HTMLLabelElement>
-  labelWidth?: number
-}
-
-
-export const $label2 = $element('label')(
+export const $defaultTextFieldContainer = $element('label')(
   layoutSheet.spacingSmall,
-  style({ 
+  style({
     width: '100%',
     cursor: 'pointer',
     display: 'flex',
@@ -47,13 +39,22 @@ const overideInputStyle = O(
 )
 
 
-export const $FieldLabeled = (config: TextField) => component((
+export interface ITextField extends Field {
+  label: string
+  hint?: string | Stream<string>
+  placeholder?: string | Stream<string>
+
+  $container?: NodeComposeFn<any, HTMLLabelElement>
+  labelWidth?: number
+}
+
+export const $FieldLabeled = (config: ITextField) => component((
   [change, sampleValue]: Behavior<string, string>
 ) => {
 
   const {
     label, placeholder, hint, labelWidth,
-    $label = $label2
+    $container = $defaultTextFieldContainer
   } = config
 
   const $field = overideInputStyle(
@@ -63,10 +64,10 @@ export const $FieldLabeled = (config: TextField) => component((
   )
 
   return [
-    $label(
+    $container(
       $row(layoutSheet.spacingSmall, style({ width: '100%' }))(
         $labelDisplay(style({ width: labelWidth ? labelWidth + 'px' : '' }))(label),
-        placeholder ? attr({ placeholder: placeholder }, $field): $field,
+        attrBehavior(map(placeholder => ({ placeholder }), streamOf(placeholder)), $field)
       ),
       $row(style({ position: 'relative' }))(
         hint ? $text(style({ fontSize: '.85rem', width: '100%' }))(hint) : empty()

@@ -5,7 +5,7 @@ import { now, skipRepeatsWith } from "@most/core"
 import { IntervalTime, USD_DECIMALS, createTimeline, formatFixed, unixTimestampNow } from "common-utils"
 import { IPricefeedMap, IPricetick, getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware-utils"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
-import { IPerformanceTimelineTick, IPositionDecrease, IPositionIncrease, isUpdateDecrease, isUpdateIncrease } from "puppet-middleware-utils"
+import { IPerformanceTimelineTick } from "puppet-middleware-utils"
 import { $Baseline, IMarker } from "ui-components"
 import * as viem from "viem"
 
@@ -19,11 +19,22 @@ type OpenPnl = {
 
 type IPerformanceTimelineTick2 = { openPnlMap: Map<viem.Hex, OpenPnl> } & IPerformanceTimelineTick
 
+type IAbstractUpdate = {
+  market: viem.Address
+  positionKey: viem.Hex
+  sizeInUsd: bigint
+  sizeInTokens: bigint
+  indexTokenPriceMax: bigint
+  basePnlUsd?: bigint
+  isLong: boolean
+  blockTimestamp: number
+}
+
 export interface IPerformanceTimeline {
   pricefeedMap: IPricefeedMap
   activityTimeframe: IntervalTime
   puppet?: viem.Address
-  list: (IPositionIncrease | IPositionDecrease)[]
+  list: IAbstractUpdate[]
   tickCount: number
   chartConfig?: DeepPartial<ChartOptions>
 }
@@ -54,7 +65,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   const data = createTimeline({
     source: [...config.list, ...priceUpdateTicks],
     seed: seed,
-    getTime(item: IPositionIncrease | IPositionDecrease | IPricetickWithIndexToken) {
+    getTime(item: IAbstractUpdate | IPricetickWithIndexToken) {
       return 'price' in item ? item.timestamp : item.blockTimestamp
     },
     seedMap: (acc, next) => {
@@ -87,19 +98,21 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
         acc.openPnlMap.set(next.positionKey, openPosition)
       }
 
-
       const currentPnl = getPositionPnlUsd(openPosition.update.isLong, openPosition.update.sizeInUsd, openPosition.update.sizeInTokens, next.indexTokenPriceMax)
 
       nextTick.openPnl += currentPnl - openPosition.pnl
       openPosition.update = next
       openPosition.pnl = currentPnl
 
-      if (next.__typename === 'PositionDecrease') {
+      if ('basePnlUsd' in next) {
         if (openPosition.update.sizeInTokens === 0n) {
           acc.openPnlMap.delete(next.positionKey)
         }
 
-        nextTick.realisedPnl += next.basePnlUsd
+        if (next.basePnlUsd) {
+          nextTick.realisedPnl += next.basePnlUsd
+        }
+
       }
 
       nextTick.pnl = nextTick.realisedPnl + nextTick.openPnl
@@ -124,18 +137,18 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
 
   const timeline = getPositionListTimelinePerformance(config)
 
-  const openMarkerList = config.list.filter(isUpdateIncrease).map((pos): IMarker => {
-    const pnl = timeline[timeline.length - 1].value
-    return {
-      position: 'inBar',
-      color: pnl < 0 ? pallete.negative : pallete.positive,
-      time: unixTimestampNow() as Time,
-      size: 1.5,
-      shape: 'circle'
-    }
-  })
+  // const openMarkerList = config.list.filter(isUpdateIncrease).map((pos): IMarker => {
+  //   const pnl = timeline[timeline.length - 1].value
+  //   return {
+  //     position: 'inBar',
+  //     color: pnl < 0 ? pallete.negative : pallete.positive,
+  //     time: unixTimestampNow() as Time,
+  //     size: 1.5,
+  //     shape: 'circle'
+  //   }
+  // })
 
-  const settledMarkerList = config.list.filter(isUpdateDecrease).map((pos): IMarker => {
+  const settledMarkerList = config.list.map((pos): IMarker => {
     return {
       position: 'inBar',
       color: colorAlpha(pallete.message, .15),
@@ -145,7 +158,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
     }
   })
 
-  const allMarkerList = [...settledMarkerList, ...openMarkerList].sort((a, b) => Number(a.time) - Number(b.time))
+  const allMarkerList = settledMarkerList.sort((a, b) => Number(a.time) - Number(b.time))
 
 
   return [

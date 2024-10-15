@@ -6,7 +6,7 @@ import {
 } from "viem/actions"
 import { type Chain } from "viem/chains"
 import { type IClient, type IWalletClient } from "./connect.js"
-import { type Abi, type ContractEventName, type TransactionReceipt, type ParseEventLogsReturnType, type ContractFunctionName, type ContractFunctionArgs, parseEventLogs, type ReadContractParameters, type ReadContractReturnType } from "viem"
+import { type Abi, type ContractEventName, type TransactionReceipt, type ParseEventLogsReturnType, type ContractFunctionName, type ContractFunctionArgs, parseEventLogs, type ReadContractParameters, type ReadContractReturnType, decodeErrorResult } from "viem"
 
 
 export type IWriteContractReturn<
@@ -31,7 +31,7 @@ export async function writeContract<
   TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
   TChain extends Chain,
   TEventName extends | ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined,
->(writeParams: IWriteContractParams<TAbi, TFunctionName, TArgs, TChain, TEventName>,): IWriteContractReturn<TAbi, TEventName> {
+>(writeParams: IWriteContractParams<TAbi, TFunctionName, TArgs, TChain, TEventName>): IWriteContractReturn<TAbi, TEventName> {
 
   try {
     const walletClient = writeParams.walletClient

@@ -7,7 +7,7 @@ import * as GMX from "gmx-middleware-const"
 import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IQueryFilter, ISchema, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
 import * as viem from "viem"
 import { schema } from './schema.js'
-import { IAccountLastAggregatedStats, IPositionDecrease, IPositionIncrease } from './types'
+import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from './types'
 import { aggregatePositionList } from './utils'
 
 
@@ -33,7 +33,7 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
     const filter: IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
 
     if (filterParams.account) {
-      filter.account_id = {
+      filter.account = {
         _eq: `"${filterParams.account}"`
       }
     }
@@ -99,7 +99,7 @@ export function queryAccountLastAggregatedStats(
   queryParams: StateParams<IQueryLeaderboardParams>
 ) {
   return map(async filterParams => {
-    const filter: IQueryFilter<IAccountLastAggregatedStats> = {}
+    const filter: IQueryFilter<IMatchRouteStats> = {}
 
     if (filterParams.account) {
       filter.account = {
@@ -146,7 +146,7 @@ export function queryAccountLastAggregatedStats(
 
 
     const list = await querySubgraph(subgraphClient, {
-      schema: schema.accountLastAggregatedStats,
+      schema: schema.routeMatchStats,
       filter,
       orderBy: {
         [filterParams.sortBy.selector]: filterParams.sortBy.direction,
@@ -224,9 +224,9 @@ interface ISubgraphStatus {
 }
 
 const chainMetadataSchema: ISchema<ISubgraphStatus> = {
-  first_event_block_number: 'int',
-  latest_processed_block: 'int',
-  num_events_processed: 'int',
+  first_event_block_number: 'bigint',
+  latest_processed_block: 'bigint',
+  num_events_processed: 'bigint',
   timestamp_caught_up_to_head_or_endblock: 'string',
   __typename: 'chain_metadata',
 }

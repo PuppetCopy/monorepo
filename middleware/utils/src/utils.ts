@@ -489,8 +489,8 @@ const intervals = [
   { label: 'sec', seconds: IntervalTime.SEC }
 ] as const
 
-export function getDuration(time: number, threshold = IntervalTime.MONTH, none = 'None') {
-  let remainingTime = time;
+export function getDuration(time: number | bigint, threshold = IntervalTime.MONTH, none = 'None') {
+  let remainingTime = Number(time);
   let durationString = '';
 
   for (const interval of intervals) {

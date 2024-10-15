@@ -5,13 +5,18 @@ import { uiStorage } from 'ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
 
-export const store = uiStorage.createStoreDefinition('root', 6, {
+export default uiStorage.createStoreDefinition('root', 8, {
   global: {
     initialState: {
       chain: arbitrum.id,
       wallet: null as null | string,
       activityTimeframe: IntervalTime.WEEK,
       collateralTokenList: [] as string[],
+    }
+  },
+  ruleEditor: {
+    initialState: {
+      advancedRouteEditorEnabled: false,
     }
   },
   leaderboard: {

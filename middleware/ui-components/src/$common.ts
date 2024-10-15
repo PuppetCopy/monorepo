@@ -1,10 +1,10 @@
 import { combineObject, isStream, O, Op } from "@aelea/core"
 import { $element, $node, $Node, $svg, $text, attr, IBranch, style, styleBehavior, stylePseudo } from "@aelea/dom"
-import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
+import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, fromPromise, map, now, skipRepeats, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { getExplorerUrl, getMappedValue, ITokenDescription, promiseState, PromiseStatus, shortenTxAddress, switchMap } from "common-utils"
+import { getExplorerUrl, getMappedValue, ITokenDescription, shortenTxAddress, switchMap } from "common-utils"
 import { arbitrum, Chain } from "viem/chains"
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from "./$icons.js"
 import { $defaultDropContainer, $Tooltip } from "./$Tooltip.js"
@@ -107,7 +107,7 @@ export const $infoLabel = (label: string | $Node) => {
 }
 
 export const $infoLabeledValue = (label: string | $Node, value: string | $Node, collapseMobile = false) => {
-  const $container = collapseMobile && screenUtils.isMobileScreen ? $column : $row(style({ alignItems: 'center' }))
+  const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
 
   return $container(layoutSheet.spacingSmall)(
     $infoLabel(label),

@@ -111,47 +111,6 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
 }
 
 
-export function mapKeyToAbiParam<T extends viem.Log<bigint, number, false, any, true, viem.Abi, string>>(abiEvent: AbiEvent, log: T) {
-  const bigIntKeys = [
-    'blockNumber', 'transactionIndex', 'logIndex',
-    ...abiEvent.inputs.filter(x => x.type === 'uint256' || x.type === 'int256').map(x => x.name)
-  ]
-  const args = log.args as any
-  const jsonObj: any = {}
-  for (const key in args) {
-    const jsonValue = args[key]
-    const value = bigIntKeys.includes(key)
-      ? getMappedValue(abiParamParseMap, jsonValue)(jsonValue)
-      : args[key]
-    jsonObj[key] = value
-
-  }
-
-  return jsonObj
-}
-
-export function parseJsonAbiEvent(abiEvent: AbiEvent) {
-  const bigIntKeys = mapArrayBy(abiEvent.inputs, x => x.name || 'none', x => x.type)
-
-  return bigIntKeys
-}
-
-export const abiParamParseMap = {
-  uint256: BigInt,
-  uint: BigInt,
-  'uint[]': (x: string[]) => x.map(BigInt),
-  string: String,
-  'string[]': (x: string[]) => x.map(String),
-  number: Number,
-  'number[]': (x: number[]) => x.map(Number),
-  'int': BigInt,
-  'int[]': (x: string[]) => x.map(BigInt),
-  address: viem.getAddress,
-  'address[]': (arrx: string[]) => arrx.map(x => viem.getAddress(x)),
-  bool: Boolean,
-  'bool[]': (x: boolean[]) => x.map(Boolean),
-  int256: BigInt,
-} as const
 
 
 export function getPositionKey(account: viem.Address, market: viem.Address, collateralToken: viem.Address, isLong: boolean) {

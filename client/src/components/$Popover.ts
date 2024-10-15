@@ -6,7 +6,7 @@ import { constant, empty, filter, map, merge, multicast, switchLatest, until, zi
 import { Stream } from "@most/types"
 
 
-export const $defaultPopoverContainer = $column(style({ backgroundColor: pallete.middleground, padding: '36px', borderRadius: '24px', border: '1px solid ' + pallete.background, boxShadow: '0 0 10px 0 ' + colorAlpha(pallete.background, .5) }))
+export const $defaultPopoverContentContainer = $column(style({ backgroundColor: pallete.middleground, padding: '36px', borderRadius: '24px', border: '1px solid ' + pallete.background, boxShadow: '0 0 10px 0 ' + colorAlpha(pallete.background, .5) }))
 
 interface IPocus {
   open: Stream<$Node>
@@ -14,13 +14,12 @@ interface IPocus {
 
   $target: $Node
 
+  $contentContainer?: NodeComposeFn<$Node>
   $container?: NodeComposeFn<$Node>
-  $wrapper?: NodeComposeFn<$Node>
-  margin?: number
-  padding?: number
+  spacing?: number
 }
 
-export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $container = $defaultPopoverContainer, $wrapper = $node, $target }: IPocus) => component((
+export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContainer = $defaultPopoverContentContainer, $container = $node, $target }: IPocus) => component((
   [overlayClick, overlayClickTether]: Behavior<INode, false>,
   [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
   [popoverContentDimension, popoverContentDimensionTether]: Behavior<INode, ResizeObserverEntry[]>,
@@ -28,7 +27,7 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
 
   const openMulticast = multicast(open)
 
-  const contentOps = $container(
+  const contentOps = $contentContainer(
     popoverContentDimensionTether(
       observer.resize({})
     ),
@@ -39,18 +38,18 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
         const bottomSpcace = window.innerHeight - targetBound.bottom
         const goDown = bottomSpcace > targetBound.bottom
 
-        const top = (goDown ? targetBound.bottom + margin : targetBound.y - margin) + 'px'
-        const width = Math.min(contentRect.contentRect.width, screenWidth - margin)
+        const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing) + 'px'
+        const width = Math.min(contentRect.contentRect.width, screenWidth - spacing)
         const center = targetBound.x + (targetBound.width / 2)
         const centerWidth = width / 2
         const rightOffset = center - screenWidth
         const leftOffset = center - centerWidth + Math.min(rightOffset < 0 ? Math.abs(rightOffset) : 0, 0)
-        const left = Math.max(leftOffset, margin) + 'px'
+        const left = Math.max(leftOffset, spacing) + 'px'
 
 
         return {
           top, left,
-          
+
           transition: 'opacity .2s ease-in-out', visibility: 'visible',
           transform: `translate(0, ${goDown ? '0' : '-100%'})`
         }
@@ -63,7 +62,7 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
 
   const $overlay = $node(
     style({
-      position: 'fixed', zIndex: 99999, backgroundColor: colorAlpha(pallete.message, .1),
+      position: 'fixed', zIndex: 4321, backgroundColor: colorAlpha(pallete.message, .1),
       top: 0, left: 0, right: 0, bottom: 0, // visibility: 'hidden',
     }),
     overlayClickTether(
@@ -71,48 +70,22 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
       filter(ev => {
         if (ev.target instanceof HTMLElement) {
           const computedStyle = getComputedStyle(ev.target)
-          if (computedStyle.zIndex === '99999' && computedStyle.inset === '0px'){
+          if (computedStyle.zIndex === '4321' && computedStyle.inset === '0px') {
             return true
           }
         }
-        
+
         return false
       }),
       constant(false)
     ),
-    // styleBehavior(
-    //   zip(([contentResizeRect], [targetIntersectionRect]) => {
-    //     const { y, x, bottom } = targetIntersectionRect.intersectionRect
-    //     const rootWidth = targetIntersectionRect.rootBounds?.width || 0
-
-    //     const width = Math.max(contentResizeRect.contentRect.width, targetIntersectionRect.intersectionRect.width) + (padding * 2) + margin
-    //     const targetHeight = targetIntersectionRect.intersectionRect.height
-    //     const contentHeight = contentResizeRect.contentRect.height
-    //     const height = contentHeight + targetHeight + margin
-
-    //     const placedWidth = x + contentResizeRect.contentRect.width
-
-    //     const leftOffset = placedWidth > rootWidth ? rootWidth - placedWidth - 20 : 0
-
-    //     const left = x + (targetIntersectionRect.intersectionRect.width / 2) + leftOffset + 'px'
-
-    //     const bottomSpace = window.innerHeight - bottom
-    //     const popDown = bottomSpace > bottom
-    //     const top = (popDown ? y + (height / 2) : y - ((height - padding) / 2)) + 'px'
-
-    //     const backgroundImage = `radial-gradient(${width}px ${height + padding * 2}px at top ${top} left ${left}, ${pallete.horizon} ${width / 2}px, ${colorAlpha(pallete.background, .45)})`
-
-
-    //     return { backgroundImage, visibility: 'visible' }
-    //   }, popoverContentDimension, targetIntersection)
-    // )
   )
 
 
   const dismissEvent = merge(overlayClick, dismiss)
 
 
-  const $popover = switchLatest(
+  const $content = switchLatest(
     map(content => {
       return until(dismissEvent, $overlay(contentOps(content)))
     }, openMulticast)
@@ -137,9 +110,9 @@ export const $Popover = ({ open, dismiss = empty(), margin = 10, padding = 76, $
   )
 
   return [
-    $wrapper(
+    $container(
       targetOp($target),
-      $popover,
+      $content,
     ),
 
     { overlayClick }

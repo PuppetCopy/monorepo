@@ -4,9 +4,9 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Stream, Time } from "@most/types"
-import { IntervalTime, getBasisPoints, getMappedValue, pagingQuery, readablePercentage, readablePnl } from "common-utils"
+import { IntervalTime, getMappedValue, pagingQuery, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
-import { IAccountLastAggregatedPerformance, IAccountLastAggregatedStats, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
+import { IMatchRouteStats, IRouteMatchActivityTimeline, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
 import {
   $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
   $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
@@ -14,7 +14,7 @@ import {
 } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $TraderDisplay, $TraderRouteDisplay, $pnlDisplay, $roiDisplay, $size } from "../../common/$common.js"
+import { $TraderDisplay, $TraderRouteDisplay, $roiDisplay, $size } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { subgraphClient } from "../../common/graphClient"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
@@ -22,7 +22,7 @@ import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastAct
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { getPositionListTimelinePerformance } from "../../components/trade/$ProfilePerformanceGraph"
-import * as storeDb from "../../const/store.js"
+import localStore from "../../const/localStore.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
 
@@ -44,19 +44,20 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
   const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, route } = config
 
-  const sortBy = uiStorage.replayWrite(storeDb.store.leaderboard, sortByChange, 'sortBy')
-  const isLong = uiStorage.replayWrite(storeDb.store.leaderboard, switchIsLong, 'isLong')
+  const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
+  const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
 
   const accountStatsList = queryAccountLastAggregatedStats(subgraphClient, { activityTimeframe, sortBy })
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
     const activityTimeframe = pageParams.activityTimeframe
-    const accountStatsList: IAccountLastAggregatedPerformance[] = (await pageParams.accountStatsList).map(stats => {
+    const accountStatsListData = await pageParams.accountStatsList
+    const accountStatsList: IRouteMatchActivityTimeline[] = accountStatsListData.map(stats => {
 
       const timeline = getPositionListTimelinePerformance({
         activityTimeframe: activityTimeframe,
-        list: [...stats.account.increaseList, ...stats.account.decreaseList],
+        list: [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList],
         pricefeedMap,
         tickCount: 25,
       })
@@ -114,7 +115,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
             }
 
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
-            const dataSource: Stream<TablePageResponse<IAccountLastAggregatedPerformance>> = map(scroll => {
+            const dataSource: Stream<TablePageResponse<IRouteMatchActivityTimeline>> = map(scroll => {
 
               const newLocal = pagingQuery(
                 { ...params.sortBy, ...scroll },
@@ -124,7 +125,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
             }, paging)
 
 
-            const columns: TableColumn<IAccountLastAggregatedPerformance>[] = [
+            const columns: TableColumn<IRouteMatchActivityTimeline>[] = [
               {
                 $head: $text('Trader'),
                 gridTemplate: '149px',
@@ -132,7 +133,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 $bodyCallback: map(pos => {
                   return $TraderDisplay({
                     route: config.route,
-                    trader: pos.account.id,
+                    trader: pos.account,
                     puppets: [],
                   })({
                     click: routeChangeTether()
@@ -140,14 +141,14 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 })
               },
               {
-                $head: $text('Collateral Route'),
+                $head: $text('Collateral Match'),
                 gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                 $bodyCallback: map(pos => {
                   return $TraderRouteDisplay({
                     walletClientQuery,
                     selectedCollateralTokenList,
-                    collateralTokenList: [...new Set([...pos.account.increaseList, ...pos.account.decreaseList].map(i => i.collateralToken))],
-                    trader: pos.account.id
+                    matchRoute: pos.matchRoute,
+                    trader: pos.account
                   })({
                     modifySubscribeList: modifySubscriberTether()
                   })
@@ -160,9 +161,9 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     $head: $text('Win/Loss'),
                     gridTemplate: '70px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                    $bodyCallback: map((pos: IAccountLastAggregatedStats) => {
-                      const totalCount = pos.account.decreaseList.length
-                      const winCount = pos.account.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
+                    $bodyCallback: map((pos: IMatchRouteStats) => {
+                      const totalCount = pos.matchRoute.decreaseList.length
+                      const winCount = pos.matchRoute.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
                       return $row(layoutSheet.spacingSmall)(
                         $text(`${winCount} / ${totalCount - winCount}`)
                       )
@@ -175,7 +176,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                     ),
                     sortBy: 'maxSizeInUsd',
                     columnOp: style({ placeContent: 'flex-end' }),
-                    $bodyCallback: map((pos: IAccountLastAggregatedStats) => {
+                    $bodyCallback: map((pos: IMatchRouteStats) => {
                       return $size(pos.maxSizeInUsd, pos.maxCollateralInUsd)
                     })
                   },
@@ -192,7 +193,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 sortBy: 'roi',
                 gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
                 $bodyCallback: map(pos => {
-                  const adjustList = [...pos.account.increaseList, ...pos.account.decreaseList]
+                  const adjustList = [...pos.matchRoute.increaseList, ...pos.matchRoute.decreaseList]
 
 
                   const markerList = adjustList
@@ -273,7 +274,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
             return $Table({
               $headerContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),
-              $container: $defaultTableContainer(style({ backgroundColor: pallete.background, borderTop: `1px solid ${colorAlpha(pallete.foreground, .2)}`, padding: screenUtils.isDesktopScreen ? '36px' : '8px' })),
+              $container: $defaultTableContainer(style({ backgroundColor: pallete.background, borderTop: `1px solid ${colorAlpha(pallete.foreground, .2)}`, padding: screenUtils.isDesktopScreen ? '36px' : '14px 8px' })),
               $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
               scrollConfig: {
                 // $container: $defaultVScrollContainer(style({ gap: '2px' })),

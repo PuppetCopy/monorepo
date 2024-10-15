@@ -1,31 +1,30 @@
 import { Client, OperationContext } from '@urql/core'
-import { abiParamParseMap } from "../gmxUtils.js"
 import { getMappedValue } from 'common-utils'
-export { encodePacked } from 'viem'
+import { getAddress } from 'viem'
 
 export type GqlType<T extends string> = { __typename: T }
 
 type PackedAbiType =
-  | 'uint'
-  | 'uint[]'
-  | 'uint256'
-  | 'uint256[]'
   | 'string'
   | 'string[]'
   | 'number'
   | 'number[]'
-  | 'int'
-  | 'int[]'
+  | 'bigint'
+  | 'bigint[]'
   | 'address'
   | 'address[]'
   | 'bool'
   | 'bool[]'
-  | 'int256'
-  | 'bytes'
+
+type ISchemaField<T> = T extends GqlType<any>
+  ? ISchema<T>
+  : T extends any[]
+  ? any
+  : PackedAbiType;
 
 export type ISchema<T extends GqlType<any>> = {
-  [P in keyof T]?: T[P] extends any[] ? any : T[P] extends GqlType<any> ? ISchema<T[P]> : P extends `__typename` ? string : PackedAbiType
-}
+  [P in keyof T as P extends '__typename' ? never : P]?: ISchemaField<T[P]>;
+} & { __typename: T['__typename']; }
 
 export type ISchemaQuery<TSchema, TQuery> = {
   [P in keyof TQuery]: TQuery[P] extends any[]
@@ -157,9 +156,9 @@ function parseFilterObject(query: any) {
 
     if (value instanceof Array) {
       if (value.length === 0) return
-      fields.push(`${key}: [${value.map(arrVal => `{${parseFilterObject(arrVal) }}`).join(' ')}]`)
+      fields.push(`${key}: [${value.map(arrVal => `{${parseFilterObject(arrVal)}}`).join(' ')}]`)
     } else if (value instanceof Object) {
-      fields.push(`${key}: { ${parseFilterObject(value)} }`)      
+      fields.push(`${key}: { ${parseFilterObject(value)} }`)
     } else if (value !== undefined) {
       fields.push(`${key}: ${value}`)
     }
@@ -191,3 +190,17 @@ function fillQuery(obj: any) {
     return acc
   }, {} as any)
 }
+
+
+export const abiParamParseMap = {
+  bigint: BigInt,
+  'bigint[]': (x: string[]) => x.map(BigInt),
+  string: String,
+  'string[]': (x: string[]) => x.map(String),
+  number: Number,
+  'number[]': (x: number[]) => x.map(Number),
+  address: getAddress,
+  'address[]': (arrx: string[]) => arrx.map(x => getAddress(x)),
+  bool: Boolean,
+  'bool[]': (x: boolean[]) => x.map(Boolean),
+} as const

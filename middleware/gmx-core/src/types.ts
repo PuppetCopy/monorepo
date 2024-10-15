@@ -30,7 +30,7 @@ export type ILogTypeId<T extends string> = ILogType<T> & {
 
 export type ILogTxType<T extends string> = ILogTypeId<T> & {
   blockTimestamp: number
-  transactionHash: viem.Hex
+  transactionHash: string
 }
 
 

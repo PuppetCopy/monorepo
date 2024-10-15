@@ -20,8 +20,6 @@ import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
 import { IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor"
-import * as storeDb from "../const/store.js"
-import { store } from "../const/store.js"
 import { newUpdateInvoke } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
 import { $Admin } from "./$Admin"
@@ -31,6 +29,8 @@ import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
 import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer"
+import localstore from "../const/localStore"
+import localStore from "../const/localStore"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -95,8 +95,8 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
 
   const isDesktopScreen = skipRepeats(map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))))
 
-  const activityTimeframe = uiStorage.replayWrite(storeDb.store.global, changeActivityTimeframe, 'activityTimeframe')
-  const selectedCollateralTokenList = uiStorage.replayWrite(storeDb.store.global, selectMarketTokenList, 'collateralTokenList')
+  const activityTimeframe = uiStorage.replayWrite(localstore.global, changeActivityTimeframe, 'activityTimeframe')
+  const selectedCollateralTokenList = uiStorage.replayWrite(localStore.global, selectMarketTokenList, 'collateralTokenList')
 
   const pricefeedMapQuery = replayLatest(multicast(queryPricefeed(subgraphClient, { activityTimeframe })))
 
@@ -116,7 +116,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   }, changeWallet)
 
 
-  const walletRdnsStore = uiStorage.replayWrite(storeDb.store.global, changeWalletProviderRdns, 'wallet')
+  const walletRdnsStore = uiStorage.replayWrite(localStore.global, changeWalletProviderRdns, 'wallet')
   const initWalletProvider: Stream<EIP6963ProviderDetail | null> = map(params => {
 
     return params.walletRdnsStore ? params.announcedProviderList.find(p => p.info.rdns === params.walletRdnsStore) || null : null
@@ -127,7 +127,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const walletProvider = map(d => d?.provider || null, mergeArray([initWalletProvider, changeWallet]))
 
 
-  const chainIdQuery = indexDb.get(store.global, 'chain')
+  const chainIdQuery = indexDb.get(localStore.global, 'chain')
   const chainQuery: Stream<Promise<viem.Chain>> = now(chainIdQuery.then(id => chains.find(c => c.id === id) || arbitrum))
 
   const {

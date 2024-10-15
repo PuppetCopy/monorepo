@@ -15,7 +15,7 @@ import { $card, $responsiveFlex } from "../../common/elements/$common"
 import { $Vest } from "../../components/$Vest.js"
 import { $SubmitBar } from "../../components/form/$Form"
 import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
-import * as storeDb from "../../const/store.js"
+import localStore from "../../const/localStore.js"
 import tokenomics from "../../logic/tokenomicsReader.js"
 import { readAddressTokenBalance } from "../../logic/traderRead"
 import { $seperator2 } from "../common"
@@ -54,7 +54,7 @@ export const $WalletPage = (config: IPageParams & IUserActivityParams) => compon
   } = config
 
 
-  const profileMode = uiStorage.replayWrite(storeDb.store.wallet, selectProfileMode, 'selectedTab')
+  const profileMode = uiStorage.replayWrite(localStore.wallet, selectProfileMode, 'selectedTab')
 
 
   const puppetTokenPriceInUsd = switchMap(async providerQuery => {

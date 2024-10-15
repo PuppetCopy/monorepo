@@ -14,7 +14,7 @@ import * as viem from "viem"
 import * as walletLink from "wallet"
 import { $heading2, $heading3 } from "../common/$text"
 import { $labeledDivider } from "../common/elements/$common"
-import { store } from "../const/store"
+import localStore from "../const/localStore"
 import tokenomicsReader from "../logic/tokenomicsReader"
 import { IComponentPageParams } from "../pages/type"
 import { $Popover } from "./$Popover"
@@ -120,12 +120,12 @@ export const $Vest = (config: IVestingDetails) => component((
   }, walletClientQuery)
 
 
-  const cashout = uiStorage.replayWrite(store.earnings, checkCashoutMode, 'cashout')
+  const cashout = uiStorage.replayWrite(localStore.earnings, checkCashoutMode, 'cashout')
   const lockSchedule = switchMap(isCashout => {
     if (isCashout) return now(0)
 
     return mergeArray([
-      uiStorage.replayWrite(store.earnings, debounce(250, changeScheduleFactor), 'scheduleFactor'),
+      uiStorage.replayWrite(localStore.earnings, debounce(250, changeScheduleFactor), 'scheduleFactor'),
       changeScheduleFactor,
     ])
   }, cashout)
@@ -306,7 +306,7 @@ export const $Vest = (config: IVestingDetails) => component((
       $node(),
 
       $labeledDivider(
-        $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+        $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
           $infoTooltip('lock PUPPET for up to two years, Longer lockups yield greater rewards. different duration will average the lockup duration.'),
           $ButtonToggle({
             $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),

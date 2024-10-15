@@ -73,7 +73,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
     if (!position) {
       position = {
         key: next.positionKey,
-        account: next.account.id,
+        account: next.account,
         market: next.market,
         collateralToken: next.collateralToken,
 

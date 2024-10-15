@@ -1,5 +1,5 @@
 import { IPriceCandle, ISchema } from "gmx-middleware-utils"
-import { IAccountLastAggregatedStats, IGbcToken, IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IProfile, ITraderAccount } from "./types.js"
+import { IMatchRouteStats, IGbcToken, IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IProfile, IMatchRoute, IMatchRule } from "./types.js"
 
 
 const gbcToken: ISchema<IGbcToken> = {
@@ -26,16 +26,16 @@ const orderCreated: ISchema<IOrderCreated> = {
 
   swapPath: 'address[]',
 
-  orderType: 'uint256',
-  decreasePositionSwapType: 'uint256',
-  sizeDeltaUsd: 'uint256',
-  initialCollateralDeltaAmount: 'uint256',
-  triggerPrice: 'uint256',
-  acceptablePrice: 'uint256',
-  executionFee: 'uint256',
-  callbackGasLimit: 'uint256',
-  minOutputAmount: 'uint256',
-  updatedAtBlock: 'uint256',
+  orderType: 'bigint',
+  decreasePositionSwapType: 'bigint',
+  sizeDeltaUsd: 'bigint',
+  initialCollateralDeltaAmount: 'bigint',
+  triggerPrice: 'bigint',
+  acceptablePrice: 'bigint',
+  executionFee: 'bigint',
+  callbackGasLimit: 'bigint',
+  minOutputAmount: 'bigint',
+  updatedAtBlock: 'bigint',
 
   isLong: 'bool',
   shouldUnwrapNativeToken: 'bool',
@@ -49,31 +49,31 @@ const positionCollectedUpdate: ISchema<IPositionFeesCollected> = {
   positionKey: 'string',
   affiliate: 'address',
 
-  totalRebateFactor: 'uint256',
-  traderDiscountFactor: 'uint256',
-  totalRebateAmount: 'uint256',
-  traderDiscountAmount: 'uint256',
-  affiliateRewardAmount: 'uint256',
-  fundingFeeAmount: 'uint256',
-  claimableLongTokenAmount: 'uint256',
-  claimableShortTokenAmount: 'uint256',
-  latestFundingFeeAmountPerSize: 'uint256',
-  latestLongTokenClaimableFundingAmountPerSize: 'uint256',
-  latestShortTokenClaimableFundingAmountPerSize: 'uint256',
-  borrowingFeeUsd: 'uint256',
-  borrowingFeeAmount: 'uint256',
-  borrowingFeeReceiverFactor: 'uint256',
-  borrowingFeeAmountForFeeReceiver: 'uint256',
-  positionFeeFactor: 'uint256',
-  protocolFeeAmount: 'uint256',
-  positionFeeReceiverFactor: 'uint256',
-  feeReceiverAmount: 'uint256',
-  feeAmountForPool: 'uint256',
-  positionFeeAmountForPool: 'uint256',
-  positionFeeAmount: 'uint256',
-  totalCostAmount: 'uint256',
-  uiFeeReceiverFactor: 'uint256',
-  uiFeeAmount: 'uint256',
+  totalRebateFactor: 'bigint',
+  traderDiscountFactor: 'bigint',
+  totalRebateAmount: 'bigint',
+  traderDiscountAmount: 'bigint',
+  affiliateRewardAmount: 'bigint',
+  fundingFeeAmount: 'bigint',
+  claimableLongTokenAmount: 'bigint',
+  claimableShortTokenAmount: 'bigint',
+  latestFundingFeeAmountPerSize: 'bigint',
+  latestLongTokenClaimableFundingAmountPerSize: 'bigint',
+  latestShortTokenClaimableFundingAmountPerSize: 'bigint',
+  borrowingFeeUsd: 'bigint',
+  borrowingFeeAmount: 'bigint',
+  borrowingFeeReceiverFactor: 'bigint',
+  borrowingFeeAmountForFeeReceiver: 'bigint',
+  positionFeeFactor: 'bigint',
+  protocolFeeAmount: 'bigint',
+  positionFeeReceiverFactor: 'bigint',
+  feeReceiverAmount: 'bigint',
+  feeAmountForPool: 'bigint',
+  positionFeeAmountForPool: 'bigint',
+  positionFeeAmount: 'bigint',
+  totalCostAmount: 'bigint',
+  uiFeeReceiverFactor: 'bigint',
+  uiFeeAmount: 'bigint',
 
   blockTimestamp: 'number',
   transactionHash: 'string',
@@ -84,26 +84,27 @@ const positionIncrease: ISchema<IPositionIncrease> = {
   id: 'string',
   market: 'address',
   collateralToken: 'address',
+  account: "address",
 
-  sizeInTokens: 'uint256',
-  sizeInUsd: 'uint256',
-  collateralAmount: 'uint256',
-  borrowingFactor: 'uint256',
-  fundingFeeAmountPerSize: 'uint256',
-  longTokenClaimableFundingAmountPerSize: 'uint256',
-  shortTokenClaimableFundingAmountPerSize: 'uint256',
-  executionPrice: 'uint256',
-  indexTokenPriceMax: 'uint256',
-  indexTokenPriceMin: 'uint256',
-  collateralTokenPriceMax: 'uint256',
-  collateralTokenPriceMin: 'uint256',
-  sizeDeltaUsd: 'uint256',
-  sizeDeltaInTokens: 'uint256',
-  orderType: 'uint256',
+  sizeInTokens: 'bigint',
+  sizeInUsd: 'bigint',
+  collateralAmount: 'bigint',
+  borrowingFactor: 'bigint',
+  fundingFeeAmountPerSize: 'bigint',
+  longTokenClaimableFundingAmountPerSize: 'bigint',
+  shortTokenClaimableFundingAmountPerSize: 'bigint',
+  executionPrice: 'bigint',
+  indexTokenPriceMax: 'bigint',
+  indexTokenPriceMin: 'bigint',
+  collateralTokenPriceMax: 'bigint',
+  collateralTokenPriceMin: 'bigint',
+  sizeDeltaUsd: 'bigint',
+  sizeDeltaInTokens: 'bigint',
+  orderType: 'bigint',
 
-  collateralDeltaAmount: 'int256',
-  priceImpactUsd: 'int256',
-  priceImpactAmount: 'int256',
+  collateralDeltaAmount: 'bigint',
+  priceImpactUsd: 'bigint',
+  priceImpactAmount: 'bigint',
 
   isLong: 'bool',
 
@@ -112,11 +113,6 @@ const positionIncrease: ISchema<IPositionIncrease> = {
   blockTimestamp: 'number',
   transactionHash: 'string',
   feeCollected: positionCollectedUpdate,
-
-  account: {
-    id: 'string',
-    __typename: 'TraderAccount',
-  },
 
   __typename: 'PositionIncrease',
 }
@@ -126,41 +122,35 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   positionKey: 'string',
   market: 'address',
   collateralToken: 'address',
+  account: "address",
 
-  sizeInTokens: 'uint256',
-  sizeInUsd: 'uint256',
-  collateralAmount: 'uint256',
-  borrowingFactor: 'uint256',
-  fundingFeeAmountPerSize: 'uint256',
-  longTokenClaimableFundingAmountPerSize: 'uint256',
-  shortTokenClaimableFundingAmountPerSize: 'uint256',
-  executionPrice: 'uint256',
-  indexTokenPriceMax: 'uint256',
-  indexTokenPriceMin: 'uint256',
-  collateralTokenPriceMax: 'uint256',
-  collateralTokenPriceMin: 'uint256',
-  sizeDeltaUsd: 'uint256',
-  sizeDeltaInTokens: 'uint256',
-  collateralDeltaAmount: 'uint256',
-  valuesPriceImpactDiffUsd: 'uint256',
-  orderType: 'uint256',
+  sizeInTokens: 'bigint',
+  sizeInUsd: 'bigint',
+  collateralAmount: 'bigint',
+  borrowingFactor: 'bigint',
+  fundingFeeAmountPerSize: 'bigint',
+  longTokenClaimableFundingAmountPerSize: 'bigint',
+  shortTokenClaimableFundingAmountPerSize: 'bigint',
+  executionPrice: 'bigint',
+  indexTokenPriceMax: 'bigint',
+  indexTokenPriceMin: 'bigint',
+  collateralTokenPriceMax: 'bigint',
+  collateralTokenPriceMin: 'bigint',
+  sizeDeltaUsd: 'bigint',
+  sizeDeltaInTokens: 'bigint',
+  collateralDeltaAmount: 'bigint',
+  valuesPriceImpactDiffUsd: 'bigint',
+  orderType: 'bigint',
 
-  priceImpactUsd: 'int256',
-  basePnlUsd: 'int256',
-  uncappedBasePnlUsd: 'int256',
+  priceImpactUsd: 'bigint',
+  basePnlUsd: 'bigint',
+  uncappedBasePnlUsd: 'bigint',
 
   isLong: 'bool',
-
 
   blockTimestamp: 'number',
   transactionHash: 'string',
   feeCollected: positionCollectedUpdate,
-
-  account: {
-    id: 'string',
-    __typename: 'TraderAccount',
-  },
-
 
   __typename: 'PositionDecrease',
 }
@@ -171,45 +161,105 @@ const priceCandle: ISchema<IPriceCandle> = {
   interval: 'string',
   slotTime: 'number',
 
-  o: 'uint',
-  h: 'uint',
-  l: 'uint',
-  c: 'uint',
+  o: 'bigint',
+  h: 'bigint',
+  l: 'bigint',
+  c: 'bigint',
 
   __typename: 'PriceCandle',
 }
 
-const traderAccount: ISchema<ITraderAccount> = {
+const matchRule: ISchema<IMatchRule> = {
   id: 'string',
-  profile: profile,
+  puppet: 'address',
+  matchKey: 'string',
 
-  increaseList: positionIncrease,
-  decreaseList: positionDecrease,
+  allowanceRate: 'bigint',
+  throttleActivity: 'bigint',
+  expiry: 'bigint',
 
-  __typename: 'TraderAccount',
+  routeMatch: {
+    id: 'string',
+    profile: profile,
+
+    increaseList: positionIncrease,
+    decreaseList: positionDecrease,
+
+    __typename: 'MatchRoute',
+  },
+
+  __typename: 'MatchRule',
 }
 
-const accountLastAggregatedStats: ISchema<IAccountLastAggregatedStats> = {
+const matchRoute: ISchema<IMatchRoute> = {
   id: 'string',
+  profile: profile,
+  collateralToken: 'address',
+  
 
-  cumulativeSizeUsd: 'uint',
-  cumulativeCollateralUsd: 'uint',
-  maxCollateralInUsd: 'uint',
-  maxSizeInUsd: 'uint',
-  openPnl: 'uint',
-  realisedPnl: 'uint',
-  pnl: 'uint',
-  roi: 'uint',
+  increaseList: {
+    market: 'address',
+    positionKey: 'bytes',
+    sizeInUsd: 'bigint',
+    sizeInTokens: 'bigint',
+    indexTokenPriceMax: 'bigint',
+    isLong: 'bool',
+    blockTimestamp: 'number',
+    __typename: 'PositionIncrease',
+  },
+  decreaseList: {
+    market: 'address',
+    positionKey: 'bytes',
+    sizeInUsd: 'bigint',
+    sizeInTokens: 'bigint',
+    indexTokenPriceMax: 'bigint',
+    basePnlUsd: 'bigint',
+    isLong: 'bool',
+    blockTimestamp: 'number',
+    __typename: 'PositionIncrease',
+  },
+  matchRuleList: {
+    id: 'string',
+    puppet: 'address',
+    matchKey: 'string',
+    allowanceRate: 'bigint',
+    throttleActivity: 'bigint',
+    expiry: 'bigint',
 
-  blockTimestamp: 'number',
+    __typename: 'MatchRule',
+  },
+
+  __typename: 'MatchRoute',
+}
+
+const routeMatchStats: ISchema<IMatchRouteStats> = {
+  id: 'string',
+  account: 'address',
+
+  cumulativeCollateralToken: 'bigint',
+  cumulativeCollateralUsd: 'bigint',
+  cumulativeSizeToken: 'bigint',
+  cumulativeSizeUsd: 'bigint',
+
+  maxSizeInTokens: 'bigint',
+  maxSizeInUsd: 'bigint',
+  maxCollateralInTokens: 'bigint',
+  maxCollateralInUsd: 'bigint',
+
+  openPnl: 'bigint',
+  realisedPnl: 'bigint',
+  pnl: 'bigint',
+  roi: 'bigint',
+
   interval: 'number',
-  account: traderAccount,
+  blockTimestamp: 'number',
 
-  __typename: 'AccountLastAggregatedStats',
+  matchRoute: matchRoute,
+
+  __typename: 'MatchRouteStats',
 }
 
 
 export const schema = {
-  priceCandle, accountLastAggregatedStats, traderAccount, positionIncrease, positionDecrease,
-  orderCreated, positionCollectedUpdate
+  priceCandle, routeMatchStats, matchRule, positionIncrease, positionDecrease, orderCreated, positionCollectedUpdate
 }

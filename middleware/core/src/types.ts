@@ -72,6 +72,7 @@ export interface IOrderStatus extends ILogTxType<'OrderStatus'> {
 export interface IPositionIncrease extends ILogTxType<'PositionIncrease'> {
   order: IOrderStatus
   positionKey: viem.Hex
+  account: viem.Address
 
   market: viem.Address
   collateralToken: viem.Address
@@ -100,13 +101,12 @@ export interface IPositionIncrease extends ILogTxType<'PositionIncrease'> {
   isLong: boolean
 
   feeCollected: IPositionFeesCollected
-
-  account: ITraderAccount
 }
 
 export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
   collateralToken: viem.Address
   market: viem.Address
+  account: viem.Address
 
   order: IOrderStatus
   positionKey: viem.Hex
@@ -137,21 +137,8 @@ export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
   isLong: boolean
 
   feeCollected: IPositionFeesCollected
-  account: ITraderAccount
 }
 
-
-
-export interface ITraderAccount extends ILogTypeId<'AccountLastAggregatedStats'> {
-  id: viem.Address
-  profile: IProfile
-
-  increaseList: IPositionIncrease[]
-  decreaseList: IPositionDecrease[]
-  matchRuleList: IMatchRule[]
-
-  stats: IAccountLastAggregatedStats[]
-}
 
 export interface IMirrorRequest {
   puppets: readonly viem.Address[]
@@ -236,57 +223,67 @@ export interface IDepositBalance extends ILogTypeId<'DepositBalance'> {
   token: viem.Address
   value: bigint
 
-  account: IPuppetAccount
-}
-
-
-export interface IPuppetAccount extends ILogTypeId<'PuppetAccount'> {
-  id: viem.Address
-  profile: IProfile
-
-  accountBalanceList: IDepositBalance[]
-  matchRuleList: IMatchRule[]
-
-  allocationList: IAllocation[]
-  settlementList: ISettlement[]
+  account: viem.Address
 }
 
 export interface IAllocate extends ILogTypeId<'Allocate'> {
   id: viem.Address
-  puppet: IPuppetAccount
+  puppet: viem.Address
+}
+
+export interface IAccountBalance extends ILogTypeId<'AccountBalance'> {
+  id: viem.Address
+  account: viem.Address
+  token: viem.Address
+  value: bigint
 }
 
 export interface IAllocation extends ILogTypeId<'Allocation'> {
   id: viem.Address
   collateralToken: viem.Address
   matchKey: viem.Address
-  sourceRequestKey: viem.Address
+  originRequestKey: viem.Address
 
   amount: bigint
 
-  puppet: IPuppetAccount
+  puppet: viem.Address
   allocate: IAllocate
+  matchRoute: IMatchRoute
 }
 
-export interface IAllocationRule extends ILogTypeId<'AllocationRule'> {
-  id: viem.Address
-  collateralToken: viem.Address
 
-  throttleActivity: bigint
-
-  puppet: IPuppetAccount
-}
 
 export interface IMatchRule extends ILogTypeId<'MatchRule'> {
   id: viem.Address
+  puppet: viem.Address
   matchKey: viem.Address
 
   allowanceRate: bigint
   throttleActivity: bigint
   expiry: bigint
 
-  trader: ITraderAccount
-  puppet: IPuppetAccount
+  routeMatch: IMatchRoute
+}
+// matchRuleList: [MatchRule!]! @derivedFrom(field: "matchRoute")
+// allocationList: [Allocation!]! @derivedFrom(field: "matchRoute")
+// settlementList: [Settlement!]! @derivedFrom(field: "matchRoute")
+
+export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
+  id: viem.Address
+  profile: IProfile
+  collateralToken: viem.Address
+
+  increaseList: IPositionIncrease[]
+  decreaseList: IPositionDecrease[]
+
+  mirrorIncreaseList: IMirrorRequest[]
+  mirrorDecreaseList: IMirrorRequest[]
+
+  matchRuleList: IMatchRule[]
+  allocationList: IAllocation[]
+  settlementList: ISettlement[]
+
+  activity: IMatchRouteStats[]
 }
 
 
@@ -298,7 +295,7 @@ export interface ISettlement extends ILogTypeId<'Settlement'> {
   contribution: bigint
   amount: bigint
 
-  puppet: IPuppetAccount
+  puppet: viem.Address
   allocate: IAllocate
 }
 
@@ -314,7 +311,7 @@ export interface ISettle extends ILogTypeId<'Settle'> {
   transactionCost: bigint
   profit: bigint
 
-  puppet: IPuppetAccount
+  puppet: viem.Address
   allocate: IAllocate
 
   blockNumber: number
@@ -331,11 +328,19 @@ export type IPerformanceTimelineTick = {
   time: number;
 }
 
-export interface IAccountLastAggregatedStats extends ILogTypeId<'AccountLastAggregatedStats'> {
-  cumulativeSizeUsd: bigint
+export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {
+  account: viem.Address
+
+  cumulativeCollateralToken: bigint
   cumulativeCollateralUsd: bigint
+  cumulativeSizeToken: bigint
+  cumulativeSizeUsd: bigint
+
+  maxSizeInTokens: bigint
   maxSizeInUsd: bigint
+  maxCollateralInTokens: bigint
   maxCollateralInUsd: bigint
+
   openPnl: bigint
   realisedPnl: bigint
   pnl: bigint
@@ -344,10 +349,10 @@ export interface IAccountLastAggregatedStats extends ILogTypeId<'AccountLastAggr
   interval: number
   blockTimestamp: number
 
-  account: ITraderAccount
+  matchRoute: IMatchRoute
 }
 
-export interface IAccountLastAggregatedPerformance extends IAccountLastAggregatedStats {
+export interface IRouteMatchActivityTimeline extends IMatchRouteStats {
   timeline: IPerformanceTimelineTick[]
 }
 
