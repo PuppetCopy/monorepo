@@ -5,25 +5,25 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, mergeArray, skipRepeats, snapshot } from "@most/core"
 import { Stream } from "@most/types"
 import { getDuration, getMappedValue, groupArrayMany, readableDate, readablePercentage, readableTokenAmountLabel, switchMap } from "common-utils"
+import { getTokenDescription } from "gmx-middleware-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import { $check, $infoLabel, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText, $target, $xCross } from "ui-components"
+import * as PUPPET from "puppet-middleware-const"
+import { $check, $infoLabel, $infoLabeledValue, $infoTooltip, $intermediateText, $target, $xCross } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
 import { $profileDisplay } from "../$AccountProfile.js"
+import { $Popover } from "../$Popover"
 import { $route } from "../../common/$common.js"
 import { $heading3 } from "../../common/$text.js"
 import { $card2, $iconCircular, $responsiveFlex } from "../../common/elements/$common.js"
+import puppetReader from "../../logic/puppetReader"
 import { $seperator2 } from "../../pages/common.js"
 import { IComponentPageParams } from "../../pages/type.js"
 import { fadeIn } from "../../transitions/enter.js"
 import { $ButtonCircular, $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 import { $SubmitBar } from "../form/$Form"
-import { IChangeSubscription } from "./$RouteSubscriptionEditor"
-import { getTokenDescription } from "gmx-middleware-utils"
 import { $AssetDepositEditor } from "./$AssetDepositEditor"
-import puppetReader from "../../logic/puppetReader"
-import { $Popover } from "../$Popover"
-import * as PUPPET from "puppet-middleware-const"
+import { IChangeSubscription } from "./$RouteSubscriptionEditor"
 
 interface IRouteSubscribeDrawer extends IComponentPageParams {
   modifySubscriber: Stream<IChangeSubscription>
@@ -42,12 +42,6 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
   const { modifySubscriber, modifySubscriptionList, providerClientQuery, walletClientQuery, } = config
 
   const openIfEmpty = skipRepeats(map(l => l.length > 0, modifySubscriptionList))
-
-
-
-
-
-
 
 
   return [
@@ -191,7 +185,7 @@ export const $RouteSubscriptionDrawer = (config: IRouteSubscribeDrawer) => compo
                     abi: [...PUPPET.errorAbi.default, ...PUPPET.CONTRACT[42161].PuppetRouter.abi],
                     walletClient: wallet,
                     functionName: 'setMatchRuleList',
-                    args: [collateralTokenList, ruleParamList, traderList]
+                    args: [collateralTokenList, traderList, ruleParamList]
                   })
                 }, modifySubscriptionList)
               )

@@ -17,6 +17,7 @@ export default [
     inputs: [
       { name: "_token", type: "address", internalType: "contract IERC20" },
       { name: "_matchKey", type: "bytes32", internalType: "bytes32" },
+      { name: "_allocationKey", type: "bytes32", internalType: "bytes32" },
       { name: "_puppet", type: "address", internalType: "address" },
       { name: "_allocationAmount", type: "uint256", internalType: "uint256" },
     ],
@@ -166,10 +167,24 @@ export default [
   },
   {
     type: "function",
+    name: "getBalanceAndAllocationList",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_key", type: "bytes32", internalType: "bytes32" },
+      { name: "_puppetList", type: "address[]", internalType: "address[]" },
+    ],
+    outputs: [
+      { name: "_balanceList", type: "uint256[]", internalType: "uint256[]" },
+      { name: "_allocationList", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getBalanceList",
     inputs: [
       { name: "_token", type: "address", internalType: "contract IERC20" },
-      { name: "_accountList", type: "address[]", internalType: "address[]" },
+      { name: "_userList", type: "address[]", internalType: "address[]" },
     ],
     outputs: [{ name: "", type: "uint256[]", internalType: "uint256[]" }],
     stateMutability: "view",
@@ -285,8 +300,8 @@ export default [
     type: "function",
     name: "getUserAllocation",
     inputs: [
-      { name: "_puppet", type: "address", internalType: "address" },
       { name: "_key", type: "bytes32", internalType: "bytes32" },
+      { name: "_puppet", type: "address", internalType: "address" },
     ],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
@@ -342,13 +357,6 @@ export default [
   },
   {
     type: "function",
-    name: "remove",
-    inputs: [{ name: "user", type: "address", internalType: "address" }],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
     name: "removeAllocation",
     inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
     outputs: [],
@@ -356,8 +364,11 @@ export default [
   },
   {
     type: "function",
-    name: "set",
-    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    name: "setAccess",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "isEnabled", type: "bool", internalType: "bool" },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -408,6 +419,17 @@ export default [
       { name: "_value", type: "uint256", internalType: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setBalanceList",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_accountList", type: "address[]", internalType: "address[]" },
+      { name: "_balanceList", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    outputs: [],
     stateMutability: "nonpayable",
   },
   {
@@ -496,21 +518,6 @@ export default [
       { name: "_token", type: "address", internalType: "contract IERC20" },
       { name: "_puppet", type: "address", internalType: "address" },
       { name: "_settleAmount", type: "uint256", internalType: "uint256" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "settleList",
-    inputs: [
-      { name: "_token", type: "address", internalType: "contract IERC20" },
-      { name: "_puppetList", type: "address[]", internalType: "address[]" },
-      {
-        name: "_settleAmountList",
-        type: "uint256[]",
-        internalType: "uint256[]",
-      },
     ],
     outputs: [],
     stateMutability: "nonpayable",

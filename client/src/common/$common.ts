@@ -371,38 +371,37 @@ export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
   }, walletClientQuery)
 
   return [
-    $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-      $Popover({
-        open: map(matchRule => {
-          return $RouteSubscriptionEditor({ trader, walletClientQuery, matchRule, collateralToken: matchRoute.collateralToken })({
-            modifySubscriber: modifySubscribeListTether()
-          })
-        }, popRouteSubscriptionEditor),
-        dismiss: modifySubscribeList,
-        $target: switchMap(expiry => {
-          return $ButtonSecondary({
-            $content: $responsiveFlex(style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }))(
-              $row(style({ alignItems: 'center' }))(
-                $tokenLabeled(getTokenDescription(matchRoute.collateralToken)),
-              ),
-              $seperator2,
-
-              $row(style({ gap: '8px' }))(
-                $text(`Copy`),
-                $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '1px', minWidth: '18px' }), viewBox: '0 0 32 32' }),
-              ),
-
+    $Popover({
+      $container: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' })),
+      open: map(matchRule => {
+        return $RouteSubscriptionEditor({ trader, walletClientQuery, matchRule, collateralToken: matchRoute.collateralToken })({
+          modifySubscriber: modifySubscribeListTether()
+        })
+      }, popRouteSubscriptionEditor),
+      dismiss: modifySubscribeList,
+      $target: switchMap(expiry => {
+        return $ButtonSecondary({
+          $content: $responsiveFlex(style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }))(
+            $row(style({ alignItems: 'center' }))(
+              $tokenLabeled(getTokenDescription(matchRoute.collateralToken)),
             ),
-            $container: $defaultMiniButtonSecondary(style({
-              borderRadius: '16px', padding: '8px', height: 'auto',
-              borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, .25)
-            }))
-          })({
-            click: popRouteSubscriptionEditorTether(constant(expiry))
-          })
-        }, matchRule)
-      })({})
-    ),
+            $seperator2,
+
+            $row(style({ gap: '8px' }))(
+              $text(`Copy`),
+              $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '1px', minWidth: '18px' }), viewBox: '0 0 32 32' }),
+            ),
+
+          ),
+          $container: $defaultMiniButtonSecondary(style({
+            borderRadius: '16px', padding: '8px', height: 'auto',
+            borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, .25)
+          }))
+        })({
+          click: popRouteSubscriptionEditorTether(constant(expiry))
+        })
+      }, matchRule)
+    })({}),
 
 
     { modifySubscribeList }

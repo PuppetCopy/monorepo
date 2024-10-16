@@ -1,94 +1,88 @@
 export default [
   {
     type: "constructor",
-    inputs: [
-      {
-        name: "_owner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    inputs: [{ name: "_owner", type: "address", internalType: "address" }],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "contractAccessMap",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
   },
   {
     type: "function",
     name: "hasAccess",
     inputs: [
-      {
-        name: "target",
-        type: "address",
-        internalType: "contract Access",
-      },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "target", type: "address", internalType: "contract Access" },
+      { name: "user", type: "address", internalType: "address" },
     ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "hasPermission",
     inputs: [
+      { name: "target", type: "address", internalType: "contract Permission" },
+      { name: "functionSig", type: "bytes4", internalType: "bytes4" },
+      { name: "user", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "initContract",
+    inputs: [
       {
         name: "target",
         type: "address",
-        internalType: "contract Permission",
+        internalType: "contract CoreContract",
       },
-      {
-        name: "functionSig",
-        type: "bytes4",
-        internalType: "bytes4",
-      },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "config", type: "bytes", internalType: "bytes" },
     ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "logEvent",
+    inputs: [
+      { name: "method", type: "string", internalType: "string" },
+      { name: "name", type: "string", internalType: "string" },
+      { name: "version", type: "string", internalType: "string" },
+      { name: "data", type: "bytes", internalType: "bytes" },
     ],
-    stateMutability: "view",
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
     name: "owner",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "removeAccess",
     inputs: [
+      { name: "target", type: "address", internalType: "contract Access" },
+      { name: "user", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "removeContractAccess",
+    inputs: [
       {
         name: "target",
         type: "address",
-        internalType: "contract Access",
-      },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
+        internalType: "contract CoreContract",
       },
     ],
     outputs: [],
@@ -98,21 +92,9 @@ export default [
     type: "function",
     name: "removePermission",
     inputs: [
-      {
-        name: "target",
-        type: "address",
-        internalType: "contract Permission",
-      },
-      {
-        name: "functionSig",
-        type: "bytes4",
-        internalType: "bytes4",
-      },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "target", type: "address", internalType: "contract Permission" },
+      { name: "functionSig", type: "bytes4", internalType: "bytes4" },
+      { name: "user", type: "address", internalType: "address" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -128,16 +110,22 @@ export default [
     type: "function",
     name: "setAccess",
     inputs: [
+      { name: "target", type: "address", internalType: "contract Access" },
+      { name: "user", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setConfig",
+    inputs: [
       {
         name: "target",
         type: "address",
-        internalType: "contract Access",
+        internalType: "contract CoreContract",
       },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "config", type: "bytes", internalType: "bytes" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -146,21 +134,9 @@ export default [
     type: "function",
     name: "setPermission",
     inputs: [
-      {
-        name: "target",
-        type: "address",
-        internalType: "contract Permission",
-      },
-      {
-        name: "functionSig",
-        type: "bytes4",
-        internalType: "bytes4",
-      },
-      {
-        name: "user",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "target", type: "address", internalType: "contract Permission" },
+      { name: "functionSig", type: "bytes4", internalType: "bytes4" },
+      { name: "user", type: "address", internalType: "address" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -168,15 +144,36 @@ export default [
   {
     type: "function",
     name: "transferOwnership",
-    inputs: [
-      {
-        name: "newOwner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    inputs: [{ name: "newOwner", type: "address", internalType: "address" }],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    name: "LogEvent",
+    inputs: [
+      {
+        name: "operator",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      { name: "name", type: "string", indexed: false, internalType: "string" },
+      {
+        name: "version",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+      {
+        name: "method",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+      { name: "data", type: "bytes", indexed: false, internalType: "bytes" },
+    ],
+    anonymous: false,
   },
   {
     type: "event",
@@ -199,6 +196,33 @@ export default [
   },
   {
     type: "event",
+    name: "RemoveContractAccess",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "SetConfig",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      { name: "config", type: "bytes", indexed: false, internalType: "bytes" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "UpdateAccess",
     inputs: [
       {
@@ -207,12 +231,7 @@ export default [
         indexed: false,
         internalType: "address",
       },
-      {
-        name: "enabled",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "enabled", type: "bool", indexed: false, internalType: "bool" },
     ],
     anonymous: false,
   },
@@ -232,35 +251,21 @@ export default [
         indexed: false,
         internalType: "bytes4",
       },
-      {
-        name: "enabled",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "enabled", type: "bool", indexed: false, internalType: "bool" },
     ],
     anonymous: false,
   },
+  { type: "error", name: "Dictator__ConfigurationUpdateFailed", inputs: [] },
+  { type: "error", name: "Dictator__ContractAlreadyInitialized", inputs: [] },
+  { type: "error", name: "Dictator__ContractNotInitialized", inputs: [] },
   {
     type: "error",
     name: "OwnableInvalidOwner",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    inputs: [{ name: "owner", type: "address", internalType: "address" }],
   },
   {
     type: "error",
     name: "OwnableUnauthorizedAccount",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    inputs: [{ name: "account", type: "address", internalType: "address" }],
   },
 ] as const;

@@ -3,7 +3,6 @@ import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
 import puppetStore from "./abi/puppetStore";
 import dictator from "./abi/dictator.js";
-import eventEmitter from "./abi/eventEmitter.js";
 import puppetToken from "./abi/puppetToken.js";
 import puppetVoteToken from "./abi/puppetVoteToken.js";
 import rewardLogic from "./abi/rewardLogic.js";
@@ -21,36 +20,32 @@ import puppetLogic from "./abi/puppetLogic";
 export const CONTRACT = {
   [arbitrum.id]: {
     Dictator: {
-      address: "0x6474AF87CbF50cbdE88710b3DaF7247A22910AA1",
+      address: "0x00deA82Eb76F6501E7Ad538b807924A7b6b3fF85",
       abi: dictator,
     },
-    EventEmitter: {
-      address: "0xfA3fA156d39235994Ed8b87DB6e0cBE74c942C41",
-      abi: eventEmitter,
-    },
     PuppetToken: {
-      address: "0x29e21E47E2a1C4128b789b1b49FEAB91dBD7A80A",
+      address: "0xBcE9f38ed8C519E6315c63f46D98Aa7730ef5491",
       abi: puppetToken,
     },
     PuppetVoteToken: {
-      address: "0xFeDA7274a47e142170824A4AbC8CF6A38033A254",
+      address: "0x4CE601B9a609BF477B5F9d671baeDfD11bfdC0Ff",
       abi: puppetVoteToken,
     },
     Router: {
-      address: "0xFd5943807B3A9dB50DB8D0DAf4162E68f7139b2C",
+      address: "0x23fd0b66933a77Bb086B189093917a6c0c984d64",
       abi: router,
     },
 
     PuppetStore: {
-      address: "0xeA9D224D16E3a35a8EB78ada6BD8D157a5F22aC4",
+      address: "0xecC5C0E9D6AdD69b3A90513f03117FE9dBEA6C00",
       abi: puppetStore,
     },
     PuppetRouter: {
-      address: "0x402bF957BfFa22936da3bb66809D1e6E841aa059",
+      address: "0x6729b1f24B859DaB45EC35bF6f00102E6e6f05E7",
       abi: puppetRouter,
     },
     PuppetLogic: {
-      address: "0xd58c8E29F36c2f082d0d6f6C3f07a6B7A519B86a",
+      address: "0x25207b028dbBAdC5E6630ffec67acbca2b7E53A8",
       abi: puppetLogic,
     },
 

@@ -62,7 +62,7 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
 
   const $overlay = $node(
     style({
-      position: 'fixed', zIndex: 4321, backgroundColor: colorAlpha(pallete.message, .1),
+      position: 'fixed', zIndex: 4321, backgroundColor: colorAlpha(pallete.background, .8),
       top: 0, left: 0, right: 0, bottom: 0, // visibility: 'hidden',
     }),
     overlayClickTether(
