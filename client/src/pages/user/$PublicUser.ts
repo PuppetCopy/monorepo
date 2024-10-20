@@ -10,7 +10,7 @@ import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'
 import { subgraphClient } from "../../common/graphClient"
 import { $TraderSummary } from "../../components/participant/$Summary.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
 
@@ -30,7 +30,6 @@ type IRouteOption = {
 export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   [changeRoute, changeRouteTether]: Behavior<string, string>,
   [selectProfileMode, selectProfileModeTether]: Behavior<IRouteOption, IRouteOption>,
-  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
@@ -161,7 +160,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
     ),
 
     {
-      modifySubscriber, changeActivityTimeframe,
+      changeActivityTimeframe,
       changeRoute: mergeArray([
         changeRoute,
         map(option => {

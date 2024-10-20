@@ -1,70 +1,49 @@
-
 import { Behavior, combineObject, O } from "@aelea/core"
 import { $element, $node, $text, attr, component, style, stylePseudo } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { empty, map, mergeArray, now, snapshot, startWith } from "@most/core"
-import { combineState, formatFixed, getDuration, IntervalTime, parseBps, switchMap, unixTimestampNow } from "common-utils"
+import { empty, map, now, sample, snapshot, startWith } from "@most/core"
+import { formatFixed, getDuration, IntervalTime, parseBps, switchMap, unixTimestampNow } from "common-utils"
 import { IMatchRule } from "puppet-middleware-utils"
 import { $Checkbox, $FieldLabeled } from "ui-components"
 import { uiStorage } from "ui-storage"
-import * as viem from "viem"
 import { theme } from "../../assignThemeSync.js"
-import { $labeledDivider } from "../../common/elements/$common"
-import localStore from "../../const/localStore"
-import { IWalletPageParams } from "../../pages/type.js"
+import { $labeledDivider } from "../../common/elements/$common.js"
+import localStore from "../../const/localStore.js"
 import { $ButtonSecondary } from "../form/$Button.js"
-import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown"
+import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown.js"
+import { Stream } from "@most/types"
+import * as viem from "viem"
 
-interface IRouteSubscriptionEditor {
-  trader: viem.Address
-  collateralToken: viem.Address
-  matchRule?: IMatchRule
-}
 
-export interface IChangeSubscription {
+export interface IDraftMatchRule {
   expiry: bigint
   allowanceRate: bigint
   throttleActivity: bigint
+}
+
+export interface IMatchRuleEditorChange {
+  value: IDraftMatchRule
   trader: viem.Address
   collateralToken: viem.Address
   matchRule?: IMatchRule
 }
 
-export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWalletPageParams) => component((
+
+export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) => component((
   [inputEndDate, inputEndDateTether]: Behavior<any, bigint>,
   [inputAllowance, inputAllowanceTether]: Behavior<any, bigint>,
-  [clickUnsubscribe, clickUnsubscribeTether]: Behavior<any, IChangeSubscription>,
-  [clickSubmit, clickSubmitTether]: Behavior<any, IChangeSubscription>,
+  [clickRemove, clickRemoveTether]: Behavior<any, IDraftMatchRule>,
   [changeActivityThrottle, changeActivityThrottleTether]: Behavior<number, bigint>,
   [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: Behavior<boolean>,
+  [saveMatchRule, saveMatchRuleTether]: Behavior<PointerEvent, IDraftMatchRule>,
 ) => {
-
-  const { trader, walletClientQuery, matchRule, collateralToken } = config
 
   const advancedRouteEditorEnabled = uiStorage.replayWrite(localStore.ruleEditor, changeAdvancedRouteEditorEnabled, 'advancedRouteEditorEnabled')
 
-
-  // const allowanceRate = mergeArray([
-  //   now(Number(config.matchRule?.allowanceRate || BigInt(1000))),
-  //   inputAllowance
-  // ])
-
-  // const activityThrottle = mergeArray([
-  //   now(Number(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
-  //   changeActivityThrottle
-  // ])
-
-
-  // const expiry = mergeArray([
-  //   now(config.matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR)),
-  //   inputEndDate
-  // ])
-
-
-  const draft = combineObject({
-    allowanceRate: startWith(config.matchRule?.allowanceRate || BigInt(1000), inputAllowance),
-    throttleActivity: startWith(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR), changeActivityThrottle),
-    expiry: startWith(config.matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR), inputEndDate),
+  const draft: Stream<IDraftMatchRule> = combineObject({
+    allowanceRate: startWith(matchRule?.allowanceRate || BigInt(1000), inputAllowance),
+    throttleActivity: startWith(matchRule?.throttleActivity || BigInt(IntervalTime.HR), changeActivityThrottle),
+    expiry: startWith(matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR), inputEndDate),
   })
 
   const isSubscribed = matchRule && matchRule.expiry > BigInt(unixTimestampNow())
@@ -76,7 +55,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
       $FieldLabeled({
         label: 'Match Allocation %',
         value: map(x => x ? `${formatFixed(4, x) * 100}` : '', inputAllowance),
-        placeholder: `${formatFixed(4, config.matchRule?.allowanceRate || BigInt(1000)) * 100}`,
+        placeholder: `${formatFixed(4, matchRule?.allowanceRate || BigInt(1000)) * 100}`,
         labelWidth: 150,
         hint: `% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring`,
       })({
@@ -109,7 +88,7 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
             $selection: $FieldLabeled({
               label: 'Activity throttle',
               value: map(O(Number, getDuration), changeActivityThrottle),
-              placeholder: getDuration(Number(config.matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
+              placeholder: getDuration(Number(matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
               labelWidth: 150,
               hint: `Ignore positions that are too close to each other in time`,
             })({
@@ -154,41 +133,26 @@ export const $RouteSubscriptionEditor = (config: IRouteSubscriptionEditor & IWal
 
       $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
         $ButtonSecondary({
-          $content: $text('Unsubscribe'),
+          $content: $text('Remove'),
           disabled: now(!isSubscribed)
         })({
-          click: clickUnsubscribeTether(
-            map(() => {
-              if (!matchRule) {
-                throw new Error('No match rule')
-              }
-
-              const subs: IChangeSubscription = { ...matchRule, matchRule, collateralToken, trader, expiry: 0n }
-              return subs
-            })
-          )
+          click: clickRemoveTether()
         }),
 
         $ButtonSecondary({
           $content: $text('Subscribe'),
           disabled: map(params => !params.allowanceRate, draft)
         })({
-          click: clickSubmitTether(
-            snapshot(params => {
-              const subsc: IChangeSubscription = { collateralToken, trader, ...params }
-              return subsc
-            }, draft)
-          )
+          click: saveMatchRuleTether()
         })
 
       )
     ),
 
     {
-      modifySubscriber: mergeArray([
-        clickSubmit,
-        clickUnsubscribe
-      ]),
+      save: sample(draft, saveMatchRule),
+      remove: snapshot((draft): IDraftMatchRule => ({ ...draft, expiry: 0n }), draft, clickRemove)
     }
   ]
 })
+

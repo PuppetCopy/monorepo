@@ -34,7 +34,7 @@ export const $defaultButtonSecondary = $defaultButtonCore(
   stylePseudo(':hover', { borderColor: pallete.foreground, borderWidth: '1px' })
 )
 
-export const $defaultMiniButtonSecondary = $defaultButtonSecondary(style({ alignSelf: 'center', borderWidth: '1px', height: '32px', padding: '0 10px', fontSize: '.85rem' }))
+export const $defaultMiniButtonSecondary = $defaultButtonSecondary(style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.85rem' }))
 
 
 export const $buttonAnchor = $element('a')(

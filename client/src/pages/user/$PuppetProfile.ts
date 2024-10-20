@@ -5,7 +5,7 @@ import { IntervalTime } from "common-utils"
 import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { IUserPositionPageParams } from "../type.js"
 
 
@@ -15,7 +15,7 @@ export interface IPuppetProfile extends IUserPositionPageParams {
 
 export const $PuppetProfile = (config: IPuppetProfile) => component((
   [changeRoute, changeRouteTether]: Behavior<string, string>,
-  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
+  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeMatchRule>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,

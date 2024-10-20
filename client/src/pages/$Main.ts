@@ -19,7 +19,8 @@ import { subgraphClient } from "../common/graphClient"
 import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
-import { IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor"
+import { $PortfolioEditorDrawer } from "../components/portfolio/$PortfolioEditorDrawer.js"
+import { default as localStore, default as localstore } from "../const/localStore"
 import { newUpdateInvoke } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
 import { $Admin } from "./$Admin"
@@ -28,9 +29,8 @@ import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
-import { $RouteSubscriptionDrawer } from "../components/portfolio/$RouteSubscriptionDrawer"
-import localstore from "../const/localStore"
-import localStore from "../const/localStore"
+import { IDepositEditorChange, IDepositEditorValue } from "../components/portfolio/$DepositEditor.js"
+import { IMatchRuleEditorChange } from "../components/portfolio/$MatchRuleEditor"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -49,7 +49,7 @@ export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMa
   [arbitrum.id]: viem.fallback([
     viem.webSocket('wss://arb-mainnet.g.alchemy.com/v2/sI7JV4ahbI8oNlOosnZ7klOi8vsxdVwm'),
     viem.http('https://arb1.arbitrum.io/rpc'),
-    
+
   ]),
   // [CHAIN.AVALANCHE]: avaGlobalProvider,
 }
@@ -58,14 +58,15 @@ export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMa
 
 export const $Main = ({ baseRoute = '' }: IApp) => component((
   [routeChanges, changeRouteTether]: Behavior<any, string>,
-  [modifySubscriptionList, modifySubscriptionListTether]: Behavior<IChangeSubscription[]>,
-  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
   [clickUpdateVersion, clickUpdateVersionTether]: Behavior<any, bigint>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+
+  [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
+  [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
 ) => {
 
   const changes = merge(locationChange, multicast(routeChanges))
@@ -148,6 +149,10 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   }, providerClientQuery))
 
 
+  const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchRuleEditorChange[])
+  const depositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorChange[])
+
+
   return [
     $column(
       switchMap(cb => {
@@ -189,29 +194,32 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
                     changeWallet: changeWalletTether(),
-                    modifySubscriber: modifySubscriberTether(),
                     changeRoute: changeRouteTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
+
+                    changeMatchRuleList: changeMatchRuleListTether(),
+                    changeDepositTokenList: changeDepositTokenListTether(),
                   })
                 )
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery })({
+                  fadeIn($Leaderboard({ 
+                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList
+                   })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
                     routeChange: changeRouteTether(),
-                    modifySubscriber: modifySubscriberTether(),
+                    changeMatchRuleList: changeMatchRuleListTether(),
                   }))
                 )
               ),
               router.contains(profileRoute)(
                 $midContainer(
                   fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery })({
-                    modifySubscriber: modifySubscriberTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     // selectMarketTokenList: selectMarketTokenListTether(),
                     changeRoute: changeRouteTether(),
@@ -292,14 +300,15 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
           ),
 
           $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
-            $RouteSubscriptionDrawer({
+            $PortfolioEditorDrawer({
+              depositTokenList,
               providerClientQuery,
               walletClientQuery,
-              modifySubscriptionList: replayLatest(modifySubscriptionList, []),
-              modifySubscriber,
+              matchRuleList
             })({
               changeWallet: changeWalletTether(),
-              modifySubscriptionList: modifySubscriptionListTether()
+              changeMatchRuleList: changeMatchRuleListTether(),
+              changeDepositTokenList: changeDepositTokenListTether(),
             })
           )
         )

@@ -24,7 +24,7 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
       return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
         $disconnectedWalletDisplay(),
         $seperator2,
-        style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Click to Connect'))
+        style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Not connected'))
       )
     }
 

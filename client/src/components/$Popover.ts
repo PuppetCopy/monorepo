@@ -2,7 +2,7 @@ import { Behavior, O } from '@aelea/core'
 import { $Node, $node, INode, NodeComposeFn, component, nodeEvent, style, styleBehavior } from '@aelea/dom'
 import { $column, observer } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, empty, filter, map, merge, multicast, switchLatest, until, zip } from "@most/core"
+import { constant, empty, filter, map, merge, mergeArray, multicast, switchLatest, until, zip } from "@most/core"
 import { Stream } from "@most/types"
 
 
@@ -19,7 +19,14 @@ interface IPocus {
   spacing?: number
 }
 
-export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContainer = $defaultPopoverContentContainer, $container = $node, $target }: IPocus) => component((
+export const $Popover = ({
+  open,
+  dismiss = empty(),
+  spacing = 10,
+  $contentContainer = $defaultPopoverContentContainer,
+  $container = $node,
+  $target
+}: IPocus) => component((
   [overlayClick, overlayClickTether]: Behavior<INode, false>,
   [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
   [popoverContentDimension, popoverContentDimensionTether]: Behavior<INode, ResizeObserverEntry[]>,
@@ -62,7 +69,7 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
 
   const $overlay = $node(
     style({
-      position: 'fixed', zIndex: 4321, backgroundColor: colorAlpha(pallete.background, .8),
+      position: 'fixed', zIndex: 2321, backgroundColor: colorAlpha(pallete.background, .8),
       top: 0, left: 0, right: 0, bottom: 0, // visibility: 'hidden',
     }),
     overlayClickTether(
@@ -70,7 +77,7 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
       filter(ev => {
         if (ev.target instanceof HTMLElement) {
           const computedStyle = getComputedStyle(ev.target)
-          if (computedStyle.zIndex === '4321' && computedStyle.inset === '0px') {
+          if (computedStyle.zIndex === '2321' && computedStyle.inset === '0px') {
             return true
           }
         }
@@ -87,7 +94,10 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
 
   const $content = switchLatest(
     map(content => {
-      return until(dismissEvent, $overlay(contentOps(content)))
+      return until(dismissEvent, mergeArray([
+        style({zIndex: 3456})(contentOps(content)),
+        $overlay(),
+      ]))
     }, openMulticast)
   )
 
@@ -103,7 +113,7 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
     ),
     styleBehavior(
       merge(
-        constant({ zIndex: 5000, position: 'relative' }, openMulticast),
+        constant({ zIndex: 2345, position: 'relative' }, openMulticast),
         constant(null, dismissEvent)
       )
     )
@@ -115,7 +125,9 @@ export const $Popover = ({ open, dismiss = empty(), spacing = 10, $contentContai
       $content,
     ),
 
-    { overlayClick }
+    {
+      overlayClick
+    }
   ]
 })
 

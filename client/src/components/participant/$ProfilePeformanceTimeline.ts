@@ -1,19 +1,17 @@
 import { Behavior, combineObject } from "@aelea/core"
-import { $element, $node, $text, MOTION_NO_WOBBLE, component, motion, style } from "@aelea/dom"
+import { $node, $text, MOTION_NO_WOBBLE, component, motion, style } from "@aelea/dom"
 import { $NumberTicker, $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest, take } from "@most/core"
-import { IntervalTime, filterNull, parseReadableNumber, readableUnitAmount, switchMap, unixTimestampNow } from "common-utils"
-import { getMarketIndexToken } from "gmx-middleware-utils"
+import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest } from "@most/core"
+import { IntervalTime, filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
-import { $Baseline, $IntermediatePromise, $infoTooltipLabel, $labelDisplay, IMarker } from "ui-components"
-import * as viem from "viem"
-import { $LastAtivity } from "../$LastActivity.js"
-import { $tokenIcon, $tokenLabeled } from "../../common/$common.js"
-import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
-import { $DropMultiSelect } from "../form/$Dropdown.js"
-import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
 import { isPositionOpen, isPositionSettled } from "puppet-middleware-utils"
+import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "ui-components"
+import * as viem from "viem"
+import { $SelectCollateralToken } from "../$CollateralTokenSelector"
+import { $LastAtivity } from "../$LastActivity.js"
+import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
+import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
 
 export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
@@ -38,37 +36,16 @@ export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUs
     return { timeline, list }
   }, newLocal))
 
-  const uniqueIndexTokenList = take(1, switchMap(async listQuery => {
-    const list = await listQuery
-    const uniqueIndexTokenList = [...new Set(list.map(update => getMarketIndexToken(update.market)))]
-
-    return uniqueIndexTokenList
-  }, positionListQuery))
-
 
 
   return [
     $column(style({ width: '100%', padding: 0, height: '200px', placeContent: 'center' }))(
       $row(style({ position: 'absolute', top: '14px', left: '20px', right: '20px', alignSelf: 'center', zIndex: 11, alignItems: 'flex-start' }))(
         $row(style({ flex: 1 }))(
-          $DropMultiSelect({
-            // $container: $row(layoutSheet.spacingTiny, style({ display: 'flex', position: 'relative' })),
-            $input: $element('input')(style({ width: '100px' })),
-            $label: $labelDisplay(style({ color: pallete.foreground }))('Market'),
-            placeholder: 'All / Select',
-            // getId: item => item.routeTypeKey,
-            $$chip: map(tr => $tokenIcon(tr)),
-            selector: {
-              list: uniqueIndexTokenList,
-              $$option: map(tr => {
-                return style({
-                  padding: '8px'
-                }, $tokenLabeled(tr))
-              })
-            },
-            value: selectedCollateralTokenList
+          $SelectCollateralToken({
+            selectedList: selectedCollateralTokenList,
           })({
-            select: selectMarketTokenListTether()
+            selectMarketTokenList: selectMarketTokenListTether()
           }),
         ),
         switchLatest(awaitPromises(map(async paramsQuery => {

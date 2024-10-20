@@ -20,7 +20,7 @@ import { IComponentPageParams } from "../pages/type"
 import { $Popover } from "./$Popover"
 import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "./$Slider"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "./form/$Button"
-import { $SubmitBar } from "./form/$Form"
+import { $SubmitBar } from "./form/$SubmitBar"
 
 function calcDurationMultiplier(baseMultiplier: bigint, duration: bigint) {
   const numerator = baseMultiplier * duration ** 2n;
@@ -493,13 +493,13 @@ export const $Vest = (config: IVestingDetails) => component((
             const params = await paramsQuery
             const callStack: viem.Hex[] = []
 
-            const rewardRouterContractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter
+            const contractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter
 
 
             if (params.claimableContributionReward > 0) {
               callStack.push(
                 viem.encodeFunctionData({
-                  ...rewardRouterContractDefs,
+                  ...contractDefs,
                   functionName: 'claimContribution',
                   args: [[ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address, params.claimableContributionReward]
                 })
@@ -509,7 +509,7 @@ export const $Vest = (config: IVestingDetails) => component((
             if (params.claimableLockReward > 0) {
               callStack.push(
                 viem.encodeFunctionData({
-                  ...rewardRouterContractDefs,
+                  ...contractDefs,
                   functionName: 'claimEmission',
                   args: [wallet.account.address, params.claimableLockReward]
                 })
@@ -519,7 +519,7 @@ export const $Vest = (config: IVestingDetails) => component((
             if (params.claimableVestedReward > 0) {
               callStack.push(
                 viem.encodeFunctionData({
-                  ...rewardRouterContractDefs,
+                  ...contractDefs,
                   functionName: 'claimVested',
                   args: [wallet.account.address, params.claimableVestedReward]
                 })
@@ -529,7 +529,7 @@ export const $Vest = (config: IVestingDetails) => component((
             if (params.lockDurationDelta > 0) {
               callStack.push(
                 viem.encodeFunctionData({
-                  ...rewardRouterContractDefs,
+                  ...contractDefs,
                   functionName: 'lock',
                   args: [params.lockAmountDelta, params.lockDurationDelta]
                 })
@@ -538,7 +538,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
 
             const writeQuery = walletLink.writeContract({
-              ...rewardRouterContractDefs,
+              ...contractDefs,
               walletClient: wallet,
               functionName: 'multicall',
               args: [callStack],

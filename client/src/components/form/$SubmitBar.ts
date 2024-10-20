@@ -1,26 +1,19 @@
-import { Behavior, O, combineArray, combineObject, isStream } from "@aelea/core"
+import { Behavior, O, combineArray, combineObject } from "@aelea/core"
 import { $Branch, $Node, $text, INode, NodeComposeFn, attrBehavior, component, nodeEvent, style, styleBehavior } from "@aelea/dom"
 import { $row, Control, layoutSheet } from "@aelea/ui-components"
-import { constant, empty, fromPromise, map, mergeArray, multicast, now, startWith, switchLatest } from "@most/core"
+import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from "@most/core"
 import { Stream } from "@most/types"
-import { erc20Abi } from "abitype/abis"
-import { MAX_UINT256, PromiseStateError, PromiseStatus, promiseState, switchMap } from "common-utils"
+import { PromiseStateError, PromiseStatus, getSafeMappedValue, promiseState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { $alertPositiveTooltip, $alertTooltip, $intermediateTooltip, $txHashRef } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"
-import { $IntermediateConnectButton } from "../$ConnectWallet"
+import { $IntermediateConnectButton } from "../$ConnectWallet.js"
 import { $iconCircular } from "../../common/elements/$common.js"
-import { getContractErrorMessage } from "../../const/contractErrorMessage"
-import { $defaultButtonPrimary } from "./$Button"
-import { $ButtonCore } from "./$ButtonCore"
-
-interface ISpend {
-  spender: viem.Address
-  token: viem.Address
-  amount?: Stream<bigint>
-  $label?: $Node | string
-}
+import { getContractErrorMessage } from "../../const/contractErrorMessage.js"
+import { $ApproveSpend, ISpend } from "./$ApproveSpend.js"
+import { $defaultButtonPrimary } from "./$Button.js"
+import { $ButtonCore } from "./$ButtonCore.js"
 
 
 export interface ISubmitBar {
@@ -41,16 +34,16 @@ export const $SubmitBar = (config: ISubmitBar) => component((
   [approveTokenSpend, approveTokenSpendTether]: Behavior<walletLink.IWriteContractReturn>,
 ) => {
   const {
-    $barContent,
     disabled = now(false),
     alert = now(null),
+    txQuery, walletClientQuery, spend,
+    $barContent,
     $container = $row,
-    txQuery, $submitContent, walletClientQuery, spend
+    $submitContent,
   } = config
 
   const multicastTxQuery = multicast(promiseState(txQuery))
   const requestStatus = mergeArray([
-    promiseState(approveTokenSpend),
     multicastTxQuery,
     map(a => a ? { state: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError : null, alert)
   ])
@@ -81,10 +74,12 @@ export const $SubmitBar = (config: ISubmitBar) => component((
             }
           }
 
-   
+
 
           return $alertTooltip(
-            $text(style({ whiteSpace: 'pre-wrap' }))(message || err.message || 'Transaction failed')
+            $text(style({ whiteSpace: 'pre-wrap' }))(
+              message || getSafeMappedValue(err, 'shortMessage', 'message') || 'Transaction failed with an unknown error'
+            )
           )
         }
 
@@ -117,7 +112,6 @@ export const $SubmitBar = (config: ISubmitBar) => component((
           if (spend) {
             const isSpendPending = startWith(false, map(s => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend)))
 
-
             return $ApproveSpend({
               ...spend,
               txQuery: approveTokenSpend,
@@ -140,70 +134,6 @@ export const $SubmitBar = (config: ISubmitBar) => component((
   ]
 })
 
-
-interface IApproveSpend extends ISpend {
-  walletClient: walletLink.IWalletClient
-  $content?: $Node
-  disabled?: Stream<boolean>
-  txQuery: Stream<walletLink.IWriteContractReturn>
-}
-
-export const $ApproveSpend = (config: IApproveSpend) => component((
-  [approveTokenSpend, approveTokenSpendTether]: Behavior<PointerEvent, walletLink.IWriteContractReturn>,
-) => {
-
-  const { $content, amount, token, walletClient, spender, $label, disabled } = config
-
-
-  const allowance = mergeArray([
-    switchMap(async query => {
-      return ((await query).events[0].args as any).value as bigint;
-    }, config.txQuery),
-    fromPromise(walletLink.readContract({
-      provider: walletClient,
-      address: token,
-      abi: erc20Abi,
-      functionName: 'allowance',
-      args: [walletClient.account.address, spender]
-    }))
-  ])
-
-  return [
-    $row(
-      switchMap(params => {
-        if (params.allowance >= params.amount) {
-          return $content || empty()
-        }
-
-
-        return $ButtonCore({
-          disabled,
-          $container: $defaultButtonPrimary(style({
-            position: 'relative',
-            overflow: 'hidden',
-          })),
-          $content: $label ? isStream($label) ? $label : $text($label) : $text('Approve spend'),
-        })({
-          click: approveTokenSpendTether(
-            map(async () => {
-              return walletLink.writeContract({
-                walletClient,
-                address: token,
-                abi: erc20Abi,
-                eventName: 'Approval',
-                functionName: 'approve',
-                args: [spender, params.amount] as const
-              })
-            })
-          )
-        })
-      }, combineObject({ allowance, amount: amount ?? now(MAX_UINT256) }))
-    ),
-    {
-      approveTokenSpend
-    }
-  ]
-})
 
 
 

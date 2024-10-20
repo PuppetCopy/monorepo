@@ -1,18 +1,18 @@
 import { Behavior, Op, combineObject } from "@aelea/core"
-import { $Node, $element, $text, attr, component, style } from "@aelea/dom"
+import { $Node, $element, $text, NodeComposeFn, attr, component, style } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
-import { awaitPromises, empty, fromPromise, join, map, multicast, never, now } from "@most/core"
+import { awaitPromises, empty, fromPromise, join, map, multicast, now } from "@most/core"
 import { Stream } from "@most/types"
 import { EthereumProvider } from "@walletconnect/ethereum-provider"
 import { ignoreAll, switchMap } from "common-utils"
 import { EIP1193Provider, EIP6963ProviderDetail, createStore } from "mipd"
+import { $caretDown, $icon } from "ui-components"
 import { arbitrum } from "viem/chains"
 import * as walletLink from "wallet"
 import { IWalletPageParams } from "../pages/type"
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from "./form/$Button.js"
+import { $ButtonSecondary } from "./form/$Button.js"
 import { IButtonCore } from "./form/$ButtonCore.js"
 import { $Dropdown } from "./form/$Dropdown"
-import { $caretDown, $icon } from "ui-components"
 
 
 const store = createStore()
@@ -59,6 +59,7 @@ export const announcedProviderList = map(provider => {
 export interface IConnectWalletPopover extends IWalletPageParams {
   $$display: Op<walletLink.IWalletClient, $Node>
   primaryButtonConfig?: Partial<IButtonCore>
+  $container?: NodeComposeFn<$Node>
 }
 
 
@@ -66,19 +67,23 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) => com
   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 ) => {
 
+  const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
+
   const wallet = awaitPromises(config.walletClientQuery)
 
   return [
-    switchMap(wallet => {
-      // no wallet connected, show connection flow
-      if (wallet === null) {
-        return $ConnectChoiceList()({
-          changeWallet: changeWalletTether()
-        })
-      }
+    $container(
+      switchMap(wallet => {
+        // no wallet connected, show connection flow
+        if (wallet === null) {
+          return $ConnectChoiceList()({
+            changeWallet: changeWalletTether()
+          })
+        }
 
-      return join(config.$$display(now(wallet)))
-    }, wallet),
+        return join(config.$$display(now(wallet)))
+      }, wallet)
+    ),
 
     {
       changeWallet
@@ -92,54 +97,49 @@ export const $ConnectChoiceList = () => component((
 ) => { 
 
   return [
-    switchMap(params => {
-      return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-
-        $Dropdown({
-          $selection: $ButtonSecondary({
-            $content: $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
-              $text('Connect Wallet'),
-              $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
-            )
-          })({}),
-          selector: {
-            value: now(null) as Stream<EIP6963ProviderDetail | null>,
-            list: params.announcedProviderList,
-            $$option: map(providerDetail => {
-              if (providerDetail === null) return empty()
-
-              return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
-                ignoreAll(changeWallet),
-                providerDetail.info.icon ?
-                  $element('img')(
-                    style({ width: '24px', height: '24px' }),
-                    attr({ src: providerDetail.info.icon })
-                  )()
-                  : empty(),
-                $text(providerDetail.info.name),
-              )
-            })
-          },
-        })({
-          select: changeWalletTether(
-            map(async providerDetail => {
-              const provider = providerDetail.provider
-              if (providerDetail.info.rdns === 'com.WalletConnect') {
-                // @ts-ignore
-                await providerDetail.provider.connect()
-              } else {
-                await provider.request({ method: 'eth_requestAccounts' })
-              }              
-              
-              return providerDetail
-            }),
-            awaitPromises,
-            multicast
+    switchMap(announcedProviderList => {
+      return $Dropdown({
+        $selection: $ButtonSecondary({
+          $content: $row(layoutSheet.spacing, style({ alignItems: 'center' }))(
+            $text('Connect Wallet'),
+            $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
           )
-        }),
-        
-      )
-    }, combineObject({ announcedProviderList }) ),
+        })({}),
+        selector: {
+          value: now(null) as Stream<EIP6963ProviderDetail | null>,
+          list: announcedProviderList,
+          $$option: map(providerDetail => {
+            if (providerDetail === null) return empty()
+
+            return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+              ignoreAll(changeWallet),
+              providerDetail.info.icon ?
+                $element('img')(
+                  style({ width: '24px', height: '24px' }),
+                  attr({ src: providerDetail.info.icon })
+                )()
+                : empty(),
+              $text(providerDetail.info.name),
+            )
+          })
+        },
+      })({
+        select: changeWalletTether(
+          map(async providerDetail => {
+            const provider = providerDetail.provider
+            if (providerDetail.info.rdns === 'com.WalletConnect') {
+              await providerDetail.provider.connect()
+            } else {
+              await provider.request({ method: 'eth_requestAccounts' })
+            }
+
+            return providerDetail
+          }),
+          awaitPromises,
+          multicast
+        )
+      })
+    }, announcedProviderList ),
 
     {
       changeWallet

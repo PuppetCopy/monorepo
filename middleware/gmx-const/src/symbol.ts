@@ -33,6 +33,7 @@ export const TOKEN_SYMBOL = {
   wstETH: "wstETH",
   EIGEN: "EIGEN",
   SATS: "SATS",
+  POL: "POL",
 
   USDT: "USDT",
   DAI: "DAI",

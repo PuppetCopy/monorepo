@@ -21,7 +21,7 @@
     ],
     // Interop constraints
     "esModuleInterop": false,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     // Skip type checking for node modules
     "skipLibCheck": true

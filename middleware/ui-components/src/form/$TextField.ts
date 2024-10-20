@@ -22,15 +22,15 @@ export const $defaultTextFieldContainer = $element('label')(
 )
 
 
-export const $labelDisplay = $text(style({ paddingRight: '4px', alignSelf: 'flex-end', cursor: 'pointer', lineHeight: '36px', borderBottom: `2px solid ${colorAlpha(pallete.message, .1)}` }))
+export const $labelDisplay = $text(style({ paddingRight: '4px', alignSelf: 'flex-end', cursor: 'pointer', lineHeight: '42px', borderBottom: `2px solid ${colorAlpha(pallete.message, .1)}` }))
 
 
 const overideInputStyle = O(
   style({
     backgroundColor: pallete.background,
     color: pallete.message,
-    lineHeight: '36px',
-    height: '36px',
+    lineHeight: '42px',
+    height: '42px',
     padding: '0 8px',
   }),
   stylePseudo('::placeholder', {

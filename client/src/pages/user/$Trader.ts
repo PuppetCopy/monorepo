@@ -7,7 +7,7 @@ import { $IntermediatePromise, $Table, $infoLabel, IQuantumScrollPage, ISortBy }
 import * as viem from 'viem'
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor.js"
+import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
 import { IUserPositionPageParams } from "../type.js"
 
@@ -21,7 +21,7 @@ export const $TraderPage = (config: IUserPositionPageParams) => component((
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
-  [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
+  [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeMatchRule>,
 ) => {
 
   const { activityTimeframe, selectedCollateralTokenList, positionListQuery } = config

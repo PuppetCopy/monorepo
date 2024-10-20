@@ -2,22 +2,17 @@ import { Behavior, Tether } from "@aelea/core"
 import { $text, component, INode, nodeEvent, style, styleInline } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, empty, map, skipRepeats } from "@most/core"
+import { pallete } from "@aelea/ui-components-theme"
+import { empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { ADDRESS_ZERO, getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf, switchMap, unixTimestampNow } from "common-utils"
+import { ADDRESS_ZERO, getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
 import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware-utils"
-import { IMatchRoute, IMatchRule, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
+import { IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoLabeledValue, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
-import { $Popover } from "../components/$Popover.js"
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button.js"
-import { $RouteSubscriptionEditor, IChangeSubscription } from "../components/portfolio/$RouteSubscriptionEditor.js"
 import { $seperator2 } from "../pages/common.js"
-import { IWalletPageParams, IWalletTab } from "../pages/type.js"
-import { $responsiveFlex } from "./elements/$common"
-import { $caretDown } from "./elements/$icons"
+import { IWalletTab } from "../pages/type.js"
 
 
 export const $midContainer = $column(
@@ -343,68 +338,6 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
     })({ click: clickTether() }),
 
     { click }
-  ]
-})
-
-
-
-interface ITraderRouteDisplay extends IWalletPageParams {
-  trader: viem.Address
-  selectedCollateralTokenList: Stream<viem.Address[]>
-  matchRoute: IMatchRoute
-}
-export const $TraderRouteDisplay = (config: ITraderRouteDisplay) => component((
-  [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, IMatchRule | undefined>,
-  [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeSubscription>,
-) => {
-
-  const { walletClientQuery, trader, selectedCollateralTokenList, matchRoute } = config
-
-  const matchRule = switchMap(async walletQuery => {
-    const wallet = await walletQuery
-
-    if (wallet === null) {
-      return
-    }
-
-    return matchRoute.matchRuleList.find(mr => mr.puppet === wallet.account.address)
-  }, walletClientQuery)
-
-  return [
-    $Popover({
-      $container: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' })),
-      open: map(matchRule => {
-        return $RouteSubscriptionEditor({ trader, walletClientQuery, matchRule, collateralToken: matchRoute.collateralToken })({
-          modifySubscriber: modifySubscribeListTether()
-        })
-      }, popRouteSubscriptionEditor),
-      dismiss: modifySubscribeList,
-      $target: switchMap(expiry => {
-        return $ButtonSecondary({
-          $content: $responsiveFlex(style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }))(
-            $row(style({ alignItems: 'center' }))(
-              $tokenLabeled(getTokenDescription(matchRoute.collateralToken)),
-            ),
-            $seperator2,
-
-            $row(style({ gap: '8px' }))(
-              $text(`Copy`),
-              $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '1px', minWidth: '18px' }), viewBox: '0 0 32 32' }),
-            ),
-
-          ),
-          $container: $defaultMiniButtonSecondary(style({
-            borderRadius: '16px', padding: '8px', height: 'auto',
-            borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, .25)
-          }))
-        })({
-          click: popRouteSubscriptionEditorTether(constant(expiry))
-        })
-      }, matchRule)
-    })({}),
-
-
-    { modifySubscribeList }
   ]
 })
 

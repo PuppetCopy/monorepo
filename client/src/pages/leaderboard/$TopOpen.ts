@@ -133,7 +133,7 @@
 //                 $bodyCallback: map(pos => {
 //                   return $TraderDisplay({
 //                     route: config.route,
-//                     // changeSubscriptionList: config.changeSubscriptionList,
+//                     // changeMatchRuleList: config.changeMatchRuleList,
 //                     subscriptionList: config.subscriptionList,
 //                     trader: pos.trader,
 //                   })({ 

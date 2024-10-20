@@ -14,12 +14,12 @@ import {
 } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $TraderDisplay, $TraderRouteDisplay, $roiDisplay, $size } from "../../common/$common.js"
+import { $TraderDisplay, $roiDisplay, $size } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { subgraphClient } from "../../common/graphClient"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
-import { IChangeSubscription } from "../../components/portfolio/$RouteSubscriptionEditor"
+import { $TraderMatchRouteEditor, IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { getPositionListTimelinePerformance } from "../../components/trade/$ProfilePerformanceGraph"
 import localStore from "../../const/localStore.js"
@@ -27,11 +27,11 @@ import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
 
 
+interface ILeaderboard extends IUserActivityPageParams {
+  matchRuleList: Stream<IChangeMatchRule[]>
+}
 
-
-export const $Leaderboard = (config: IUserActivityPageParams) => component((
-  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
-
+export const $Leaderboard = (config: ILeaderboard) => component((
   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
   [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
 
@@ -40,9 +40,11 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
 
   [routeChange, routeChangeTether]: Behavior<any, string>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
+
+  [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IChangeMatchRule[]>,
 ) => {
 
-  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, route } = config
+  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, matchRuleList, route } = config
 
   const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
@@ -144,13 +146,13 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
                 $head: $text('Collateral Match'),
                 gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                 $bodyCallback: map(pos => {
-                  return $TraderRouteDisplay({
+                  return $TraderMatchRouteEditor({
+                    changeMatchRuleList,
                     walletClientQuery,
-                    selectedCollateralTokenList,
                     matchRoute: pos.matchRoute,
                     trader: pos.account
                   })({
-                    modifySubscribeList: modifySubscriberTether()
+                    changeMatchRuleList: changeMatchRuleListTether(),
                   })
                 })
               },
@@ -311,12 +313,7 @@ export const $Leaderboard = (config: IUserActivityPageParams) => component((
     ),
 
     {
-      routeChange, modifySubscriber, changeActivityTimeframe, selectMarketTokenList,
-      // unSubscribeSelectedTraders: snapshot((params, trader) => {
-      //   const selectedIdx = params.selection.indexOf(trader)
-      //   selectedIdx === -1 ? params.selection.push(trader) : params.selection.splice(selectedIdx, 1)
-      //   return params.selection
-      // }, combineObject({ selection: config.selectedTraders, subscription: config.subscription }), selectTrader),
+      routeChange, changeActivityTimeframe, selectMarketTokenList, changeMatchRuleList,
     }
   ]
 })

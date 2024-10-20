@@ -45,7 +45,7 @@ export const CONTRACT = {
       abi: puppetRouter,
     },
     PuppetLogic: {
-      address: "0x25207b028dbBAdC5E6630ffec67acbca2b7E53A8",
+      address: "0x7c5b84C0a4D7D565465C0A4121C5833498ED1192",
       abi: puppetLogic,
     },
 
