@@ -1,7 +1,7 @@
 import * as router from '@aelea/router'
 import { Stream } from '@most/types'
 import { IntervalTime } from 'common-utils'
-import { IPricefeedMap } from 'gmx-middleware-utils'
+import { IPricefeedMap } from 'gmx-middleware'
 import { IPosition } from 'puppet-middleware-utils'
 import * as viem from 'viem'
 import * as walletLink from "wallet"

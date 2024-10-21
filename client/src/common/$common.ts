@@ -5,14 +5,15 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { ADDRESS_ZERO, getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
-import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware-utils"
+import { getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
+import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware"
 import { IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoLabeledValue, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
 import { $seperator2 } from "../pages/common.js"
 import { IWalletTab } from "../pages/type.js"
+import { ADDRESS_ZERO } from "puppet-const"
 
 
 export const $midContainer = $column(

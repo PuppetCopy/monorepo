@@ -3,8 +3,8 @@ import { $Node, $element, NodeComposeFn, component, style } from '@aelea/dom'
 import { pallete } from "@aelea/ui-components-theme"
 import { map } from "@most/core"
 import { Stream } from '@most/types'
-import { getTokenDescription } from 'gmx-middleware-utils'
-import { PUPPET_COLLATERAL_LIST } from 'puppet-middleware-const'
+import { getTokenDescription } from 'gmx-middleware'
+import { PUPPET_COLLATERAL_LIST } from 'puppet-const'
 import { $labelDisplay } from 'ui-components'
 import * as viem from 'viem'
 import { $tokenIcon, $tokenLabeled } from '../common/$common'

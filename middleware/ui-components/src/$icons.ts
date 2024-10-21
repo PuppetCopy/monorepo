@@ -1,6 +1,6 @@
 import { $svg, attr } from "@aelea/dom"
-import { ADDRESS_ZERO } from "common-utils"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { ADDRESS_ZERO, TOKEN_DESCRIPTION_MAP } from "puppet-const"
+
 
 export const $path = $svg('path')
 

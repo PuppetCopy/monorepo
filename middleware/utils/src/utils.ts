@@ -1,27 +1,9 @@
 import { curry2 } from "@most/prelude"
+import { BASIS_POINTS_DIVISOR, IntervalTime } from "puppet-const"
 import * as viem from "viem"
 import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription, IVested } from "./types.js"
-import { BASIS_POINTS_DIVISOR, FACTOR_PERCISION, USD_DECIMALS } from "./const.js"
 export * as GraphQL from '@urql/core'
 
-
-export enum IntervalTime {
-  SEC = 1,
-  MIN = 60,
-  MIN5 = 300,
-  MIN15 = 900,
-  MIN30 = 1800,
-  HR = 3600,
-  HR2 = 7200,
-  HR4 = 14400,
-  HR6 = 21600,
-  HR8 = 28800,
-  DAY = 86400,
-  WEEK = 604800,
-  MONTH = 2628000,
-  QUARTER = 7884000,
-  YEAR = 31536000
-}
 
 
 export const ETH_ADDRESS_REGEXP = /^0x[a-fA-F0-9]{40}$/i
@@ -83,15 +65,15 @@ export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)
 export const readableUSD = readableNumber({})
 export const readablePercentage = (amount: bigint) => readableUnitAmount(formatFixed(2, amount)) + '%'
-export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(FACTOR_PERCISION, amount) * 100) + '%'
+export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(30, amount) * 100) + '%'
 export const readableLeverage = (a: bigint, b: bigint) => (b ? readableUnitAmount(formatFixed(4, a * BASIS_POINTS_DIVISOR / b)) : 0n) + 'x'
-export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(USD_DECIMALS, ammount))
-export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) => readableNumber({ signDisplay: "exceptZero" })(formatFixed(decimals, ammount))
+export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(30, ammount))
+export const readablePnl = (ammount: bigint, decimals = 30) => readableNumber({ signDisplay: "exceptZero" })(formatFixed(decimals, ammount))
 export const readableTokenAmountFromUsdAmount = (decimals: number, price: bigint, amount: bigint) => readableUnitAmount(formatFixed(decimals, getTokenAmount(price, amount)))
 export const readableTokenUsd = (price: bigint, amount: bigint) => readableUsd(getTokenUsd(price, amount))
 export const readableTokenAmount = (tokenDesc: ITokenDescription, amount: bigint) => readableUnitAmount(formatFixed(tokenDesc.decimals, amount))
 export const readableTokenAmountLabel = (tokenDesc: ITokenDescription, amount: bigint) => readableTokenAmount(tokenDesc, amount) + ' ' + tokenDesc.symbol
-export const readableTokenPrice = (decimals: number, amount: bigint) => readableAccountingAmount(formatFixed(USD_DECIMALS - decimals, amount))
+export const readableTokenPrice = (decimals: number, amount: bigint) => readableAccountingAmount(formatFixed(30 - decimals, amount))
 
 const UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte']
 const BYTES_PER_KB = 1000

@@ -1,13 +1,13 @@
 
 import { awaitPromises, map } from "@most/core"
 import { Stream } from "@most/types"
-import { PRECISION, expandDecimals, getDenominator, zipState } from "common-utils"
-import { ARBITRUM_ADDRESS, AVALANCHE_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { expandDecimals, getDenominator, zipState } from "common-utils"
 import { Address, PublicClient } from "viem"
 import { getNativeTokenDescription } from "../gmxUtils.js"
 import { arbitrum, avalanche } from "viem/chains"
 import univ3Pool from './uniV3.abi.js'
 import univ2Pool from './uniV2.abi.js'
+import { ARBITRUM_ADDRESS, AVALANCHE_ADDRESS, FLOAT_PRECISION, TOKEN_DESCRIPTION_MAP } from "puppet-const"
 
 export async function getUniV3PoolPrice(client: PublicClient, decimals: number, poolAddress: Address) {
   const [sqrtPriceX96] = await client.readContract({
@@ -59,7 +59,7 @@ export function getGmxPriceUsd(client: Stream<PublicClient>, networkTokenUsd: St
     }
 
     const networkTokenDescription = getNativeTokenDescription(params.client.chain)
-    const price = params.networkTokenUsd * PRECISION / expandDecimals(params.gmxPerNetworkToken, 30 - networkTokenDescription.decimals)
+    const price = params.networkTokenUsd * FLOAT_PRECISION / expandDecimals(params.gmxPerNetworkToken, 30 - networkTokenDescription.decimals)
 
     return price
   }, state)

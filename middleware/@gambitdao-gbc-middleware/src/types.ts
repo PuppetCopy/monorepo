@@ -1,5 +1,5 @@
 import { IResponsePageApi } from "common-utils"
-import { IPriceCandle } from "gmx-middleware-utils"
+import { IPriceCandle } from "gmx-middleware"
 
 export type IPrice = {
   priceUsd: bigint

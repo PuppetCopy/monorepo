@@ -1,19 +1,20 @@
-import { IPriceCandle, ISchema } from "gmx-middleware-utils"
+import { IPriceCandle } from "gmx-middleware"
 import { IMatchRouteStats, IGbcToken, IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IProfile, IMatchRoute, IMatchRule } from "./types.js"
+import { graph } from "common-utils"
 
 
-const gbcToken: ISchema<IGbcToken> = {
+const gbcToken: graph.ISchema<IGbcToken> = {
   id: 'number',
   __typename: 'GbcToken',
 }
 
-const profile: ISchema<IProfile> = {
+const profile: graph.ISchema<IProfile> = {
   id: 'address',
   gbcTokenList: gbcToken,
   __typename: 'Profile',
 }
 
-const orderCreated: ISchema<IOrderCreated> = {
+const orderCreated: graph.ISchema<IOrderCreated> = {
   id: 'string',
   key: 'string',
 
@@ -44,7 +45,7 @@ const orderCreated: ISchema<IOrderCreated> = {
   __typename: 'OrderCreated',
 }
 
-const positionCollectedUpdate: ISchema<IPositionFeesCollected> = {
+const positionCollectedUpdate: graph.ISchema<IPositionFeesCollected> = {
   id: 'string',
   positionKey: 'string',
   affiliate: 'address',
@@ -80,7 +81,7 @@ const positionCollectedUpdate: ISchema<IPositionFeesCollected> = {
   __typename: 'PositionFeesCollected',
 }
 
-const positionIncrease: ISchema<IPositionIncrease> = {
+const positionIncrease: graph.ISchema<IPositionIncrease> = {
   id: 'string',
   market: 'address',
   collateralToken: 'address',
@@ -117,7 +118,7 @@ const positionIncrease: ISchema<IPositionIncrease> = {
   __typename: 'PositionIncrease',
 }
 
-const positionDecrease: ISchema<IPositionDecrease> = {
+const positionDecrease: graph.ISchema<IPositionDecrease> = {
   id: 'string',
   positionKey: 'string',
   market: 'address',
@@ -155,7 +156,7 @@ const positionDecrease: ISchema<IPositionDecrease> = {
   __typename: 'PositionDecrease',
 }
 
-const priceCandle: ISchema<IPriceCandle> = {
+const priceCandle: graph.ISchema<IPriceCandle> = {
   id: 'string',
   token: 'address',
   interval: 'string',
@@ -169,7 +170,7 @@ const priceCandle: ISchema<IPriceCandle> = {
   __typename: 'PriceCandle',
 }
 
-const matchRule: ISchema<IMatchRule> = {
+const matchRule: graph.ISchema<IMatchRule> = {
   id: 'string',
   puppet: 'address',
   matchKey: 'string',
@@ -191,7 +192,7 @@ const matchRule: ISchema<IMatchRule> = {
   __typename: 'MatchRule',
 }
 
-const matchRoute: ISchema<IMatchRoute> = {
+const matchRoute: graph.ISchema<IMatchRoute> = {
   id: 'string',
   profile: profile,
   collateralToken: 'address',
@@ -232,7 +233,7 @@ const matchRoute: ISchema<IMatchRoute> = {
   __typename: 'MatchRoute',
 }
 
-const routeMatchStats: ISchema<IMatchRouteStats> = {
+const routeMatchStats: graph.ISchema<IMatchRouteStats> = {
   id: 'string',
   account: 'address',
 

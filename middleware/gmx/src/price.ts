@@ -1,7 +1,7 @@
-import * as GMX from "gmx-middleware-const"
+import { abs, applyFactor, delta, getDenominator, getMappedValue, getTokenUsd, groupArrayByKeyMap } from "common-utils"
+import { FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP } from "puppet-const"
 import * as viem from "viem"
 import { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from "./types.js"
-import { abs, applyFactor, delta, getDenominator, getMappedValue, getTokenUsd, groupArrayByKeyMap } from "common-utils"
 
 
 
@@ -31,7 +31,7 @@ export function getPriceImpactUsd(
     const factor = hasPositiveImpact ? factorPositive : factorNegative
 
     return calculateImpactForSameSideRebalance(currentDiff, nextDiff, hasPositiveImpact, factor, exponentFactor)
-  } 
+  }
 
   return calculateImpactForCrossoverRebalance(currentDiff, nextDiff, factorPositive, factorNegative, exponentFactor,)
 }
@@ -85,7 +85,7 @@ export function getCappedPositionImpactUsd(
   const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(
     marketPrice.indexTokenPrice.min,
     impactPoolAmount,
-  )!
+  )
 
   let cappedImpactUsd = priceImpactDeltaUsd
 
@@ -111,7 +111,7 @@ export function getPriceImpactForPosition(
 
   const longInterestInUsd = marketInfo.usage.longInterestUsd
   const shortInterestInUsd = marketInfo.usage.shortInterestUsd
-    
+
 
   const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
   const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
@@ -215,15 +215,15 @@ function getNextOpenInterestParams(
 
 export function getOraclePriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
   const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getMappedValue(GMX.TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
-  
+  const desc = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
+
   return pickedPrice * getDenominator(desc.decimals)
 }
 
 export function getPriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
   const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getMappedValue(GMX.TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
-  
+  const desc = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
+
   return pickedPrice * getDenominator(desc.decimals)
 }
 
@@ -265,7 +265,6 @@ export function getShouldUseMaxPrice(isIncrease: boolean, isLong: boolean) {
   return isIncrease ? isLong : !isLong
 }
 
-const FLOAT_PRECISION = 10n ** 30n
 
 function applyImpactFactor(diff: bigint, factor: bigint, exponent: bigint): bigint {
   const _diff = Number(diff) / 10 ** 30
@@ -338,7 +337,7 @@ export async function querySignedPrices(): Promise<IPriceOracleMap> {
   const x = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
 
 
-  const res = await x.json() as {signedPrices: ISignedPrice[]}
+  const res = await x.json() as { signedPrices: ISignedPrice[] }
   return groupArrayByKeyMap(res.signedPrices, price => viem.getAddress(price.tokenAddress), (price, token) => {
 
     const priceMin = BigInt(price.minPriceFull)

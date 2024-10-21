@@ -1,4 +1,4 @@
-import { ILogTxType, ILogTypeId } from "gmx-middleware-utils"
+import { ILogTxType, ILogTypeId } from "gmx-middleware"
 import * as viem from "viem"
 
 

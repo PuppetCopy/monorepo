@@ -1,6 +1,6 @@
 
 import { getMappedValue } from "common-utils"
-import * as PUPPET from "puppet-middleware-const"
+import * as PUPPET from "puppet-const"
 import { Address } from "viem/accounts"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"

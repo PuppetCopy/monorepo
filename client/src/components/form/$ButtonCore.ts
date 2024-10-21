@@ -1,8 +1,8 @@
-import { constant, empty, filter, map, merge, mergeArray, startWith } from "@most/core"
 import { Behavior, O } from '@aelea/core'
-import { $Node, $element, component, nodeEvent, INode, styleBehavior, IBranch, attrBehavior, NodeComposeFn } from '@aelea/dom'
-import { pallete } from '@aelea/ui-components-theme'
+import { $Node, $element, IBranch, INode, NodeComposeFn, component, nodeEvent, styleBehavior } from '@aelea/dom'
 import { Control, designSheet } from "@aelea/ui-components"
+import { pallete } from '@aelea/ui-components-theme'
+import { constant, filter, map, merge, mergeArray, startWith } from "@most/core"
 
 
 export const interactionOp = O(

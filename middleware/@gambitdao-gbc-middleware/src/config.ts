@@ -1,6 +1,7 @@
 import { IAttributeMappings, LabItemSale, SaleType } from "./types.js"
 import { parseEther } from "viem"
-import { IntervalTime, groupArrayByKey, unixTimestampNow } from "common-utils"
+import { groupArrayByKey, unixTimestampNow } from "common-utils"
+import { IntervalTime } from "puppet-const"
 
 const date = new Date()
 const timeNow = unixTimestampNow()

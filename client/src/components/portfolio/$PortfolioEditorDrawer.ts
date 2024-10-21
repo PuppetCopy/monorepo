@@ -6,7 +6,7 @@ import { constant, empty, map, mergeArray, skipRepeats, snapshot } from "@most/c
 import { Stream } from "@most/types"
 import { getDuration, getMappedValue, readableDate, readablePercentage, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import * as PUPPET from "puppet-middleware-const"
+import * as PUPPET from "puppet-const"
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from "ui-components"
 import * as viem from "viem"
 import * as walletLink from "wallet"

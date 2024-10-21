@@ -3,7 +3,7 @@
 // import { now } from "@most/core"
 // import { Stream } from "@most/types"
 // import { IntervalTime } from "common-utils"
-// import { IPriceTickListMap } from "gmx-middleware-utils"
+// import { IPriceTickListMap } from "gmx-middleware"
 // import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
 // import * as viem from 'viem'
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"

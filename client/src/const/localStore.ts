@@ -1,9 +1,9 @@
 
-import { IntervalTime } from 'common-utils'
 import { ISortBy } from 'ui-components'
 import { uiStorage } from 'ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
+import { IntervalTime } from 'puppet-const'
 
 export default uiStorage.createStoreDefinition('root', 8, {
   global: {

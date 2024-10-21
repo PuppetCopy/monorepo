@@ -4,10 +4,9 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, mergeArray, multicast, now, periodic, sample, snapshot, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, FACTOR_PERCISION, formatFixed, getDuration, getMappedValue, getVestingCursor, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
-import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { applyFactor, combineState, formatFixed, getDuration, getMappedValue, getVestingCursor, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
-import * as PUPPET from "puppet-middleware-const"
+import * as PUPPET from "puppet-const"
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
@@ -73,7 +72,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
     if (!wallet) return 0n
 
-    return tokenomicsReader.ContributeLogic.getClaimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address)
+    return tokenomicsReader.ContributeLogic.getClaimable(wallet, [PUPPET.ARBITRUM_ADDRESS.USDC, PUPPET.ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address)
   }, walletClientQuery)))
   const claimableLockRewardQuery = replayLatest(multicast(map(async walletQuery => {
     const wallet = await walletQuery
@@ -197,13 +196,13 @@ export const $Vest = (config: IVestingDetails) => component((
               $row(layoutSheet.spacingSmall, style({ position: 'relative' }))(
                 $FieldLabeled({
                   label: 'Amount',
-                  value: startWith('', map(amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
+                  value: startWith('', map(amount => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
                   placeholder: 'Enter amount',
-                  hint: map(amount => `Balance: ${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, lockedAmount),
+                  hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, lockedAmount),
                 })({
                   change: popoverInputAmountTether(
                     map(amount => {
-                      return parseFixed(TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
+                      return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
                     })
                   )
                 }),
@@ -257,9 +256,9 @@ export const $Vest = (config: IVestingDetails) => component((
             const params = await paramsQuery
             if (params.cashout) return ''
 
-            return readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
+            return readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
           }, claimableState),
-          $val: $text(switchMap(async amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, await amount), lockAmountQuery)),
+          $val: $text(switchMap(async amount => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await amount), lockAmountQuery)),
         })
       ),
       style({ placeContent: 'space-between' })(
@@ -289,14 +288,14 @@ export const $Vest = (config: IVestingDetails) => component((
             const params = await paramsQuery
             if (params.lockDurationBonusInVest == 0n) return ''
 
-            return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, params.vestedAmount + params.lockDurationBonusInVest)
+            return readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.vestedAmount + params.lockDurationBonusInVest)
           }, claimableState),
           $val: $text(
             switchMap(async vestedQuery => {
               const vested = await vestedQuery
               if (vested === null) return '0'
 
-              return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, vested.amount - vested.accrued)
+              return readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, vested.amount - vested.accrued)
             }, vestedCursorQuery)
           ),
         })
@@ -350,7 +349,7 @@ export const $Vest = (config: IVestingDetails) => component((
                   $text(style({ fontWeight: 'bold' }))(
                     switchMap((durationMultiplier) => {
                       return map(duration => {
-                        const factor = formatFixed(FACTOR_PERCISION, durationMultiplier) * ((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)
+                        const factor = formatFixed(PUPPET.USD_DECIMALS, durationMultiplier) * ((duration ** 2 / PUPPET.MAX_LOCK_SCHEDULE ** 2) * 100)
 
                         return `${readableUnitAmount(factor)}%`
                       }, slideDuration)
@@ -376,13 +375,13 @@ export const $Vest = (config: IVestingDetails) => component((
                       $row(layoutSheet.spacingSmall, style({ position: 'relative' }))(
                         $FieldLabeled({
                           label: 'Amount',
-                          value: startWith('', map(amount => readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
+                          value: startWith('', map(amount => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
                           placeholder: 'Enter amount',
-                          hint: map(amount => `Balance: ${readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, walletBalance),
+                          hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, walletBalance),
                         })({
                           change: popoverInputAmountTether(
                             map(amount => {
-                              return parseFixed(TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
+                              return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
                             })
                           )
                         }),
@@ -415,7 +414,7 @@ export const $Vest = (config: IVestingDetails) => component((
                   }),
                   dismiss: popoverSaveDepositAmount
                 })({}),
-                $text(style({ placeContent: 'space-between' }))(map(amount => readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, amount), walletLockAmount))
+                $text(style({ placeContent: 'space-between' }))(map(amount => readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount), walletLockAmount))
               )
             )
           )
@@ -427,7 +426,7 @@ export const $Vest = (config: IVestingDetails) => component((
 
             $text(style({ placeContent: 'space-between', fontWeight: 'bold', color: pallete.positive }))(intermediateText(
               map(async params => {
-                return '+' + readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, params.totalClaimable)
+                return '+' + readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.totalClaimable)
               }, awaitPromises(claimableState))
             )),
           )
@@ -501,7 +500,7 @@ export const $Vest = (config: IVestingDetails) => component((
                 viem.encodeFunctionData({
                   ...contractDefs,
                   functionName: 'claimContribution',
-                  args: [[ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address, params.claimableContributionReward]
+                  args: [[PUPPET.ARBITRUM_ADDRESS.USDC, PUPPET.ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address, params.claimableContributionReward]
                 })
               )
             }

@@ -1,9 +1,8 @@
-import { AbiEvent } from "abitype"
-import { BASIS_POINTS_DIVISOR, easeInExpo, factor, formatFixed, getBasisPoints, getMappedValue, getPriceDelta, ITokenDescription } from "common-utils"
-import { CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, mapArrayBy, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP } from "gmx-middleware-const"
+import { easeInExpo, factor, formatFixed, getBasisPoints, getMappedValue, getPriceDelta, ITokenDescription } from "common-utils"
 import * as viem from "viem"
 import { MARKET_TOKEN_MAP } from "./marketMap.js"
 import { ILogEvent } from "./types.js"
+import { BASIS_POINTS_DIVISOR, CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP } from "puppet-const"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {

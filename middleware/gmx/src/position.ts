@@ -1,9 +1,9 @@
-import * as GMX from "gmx-middleware-const"
 import * as viem from "viem"
-import { applyFactor, BASIS_POINTS_DIVISOR, getDenominator, getMappedValue, getTokenUsd, ITokenDescription, PRECISION, WEI_PRECISION } from "common-utils"
+import { applyFactor, getDenominator, getMappedValue, getTokenUsd } from "common-utils"
 import { getPriceImpactForPosition } from "./price.js"
 import { getPoolUsdWithoutPnl } from "./market.js"
 import { IMarketPrice, IMarketInfo, IPositionFees, PositionReferralFees, IPositionNumbers } from "./types.js"
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from "puppet-const"
 
 
 
@@ -82,7 +82,7 @@ export function getFundingAmount(
 
   const fundingDiffFactor = latestFundingAmountPerSize - positionFundingAmountPerSize
 
-  const denominator = PRECISION * FLOAT_PRECISION_SQRT
+  const denominator = FLOAT_PRECISION * FLOAT_PRECISION_SQRT
   return positionSizeInUsd * fundingDiffFactor / denominator
 }
 
@@ -199,7 +199,7 @@ export function getLiquidationPrice(
 
   let liquidationPrice = 0n
 
-  const indexTokenDescription = getMappedValue(GMX.TOKEN_ADDRESS_DESCRIPTION_MAP, indexToken)
+  const indexTokenDescription = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, indexToken)
   const indexTokenDenominator = getDenominator(indexTokenDescription.decimals)
 
   if (collateralToken === indexToken) {

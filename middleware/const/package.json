@@ -1,5 +1,5 @@
 {
-    "name": "puppet-middleware-const",
+    "name": "puppet-const",
     "module": "dist/esm/index.js",
     "types": "dist/types/index.d.ts",
     "type": "module",
@@ -12,7 +12,6 @@
         "build:tsc": "bun tsc -b"
     },
     "dependencies": {
-        "viem": "2.21.3",
-        "gmx-middleware-const": "workspace:*"
+        "viem": "2.21.3"
     }
 }

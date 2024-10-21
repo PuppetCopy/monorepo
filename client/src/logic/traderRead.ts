@@ -3,11 +3,9 @@ import { http } from "@aelea/ui-components"
 import { empty, map, mergeArray, now, scan, skip } from "@most/core"
 import { Stream } from "@most/types"
 import { erc20Abi } from "abitype/abis"
-import { ADDRESS_ZERO, ITokenDescription, IntervalTime, USD_DECIMALS, filterNull, getDenominator, getMappedValue, parseFixed } from "common-utils"
-import * as GMX from "gmx-middleware-const"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
-import { hashData, resolveAddress } from "gmx-middleware-utils"
-import * as PUPPET from "puppet-middleware-const"
+import { ITokenDescription, filterNull, getDenominator, getMappedValue, parseFixed } from "common-utils"
+import { hashData, resolveAddress } from "gmx-middleware"
+import * as PUPPET from "puppet-const"
 import { } from "puppet-middleware-utils"
 import * as viem from "viem"
 import { getBalance } from "viem/actions"
@@ -40,20 +38,20 @@ export interface ITokenInfo {
 
 
 const derievedSymbolMapping = {
-  [TOKEN_DESCRIPTION_MAP.WETH.symbol]: 'ETH',
-  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: 'BTC',
-  [TOKEN_DESCRIPTION_MAP.BTCB.symbol]: 'BTC',
-  [TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: 'BTC',
-  [TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: 'AVAX',
-  [TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.WETH.symbol]: 'ETH',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.WBTC.symbol]: 'BTC',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.BTCB.symbol]: 'BTC',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: 'BTC',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: 'AVAX',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL',
 } as const
 
 const gmxIoPricefeedIntervalLabel = {
-  [IntervalTime.MIN5]: '5m',
-  [IntervalTime.MIN15]: '15m',
-  [IntervalTime.HR]: '1h',
-  [IntervalTime.HR4]: '4h',
-  [IntervalTime.DAY]: '1d',
+  [PUPPET.IntervalTime.MIN5]: '5m',
+  [PUPPET.IntervalTime.MIN15]: '15m',
+  [PUPPET.IntervalTime.HR]: '1h',
+  [PUPPET.IntervalTime.HR4]: '4h',
+  [PUPPET.IntervalTime.DAY]: '1d',
 }
 
 
@@ -126,16 +124,16 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
     return prev === 0 ? next : (prev + next) / 2
   }, 0, allSources))
 
-  return map(ev => parseFixed(USD_DECIMALS, ev) / getDenominator(tokendescription.decimals), avgPrice)
+  return map(ev => parseFixed(PUPPET.USD_DECIMALS, ev) / getDenominator(tokendescription.decimals), avgPrice)
 }
 
 
-export async function readAddressTokenBalance(provider: walletLink.IClient, token: viem.Address | typeof ADDRESS_ZERO, address: viem.Address): Promise<bigint> {
-  if (token === ADDRESS_ZERO) {
+export async function readAddressTokenBalance(provider: walletLink.IClient, token: viem.Address | typeof PUPPET.ADDRESS_ZERO, address: viem.Address): Promise<bigint> {
+  if (token === PUPPET.ADDRESS_ZERO) {
     return getBalance(provider, { address })
   }
 
-  const contractMapping = getMappedValue(GMX.TRADE_CONTRACT_MAPPING, provider.chain.id)
+  const contractMapping = getMappedValue(PUPPET.TRADE_CONTRACT_MAPPING, provider.chain.id)
 
   if (!contractMapping) {
     return 0n
@@ -157,7 +155,7 @@ export async function readAddressTokenBalance(provider: walletLink.IClient, toke
 
 
 export const exchangesWebsocketPriceSource = (token: viem.Address) => {
-  const existingToken = getMappedValue(GMX.TOKEN_ADDRESS_DESCRIPTION_MAP, token)
+  const existingToken = getMappedValue(PUPPET.TOKEN_ADDRESS_DESCRIPTION_MAP, token)
 
   return latestPriceFromExchanges(existingToken)
   // const source = gmxIOPriceMapSource[chain.id]
@@ -178,9 +176,7 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
   const res = await fetch(url)
   const json = await res.json()
 
-  // @ts-ignore
   return Object.keys(json).reduce((seed, key) => {
-    // @ts-ignore
     seed[key] = json[key]
     return seed
   }, {})

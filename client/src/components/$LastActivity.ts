@@ -1,13 +1,11 @@
+import { Behavior } from "@aelea/core"
 import { $text, component, nodeEvent, style, styleBehavior } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map } from "@most/core"
-import { $anchor, $infoTooltipLabel } from "ui-components"
-import * as store from "../const/localStore.js"
-import { Behavior } from "@aelea/core"
-import * as GMX from "gmx-middleware-const"
 import { Stream } from "@most/types"
-import { IntervalTime } from "common-utils"
+import { IntervalTime } from "puppet-const"
+import { $anchor, $infoTooltipLabel } from "ui-components"
 
 
 export const LAST_ACTIVITY_LABEL_MAP = {

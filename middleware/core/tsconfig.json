@@ -11,10 +11,7 @@
       "path": "../const"
     },
     {
-      "path": "../gmx-core"
-    },
-    {
-      "path": "../gmx-const"
+      "path": "../gmx"
     },
     {
       "path": "../utils"

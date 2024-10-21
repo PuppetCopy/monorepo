@@ -2,7 +2,7 @@ import { Behavior, combineObject, O } from "@aelea/core"
 import { $element, $node, $text, attr, component, style, stylePseudo } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { empty, map, now, sample, snapshot, startWith } from "@most/core"
-import { formatFixed, getDuration, IntervalTime, parseBps, switchMap, unixTimestampNow } from "common-utils"
+import { formatFixed, getDuration, parseBps, switchMap, unixTimestampNow } from "common-utils"
 import { IMatchRule } from "puppet-middleware-utils"
 import { $Checkbox, $FieldLabeled } from "ui-components"
 import { uiStorage } from "ui-storage"
@@ -13,6 +13,7 @@ import { $ButtonSecondary } from "../form/$Button.js"
 import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown.js"
 import { Stream } from "@most/types"
 import * as viem from "viem"
+import { IntervalTime } from "puppet-const"
 
 
 export interface IDraftMatchRule {

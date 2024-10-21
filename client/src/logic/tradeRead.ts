@@ -1,6 +1,6 @@
 import { getMappedValue } from "common-utils"
-import * as GMX from "gmx-middleware-const"
-import { IMarket, IMarketConfig, IMarketFees, IMarketInfo, IMarketPool, IMarketPrice, IMarketUsageInfo, hashData } from "gmx-middleware-utils"
+import * as GMX from "gmx-middleware"
+import { IMarket, IMarketConfig, IMarketFees, IMarketInfo, IMarketPool, IMarketPrice, IMarketUsageInfo, hashData } from "gmx-middleware"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"
 

@@ -1,8 +1,9 @@
 import { arbitrum, avalanche } from "viem/chains"
-import { ARBITRUM_ADDRESS } from "./chain/arbitrum.js"
-import { AVALANCHE_ADDRESS } from "./chain/avalanche.js"
-import { TOKEN_SYMBOL } from "./symbol.js"
-import { mapArrayBy } from "./utils.js"
+import { TOKEN_SYMBOL } from "./symbol"
+import { ARBITRUM_ADDRESS } from "./chain/arbitrum"
+import { AVALANCHE_ADDRESS } from "./chain/avalanche"
+import { mapArrayBy } from "./common"
+
 
 
 export const TOKEN_DESCRIPTION_LIST = [

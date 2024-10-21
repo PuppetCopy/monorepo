@@ -3,7 +3,7 @@ import { map } from "@most/core"
 import { Client, ClientOptions, OperationContext, TypedDocumentNode, cacheExchange, createClient, fetchExchange, gql } from "@urql/core"
 import {
   IIdentifiableEntity
-} from "gmx-middleware-utils"
+} from "gmx-middleware"
 import { numberToHex } from "viem"
 import { ILabItem, ILabItemOwnership, IOwner, IToken } from "./types.js"
 import { IRequestPagePositionApi } from "common-utils"

@@ -5,7 +5,7 @@
 // import { pallete } from "@aelea/ui-components-theme"
 // import { constant, empty, map, multicast, snapshot, startWith } from "@most/core"
 // import { IntervalTime, pagingQuery, readableLeverage, readableUsd, switchMap, unixTimestampNow } from "common-utils"
-// import { IPriceTickListMap } from "gmx-middleware-utils"
+// import { IPriceTickListMap } from "gmx-middleware"
 // import { ISetRouteType, accountSettledPositionListSummary, openPositionListPnl } from "puppet-middleware-utils"
 // import { $Table, $caretDown, $infoLabeledValue, IQuantumScrollPage } from "ui-components"
 // import { $Popover } from "../$Popover"

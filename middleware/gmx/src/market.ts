@@ -1,5 +1,6 @@
-import { IntervalTime, PRECISION, applyFactor, factor, getTokenUsd } from "common-utils"
+import { applyFactor, factor, getTokenUsd } from "common-utils"
 import { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from "./types.js"
+import { FLOAT_PRECISION, IntervalTime } from "puppet-const"
 
 export function getPoolUsd(
   marketInfo: IMarketInfo,
@@ -50,10 +51,10 @@ export function getMaxReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketP
   const reserveFactor = isLong ? marketInfo.config.reserveFactorLong : marketInfo.config.reserveFactorShort
 
   if (openInterestReserveFactor < reserveFactor) {
-    return poolUsd * openInterestReserveFactor / PRECISION
+    return poolUsd * openInterestReserveFactor / FLOAT_PRECISION
   }
 
-  return poolUsd * reserveFactor / PRECISION
+  return poolUsd * reserveFactor / FLOAT_PRECISION
 }
 
 // export function getReservedUsd(marketInfo: MarketInfo, isLong: boolean) {

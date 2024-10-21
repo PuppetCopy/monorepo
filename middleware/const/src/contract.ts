@@ -1,21 +1,28 @@
+import { erc20Abi } from "viem";
 import { arbitrum } from "viem/chains";
 import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
-import puppetStore from "./abi/puppetStore";
+import customError from "./abi/customError";
+import datastore from "./abi/datastore";
 import dictator from "./abi/dictator.js";
+import eventEmitter from "./abi/eventEmitter";
+import exchangeRouter from "./abi/exchangeRouter";
+import positionRouter from "./abi/positionRouter";
+import positionStore from "./abi/positionStore";
+import puppetLogic from "./abi/puppetLogic";
+import puppetRouter from "./abi/puppetRouter";
+import puppetStore from "./abi/puppetStore";
 import puppetToken from "./abi/puppetToken.js";
 import puppetVoteToken from "./abi/puppetVoteToken.js";
+import reader from "./abi/reader";
+import referralStorage from "./abi/referralStorage";
 import rewardLogic from "./abi/rewardLogic.js";
 import rewardRouter from "./abi/rewardRouter.js";
 import rewardStore from "./abi/rewardStore.js";
 import router from "./abi/router.js";
+import stubPublicContribute from "./abi/stubPublicContribute.js";
 import votingEscrowLogic from "./abi/votingEscrowLogic.js";
 import votingEscrowStore from "./abi/votingEscrowStore.js";
-import stubPublicContribute from "./abi/stubPublicContribute.js";
-import positionStore from "./abi/positionStore";
-import puppetRouter from "./abi/puppetRouter";
-import positionRouter from "./abi/positionRouter";
-import puppetLogic from "./abi/puppetLogic";
 
 export const CONTRACT = {
   [arbitrum.id]: {
@@ -90,6 +97,39 @@ export const CONTRACT = {
     StubPublicContribute: {
       address: "0x31a193C331773BEA727D8BA92db185597faBfcC5",
       abi: stubPublicContribute,
+    },
+
+    GMX: {
+      address: "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a",
+      abi: erc20Abi,
+    },
+    ReferralStorage: {
+      address: '0xe6fab3f0c7199b0d34d7fbe83394fc0e0d06e99d',
+      abi: referralStorage,
+    },
+
+    // V2
+    ReaderV2: {
+      address: "0x38d91ED96283d62182Fc6d990C24097A918a4d9b",
+      abi: reader,
+    },
+    ExchangeRouter: {
+      address: "0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8",
+      abi: exchangeRouter,
+    },
+    OrderVault: {
+      address: "0x31eF83a530Fde1B38EE9A18093A333D8Bbbc40D5",
+    },
+    Datastore: {
+      address: "0xFD70de6b91282D8017aA4E741e9Ae325CAb992d8",
+      abi: datastore,
+    },
+    EventEmitter: {
+      address: "0xC8ee91A54287DB53897056e12D9819156D3822Fb",
+      abi: eventEmitter,
+    },
+    CustomError: {
+      abi: customError,
     },
   },
 } as const;

@@ -1,10 +1,9 @@
 import { ExtractAbiEvent } from "abitype"
-import { IntervalTime } from "common-utils"
-import * as GMX from "gmx-middleware-const"
-import { TOKEN_DESCRIPTION_MAP } from "gmx-middleware-const"
 import * as viem from "viem"
+import * as CONST from "puppet-const"
+import { IntervalTime } from "puppet-const"
 
-export type ITokenSymbol = keyof typeof TOKEN_DESCRIPTION_MAP
+export type ITokenSymbol = keyof typeof CONST.TOKEN_DESCRIPTION_MAP
 
 export interface IIdentifiableEntity {
   id: string
@@ -117,10 +116,6 @@ export const OrderType = {
   Liquidation: 7n,
 } as const
 
-
-export type IEventEmitterAbi = typeof GMX.CONTRACT['42161']['EventEmitter']['abi']
-
-export type IEventLog1Args = ILogOrderedEvent<IEventEmitterAbi, 'EventLog1'>
 
 
 export interface PositionReferralFees {

@@ -5,7 +5,7 @@
 // import { constant, map, mergeArray } from "@most/core"
 // import { Stream } from "@most/types"
 // import { StateStream, filterNull } from "common-utils"
-// import { IMarket } from "gmx-middleware-utils"
+// import { IMarket } from "gmx-middleware"
 // import { IMirrorPosition } from "puppet-middleware-utils"
 // import { $IntermediatePromise } from "ui-components"
 // import * as viem from "viem"

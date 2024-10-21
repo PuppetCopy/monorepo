@@ -1,7 +1,7 @@
-import * as GMX from "gmx-middleware-const"
 import * as viem from "viem"
 import { getNativeTokenAddress } from "./gmxUtils.js"
-import { ADDRESS_ZERO, getDenominator, getSafeMappedValue } from "common-utils"
+import { getDenominator, getSafeMappedValue } from "common-utils"
+import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from "puppet-const"
 
 
 
@@ -10,7 +10,7 @@ export function resolveAddress<TChain extends viem.Chain>(chain: TChain, indexTo
     return getNativeTokenAddress(chain)
   }
 
-  const contractAddressMap = getSafeMappedValue(GMX.TOKEN_ADDRESS_DESCRIPTION_MAP, indexToken, indexToken as any)
+  const contractAddressMap = getSafeMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, indexToken, indexToken as any)
 
   if (contractAddressMap === null) {
     throw new Error(`Token ${indexToken} does not exist`)

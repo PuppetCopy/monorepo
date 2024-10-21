@@ -4,7 +4,7 @@ import { getMappedValue } from "common-utils"
 import { Address } from "viem"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"
-import * as PUPPET from "puppet-middleware-const"
+import * as PUPPET from "puppet-const"
 import * as viem from "viem"
 
 

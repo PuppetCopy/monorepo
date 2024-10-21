@@ -3,7 +3,7 @@ import { $node, $text, MOTION_NO_WOBBLE, component, motion, style } from "@aelea
 import { $NumberTicker, $column, $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest } from "@most/core"
-import { IntervalTime, filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
+import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
 import { isPositionOpen, isPositionSettled } from "puppet-middleware-utils"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "ui-components"
@@ -12,6 +12,7 @@ import { $SelectCollateralToken } from "../$CollateralTokenSelector"
 import { $LastAtivity } from "../$LastActivity.js"
 import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
 import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
+import { IntervalTime } from "puppet-const"
 
 export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,

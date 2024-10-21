@@ -7,9 +7,5 @@
     "emitDeclarationOnly": false,
     "allowSyntheticDefaultImports": true,
   },
-  "references": [
-    {
-      "path": "../gmx-const"
-    }
-  ]
+  "references": []
 }

@@ -4,7 +4,7 @@ import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
 import { map, mergeArray, now, startWith } from "@most/core"
 import { ETH_ADDRESS_REGEXP, IntervalTime, switchMap } from "common-utils"
-import { getMarketIndexToken } from "gmx-middleware-utils"
+import { getMarketIndexToken } from "gmx-middleware"
 import { queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'

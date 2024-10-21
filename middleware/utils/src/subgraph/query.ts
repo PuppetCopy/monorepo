@@ -1,6 +1,6 @@
 import { Client, OperationContext } from '@urql/core'
-import { getMappedValue } from 'common-utils'
 import { getAddress } from 'viem'
+import { getMappedValue } from '../utils';
 
 export type GqlType<T extends string> = { __typename: T }
 

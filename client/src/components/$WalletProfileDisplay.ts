@@ -2,8 +2,7 @@ import { $text, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map, switchLatest } from "@most/core"
 import { applyFactor, combineState, readableTokenAmountLabel, switchMap } from "common-utils"
-import * as GMX from "gmx-middleware-const"
-import { ARBITRUM_ADDRESS } from "gmx-middleware-const"
+import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "puppet-const"
 import { $infoLabel, intermediateText } from "ui-components"
 import tokenomicsReader from "../logic/tokenomicsReader"
 import { $seperator2 } from "../pages/common"
@@ -54,7 +53,7 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
 
             console.log(claimableVested, vested)
 
-            return readableTokenAmountLabel(GMX.TOKEN_DESCRIPTION_MAP.PUPPET, total)
+            return readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, total)
           }, combineState({
             baselineEmissionRateQuery: tokenomicsReader.ContributeLogic.getConfig(wallet),
             claimableContributionQuery: tokenomicsReader.ContributeLogic.getClaimable(wallet, [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN], wallet.account.address),

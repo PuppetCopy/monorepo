@@ -8,7 +8,7 @@ import { $infoTooltip, TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from "../../common/$common.js"
 import { pallete, colorAlpha } from "@aelea/ui-components-theme"
-import { getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware-utils"
+import { getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware"
 import { $seperator2 } from "../../pages/common"
 
 

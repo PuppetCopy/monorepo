@@ -5,10 +5,10 @@
 // import { pallete } from "@aelea/ui-components-theme"
 // import { map, startWith } from "@most/core"
 // import { Stream } from "@most/types"
-// import * as GMX from 'gmx-middleware-const'
+// import * as GMX from 'gmx-middleware'
 // import { $Table, ISortBy, ScrollRequest } from "ui-components"
-// import { IAbstractPositionParams, pagingQuery, switchMap } from "gmx-middleware-utils"
-// import { ROUTE_DESCRIPTION } from "puppet-middleware-const"
+// import { IAbstractPositionParams, pagingQuery, switchMap } from "gmx-middleware"
+// import { ROUTE_DESCRIPTION } from "puppet-const"
 // import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "puppet-middleware-utils"
 // import { $labelDisplay } from "../../common/$TextField.js"
 // import { $TraderDisplay, $route } from "../../common/$common.js"

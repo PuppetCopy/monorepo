@@ -27,10 +27,7 @@
   },
   "references": [
     {
-      "path": "../middleware/gmx-core"
-    },
-    {
-      "path": "../middleware/gmx-const"
+      "path": "../middleware/gmx"
     },
     {
       "path": "../middleware/const"

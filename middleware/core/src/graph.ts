@@ -2,13 +2,13 @@ import { replayLatest } from '@aelea/core'
 import { map, multicast } from '@most/core'
 import { Stream } from '@most/types'
 import { type Client } from '@urql/core'
-import { combineState, getClosestNumber, groupArrayMany, IntervalTime, IRequestSortApi, periodicRun, StateParams, unixTimestampNow } from 'common-utils'
-import * as GMX from "gmx-middleware-const"
-import { IPriceCandle, IPricefeedMap, IPriceOracleMap, IQueryFilter, ISchema, querySignedPrices, querySubgraph } from "gmx-middleware-utils"
+import { combineState, getClosestNumber, graph, groupArrayMany, IRequestSortApi, periodicRun, StateParams, unixTimestampNow } from 'common-utils'
+import { IPriceCandle, IPricefeedMap, IPriceOracleMap, querySignedPrices } from 'gmx-middleware'
 import * as viem from "viem"
 import { schema } from './schema.js'
 import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from './types'
 import { aggregatePositionList } from './utils'
+import { IntervalTime, PRICEFEED_INTERVAL } from 'puppet-const'
 
 
 export interface IQueryPositionParams {
@@ -30,7 +30,7 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
   queryParams: TStateParams
 ) {
   return map(async filterParams => {
-    const filter: IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
+    const filter: graph.IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
 
     if (filterParams.account) {
       filter.account = {
@@ -70,7 +70,7 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
       filter._or = orFilters
     }
 
-    const queryIncreaseList = querySubgraph(subgraphClient, {
+    const queryIncreaseList = graph.querySubgraph(subgraphClient, {
       schema: schema.positionIncrease,
       filter: filter,
       orderBy: {
@@ -78,7 +78,7 @@ export function queryPosition<TStateParams extends StateParams<IQueryPositionPar
       }
     })
 
-    const queryDecreaseList = querySubgraph(subgraphClient, {
+    const queryDecreaseList = graph.querySubgraph(subgraphClient, {
       schema: schema.positionDecrease,
       filter: filter,
     })
@@ -99,7 +99,7 @@ export function queryAccountLastAggregatedStats(
   queryParams: StateParams<IQueryLeaderboardParams>
 ) {
   return map(async filterParams => {
-    const filter: IQueryFilter<IMatchRouteStats> = {}
+    const filter: graph.IQueryFilter<IMatchRouteStats> = {}
 
     if (filterParams.account) {
       filter.account = {
@@ -145,7 +145,7 @@ export function queryAccountLastAggregatedStats(
     // }
 
 
-    const list = await querySubgraph(subgraphClient, {
+    const list = await graph.querySubgraph(subgraphClient, {
       schema: schema.routeMatchStats,
       filter,
       orderBy: {
@@ -168,10 +168,10 @@ export function queryPricefeed(
   estTickAmout = 20
 ) {
   return map(async params => {
-    const filter: IQueryFilter<IPriceCandle> = {
+    const filter: graph.IQueryFilter<IPriceCandle> = {
 
       interval: {
-        _eq: getClosestNumber(GMX.PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)
+        _eq: getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)
       },
       slotTime: {
         _gte: unixTimestampNow() - params.activityTimeframe
@@ -187,7 +187,7 @@ export function queryPricefeed(
     }
 
 
-    const candleListQuery = querySubgraph(subgraphClient, {
+    const candleListQuery = graph.querySubgraph(subgraphClient, {
       schema: schema.priceCandle,
       filter,
       orderBy: {
@@ -223,7 +223,7 @@ interface ISubgraphStatus {
   __typename: 'chain_metadata',
 }
 
-const chainMetadataSchema: ISchema<ISubgraphStatus> = {
+const chainMetadataSchema: graph.ISchema<ISubgraphStatus> = {
   first_event_block_number: 'bigint',
   latest_processed_block: 'bigint',
   num_events_processed: 'bigint',
@@ -232,7 +232,7 @@ const chainMetadataSchema: ISchema<ISubgraphStatus> = {
 }
 
 export const getSubgraphStatus = async (subgraphClient: Client): Promise<ISubgraphStatus> => {
-  const query = await querySubgraph(subgraphClient, {
+  const query = await graph.querySubgraph(subgraphClient, {
     schema: chainMetadataSchema,
   }, { requestPolicy: 'network-only' })
 
