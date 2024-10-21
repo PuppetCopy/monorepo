@@ -135,7 +135,7 @@ export const $WalletPage = (config: IWalletPageParams) => component((
             changeMatchRuleList: changeMatchRuleListTether(),
           })
         } else if (params.profileMode === IWalletTab.TRADER) {
-          return $text('Trader')
+          return $text('Trader (WIP)')
           // const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
           // const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
 
