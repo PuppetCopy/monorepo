@@ -4,8 +4,9 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Stream, Time } from "@most/types"
-import { IntervalTime, getMappedValue, pagingQuery, readablePnl } from "common-utils"
+import { getMappedValue, pagingQuery, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
+import { IntervalTime } from "puppet-const"
 import { IMatchRouteStats, IRouteMatchActivityTimeline, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
 import {
   $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
@@ -19,7 +20,8 @@ import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
 import { subgraphClient } from "../../common/graphClient"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
-import { $TraderMatchRouteEditor, IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
+import { $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { getPositionListTimelinePerformance } from "../../components/trade/$ProfilePerformanceGraph"
 import localStore from "../../const/localStore.js"
@@ -28,7 +30,7 @@ import { IUserActivityPageParams } from "../type.js"
 
 
 interface ILeaderboard extends IUserActivityPageParams {
-  matchRuleList: Stream<IChangeMatchRule[]>
+  matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
 
 export const $Leaderboard = (config: ILeaderboard) => component((
@@ -41,7 +43,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   [routeChange, routeChangeTether]: Behavior<any, string>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
 
-  [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IChangeMatchRule[]>,
+  [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
 ) => {
 
   const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, matchRuleList, route } = config
@@ -147,8 +149,9 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                 gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                 $bodyCallback: map(pos => {
                   return $TraderMatchRouteEditor({
-                    changeMatchRuleList,
+                    matchRuleList,
                     walletClientQuery,
+                    collateralToken: pos.collateralToken,
                     matchRoute: pos.matchRoute,
                     trader: pos.account
                   })({

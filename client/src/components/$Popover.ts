@@ -40,12 +40,17 @@ export const $Popover = ({
     ),
     styleBehavior(
       zip(([contentRect], [targetRect]) => {
+        targetRect.target.querySelector('#scrolled-parent');
+
+        // Get the scroll position
+        // const scrollTop = getScrollParent(targetRect.target)?.scrollTop || 0
+
         const screenWidth = targetRect.rootBounds ? targetRect.rootBounds.width : window.innerWidth
         const targetBound = targetRect.intersectionRect
         const bottomSpcace = window.innerHeight - targetBound.bottom
         const goDown = bottomSpcace > targetBound.bottom
 
-        const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing) + 'px'
+        const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing)  + 'px'
         const width = Math.min(contentRect.contentRect.width, screenWidth - spacing)
         const center = targetBound.x + (targetBound.width / 2)
         const centerWidth = width / 2
@@ -62,7 +67,7 @@ export const $Popover = ({
         }
       }, popoverContentDimension, targetIntersection)
     ),
-    style({ position: 'absolute', visibility: 'hidden' }),
+    style({ position: 'fixed', visibility: 'hidden' }),
   )
 
 
@@ -95,7 +100,7 @@ export const $Popover = ({
   const $content = switchLatest(
     map(content => {
       return until(dismissEvent, mergeArray([
-        style({zIndex: 3456})(contentOps(content)),
+        style({ zIndex: 3456 })(contentOps(content)),
         $overlay(),
       ]))
     }, openMulticast)
@@ -130,4 +135,28 @@ export const $Popover = ({
     }
   ]
 })
+
+/**
+ * Returns the nearest scrollable parent of an element.
+ * @param {HTMLElement} element - The element whose scrollable parent is to be found.
+ * @returns {HTMLElement} - The nearest scrollable parent element.
+ */
+function getScrollParent(element: Element): Element | null | undefined {
+  let parent = element.parentElement;
+
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    const overflowY = style.getPropertyValue('overflow-y');
+    const isScrollable = overflowY === 'auto' || overflowY === 'scroll';
+
+    if (isScrollable && parent.scrollHeight > parent.clientHeight) {
+      return parent;
+    }
+
+    parent = parent.parentElement;
+  }
+
+  // Fallback to document scrolling element (usually <html> or <body>)
+  return document.scrollingElement || document.documentElement;
+}
 

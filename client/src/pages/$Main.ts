@@ -5,8 +5,9 @@ import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { IntervalTime, filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
+import { filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
+import { IntervalTime } from "puppet-const"
 import { queryPricefeed, subgraphStatus } from "puppet-middleware-utils"
 import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
@@ -19,6 +20,8 @@ import { subgraphClient } from "../common/graphClient"
 import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
+import { IDepositEditorChange } from "../components/portfolio/$DepositEditor.js"
+import { IMatchRuleEditorChange } from "../components/portfolio/$MatchRuleEditor"
 import { $PortfolioEditorDrawer } from "../components/portfolio/$PortfolioEditorDrawer.js"
 import { default as localStore, default as localstore } from "../const/localStore"
 import { newUpdateInvoke } from "../sw/swUtils"
@@ -29,8 +32,6 @@ import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $PublicUserPage } from "./user/$PublicUser.js"
 import { $WalletPage } from "./user/$Wallet.js"
-import { IDepositEditorChange, IDepositEditorValue } from "../components/portfolio/$DepositEditor.js"
-import { IMatchRuleEditorChange } from "../components/portfolio/$MatchRuleEditor"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)

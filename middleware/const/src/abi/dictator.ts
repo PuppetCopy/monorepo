@@ -150,6 +150,19 @@ export default [
   },
   {
     type: "event",
+    name: "AddContractAccess",
+    inputs: [
+      {
+        name: "target",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "LogEvent",
     inputs: [
       {
@@ -158,15 +171,15 @@ export default [
         indexed: false,
         internalType: "address",
       },
-      { name: "name", type: "string", indexed: false, internalType: "string" },
       {
-        name: "version",
+        name: "method",
         type: "string",
         indexed: false,
         internalType: "string",
       },
+      { name: "name", type: "string", indexed: false, internalType: "string" },
       {
-        name: "method",
+        name: "version",
         type: "string",
         indexed: false,
         internalType: "string",

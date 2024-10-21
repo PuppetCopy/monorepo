@@ -1,9 +1,9 @@
 
-import { Behavior } from "@aelea/core"
+import { Behavior, combineObject } from "@aelea/core"
 import { $text, component, style } from "@aelea/dom"
 import { $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, map, mergeArray, snapshot } from "@most/core"
+import { constant, map, mergeArray, multicast, snapshot } from "@most/core"
 import { Stream } from "@most/types"
 import { switchMap, unixTimestampNow } from "common-utils"
 import { getTokenDescription } from "gmx-middleware"
@@ -21,8 +21,9 @@ import { $MatchRuleEditor, IMatchRuleEditorChange, IDraftMatchRule } from "./$Ma
 
 interface ITraderMatchRouteEditor extends IWalletPageParams {
   trader: viem.Address
+  collateralToken: viem.Address
   matchRoute: IMatchRoute
-  changeMatchRuleList: Stream<IMatchRuleEditorChange[]>
+  matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
 
 
@@ -33,7 +34,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
   [saveDraft, saveDraftTether]: Behavior<IDraftMatchRule>,
 ) => {
 
-  const { walletClientQuery, trader, changeMatchRuleList, matchRoute, } = config
+  const { walletClientQuery, trader, matchRuleList, matchRoute } = config
 
   const matchRule = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -56,6 +57,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
       }, popRouteSubscriptionEditor),
       dismiss: mergeArray([saveDraft, discardDraft]),
       $target: switchMap(rule => {
+        const isHighlisted = rule && rule.expiry > unixTimestampNow()
         return $ButtonSecondary({
           $content: $responsiveFlex(style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }))(
             $row(style({ alignItems: 'center' }))(
@@ -71,7 +73,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
           ),
           $container: $defaultMiniButtonSecondary(style({
             borderRadius: '16px', padding: '8px', height: 'auto',
-            borderColor: Number(rule) > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, .25)
+            borderColor: isHighlisted ? pallete.primary : colorAlpha(pallete.foreground, .25)
           }))
         })({
           click: popRouteSubscriptionEditorTether(constant(rule))
@@ -82,16 +84,16 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
 
     {
       changeMatchRuleList: mergeArray([
-        snapshot((list, value) => {
+        snapshot((list, params) => {
           const index = list.findIndex(x =>
             x.trader === trader
           )
           const newList = [...list]
           const change: IMatchRuleEditorChange = {
-            // matchRule: null,
-            value,
+            value: params.saveDraft,
             trader,
             collateralToken: matchRoute.collateralToken,
+            matchRule: params.matchRule
           }
           if (index === -1) {
             newList.push(change)
@@ -100,7 +102,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
 
           newList[index] = change
           return newList
-        }, changeMatchRuleList, saveDraft),
+        }, matchRuleList, combineObject({ saveDraft, matchRule })),
         snapshot((list, draft) => {
           const index = list.findIndex(x =>
             x.trader === trader
@@ -113,7 +115,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
 
           newList.splice(index, 1)
           return newList
-        }, changeMatchRuleList, discardDraft)
+        }, matchRuleList, discardDraft)
       ]),
     }
   ]

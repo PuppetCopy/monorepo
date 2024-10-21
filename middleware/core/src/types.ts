@@ -264,9 +264,7 @@ export interface IMatchRule extends ILogTypeId<'MatchRule'> {
 
   routeMatch: IMatchRoute
 }
-// matchRuleList: [MatchRule!]! @derivedFrom(field: "matchRoute")
-// allocationList: [Allocation!]! @derivedFrom(field: "matchRoute")
-// settlementList: [Settlement!]! @derivedFrom(field: "matchRoute")
+
 
 export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
   id: viem.Address
@@ -330,6 +328,7 @@ export type IPerformanceTimelineTick = {
 
 export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {
   account: viem.Address
+  collateralToken: viem.Address
 
   cumulativeCollateralToken: bigint
   cumulativeCollateralUsd: bigint

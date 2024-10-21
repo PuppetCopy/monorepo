@@ -97,7 +97,14 @@ export const $DepositEditor = (config: IDepositEditor) => component((
           label: 'Amount',
           value: map(value => value ? readableTokenAmount(tokenDescription, value) : '', mergeArray([now(change.value.amount), clickMax, constant(0n, changeDepositMode)])),
           placeholder: 'Enter amount',
-          hint: map(amount => `Wallet Balance: ${readableTokenAmountLabel(tokenDescription, amount)}`, max),
+          hint: map(params => {
+
+            if (params.action === DepositEditorAction.DEPOSIT) {
+              return `Wallet Balance: ${readableTokenAmountLabel(tokenDescription, params.max)}`
+            }
+
+            return ` `
+          }, combineObject({ max, action })),
         })({
           change: changeAmountTether(
             map(val => {

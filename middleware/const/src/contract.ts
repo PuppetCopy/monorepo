@@ -44,15 +44,15 @@ export const CONTRACT = {
     },
 
     PuppetStore: {
-      address: "0xecC5C0E9D6AdD69b3A90513f03117FE9dBEA6C00",
+      address: "0xd5Ecfc3985098A72fBFE06256ddcDb49Bf2E657c",
       abi: puppetStore,
     },
     PuppetRouter: {
-      address: "0x6729b1f24B859DaB45EC35bF6f00102E6e6f05E7",
+      address: "0xC6C2eBfC112b9703752E4e99E51b4d8B1F84E244",
       abi: puppetRouter,
     },
     PuppetLogic: {
-      address: "0x7c5b84C0a4D7D565465C0A4121C5833498ED1192",
+      address: "0x806eD8d1d4e10E5fD8fe8e8B7851434c157E7257",
       abi: puppetLogic,
     },
 

@@ -2,26 +2,24 @@ import { Behavior, combineObject, replayLatest } from "@aelea/core"
 import { $text, component, style } from "@aelea/dom"
 import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { map, startWith } from "@most/core"
-import { IntervalTime, pagingQuery } from "common-utils"
+import {  pagingQuery } from "common-utils"
 import { $IntermediatePromise, $Table, $infoLabel, IQuantumScrollPage, ISortBy } from "ui-components"
 import * as viem from 'viem'
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
 import { IUserPositionPageParams } from "../type.js"
+import { IntervalTime } from "puppet-const"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 
 
 export const $TraderPage = (config: IUserPositionPageParams) => component((
   [changeRoute, changeRouteTether]: Behavior<any, string>,
   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
   [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
-
-
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
-
-  [modifySubscribeList, modifySubscribeListTether]: Behavior<IChangeMatchRule>,
+  [modifySubscribeList, modifySubscribeListTether]: Behavior<IMatchRuleEditorChange>,
 ) => {
 
   const { activityTimeframe, selectedCollateralTokenList, positionListQuery } = config

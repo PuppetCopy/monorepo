@@ -70,7 +70,7 @@ export const $FieldLabeled = (config: ITextField) => component((
         attrBehavior(map(placeholder => ({ placeholder }), streamOf(placeholder)), $field)
       ),
       $row(style({ position: 'relative' }))(
-        hint ? $text(style({ fontSize: '.85rem', width: '100%' }))(hint) : empty()
+        hint ? $text(style({ fontSize: '.85rem', width: '100%', whiteSpace: 'pre-wrap' }))(hint) : empty()
       )
     ),
 

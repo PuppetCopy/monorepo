@@ -1,12 +1,12 @@
 import { Behavior } from "@aelea/core"
 import { component, style } from "@aelea/dom"
 import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { IntervalTime } from "common-utils"
 import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { IUserPositionPageParams } from "../type.js"
+import { IntervalTime } from "puppet-const"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 
 
 export interface IPuppetProfile extends IUserPositionPageParams {
@@ -15,7 +15,7 @@ export interface IPuppetProfile extends IUserPositionPageParams {
 
 export const $PuppetProfile = (config: IPuppetProfile) => component((
   [changeRoute, changeRouteTether]: Behavior<string, string>,
-  [modifySubscriber, modifySubscriberTether]: Behavior<IChangeMatchRule>,
+  [modifySubscriber, modifySubscriberTether]: Behavior<IMatchRuleEditorChange>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,

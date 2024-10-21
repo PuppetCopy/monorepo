@@ -236,6 +236,7 @@ const matchRoute: graph.ISchema<IMatchRoute> = {
 const routeMatchStats: graph.ISchema<IMatchRouteStats> = {
   id: 'string',
   account: 'address',
+  collateralToken: 'address',
 
   cumulativeCollateralToken: 'bigint',
   cumulativeCollateralUsd: 'bigint',

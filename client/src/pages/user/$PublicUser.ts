@@ -3,16 +3,16 @@ import { $node, $text, component, style } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, layoutSheet } from "@aelea/ui-components"
 import { map, mergeArray, now, startWith } from "@most/core"
-import { ETH_ADDRESS_REGEXP, IntervalTime, switchMap } from "common-utils"
+import { ETH_ADDRESS_REGEXP, switchMap } from "common-utils"
 import { getMarketIndexToken } from "gmx-middleware"
 import { queryPosition } from "puppet-middleware-utils"
 import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
 import * as viem from 'viem'
 import { subgraphClient } from "../../common/graphClient"
 import { $TraderSummary } from "../../components/participant/$Summary.js"
-import { IChangeMatchRule } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
+import { IntervalTime } from "puppet-const"
 
 
 
