@@ -7,7 +7,7 @@ import { empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
 import { getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
 import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware"
-import { IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
+import { IMatchRoute, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
 import { $infoLabel, $infoLabeledValue, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
 import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
@@ -304,13 +304,13 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 interface ITraderDisplay {
   trader: viem.Address
   route: router.Route,
-  puppets: viem.Address[]
+  matchRoute: IMatchRoute
 }
 export const $TraderDisplay = (config: ITraderDisplay) => component((
   [click, clickTether]: Behavior<any, viem.Address>,
 ) => {
 
-  const { route, trader } = config
+  const { route, trader, matchRoute } = config
 
   return [
     $Link({
@@ -318,15 +318,15 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
         $profileAvatar({ ...config, account: trader }),
         $column(style({ gap: '3px' }))(
           $AccountLabel(trader),
-          config.puppets.length > 0
+          matchRoute.matchRuleList.length > 0
             ? $row(style({ alignItems: 'center' }))(
-              ...config.puppets.map(account => {
+              ...matchRoute.matchRuleList.map(mr => {
 
                 return style({ marginRight: '-12px', border: '2px solid black' })(
-                  $profileAvatar({ account, profileSize: 25 })
+                  $profileAvatar({ account: mr.puppet, profileSize: 25 })
                 )
               }),
-              $text(style({ gap: '8px', marginLeft: '16px' }))(`${config.puppets.length}`)
+              $text(style({ gap: '8px', marginLeft: '16px' }))(`${matchRoute.matchRuleList.length}`)
             )
             : $row(style({ alignItems: 'center' }))(
               $text(style({ color: pallete.foreground, fontSize: '.75em' }))(`0 puppets`)

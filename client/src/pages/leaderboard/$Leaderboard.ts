@@ -138,7 +138,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   return $TraderDisplay({
                     route: config.route,
                     trader: pos.account,
-                    puppets: [],
+                    matchRoute: pos.matchRoute,
                   })({
                     click: routeChangeTether()
                   })
