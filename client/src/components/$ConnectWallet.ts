@@ -1,4 +1,4 @@
-import { Behavior, Op, combineObject } from "@aelea/core"
+import { Behavior, Op } from "@aelea/core"
 import { $Node, $element, $text, NodeComposeFn, attr, component, style } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { awaitPromises, empty, fromPromise, join, map, multicast, now } from "@most/core"

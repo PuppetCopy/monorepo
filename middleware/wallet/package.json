@@ -14,7 +14,7 @@
     "dependencies": {
         "viem": "2.21.32",
         "mipd": "^0.0.7",
-        "@walletconnect/ethereum-provider": "^2.15.2",
+        "@walletconnect/ethereum-provider": "^2.17.1",
         "common-utils": "workspace:*",
         "@aelea/core": "^1.3.2",
         "@most/core": "^1.6.1",
