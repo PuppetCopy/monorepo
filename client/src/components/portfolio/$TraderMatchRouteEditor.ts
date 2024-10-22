@@ -21,7 +21,6 @@ import { $MatchRuleEditor, IMatchRuleEditorChange, IDraftMatchRule } from "./$Ma
 
 interface ITraderMatchRouteEditor extends IWalletPageParams {
   trader: viem.Address
-  collateralToken: viem.Address
   matchRoute: IMatchRoute
   matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
