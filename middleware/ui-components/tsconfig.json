@@ -7,8 +7,6 @@
     "emitDeclarationOnly": false
   },
   "references": [
-    {
-      "path": "../gmx"
-    }
+
   ]
 }
