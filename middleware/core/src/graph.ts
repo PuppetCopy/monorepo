@@ -93,6 +93,7 @@ export interface IQueryLeaderboardParams {
   account?: viem.Address
   activityTimeframe?: IntervalTime
   sortBy: IRequestSortApi
+  collateralTokenList?: viem.Address[]
 }
 export function queryAccountLastAggregatedStats(
   subgraphClient: Client,
@@ -110,15 +111,15 @@ export function queryAccountLastAggregatedStats(
 
     const orFilters: any[] = []
 
-    // if (filterParams.selectedCollateralTokenList) {
-    //   orFilters.push(
-    //     ...filterParams.selectedCollateralTokenList.map(token => ({
-    //       collateralToken: {
-    //         _eq: `"${token}"`
-    //       }
-    //     }))
-    //   )
-    // }
+    if (filterParams.collateralTokenList) {
+      orFilters.push(
+        ...filterParams.collateralTokenList.map(token => ({
+          collateralToken: {
+            _eq: `"${token}"`
+          }
+        }))
+      )
+    }
 
     if (filterParams.activityTimeframe) {
       const timestampFilter = unixTimestampNow() - filterParams.activityTimeframe

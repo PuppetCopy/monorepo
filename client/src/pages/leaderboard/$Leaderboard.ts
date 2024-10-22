@@ -7,7 +7,7 @@ import { Stream, Time } from "@most/types"
 import { getMappedValue, pagingQuery, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "puppet-const"
-import { IMatchRouteStats, IRouteMatchActivityTimeline, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
+import { IMatchRouteStats, ILeaderboardMatchStats, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
 import {
   $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
   $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
@@ -51,28 +51,34 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
 
-  const accountStatsList = queryAccountLastAggregatedStats(subgraphClient, { activityTimeframe, sortBy })
+  const accountStatsList = queryAccountLastAggregatedStats(subgraphClient, { activityTimeframe, sortBy, collateralTokenList: selectedCollateralTokenList })
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
     const activityTimeframe = pageParams.activityTimeframe
     const accountStatsListData = await pageParams.accountStatsList
-    const accountStatsList: IRouteMatchActivityTimeline[] = accountStatsListData.map(stats => {
+    const accountStatsList: ILeaderboardMatchStats[] = accountStatsListData
+      .map(stats => {
+        const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => pageParams.isLong === undefined || pos.isLong === pageParams.isLong)
 
-      const timeline = getPositionListTimelinePerformance({
-        activityTimeframe: activityTimeframe,
-        list: [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList],
-        pricefeedMap,
-        tickCount: 25,
+        if (list.length === 0) return null
+
+
+        const timeline = getPositionListTimelinePerformance({
+          activityTimeframe: activityTimeframe,
+          list,
+          pricefeedMap,
+          tickCount: 25,
+        })
+
+        stats.pnl = timeline[timeline.length - 1].pnl
+
+        return { ...stats, timeline, list }
       })
-
-      stats.pnl = timeline[timeline.length - 1].pnl
-
-      return { ...stats, timeline }
-    })
+      .filter(pos => pos !== null)
 
     return { accountStatsList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
-  }, combineObject({ sortBy, accountStatsList, pricefeedMapQuery, activityTimeframe }))
+  }, combineObject({ sortBy, accountStatsList, pricefeedMapQuery, activityTimeframe, isLong }))
 
 
 
@@ -119,7 +125,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
             }
 
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
-            const dataSource: Stream<TablePageResponse<IRouteMatchActivityTimeline>> = map(scroll => {
+            const dataSource: Stream<TablePageResponse<ILeaderboardMatchStats>> = map(scroll => {
 
               const newLocal = pagingQuery(
                 { ...params.sortBy, ...scroll },
@@ -129,7 +135,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
             }, paging)
 
 
-            const columns: TableColumn<IRouteMatchActivityTimeline>[] = [
+            const columns: TableColumn<ILeaderboardMatchStats>[] = [
               {
                 $head: $text('Trader'),
                 gridTemplate: '149px',
@@ -151,7 +157,6 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   return $TraderMatchRouteEditor({
                     matchRuleList,
                     walletClientQuery,
-                    collateralToken: pos.collateralToken,
                     matchRoute: pos.matchRoute,
                     trader: pos.account
                   })({
