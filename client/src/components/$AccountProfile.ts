@@ -1,7 +1,7 @@
 import { $Node, $node, $text, NodeComposeFn, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
-import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
+// import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
 import { awaitPromises, empty, now } from "@most/core"
 import * as viem from "viem"
 import { $jazzicon } from "../common/$avatar.js"
@@ -33,7 +33,7 @@ export const $profileDisplay = (config: IProfilePreview) => {
 
 export const $profileAvatar = (config: IAccountPreview) => {
   const { account, profileSize = 50 } = config
-  const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: account.toLowerCase() })))
+  // const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: account.toLowerCase() })))
 
   return $row(style({ width: `${profileSize}px`, borderRadius: '50%', overflow: 'hidden', height: `${profileSize}px` }))(
     $jazzicon(account),

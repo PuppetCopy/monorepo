@@ -2,12 +2,10 @@ import { isStream } from "@aelea/core"
 import { $Branch, $Node, $text, attr, style } from "@aelea/dom"
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete, theme } from "@aelea/ui-components-theme"
-import { IToken } from "@gambitdao/gbc-middleware"
 import { empty } from "@most/core"
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from "common-utils"
 import { $anchor, $calendar, $caretDblDown, $ethScan } from "ui-components"
 import * as viem from "viem"
-import { $berryByToken } from "../../components/$common.js"
 import { $trash } from "./$icons.js"
 
 export const $TrashBtn = $ButtonIcon($trash)
@@ -132,19 +130,3 @@ export const $txnIconLink = (hash: string, chain: viem.Chain) => {
   )
 }
 
-
-export interface ITeamMember {
-  name: string
-  title: string
-  token: IToken
-}
-
-export const $teamMember = ({ name, title, token }: ITeamMember) => {
-  return $column(layoutSheet.spacing, style({ alignItems: 'center', fontSize: screenUtils.isDesktopScreen ? '' : '.85rem' }))(
-    $berryByToken(token),
-    $column(layoutSheet.spacingTiny, style({ alignItems: 'center' }))(
-      $anchor(attr(({ href: `https://twitter.com/${name}` })), style({ fontWeight: 900, textDecoration: 'none', fontSize: '1em' }))($text(`@${name}`)),
-      $text(style({ fontSize: '.85rem', color: pallete.foreground, textAlign: 'center', lineHeight: '1.3' }))(title),
-    )
-  )
-}

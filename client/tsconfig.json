@@ -49,10 +49,7 @@
     },
     {
       "path": "../middleware/ui-storage"
-    },
-    {
-      "path": "../middleware/@gambitdao-gbc-middleware"
-    },
+    }
   ],
   "include": [
     "src",
