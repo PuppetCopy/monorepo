@@ -1,14 +1,14 @@
+import { isStream } from "@aelea/core"
 import { $Branch, $Node, $text, attr, style } from "@aelea/dom"
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete, theme } from "@aelea/ui-components-theme"
 import { IToken } from "@gambitdao/gbc-middleware"
 import { empty } from "@most/core"
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from "common-utils"
-import { $anchor, $calendar, $caretDblDown, $ethScan, $infoLabel } from "ui-components"
+import { $anchor, $calendar, $caretDblDown, $ethScan } from "ui-components"
 import * as viem from "viem"
 import { $berryByToken } from "../../components/$common.js"
 import { $trash } from "./$icons.js"
-import { isStream } from "@aelea/core"
 
 export const $TrashBtn = $ButtonIcon($trash)
 

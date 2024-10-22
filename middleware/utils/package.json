@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "@aelea/core": "^1.3.2",
-        "viem": "2.21.3",
+        "viem": "2.21.32",
         "@most/core": "^1.6.1",
         "@most/disposable": "^1.3.0",
         "@most/prelude": "^1.8.0",

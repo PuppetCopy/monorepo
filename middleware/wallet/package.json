@@ -12,7 +12,7 @@
         "build:tsc": "bun tsc -b"
     },
     "dependencies": {
-        "viem": "2.21.3",
+        "viem": "2.21.32",
         "mipd": "^0.0.7",
         "@walletconnect/ethereum-provider": "^2.15.2",
         "common-utils": "workspace:*",

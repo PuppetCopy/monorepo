@@ -326,7 +326,7 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
                   $profileAvatar({ account: mr.puppet, profileSize: 25 })
                 )
               }),
-              $text(style({ gap: '8px', marginLeft: '16px' }))(`${matchRoute.matchRuleList.length}`)
+              $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.75em' }))(`${matchRoute.matchRuleList.length}`)
             )
             : $row(style({ alignItems: 'center' }))(
               $text(style({ color: pallete.foreground, fontSize: '.75em' }))(`0 puppets`)

@@ -21,11 +21,11 @@
         "@most/core": "^1.6.1",
         "@most/disposable": "^1.3.0",
         "@most/prelude": "^1.8.0",
-        "lightweight-charts": "^4.2.0",
+        "lightweight-charts": "^4.2.1",
         "@most/scheduler": "^1.3.0",
         "@most/types": "^1.1.0",
         "abitype": "1.0.6",
         "jazzicon": "^1.5.0",
-        "viem": "2.21.3"
+        "viem": "2.21.32"
     }
 }
