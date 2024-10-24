@@ -4,7 +4,7 @@
 // import { Stream } from "@most/types"
 // import { IntervalTime } from "common-utils"
 // import { IPriceTickListMap } from "gmx-middleware"
-// import { ISetRouteType, queryPosition } from "puppet-middleware-utils"
+// import { ISetRouteType, queryPosition } from "puppet-middleware"
 // import * as viem from 'viem'
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 // import { $TraderSummary } from "../components/participant/$Summary.js"

@@ -9,7 +9,7 @@
 // import { $Table, ISortBy, ScrollRequest } from "ui-components"
 // import { IAbstractPositionParams, pagingQuery, switchMap } from "gmx-middleware"
 // import { ROUTE_DESCRIPTION } from "puppet-const"
-// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "puppet-middleware-utils"
+// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "puppet-middleware"
 // import { $labelDisplay } from "../../common/$TextField.js"
 // import { $TraderDisplay, $route } from "../../common/$common.js"
 // import { $DropMultiSelect } from "../../components/form/$Dropdown.js"

@@ -6,7 +6,7 @@
 // import { constant, empty, map, multicast, snapshot, startWith } from "@most/core"
 // import { IntervalTime, pagingQuery, readableLeverage, readableUsd, switchMap, unixTimestampNow } from "common-utils"
 // import { IPriceTickListMap } from "gmx-middleware"
-// import { ISetRouteType, accountSettledPositionListSummary, openPositionListPnl } from "puppet-middleware-utils"
+// import { ISetRouteType, accountSettledPositionListSummary, openPositionListPnl } from "puppet-middleware"
 // import { $Table, $caretDown, $infoLabeledValue, IQuantumScrollPage } from "ui-components"
 // import { $Popover } from "../$Popover"
 // import { $TraderDisplay, $pnlDisplay, $puppets } from "../../common/$common.js"

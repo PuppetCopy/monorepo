@@ -6,7 +6,7 @@ import { map, mergeArray, multicast, now, startWith } from "@most/core"
 import { combineState, ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, switchMap } from "common-utils"
 import { getMarketIndexToken } from "gmx-middleware"
 import { IntervalTime } from "puppet-const"
-import { accountSettledPositionListSummary, queryPosition } from "puppet-middleware-utils"
+import { accountSettledPositionListSummary, queryPosition } from "puppet-middleware"
 import { $ButtonToggle, $defaulButtonToggleContainer, intermediateText } from "ui-components"
 import * as viem from 'viem'
 import { $heading2 } from "../../common/$text"

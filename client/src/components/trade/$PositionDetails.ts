@@ -5,7 +5,7 @@
 // import { Stream } from "@most/types"
 // import { StateStream, getMappedValue, getTimeSince, getTokenUsd, readableDate, readableTokenPrice, readableUsd, switchMap, unixTimestampNow } from "common-utils"
 // import { IPositionDecrease, IPositionIncrease, IPriceCandle, getMarketIndexToken, getTokenDescription } from "gmx-middleware"
-// import { IMirrorPosition } from "puppet-middleware-utils"
+// import { IMirrorPosition } from "puppet-middleware"
 // import { $Table, $infoLabel, $txHashRef } from "ui-components"
 // import * as viem from "viem"
 // import * as walletLink from "wallet"

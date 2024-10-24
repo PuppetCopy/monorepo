@@ -9,7 +9,7 @@
 // import { IPriceCandle, OrderType, getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, resolveAddress } from "gmx-middleware"
 // import { EIP6963ProviderDetail } from "mipd"
 // import * as PUPPET from "puppet-const"
-// import { IMirrorPosition, latestPriceMap } from "puppet-middleware-utils"
+// import { IMirrorPosition, latestPriceMap } from "puppet-middleware"
 // import { $alert, $alertTooltip, $anchor, $infoLabeledValue, $infoTooltipLabel } from "ui-components"
 // import * as viem from "viem"
 // import * as walletLink from "wallet"

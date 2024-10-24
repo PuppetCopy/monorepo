@@ -17,7 +17,7 @@ type OpenPnl = {
   pnl: bigint
 }
 
-type IPerformanceTimelineTick = {
+export type IPerformanceTimelineTick = {
   value: number
   openPnl: bigint
   realisedPnl: bigint

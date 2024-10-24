@@ -1,5 +1,5 @@
 {
-    "name": "puppet-middleware-utils",
+    "name": "puppet-middleware",
     "module": "dist/esm/index.js",
     "types": "dist/types/index.d.ts",
     "type": "module",

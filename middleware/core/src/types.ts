@@ -342,10 +342,6 @@ export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {
   matchRoute: IMatchRoute
 }
 
-export interface ILeaderboardMatchStats extends IMatchRouteStats {
-  timeline: IPerformanceTimelineTick[]
-  list: (IPositionIncrease | IPositionDecrease)[]
-}
 
 
 

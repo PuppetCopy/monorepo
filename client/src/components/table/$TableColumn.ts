@@ -3,7 +3,7 @@ import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map, skipRepeats } from "@most/core"
 import { getBasisPoints, getTimeSince, readableDate, readablePercentage, streamOf, switchMap } from "common-utils"
-import { IPosition, getParticiapntPortion, getSettledMpPnL, isPositionSettled, latestPriceMap } from "puppet-middleware-utils"
+import { IPosition, getParticiapntPortion, getSettledMpPnL, isPositionSettled, latestPriceMap } from "puppet-middleware"
 import { $infoTooltip, TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from "../../common/$common.js"

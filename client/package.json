@@ -35,7 +35,7 @@
     "mersenne-twister": "1.1.0",
     "mipd": "^0.0.7",
     "puppet-const": "workspace:*",
-    "puppet-middleware-utils": "workspace:*",
+    "puppet-middleware": "workspace:*",
     "ui-components": "workspace:*",
     "ui-router": "workspace:*",
     "ui-storage": "workspace:*",

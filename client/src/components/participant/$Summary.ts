@@ -3,7 +3,7 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { map, multicast } from "@most/core"
 import { combineState, readableLeverage, readableUsd } from "common-utils"
-import { accountSettledPositionListSummary } from "puppet-middleware-utils"
+import { accountSettledPositionListSummary } from "puppet-middleware"
 import { intermediateText } from "ui-components"
 import * as viem from 'viem'
 import { $profileDisplay } from "../$AccountProfile.js"

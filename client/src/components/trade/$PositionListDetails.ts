@@ -6,7 +6,7 @@
 // import { Stream } from "@most/types"
 // import { StateStream, filterNull } from "common-utils"
 // import { IMarket } from "gmx-middleware"
-// import { IMirrorPosition } from "puppet-middleware-utils"
+// import { IMirrorPosition } from "puppet-middleware"
 // import { $IntermediatePromise } from "ui-components"
 // import * as viem from "viem"
 // import { $entry, $positionPnl, $sizeAndLiquidation } from "../../common/$common.js"

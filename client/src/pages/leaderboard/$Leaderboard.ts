@@ -7,7 +7,7 @@ import { Stream, Time } from "@most/types"
 import { getMappedValue, pagingQuery, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "puppet-const"
-import { IMatchRouteStats, ILeaderboardMatchStats, queryAccountLastAggregatedStats } from "puppet-middleware-utils"
+import { IMatchRouteStats, IPositionDecrease, IPositionIncrease, queryAccountLastAggregatedStats } from "puppet-middleware"
 import {
   $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
   $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
@@ -23,11 +23,16 @@ import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastAct
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import { $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
-import { getPositionListTimelinePerformance } from "../../components/trade/$ProfilePerformanceGraph"
+import { getPositionListTimelinePerformance, IPerformanceTimelineTick } from "../../components/trade/$ProfilePerformanceGraph"
 import localStore from "../../const/localStore.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
 import { getMarketIndexToken } from "gmx-middleware"
+
+export interface ILeaderboardMatchStats extends IMatchRouteStats {
+  timeline: IPerformanceTimelineTick[]
+  list: (IPositionIncrease | IPositionDecrease)[]
+}
 
 
 interface ILeaderboard extends IUserActivityPageParams {
