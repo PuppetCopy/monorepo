@@ -1,5 +1,6 @@
 import { erc20Abi } from "viem";
 import { arbitrum } from "viem/chains";
+import allocationLogic from "./abi/allocationLogic.js";
 import contributeLogic from "./abi/contributeLogic.js";
 import contributeStore from "./abi/contributeStore.js";
 import customError from "./abi/customError";
@@ -7,6 +8,7 @@ import datastore from "./abi/datastore";
 import dictator from "./abi/dictator.js";
 import eventEmitter from "./abi/eventEmitter";
 import exchangeRouter from "./abi/exchangeRouter";
+import executionLogic from "./abi/executionLogic";
 import positionRouter from "./abi/positionRouter";
 import positionStore from "./abi/positionStore";
 import puppetLogic from "./abi/puppetLogic";
@@ -16,13 +18,14 @@ import puppetToken from "./abi/puppetToken.js";
 import puppetVoteToken from "./abi/puppetVoteToken.js";
 import reader from "./abi/reader";
 import referralStorage from "./abi/referralStorage";
+import requestLogic from "./abi/requestLogic";
 import rewardLogic from "./abi/rewardLogic.js";
-import tokenomicsRouter from "./abi/tokenomicsRouter.js";
 import rewardStore from "./abi/rewardStore.js";
 import router from "./abi/router.js";
-import stubPublicContribute from "./abi/stubPublicContribute.js";
+import tokenomicsRouter from "./abi/tokenomicsRouter.js";
 import votingEscrowLogic from "./abi/votingEscrowLogic.js";
 import votingEscrowStore from "./abi/votingEscrowStore.js";
+import unhandledCallbackLogic from "./unhandledCallbackLogic";
 
 export const CONTRACT = {
   [arbitrum.id]: {
@@ -57,46 +60,57 @@ export const CONTRACT = {
     },
 
     ContributeStore: {
-      address: "0xD8f35E3F2F58579d0AFC937913539c06932Ca13D",
+      address: "0x206eFEf96Cea6Fe0c6a612A8F7841299e34293F4",
       abi: contributeStore,
     },
     VotingEscrowStore: {
-      address: "0x2A87123506E4459783A449f43224669d53B6EFB0",
+      address: "0xb8b291Fb808A8781f9b1f9A23a783B66ae2E057B",
       abi: votingEscrowStore,
     },
     RewardStore: {
-      address: "0x9e2Ba591081B10612E8Fdf868EC20c3472CC15CF",
+      address: "0x86e52286a8A83727F4dfB3176B59D2cEb13883a9",
       abi: rewardStore,
     },
-    VotingEscrowLogic: {
-      address: "0xA9233Fb481b6790199F39AE501B05d623Fa85A86",
-      abi: votingEscrowLogic,
-    },
     ContributeLogic: {
-      address: "0x2C78298cd4a7A2312547c94D6F9AABBB8c709A95",
+      address: "0xC8b0f054c65168F97E5a3f37910B78964B7D1d60",
       abi: contributeLogic,
     },
+    VotingEscrowLogic: {
+      address: "0x69DA8323249118562F64f38e27396323Cbe05223",
+      abi: votingEscrowLogic,
+    },
     RewardLogic: {
-      address: "0xf560b1f2dE1eb62e93FBA01Ee13578AACB8Fcd52",
+      address: "0x00Ea985Cfea1F4045121Dc7392f8B530e267f16E",
       abi: rewardLogic,
     },
     TokenomicsRouter: {
-      address: "0x8192468Ab9852391734fA4862581Bb8D96168CE3",
+      address: "0xa73dC3EDf189Db626E013c1d1f6921AA63bffb8a",
       abi: tokenomicsRouter,
     },
+
     PositionStore: {
-      address: "0x5F5C9d9272b4Bae556e0F83BE2c488B6E77F03EC",
+      address: "0x070c8AC23Eaf7880aBD1D66516ae15a3a6445546",
       abi: positionStore,
     },
-    PositionRouter: {
-      address: "0xe24B30FB459656425c8215eDf555585fc6b1F711",
-      abi: positionRouter,
+    AllocationLogic: {
+      address: "0xBEB9BD0bEeC0d6C3295e3681459327530b75deb1",
+      abi: allocationLogic,
     },
-
-    // TODO: Remove these as they are used for testing
-    StubPublicContribute: {
-      address: "0x31a193C331773BEA727D8BA92db185597faBfcC5",
-      abi: stubPublicContribute,
+    RequestLogic: {
+      address: "0xb07f2eAF3ec04d0ad84965f9Fa18985dBB34939D",
+      abi: requestLogic,
+    },
+    ExecutionLogic: {
+      address: "0x10E097461cC0eb02f119EaDe75332f28E8cd6A59",
+      abi: executionLogic,
+    },
+    UnhandledCallbackLogic: {
+      address: "0x387429cd6463427aC327c628773Af4FE90adAF01",
+      abi: unhandledCallbackLogic,
+    },
+    PositionRouter: {
+      address: "0x3fBFAbbadE7fBA80C17e020D7d7E376D8Ca4379a",
+      abi: positionRouter,
     },
 
     GMX: {

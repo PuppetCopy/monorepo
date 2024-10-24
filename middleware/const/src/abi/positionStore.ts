@@ -1,1 +1,576 @@
-export default [{ "inputs": [{ "internalType": "contract IAuthority", "name": "_authority", "type": "address" }, { "internalType": "contract Router", "name": "_router", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "Auth_Unauthorized", "type": "error" }, { "inputs": [], "name": "authority", "outputs": [{ "internalType": "contract IAuthority", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "canCall", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "createSubaccount", "outputs": [{ "internalType": "contract Subaccount", "name": "", "type": "address" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "getMirrorPosition", "outputs": [{ "components": [{ "internalType": "address", "name": "trader", "type": "address" }, { "internalType": "address[]", "name": "puppetList", "type": "address[]" }, { "internalType": "uint256[]", "name": "collateralList", "type": "uint256[]" }, { "internalType": "uint256", "name": "traderSize", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSize", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "cumulativeTransactionCost", "type": "uint256" }], "internalType": "struct PositionStore.MirrorPosition", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "getRequestAdjustment", "outputs": [{ "components": [{ "internalType": "bytes32", "name": "positionKey", "type": "bytes32" }, { "internalType": "uint256", "name": "traderSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "transactionCost", "type": "uint256" }], "internalType": "struct PositionStore.RequestAdjustment", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getSubaccount", "outputs": [{ "internalType": "contract Subaccount", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getTokenBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "getUnhandledCallback", "outputs": [{ "components": [{ "internalType": "enum GmxPositionUtils.OrderExecutionStatus", "name": "status", "type": "uint8" }, { "components": [{ "components": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "address", "name": "callbackContract", "type": "address" }, { "internalType": "address", "name": "uiFeeReceiver", "type": "address" }, { "internalType": "address", "name": "market", "type": "address" }, { "internalType": "contract IERC20", "name": "initialCollateralToken", "type": "address" }, { "internalType": "address[]", "name": "swapPath", "type": "address[]" }], "internalType": "struct GmxPositionUtils.Addresses", "name": "addresses", "type": "tuple" }, { "components": [{ "internalType": "enum GmxPositionUtils.OrderType", "name": "orderType", "type": "uint8" }, { "internalType": "enum GmxPositionUtils.DecreasePositionSwapType", "name": "decreasePositionSwapType", "type": "uint8" }, { "internalType": "uint256", "name": "initialCollateralDeltaAmount", "type": "uint256" }, { "internalType": "uint256", "name": "sizeDeltaUsd", "type": "uint256" }, { "internalType": "uint256", "name": "triggerPrice", "type": "uint256" }, { "internalType": "uint256", "name": "acceptablePrice", "type": "uint256" }, { "internalType": "uint256", "name": "executionFee", "type": "uint256" }, { "internalType": "uint256", "name": "callbackGasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "minOutputAmount", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAtBlock", "type": "uint256" }], "internalType": "struct GmxPositionUtils.Numbers", "name": "numbers", "type": "tuple" }, { "components": [{ "internalType": "bool", "name": "isLong", "type": "bool" }, { "internalType": "bool", "name": "shouldUnwrapNativeToken", "type": "bool" }, { "internalType": "bool", "name": "isFrozen", "type": "bool" }], "internalType": "struct GmxPositionUtils.Flags", "name": "flags", "type": "tuple" }], "internalType": "struct GmxPositionUtils.Props", "name": "order", "type": "tuple" }, { "internalType": "bytes", "name": "eventData", "type": "bytes" }], "internalType": "struct PositionStore.UnhandledCallback", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract BankStore", "name": "_bank", "type": "address" }, { "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "interIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "positionKey", "type": "bytes32" }], "name": "positionMap", "outputs": [{ "internalType": "address", "name": "trader", "type": "address" }, { "internalType": "uint256", "name": "traderSize", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSize", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "cumulativeTransactionCost", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "recordedTransferIn", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "removeAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "removeMirrorPosition", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "removeRequestAdjustment", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "removeRequestDecrease", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }], "name": "removeUnhandledCallback", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "requestKey", "type": "bytes32" }], "name": "requestAdjustmentMap", "outputs": [{ "internalType": "bytes32", "name": "positionKey", "type": "bytes32" }, { "internalType": "uint256", "name": "traderSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "transactionCost", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "setAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }, { "components": [{ "internalType": "address", "name": "trader", "type": "address" }, { "internalType": "address[]", "name": "puppetList", "type": "address[]" }, { "internalType": "uint256[]", "name": "collateralList", "type": "uint256[]" }, { "internalType": "uint256", "name": "traderSize", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSize", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateral", "type": "uint256" }, { "internalType": "uint256", "name": "cumulativeTransactionCost", "type": "uint256" }], "internalType": "struct PositionStore.MirrorPosition", "name": "_mp", "type": "tuple" }], "name": "setMirrorPosition", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "_key", "type": "bytes32" }, { "components": [{ "internalType": "bytes32", "name": "positionKey", "type": "bytes32" }, { "internalType": "uint256", "name": "traderSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "traderCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetSizeDelta", "type": "uint256" }, { "internalType": "uint256", "name": "puppetCollateralDelta", "type": "uint256" }, { "internalType": "uint256", "name": "transactionCost", "type": "uint256" }], "internalType": "struct PositionStore.RequestAdjustment", "name": "_ra", "type": "tuple" }], "name": "setRequestAdjustment", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "enum GmxPositionUtils.OrderExecutionStatus", "name": "_status", "type": "uint8" }, { "components": [{ "components": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "address", "name": "callbackContract", "type": "address" }, { "internalType": "address", "name": "uiFeeReceiver", "type": "address" }, { "internalType": "address", "name": "market", "type": "address" }, { "internalType": "contract IERC20", "name": "initialCollateralToken", "type": "address" }, { "internalType": "address[]", "name": "swapPath", "type": "address[]" }], "internalType": "struct GmxPositionUtils.Addresses", "name": "addresses", "type": "tuple" }, { "components": [{ "internalType": "enum GmxPositionUtils.OrderType", "name": "orderType", "type": "uint8" }, { "internalType": "enum GmxPositionUtils.DecreasePositionSwapType", "name": "decreasePositionSwapType", "type": "uint8" }, { "internalType": "uint256", "name": "initialCollateralDeltaAmount", "type": "uint256" }, { "internalType": "uint256", "name": "sizeDeltaUsd", "type": "uint256" }, { "internalType": "uint256", "name": "triggerPrice", "type": "uint256" }, { "internalType": "uint256", "name": "acceptablePrice", "type": "uint256" }, { "internalType": "uint256", "name": "executionFee", "type": "uint256" }, { "internalType": "uint256", "name": "callbackGasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "minOutputAmount", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAtBlock", "type": "uint256" }], "internalType": "struct GmxPositionUtils.Numbers", "name": "numbers", "type": "tuple" }, { "components": [{ "internalType": "bool", "name": "isLong", "type": "bool" }, { "internalType": "bool", "name": "shouldUnwrapNativeToken", "type": "bool" }, { "internalType": "bool", "name": "isFrozen", "type": "bool" }], "internalType": "struct GmxPositionUtils.Flags", "name": "flags", "type": "tuple" }], "internalType": "struct GmxPositionUtils.Props", "name": "_order", "type": "tuple" }, { "internalType": "bytes32", "name": "_key", "type": "bytes32" }, { "internalType": "bytes", "name": "_eventData", "type": "bytes" }], "name": "setUnhandledCallback", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "subaccountMap", "outputs": [{ "internalType": "contract Subaccount", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "syncTokenBalance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "name": "tokenBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_receiver", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferOut", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bytes32", "name": "positionKey", "type": "bytes32" }], "name": "unhandledCallbackMap", "outputs": [{ "internalType": "enum GmxPositionUtils.OrderExecutionStatus", "name": "status", "type": "uint8" }, { "components": [{ "components": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "address", "name": "callbackContract", "type": "address" }, { "internalType": "address", "name": "uiFeeReceiver", "type": "address" }, { "internalType": "address", "name": "market", "type": "address" }, { "internalType": "contract IERC20", "name": "initialCollateralToken", "type": "address" }, { "internalType": "address[]", "name": "swapPath", "type": "address[]" }], "internalType": "struct GmxPositionUtils.Addresses", "name": "addresses", "type": "tuple" }, { "components": [{ "internalType": "enum GmxPositionUtils.OrderType", "name": "orderType", "type": "uint8" }, { "internalType": "enum GmxPositionUtils.DecreasePositionSwapType", "name": "decreasePositionSwapType", "type": "uint8" }, { "internalType": "uint256", "name": "initialCollateralDeltaAmount", "type": "uint256" }, { "internalType": "uint256", "name": "sizeDeltaUsd", "type": "uint256" }, { "internalType": "uint256", "name": "triggerPrice", "type": "uint256" }, { "internalType": "uint256", "name": "acceptablePrice", "type": "uint256" }, { "internalType": "uint256", "name": "executionFee", "type": "uint256" }, { "internalType": "uint256", "name": "callbackGasLimit", "type": "uint256" }, { "internalType": "uint256", "name": "minOutputAmount", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAtBlock", "type": "uint256" }], "internalType": "struct GmxPositionUtils.Numbers", "name": "numbers", "type": "tuple" }, { "components": [{ "internalType": "bool", "name": "isLong", "type": "bool" }, { "internalType": "bool", "name": "shouldUnwrapNativeToken", "type": "bool" }, { "internalType": "bool", "name": "isFrozen", "type": "bool" }], "internalType": "struct GmxPositionUtils.Flags", "name": "flags", "type": "tuple" }], "internalType": "struct GmxPositionUtils.Props", "name": "order", "type": "tuple" }, { "internalType": "bytes", "name": "eventData", "type": "bytes" }], "stateMutability": "view", "type": "function" }] as const
+export default [
+  {
+    type: "constructor",
+    inputs: [
+      {
+        name: "_authority",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+      { name: "_router", type: "address", internalType: "contract Router" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "authority",
+    inputs: [],
+    outputs: [
+      { name: "", type: "address", internalType: "contract IAuthority" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "canCall",
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "createSubaccount",
+    inputs: [
+      { name: "_key", type: "bytes32", internalType: "bytes32" },
+      { name: "_account", type: "address", internalType: "address" },
+    ],
+    outputs: [
+      { name: "", type: "address", internalType: "contract Subaccount" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "getRequestAdjustment",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct PositionStore.RequestAdjustment",
+        components: [
+          { name: "allocationKey", type: "bytes32", internalType: "bytes32" },
+          {
+            name: "sourceRequestKey",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          { name: "matchKey", type: "bytes32", internalType: "bytes32" },
+          { name: "sizeDelta", type: "uint256", internalType: "uint256" },
+          { name: "transactionCost", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getSubaccount",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      { name: "", type: "address", internalType: "contract Subaccount" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getUnhandledCallback",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct PositionStore.UnhandledCallback",
+        components: [
+          {
+            name: "order",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Props",
+            components: [
+              {
+                name: "addresses",
+                type: "tuple",
+                internalType: "struct GmxPositionUtils.Addresses",
+                components: [
+                  { name: "account", type: "address", internalType: "address" },
+                  {
+                    name: "receiver",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  {
+                    name: "callbackContract",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  {
+                    name: "uiFeeReceiver",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  { name: "market", type: "address", internalType: "address" },
+                  {
+                    name: "initialCollateralToken",
+                    type: "address",
+                    internalType: "contract IERC20",
+                  },
+                  {
+                    name: "swapPath",
+                    type: "address[]",
+                    internalType: "address[]",
+                  },
+                ],
+              },
+              {
+                name: "numbers",
+                type: "tuple",
+                internalType: "struct GmxPositionUtils.Numbers",
+                components: [
+                  {
+                    name: "orderType",
+                    type: "uint8",
+                    internalType: "enum GmxPositionUtils.OrderType",
+                  },
+                  {
+                    name: "decreasePositionSwapType",
+                    type: "uint8",
+                    internalType:
+                      "enum GmxPositionUtils.DecreasePositionSwapType",
+                  },
+                  {
+                    name: "initialCollateralDeltaAmount",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "sizeDeltaUsd",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "triggerPrice",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "acceptablePrice",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "executionFee",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "callbackGasLimit",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "minOutputAmount",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                  {
+                    name: "updatedAtBlock",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                ],
+              },
+              {
+                name: "flags",
+                type: "tuple",
+                internalType: "struct GmxPositionUtils.Flags",
+                components: [
+                  { name: "isLong", type: "bool", internalType: "bool" },
+                  {
+                    name: "shouldUnwrapNativeToken",
+                    type: "bool",
+                    internalType: "bool",
+                  },
+                  { name: "isFrozen", type: "bool", internalType: "bool" },
+                ],
+              },
+            ],
+          },
+          { name: "eventData", type: "bytes", internalType: "bytes" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "interTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_bank", type: "address", internalType: "contract BankStore" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "recordTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "removeRequestAdjustment",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "removeRequestDecrease",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "removeUnhandledCallback",
+    inputs: [{ name: "_key", type: "bytes32", internalType: "bytes32" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "requestAdjustmentMap",
+    inputs: [{ name: "requestKey", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      { name: "allocationKey", type: "bytes32", internalType: "bytes32" },
+      { name: "sourceRequestKey", type: "bytes32", internalType: "bytes32" },
+      { name: "matchKey", type: "bytes32", internalType: "bytes32" },
+      { name: "sizeDelta", type: "uint256", internalType: "uint256" },
+      { name: "transactionCost", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "setAccess",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "isEnabled", type: "bool", internalType: "bool" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setRequestAdjustment",
+    inputs: [
+      { name: "_key", type: "bytes32", internalType: "bytes32" },
+      {
+        name: "_ra",
+        type: "tuple",
+        internalType: "struct PositionStore.RequestAdjustment",
+        components: [
+          { name: "allocationKey", type: "bytes32", internalType: "bytes32" },
+          {
+            name: "sourceRequestKey",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          { name: "matchKey", type: "bytes32", internalType: "bytes32" },
+          { name: "sizeDelta", type: "uint256", internalType: "uint256" },
+          { name: "transactionCost", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUnhandledCallback",
+    inputs: [
+      {
+        name: "_order",
+        type: "tuple",
+        internalType: "struct GmxPositionUtils.Props",
+        components: [
+          {
+            name: "addresses",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Addresses",
+            components: [
+              { name: "account", type: "address", internalType: "address" },
+              { name: "receiver", type: "address", internalType: "address" },
+              {
+                name: "callbackContract",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "uiFeeReceiver",
+                type: "address",
+                internalType: "address",
+              },
+              { name: "market", type: "address", internalType: "address" },
+              {
+                name: "initialCollateralToken",
+                type: "address",
+                internalType: "contract IERC20",
+              },
+              {
+                name: "swapPath",
+                type: "address[]",
+                internalType: "address[]",
+              },
+            ],
+          },
+          {
+            name: "numbers",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Numbers",
+            components: [
+              {
+                name: "orderType",
+                type: "uint8",
+                internalType: "enum GmxPositionUtils.OrderType",
+              },
+              {
+                name: "decreasePositionSwapType",
+                type: "uint8",
+                internalType: "enum GmxPositionUtils.DecreasePositionSwapType",
+              },
+              {
+                name: "initialCollateralDeltaAmount",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "sizeDeltaUsd",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "triggerPrice",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "acceptablePrice",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "executionFee",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "callbackGasLimit",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "minOutputAmount",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "updatedAtBlock",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
+          },
+          {
+            name: "flags",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Flags",
+            components: [
+              { name: "isLong", type: "bool", internalType: "bool" },
+              {
+                name: "shouldUnwrapNativeToken",
+                type: "bool",
+                internalType: "bool",
+              },
+              { name: "isFrozen", type: "bool", internalType: "bool" },
+            ],
+          },
+        ],
+      },
+      { name: "_key", type: "bytes32", internalType: "bytes32" },
+      { name: "_eventData", type: "bytes", internalType: "bytes" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "syncTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "tokenBalanceMap",
+    inputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "transferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOut",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_receiver", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "unhandledCallbackMap",
+    inputs: [{ name: "positionKey", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "order",
+        type: "tuple",
+        internalType: "struct GmxPositionUtils.Props",
+        components: [
+          {
+            name: "addresses",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Addresses",
+            components: [
+              { name: "account", type: "address", internalType: "address" },
+              { name: "receiver", type: "address", internalType: "address" },
+              {
+                name: "callbackContract",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "uiFeeReceiver",
+                type: "address",
+                internalType: "address",
+              },
+              { name: "market", type: "address", internalType: "address" },
+              {
+                name: "initialCollateralToken",
+                type: "address",
+                internalType: "contract IERC20",
+              },
+              {
+                name: "swapPath",
+                type: "address[]",
+                internalType: "address[]",
+              },
+            ],
+          },
+          {
+            name: "numbers",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Numbers",
+            components: [
+              {
+                name: "orderType",
+                type: "uint8",
+                internalType: "enum GmxPositionUtils.OrderType",
+              },
+              {
+                name: "decreasePositionSwapType",
+                type: "uint8",
+                internalType: "enum GmxPositionUtils.DecreasePositionSwapType",
+              },
+              {
+                name: "initialCollateralDeltaAmount",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "sizeDeltaUsd",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "triggerPrice",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "acceptablePrice",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "executionFee",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "callbackGasLimit",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "minOutputAmount",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "updatedAtBlock",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
+          },
+          {
+            name: "flags",
+            type: "tuple",
+            internalType: "struct GmxPositionUtils.Flags",
+            components: [
+              { name: "isLong", type: "bool", internalType: "bool" },
+              {
+                name: "shouldUnwrapNativeToken",
+                type: "bool",
+                internalType: "bool",
+              },
+              { name: "isFrozen", type: "bool", internalType: "bool" },
+            ],
+          },
+        ],
+      },
+      { name: "eventData", type: "bytes", internalType: "bytes" },
+    ],
+    stateMutability: "view",
+  },
+  { type: "error", name: "Access__Unauthorized", inputs: [] },
+] as const;

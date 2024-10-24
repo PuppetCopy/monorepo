@@ -1,1 +1,198 @@
-export default [{ "inputs": [{ "internalType": "contract IAuthority", "name": "_authority", "type": "address" }, { "internalType": "contract Router", "name": "_router", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "Auth_Unauthorized", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "authMap", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "authority", "outputs": [{ "internalType": "contract IAuthority", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "canCall", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getLockDuration", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getTokenBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getVested", "outputs": [{ "components": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint256", "name": "remainingDuration", "type": "uint256" }, { "internalType": "uint256", "name": "lastAccruedTime", "type": "uint256" }, { "internalType": "uint256", "name": "accrued", "type": "uint256" }], "internalType": "struct VotingEscrowStore.Vested", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract BankStore", "name": "_bank", "type": "address" }, { "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "interIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "lockDurationMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "recordedTransferIn", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "removeAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "setAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_duration", "type": "uint256" }], "name": "setLockDuration", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }, { "components": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint256", "name": "remainingDuration", "type": "uint256" }, { "internalType": "uint256", "name": "lastAccruedTime", "type": "uint256" }, { "internalType": "uint256", "name": "accrued", "type": "uint256" }], "internalType": "struct VotingEscrowStore.Vested", "name": "_vest", "type": "tuple" }], "name": "setVested", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "syncTokenBalance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "name": "tokenBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_receiver", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferOut", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "userBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "vestMap", "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint256", "name": "remainingDuration", "type": "uint256" }, { "internalType": "uint256", "name": "lastAccruedTime", "type": "uint256" }, { "internalType": "uint256", "name": "accrued", "type": "uint256" }], "stateMutability": "view", "type": "function" }] as const
+export default [
+  {
+    type: "constructor",
+    inputs: [
+      {
+        name: "_authority",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+      { name: "_router", type: "address", internalType: "contract Router" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "authority",
+    inputs: [],
+    outputs: [
+      { name: "", type: "address", internalType: "contract IAuthority" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "canCall",
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getLockDuration",
+    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getVested",
+    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct VotingEscrowStore.Vested",
+        components: [
+          { name: "amount", type: "uint256", internalType: "uint256" },
+          {
+            name: "remainingDuration",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          { name: "lastAccruedTime", type: "uint256", internalType: "uint256" },
+          { name: "accrued", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "interTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_bank", type: "address", internalType: "contract BankStore" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "lockDurationMap",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "recordTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setAccess",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "isEnabled", type: "bool", internalType: "bool" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setLockDuration",
+    inputs: [
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_duration", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setVested",
+    inputs: [
+      { name: "_user", type: "address", internalType: "address" },
+      {
+        name: "_vest",
+        type: "tuple",
+        internalType: "struct VotingEscrowStore.Vested",
+        components: [
+          { name: "amount", type: "uint256", internalType: "uint256" },
+          {
+            name: "remainingDuration",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          { name: "lastAccruedTime", type: "uint256", internalType: "uint256" },
+          { name: "accrued", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "syncTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "tokenBalanceMap",
+    inputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "transferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOut",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_receiver", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "userBalanceMap",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "vestMap",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [
+      { name: "amount", type: "uint256", internalType: "uint256" },
+      { name: "remainingDuration", type: "uint256", internalType: "uint256" },
+      { name: "lastAccruedTime", type: "uint256", internalType: "uint256" },
+      { name: "accrued", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+  },
+  { type: "error", name: "Access__Unauthorized", inputs: [] },
+] as const;

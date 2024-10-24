@@ -1,1 +1,229 @@
-export default [{ "inputs": [{ "internalType": "contract IAuthority", "name": "_authority", "type": "address" }, { "internalType": "contract Router", "name": "_router", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "Auth_Unauthorized", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "authMap", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "authority", "outputs": [{ "internalType": "contract IAuthority", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "canCall", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "cumulativeRewardPerToken", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "emissionRate", "outputs": [{ "internalType": "uint256", "name": "twa", "type": "uint256" }, { "internalType": "uint256", "name": "timestamp", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getEmissionRate", "outputs": [{ "components": [{ "internalType": "uint256", "name": "twa", "type": "uint256" }, { "internalType": "uint256", "name": "timestamp", "type": "uint256" }], "internalType": "struct RewardStore.EmissionRate", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getTokenBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getUserRewardCursor", "outputs": [{ "components": [{ "internalType": "uint256", "name": "rewardPerToken", "type": "uint256" }, { "internalType": "uint256", "name": "accruedReward", "type": "uint256" }], "internalType": "struct RewardStore.UserRewardCursor", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "incrementCumulativePerContribution", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract BankStore", "name": "_bank", "type": "address" }, { "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "interIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "lastDistributionTimestamp", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "recordedTransferIn", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "removeAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "rewardRate", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "setAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "components": [{ "internalType": "uint256", "name": "twa", "type": "uint256" }, { "internalType": "uint256", "name": "timestamp", "type": "uint256" }], "internalType": "struct RewardStore.EmissionRate", "name": "_value", "type": "tuple" }], "name": "setEmissionRate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setLastDistributionTimestamp", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setRewardRate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }, { "components": [{ "internalType": "uint256", "name": "rewardPerToken", "type": "uint256" }, { "internalType": "uint256", "name": "accruedReward", "type": "uint256" }], "internalType": "struct RewardStore.UserRewardCursor", "name": "cursor", "type": "tuple" }], "name": "setUserRewardCursor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "syncTokenBalance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "name": "tokenBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_receiver", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferOut", "outputs": [], "stateMutability": "nonpayable", "type": "function" }] as const
+export default [
+  {
+    type: "constructor",
+    inputs: [
+      {
+        name: "_authority",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+      { name: "_router", type: "address", internalType: "contract Router" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "authority",
+    inputs: [],
+    outputs: [
+      { name: "", type: "address", internalType: "contract IAuthority" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "canCall",
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "cumulativeRewardPerToken",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "emissionRate",
+    inputs: [],
+    outputs: [
+      { name: "twa", type: "uint256", internalType: "uint256" },
+      { name: "timestamp", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getEmissionRate",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct RewardStore.EmissionRate",
+        components: [
+          { name: "twa", type: "uint256", internalType: "uint256" },
+          { name: "timestamp", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getUserRewardCursor",
+    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct RewardStore.UserRewardCursor",
+        components: [
+          { name: "rewardPerToken", type: "uint256", internalType: "uint256" },
+          { name: "accruedReward", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "incrementCumulativePerContribution",
+    inputs: [{ name: "_value", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "interTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_bank", type: "address", internalType: "contract BankStore" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "lastDistributionTimestamp",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "recordTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "rewardRate",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "setAccess",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "isEnabled", type: "bool", internalType: "bool" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setEmissionRate",
+    inputs: [
+      {
+        name: "_value",
+        type: "tuple",
+        internalType: "struct RewardStore.EmissionRate",
+        components: [
+          { name: "twa", type: "uint256", internalType: "uint256" },
+          { name: "timestamp", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setLastDistributionTimestamp",
+    inputs: [{ name: "_value", type: "uint256", internalType: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setRewardRate",
+    inputs: [{ name: "_value", type: "uint256", internalType: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUserRewardCursor",
+    inputs: [
+      { name: "_user", type: "address", internalType: "address" },
+      {
+        name: "cursor",
+        type: "tuple",
+        internalType: "struct RewardStore.UserRewardCursor",
+        components: [
+          { name: "rewardPerToken", type: "uint256", internalType: "uint256" },
+          { name: "accruedReward", type: "uint256", internalType: "uint256" },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "syncTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "tokenBalanceMap",
+    inputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "transferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOut",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_receiver", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  { type: "error", name: "Access__Unauthorized", inputs: [] },
+] as const;

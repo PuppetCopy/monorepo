@@ -1,1 +1,325 @@
-export default [{ "inputs": [{ "internalType": "contract IAuthority", "name": "_authority", "type": "address" }, { "internalType": "contract Router", "name": "_router", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "Auth_Unauthorized", "type": "error" }, { "inputs": [], "name": "RewardStore__InvalidLength", "type": "error" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "authMap", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "authority", "outputs": [{ "internalType": "contract IAuthority", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "canCall", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "contribute", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "address[]", "name": "_userList", "type": "address[]" }, { "internalType": "uint256[]", "name": "_valueList", "type": "uint256[]" }], "name": "contributeMany", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getBuybackQuote", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getCursor", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getCursorBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_cursor", "type": "uint256" }], "name": "getCursorRate", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "getPendingCursorReward", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20[]", "name": "_tokenList", "type": "address[]" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "getPendingCursorRewardList", "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "getTokenBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }], "name": "getUserAccruedReward", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "getUserContributionBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "getUserCursor", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract BankStore", "name": "_bank", "type": "address" }, { "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "interIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "recordedTransferIn", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "removeAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "user", "type": "address" }], "name": "setAuth", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setBuybackQuote", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setCursor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setCursorBalance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "uint256", "name": "_cursor", "type": "uint256" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setCursorRate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setUserAccruedReward", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setUserContributionBalanceMap", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "setUserCursor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }], "name": "syncTokenBalance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "name": "tokenBalanceMap", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_depositor", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_receiver", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "transferOut", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "_user", "type": "address" }, { "internalType": "uint256", "name": "_value", "type": "uint256" }], "name": "updateAccruedReward", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20", "name": "_token", "type": "address" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "updateCursorReward", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract IERC20[]", "name": "_tokenList", "type": "address[]" }, { "internalType": "address", "name": "_user", "type": "address" }], "name": "updateCursorRewardList", "outputs": [], "stateMutability": "nonpayable", "type": "function" }] as const
+export default [
+  {
+    type: "constructor",
+    inputs: [
+      {
+        name: "_authority",
+        type: "address",
+        internalType: "contract IAuthority",
+      },
+      { name: "_router", type: "address", internalType: "contract Router" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "authority",
+    inputs: [],
+    outputs: [
+      { name: "", type: "address", internalType: "contract IAuthority" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "canCall",
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "contribute",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_amount", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "contributeMany",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_userList", type: "address[]", internalType: "address[]" },
+      { name: "_valueList", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "getBuybackQuote",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCursor",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCursorBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCursorRate",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_cursor", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getPendingCursorReward",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getPendingCursorRewardList",
+    inputs: [
+      {
+        name: "_tokenList",
+        type: "address[]",
+        internalType: "contract IERC20[]",
+      },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256[]", internalType: "uint256[]" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getUserAccruedReward",
+    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getUserContributionBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getUserCursor",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "interTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_bank", type: "address", internalType: "contract BankStore" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "recordTransferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setAccess",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "isEnabled", type: "bool", internalType: "bool" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setBuybackQuote",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCursor",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCursorBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCursorRate",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_cursor", type: "uint256", internalType: "uint256" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUserAccruedReward",
+    inputs: [
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUserContributionBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUserCursor",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "syncTokenBalance",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "tokenBalanceMap",
+    inputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "transferIn",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_depositor", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOut",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_receiver", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "updateAccruedReward",
+    inputs: [
+      { name: "_user", type: "address", internalType: "address" },
+      { name: "_value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "updateCursorReward",
+    inputs: [
+      { name: "_token", type: "address", internalType: "contract IERC20" },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "updateCursorRewardList",
+    inputs: [
+      {
+        name: "_tokenList",
+        type: "address[]",
+        internalType: "contract IERC20[]",
+      },
+      { name: "_user", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  { type: "error", name: "Access__Unauthorized", inputs: [] },
+] as const;
