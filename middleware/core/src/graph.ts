@@ -134,6 +134,11 @@ export function queryAccountLastAggregatedStats(
       filter.blockTimestamp = {
         _gte: timestampFilter
       }
+
+      filter.matchRoute = {
+        increaseList: { blockTimestamp: { _gte: timestampFilter } },
+        decreaseList: { blockTimestamp: { _gte: timestampFilter } }
+      } as any
     }
 
 

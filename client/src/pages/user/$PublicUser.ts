@@ -1,18 +1,21 @@
 import { Behavior } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import * as router from '@aelea/router'
-import { $column, layoutSheet } from "@aelea/ui-components"
-import { map, mergeArray, now, startWith } from "@most/core"
-import { ETH_ADDRESS_REGEXP, switchMap } from "common-utils"
+import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
+import { map, mergeArray, multicast, now, startWith } from "@most/core"
+import { combineState, ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, switchMap } from "common-utils"
 import { getMarketIndexToken } from "gmx-middleware"
-import { queryPosition } from "puppet-middleware-utils"
-import { $ButtonToggle, $defaulButtonToggleContainer } from "ui-components"
+import { IntervalTime } from "puppet-const"
+import { accountSettledPositionListSummary, queryPosition } from "puppet-middleware-utils"
+import { $ButtonToggle, $defaulButtonToggleContainer, intermediateText } from "ui-components"
 import * as viem from 'viem'
+import { $heading2 } from "../../common/$text"
 import { subgraphClient } from "../../common/graphClient"
-import { $TraderSummary } from "../../components/participant/$Summary.js"
+import { $profileDisplay } from "../../components/$AccountProfile"
+import { $metricLabel, $metricRow } from "../../components/participant/$Summary.js"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
-import { IntervalTime } from "puppet-const"
+import { $TraderDisplay } from "../../common/$common"
 
 
 
@@ -99,11 +102,65 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                 }, query)
               }, filteredMarketList)
 
+              const metricsQuery = multicast(map(async params => {
+                const allPositions = await params.positionListQuery
+
+                return accountSettledPositionListSummary(allPositions)
+              }, combineState({ positionListQuery })))
+
 
 
 
               return $column(layoutSheet.spacingBig)(
-                $TraderSummary({ ...config, account, positionListQuery })({}),
+                $column(layoutSheet.spacing, style({ minHeight: '90px' }))(
+                  $node(style({ display: 'flex', flexDirection: screenUtils.isDesktopScreen ? 'row' : 'column', gap: screenUtils.isDesktopScreen ? '56px' : '26px', zIndex: 10, placeContent: 'center', alignItems: 'center', padding: '0 8px' }))(
+                    $row(
+                      $TraderDisplay({
+                        route: config.route,
+                        trader: account,
+                        puppetList: [],
+                        labelSize: '22px',
+                        profileSize: screenUtils.isDesktopScreen ? 80 : 80
+                      })({
+                        click: changeRouteTether()
+                      }),
+                    ),
+                    $row(layoutSheet.spacingBig, style({ alignItems: 'flex-end' }))(
+                      $metricRow(
+                        $heading2(intermediateText(
+                          map(async summaryQuery => {
+                            const summary = await summaryQuery
+
+                            return `${summary.winCount} / ${summary.lossCount}`
+                          }, metricsQuery)
+                        )),
+                        $metricLabel($text('Win / Loss'))
+                      ),
+
+                      $metricRow(
+                        $heading2(intermediateText(
+                          map(async summaryQuery => {
+                            const summary = await summaryQuery
+
+                            return readableUsd(summary.avgCollateral)
+                          }, metricsQuery)
+                        )),
+                        $metricLabel($text('Avg Collateral'))
+                      ),
+                      $metricRow(
+                        $heading2(intermediateText(
+                          map(async summaryQuery => {
+                            const summary = await summaryQuery
+
+                            return readableLeverage(summary.avgSize, summary.avgCollateral)
+                          }, metricsQuery)
+                        )),
+                        $metricLabel($text('Avg Leverage'))
+                      )
+
+                    ),
+                  )
+                ),
 
                 $TraderPage({ ...config, positionListQuery, })({
                   selectMarketTokenList: selectMarketTokenListTether(),

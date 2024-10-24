@@ -6,7 +6,6 @@ import { createTimeline, formatFixed, unixTimestampNow } from "common-utils"
 import { IPricefeedMap, IPricetick, getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
 import { IntervalTime, USD_DECIMALS } from "puppet-const"
-import { IPerformanceTimelineTick } from "puppet-middleware-utils"
 import { $Baseline, IMarker } from "ui-components"
 import * as viem from "viem"
 
@@ -18,7 +17,15 @@ type OpenPnl = {
   pnl: bigint
 }
 
-type IPerformanceTimelineTick2 = { openPnlMap: Map<viem.Hex, OpenPnl> } & IPerformanceTimelineTick
+type IPerformanceTimelineTick = {
+  value: number
+  openPnl: bigint
+  realisedPnl: bigint
+  pnl: bigint
+  roi: bigint
+  time: number
+  openPnlMap: Map<viem.Hex, OpenPnl>
+}
 
 type IAbstractUpdate = {
   market: viem.Address
@@ -40,7 +47,7 @@ export interface IPerformanceTimeline {
   chartConfig?: DeepPartial<ChartOptions>
 }
 
-export function getPositionListTimelinePerformance(config: IPerformanceTimeline): IPerformanceTimelineTick2[] {
+export function getPositionListTimelinePerformance(config: IPerformanceTimeline): IPerformanceTimelineTick[] {
   if (config.list.length === 0) {
     return []
   }
@@ -48,19 +55,22 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   const timeNow = unixTimestampNow()
   const startTime = timeNow - config.activityTimeframe
   const initialPositionTime = config.list.map(pos => pos.blockTimestamp).reduce((a, b) => Math.min(a, b), config.list[0].blockTimestamp)
-  const uniqueIndexTokenList = [...new Set(config.list.map(update => getMarketIndexToken(update.market)))]
+  const uniqueIndexTokenList = [...new Set(
+    config.list.map(update => getMarketIndexToken(update.market))
+  )]
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
     .flatMap(indexToken =>
       config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.slotTime })) ?? []
     )
     .filter(tick => tick.timestamp > initialPositionTime)
 
-  const seed: IPerformanceTimelineTick2 = {
+  const seed: IPerformanceTimelineTick = {
     value: 0,
     realisedPnl: 0n,
     openPnl: 0n,
     openPnlMap: new Map<viem.Hex, OpenPnl>(),
     pnl: 0n,
+    roi: 0n,
     time: startTime,
   }
   const data = createTimeline({
@@ -85,7 +95,6 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
         })
 
         nextTick.pnl = nextTick.realisedPnl + nextTick.openPnl
-
         nextTick.value = formatFixed(USD_DECIMALS, nextTick.pnl)
 
         return nextTick

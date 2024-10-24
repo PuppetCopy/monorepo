@@ -102,7 +102,7 @@ export const $WalletPage = (config: IWalletPageParams) => component((
         $ButtonToggle({
           $container: $defaulButtonToggleContainer(style({ alignSelf: 'center', })),
           selected: profileMode,
-          options: [IWalletTab.EARN, IWalletTab.PUPPET, IWalletTab.TRADER],
+          options: [IWalletTab.PUPPET, IWalletTab.EARN, IWalletTab.TRADER],
           $$option: map(option => {
             return $text(optionDisplay[option].label)
           })
@@ -364,7 +364,7 @@ function $ContributionTooling(config: IPageParams) {
             snapshot(async (params, wallet) => {
 
               return walletLink.writeContract({
-                ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter,
+                ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter,
                 walletClient: wallet,
                 functionName: 'buyback',
                 args: [PUPPET.ARBITRUM_ADDRESS.USDC, wallet.account.address, params.inputBuybackAmount]

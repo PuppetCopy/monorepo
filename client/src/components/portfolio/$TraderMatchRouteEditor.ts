@@ -3,7 +3,7 @@ import { Behavior, combineObject } from "@aelea/core"
 import { $text, component, style } from "@aelea/dom"
 import { $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, map, mergeArray, multicast, snapshot } from "@most/core"
+import { constant, map, mergeArray, snapshot } from "@most/core"
 import { Stream } from "@most/types"
 import { switchMap, unixTimestampNow } from "common-utils"
 import { getTokenDescription } from "gmx-middleware"
@@ -16,7 +16,7 @@ import { $responsiveFlex } from "../../common/elements/$common.js"
 import { $seperator2 } from "../../pages/common"
 import { IWalletPageParams } from "../../pages/type.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
-import { $MatchRuleEditor, IMatchRuleEditorChange, IDraftMatchRule } from "./$MatchRuleEditor.js"
+import { $MatchRuleEditor, IDraftMatchRule, IMatchRuleEditorChange } from "./$MatchRuleEditor.js"
 
 
 interface ITraderMatchRouteEditor extends IWalletPageParams {
@@ -64,9 +64,9 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
             ),
             $seperator2,
 
-            $row(style({ gap: '8px' }))(
+            $row(style({ gap: '6px' }))(
               $text(`Copy`),
-              $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '1px', minWidth: '18px' }), viewBox: '0 0 32 32' }),
+              $icon({ $content: $caretDown, width: '12px', svgOps: style({ marginTop: '2px', minWidth: '8px' }), viewBox: '0 0 32 32' }),
             ),
 
           ),

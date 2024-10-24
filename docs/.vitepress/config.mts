@@ -47,8 +47,8 @@ export default defineConfig({
                 link: '/pages/generated-sources/PuppetRouter',
               },
               {
-                text: 'RewardRouter',
-                link: '/pages/generated-sources/RewardRouter',
+                text: 'tokenomicsRouter',
+                link: '/pages/generated-sources/TokenomicsRouter',
               },
             ]
           },

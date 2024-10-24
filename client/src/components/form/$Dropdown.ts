@@ -5,9 +5,8 @@ import { pallete } from "@aelea/ui-components-theme"
 import { constant, empty, filter, map, merge, mergeArray, multicast, never, now, scan, skip, skipRepeats, snapshot, startWith, switchLatest, take, tap, zip } from "@most/core"
 import { append, remove } from "@most/prelude"
 import { Stream } from "@most/types"
-import { $xCross } from "ui-components"
+import { $caretDown, $xCross } from "ui-components"
 import { streamOf } from "common-utils"
-import { $caretDown } from "../../common/elements/$icons.js"
 import { $Select, ISelect } from "./$Select.js"
 
 
@@ -262,9 +261,9 @@ export const $DropMultiSelect = <T>({
               return $chip(
                 switchLatest($$chip(now(token))),
                 $icon({
-                  $content: $xCross, width: '32px',
+                  $content: $xCross, width: '28px',
                   svgOps: O(
-                    style({ padding: '6px', cursor: 'pointer' }),
+                    style({ padding: '4px', cursor: 'pointer' }),
                     clickOptionRemoveTether(nodeEvent('click'), tap(x => x.preventDefault()), constant(token))
                   ),
                   viewBox: '0 0 32 32'
@@ -281,12 +280,13 @@ export const $DropMultiSelect = <T>({
               blurTether(dismissOp),
 
               style({
+                width: '100px',
                 border: 'none',
                 fontSize: '1em',
                 alignSelf: 'stretch',
                 outline: 'none',
                 minHeight: '36px',
-                flex: '1 0 100px',
+                flex: '1 0 70px',
                 color: pallete.message,
                 background: 'transparent',
               }),
@@ -307,7 +307,7 @@ export const $DropMultiSelect = <T>({
               ),
 
             )(),
-            $icon({ $content: $caretDown, width: '18px', svgOps: style({ marginTop: '3px', minWidth: '18px', marginLeft: '6px' }), viewBox: '0 0 32 32' }),
+            $icon({ $content: $caretDown, width: '12px', svgOps: style({ minWidth: '12px', margin: '2px 1px 0' }), viewBox: '0 0 32 32' }),
           ),
 
         ),

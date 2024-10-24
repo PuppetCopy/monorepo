@@ -17,7 +17,7 @@ import puppetVoteToken from "./abi/puppetVoteToken.js";
 import reader from "./abi/reader";
 import referralStorage from "./abi/referralStorage";
 import rewardLogic from "./abi/rewardLogic.js";
-import rewardRouter from "./abi/rewardRouter.js";
+import tokenomicsRouter from "./abi/tokenomicsRouter.js";
 import rewardStore from "./abi/rewardStore.js";
 import router from "./abi/router.js";
 import stubPublicContribute from "./abi/stubPublicContribute.js";
@@ -80,9 +80,9 @@ export const CONTRACT = {
       address: "0xf560b1f2dE1eb62e93FBA01Ee13578AACB8Fcd52",
       abi: rewardLogic,
     },
-    RewardRouter: {
+    TokenomicsRouter: {
       address: "0x8192468Ab9852391734fA4862581Bb8D96168CE3",
-      abi: rewardRouter,
+      abi: tokenomicsRouter,
     },
     PositionStore: {
       address: "0x5F5C9d9272b4Bae556e0F83BE2c488B6E77F03EC",

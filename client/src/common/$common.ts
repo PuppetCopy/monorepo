@@ -61,7 +61,7 @@ export const $entry = (pos: IPosition) => {
           )
           : empty(),
       ),
-      $anchor: $route(collateralTokenDescription, false)
+      $anchor: $route(indexDescription, false)
     })({}),
     $column(layoutSheet.spacingTiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))((pos.isLong ? 'LONG' : 'SHORT'))),
@@ -304,13 +304,15 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 interface ITraderDisplay {
   trader: viem.Address
   route: router.Route,
-  matchRoute: IMatchRoute
+  puppetList: viem.Address[]
+  labelSize?: string
+  profileSize?: number
 }
 export const $TraderDisplay = (config: ITraderDisplay) => component((
   [click, clickTether]: Behavior<any, viem.Address>,
 ) => {
 
-  const { route, trader, matchRoute } = config
+  const { route, trader, puppetList } = config
 
   return [
     $Link({
@@ -318,18 +320,18 @@ export const $TraderDisplay = (config: ITraderDisplay) => component((
         $profileAvatar({ ...config, account: trader }),
         $column(style({ gap: '3px' }))(
           $AccountLabel(trader),
-          matchRoute.matchRuleList.length > 0
+          puppetList.length > 0
             ? $row(style({ alignItems: 'center' }))(
-              ...matchRoute.matchRuleList.map(mr => {
+              ...puppetList.map(puppet => {
 
                 return style({ marginRight: '-12px', border: '2px solid black' })(
-                  $profileAvatar({ account: mr.puppet, profileSize: 25 })
+                  $profileAvatar({ account: puppet, profileSize: 25 })
                 )
               }),
-              $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.75em' }))(`${matchRoute.matchRuleList.length}`)
+              $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(`${puppetList.length}`)
             )
             : $row(style({ alignItems: 'center' }))(
-              $text(style({ color: pallete.foreground, fontSize: '.75em' }))(`0 puppets`)
+              $text(style({ color: pallete.foreground, fontSize: '.85em' }))(`0 puppets`)
             )
 
         )

@@ -1,5 +1,5 @@
 import { Behavior, Op } from "@aelea/core"
-import { $Node, $text, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior } from "@aelea/dom"
+import { $node, $Node, $text, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior } from "@aelea/dom"
 import { $row } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, now, switchLatest } from "@most/core"
@@ -16,20 +16,26 @@ export interface IButtonToggle<T> {
 }
 
 export const $defaulButtonToggleBtn = $row(style({
-  placeContent: 'center', fontWeight: 'bold',
+  placeContent: 'center', fontWeight: 'bold', flex: 1,
   borderRadius: '20px', padding: '10px 16px', alignItems: 'center', border: '1px solid transparent',
-  cursor: 'pointer', margin: '-2px'
+  cursor: 'pointer', margin: '-2px', textAlign: 'center'
 }))
 
-export const $defaulButtonToggleContainer = $row(style({
-  borderRadius: '20px',
+export const $defaulButtonToggleContainer = $node(style({
+  display: 'grid', gridAutoFlow: 'column', gridAutoColumns: 'minmax(50px, 1fr)', borderRadius: '20px',
   border: `1px solid ${pallete.horizon}`, backgroundColor: pallete.background
 }))
 
 
 const defaultOption = map(<T>(o: T) => $text(String(o)))
 
-export const $ButtonToggle = <T>({ options, selected, $$option = defaultOption, $button = $defaulButtonToggleBtn, $container = $defaulButtonToggleContainer }: IButtonToggle<T>) => component((
+export const $ButtonToggle = <T>({
+  options,
+  selected,
+  $$option = defaultOption,
+  $button = $defaulButtonToggleBtn,
+  $container = $defaulButtonToggleContainer
+}: IButtonToggle<T>) => component((
   [select, sampleSelect]: Behavior<INode, T>
 ) => {
 

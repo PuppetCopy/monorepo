@@ -27,6 +27,7 @@ import { getPositionListTimelinePerformance } from "../../components/trade/$Prof
 import localStore from "../../const/localStore.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
+import { getMarketIndexToken } from "gmx-middleware"
 
 
 interface ILeaderboard extends IUserActivityPageParams {
@@ -59,7 +60,15 @@ export const $Leaderboard = (config: ILeaderboard) => component((
     const accountStatsListData = await pageParams.accountStatsList
     const accountStatsList: ILeaderboardMatchStats[] = accountStatsListData
       .map(stats => {
-        const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => pageParams.isLong === undefined || pos.isLong === pageParams.isLong)
+        const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => {
+          try {
+            getMarketIndexToken(pos.market)
+            return pageParams.isLong === undefined || pos.isLong === pageParams.isLong
+          } catch (e) {
+            console.error(e)
+            return false
+          }
+        })
 
         if (list.length === 0) return null
 
@@ -144,7 +153,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   return $TraderDisplay({
                     route: config.route,
                     trader: pos.account,
-                    matchRoute: pos.matchRoute,
+                    puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
                   })({
                     click: routeChangeTether()
                   })

@@ -101,6 +101,7 @@ export interface IPositionIncrease extends ILogTxType<'PositionIncrease'> {
   isLong: boolean
 
   feeCollected: IPositionFeesCollected
+  // matchRoute: IMatchRoute
 }
 
 export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
@@ -137,6 +138,7 @@ export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
   isLong: boolean
 
   feeCollected: IPositionFeesCollected
+  // matchRoute: IMatchRoute
 }
 
 
@@ -145,7 +147,7 @@ export interface IMirrorRequest {
   trader: viem.Address
   subaccount: viem.Address
   positionKey: viem.Hex
-  isIncrease: boolean;
+  isIncrease: boolean
   requestKey: viem.Hex
 }
 
@@ -268,20 +270,18 @@ export interface IMatchRule extends ILogTypeId<'MatchRule'> {
 
 export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
   id: viem.Address
-  profile: IProfile
   collateralToken: viem.Address
+
+  profile: IProfile
 
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
-
-  mirrorIncreaseList: IMirrorRequest[]
-  mirrorDecreaseList: IMirrorRequest[]
 
   matchRuleList: IMatchRule[]
   allocationList: IAllocation[]
   settlementList: ISettlement[]
 
-  activity: IMatchRouteStats[]
+  stats: IMatchRouteStats[]
 }
 
 
@@ -315,15 +315,6 @@ export interface ISettle extends ILogTypeId<'Settle'> {
   blockNumber: number
   blockTimestamp: number
   transactionHash: viem.Address
-}
-
-
-export type IPerformanceTimelineTick = {
-  value: number;
-  openPnl: bigint;
-  realisedPnl: bigint;
-  pnl: bigint;
-  time: number;
 }
 
 export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {

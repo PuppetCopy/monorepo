@@ -228,7 +228,7 @@ export const $Vest = (config: IVestingDetails) => component((
                 changeWallet: changeWalletTether(),
                 click: popoverRequestWithdrawTether(
                   snapshot(async (amount, wallet) => {
-                    const rewardRouterContractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter
+                    const rewardRouterContractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter
 
                     return walletLink.writeContract({
                       ...rewardRouterContractDefs,
@@ -492,7 +492,7 @@ export const $Vest = (config: IVestingDetails) => component((
             const params = await paramsQuery
             const callStack: viem.Hex[] = []
 
-            const contractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).RewardRouter
+            const contractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter
 
 
             if (params.claimableContributionReward > 0) {

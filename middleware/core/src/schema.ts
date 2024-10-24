@@ -81,6 +81,48 @@ const positionCollectedUpdate: graph.ISchema<IPositionFeesCollected> = {
   __typename: 'PositionFeesCollected',
 }
 
+
+const matchRoute: graph.ISchema<IMatchRoute> = {
+  id: 'string',
+  profile: profile,
+  collateralToken: 'address',
+
+
+  increaseList: {
+    market: 'address',
+    positionKey: 'bytes',
+    sizeInUsd: 'bigint',
+    sizeInTokens: 'bigint',
+    indexTokenPriceMax: 'bigint',
+    isLong: 'bool',
+    blockTimestamp: 'number',
+    __typename: 'PositionIncrease',
+  },
+  decreaseList: {
+    market: 'address',
+    positionKey: 'bytes',
+    sizeInUsd: 'bigint',
+    sizeInTokens: 'bigint',
+    indexTokenPriceMax: 'bigint',
+    basePnlUsd: 'bigint',
+    isLong: 'bool',
+    blockTimestamp: 'number',
+    __typename: 'PositionIncrease',
+  },
+  matchRuleList: {
+    id: 'string',
+    puppet: 'address',
+    matchKey: 'string',
+    allowanceRate: 'bigint',
+    throttleActivity: 'bigint',
+    expiry: 'bigint',
+
+    __typename: 'MatchRule',
+  },
+
+  __typename: 'MatchRoute',
+}
+
 const positionIncrease: graph.ISchema<IPositionIncrease> = {
   id: 'string',
   market: 'address',
@@ -192,46 +234,6 @@ const matchRule: graph.ISchema<IMatchRule> = {
   __typename: 'MatchRule',
 }
 
-const matchRoute: graph.ISchema<IMatchRoute> = {
-  id: 'string',
-  profile: profile,
-  collateralToken: 'address',
-  
-
-  increaseList: {
-    market: 'address',
-    positionKey: 'bytes',
-    sizeInUsd: 'bigint',
-    sizeInTokens: 'bigint',
-    indexTokenPriceMax: 'bigint',
-    isLong: 'bool',
-    blockTimestamp: 'number',
-    __typename: 'PositionIncrease',
-  },
-  decreaseList: {
-    market: 'address',
-    positionKey: 'bytes',
-    sizeInUsd: 'bigint',
-    sizeInTokens: 'bigint',
-    indexTokenPriceMax: 'bigint',
-    basePnlUsd: 'bigint',
-    isLong: 'bool',
-    blockTimestamp: 'number',
-    __typename: 'PositionIncrease',
-  },
-  matchRuleList: {
-    id: 'string',
-    puppet: 'address',
-    matchKey: 'string',
-    allowanceRate: 'bigint',
-    throttleActivity: 'bigint',
-    expiry: 'bigint',
-
-    __typename: 'MatchRule',
-  },
-
-  __typename: 'MatchRoute',
-}
 
 const routeMatchStats: graph.ISchema<IMatchRouteStats> = {
   id: 'string',
