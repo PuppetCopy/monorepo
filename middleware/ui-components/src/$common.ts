@@ -35,6 +35,7 @@ export const $alertPositiveContainer = $row(layoutSheet.spacingSmall, style({
   border: `1px dashed ${pallete.positive}`, padding: '8px 12px',
 }))
 
+
 export const $alertIntermediateContainer = (...$content: $Node[]) => $row(layoutSheet.spacingSmall, style({
   minWidth: 0, maxWidth: '100%',
   borderRadius: '100px', alignItems: 'center', fontSize: '.85rem',
@@ -42,11 +43,12 @@ export const $alertIntermediateContainer = (...$content: $Node[]) => $row(layout
 }))(
   $node(
     style({
-      inset: 0,
+      left: '-50%',
       width: '200%',
-      animation: `borderRotate .75s linear infinite`,
+      aspectRatio: '1 / 1',
+      animation: `rotate 3.5s linear infinite`,
       position: 'absolute',
-      background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`,
+      background: `conic-gradient(transparent, transparent, transparent, ${pallete.indeterminate})`,
     }),
   )(),
   $node(

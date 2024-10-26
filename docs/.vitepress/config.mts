@@ -46,10 +46,6 @@ export default defineConfig({
                 text: 'PuppetRouter',
                 link: '/pages/generated-sources/PuppetRouter',
               },
-              {
-                text: 'tokenomicsRouter',
-                link: '/pages/generated-sources/TokenomicsRouter',
-              },
             ]
           },
           {

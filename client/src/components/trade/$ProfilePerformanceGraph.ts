@@ -60,7 +60,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   )]
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
     .flatMap(indexToken =>
-      config.pricefeedMap[indexToken].map(x => ({ indexToken, price: x.c, timestamp: x.slotTime })) ?? []
+      config.pricefeedMap[indexToken]?.map(x => ({ indexToken, price: x.c, timestamp: x.slotTime })) ?? []
     )
     .filter(tick => tick.timestamp > initialPositionTime)
 

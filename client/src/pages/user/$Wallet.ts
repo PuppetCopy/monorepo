@@ -1,24 +1,21 @@
 import { Behavior, combineObject } from "@aelea/core"
 import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { map, now, snapshot } from "@most/core"
+import { map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { getMappedValue, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, switchMap } from "common-utils"
+import { readableTokenAmount, readableTokenAmountLabel, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-const"
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText } from "ui-components"
+import { $ButtonToggle, $defaulButtonToggleContainer, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from 'viem'
-import * as walletLink from "wallet"
-import { $heading2, $heading3 } from "../../common/$text"
+import { $heading3 } from "../../common/$text"
 import { $card, $responsiveFlex } from "../../common/elements/$common"
 import { $Vest } from "../../components/$Vest.js"
-import { $SubmitBar } from "../../components/form/$SubmitBar.js"
 import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.js"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import localStore from "../../const/localStore.js"
 import tokenomics from "../../logic/tokenomicsReader.js"
-import { readAddressTokenBalance } from "../../logic/traderRead"
 import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
 import { $WalletPuppet } from "./$WalletPuppet"
@@ -238,144 +235,144 @@ export const $WalletPage = (config: IWalletPageParams) => component((
 })
 
 
-function $ContributionTooling(config: IPageParams) {
-  return component((
-    [inputDepositAmount, inputDepositAmountTether]: Behavior<string, bigint>,
-    [submitContribute, submitContributeTether]: Behavior<walletLink.IWalletClient, any>,
+// function $ContributionTooling(config: IPageParams) {
+//   return component((
+//     [inputDepositAmount, inputDepositAmountTether]: Behavior<string, bigint>,
+//     [submitContribute, submitContributeTether]: Behavior<walletLink.IWalletClient, any>,
 
-    [inputBuybackAmount, inputBuybackAmountTether]: Behavior<string, bigint>,
-    [submitBuyback, submitBuybackTether]: Behavior<walletLink.IWalletClient, any>
+//     [inputBuybackAmount, inputBuybackAmountTether]: Behavior<string, bigint>,
+//     [submitBuyback, submitBuybackTether]: Behavior<walletLink.IWalletClient, any>
 
-  ) => {
+//   ) => {
 
-    const walletBalance = switchMap(async (walletQuery) => {
-      const wallet = await walletQuery
+//     const walletBalance = switchMap(async (walletQuery) => {
+//       const wallet = await walletQuery
 
-      if (wallet == null) {
-        return 0n
-      }
+//       if (wallet == null) {
+//         return 0n
+//       }
 
-      return readAddressTokenBalance(wallet, PUPPET.ARBITRUM_ADDRESS.USDC, wallet.account.address)
-    }, config.walletClientQuery)
+//       return readAddressTokenBalance(wallet, PUPPET.ARBITRUM_ADDRESS.USDC, wallet.account.address)
+//     }, config.walletClientQuery)
 
-    const contributedUsdcQuery = switchMap(async (walletClientQuery) => {
-      const wallet = await walletClientQuery
+//     const contributedUsdcQuery = switchMap(async (walletClientQuery) => {
+//       const wallet = await walletClientQuery
 
-      if (wallet == null) {
-        return 0n
-      }
+//       if (wallet == null) {
+//         return 0n
+//       }
 
-      return tokenomics.ContributeStore.getCursorBalance(wallet, PUPPET.ARBITRUM_ADDRESS.USDC)
-    }, config.walletClientQuery)
+//       return tokenomics.ContributeStore.getCursorBalance(wallet, PUPPET.ARBITRUM_ADDRESS.USDC)
+//     }, config.walletClientQuery)
 
-    const usdcBuybackQuote = map(async (walletClientQuery) => {
-      const wallet = await walletClientQuery
+//     const usdcBuybackQuote = map(async (walletClientQuery) => {
+//       const wallet = await walletClientQuery
 
-      if (wallet == null) {
-        return 0n
-      }
+//       if (wallet == null) {
+//         return 0n
+//       }
 
-      return tokenomics.ContributeStore.getBuybackQuote(wallet, PUPPET.ARBITRUM_ADDRESS.USDC)
-    }, config.walletClientQuery)
-
-
-
-
-    return [
-      $card(layoutSheet.spacingBig, style({ placeSelf: 'center', maxWidth: '600px', width: '100%', flex: 1 }))(
-        $heading2('Contribution Tooling (Testnet)'),
-        $seperator2,
-
-        $column(layoutSheet.spacing)(
-          $text('Contribute USDC to the Protocol'),
-          $FieldLabeled({
-            label: 'Amount',
-            placeholder: 'Enter amount',
-            hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, walletBalance),
-          })({
-            change: inputDepositAmountTether(map(value => {
-              return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
-            }))
-          })
-        ),
+//       return tokenomics.ContributeStore.getBuybackQuote(wallet, PUPPET.ARBITRUM_ADDRESS.USDC)
+//     }, config.walletClientQuery)
 
 
 
-        $SubmitBar({
-          spend: {
-            token: PUPPET.ARBITRUM_ADDRESS.USDC,
-            spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
-          },
-          txQuery: submitContribute,
-          walletClientQuery: config.walletClientQuery,
-          $submitContent: $text('User Contribute USDC'),
-        })({
-          // changeWallet: changeWalletTether(),
-          click: submitContributeTether(
-            snapshot(async (params, wallet) => {
-              return walletLink.writeContract({
-                ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).StubPublicContribute,
-                walletClient: wallet,
-                functionName: 'contribute',
-                args: [PUPPET.ARBITRUM_ADDRESS.USDC, params.inputDepositAmount] as const
-              })
-            }, combineObject({ inputDepositAmount }))
-          )
-        }),
 
-        $seperator2,
-        $text('Swap your PUPPET tokens in return for USDC accrued from contributions'),
+//     return [
+//       $card(layoutSheet.spacingBig, style({ placeSelf: 'center', maxWidth: '600px', width: '100%', flex: 1 }))(
+//         $heading2('Contribution Tooling (Testnet)'),
+//         $seperator2,
 
-        $infoLabeledValue(
-          $text('Accrued USDC for sale'),
-          $text(map(amount => `${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, contributedUsdcQuery))
-        ),
-        $infoLabeledValue(
-          $text('Offered Quote'),
-          $intermediateText(
-            map(async (durationQuery) => {
-              return readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await durationQuery)
-            }, usdcBuybackQuote)
-          )
-        ),
-
-        $column(layoutSheet.spacing)(
-          $FieldLabeled({
-            label: 'Amount',
-            placeholder: 'Enter amount'
-          })({
-            change: inputBuybackAmountTether(map(value => {
-              return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, parseReadableNumber(value))
-            }))
-          })
-        ),
-
-        $SubmitBar({
-          spend: {
-            token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
-            spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
-          },
-          txQuery: submitBuyback,
-          walletClientQuery: config.walletClientQuery,
-          $submitContent: $text('Buyback'),
-        })({
-          // changeWallet: changeWalletTether(),
-          click: submitBuybackTether(
-            snapshot(async (params, wallet) => {
-
-              return walletLink.writeContract({
-                ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter,
-                walletClient: wallet,
-                functionName: 'buyback',
-                args: [PUPPET.ARBITRUM_ADDRESS.USDC, wallet.account.address, params.inputBuybackAmount]
-              })
-            }, combineObject({ inputBuybackAmount }))
-          )
-        })
+//         $column(layoutSheet.spacing)(
+//           $text('Contribute USDC to the Protocol'),
+//           $FieldLabeled({
+//             label: 'Amount',
+//             placeholder: 'Enter amount',
+//             hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, walletBalance),
+//           })({
+//             change: inputDepositAmountTether(map(value => {
+//               return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
+//             }))
+//           })
+//         ),
 
 
-      ),
-    ]
-  })
-}
+
+//         $SubmitBar({
+//           spend: {
+//             token: PUPPET.ARBITRUM_ADDRESS.USDC,
+//             spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+//           },
+//           txQuery: submitContribute,
+//           walletClientQuery: config.walletClientQuery,
+//           $submitContent: $text('User Contribute USDC'),
+//         })({
+//           // changeWallet: changeWalletTether(),
+//           click: submitContributeTether(
+//             snapshot(async (params, wallet) => {
+//               return walletLink.writeContract({
+//                 ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).StubPublicContribute,
+//                 walletClient: wallet,
+//                 functionName: 'contribute',
+//                 args: [PUPPET.ARBITRUM_ADDRESS.USDC, params.inputDepositAmount] as const
+//               })
+//             }, combineObject({ inputDepositAmount }))
+//           )
+//         }),
+
+//         $seperator2,
+//         $text('Swap your PUPPET tokens in return for USDC accrued from contributions'),
+
+//         $infoLabeledValue(
+//           $text('Accrued USDC for sale'),
+//           $text(map(amount => `${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, contributedUsdcQuery))
+//         ),
+//         $infoLabeledValue(
+//           $text('Offered Quote'),
+//           $intermediateText(
+//             map(async (durationQuery) => {
+//               return readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await durationQuery)
+//             }, usdcBuybackQuote)
+//           )
+//         ),
+
+//         $column(layoutSheet.spacing)(
+//           $FieldLabeled({
+//             label: 'Amount',
+//             placeholder: 'Enter amount'
+//           })({
+//             change: inputBuybackAmountTether(map(value => {
+//               return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, parseReadableNumber(value))
+//             }))
+//           })
+//         ),
+
+//         $SubmitBar({
+//           spend: {
+//             token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
+//             spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+//           },
+//           txQuery: submitBuyback,
+//           walletClientQuery: config.walletClientQuery,
+//           $submitContent: $text('Buyback'),
+//         })({
+//           // changeWallet: changeWalletTether(),
+//           click: submitBuybackTether(
+//             snapshot(async (params, wallet) => {
+
+//               return walletLink.writeContract({
+//                 ...getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter,
+//                 walletClient: wallet,
+//                 functionName: 'buyback',
+//                 args: [PUPPET.ARBITRUM_ADDRESS.USDC, wallet.account.address, params.inputBuybackAmount]
+//               })
+//             }, combineObject({ inputBuybackAmount }))
+//           )
+//         })
+
+
+//       ),
+//     ]
+//   })
+// }
 
