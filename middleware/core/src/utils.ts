@@ -240,7 +240,6 @@ export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
 }
 
 
-
 export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
   if (supply === 0n || amount == 0n) return amount
 
@@ -250,5 +249,26 @@ export function getPortion(supply: bigint, share: bigint, amount: bigint): bigin
     return amount * share / supply
   }
 }
+
+
+export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+  return viem.keccak256(
+    viem.encodeAbiParameters(
+      viem.parseAbiParameters('address, address, address'),
+      [collateralToken, puppet, trader]
+    )
+  )
+}
+export function getAllocationKey(matchKey: viem.Hex, cursor: bigint) {
+  return viem.keccak256(
+    viem.encodeAbiParameters(
+      viem.parseAbiParameters('bytes32, uint'),
+      [matchKey, cursor]
+    )
+  )
+}
+
+
+
 
 

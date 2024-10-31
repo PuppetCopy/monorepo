@@ -126,18 +126,6 @@ export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, 
   )
 }
 
-export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
-  return hashData(
-    ["address", "address", "address"],
-    [collateralToken, puppet, trader]
-  )
-}
-export function getAllocationKey(matchKey: viem.Hex, cursor: bigint) {
-  return hashData(
-    ["bytes32", "uint"],
-    [matchKey, cursor]
-  )
-}
 
 export function hashData(types: string[], values: any) {
   const params = viem.parseAbiParameters(types)
