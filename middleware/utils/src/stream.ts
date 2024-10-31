@@ -98,6 +98,7 @@ export interface IPeriodRun<T> {
 
 export const filterNull = <T>(prov: Stream<T | null>) => filter((provider): provider is T => provider !== null, prov)
 
+export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 
 export const periodicRun = <T>({ actionOp, interval = 1000, startImmediate = true, recoverError = true }: IPeriodRun<T>): Stream<T> => {
   const tickDelay = at(interval, null)

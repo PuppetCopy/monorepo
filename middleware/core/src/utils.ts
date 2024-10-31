@@ -1,6 +1,6 @@
-import { factor, getMappedValue } from "common-utils"
+import { factor, getMappedValue, unixTimestampNow } from "common-utils"
 import * as viem from "viem"
-import { IPositionListSummary, IPosition, IPositionDecrease, IPositionIncrease, IPuppetPosition } from "./types.js"
+import { IPositionListSummary, IPosition, IPositionDecrease, IPositionIncrease, IPuppetPosition, IVested } from "./types.js"
 import { getMarketIndexToken, getTokenDescription, IPriceCandle, IPricefeedMap, OrderType } from "gmx-middleware"
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
@@ -251,6 +251,23 @@ export function getPortion(supply: bigint, share: bigint, amount: bigint): bigin
 }
 
 
+export function getVestingCursor(vested: IVested): IVested {
+  const now = BigInt(unixTimestampNow())
+  const timeElapsed = now - vested.lastAccruedTime
+  const accruedDelta = timeElapsed >= vested.remainingDuration
+    ? vested.amount
+    : timeElapsed * vested.amount / vested.remainingDuration
+
+  vested.remainingDuration = timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
+  vested.amount -= accruedDelta
+  vested.accrued += accruedDelta
+
+  vested.lastAccruedTime = now
+
+  return vested
+}
+
+
 export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
   return viem.keccak256(
     viem.encodeAbiParameters(
@@ -259,11 +276,12 @@ export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address,
     )
   )
 }
-export function getAllocationKey(matchKey: viem.Hex, cursor: bigint) {
+
+export function getAllocationKey(matchKey: viem.Hex, positionKey: viem.Hex) {
   return viem.keccak256(
     viem.encodeAbiParameters(
-      viem.parseAbiParameters('bytes32, uint'),
-      [matchKey, cursor]
+      viem.parseAbiParameters('bytes32, bytes32'),
+      [matchKey, positionKey]
     )
   )
 }

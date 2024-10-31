@@ -1,5 +1,5 @@
 import { IPriceCandle } from "gmx-middleware"
-import { IMatchRouteStats, IGbcToken, IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IProfile, IMatchRoute, IMatchRule } from "./types.js"
+import { IMatchRouteStats, IGbcToken, IOrderCreated, IPositionDecrease, IPositionFeesCollected, IPositionIncrease, IProfile, IMatchRoute, IMatchRule, IAllocation, IPuppetAllocation, IPuppetSettlement, ISettlement } from "./types.js"
 import { graph } from "common-utils"
 
 
@@ -13,6 +13,8 @@ const profile: graph.ISchema<IProfile> = {
   gbcTokenList: gbcToken,
   __typename: 'Profile',
 }
+
+
 
 const orderCreated: graph.ISchema<IOrderCreated> = {
   id: 'string',
@@ -263,7 +265,73 @@ const routeMatchStats: graph.ISchema<IMatchRouteStats> = {
   __typename: 'MatchRouteStats',
 }
 
+const puppetAllocation: graph.ISchema<IPuppetAllocation> = {
+  id: 'string',
+  puppet: 'address',
+  collateralToken: 'address',
+  matchKey: 'string',
+  originRequestKey: 'string',
+
+  activityThrottle: 'bigint',
+  amount: 'bigint',
+
+  __typename: 'PuppetAllocation',
+}
+
+const allocation: graph.ISchema<IAllocation> = {
+  id: 'address',
+  collateralToken: 'address',
+  originRequestKey: 'address',
+  matchKey: 'address',
+  puppetListHash: 'address',
+
+  matchSequenceId: 'bigint',
+  transactionCost: 'bigint',
+  totalAllocated: 'bigint',
+
+  allocationList: puppetAllocation,
+
+  __typename: 'Allocation',
+}
+
+const puppetSettlement: graph.ISchema<IPuppetSettlement> = {
+  id: 'string',
+  puppet: 'address',
+  collateralToken: 'address',
+  matchKey: 'string',
+
+  contribution: 'bigint',
+  amount: 'bigint',
+
+  __typename: 'PuppetSettlement',
+}
+
+
+const settlement: graph.ISchema<ISettlement> = {
+  id: 'string',
+  puppet: 'address',
+  collateralToken: 'address',
+  matchKey: 'string',
+
+  allocated: 'bigint',
+  settled: 'bigint',
+  puppetContribution: 'bigint',
+  traderPerformanceContribution: 'bigint',
+  transactionCost: 'bigint',
+  profit: 'bigint',
+
+
+  allocate: allocation,
+  settlementList: puppetSettlement,
+
+  blockNumber: 'number',
+  blockTimestamp: 'number',
+  transactionHash: 'string',
+
+  __typename: 'Settlement',
+}
 
 export const schema = {
-  priceCandle, routeMatchStats, matchRule, positionIncrease, positionDecrease, orderCreated, positionCollectedUpdate
+  priceCandle, routeMatchStats, matchRule, positionIncrease, positionDecrease, orderCreated, positionCollectedUpdate,
+  allocation, puppetAllocation, settlement, puppetSettlement,
 }

@@ -109,23 +109,12 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
   return Number(blockNumber * 1000000n)
 }
 
-
-
-
 export function getPositionKey(account: viem.Address, market: viem.Address, collateralToken: viem.Address, isLong: boolean) {
   return hashData(
     ["address", "address", "address", "bool"],
     [account, market, collateralToken, isLong]
   )
 }
-
-export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
-  return hashData(
-    ["address", "address", "address"],
-    [collateralToken, puppet, trader]
-  )
-}
-
 
 export function hashData(types: string[], values: any) {
   const params = viem.parseAbiParameters(types)

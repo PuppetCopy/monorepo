@@ -33,6 +33,12 @@ export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollecte
   uiFeeAmount: bigint
 }
 
+export interface IVested {
+  amount: bigint
+  remainingDuration: bigint
+  lastAccruedTime: bigint
+  accrued: bigint
+}
 
 export interface IOrderCreated extends ILogTypeId<'OrderCreated'> {
   key: viem.Hex
@@ -228,11 +234,6 @@ export interface IDepositBalance extends ILogTypeId<'DepositBalance'> {
   account: viem.Address
 }
 
-export interface IAllocate extends ILogTypeId<'Allocate'> {
-  id: viem.Address
-  puppet: viem.Address
-}
-
 export interface IAccountBalance extends ILogTypeId<'AccountBalance'> {
   id: viem.Address
   account: viem.Address
@@ -240,19 +241,63 @@ export interface IAccountBalance extends ILogTypeId<'AccountBalance'> {
   value: bigint
 }
 
-export interface IAllocation extends ILogTypeId<'Allocation'> {
+export interface IPuppetAllocation extends ILogTypeId<'PuppetAllocation'> {
   id: viem.Address
+  puppet: viem.Address
   collateralToken: viem.Address
   matchKey: viem.Address
   originRequestKey: viem.Address
 
+  activityThrottle: bigint
   amount: bigint
+}
 
-  puppet: viem.Address
-  allocate: IAllocate
+export interface IAllocation extends ILogTypeId<'Allocation'> {
+  id: viem.Address
+  collateralToken: viem.Address
+  originRequestKey: viem.Address
+  matchKey: viem.Address
+  puppetListHash: viem.Address
+
+  matchSequenceId: bigint
+  transactionCost: bigint
+  totalAllocated: bigint
+
+  allocationList: IPuppetAllocation[]
   matchRoute: IMatchRoute
 }
 
+export interface IPuppetSettlement extends ILogTypeId<'PuppetSettlement'> {
+  id: viem.Address
+  puppet: viem.Address
+  collateralToken: viem.Address
+  matchKey: viem.Address
+
+  contribution: bigint
+  amount: bigint
+}
+
+export interface ISettlement extends ILogTypeId<'Settlement'> {
+  id: viem.Address
+  puppet: viem.Address
+  collateralToken: viem.Address
+  matchKey: viem.Address
+
+  allocated: bigint
+  settled: bigint
+  puppetContribution: bigint
+  traderPerformanceContribution: bigint
+  transactionCost: bigint
+  profit: bigint
+
+  allocate: IAllocation
+
+  settlementList: IPuppetSettlement[]
+
+  blockNumber: number
+  blockTimestamp: number
+  transactionHash: viem.Address
+}
 
 
 export interface IMatchRule extends ILogTypeId<'MatchRule'> {
@@ -266,6 +311,7 @@ export interface IMatchRule extends ILogTypeId<'MatchRule'> {
 
   routeMatch: IMatchRoute
 }
+
 
 
 export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
@@ -285,18 +331,6 @@ export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
 }
 
 
-export interface ISettlement extends ILogTypeId<'Settlement'> {
-  id: viem.Address
-  collateralToken: viem.Address
-  matchKey: viem.Address
-
-  contribution: bigint
-  amount: bigint
-
-  puppet: viem.Address
-  allocate: IAllocate
-}
-
 export interface ISettle extends ILogTypeId<'Settle'> {
   id: viem.Address
   collateralToken: viem.Address
@@ -310,7 +344,7 @@ export interface ISettle extends ILogTypeId<'Settle'> {
   profit: bigint
 
   puppet: viem.Address
-  allocate: IAllocate
+  allocate: IAllocation
 
   blockNumber: number
   blockTimestamp: number

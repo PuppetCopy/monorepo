@@ -58,7 +58,16 @@ export default [
       { name: "gmxFundsReciever", type: "address", internalType: "address" },
       { name: "gmxOrderVault", type: "address", internalType: "address" },
       { name: "referralCode", type: "bytes32", internalType: "bytes32" },
-      { name: "callbackGasLimit", type: "uint256", internalType: "uint256" },
+      {
+        name: "increaseCallbackGasLimit",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "decreaseCallbackGasLimit",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     stateMutability: "view",
   },

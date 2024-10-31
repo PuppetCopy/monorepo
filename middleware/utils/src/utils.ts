@@ -1,7 +1,7 @@
 import { curry2 } from "@most/prelude"
 import { BASIS_POINTS_DIVISOR, IntervalTime } from "puppet-const"
 import * as viem from "viem"
-import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription, IVested } from "./types.js"
+import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription } from "./types.js"
 export * as GraphQL from '@urql/core'
 
 
@@ -354,14 +354,6 @@ export function getDebankProfileUrl(account: viem.Address) {
 }
 
 
-
-
-
-
-
-
-
-
 export const timespanPassedSinceInvoke = (timespan: number) => {
   let lastTimePasses = unixTimestampNow()
 
@@ -458,6 +450,58 @@ export function getMappedValue<TMap extends object, TMapkey extends keyof TMap>(
 
 export function easeInExpo(x: number) {
   return x === 0 ? 0 : Math.pow(2, 10 * x - 10)
+}
+
+export function splitIntoChunkList<T>(
+  array: T[],
+  chunkSize: number
+): T[][];
+
+export function splitIntoChunkList<T, R>(
+  array: T[],
+  chunkSize: number,
+  mapFn: (item: T, index: number) => R
+): R[][];
+
+export function splitIntoChunkList<T, R>(
+  array: T[],
+  chunkSize: number,
+  mapFn?: (item: T, index: number) => R
+): T[][] | R[][] {
+  if (chunkSize <= 0) {
+    throw new Error("Chunk size must be a positive integer");
+  }
+
+  if (mapFn) {
+    const result: R[][] = [];
+    let chunk: R[] = [];
+    for (let i = 0; i < array.length; i++) {
+      const mappedItem = mapFn(array[i], i);
+      chunk.push(mappedItem);
+      if (chunk.length === chunkSize) {
+        result.push(chunk);
+        chunk = [];
+      }
+    }
+    if (chunk.length > 0) {
+      result.push(chunk);
+    }
+    return result;
+  } else {
+    const result: T[][] = [];
+    let chunk: T[] = [];
+    for (let i = 0; i < array.length; i++) {
+      chunk.push(array[i]);
+      if (chunk.length === chunkSize) {
+        result.push(chunk);
+        chunk = [];
+      }
+    }
+    if (chunk.length > 0) {
+      result.push(chunk);
+    }
+    return result;
+  }
 }
 
 
@@ -619,21 +663,4 @@ export function getShortHash(name: string, obj: any) {
   }
 
   return `${name}-${hash.toString(16)}`
-}
-
-
-export function getVestingCursor(vested: IVested): IVested {
-  const now = BigInt(unixTimestampNow())
-  const timeElapsed = now - vested.lastAccruedTime
-  const accruedDelta = timeElapsed >= vested.remainingDuration
-    ? vested.amount
-    : timeElapsed * vested.amount / vested.remainingDuration
-
-  vested.remainingDuration = timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
-  vested.amount -= accruedDelta
-  vested.accrued += accruedDelta
-
-  vested.lastAccruedTime = now
-
-  return vested
 }

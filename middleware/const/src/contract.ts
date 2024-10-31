@@ -26,6 +26,7 @@ import tokenomicsRouter from "./abi/tokenomicsRouter.js";
 import votingEscrowLogic from "./abi/votingEscrowLogic.js";
 import votingEscrowStore from "./abi/votingEscrowStore.js";
 import unhandledCallbackLogic from "./unhandledCallbackLogic";
+import gmxEventEmitter from "./abi/gmxEventEmitter";
 
 export const CONTRACT = {
   [arbitrum.id]: {
@@ -140,7 +141,7 @@ export const CONTRACT = {
     },
     EventEmitter: {
       address: "0xC8ee91A54287DB53897056e12D9819156D3822Fb",
-      abi: eventEmitter,
+      abi: gmxEventEmitter,
     },
     CustomError: {
       abi: customError,

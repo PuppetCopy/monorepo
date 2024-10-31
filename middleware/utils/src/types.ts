@@ -1,3 +1,7 @@
+import { Stream } from "@most/types";
+
+export type InferStream<T> = T extends Stream<infer U> ? U : T;
+
 export interface IRequestPagePositionApi {
   offset: number
   pageSize: number
@@ -29,11 +33,3 @@ export interface ITokenDescription {
   denominator: bigint
 }
 
-
-
-export interface IVested {
-  amount: bigint
-  remainingDuration: bigint
-  lastAccruedTime: bigint
-  accrued: bigint
-}

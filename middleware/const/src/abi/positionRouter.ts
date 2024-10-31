@@ -10,7 +10,7 @@ export default [
       {
         name: "_positionStore",
         type: "address",
-        internalType: "contract PositionStore",
+        internalType: "contract MirrorPositionStore",
       },
     ],
     stateMutability: "nonpayable",
@@ -379,6 +379,7 @@ export default [
         internalType: "contract IERC20",
       },
       { name: "sourceRequestKey", type: "bytes32", internalType: "bytes32" },
+      { name: "positionKey", type: "bytes32", internalType: "bytes32" },
       { name: "matchKey", type: "bytes32", internalType: "bytes32" },
       { name: "puppetList", type: "address[]", internalType: "address[]" },
     ],
@@ -486,6 +487,13 @@ export default [
   },
   {
     type: "function",
+    name: "multicall",
+    inputs: [{ name: "data", type: "bytes[]", internalType: "bytes[]" }],
+    outputs: [{ name: "results", type: "bytes[]", internalType: "bytes[]" }],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "setConfig",
     inputs: [{ name: "data", type: "bytes", internalType: "bytes" }],
     outputs: [],
@@ -513,6 +521,12 @@ export default [
     stateMutability: "nonpayable",
   },
   { type: "event", name: "EIP712DomainChanged", inputs: [], anonymous: false },
+  {
+    type: "error",
+    name: "AddressEmptyCode",
+    inputs: [{ name: "target", type: "address", internalType: "address" }],
+  },
+  { type: "error", name: "FailedInnerCall", inputs: [] },
   { type: "error", name: "InvalidShortString", inputs: [] },
   { type: "error", name: "Permission__Unauthorized", inputs: [] },
   { type: "error", name: "ReentrancyGuardReentrantCall", inputs: [] },
