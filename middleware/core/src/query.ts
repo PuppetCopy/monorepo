@@ -154,6 +154,64 @@ export function queryMatchRoute<TStateParams extends StateParams<IQueryMatchRout
   )
 }
 
+export function queryMatchRoute<TStateParams extends StateParams<IQueryMatchRouteParams>>(
+  subgraphClient: Client,
+  queryParams: TStateParams
+) {
+  return map(async filterParams => {
+    const filter: graph.IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
+
+    if (filterParams.account) {
+      filter.account = {
+        _eq: `"${filterParams.account}"`
+      }
+    }
+
+
+    const orFilters = []
+
+    if (filterParams.selectedCollateralTokenList) {
+      orFilters.push(
+        ...filterParams.selectedCollateralTokenList.map(token => ({
+          collateralToken: {
+            _eq: `"${token}"`
+          }
+        }))
+      )
+    }
+
+    if (filterParams.activityTimeframe) {
+      const timestampFilter = unixTimestampNow() - filterParams.activityTimeframe
+      orFilters.push({
+        blockTimestamp: {
+          _gte: timestampFilter
+        }
+      })
+    }
+
+    if (orFilters.length) {
+      filter._or = orFilters
+    }
+
+    const queryIncreaseList = graph.querySubgraph(subgraphClient, {
+      schema: schema.positionIncrease,
+      filter: filter,
+      orderBy: {
+        blockTimestamp: 'desc'
+      }
+    })
+
+    const queryDecreaseList = graph.querySubgraph(subgraphClient, {
+      schema: schema.positionDecrease,
+      filter: filter,
+    })
+
+    return aggregatePositionList([...await queryIncreaseList, ...await queryDecreaseList]).sort((a, b) => b.openTimestamp - a.openTimestamp)
+  },
+    combineState(queryParams)
+  )
+}
+
 export interface IQueryLeaderboardParams {
   account?: viem.Address
   activityTimeframe?: IntervalTime
