@@ -7,7 +7,7 @@ import { Stream, Time } from "@most/types"
 import { getMappedValue, pagingQuery, readablePnl } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "puppet-const"
-import { IMatchRouteStats, IPositionDecrease, IPositionIncrease, queryAccountLastAggregatedStats } from "puppet-middleware"
+import { IMatchRouteStats, IPositionDecrease, IPositionIncrease, queryMatchRouteStats } from "puppet-middleware"
 import {
   $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
   $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
@@ -36,7 +36,6 @@ export interface ILeaderboardMatchStats extends IMatchRouteStats {
 
 
 interface ILeaderboard extends IUserActivityPageParams {
-  matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
 
 export const $Leaderboard = (config: ILeaderboard) => component((
@@ -57,12 +56,12 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
 
-  const accountStatsList = queryAccountLastAggregatedStats(subgraphClient, { activityTimeframe, sortBy, collateralTokenList: selectedCollateralTokenList })
+  const routeStatsList = queryMatchRouteStats(subgraphClient, { activityTimeframe, sortBy, collateralTokenList: selectedCollateralTokenList })
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
     const activityTimeframe = pageParams.activityTimeframe
-    const accountStatsListData = await pageParams.accountStatsList
+    const accountStatsListData = await pageParams.routeStatsList
     const accountStatsList: ILeaderboardMatchStats[] = accountStatsListData
       .map(stats => {
         const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => {
@@ -92,7 +91,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
       .filter(pos => pos !== null)
 
     return { accountStatsList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
-  }, combineObject({ sortBy, accountStatsList, pricefeedMapQuery, activityTimeframe, isLong }))
+  }, combineObject({ sortBy, routeStatsList, pricefeedMapQuery, activityTimeframe, isLong }))
 
 
 

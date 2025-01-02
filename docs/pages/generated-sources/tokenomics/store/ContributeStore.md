@@ -1,5 +1,5 @@
 # ContributeStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/store/ContributeStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/store/ContributeStore.sol)
 
 **Inherits:**
 BankStore
@@ -67,7 +67,9 @@ constructor(IAuthority _authority, Router _router) BankStore(_authority, _router
 
 
 ```solidity
-function getBuybackQuote(IERC20 _token) external view returns (uint);
+function getBuybackQuote(
+    IERC20 _token
+) external view returns (uint);
 ```
 
 ### setBuybackQuote
@@ -81,7 +83,9 @@ function setBuybackQuote(IERC20 _token, uint _value) external auth;
 
 
 ```solidity
-function getCursor(IERC20 _token) external view returns (uint);
+function getCursor(
+    IERC20 _token
+) external view returns (uint);
 ```
 
 ### setCursor
@@ -95,7 +99,9 @@ function setCursor(IERC20 _token, uint _value) external auth;
 
 
 ```solidity
-function getCursorBalance(IERC20 _token) external view returns (uint);
+function getCursorBalance(
+    IERC20 _token
+) external view returns (uint);
 ```
 
 ### setCursorBalance
@@ -133,44 +139,41 @@ function getUserCursor(IERC20 _token, address _user) external view returns (uint
 function setUserCursor(IERC20 _token, address _user, uint _value) external auth;
 ```
 
-### getUserContributionBalanceMap
+### getUserContributionBalance
 
 
 ```solidity
-function getUserContributionBalanceMap(IERC20 _token, address _user) external view returns (uint);
+function getUserContributionBalance(IERC20 _token, address _user) external view returns (uint);
 ```
 
-### setUserContributionBalanceMap
+### setUserContributionBalance
 
 
 ```solidity
-function setUserContributionBalanceMap(IERC20 _token, address _user, uint _value) external auth;
+function setUserContributionBalance(IERC20 _token, address _user, uint _value) external auth;
 ```
 
 ### contribute
 
 
 ```solidity
-function contribute(IERC20 _token, address _depositor, address _user, uint _amount) external auth;
+function contribute(IERC20 _token, address _user, uint _amount) external auth;
 ```
 
 ### contributeMany
 
 
 ```solidity
-function contributeMany(
-    IERC20 _token,
-    address _depositor,
-    address[] calldata _userList,
-    uint[] calldata _valueList
-) external auth;
+function contributeMany(IERC20 _token, address[] calldata _userList, uint[] calldata _valueList) external auth;
 ```
 
 ### getUserAccruedReward
 
 
 ```solidity
-function getUserAccruedReward(address _user) external view returns (uint);
+function getUserAccruedReward(
+    address _user
+) external view returns (uint);
 ```
 
 ### setUserAccruedReward
@@ -230,12 +233,5 @@ function updateCursorRewardList(IERC20[] calldata _tokenList, address _user) ext
 
 ```solidity
 function updateCursorReward(IERC20 _token, address _user) public auth;
-```
-
-## Errors
-### RewardStore__InvalidLength
-
-```solidity
-error RewardStore__InvalidLength();
 ```
 

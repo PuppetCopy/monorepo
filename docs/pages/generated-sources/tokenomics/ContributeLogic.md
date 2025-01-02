@@ -1,5 +1,5 @@
 # ContributeLogic
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/ContributeLogic.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/ContributeLogic.sol)
 
 **Inherits:**
 CoreContract
@@ -11,12 +11,12 @@ PUPPET token sold, enabling users to claim PUPPET rewards proportionate to their
 
 
 ## State Variables
-### config
-The configuration parameters for the ContributeLogic
+### store
+The RewardStore contract used for tracking reward accruals
 
 
 ```solidity
-Config public config;
+ContributeStore immutable store;
 ```
 
 
@@ -29,12 +29,12 @@ IERC20Mintable public immutable rewardToken;
 ```
 
 
-### store
-The RewardStore contract used for tracking reward accruals
+### config
+The configuration parameters for the ContributeLogic
 
 
 ```solidity
-ContributeStore public immutable store;
+Config public config;
 ```
 
 
@@ -59,11 +59,9 @@ function getClaimable(IERC20[] calldata tokenList, address user) external view r
 ```solidity
 constructor(
     IAuthority _authority,
-    EventEmitter _eventEmitter,
     IERC20Mintable _rewardToken,
-    ContributeStore _store,
-    Config memory _config
-) CoreContract("ContributeLogic", "1", _authority, _eventEmitter);
+    ContributeStore _store
+) CoreContract("ContributeLogic", "1", _authority);
 ```
 
 ### buyback
@@ -124,52 +122,22 @@ function setBuybackQuote(IERC20 token, uint value) external auth;
 |`value`|`uint256`|The value of the buyback quote.|
 
 
-### setConfig
-
-Set the mint rate limit for the token.
-
-
-```solidity
-function setConfig(Config calldata _config) external auth;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new rate limit configuration.|
-
-
 ### _setConfig
 
-*Internal function to set the configuration.*
+Set the configuration parameters for the ContributeLogic contract.
 
 
 ```solidity
-function _setConfig(Config memory _config) internal;
+function _setConfig(
+    bytes calldata data
+) internal override;
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
-|`_config`|`Config`|The configuration to set.|
+|`data`|`bytes`|The new configuration parameters.|
 
-
-## Errors
-### ContributeLogic__InvalidBuybackToken
-Error emitted when the claim token is invalid
-
-
-```solidity
-error ContributeLogic__InvalidBuybackToken();
-```
-
-### ContributeLogic__InsufficientClaimableReward
-Error emitted when the claimable reward is insufficient
-
-
-```solidity
-error ContributeLogic__InsufficientClaimableReward(uint accruedReward);
-```
 
 ## Structs
 ### Config

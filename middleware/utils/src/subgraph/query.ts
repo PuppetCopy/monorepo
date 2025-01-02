@@ -7,6 +7,8 @@ export type GqlType<T extends string> = { __typename: T }
 type PackedAbiType =
   | 'string'
   | 'string[]'
+  | 'bytes'
+  | 'bytes[]'
   | 'number'
   | 'number[]'
   | 'bigint'
@@ -79,9 +81,9 @@ export interface IQuerySubgraph<
   filter?: TQueryFilter
   startBlock?: bigint
 
-  first?: number
+  limit?: number
   skip?: number
-  orderBy?: IQueryOrderBy<Type>
+  sortBy?: IQueryOrderBy<Type>
 }
 
 
@@ -100,9 +102,10 @@ export const querySubgraph = <
   }
 
   const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
-  const orderByFilterParam = params.orderBy ? parseFilterObject({ order_by: params.orderBy }) : ''
+  const orderByFilterParam = params.sortBy ? parseFilterObject({ order_by: params.sortBy }) : ''
   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
-  const filter = orderByFilterParam || whereClause ? `( ${orderByFilterParam} ${whereClause})` : ''
+  const limit = params.limit ? `limit: ${params.limit},` : ''
+  const filter = whereClause ? `(${limit}, ${orderByFilterParam} ${whereClause})` : ''
 
   const entry = `${typename}${filter} { ${fieldStructure} }`
 

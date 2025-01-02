@@ -2,15 +2,48 @@ import { ILogTxType, ILogTypeId } from "gmx-middleware"
 import * as viem from "viem"
 
 
+// type PositionFeesCollected {
+//   id: Bytes!
+//   positionKey: Bytes!
+
+//   referralCode: Bytes!
+//   affiliate: Bytes!
+
+//   collateralTokenPriceMin: BigInt!
+//   collateralTokenPriceMax: BigInt!
+//   tradeSizeUsd: BigInt!
+//   fundingFeeAmount: BigInt!
+//   claimableLongTokenAmount: BigInt!
+//   claimableShortTokenAmount: BigInt!
+//   latestFundingFeeAmountPerSize: BigInt!
+//   latestLongTokenClaimableFundingAmountPerSize: BigInt!
+//   latestShortTokenClaimableFundingAmountPerSize: BigInt!
+//   borrowingFeeUsd: BigInt!
+//   borrowingFeeAmount: BigInt!
+//   borrowingFeeReceiverFactor: BigInt!
+//   borrowingFeeAmountForFeeReceiver: BigInt!
+//   positionFeeFactor: BigInt!
+//   protocolFeeAmount: BigInt!
+//   positionFeeReceiverFactor: BigInt!
+//   feeReceiverAmount: BigInt!
+//   feeAmountForPool: BigInt!
+//   positionFeeAmountForPool: BigInt!
+//   positionFeeAmount: BigInt!
+//   totalCostAmount: BigInt!
+//   uiFeeReceiverFactor: BigInt!
+//   uiFeeAmount: BigInt!
+
+// }
+
 export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollected'> {
   affiliate: viem.Address
+  referralCode: viem.Address
   positionKey: viem.Address
+  
 
-  totalRebateFactor: bigint
-  traderDiscountFactor: bigint
-  totalRebateAmount: bigint
-  traderDiscountAmount: bigint
-  affiliateRewardAmount: bigint
+  collateralTokenPriceMin: bigint
+  collateralTokenPriceMax: bigint
+  tradeSizeUsd: bigint
   fundingFeeAmount: bigint
   claimableLongTokenAmount: bigint
   claimableShortTokenAmount: bigint
@@ -182,15 +215,15 @@ export interface IPosition {
   collateralInUsd: bigint
   realisedPnlUsd: bigint
 
-  cumulativeSizeToken: bigint
-  cumulativeSizeUsd: bigint
-  cumulativeCollateralToken: bigint
-  cumulativeCollateralUsd: bigint
+  // cumulativeCollateralToken: bigint
+  // cumulativeCollateralUsd: bigint
+  // cumulativeSizeToken: bigint
+  // cumulativeSizeUsd: bigint
 
-  maxSizeInUsd: bigint
   maxSizeInTokens: bigint
-  maxCollateralInUsd: bigint
+  maxSizeInUsd: bigint
   maxCollateralInTokens: bigint
+  maxCollateralInUsd: bigint
 
   avgEntryPrice: bigint
 
@@ -314,6 +347,7 @@ export interface IMatchRule extends ILogTypeId<'MatchRule'> {
 
 
 
+
 export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
   id: viem.Address
   collateralToken: viem.Address
@@ -322,6 +356,33 @@ export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
 
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
+
+
+  // increaseList: {
+  //   market: viem.Address
+  //   positionKey: viem.Hex
+  //   collateralAmount: bigint
+  //   collateralInUsd: bigint
+  //   sizeInTokens: bigint
+  //   sizeInUsd: bigint
+  //   indexTokenPriceMax: bigint
+  //   isLong: boolean
+  //   blockTimestamp: number,
+  //   __typename: 'PositionIncrease'
+  // },
+  // decreaseList: {
+  //   market: viem.Address
+  //   positionKey: viem.Hex
+  //   collateralAmount: bigint
+  //   collateralInUsd: bigint
+  //   sizeInTokens: bigint
+  //   sizeInUsd: bigint
+  //   indexTokenPriceMax: bigint
+  //   basePnlUsd: bigint
+  //   isLong: boolean
+  //   blockTimestamp: number
+  //   __typename: 'PositionDecrease'
+  // },
 
   matchRuleList: IMatchRule[]
   allocationList: IAllocation[]

@@ -1,5 +1,5 @@
 # PuppetLogic
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/puppet/PuppetLogic.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/puppet/PuppetLogic.sol)
 
 **Inherits:**
 CoreContract
@@ -9,14 +9,14 @@ CoreContract
 ### config
 
 ```solidity
-Config config;
+Config public config;
 ```
 
 
 ### store
 
 ```solidity
-PuppetStore store;
+PuppetStore immutable store;
 ```
 
 
@@ -25,154 +25,74 @@ PuppetStore store;
 
 
 ```solidity
-constructor(
-    IAuthority _authority,
-    EventEmitter _eventEmitter,
-    PuppetStore _store,
-    Config memory _config
-) CoreContract("PuppetLogic", "1", _authority, _eventEmitter);
+constructor(IAuthority _authority, PuppetStore _store) CoreContract("PuppetLogic", "1", _authority);
 ```
 
 ### deposit
 
 
 ```solidity
-function deposit(IERC20 token, address user, uint amount) external auth;
+function deposit(IERC20 collateralToken, address user, uint amount) external auth;
 ```
 
 ### withdraw
 
 
 ```solidity
-function withdraw(IERC20 token, address user, address receiver, uint amount) external auth;
+function withdraw(IERC20 collateralToken, address user, address receiver, uint amount) external auth;
 ```
 
-### setRule
+### setMatchRule
 
 
 ```solidity
-function setRule(
+function setMatchRule(
     IERC20 collateralToken,
+    PuppetStore.MatchRule calldata ruleParams,
     address puppet,
-    address trader,
-    PuppetStore.AllocationRule calldata ruleParams
+    address trader
 ) external auth;
 ```
 
-### setRuleList
+### setMatchRuleList
 
 
 ```solidity
-function setRuleList(
-    address puppet,
-    address[] calldata traderList,
+function setMatchRuleList(
     IERC20[] calldata collateralTokenList,
-    PuppetStore.AllocationRule[] calldata ruleParams
+    address[] calldata traderList,
+    PuppetStore.MatchRule[] calldata ruleParamList,
+    address puppet
 ) external auth;
 ```
 
-### _setRule
+### validatePuppetTokenAllowance
 
 
 ```solidity
-function _setRule(
-    PuppetStore.AllocationRule memory storedRule,
-    PuppetStore.AllocationRule calldata ruleParams
-) internal view returns (PuppetStore.AllocationRule memory);
+function validatePuppetTokenAllowance(IERC20 token, address puppet, uint deltaAmount) internal view returns (uint);
 ```
 
-### isArrayContains
+### _validateRuleParams
 
 
 ```solidity
-function isArrayContains(IERC20[] memory array, IERC20 value) internal pure returns (bool);
+function _validateRuleParams(
+    PuppetStore.MatchRule memory ruleParams
+) internal view;
 ```
-
-### _validatePuppetTokenAllowanceList
-
-
-```solidity
-function _validatePuppetTokenAllowanceList(IERC20[] memory tokenList, address puppet) internal view;
-```
-
-### _validatePuppetTokenAllowance
-
-
-```solidity
-function _validatePuppetTokenAllowance(IERC20 token, address puppet) internal view returns (uint);
-```
-
-### setConfig
-
-Set the mint rate limit for the token.
-
-
-```solidity
-function setConfig(Config calldata _config) external auth;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new rate limit configuration.|
-
 
 ### _setConfig
 
-*Internal function to set the configuration.*
+Sets the configuration parameters for the PuppetLogic contract.
+
+*Emits a SetConfig event upon successful execution*
 
 
 ```solidity
-function _setConfig(Config memory _config) internal;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The configuration to set.|
-
-
-## Errors
-### PuppetLogic__InvalidAllowanceRate
-
-```solidity
-error PuppetLogic__InvalidAllowanceRate(uint min, uint max);
-```
-
-### PuppetLogic__ExpiredDate
-
-```solidity
-error PuppetLogic__ExpiredDate();
-```
-
-### PuppetLogic__NotFound
-
-```solidity
-error PuppetLogic__NotFound();
-```
-
-### PuppetLogic__TokenNotAllowed
-
-```solidity
-error PuppetLogic__TokenNotAllowed();
-```
-
-### PuppetLogic__AllowanceAboveLimit
-
-```solidity
-error PuppetLogic__AllowanceAboveLimit(uint allowanceCap);
-```
-
-### PuppetLogic__InvalidAmount
-
-```solidity
-error PuppetLogic__InvalidAmount();
-```
-
-### PuppetLogic__InsufficientBalance
-
-```solidity
-error PuppetLogic__InsufficientBalance();
+function _setConfig(
+    bytes calldata data
+) internal override;
 ```
 
 ## Structs
@@ -183,6 +103,10 @@ struct Config {
     uint minExpiryDuration;
     uint minAllowanceRate;
     uint maxAllowanceRate;
+    uint minAllocationActivity;
+    uint maxAllocationActivity;
+    IERC20[] tokenAllowanceList;
+    uint[] tokenAllowanceAmountList;
 }
 ```
 

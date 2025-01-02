@@ -47,16 +47,16 @@ const orderCreated: graph.ISchema<IOrderCreated> = {
   __typename: 'OrderCreated',
 }
 
+
+
 const positionCollectedUpdate: graph.ISchema<IPositionFeesCollected> = {
   id: 'string',
   positionKey: 'string',
   affiliate: 'address',
 
-  totalRebateFactor: 'bigint',
-  traderDiscountFactor: 'bigint',
-  totalRebateAmount: 'bigint',
-  traderDiscountAmount: 'bigint',
-  affiliateRewardAmount: 'bigint',
+  collateralTokenPriceMin: 'bigint',
+  collateralTokenPriceMax: 'bigint',
+  tradeSizeUsd: 'bigint',
   fundingFeeAmount: 'bigint',
   claimableLongTokenAmount: 'bigint',
   claimableShortTokenAmount: 'bigint',
@@ -84,46 +84,7 @@ const positionCollectedUpdate: graph.ISchema<IPositionFeesCollected> = {
 }
 
 
-const matchRoute: graph.ISchema<IMatchRoute> = {
-  id: 'string',
-  profile: profile,
-  collateralToken: 'address',
 
-
-  increaseList: {
-    market: 'address',
-    positionKey: 'bytes',
-    sizeInUsd: 'bigint',
-    sizeInTokens: 'bigint',
-    indexTokenPriceMax: 'bigint',
-    isLong: 'bool',
-    blockTimestamp: 'number',
-    __typename: 'PositionIncrease',
-  },
-  decreaseList: {
-    market: 'address',
-    positionKey: 'bytes',
-    sizeInUsd: 'bigint',
-    sizeInTokens: 'bigint',
-    indexTokenPriceMax: 'bigint',
-    basePnlUsd: 'bigint',
-    isLong: 'bool',
-    blockTimestamp: 'number',
-    __typename: 'PositionIncrease',
-  },
-  matchRuleList: {
-    id: 'string',
-    puppet: 'address',
-    matchKey: 'string',
-    allowanceRate: 'bigint',
-    throttleActivity: 'bigint',
-    expiry: 'bigint',
-
-    __typename: 'MatchRule',
-  },
-
-  __typename: 'MatchRoute',
-}
 
 const positionIncrease: graph.ISchema<IPositionIncrease> = {
   id: 'string',
@@ -198,6 +159,27 @@ const positionDecrease: graph.ISchema<IPositionDecrease> = {
   feeCollected: positionCollectedUpdate,
 
   __typename: 'PositionDecrease',
+}
+
+const matchRoute: graph.ISchema<IMatchRoute> = {
+  id: 'string',
+  profile: profile,
+  collateralToken: 'address',
+
+
+  increaseList: positionIncrease,
+  decreaseList: positionDecrease,
+  matchRuleList: {
+    id: 'string',
+    puppet: 'address',
+    matchKey: 'string',
+    allowanceRate: 'bigint',
+    throttleActivity: 'bigint',
+    expiry: 'bigint',
+    __typename: 'MatchRule',
+  },
+
+  __typename: 'MatchRoute',
 }
 
 const priceCandle: graph.ISchema<IPriceCandle> = {
@@ -333,5 +315,5 @@ const settlement: graph.ISchema<ISettlement> = {
 
 export const schema = {
   priceCandle, routeMatchStats, matchRule, positionIncrease, positionDecrease, orderCreated, positionCollectedUpdate,
-  allocation, puppetAllocation, settlement, puppetSettlement,
+  allocation, puppetAllocation, settlement, puppetSettlement, matchRoute,
 }

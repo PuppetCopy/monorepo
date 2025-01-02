@@ -1,5 +1,5 @@
 # VotingEscrowLogic
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/VotingEscrowLogic.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/VotingEscrowLogic.sol)
 
 **Inherits:**
 CoreContract
@@ -15,16 +15,14 @@ It implements a weighted average mechanism for lock durations and vesting period
 ### MAXTIME
 
 ```solidity
-uint constant MAXTIME = 63120000;
+uint constant MAXTIME = 106 weeks;
 ```
 
 
-### config
-The configuration parameters for the RewardLogic
-
+### store
 
 ```solidity
-Config public config;
+VotingEscrowStore immutable store;
 ```
 
 
@@ -42,10 +40,12 @@ PuppetVoteToken public immutable vToken;
 ```
 
 
-### store
+### config
+The configuration parameters for the RewardLogic
+
 
 ```solidity
-VotingEscrowStore public immutable store;
+Config public config;
 ```
 
 
@@ -58,7 +58,9 @@ Computes the current vesting state for a user, updating the amount and remaining
 
 
 ```solidity
-function getVestingCursor(address user) public view returns (VotingEscrowStore.Vested memory vested);
+function getVestingCursor(
+    address user
+) public view returns (VotingEscrowStore.Vested memory vested);
 ```
 **Parameters**
 
@@ -82,7 +84,9 @@ elapsed.*
 
 
 ```solidity
-function getClaimable(address user) external view returns (uint);
+function getClaimable(
+    address user
+) external view returns (uint);
 ```
 **Parameters**
 
@@ -105,7 +109,9 @@ Calculates the multiplier for rewards based on the lock duration.
 
 
 ```solidity
-function calcDurationMultiplier(uint duration) public view returns (uint);
+function calcDurationMultiplier(
+    uint duration
+) public view returns (uint);
 ```
 **Parameters**
 
@@ -152,23 +158,19 @@ Initializes the contract with the specified authority, router, and token.
 ```solidity
 constructor(
     IAuthority _authority,
-    EventEmitter _eventEmitter,
     VotingEscrowStore _store,
     PuppetToken _token,
-    PuppetVoteToken _vToken,
-    Config memory _config
-) CoreContract("VotingEscrowLogic", "1", _authority, _eventEmitter);
+    PuppetVoteToken _vToken
+) CoreContract("VotingEscrowLogic", "1", _authority);
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
 |`_authority`|`IAuthority`|The address of the authority contract for permission checks.|
-|`_eventEmitter`|`EventEmitter`||
 |`_store`|`VotingEscrowStore`||
 |`_token`|`PuppetToken`|The address of the ERC20 token to be locked.|
 |`_vToken`|`PuppetVoteToken`||
-|`_config`|`Config`||
 
 
 ### lock
@@ -231,62 +233,22 @@ function claim(address user, address receiver, uint amount) external auth;
 |`amount`|`uint256`|The amount of tokens to be claimed.|
 
 
-### setConfig
-
-Set the mint rate limit for the token.
-
-
-```solidity
-function setConfig(Config calldata _config) external auth;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new rate limit configuration.|
-
-
 ### _setConfig
 
-Sets the configuration parameters for the contract.
-
-*Can only be called by an authorized entity. Updates the contract's configuration.*
+Sets the configuration parameters for the VotingEscrowLogic contract.
 
 
 ```solidity
-function _setConfig(Config memory _config) internal;
+function _setConfig(
+    bytes calldata data
+) internal override;
 ```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new configuration parameters.|
-
 
 ### _vest
 
 
 ```solidity
 function _vest(address user, address receiver, uint amount, uint duration) internal;
-```
-
-## Errors
-### VotingEscrowLogic__ZeroAmount
-
-```solidity
-error VotingEscrowLogic__ZeroAmount();
-```
-
-### VotingEscrowLogic__ExceedMaxTime
-
-```solidity
-error VotingEscrowLogic__ExceedMaxTime();
-```
-
-### VotingEscrowLogic__ExceedingAccruedAmount
-
-```solidity
-error VotingEscrowLogic__ExceedingAccruedAmount(uint accrued);
 ```
 
 ## Structs

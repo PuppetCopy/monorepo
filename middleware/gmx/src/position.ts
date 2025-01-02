@@ -9,7 +9,6 @@ import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, W
 
 
 
-
 export function getPositionPnlUsd(
   isLong: boolean,
   sizeInUsd: bigint,
@@ -119,7 +118,7 @@ export function getMarginFee(marketInfo: IMarketInfo, forPositiveImpact: boolean
   const factor = forPositiveImpact
     ? marketInfo.config.positionFeeFactorForPositiveImpact
     : marketInfo.config.positionFeeFactorForNegativeImpact
-  
+
   return -applyFactor(sizeDeltaUsd, factor)
 }
 
@@ -161,7 +160,7 @@ export function getLiquidationPrice(
 
   collateralAmount: bigint,
   collateralUsd: bigint,
-  
+
   pendingFundingFeesUsd = 0n,
   pendingBorrowingFeesUsd = 0n,
   // minCollateralUsd: bigint,
@@ -206,7 +205,7 @@ export function getLiquidationPrice(
     if (isLong) {
       const denominator = sizeInTokens + collateralAmount
       if (denominator === 0n) return 0n
-      
+
       liquidationPrice = (sizeInUsd + liquidationCollateralUsd - priceImpactDeltaUsd + totalFeesUsd) / denominator * indexTokenDenominator
     } else {
       const denominator = sizeInTokens - collateralAmount

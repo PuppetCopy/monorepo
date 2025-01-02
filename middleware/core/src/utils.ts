@@ -1,7 +1,7 @@
-import { factor, getMappedValue, unixTimestampNow } from "common-utils"
-import * as viem from "viem"
-import { IPositionListSummary, IPosition, IPositionDecrease, IPositionIncrease, IPuppetPosition, IVested } from "./types.js"
+import { factor, getMappedValue, getTokenUsd, unixTimestampNow } from "common-utils"
 import { getMarketIndexToken, getTokenDescription, IPriceCandle, IPricefeedMap, OrderType } from "gmx-middleware"
+import * as viem from "viem"
+import { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
   const gmap = {} as { [P in B]: R }
@@ -93,10 +93,10 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
         collateralInUsd: 0n,
         realisedPnlUsd: 0n,
 
-        cumulativeSizeUsd: 0n,
-        cumulativeSizeToken: 0n,
-        cumulativeCollateralUsd: 0n,
-        cumulativeCollateralToken: 0n,
+        // cumulativeSizeUsd: 0n,
+        // cumulativeSizeToken: 0n,
+        // cumulativeCollateralUsd: 0n,
+        // cumulativeCollateralToken: 0n,
 
         maxSizeInUsd: 0n,
         maxSizeInTokens: 0n,
@@ -125,36 +125,36 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
     position.lastUpdate = next
 
     if (next.__typename === 'PositionIncrease') {
-      position.sizeInUsd += next.sizeDeltaUsd
-      position.sizeInTokens += next.sizeDeltaInTokens
-      position.collateralInTokens += next.collateralDeltaAmount
-      position.collateralInUsd = position.collateralInTokens * next.collateralTokenPriceMax
+      position.sizeInUsd = next.sizeInUsd
+      position.sizeInTokens = next.sizeInTokens
+      position.collateralInTokens = next.collateralAmount
+      position.collateralInUsd = next.collateralAmount * next.collateralTokenPriceMax
 
       position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
       position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
       position.maxCollateralInTokens = next.collateralAmount > position.maxCollateralInTokens ? next.collateralAmount : position.maxCollateralInTokens
       position.maxCollateralInUsd = position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
 
-      position.cumulativeSizeToken += next.sizeInTokens
-      position.cumulativeSizeUsd += next.sizeInUsd
-      position.cumulativeCollateralToken += next.collateralAmount
-      position.cumulativeCollateralUsd += position.collateralInUsd
+      // position.cumulativeSizeToken += next.sizeInTokens
+      // position.cumulativeSizeUsd += next.sizeInUsd
+      // position.cumulativeCollateralToken += next.collateralAmount
+      // position.cumulativeCollateralUsd += position.collateralInUsd
 
       position.increaseList.push(next)
     } else {
 
       // case where indexing ahead of prior position updates
-      if (position.cumulativeCollateralUsd === 0n) {
-        position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
-        position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
-        position.maxSizeInTokens = next.sizeInTokens + next.sizeDeltaInTokens
-        position.maxSizeInUsd = next.sizeInUsd + next.sizeDeltaUsd
+      // if (position.cumulativeCollateralUsd === 0n) {
+      //   position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
+      //   position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
+      //   position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
+      //   position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
 
-        position.cumulativeCollateralToken = position.maxCollateralInTokens
-        position.cumulativeCollateralUsd = position.maxCollateralInUsd
-        position.cumulativeSizeToken = position.maxSizeInTokens
-        position.cumulativeSizeUsd = position.maxSizeInUsd
-      }
+      //   position.cumulativeCollateralToken = position.maxCollateralInTokens
+      //   position.cumulativeCollateralUsd = position.maxCollateralInUsd
+      //   position.cumulativeSizeToken = position.maxSizeInTokens
+      //   position.cumulativeSizeUsd = position.maxSizeInUsd
+      // }
 
       position.decreaseList.push(next)
       position.realisedPnlUsd += next.basePnlUsd
@@ -167,7 +167,10 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       }
     }
 
-    position.avgEntryPrice = position.maxSizeInUsd / position.maxSizeInTokens * getTokenDescription(getMarketIndexToken(next.market)).denominator
+    if (position.maxSizeInTokens > 0n) {
+      position.avgEntryPrice = position.maxSizeInUsd / position.maxSizeInTokens * getTokenDescription(getMarketIndexToken(next.market)).denominator
+    }
+
 
   }
 

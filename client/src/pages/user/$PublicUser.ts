@@ -6,16 +6,16 @@ import { map, mergeArray, multicast, now, startWith } from "@most/core"
 import { combineState, ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, switchMap } from "common-utils"
 import { getMarketIndexToken } from "gmx-middleware"
 import { IntervalTime } from "puppet-const"
-import { accountSettledPositionListSummary, queryPosition } from "puppet-middleware"
+import { accountSettledPositionListSummary, aggregatePositionList, IPosition, queryMatchRoute, queryMatchRouteStats, queryPosition } from "puppet-middleware"
 import { $ButtonToggle, $defaulButtonToggleContainer, intermediateText } from "ui-components"
 import * as viem from 'viem'
+import { $TraderDisplay } from "../../common/$common"
 import { $heading2 } from "../../common/$text"
 import { subgraphClient } from "../../common/graphClient"
-import { $profileDisplay } from "../../components/$AccountProfile"
 import { $metricLabel, $metricRow } from "../../components/participant/$Summary.js"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
-import { $TraderDisplay } from "../../common/$common"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 
 
 
@@ -35,13 +35,17 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   [selectProfileMode, selectProfileModeTether]: Behavior<IRouteOption, IRouteOption>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+  [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
 
 ) => {
 
   const { route, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, } = config
 
   const profileAddressRoute = config.route
-  const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ title: 'Trader', fragment: ETH_ADDRESS_REGEXP })
+  const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ 
+    title: 'Trader',
+    fragment: ETH_ADDRESS_REGEXP
+   })
   const puppetRoute = profileAddressRoute.create({ fragment: 'puppet' }).create({ title: 'Puppet', fragment: ETH_ADDRESS_REGEXP })
 
 
@@ -84,29 +88,16 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const account = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const filteredMarketList = startWith([], selectMarketTokenList)
-
-              const positionListQuery = switchMap(marketList => {
-                const query = queryPosition(subgraphClient, { account, activityTimeframe })
-
-                return map(async listQuery => {
-                  const list = await listQuery
-
-                  if (marketList.length === 0) {
-                    return list
-                  }
-
-                  return list
-                    .filter(pos => marketList.includes(getMarketIndexToken(pos.market)))
-                    .sort((a, b) => b.openTimestamp - a.openTimestamp)
-                }, query)
-              }, filteredMarketList)
+              const accountRouteStatsListQuery = queryMatchRouteStats(subgraphClient, { account, activityTimeframe, collateralTokenList: selectedCollateralTokenList })
 
               const metricsQuery = multicast(map(async params => {
-                const allPositions = await params.positionListQuery
+                const positionList = (await params.accountRouteStatsListQuery).reduce((seed, next) => {
+                  seed.push(...aggregatePositionList([...next.matchRoute.decreaseList, ...next.matchRoute.increaseList]))
+                  return seed
+                }, [] as IPosition[])
 
-                return accountSettledPositionListSummary(allPositions)
-              }, combineState({ positionListQuery })))
+                return accountSettledPositionListSummary(positionList)
+              }, combineState({ accountRouteStatsListQuery })))
 
 
 
@@ -162,10 +153,11 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                   )
                 ),
 
-                $TraderPage({ ...config, positionListQuery, })({
+                $TraderPage({ ...config, accountRouteStatsListQuery })({
                   selectMarketTokenList: selectMarketTokenListTether(),
                   changeRoute: changeRouteTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
+                  changeMatchRuleList: changeMatchRuleListTether(),
                 })
               ).run(sink, scheduler)
             },
@@ -217,6 +209,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
     ),
 
     {
+      changeMatchRuleList,
       changeActivityTimeframe,
       changeRoute: mergeArray([
         changeRoute,

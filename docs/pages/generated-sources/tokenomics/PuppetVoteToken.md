@@ -1,8 +1,8 @@
 # PuppetVoteToken
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/PuppetVoteToken.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/PuppetVoteToken.sol)
 
 **Inherits:**
-Permission, ERC20Votes
+Permission, ERC20Votes, ERC165
 
 
 ## Functions
@@ -10,10 +10,9 @@ Permission, ERC20Votes
 
 
 ```solidity
-constructor(IAuthority _authority)
-    Permission(_authority)
-    ERC20("Puppet Voting Power", "vPUPPET")
-    EIP712("PuppetVoteToken", "1");
+constructor(
+    IAuthority _authority
+) Permission(_authority) ERC20("Puppet Voting Power", "vPUPPET") EIP712("PuppetVoteToken", "1");
 ```
 
 ### burn
@@ -48,10 +47,12 @@ TransferFrom is unsupported in this contract.
 function transferFrom(address, address, uint) public pure override returns (bool);
 ```
 
-## Errors
-### VotingEscrow__Unsupported
+### supportsInterface
+
 
 ```solidity
-error VotingEscrow__Unsupported();
+function supportsInterface(
+    bytes4 interfaceId
+) public view virtual override(ERC165) returns (bool);
 ```
 

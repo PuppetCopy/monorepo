@@ -5,29 +5,34 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest } from "@most/core"
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
-import { isPositionOpen, isPositionSettled } from "puppet-middleware"
+import { IPosition, isPositionOpen, isPositionSettled } from "puppet-middleware"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "ui-components"
 import * as viem from "viem"
 import { $SelectCollateralToken } from "../$CollateralTokenSelector"
 import { $LastAtivity } from "../$LastActivity.js"
-import { IPositionActivityParams, IUserActivityParams } from "../../pages/type.js"
+import { IUserActivityPageParams } from "../../pages/type.js"
 import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
 import { IntervalTime } from "puppet-const"
+import { Stream } from "@most/types"
 
-export const $ProfilePeformanceTimeline = (config: IPositionActivityParams & IUserActivityParams & { puppet?: viem.Address }) => component((
+
+interface IProfilePeformanceTimeline extends IUserActivityPageParams {
+  positionListQuery: Stream<Promise<IPosition[]>>
+}
+
+export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) => component((
   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, selectedCollateralTokenList, puppet, pricefeedMapQuery, positionListQuery } = config
+  const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, positionListQuery } = config
 
   const newLocal = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
   const positionParams = multicast(map(async (params) => {
     const list = await params.positionListQuery
     const timeline = getPositionListTimelinePerformance({
       ...params,
-      puppet,
       list: list.flatMap(pos => [...pos.decreaseList, ...pos.increaseList]),
       tickCount: 100,
       activityTimeframe: params.activityTimeframe,

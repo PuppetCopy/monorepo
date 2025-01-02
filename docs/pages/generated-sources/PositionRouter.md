@@ -1,22 +1,22 @@
 # PositionRouter
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/PositionRouter.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/PositionRouter.sol)
 
 **Inherits:**
-CoreContract, ReentrancyGuardTransient, IGmxOrderCallbackReceiver
+CoreContract, ReentrancyGuardTransient, IGmxOrderCallbackReceiver, Multicall
 
 
 ## State Variables
-### config
-
-```solidity
-Config config;
-```
-
-
 ### positionStore
 
 ```solidity
-PositionStore positionStore;
+PositionStore immutable positionStore;
+```
+
+
+### config
+
+```solidity
+Config public config;
 ```
 
 
@@ -25,50 +25,7 @@ PositionStore positionStore;
 
 
 ```solidity
-constructor(
-    IAuthority _authority,
-    EventEmitter _eventEmitter,
-    PositionStore _positionStore,
-    Config memory _config
-) CoreContract("PositionRouter", "1", _authority, _eventEmitter);
-```
-
-### requestTraderIncrease
-
-
-```solidity
-function requestTraderIncrease(
-    PositionUtils.OrderMirrorPosition calldata order,
-    address[] calldata puppetList
-) external nonReentrant;
-```
-
-### requestTraderDecrease
-
-
-```solidity
-function requestTraderDecrease(PositionUtils.OrderMirrorPosition calldata order) external nonReentrant;
-```
-
-### requestProxyIncrease
-
-
-```solidity
-function requestProxyIncrease(
-    PositionUtils.OrderMirrorPosition calldata order,
-    address[] calldata puppetList,
-    address user
-) external nonReentrant auth;
-```
-
-### requestProxyDecrease
-
-
-```solidity
-function requestProxyDecrease(
-    PositionUtils.OrderMirrorPosition calldata order,
-    address user
-) external nonReentrant auth;
+constructor(IAuthority _authority, PositionStore _positionStore) CoreContract("PositionRouter", "1", _authority);
 ```
 
 ### afterOrderExecution
@@ -104,66 +61,42 @@ function afterOrderFrozen(
 ) external nonReentrant auth;
 ```
 
-### executeUnhandledExecutionCallback
+### allocate
 
 
 ```solidity
-function executeUnhandledExecutionCallback(bytes32 key) external nonReentrant auth;
+function allocate(
+    IERC20 collateralToken,
+    bytes32 sourceRequestKey,
+    bytes32 positionKey,
+    bytes32 matchKey,
+    address[] calldata puppetList
+) external nonReentrant auth returns (bytes32 allocationKey);
 ```
 
-### setConfig
-
-Set the mint rate limit for the token.
+### mirror
 
 
 ```solidity
-function setConfig(Config calldata _config) external auth;
+function mirror(
+    RequestLogic.MirrorPositionParams calldata params
+) external payable nonReentrant auth returns (bytes32 requestKey);
 ```
-**Parameters**
 
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new rate limit configuration.|
+### settle
 
+
+```solidity
+function settle(bytes32 key, address[] calldata puppetList) external nonReentrant auth;
+```
 
 ### _setConfig
 
-*Internal function to set the configuration.*
-
 
 ```solidity
-function _setConfig(Config memory _config) internal;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The configuration to set.|
-
-
-### storeUnhandledCallback
-
-
-```solidity
-function storeUnhandledCallback(
-    GmxPositionUtils.OrderExecutionStatus status,
-    GmxPositionUtils.Props calldata order,
-    bytes32 key,
-    bytes calldata eventData
-) internal auth;
-```
-
-## Errors
-### PositionRouter__InvalidOrderType
-
-```solidity
-error PositionRouter__InvalidOrderType(GmxPositionUtils.OrderType orderType);
-```
-
-### PositionRouter__SenderNotMatchingTrader
-
-```solidity
-error PositionRouter__SenderNotMatchingTrader();
+function _setConfig(
+    bytes calldata data
+) internal override;
 ```
 
 ## Structs
@@ -171,11 +104,10 @@ error PositionRouter__SenderNotMatchingTrader();
 
 ```solidity
 struct Config {
-    RequestIncreasePositionLogic requestIncrease;
-    ExecuteIncreasePositionLogic executeIncrease;
-    RequestDecreasePositionLogic requestDecrease;
-    ExecuteDecreasePositionLogic executeDecrease;
-    ExecuteRevertedAdjustmentLogic executeRevertedAdjustment;
+    RequestLogic requestLogic;
+    AllocationLogic allocationLogic;
+    ExecutionLogic executionLogic;
+    UnhandledCallbackLogic unhandledCallbackLogic;
 }
 ```
 

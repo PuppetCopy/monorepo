@@ -116,6 +116,7 @@ export function getPositionKey(account: viem.Address, market: viem.Address, coll
   )
 }
 
+
 export function hashData(types: string[], values: any) {
   const params = viem.parseAbiParameters(types)
   const hex = viem.encodeAbiParameters(params as any, values)

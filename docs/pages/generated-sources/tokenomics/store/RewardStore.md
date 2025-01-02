@@ -1,5 +1,5 @@
 # RewardStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/store/RewardStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/store/RewardStore.sol)
 
 **Inherits:**
 BankStore
@@ -53,14 +53,18 @@ constructor(IAuthority _authority, Router _router) BankStore(_authority, _router
 
 
 ```solidity
-function incrementCumulativePerContribution(uint _value) external auth returns (uint);
+function incrementCumulativePerContribution(
+    uint _value
+) external auth returns (uint);
 ```
 
 ### getUserRewardCursor
 
 
 ```solidity
-function getUserRewardCursor(address _user) external view returns (UserRewardCursor memory);
+function getUserRewardCursor(
+    address _user
+) external view returns (UserRewardCursor memory);
 ```
 
 ### setUserRewardCursor
@@ -74,21 +78,27 @@ function setUserRewardCursor(address _user, UserRewardCursor calldata cursor) ex
 
 
 ```solidity
-function setRewardRate(uint _value) external auth;
+function setRewardRate(
+    uint _value
+) external auth;
 ```
 
 ### setLastDistributionTimestamp
 
 
 ```solidity
-function setLastDistributionTimestamp(uint _value) external auth;
+function setLastDistributionTimestamp(
+    uint _value
+) external auth;
 ```
 
 ### setEmissionRate
 
 
 ```solidity
-function setEmissionRate(EmissionRate calldata _value) external auth;
+function setEmissionRate(
+    EmissionRate calldata _value
+) external auth;
 ```
 
 ### getEmissionRate

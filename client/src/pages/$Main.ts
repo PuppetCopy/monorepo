@@ -208,9 +208,9 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.match(leaderboardRoute)(
                 $midContainer(
-                  fadeIn($Leaderboard({ 
-                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList
-                   })({
+                  fadeIn($Leaderboard({
+                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList, depositTokenList
+                  })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
                     routeChange: changeRouteTether(),
@@ -220,9 +220,9 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               router.contains(profileRoute)(
                 $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery })({
+                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
-                    // selectMarketTokenList: selectMarketTokenListTether(),
+                    changeMatchRuleList: changeMatchRuleListTether(),
                     changeRoute: changeRouteTether(),
                   }))
                 )

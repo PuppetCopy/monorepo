@@ -1,5 +1,5 @@
 # VotingEscrowStore
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/store/VotingEscrowStore.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/store/VotingEscrowStore.sol)
 
 **Inherits:**
 BankStore
@@ -39,7 +39,9 @@ constructor(IAuthority _authority, Router _router) BankStore(_authority, _router
 
 
 ```solidity
-function getLockDuration(address _user) external view returns (uint);
+function getLockDuration(
+    address _user
+) external view returns (uint);
 ```
 
 ### setLockDuration
@@ -53,7 +55,9 @@ function setLockDuration(address _user, uint _duration) external auth;
 
 
 ```solidity
-function getVested(address _user) external view returns (Vested memory);
+function getVested(
+    address _user
+) external view returns (Vested memory);
 ```
 
 ### setVested

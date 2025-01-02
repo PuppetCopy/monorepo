@@ -1,5 +1,5 @@
 # PuppetToken
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/474b8277cbb576730f09bb3ba6a3b6396a451789/src/tokenomics/PuppetToken.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/PuppetToken.sol)
 
 **Inherits:**
 CoreContract, ERC20, IERC20Mintable
@@ -19,7 +19,7 @@ intended to gradually transfer governance power and incentivises broader ownersh
 
 
 ```solidity
-uint private constant CORE_RELEASE_DURATION_DIVISOR = 31560000;
+uint private constant CORE_RELEASE_DURATION_DIVISOR = 31_536_000;
 ```
 
 
@@ -29,15 +29,6 @@ uint private constant CORE_RELEASE_DURATION_DIVISOR = 31560000;
 
 ```solidity
 uint private constant GENESIS_MINT_AMOUNT = 100_000e18;
-```
-
-
-### config
-The current configuration.
-
-
-```solidity
-Config public config;
 ```
 
 
@@ -59,6 +50,15 @@ uint emissionRate;
 ```
 
 
+### mintedCoreAmount
+The amount of tokens minted to the core.
+
+
+```solidity
+uint public mintedCoreAmount;
+```
+
+
 ### deployTimestamp
 The timestamp when the contract was deployed.
 
@@ -68,12 +68,12 @@ uint public immutable deployTimestamp = block.timestamp;
 ```
 
 
-### mintedCoreAmount
-The amount of tokens minted to the core.
+### config
+The current configuration.
 
 
 ```solidity
-uint public mintedCoreAmount = 0;
+Config public config;
 ```
 
 
@@ -87,40 +87,15 @@ genesis mint.
 ```solidity
 constructor(
     IAuthority _authority,
-    EventEmitter _eventEmitter,
-    Config memory _config,
     address receiver
-) ERC20("Puppet Test", "PUPPET-TEST") CoreContract("PuppetToken", "1", _authority, _eventEmitter);
+) ERC20("Puppet Test", "PUPPET-TEST") CoreContract("PuppetToken", "1", _authority);
 ```
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
 |`_authority`|`IAuthority`|The authority contract for permission checks.|
-|`_eventEmitter`|`EventEmitter`||
-|`_config`|`Config`|The initial configuration for mint rate limit.|
 |`receiver`|`address`|The address to receive the genesis mint amount.|
-
-
-### getLockedAmount
-
-Returns the locked amount for a user.
-
-
-```solidity
-function getLockedAmount(address _user) public view returns (uint);
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_user`|`address`|The address of the user.|
-
-**Returns**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`<none>`|`uint256`|The locked amount.|
 
 
 ### getCoreShare
@@ -138,41 +113,14 @@ function getCoreShare() public view returns (uint);
 |`<none>`|`uint256`|The core share.|
 
 
-### getCoreShare
-
-Returns the core share based on a specific time.
-
-
-```solidity
-function getCoreShare(uint _time) public view returns (uint);
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_time`|`uint256`|The time to calculate the core share for.|
-
-**Returns**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`<none>`|`uint256`|The core share.|
-
-
 ### getMintableCoreAmount
 
 Returns the amount of core tokens that can be minted based on the last mint time.
 
 
 ```solidity
-function getMintableCoreAmount(uint _lastMintTime) public view returns (uint);
+function getMintableCoreAmount() public view returns (uint);
 ```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_lastMintTime`|`uint256`|The last mint time to calculate for.|
-
 **Returns**
 
 |Name|Type|Description|
@@ -180,13 +128,13 @@ function getMintableCoreAmount(uint _lastMintTime) public view returns (uint);
 |`<none>`|`uint256`|The mintable core amount.|
 
 
-### getLimitAmount
+### getEmissionRateLimit
 
 Returns the limit amount based on the current configuration.
 
 
 ```solidity
-function getLimitAmount() public view returns (uint);
+function getEmissionRateLimit() public view returns (uint);
 ```
 **Returns**
 
@@ -201,7 +149,7 @@ Mints new tokens with a governance-configured rate limit.
 
 
 ```solidity
-function mint(address _receiver, uint _amount) external auth returns (uint);
+function mint(address _receiver, uint _amount) external auth;
 ```
 **Parameters**
 
@@ -210,12 +158,6 @@ function mint(address _receiver, uint _amount) external auth returns (uint);
 |`_receiver`|`address`|The address to mint tokens to.|
 |`_amount`|`uint256`|The amount of tokens to mint.|
 
-**Returns**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`<none>`|`uint256`|The amount of tokens minted.|
-
 
 ### mintCore
 
@@ -223,7 +165,9 @@ Mints new tokens to the core with a time-based reduction release schedule.
 
 
 ```solidity
-function mintCore(address _receiver) external auth returns (uint);
+function mintCore(
+    address _receiver
+) external auth returns (uint);
 ```
 **Parameters**
 
@@ -238,83 +182,13 @@ function mintCore(address _receiver) external auth returns (uint);
 |`<none>`|`uint256`|The amount of tokens minted.|
 
 
-### setConfig
-
-Set the mint rate limit for the token.
-
-
-```solidity
-function setConfig(Config calldata _config) external auth;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The new rate limit configuration.|
-
-
 ### _setConfig
 
-*Internal function to set the configuration.*
-
 
 ```solidity
-function _setConfig(Config memory _config) internal;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`_config`|`Config`|The configuration to set.|
-
-
-## Events
-### Puppet__MintCore
-Emitted when tokens are minted to the core.
-
-
-```solidity
-event Puppet__MintCore(address operator, address indexed receiver, uint amount);
-```
-
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`operator`|`address`|The address that triggered the minting.|
-|`receiver`|`address`|The address that received the minted tokens.|
-|`amount`|`uint256`|The amount of tokens minted.|
-
-## Errors
-### Puppet__InvalidRate
-*Error for when the rate is invalid (zero).*
-
-
-```solidity
-error Puppet__InvalidRate();
-```
-
-### Puppet__ExceededRateLimit
-*Error for when the minting exceeds the rate limit.*
-
-
-```solidity
-error Puppet__ExceededRateLimit(uint rateLimit, uint emissionRate);
-```
-
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`rateLimit`|`uint256`|The rate limit.|
-|`emissionRate`|`uint256`|The current emission rate.|
-
-### Puppet__CoreShareExceedsMining
-*Error for when the core share exceeds the mintable amount.*
-
-
-```solidity
-error Puppet__CoreShareExceedsMining();
+function _setConfig(
+    bytes calldata data
+) internal override;
 ```
 
 ## Structs

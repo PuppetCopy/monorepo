@@ -1,10 +1,11 @@
 import * as router from '@aelea/router'
 import { Stream } from '@most/types'
-import { IntervalTime } from 'common-utils'
 import { IPricefeedMap } from 'gmx-middleware'
-import { IPosition } from 'puppet-middleware'
 import * as viem from 'viem'
 import * as walletLink from "wallet"
+import { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
+import { IMatchRuleEditorChange } from '../components/portfolio/$MatchRuleEditor'
+import { IntervalTime } from 'puppet-const'
 
 
 export interface IWalletPageParams {
@@ -19,20 +20,14 @@ export interface IPageParams extends IComponentPageParams {
   route: router.Route
 }
 
-export interface IUserActivityParams {
+
+export interface IUserActivityPageParams extends IPageParams {
   selectedCollateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
   pricefeedMapQuery: Stream<Promise<IPricefeedMap>>
+  depositTokenList: Stream<IDepositEditorChange[]>
+  matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
-
-export interface IUserActivityPageParams extends IPageParams, IUserActivityParams {
-}
-
-export interface IPositionActivityParams {
-  positionListQuery: Stream<Promise<IPosition[]>>
-}
-
-export interface IUserPositionPageParams extends IPageParams, IPositionActivityParams, IUserActivityParams { }
 
 
 

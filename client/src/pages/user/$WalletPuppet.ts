@@ -1,23 +1,23 @@
 import { Behavior, combineObject } from "@aelea/core"
 import { $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { map, multicast } from "@most/core"
+import { map } from "@most/core"
 import { Stream } from "@most/types"
-import { IntervalTime } from "common-utils"
 import { getTokenDescription } from "gmx-middleware"
 import { EIP6963ProviderDetail } from "mipd"
+import { IntervalTime } from "puppet-const"
 import { $infoLabel, $IntermediatePromise } from "ui-components"
 import * as viem from "viem"
-import { $card, $card2, $labeledDivider } from "../../common/elements/$common.js"
+import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
 import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.js"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor.js"
 import { $RouteDepositEditor } from "../../components/portfolio/$RouteDepositEditor"
 import { $seperator2 } from "../common"
-import { IUserPositionPageParams } from "../type.js"
+import { IUserActivityPageParams } from "../type.js"
 
 
-interface IWalletPuppet extends IUserPositionPageParams {
+interface IWalletPuppet extends  IUserActivityPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
   matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
@@ -36,7 +36,7 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
 
   const {
     activityTimeframe, walletClientQuery, depositTokenList, matchRuleList,
-    pricefeedMapQuery, providerClientQuery, positionListQuery, selectedCollateralTokenList, route
+    pricefeedMapQuery, providerClientQuery, selectedCollateralTokenList, route
   } = config
 
 

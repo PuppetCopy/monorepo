@@ -1,15 +1,15 @@
 import { Behavior } from "@aelea/core"
 import { component, style } from "@aelea/dom"
 import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
+import { IntervalTime } from "puppet-const"
 import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IUserPositionPageParams } from "../type.js"
-import { IntervalTime } from "puppet-const"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
+import { IUserActivityPageParams } from "../type.js"
 
 
-export interface IPuppetProfile extends IUserPositionPageParams {
+export interface IPuppetProfile extends IUserActivityPageParams {
   // puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
 }
 

@@ -41,7 +41,6 @@ type IAbstractUpdate = {
 export interface IPerformanceTimeline {
   pricefeedMap: IPricefeedMap
   activityTimeframe: IntervalTime
-  puppet?: viem.Address
   list: IAbstractUpdate[]
   tickCount: number
   chartConfig?: DeepPartial<ChartOptions>

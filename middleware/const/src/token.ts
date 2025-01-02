@@ -267,6 +267,151 @@ export const TOKEN_DESCRIPTION_LIST = [
     denominator: 10n ** 18n
   },
 
+  {
+    name: "APE",
+    symbol: "APE",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "SUI",
+    symbol: "SUI",
+    decimals: 9,
+    denominator: 10n ** 9n
+  },
+  {
+    name: "SEI",
+    symbol: "SEI",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "APT",
+    symbol: "APT",
+    decimals: 8,
+    denominator: 10n ** 8n
+  },
+  {
+    name: "TIA",
+    symbol: "TIA",
+    decimals: 6,
+    denominator: 10n ** 6n
+  },
+  {
+    name: "TRON",
+    symbol: "TRX",
+    decimals: 6,
+    denominator: 10n ** 6n
+
+  },
+  {
+    name: "TON",
+    symbol: "TON",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "WLD",
+    symbol: "WLD",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "BONK",
+    symbol: "BONK",
+    decimals: 5,
+    denominator: 10n ** 5n
+  },
+  {
+    name: "TAO",
+    symbol: "TAO",
+    decimals: 9,
+    denominator: 10n ** 9n
+  },
+  {
+    name: "BOME",
+    symbol: "BOME",
+    decimals: 6,
+    denominator: 10n ** 6n
+  },
+  {
+    name: "FLOKI",
+    symbol: "FLOKI",
+    decimals: 9,
+    denominator: 10n ** 9n
+  },
+  {
+    name: "MEME",
+    symbol: "MEME",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "MEW",
+    symbol: "MEW",
+    decimals: 5,
+    denominator: 10n ** 5n
+  },
+  {
+    name: "PENDLE",
+    symbol: "PENDLE",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "ADA",
+    symbol: "ADA",
+    decimals: 6,
+    denominator: 10n ** 6n
+  },
+  {
+    name: "BCH",
+    symbol: "BCH",
+    decimals: 8,
+    denominator: 10n ** 8n
+  },
+  {
+    name: "DOT",
+    symbol: "DOT",
+    decimals: 10,
+    denominator: 10n ** 10n
+  },
+  {
+    name: "ICP",
+    symbol: "ICP",
+    decimals: 8,
+    denominator: 10n ** 8n
+  },
+  {
+    name: "XLM",
+    symbol: "XLM",
+    decimals: 7,
+    denominator: 10n ** 7n
+  },
+  {
+    name: "RENDER",
+    symbol: "RENDER",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "Filecoin",
+    symbol: "FIL",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "dYdX",
+    symbol: "DYDX",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
+  {
+    name: "Injective",
+    symbol: "INJ",
+    decimals: 18,
+    denominator: 10n ** 18n
+  },
 
 ] as const
 
@@ -314,6 +459,13 @@ export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   [ARBITRUM_ADDRESS.EIGEN]: TOKEN_DESCRIPTION_MAP.EIGEN,
   [ARBITRUM_ADDRESS.SATS]: TOKEN_DESCRIPTION_MAP.SATS,
   [ARBITRUM_ADDRESS.POL]: TOKEN_DESCRIPTION_MAP.POL,
+  [ARBITRUM_ADDRESS.APE]: TOKEN_DESCRIPTION_MAP.APE,
+  [ARBITRUM_ADDRESS.SUI]: TOKEN_DESCRIPTION_MAP.SUI,
+  [ARBITRUM_ADDRESS.SEI]: TOKEN_DESCRIPTION_MAP.SEI,
+  [ARBITRUM_ADDRESS.APT]: TOKEN_DESCRIPTION_MAP.APT,
+  [ARBITRUM_ADDRESS.TIA]: TOKEN_DESCRIPTION_MAP.TIA,
+  [ARBITRUM_ADDRESS.TRX]: TOKEN_DESCRIPTION_MAP.TRX,
+  [ARBITRUM_ADDRESS.TON]: TOKEN_DESCRIPTION_MAP.TON,
 
 
   [ARBITRUM_ADDRESS.DOGE]: TOKEN_DESCRIPTION_MAP.DOGE,
