@@ -4,17 +4,15 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, mergeArray, multicast, now, periodic, sample, snapshot, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { applyFactor, combineState, formatFixed, getDuration, getMappedValue, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
+import { applyFactor, combineState, formatFixed, getDuration, getMappedValue, getVestingCursor, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-const"
-import { getVestingCursor } from "puppet-middleware"
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from 'viem'
 import * as walletLink from "wallet"
-import { $heading3 } from "../../common/$text"
+import { $heading2, $heading3 } from "../../common/$text"
 import { $card, $labeledDivider, $responsiveFlex } from "../../common/elements/$common"
-import { $Popover } from "../../components/$Popover"
 import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "../../components/$Slider"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../../components/form/$Button"
 import { $SubmitBar } from "../../components/form/$SubmitBar"
@@ -22,8 +20,10 @@ import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import localStore from "../../const/localStore.js"
 import tokenomicsReader from "../../logic/tokenomicsReader.js"
-import { IPageParams, IUserActivityPageParams, IWalletTab } from "../type.js"
+import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
 import { $WalletPuppet } from "./$WalletPuppet"
+import { $Popover } from "../../components/$Popover"
+import { $metricLabel, $metricRow } from "../../components/participant/$Summary"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -62,7 +62,7 @@ export const $WalletPage = (config: IWalletPageParams) => component((
   [popoverAddWallet, popoverAddWalletTether]: Behavior<any>,
   [popoverWithdrawLocked, popoverWithdrawLockedTether]: Behavior<any>,
   [popoverClickMaxDeposit, popoverClickMaxDepositTether]: Behavior<any>,
-  [popoverRequestWithdraw, popoverRequestWithdrawTether]: Behavior<walletLink.IWalletClient, any>,  
+  [popoverRequestWithdraw, popoverRequestWithdrawTether]: Behavior<walletLink.IWalletClient, any>,
   [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: Behavior<any, bigint>,
 ) => {
 

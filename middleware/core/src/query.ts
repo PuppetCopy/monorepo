@@ -101,10 +101,10 @@ export function queryMatchRoute<TStateParams extends StateParams<IQueryMatchRout
   queryParams: TStateParams
 ) {
   return map(async filterParams => {
-    const filter: graph.IQueryFilter<IMatchRoute> = {}
+    const filter: graph.IQueryFilter<IPositionIncrease | IPositionDecrease> = {}
 
     if (filterParams.account) {
-      filter.profile_id = {
+      filter.account = {
         _eq: `"${filterParams.account}"`
       }
     }
@@ -124,28 +124,31 @@ export function queryMatchRoute<TStateParams extends StateParams<IQueryMatchRout
 
     if (filterParams.activityTimeframe) {
       const timestampFilter = unixTimestampNow() - filterParams.activityTimeframe
-      // orFilters.push({
-      //   decreaseList: {
-      //     blockTimestamp: {
-      //       _gte: timestampFilter
-      //     }
-      //   }
-      // })
+      orFilters.push({
+        blockTimestamp: {
+          _gte: timestampFilter
+        }
+      })
     }
 
     if (orFilters.length) {
       filter._or = orFilters
     }
 
-    const matchRouteList = graph.querySubgraph(subgraphClient, {
-      schema: schema.matchRoute,
+    const queryIncreaseList = graph.querySubgraph(subgraphClient, {
+      schema: schema.positionIncrease,
       filter: filter,
-      sortBy: {}
+      orderBy: {
+        blockTimestamp: 'desc'
+      }
     })
 
+    const queryDecreaseList = graph.querySubgraph(subgraphClient, {
+      schema: schema.positionDecrease,
+      filter: filter,
+    })
 
-    return matchRouteList
-    // return aggregatePositionList(matchRouteList).sort((a, b) => b.openTimestamp - a.openTimestamp)
+    return aggregatePositionList([...await queryIncreaseList, ...await queryDecreaseList]).sort((a, b) => b.openTimestamp - a.openTimestamp)
   },
     combineState(queryParams)
   )

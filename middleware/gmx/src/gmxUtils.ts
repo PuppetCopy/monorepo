@@ -116,6 +116,12 @@ export function getPositionKey(account: viem.Address, market: viem.Address, coll
   )
 }
 
+export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+  return hashData(
+    ["address", "address", "address"],
+    [collateralToken, puppet, trader]
+  )
+}
 
 export function hashData(types: string[], values: any) {
   const params = viem.parseAbiParameters(types)
