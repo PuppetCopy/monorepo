@@ -15,6 +15,7 @@ import { subgraphClient } from "../../common/graphClient"
 import { $metricLabel, $metricRow } from "../../components/participant/$Summary.js"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
 import { $TraderPage } from "./$Trader.js"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 
 
 

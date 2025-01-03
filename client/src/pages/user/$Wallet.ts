@@ -3,16 +3,16 @@ import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, mergeArray, multicast, now, periodic, sample, snapshot, startWith } from "@most/core"
-import { Stream } from "@most/types"
-import { applyFactor, combineState, formatFixed, getDuration, getMappedValue, getVestingCursor, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
+import { applyFactor, combineState, formatFixed, getDuration, getMappedValue, parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel, readableUnitAmount, switchMap } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import * as PUPPET from "puppet-const"
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled, $infoLabeledValue, $infoTooltip, $infoTooltipLabel, $labeledhintAdjustment, intermediateText } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from 'viem'
 import * as walletLink from "wallet"
-import { $heading2, $heading3 } from "../../common/$text"
+import { $heading3 } from "../../common/$text"
 import { $card, $labeledDivider, $responsiveFlex } from "../../common/elements/$common"
+import { $Popover } from "../../components/$Popover"
 import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "../../components/$Slider"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../../components/form/$Button"
 import { $SubmitBar } from "../../components/form/$SubmitBar"
@@ -20,10 +20,9 @@ import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import localStore from "../../const/localStore.js"
 import tokenomicsReader from "../../logic/tokenomicsReader.js"
-import { IPageParams, IUserActivityParams, IWalletTab } from "../type.js"
+import { IUserActivityPageParams, IWalletTab } from "../type.js"
 import { $WalletPuppet } from "./$WalletPuppet"
-import { $Popover } from "../../components/$Popover"
-import { $metricLabel, $metricRow } from "../../components/participant/$Summary"
+import { getVestingCursor } from "puppet-middleware"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -255,8 +254,7 @@ export const $WalletPage = (config: IWalletPageParams) => component((
           return $WalletPuppet({
             walletClientQuery, route, pricefeedMapQuery,
             activityTimeframe, selectedCollateralTokenList, providerClientQuery,
-            matchRuleList, depositTokenList,
-            positionListQuery: now(Promise.all([])),
+            matchRuleList, depositTokenList
           })({
             changeWallet: changeWalletTether(),
             changeRoute: changeRouteTether(),
