@@ -1,6 +1,6 @@
 
 import { Behavior, combineObject } from "@aelea/core"
-import { $text, component, style } from "@aelea/dom"
+import { $Node, $text, component, NodeComposeFn, style } from "@aelea/dom"
 import { $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, map, mergeArray, snapshot } from "@most/core"
@@ -23,8 +23,10 @@ interface ITraderMatchRouteEditor extends IWalletPageParams {
   trader: viem.Address
   matchRoute: IMatchRoute
   matchRuleList: Stream<IMatchRuleEditorChange[]>
+  $container?: NodeComposeFn<$Node>
 }
 
+export const $defaultTraderMatchRouteEditorContainer = $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))
 
 export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => component((
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, IMatchRule | undefined>,
@@ -33,7 +35,10 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
   [saveDraft, saveDraftTether]: Behavior<IDraftMatchRule>,
 ) => {
 
-  const { walletClientQuery, trader, matchRuleList, matchRoute } = config
+  const {
+    walletClientQuery, trader, matchRuleList, matchRoute,
+    $container = $defaultTraderMatchRouteEditorContainer
+  } = config
 
   const matchRule = switchMap(async walletQuery => {
     const wallet = await walletQuery
@@ -47,7 +52,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
 
   return [
     $Popover({
-      $container: $row(layoutSheet.spacingSmall, style({ alignItems: 'center' })),
+      $container,
       open: map(matchRule => {
         return $MatchRuleEditor(matchRule)({
           remove: discardDraftTether(),

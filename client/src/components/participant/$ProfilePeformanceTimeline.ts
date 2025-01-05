@@ -28,7 +28,8 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
 
   const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, positionListQuery } = config
 
-  const newLocal = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
+  const debouncedState = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
+
   const positionParams = multicast(map(async (params) => {
     const list = await params.positionListQuery
     const timeline = getPositionListTimelinePerformance({
@@ -40,7 +41,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
     })
 
     return { timeline, list }
-  }, newLocal))
+  }, debouncedState))
 
 
 

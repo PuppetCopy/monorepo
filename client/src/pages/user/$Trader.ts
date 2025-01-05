@@ -11,10 +11,11 @@ import { $infoLabel, $IntermediatePromise, $Table, IQuantumScrollPage, ISortBy }
 import * as viem from 'viem'
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
-import { $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor"
+import { $defaultTraderMatchRouteEditorContainer, $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor"
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
 import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
+import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline"
 
 
 interface ITraderPage extends IPageParams, IUserActivityPageParams {
@@ -31,8 +32,8 @@ export const $TraderPage = (config: ITraderPage) => component((
 ) => {
 
   const {
-    activityTimeframe, selectedCollateralTokenList, accountRouteStatsListQuery, matchRuleList, depositTokenList, pricefeedMapQuery, providerClientQuery, route,
-    walletClientQuery
+    activityTimeframe, selectedCollateralTokenList, accountRouteStatsListQuery,
+    matchRuleList, depositTokenList, pricefeedMapQuery, providerClientQuery, route, walletClientQuery
   } = config
 
   const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
@@ -49,10 +50,10 @@ export const $TraderPage = (config: ITraderPage) => component((
     $column(layoutSheet.spacingBig)(
       $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
-          // $ProfilePeformanceTimeline({ ...config })({
-          //   selectMarketTokenList: selectMarketTokenListTether(),
-          //   changeActivityTimeframe: changeActivityTimeframeTether(),
-          // })
+          $ProfilePeformanceTimeline({ ...config })({
+            selectMarketTokenList: selectMarketTokenListTether(),
+            changeActivityTimeframe: changeActivityTimeframeTether(),
+          })
         ),
 
         $IntermediatePromise({
@@ -85,7 +86,8 @@ export const $TraderPage = (config: ITraderPage) => component((
                     matchRuleList,
                     walletClientQuery,
                     matchRoute: route.matchRoute,
-                    trader: route.account
+                    trader: route.account,
+                    $container: $defaultTraderMatchRouteEditorContainer(style({ marginLeft: '-16px' }))
                   })({
                     changeMatchRuleList: changeMatchRuleListTether(),
                   }),
