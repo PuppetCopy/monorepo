@@ -36,20 +36,20 @@ export default defineConfig({
         link: '/pages/generated-sources/contracts',
         items: [
           {
-            text: 'Public',
+            text: 'Position',
             items: [
               {
-                text: 'PositionRouter',
-                link: '/pages/generated-sources/PositionRouter',
+                text: 'MirrorPosition',
+                link: '/pages/generated-sources/position/MirrorPosition',
               },
               {
-                text: 'PuppetRouter',
-                link: '/pages/generated-sources/PuppetRouter',
+                text: 'MatchRule',
+                link: '/pages/generated-sources/position/MatchRule',
               },
             ]
           },
           {
-            text: 'Core',
+            text: 'Tokenomics',
             items: [
 
               {
@@ -57,16 +57,12 @@ export default defineConfig({
                 link: '/pages/generated-sources/tokenomics/PuppetToken',
               },
               {
-                text: 'ContributeLogic.sol',
-                link: '/pages/generated-sources/tokenomics/ContributeLogic',
+                text: 'RewardDistributor.sol',
+                link: '/pages/generated-sources/tokenomics/RewardDistributor',
               },
               {
-                text: 'RewardLogic.sol',
-                link: '/pages/generated-sources/tokenomics/RewardLogic',
-              },
-              {
-                text: 'VotingEscrowLogic.sol',
-                link: '/pages/generated-sources/tokenomics/VotingEscrowLogic',
+                text: 'VotingEscrow.sol',
+                link: '/pages/generated-sources/tokenomics/VotingEscrow',
               }
             ]
           },

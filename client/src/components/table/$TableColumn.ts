@@ -2,7 +2,7 @@ import { O, Tether } from "@aelea/core"
 import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map, skipRepeats } from "@most/core"
-import { getBasisPoints, getTimeSince, readableDate, readablePercentage, streamOf, switchMap } from "common-utils"
+import { getBasisPoints, getMappedValue, getTimeSince, readableDate, readablePercentage, streamOf, switchMap } from "common-utils"
 import { IPosition, getParticiapntPortion, getSettledMpPnL, isPositionSettled, latestPriceMap } from "puppet-middleware"
 import { $infoTooltip, TableColumn } from "ui-components"
 import * as viem from 'viem'
@@ -53,7 +53,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
   columnOp: style({ placeContent: 'flex-start' }),
   $bodyCallback: map(pos => {
     const indexToken = getMarketIndexToken(pos.market)
-    const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
+    const latestPrice = map(pm => getMappedValue(pm, indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
 
     const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
@@ -100,7 +100,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
 
 
 export const timeColumn: TableColumn<IPosition>  = {
-  $head: $text('Open Timestamp'),
+  $head: $text('Settle Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   sortBy: 'openTimestamp',
   $bodyCallback: map(pos => {

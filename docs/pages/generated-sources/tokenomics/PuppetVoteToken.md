@@ -1,5 +1,5 @@
 # PuppetVoteToken
-[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/e958c407aafad0b6c3aeaa6893e84ba9f1b97fb1/src/tokenomics/PuppetVoteToken.sol)
+[Git Source](https://github.com/GMX-Blueberry-Club/puppet-contracts/blob/5895883d384bd97e4c9ce86357488a3f0b4cf07b/src/tokenomics/PuppetVoteToken.sol)
 
 **Inherits:**
 Permission, ERC20Votes, ERC165

@@ -238,7 +238,7 @@ export function queryPricefeed(
     tokenList?: viem.Address[]
     activityTimeframe: IntervalTime
   }>,
-  estTickAmout = 20
+  estTickAmout = 10
 ) {
   return map(async params => {
     const filter: graph.IQueryFilter<IPriceCandle> = {

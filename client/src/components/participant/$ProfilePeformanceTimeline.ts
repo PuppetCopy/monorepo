@@ -5,19 +5,17 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, startWith, switchLatest } from "@most/core"
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "common-utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
-import { IPosition, isPositionOpen, isPositionSettled } from "puppet-middleware"
+import { IntervalTime } from "puppet-const"
+import { isPositionOpen, isPositionSettled } from "puppet-middleware"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "ui-components"
 import * as viem from "viem"
 import { $SelectCollateralToken } from "../$CollateralTokenSelector"
 import { $LastAtivity } from "../$LastActivity.js"
 import { IUserActivityPageParams } from "../../pages/type.js"
 import { getPositionListTimelinePerformance } from "../trade/$ProfilePerformanceGraph.js"
-import { IntervalTime } from "puppet-const"
-import { Stream } from "@most/types"
 
 
 interface IProfilePeformanceTimeline extends IUserActivityPageParams {
-  positionListQuery: Stream<Promise<IPosition[]>>
 }
 
 export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) => component((
@@ -26,10 +24,9 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
 ) => {
 
-  const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, positionListQuery } = config
+  const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, depositTokenList, matchRuleList, providerClientQuery, route } = config
 
-  const debouncedState = debounce(40, combineObject({ pricefeedMapQuery, positionListQuery, activityTimeframe }))
-
+  const debouncedState = debounce(40, combineObject({ selectedCollateralTokenList, pricefeedMapQuery, activityTimeframe, matchRuleList }))
   const positionParams = multicast(map(async (params) => {
     const list = await params.positionListQuery
     const timeline = getPositionListTimelinePerformance({

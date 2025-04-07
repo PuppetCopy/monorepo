@@ -19,7 +19,7 @@ import { $ProfilePeformanceTimeline } from "../../components/participant/$Profil
 
 
 interface ITraderPage extends IPageParams, IUserActivityPageParams {
-  accountRouteStatsListQuery: Stream<Promise<IMatchRouteStats[]>>
+  matchRouteStatsQuery: Stream<Promise<IMatchRouteStats[]>>
 }
 
 export const $TraderPage = (config: ITraderPage) => component((
@@ -32,7 +32,7 @@ export const $TraderPage = (config: ITraderPage) => component((
 ) => {
 
   const {
-    activityTimeframe, selectedCollateralTokenList, accountRouteStatsListQuery,
+    activityTimeframe, selectedCollateralTokenList, matchRouteStatsQuery,
     matchRuleList, depositTokenList, pricefeedMapQuery, providerClientQuery, route, walletClientQuery
   } = config
 
@@ -40,10 +40,10 @@ export const $TraderPage = (config: ITraderPage) => component((
 
   const tableParams = map(async params => {
     const activityTimeframe = params.activityTimeframe
-    const matchRouteList = await params.accountRouteStatsListQuery
+    const matchRouteList = await params.matchRouteStatsQuery
 
     return { matchRouteList, sortBy: params.sortBy, activityTimeframe }
-  }, combineObject({ sortBy, accountRouteStatsListQuery, activityTimeframe }))
+  }, combineObject({ sortBy, matchRouteStatsQuery, activityTimeframe }))
 
 
   return [
@@ -87,7 +87,7 @@ export const $TraderPage = (config: ITraderPage) => component((
                     walletClientQuery,
                     matchRoute: route.matchRoute,
                     trader: route.account,
-                    $container: $defaultTraderMatchRouteEditorContainer(style({ marginLeft: '-16px' }))
+                    $container: $defaultTraderMatchRouteEditorContainer(style({ marginLeft: '-16px', paddingBottom: '16px' }))
                   })({
                     changeMatchRuleList: changeMatchRuleListTether(),
                   }),

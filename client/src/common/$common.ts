@@ -5,7 +5,7 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
+import { getBasisPoints, getMappedValue, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
 import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware"
 import { IMatchRoute, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware"
 import { $infoLabel, $infoLabeledValue, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
@@ -137,7 +137,7 @@ export const $puppetList = (
 
 
       return click(nodeEvent('click'), map(() => {
-        const url = `/app/profile/puppet/${account}`
+        const url = `/app/profile/position/${account}`
 
         history.pushState({}, '', url)
         return url
@@ -199,7 +199,7 @@ export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
   const indexToken = getMarketIndexToken(pos.market)
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, pos.maxCollateralInUsd)
-  const latestPrice = map(pm => pm[indexToken].max, latestPriceMap)
+  const latestPrice = map(pm => getMappedValue(pm, indexToken).max, latestPriceMap)
 
   const roi = isPositionSettled(pos)
     ? readablePercentage(getBasisPoints(pos.realisedPnlUsd, collateralUsd))

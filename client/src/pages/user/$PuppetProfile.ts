@@ -24,7 +24,6 @@ export const $PuppetProfile = (config: IPuppetProfile) => component((
   const { activityTimeframe, walletClientQuery, providerClientQuery, pricefeedMapQuery, selectedCollateralTokenList, route } = config
 
   return [
-
     $column(layoutSheet.spacingBig)(
       $card(layoutSheet.spacingBig, style({ flex: 1, width: '100%' }))(
         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(

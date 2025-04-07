@@ -42,10 +42,10 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
   const { route, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, } = config
 
   const profileAddressRoute = config.route
-  const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({ 
+  const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({
     title: 'Trader',
     fragment: ETH_ADDRESS_REGEXP
-   })
+  })
   const puppetRoute = profileAddressRoute.create({ fragment: 'puppet' }).create({ title: 'Puppet', fragment: ETH_ADDRESS_REGEXP })
 
 
@@ -88,16 +88,19 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const account = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const accountRouteStatsListQuery = queryMatchRouteStats(subgraphClient, { account, activityTimeframe, collateralTokenList: selectedCollateralTokenList })
+              const matchRouteStatsQuery = queryMatchRouteStats(subgraphClient, { account, activityTimeframe, collateralTokenList: selectedCollateralTokenList })
 
-              const metricsQuery = multicast(map(async params => {
-                const positionList = (await params.accountRouteStatsListQuery).reduce((seed, next) => {
+              const metricsQuery = multicast(map(async query => {
+                const positionList = (await query).reduce((seed, next) => {
                   seed.push(...aggregatePositionList([...next.matchRoute.decreaseList, ...next.matchRoute.increaseList]))
                   return seed
                 }, [] as IPosition[])
 
+                console.log(positionList)
+
+
                 return accountSettledPositionListSummary(positionList)
-              }, combineState({ accountRouteStatsListQuery })))
+              }, matchRouteStatsQuery))
 
 
 
@@ -153,7 +156,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
                   )
                 ),
 
-                $TraderPage({ ...config, accountRouteStatsListQuery })({
+                $TraderPage({ ...config, matchRouteStatsQuery })({
                   selectMarketTokenList: selectMarketTokenListTether(),
                   changeRoute: changeRouteTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),

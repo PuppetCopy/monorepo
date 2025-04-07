@@ -3,7 +3,7 @@
   "license": "BSL-1.1 and MIT",
   "private": true,
   "description": "Puppet Monorepo",
-  "packageManager": "bun@1.1.32",
+  "packageManager": "bun@1.2.8",
   "keywords": [
     "Puppet",
     "Copy Trading",
@@ -20,15 +20,17 @@
   ],
   "scripts": {
     "docs:build": "cd docs && bun run build",
-    "client:build": "cd client && bun run build"
+    "client:build": "cd client && bun run build",
+    "wagmi:generate": "wagmi generate"
   },
   "devDependencies": {
-    "typescript-eslint": "8.11.0",
-    "@eslint/js": "^9.13.0",
-    "@stylistic/eslint-plugin": "^2.9.0",
-    "@stylistic/eslint-plugin-ts": "^2.9.0",
-    "eslint": "^9.13.0",
-    "globals": "^15.11.0",
-    "typescript": "^5.6.3"
+    "typescript-eslint": "8.29.1",
+    "@eslint/js": "^9.24.0",
+    "@stylistic/eslint-plugin": "^4.2.0",
+    "@stylistic/eslint-plugin-ts": "^4.2.0",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.3",
+    "@wagmi/cli": "^2.2.1"
   }
 }

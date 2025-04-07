@@ -60,7 +60,6 @@ export const $Leaderboard = (config: ILeaderboard) => component((
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
-    const activityTimeframe = pageParams.activityTimeframe
     const accountStatsListData = await pageParams.routeStatsList
     const accountStatsList: ILeaderboardMatchStats[] = accountStatsListData
       .map(stats => {
@@ -78,7 +77,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
 
 
         const timeline = getPositionListTimelinePerformance({
-          activityTimeframe: activityTimeframe,
+          activityTimeframe: pageParams.activityTimeframe,
           list,
           pricefeedMap,
           tickCount: 25,
