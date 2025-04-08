@@ -271,20 +271,24 @@ export function getVestingCursor(vested: IVested): IVested {
 }
 
 
-export function getMatchKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+export function getMatchKey(collateralToken: viem.Address, trader: viem.Address) {
   return viem.keccak256(
     viem.encodeAbiParameters(
-      viem.parseAbiParameters('address, address, address'),
-      [collateralToken, puppet, trader]
+      viem.parseAbiParameters('address, address'),
+      [collateralToken, trader]
     )
   )
 }
 
-export function getAllocationKey(matchKey: viem.Hex, positionKey: viem.Hex) {
+export function getAllocationKey(
+  puppetList: viem.Address[],
+  matchKey: viem.Hex,
+  allocationId: bigint
+) {
   return viem.keccak256(
     viem.encodeAbiParameters(
-      viem.parseAbiParameters('bytes32, bytes32'),
-      [matchKey, positionKey]
+      viem.parseAbiParameters('address[], bytes32, uint256'),
+      [puppetList, matchKey, allocationId]
     )
   )
 }
