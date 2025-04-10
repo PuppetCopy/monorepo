@@ -4,30 +4,38 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Stream, Time } from "@most/types"
-import { getMappedValue, pagingQuery, readablePnl } from "common-utils"
+import { and, desc, eq, gte, or } from "@ponder/client"
+import { getMappedValue, pagingQuery, readablePnl, unixTimestampNow } from "common-utils"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "puppet-const"
-import { IMatchRouteStats, IPositionDecrease, IPositionIncrease, queryMatchRouteStats } from "puppet-middleware"
+import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from "puppet-middleware"
 import {
-  $Baseline, $ButtonToggle, $IntermediatePromise, $Table, $bear, $bull,
+  $Baseline,
+  $bear, $bull,
+  $ButtonToggle,
   $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer,
-  $icon, $infoLabel, $infoLabeledValue, $spinner, IMarker, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse
+  $icon, $infoLabel, $infoLabeledValue,
+  $IntermediatePromise,
+  $spinner,
+  $Table,
+  IMarker, IQuantumScrollPage, ISortBy, TableColumn, TablePageResponse
 } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
-import { $TraderDisplay, $roiDisplay, $size } from "../../common/$common.js"
+import { $roiDisplay, $size, $TraderDisplay } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
-import { subgraphClient } from "../../common/graphClient"
+import { query } from "../../common/query"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import { $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
-import { getPositionListTimelinePerformance, IPerformanceTimelineTick } from "../../components/trade/$ProfilePerformanceGraph"
+import { IPerformanceTimelineTick } from "../../components/trade/$ProfilePerformanceGraph"
 import localStore from "../../const/localStore.js"
+import * as schema from "../../ponder.schema.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { getMarketIndexToken } from "gmx-middleware"
+import { ITraderRouteMetric } from "../../ponder.schema.js"
 
 export interface ILeaderboardMatchStats extends IMatchRouteStats {
   timeline: IPerformanceTimelineTick[]
@@ -40,7 +48,7 @@ interface ILeaderboard extends IUserActivityPageParams {
 
 export const $Leaderboard = (config: ILeaderboard) => component((
   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
-  [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
+  [sortByChange, sortByChangeTether]: Behavior<ISortBy<ITraderRouteMetric>>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
@@ -56,37 +64,67 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
 
-  const routeStatsList = queryMatchRouteStats(subgraphClient, { activityTimeframe, sortBy, collateralTokenList: selectedCollateralTokenList })
+  const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+
+  const routeStatsList = map(async filterParams => {
+
+    const metrictList = await query.db.select().from(schema.traderRouteMetric)
+      .where(
+        and(
+          // ...(filterParams.account ? [eq(schema.traderRouteMetric.account, filterParams.account)] : []),
+          gte(schema.traderRouteMetric.syncTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
+          or(
+            ...(filterParams.collateralTokenList.map(token => (
+              eq(schema.traderRouteMetric.collateralToken, token)
+            )))
+          )
+        )
+      )
+      .orderBy(
+        ...(filterParams.sortBy ? [
+          desc(schema.traderRouteMetric[filterParams.sortBy.selector])
+        ] : [])
+      )
+      .limit(filterParams.paging.pageSize).offset(filterParams.paging.offset)
+      // .leftJoin(schema.traderRouteMetricRelations, eq(cities.id, users.cityId)).all();
+    
+    
+    // const adjustmentList = await query.db.query.select().from(schema.positionIncrease)
+    
+    
+
+    return metrictList
+  }, combineObject({ activityTimeframe, paging, sortBy, collateralTokenList: selectedCollateralTokenList }))
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
     const accountStatsListData = await pageParams.routeStatsList
-    const accountStatsList: ILeaderboardMatchStats[] = accountStatsListData
-      .map(stats => {
-        const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => {
-          try {
-            getMarketIndexToken(pos.market)
-            return pageParams.isLong === undefined || pos.isLong === pageParams.isLong
-          } catch (e) {
-            console.error(e)
-            return false
-          }
-        })
+    const accountStatsList = accountStatsListData
+      // .map(stats => {
+      //   const list = [...stats.matchRoute.increaseList, ...stats.matchRoute.decreaseList].filter(pos => {
+      //     try {
+      //       getMarketIndexToken(pos.market)
+      //       return pageParams.isLong === undefined || pos.isLong === pageParams.isLong
+      //     } catch (e) {
+      //       console.error(e)
+      //       return false
+      //     }
+      //   })
 
-        if (list.length === 0) return null
+      //   if (list.length === 0) return null
 
 
-        const timeline = getPositionListTimelinePerformance({
-          activityTimeframe: pageParams.activityTimeframe,
-          list,
-          pricefeedMap,
-          tickCount: 25,
-        })
+      //   const timeline = getPositionListTimelinePerformance({
+      //     activityTimeframe: pageParams.activityTimeframe,
+      //     list,
+      //     pricefeedMap,
+      //     tickCount: 25,
+      //   })
 
-        stats.pnl = timeline[timeline.length - 1].pnl
+      //   stats.pnl = timeline[timeline.length - 1].pnl
 
-        return { ...stats, timeline, list }
-      })
+      //   return { ...stats, timeline, list }
+      // })
       .filter(pos => pos !== null)
 
     return { accountStatsList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
@@ -136,15 +174,14 @@ export const $Leaderboard = (config: ILeaderboard) => component((
               )
             }
 
-            const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
-            const dataSource: Stream<TablePageResponse<ILeaderboardMatchStats>> = map(scroll => {
+            // const dataSource: Stream<TablePageResponse<ILeaderboardMatchStats>> = map(scroll => {
 
-              const newLocal = pagingQuery(
-                { ...params.sortBy, ...scroll },
-                params.accountStatsList
-              )
-              return newLocal
-            }, paging)
+            //   const newLocal = pagingQuery(
+            //     { ...params.sortBy, ...scroll },
+            //     params.accountStatsList
+            //   )
+            //   return newLocal
+            // }, paging)
 
 
             const columns: TableColumn<ILeaderboardMatchStats>[] = [

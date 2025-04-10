@@ -1,22 +1,22 @@
 import { Behavior, combineObject, fromCallback, replayLatest } from "@aelea/core"
-import { $element, $node, $text, component, eventElementTarget, style, styleBehavior } from "@aelea/dom"
+import { $element, $node, $text, component, eventElementTarget, style } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
-import { colorAlpha, pallete } from "@aelea/ui-components-theme"
+import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "common-utils"
+import { filterNull, switchMap, unixTimestampNow } from "common-utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { IntervalTime } from "puppet-const"
-import { queryPricefeed, subgraphStatus } from "puppet-middleware"
-import { $Tooltip, $alertPositiveContainer, $infoLabeledValue } from "ui-components"
+import { } from "puppet-middleware"
+import { $alertPositiveContainer } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { arbitrum } from "viem/chains"
 import * as walletLink from "wallet"
 import { $midContainer } from "../common/$common.js"
 import { $heading2 } from "../common/$text"
-import { subgraphClient } from "../common/graphClient"
+import { queryPricefeed, subgraphStatus } from "../common/query"
 import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
@@ -100,15 +100,14 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   const activityTimeframe = uiStorage.replayWrite(localstore.global, changeActivityTimeframe, 'activityTimeframe')
   const selectedCollateralTokenList = uiStorage.replayWrite(localStore.global, selectMarketTokenList, 'collateralTokenList')
 
-  const pricefeedMapQuery = replayLatest(multicast(queryPricefeed(subgraphClient, { activityTimeframe })))
+  const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
 
-  const subgraphStatusStream = subgraphStatus(subgraphClient)
   const subgraphBeaconStatusColor = map(status => {
-    const timestampDelta = unixTimestampNow() - new Date(status.timestamp_caught_up_to_head_or_endblock).getTime()
+    const timestampDelta = unixTimestampNow() - new Date(status['arbitrum']?.block?.number || 0).getTime()
 
     const color = timestampDelta > 60 ? pallete.negative : timestampDelta > 10 ? pallete.indeterminate : pallete.positive
     return color
-  }, subgraphStatusStream)
+  }, subgraphStatus)
   const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
   //  fromPromise(indexDb.get(store.global, 'wallet'))
@@ -259,41 +258,41 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               $row(layoutSheet.spacing, style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
                 $row(
-                  $Tooltip({
-                    $content: switchMap(params => {
-                      const blocksBehind = $text(readableUnitAmount(Math.max(0, Number(params.latestBlock - params.subgraphStatus.latest_processed_block))))
-                      const timeSince = getTimeSince(new Date(params.subgraphStatus.timestamp_caught_up_to_head_or_endblock).getTime())
+                  // $Tooltip({
+                  //   $content: switchMap(params => {
+                  //     const blocksBehind = $text(readableUnitAmount(Math.max(0, Number(params.latestBlock) - params.subgraphStatus.status.arbitrum.block.number)))
+                  //     const timeSince = getTimeSince(new Date(params.subgraphStatus.status?.block?.timestamp || 0).getTime())
 
 
-                      return $column(layoutSheet.spacingTiny)(
-                        $text('Subgraph Status'),
-                        $column(
-                          // params.subgraphStatus.hasIndexingErrors
-                          //   ? $alertPositiveContainer($text('Indexing has experienced errors')) : empty(),
-                          $infoLabeledValue('Latest Sync', timeSince),
-                          $infoLabeledValue('blocks behind', blocksBehind),
-                        )
-                      )
-                    }, zipState({ subgraphStatus: subgraphStatusStream, latestBlock })),
-                    $anchor: $row(
-                      style({ width: '8px', height: '8px', borderRadius: '50%', outlineOffset: '4px', padding: '6px' }),
-                      styleBehavior(map(color => {
-                        return { backgroundColor: colorAlpha(color, .5), outlineColor: color }
-                      }, subgraphStatusColorOnce))
-                    )(
-                      $node(
-                        style({
-                          position: 'absolute', top: 'calc(50% - 20px)', left: 'calc(50% - 20px)', width: '40px', height: '40px',
-                          borderRadius: '50%', border: `1px solid rgba(74, 180, 240, 0.12)`, opacity: 0,
-                          animationName: 'signal', animationDuration: '2s',
-                          animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                        }),
-                        styleBehavior(map(color => {
-                          return { backgroundColor: colorAlpha(color, .5), animationIterationCount: color === pallete.negative ? 'infinite' : 1 }
-                        }, subgraphStatusColorOnce))
-                      )()
-                    ),
-                  })({}),
+                  //     return $column(layoutSheet.spacingTiny)(
+                  //       $text('Subgraph Status'),
+                  //       $column(
+                  //         // params.subgraphStatus.hasIndexingErrors
+                  //         //   ? $alertPositiveContainer($text('Indexing has experienced errors')) : empty(),
+                  //         $infoLabeledValue('Latest Sync', timeSince),
+                  //         $infoLabeledValue('blocks behind', blocksBehind),
+                  //       )
+                  //     )
+                  //   }, zipState({ subgraphStatus: subgraphStatusStream, latestBlock })),
+                  //   $anchor: $row(
+                  //     style({ width: '8px', height: '8px', borderRadius: '50%', outlineOffset: '4px', padding: '6px' }),
+                  //     styleBehavior(map(color => {
+                  //       return { backgroundColor: colorAlpha(color, .5), outlineColor: color }
+                  //     }, subgraphStatusColorOnce))
+                  //   )(
+                  //     $node(
+                  //       style({
+                  //         position: 'absolute', top: 'calc(50% - 20px)', left: 'calc(50% - 20px)', width: '40px', height: '40px',
+                  //         borderRadius: '50%', border: `1px solid rgba(74, 180, 240, 0.12)`, opacity: 0,
+                  //         animationName: 'signal', animationDuration: '2s',
+                  //         animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                  //       }),
+                  //       styleBehavior(map(color => {
+                  //         return { backgroundColor: colorAlpha(color, .5), animationIterationCount: color === pallete.negative ? 'infinite' : 1 }
+                  //       }, subgraphStatusColorOnce))
+                  //     )()
+                  //   ),
+                  // })({}),
                 ),
 
               ),

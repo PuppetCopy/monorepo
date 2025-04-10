@@ -88,7 +88,7 @@ export const $PublicUserPage = (config: IUserActivityPageParams) => component((
             run(sink, scheduler) {
               const urlFragments = document.location.pathname.split('/')
               const account = viem.getAddress(urlFragments[urlFragments.length - 1])
-              const matchRouteStatsQuery = queryMatchRouteStats(subgraphClient, { account, activityTimeframe, collateralTokenList: selectedCollateralTokenList })
+              const matchRouteStatsQuery = queryMatchRouteStats(client, { account, activityTimeframe, collateralTokenList: selectedCollateralTokenList })
 
               const metricsQuery = multicast(map(async query => {
                 const positionList = (await query).reduce((seed, next) => {

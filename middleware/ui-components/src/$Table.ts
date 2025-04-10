@@ -47,9 +47,9 @@ export interface IPageRequest {
   pageSize: number
 }
 
-export interface ISortBy {
+export interface ISortBy<T = any, K extends keyof T = keyof T> {
   direction: 'asc' | 'desc'
-  selector: string
+  selector: K
 }
 
 

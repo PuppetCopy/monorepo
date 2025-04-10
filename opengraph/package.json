@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "playwright-core": "^1.46.0",
-    "viem": "2.21.32"
+    "viem": "^2.26.2"
   },
   "devDependencies": {
     "@types/bun": "latest",

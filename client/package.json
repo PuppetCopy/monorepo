@@ -9,7 +9,8 @@
     "clean:rimraf": "rimraf dist && tsc -build --clean",
     "preview": "bunx --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
-    "build:clean:all": "bun --filter '*' clean:tsc"
+    "build:clean:all": "bun --filter '*' clean:tsc",
+    "copy:schema": "cp ../subgraph/ponder.schema.ts ./"
   },
   "dependencies": {
     "@aelea/core": "^1.3.2",
@@ -22,10 +23,10 @@
     "@most/prelude": "^1.8.0",
     "@most/scheduler": "^1.3.0",
     "@most/types": "^1.1.0",
-    "@urql/core": "5.0.8",
+    "@ponder/client": "^0.10.11",
     "@urql/exchange-graphcache": "7.2.1",
     "@walletconnect/ethereum-provider": "2.17.1",
-    "abitype": "1.0.6",
+    "abitype": "1.0.8",
     "color": "^4.2.3",
     "common-utils": "workspace:*",
     "construct-style-sheets-polyfill": "3.1.0",
@@ -39,7 +40,7 @@
     "ui-components": "workspace:*",
     "ui-router": "workspace:*",
     "ui-storage": "workspace:*",
-    "viem": "2.21.32",
+    "viem": "^2.26.2",
     "wallet": "workspace:*"
   },
   "devDependencies": {

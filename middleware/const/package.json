@@ -12,6 +12,6 @@
         "build:tsc": "bun tsc -b"
     },
     "dependencies": {
-        "viem": "2.21.32"
+        "viem": "^2.26.2"
     }
 }

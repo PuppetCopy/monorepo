@@ -25,7 +25,7 @@ export const CONTRACT = {
       abi: routerAbi,
     },
 
-    Dictator: {
+    Dictatorship: {
       address: "0x583367f217a6684039d378C0a142Cbe17F2FC058",
       abi: dictatorshipAbi,
     },

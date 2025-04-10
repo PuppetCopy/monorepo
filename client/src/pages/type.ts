@@ -6,6 +6,8 @@ import * as walletLink from "wallet"
 import { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 import { IMatchRuleEditorChange } from '../components/portfolio/$MatchRuleEditor'
 import { IntervalTime } from 'puppet-const'
+import { type Event } from "ponder:registry";
+import { type priceCandle } from "../ponder.schema";
 
 
 export interface IWalletPageParams {
@@ -24,7 +26,7 @@ export interface IPageParams extends IComponentPageParams {
 export interface IUserActivityPageParams extends IPageParams {
   selectedCollateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
-  pricefeedMapQuery: Stream<Promise<IPricefeedMap>>
+  pricefeedMapQuery: Stream<Promise<typeof priceCandle.$inferSelect[]>>
   depositTokenList: Stream<IDepositEditorChange[]>
   matchRuleList: Stream<IMatchRuleEditorChange[]>
 }

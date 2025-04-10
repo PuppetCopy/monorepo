@@ -102,7 +102,7 @@ export const querySubgraph = <
   }
 
   const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
-  const orderByFilterParam = params.sortBy ? parseFilterObject({ order_by: params.sortBy }) : ''
+  const orderByFilterParam = params.sortBy ? parseFilterObject({ orderBy: params.sortBy }) : ''
   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
   const limit = params.limit ? `limit: ${params.limit},` : ''
   const filter = whereClause ? `(${limit}, ${orderByFilterParam} ${whereClause})` : ''

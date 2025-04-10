@@ -154,15 +154,14 @@ export function queryMatchRoute<TStateParams extends StateParams<IQueryMatchRout
   )
 }
 
-export interface IQueryLeaderboardParams {
-  account?: viem.Address
-  activityTimeframe?: IntervalTime
-  sortBy?: IRequestSortApi
-  collateralTokenList?: viem.Address[]
-}
 export function queryMatchRouteStats(
   subgraphClient: Client,
-  queryParams: StateParams<IQueryLeaderboardParams>
+  queryParams: StateParams<{
+    account?: viem.Address
+    activityTimeframe?: IntervalTime
+    sortBy?: IRequestSortApi
+    collateralTokenList?: viem.Address[]
+  }>
 ) {
   return map(async filterParams => {
     const filter: graph.IQueryFilter<IMatchRouteStats> = {}
@@ -273,7 +272,6 @@ export function queryPricefeed(
 
     return mapped
   }, combineState(queryParams))
-
 }
 
 export const latestPriceMap: Stream<IPriceOracleMap> = replayLatest(multicast(periodicRun({
@@ -286,37 +284,6 @@ export const latestPriceMap: Stream<IPriceOracleMap> = replayLatest(multicast(pe
 })))
 
 
-
-interface ISubgraphStatus {
-  end_block?: number
-  first_event_block_number: number
-  latest_processed_block: bigint
-  num_events_processed: number
-  timestamp_caught_up_to_head_or_endblock: number
-  __typename: 'chain_metadata',
-}
-
-const chainMetadataSchema: graph.ISchema<ISubgraphStatus> = {
-  first_event_block_number: 'bigint',
-  latest_processed_block: 'bigint',
-  num_events_processed: 'bigint',
-  timestamp_caught_up_to_head_or_endblock: 'string',
-  __typename: 'chain_metadata',
-}
-
-export const getSubgraphStatus = async (subgraphClient: Client): Promise<ISubgraphStatus> => {
-  const query = await graph.querySubgraph(subgraphClient, {
-    schema: chainMetadataSchema,
-  }, { requestPolicy: 'network-only' })
-
-  return query[0]
-}
-
-export const subgraphStatus = (subgraphClient: Client): Stream<ISubgraphStatus> => replayLatest(multicast(periodicRun({
-  startImmediate: true,
-  interval: 2500,
-  actionOp: map(() => getSubgraphStatus(subgraphClient)),
-})))
 
 
 export type { Client }
