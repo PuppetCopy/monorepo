@@ -3,9 +3,10 @@ import { $Node, NodeComposeFn, component, style } from "@aelea/dom"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { now, skipRepeatsWith } from "@most/core"
 import { createTimeline, formatFixed, unixTimestampNow } from "common-utils"
-import { IPricefeedMap, IPricetick, getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware"
+import { IPricetick, getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware"
 import { BaselineData, ChartOptions, DeepPartial, LineType, MouseEventParams, Time } from "lightweight-charts"
 import { IntervalTime, USD_DECIMALS } from "puppet-const"
+import { IPriceCandle } from "schema"
 import { $Baseline, IMarker } from "ui-components"
 import * as viem from "viem"
 
@@ -39,7 +40,7 @@ type IAbstractUpdate = {
 }
 
 export interface IPerformanceTimeline {
-  pricefeedMap: IPricefeedMap
+  pricefeedMap: Record<viem.Address, IPriceCandle[]>
   activityTimeframe: IntervalTime
   list: IAbstractUpdate[]
   tickCount: number

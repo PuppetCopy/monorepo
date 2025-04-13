@@ -14,14 +14,14 @@
   ],
   "workspaces": [
     "client",
-    "middleware/*",
     "docs",
-    "opengraph"
+    "opengraph",
+    "middleware/*"
   ],
   "scripts": {
     "docs:build": "cd docs && bun run build",
     "client:build": "cd client && bun run build",
-    "wagmi:generate": "wagmi generate"
+    "wagmi:generate": "wagmi generate --config wagmi.client.config.ts && wagmi generate --config wagmi.subgraph.config.ts"
   },
   "devDependencies": {
     "typescript-eslint": "8.29.1",

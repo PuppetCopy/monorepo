@@ -1,14 +1,12 @@
-
 import { replayLatest } from "@aelea/core";
 import { map, multicast } from "@most/core";
 import { and, createClient, desc, eq, gte, or, Status } from "@ponder/client";
-import { combineState, getClosestNumber, IRequestSortApi, periodicRun, StateParams, unixTimestampNow } from "common-utils";
+import { combineState, getClosestNumber, periodicRun, StateParams, unixTimestampNow } from "common-utils";
 import { IntervalTime, PRICEFEED_INTERVAL } from "puppet-const";
+import * as schema from "schema";
 import * as viem from "viem";
-import * as schema from "../ponder.schema";
-import { Stream } from "@most/types";
 
-export const query = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema });
+export const query = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, });
 
 
 export const getSubgraphStatus = async (): Promise<Status> => {
@@ -44,7 +42,8 @@ export function queryPricefeed(
       )
       .orderBy(
         desc(schema.priceCandle.slotTime)
-      )
+    )
+    // map results by token
 
   }, combineState(queryParams))
 }

@@ -10,7 +10,7 @@
     "preview": "bunx --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
-    "copy:schema": "cp ../subgraph/ponder.schema.ts ./"
+    "copy:schema": "cp ../subgraph/ponder.schema.ts ./src/__generated__/ponder.schema.ts"
   },
   "dependencies": {
     "@aelea/core": "^1.3.2",
@@ -23,7 +23,7 @@
     "@most/prelude": "^1.8.0",
     "@most/scheduler": "^1.3.0",
     "@most/types": "^1.1.0",
-    "@ponder/client": "^0.10.11",
+    "@ponder/client": "0.10.10",
     "@urql/exchange-graphcache": "7.2.1",
     "@walletconnect/ethereum-provider": "2.17.1",
     "abitype": "1.0.8",

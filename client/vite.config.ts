@@ -1,9 +1,8 @@
 import replace from '@rollup/plugin-replace'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import tsconfigPaths from 'vite-tsconfig-paths' // Import the plugin
 import { dark } from './src/common/theme.js'
-
-
 
 const SITE_CONFIG = {
   __WEBSITE__: 'https://puppet.house',
@@ -22,6 +21,7 @@ export default defineConfig({
     port: Number(process.env.PORT) || 3000,
   },
   plugins: [
+    tsconfigPaths(),
     VitePWA({
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
@@ -78,6 +78,6 @@ export default defineConfig({
     replace({
       include: 'index.html',
       ...SITE_CONFIG
-    }),
+    })
   ]
 })

@@ -1,13 +1,11 @@
 import * as router from '@aelea/router'
 import { Stream } from '@most/types'
-import { IPricefeedMap } from 'gmx-middleware'
+import { IntervalTime } from 'puppet-const'
+import { IPriceCandle } from "schema"
 import * as viem from 'viem'
 import * as walletLink from "wallet"
 import { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 import { IMatchRuleEditorChange } from '../components/portfolio/$MatchRuleEditor'
-import { IntervalTime } from 'puppet-const'
-import { type Event } from "ponder:registry";
-import { type priceCandle } from "../ponder.schema";
 
 
 export interface IWalletPageParams {
@@ -26,7 +24,7 @@ export interface IPageParams extends IComponentPageParams {
 export interface IUserActivityPageParams extends IPageParams {
   selectedCollateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
-  pricefeedMapQuery: Stream<Promise<typeof priceCandle.$inferSelect[]>>
+  pricefeedMapQuery: Stream<Promise<Record<viem.Address, IPriceCandle[]>>>
   depositTokenList: Stream<IDepositEditorChange[]>
   matchRuleList: Stream<IMatchRuleEditorChange[]>
 }

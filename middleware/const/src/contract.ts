@@ -5,11 +5,11 @@ import {
   puppetTokenAbi,
   puppetVoteTokenAbi,
   routerAbi,
-  matchRuleAbi,
+  matchingRuleAbi,
   mirrorPositionAbi,
   feeMarketplaceAbi,
   errorAbi
-} from "./abi/__generatedContracts.js";
+} from "./abi/__generatedAbi.js";
 
 // gmx v2
 import exchangeRouter from "./abi/exchangeRouter";
@@ -44,7 +44,7 @@ export const CONTRACT = {
 
     MatchRule: {
       address: "0x1fC2D4aE5E8bA3fE3dF7B6c8D9B1fF8C8E0eA8C7",
-      abi: matchRuleAbi,
+      abi: matchingRuleAbi,
     },
     MirrorPosition: {
       address: "0x4F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",

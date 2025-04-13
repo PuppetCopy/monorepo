@@ -16,7 +16,6 @@ export const positionIncrease = onchainTable("PositionIncrease", t => ({
   id: t.hex().primaryKey(),
   market: t.hex().notNull(),
   account: t.hex().notNull(),
-  orderKey: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
   positionKey: t.hex().notNull(),
 
@@ -52,6 +51,7 @@ export const positionIncrease = onchainTable("PositionIncrease", t => ({
 }))
 export type IPositionIncrease = typeof positionIncrease.$inferInsert
 
+
 export const positionIncreaseRelations = relations(positionIncrease, ({ one }) => ({
   feeCollected: one(positionFeesCollected, { fields: [positionIncrease.feeCollectedId], references: [positionFeesCollected.id] }),
   traderRoute: one(traderRoute, { fields: [positionIncrease.traderRouteId], references: [traderRoute.id] }),
@@ -62,7 +62,6 @@ export const positionDecrease = onchainTable("PositionDecrease", t => ({
   id: t.hex().primaryKey(),
   market: t.hex().notNull(),
   account: t.hex().notNull(),
-  orderKey: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
   positionKey: t.hex().notNull(),
 
@@ -143,26 +142,22 @@ export const positionFeesCollected = onchainTable("PositionFeesCollected", t => 
 )
 export type IPositionFeesCollected = typeof positionFeesCollected.$inferInsert
 
-export const profile = onchainTable("Profile", t => ({
-  id: t.hex().primaryKey(),
-  gbcTokenId: t.hex().notNull(),
-}))
-export type IProfile = typeof profile.$inferInsert
 
-export const puppetUser = onchainTable("PuppetUser", t => ({
+export const puppetProfile = onchainTable("PuppetProfile", t => ({
   id: t.hex().primaryKey(),
-  account: t.hex().notNull(),
   token: t.hex().notNull(),
   balance: t.bigint().notNull(),
   allocated: t.bigint().notNull(),
-
-  userId: t.hex().notNull(),
+  gbcTokenId: t.integer(),
 }))
-export type IPuppetUser = typeof puppetUser.$inferInsert
+export type IPuppetUser = typeof puppetProfile.$inferInsert
 
-export const puppetUserRelations = relations(puppetUser, ({ one, many }) => ({
-  profile: one(profile, { fields: [puppetUser.userId], references: [profile.id] }),
+export const traderUser = onchainTable("TraderUser", t => ({
+  id: t.hex().primaryKey(),
+  gbcTokenId: t.hex(),
 }))
+export type ITraderUser = typeof puppetProfile.$inferInsert
+
 
 export const puppetAllocation = onchainTable("PuppetAllocation", t => ({
   id: t.hex().primaryKey(),
@@ -235,17 +230,11 @@ export const mirrorPositionRelations = relations(mirrorPosition, ({ many }) => (
 export const traderOpenPnl = onchainTable("TraderOpenPnl", t => ({
   id: t.hex().primaryKey(),
   pnl: t.bigint().notNull(),
-
-  traderRouteId: t.hex().notNull(),
-  profileId: t.hex().notNull(),
+  account: t.hex().notNull(),
 })
 )
 export type ITraderOpenPnl = typeof traderOpenPnl.$inferInsert
 
-export const traderRouteOpenPnlRelations = relations(traderOpenPnl, ({ one }) => ({
-  // traderRoute: one(traderRoute, { fields: [traderRouteOpenPnl.traderRouteId], references: [traderRoute.id] }),
-  profile: one(profile, { fields: [traderOpenPnl.profileId], references: [profile.id] }),
-}))
 
 export const traderRouteMetric = onchainTable("TraderRouteMetric", t => ({
   id: t.text().primaryKey(),
@@ -265,6 +254,9 @@ export const traderRouteMetric = onchainTable("TraderRouteMetric", t => ({
   roi: t.bigint().notNull(),
   interval: t.integer().notNull(),
   syncTimestamp: t.integer().notNull(),
+  marketList: t.hex().array().notNull(),
+  longShortRatio: t.bigint().notNull(),
+
   traderRouteId: t.hex().notNull(),
 }))
 export type ITraderRouteMetric = typeof traderRouteMetric.$inferInsert
@@ -281,10 +273,10 @@ export const traderRoute = onchainTable("TraderRoute", t => ({
 export type ITraderRoute = typeof traderRoute.$inferInsert
 
 export const traderRouteRelations = relations(traderRoute, ({ many, one }) => ({
-  profile: one(profile, { fields: [traderRoute.account], references: [profile.id] }),
+  profile: one(traderUser, { fields: [traderRoute.account], references: [traderUser.id] }),
   increaseList: many(positionIncrease),
   decreaseList: many(positionDecrease),
-  settlementList: many(settlement),
+  // settlementList: many(settlement),
   statsList: many(traderRouteMetric),
 }))
 

@@ -23,7 +23,11 @@
     "noUnusedParameters": false,
     "noEmit": true,
     "isolatedModules": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    /* Path Aliases */
+    "paths": {
+      "schema": ["./src/__generated__/ponder.schema.ts"]
+    }
   },
   "references": [
     {
