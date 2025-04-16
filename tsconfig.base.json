@@ -20,10 +20,11 @@
     "allowJs": false,
     "checkJs": false,
     // Interop constraints
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": false,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
     // Language and environment
     "moduleResolution": "NodeNext",
     "module": "NodeNext",

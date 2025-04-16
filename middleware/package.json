@@ -4,7 +4,6 @@
   "description": "Copytrading middleware",
   "version": "2.27.0",
   "type": "module",
-  "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "typings": "./dist/types/index.d.ts",
@@ -15,48 +14,39 @@
   "exports": {
     "./const": {
       "types": "./dist/types/const/index.d.ts",
-      "import": "./dist/esm/const/index.js",
-      "default": "./dist/cjs/const/index.js"
+      "import": "./dist/esm/const/index.js"
     },
     "./core": {
       "types": "./dist/types/core/index.d.ts",
-      "import": "./dist/esm/core/index.js",
-      "default": "./dist/cjs/core/index.js"
+      "import": "./dist/esm/core/index.js"
     },
     "./wallet": {
       "types": "./dist/types/wallet/index.d.ts",
-      "import": "./dist/esm/wallet/index.js",
-      "default": "./dist/cjs/wallet/index.js"
+      "import": "./dist/esm/wallet/index.js"
     },
     "./utils": {
       "types": "./dist/types/utils/index.d.ts",
-      "import": "./dist/esm/utils/index.js",
-      "default": "./dist/cjs/utils/index.js"
+      "import": "./dist/esm/utils/index.js"
     },
     "./gmx": {
       "types": "./dist/types/gmx/index.d.ts",
-      "import": "./dist/esm/gmx/index.js",
-      "default": "./dist/cjs/gmx/index.js"
+      "import": "./dist/esm/gmx/index.js"
     },
     "./gbc": {
       "types": "./dist/types/gbc/index.d.ts",
-      "import": "./dist/esm/gbc/index.js",
-      "default": "./dist/cjs/gbc/index.js"
+      "import": "./dist/esm/gbc/index.js"
     },
     "./ui-components": {
       "types": "./dist/types/ui-components/index.d.ts",
-      "import": "./dist/esm/ui-components/index.js",
-      "default": "./dist/cjs/ui-components/index.js"
+      "import": "./dist/esm/ui-components/index.js"
     },
     "./ui-router": {
       "types": "./dist/types/ui-router/index.d.ts",
-      "import": "./dist/esm/ui-router/index.js",
-      "default": "./dist/cjs/ui-router/index.js"
+      "import": "./dist/esm/ui-router/index.js"
     },
     "./ui-storage": {
       "types": "./dist/types/ui-storage/index.d.ts",
-      "import": "./dist/esm/ui-storage/index.js",
-      "default": "./dist/cjs/ui-storage/index.js"
+      "import": "./dist/esm/ui-storage/index.js"
     },
     "./package.json": "./package.json"
   },

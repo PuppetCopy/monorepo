@@ -1,13 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "include": [
-    "middleware",
-    "contracts"
+    "middleware"
   ],
-  "exclude": [
-  ],
+  "exclude": [],
   "compilerOptions": {
     "sourceMap": true,
-    "resolveJsonModule": true
+    "rootDir": "./middleware"
   }
 }

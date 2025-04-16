@@ -1,6 +1,6 @@
 import { erc20Abi } from "viem";
 import * as abi from "./abi/__generatedAbi.js";
-import addresses from '../../contracts/deployments/addresses.json' with { type: "json" };
+import addresses from './addresses.json' with { type: "json" };
 
 // gmx v2
 import exchangeRouter from "./abi/exchangeRouter.js";
@@ -48,7 +48,7 @@ export const CONTRACT = {
     FeeMarketplace: {
       address: "",
       abi: abi.feeMarketplaceAbi,
-    }
+    },
 
 
     GMX: {
