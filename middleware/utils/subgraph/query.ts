@@ -140,7 +140,7 @@ export function parseQueryResults(json: any, schema: any) {
 
       entity[key] = parseFn(value)
     } else if (value instanceof Array) {
-      entity[key] = value.map((item, i) => parseQueryResults(item, schemaType))
+      entity[key] = value.map((item) => parseQueryResults(item, schemaType))
     } else if (value instanceof Object) {
       entity[key] = parseQueryResults(value, schemaType)
     } else {

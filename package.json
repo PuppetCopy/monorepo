@@ -26,8 +26,11 @@
     "!**/*.test.ts"
   ],
   "scripts": {
-    "build": "pnpm clean && pnpm build:cjs && pnpm build:esm && pnpm build:types",
-    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./dist/_esm",
+    "build": "bun run build:clean && bun run build:cjs && bun run build:esm && bun run build:types",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --moduleResolution node --outDir ./middleware/dist/_cjs --removeComments --verbatimModuleSyntax false",
+    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./middleware/dist/_esm",
+    "build:types": "tsc --project ./tsconfig.build.json --declarationDir ./middleware/dist/_types --emitDeclarationOnly --declaration --declarationMap",
+    "build:clean": "rm -rf *.tsbuildinfo middleware/dist/*.tsbuildinfo middleware/dist/_esm middleware/dist/_cjs middleware/dist/_types",
     "docs:build": "cd docs && bun run build",
     "client:build": "cd client && bun run build",
     "forge:test": "forge test --match-contract TradingTest -vvvvv",

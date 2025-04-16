@@ -1,5 +1,5 @@
 import { O } from '@aelea/core'
-import { $Node, nodeEvent } from '@aelea/dom'
+import { type $Node, nodeEvent } from '@aelea/dom'
 import { constant, filter, merge } from '@most/core'
 
 

@@ -1,11 +1,12 @@
-import { Behavior, O } from "@aelea/core"
-import { $element, $text, NodeComposeFn, attr, attrBehavior, component, style, stylePseudo } from "@aelea/dom"
+import { type Behavior, O } from "@aelea/core"
+import { $element, $text, type NodeComposeFn, attrBehavior, component, style, stylePseudo } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map } from "@most/core"
-import { Stream } from "@most/types"
-import { $Field, Field } from "./$Field.js"
-import { streamOf } from "../utils/index.js"
+import type { Stream } from "@most/types"
+import { streamOf } from "../../utils/index.js"
+import { $Field, type Field } from "./$Field.js"
+
 
 
 

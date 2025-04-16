@@ -13,7 +13,7 @@ export type { Client, ClientOptions, OperationContext, TypedDocumentNode }
 const createSubgraphClient = (opts: ClientOptions) => {
   const client = createClient(opts)
 
-  return async <Data, Variables extends object = object>(document: TypedDocumentNode<Data, Variables>, params: Variables, context?: Partial<OperationContext>): Promise<Data> => {
+  return async <Data, Variables extends object = object>(document: TypedDocumentNode<Data, Variables>, params: Variables, context?: Partial<OperationContext>): Promise<Data | undefined> => {
     const result = await client.query(document, params, context)
       .toPromise()
 

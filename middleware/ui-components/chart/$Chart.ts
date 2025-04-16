@@ -241,7 +241,7 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
 
             return coords.crosshairMove?.point?.y || null
           }, combineObject({ crosshairMove, isFocused: config.yAxisState.isFocused })),
-          snapshot((params, range) => {
+          snapshot((params) => {
             if (params.isFocused && params.price) {
               return seriesApi.priceToCoordinate(params.price)
             }

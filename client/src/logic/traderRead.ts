@@ -6,10 +6,9 @@ import { erc20Abi } from "abitype/abis"
 import { ITokenDescription, filterNull, getDenominator, getMappedValue, parseFixed } from "../utils/index.js"
 import { hashData, resolveAddress } from "../gmx/index.js"
 import * as PUPPET from "../const/index.js"
-import { } from "puppet-middleware"
 import * as viem from "viem"
 import { getBalance } from "viem/actions"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 
 
 
