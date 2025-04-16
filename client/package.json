@@ -27,20 +27,13 @@
     "@walletconnect/ethereum-provider": "2.19.2",
     "abitype": "1.0.8",
     "color": "^5.0.0",
-    "common-utils": "workspace:*",
+    "@puppet/middleware": "workspace:*",
     "construct-style-sheets-polyfill": "3.1.0",
     "eventemitter3": "^5.0.1",
-    "gmx-middleware": "workspace:*",
     "lightweight-charts": "4.2.3",
     "mersenne-twister": "1.1.0",
     "mipd": "^0.0.7",
-    "puppet-const": "workspace:*",
-    "puppet-middleware": "workspace:*",
-    "ui-components": "workspace:*",
-    "ui-router": "workspace:*",
-    "ui-storage": "workspace:*",
-    "viem": "^2.26.2",
-    "wallet": "workspace:*"
+    "viem": "^2.26.2"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "5.1.4",

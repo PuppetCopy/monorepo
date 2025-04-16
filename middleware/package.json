@@ -25,6 +25,16 @@
       "import": "./_esm/index.js",
       "default": "./_cjs/index.js"
     },
+    "./const": {
+      "types": "./_types/const/index.d.ts",
+      "import": "./_esm/const/index.js",
+      "default": "./_cjs/const/index.js"
+    },
+    "./core": {
+      "types": "./_types/core/index.d.ts",
+      "import": "./_esm/core/index.js",
+      "default": "./_cjs/core/index.js"
+    },
     "./wallet": {
       "types": "./_types/wallet/index.d.ts",
       "import": "./_esm/wallet/index.js",
@@ -40,28 +50,15 @@
       "import": "./_esm/gmx/index.js",
       "default": "./_cjs/gmx/index.js"
     },
-    "./const": {
-      "types": "./_types/const/index.d.ts",
-      "import": "./_esm/const/index.js",
-      "default": "./_cjs/const/index.js"
-    },
-    "./@gambitdao-gbc-middleware": {
-      "types": "./_types/@gambitdao-gbc-middleware/index.d.ts",
-      "import": "./_esm/@gambitdao-gbc-middleware/index.js",
-      "default": "./_cjs/@gambitdao-gbc-middleware/index.js"
-    },
-    "./core": {
-      "types": "./_types/core/index.d.ts",
-      "import": "./_esm/core/index.js",
-      "default": "./_cjs/core/index.js"
+    "./gbc": {
+      "types": "./_types/gbc/index.d.ts",
+      "import": "./_esm/gbc/index.js",
+      "default": "./_cjs/gbc/index.js"
     },
     "./package.json": "./package.json"
   },
   "dependencies": {
     "@aelea/core": "^1.3.2",
-    "gmx-middleware": "workspace:*",
-    "puppet-const": "workspace:*",
-    "common-utils": "workspace:*",
     "@most/core": "^1.6.1",
     "@most/disposable": "^1.3.0",
     "@most/prelude": "^1.8.0",
