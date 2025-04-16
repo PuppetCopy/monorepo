@@ -1,9 +1,9 @@
 import * as viem from "viem"
-import { applyFactor, getDenominator, getMappedValue, getTokenUsd } from "common-utils"
-import { getPriceImpactForPosition } from "./price.js"
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from "../const/index.js"
+import { applyFactor, getDenominator, getMappedValue, getTokenUsd } from "../utils/index.js"
 import { getPoolUsdWithoutPnl } from "./market.js"
-import { IMarketPrice, IMarketInfo, IPositionFees, PositionReferralFees, IPositionNumbers } from "./types.js"
-import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from "puppet-const"
+import { getPriceImpactForPosition } from "./price.js"
+import type { IMarketInfo, IMarketPrice, IPositionFees, IPositionNumbers, PositionReferralFees } from "./types.js"
 
 
 

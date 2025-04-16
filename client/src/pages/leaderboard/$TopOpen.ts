@@ -7,8 +7,8 @@
 // import { Stream } from "@most/types"
 // import * as GMX from 'gmx-middleware'
 // import { $Table, ISortBy, ScrollRequest } from "ui-components"
-// import { IAbstractPositionParams, pagingQuery, switchMap } from "gmx-middleware"
-// import { ROUTE_DESCRIPTION } from "puppet-const"
+// import { IAbstractPositionParams, pagingQuery, switchMap } from "../gmx/index.js"
+// import { ROUTE_DESCRIPTION } from "../const/index.js"
 // import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "puppet-middleware"
 // import { $labelDisplay } from "../../common/$TextField.js"
 // import { $TraderDisplay, $route } from "../../common/$common.js"

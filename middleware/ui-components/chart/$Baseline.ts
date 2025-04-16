@@ -1,13 +1,13 @@
 import { pallete } from '@aelea/ui-components-theme'
 import {
-  BarPrice,
-  BaselineSeriesPartialOptions,
-  ChartOptions,
-  DeepPartial,
+  type BarPrice,
+  type BaselineSeriesPartialOptions,
+  type ChartOptions,
+  type DeepPartial,
   LineStyle
 } from 'lightweight-charts'
-import { $Chart, IChartConfig } from "./$Chart.js"
-import { readableUnitAmount } from 'common-utils'
+import { $Chart, type IChartConfig } from "./$Chart.js"
+import { readableUnitAmount } from '../../utils/index.js'
 
 
 export interface IBaselineChart extends IChartConfig<'Baseline'> {

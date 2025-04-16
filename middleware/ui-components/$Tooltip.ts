@@ -1,5 +1,5 @@
-import { Behavior } from "@aelea/core"
-import { $Node, component, eventElementTarget, INode, NodeComposeFn, nodeEvent, style, styleInline } from '@aelea/dom'
+import type { Behavior } from "@aelea/core"
+import { type $Node, component, eventElementTarget, type INode, type NodeComposeFn, nodeEvent, style, styleInline } from '@aelea/dom'
 import { $column, $row, observer } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, switchLatest, empty, map, skipRepeats, startWith, skip, zip } from "@most/core"

@@ -3,9 +3,9 @@ import { constant, map, mergeArray, multicast, now, startWith } from "@most/core
 import { disposeWith } from "@most/disposable"
 import type { Stream } from "@most/types"
 import { EthereumProvider } from "@walletconnect/ethereum-provider"
-import { switchMap } from "../utils"
 import type { EIP1193Provider } from "mipd"
 import { createPublicClient, createWalletClient, custom, fallback, getAddress, type Account, type Chain, type CustomTransport, type EIP1193EventMap, type PublicClient, type Transport, type WalletClient } from "viem"
+import { switchMap } from "../utils/index.js"
 
 
 export type IPublicProvider = PublicClient<Transport, Chain>

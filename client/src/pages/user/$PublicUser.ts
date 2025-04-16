@@ -3,9 +3,9 @@ import { $node, $text, component, style } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { map, mergeArray, multicast, now, startWith } from "@most/core"
-import { combineState, ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, switchMap } from "common-utils"
-import { getMarketIndexToken } from "gmx-middleware"
-import { IntervalTime } from "puppet-const"
+import { combineState, ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, switchMap } from "../utils/index.js"
+import { getMarketIndexToken } from "../gmx/index.js"
+import { IntervalTime } from "../const/index.js"
 import { accountSettledPositionListSummary, aggregatePositionList, IPosition, queryMatchRoute, queryMatchRouteStats, queryPosition } from "puppet-middleware"
 import { $ButtonToggle, $defaulButtonToggleContainer, intermediateText } from "ui-components"
 import * as viem from 'viem'

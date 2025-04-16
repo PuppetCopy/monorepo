@@ -1,8 +1,8 @@
 import { replayLatest } from "@aelea/core";
 import { map, multicast } from "@most/core";
 import { createClient, Status } from "@ponder/client";
-import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "common-utils";
-import { IntervalTime, PRICEFEED_INTERVAL } from "puppet-const";
+import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "../utils/index.js";
+import { IntervalTime, PRICEFEED_INTERVAL } from "../const/index.js";
 import * as schema from "schema";
 import * as viem from "viem";
 

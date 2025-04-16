@@ -5,11 +5,9 @@ import { O } from '@aelea/core'
 import type { Fragment, Path, PathEvent, Route, RouteConfig } from './types.js'
 
 
-
 type RootRouteConfig = RouteConfig & {
   fragmentsChange: Stream<PathEvent>
 }
-
 
 export const create = ({ fragment = '', fragmentsChange, title }: RootRouteConfig) => {
   const ignoreRepeatPathChanges = skipRepeatsWith((next, prev) => {

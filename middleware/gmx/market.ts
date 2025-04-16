@@ -1,6 +1,6 @@
-import { applyFactor, factor, getTokenUsd } from "common-utils"
-import { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from "./types.js"
-import { FLOAT_PRECISION, IntervalTime } from "puppet-const"
+import { applyFactor, factor, getTokenUsd } from "../utils/index.js"
+import type { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from "./types.js"
+import { FLOAT_PRECISION, IntervalTime } from "../const/index.js"
 
 export function getPoolUsd(
   marketInfo: IMarketInfo,

@@ -1,9 +1,9 @@
-import { Behavior, combineArray, O } from "@aelea/core"
-import { $Branch, $element, component, style, styleBehavior, StyleCSS, stylePseudo } from "@aelea/dom"
-import { $RouterAnchor, IAnchor } from "@aelea/router"
+import { type Behavior, combineArray, O } from "@aelea/core"
+import { type $Branch, $element, component, style, styleBehavior, type StyleCSS } from "@aelea/dom"
+import { $RouterAnchor, type IAnchor } from "@aelea/router"
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map } from "@most/core"
-import { Stream } from "@most/types"
+import type { Stream } from "@most/types"
 
 
 export interface ILink extends Omit<IAnchor, '$anchor'> {

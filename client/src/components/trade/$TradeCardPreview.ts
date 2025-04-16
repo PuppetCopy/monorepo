@@ -4,7 +4,7 @@ import { $NumberTicker, $column, $icon, $row, layoutSheet, screenUtils } from "@
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, multicast, skipRepeatsWith, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { filterNull, parseReadableNumber, readableUnitAmount } from "common-utils"
+import { filterNull, parseReadableNumber, readableUnitAmount } from "../utils/index.js"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from "lightweight-charts"
 import { IPosition } from "puppet-middleware"
 import { $Baseline, $bear, $bull, $infoTooltipLabel } from "ui-components"

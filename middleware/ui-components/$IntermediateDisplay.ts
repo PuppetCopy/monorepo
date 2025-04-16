@@ -1,11 +1,10 @@
-import { Op, replayLatest } from "@aelea/core"
-import { $Node, $node, $text, component, style } from "@aelea/dom"
+import { type Op, replayLatest } from "@aelea/core"
+import { type $Node, $node, $text, component, style } from "@aelea/dom"
 import { $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, empty, fromPromise, map, merge, mergeArray, multicast, now, recoverWith, startWith, switchLatest } from "@most/core"
-import { Stream } from "@most/types"
-import { Abi } from "abitype"
-import { Chain, TransactionReceipt } from "viem"
+import type { Stream } from "@most/types"
+import type { Chain, TransactionReceipt } from "viem"
 import { $alert, $alertTooltip, $txHashRef, } from "./$common.js"
 
 
@@ -79,10 +78,6 @@ export const $IntermediatePromise = <T>({
 
 
 type IIntermediateTx<
-  TAbi extends Abi,
-  TFunctionName extends string,
-  TChain extends Chain,
-  TChainOverride extends Chain,
   TSuccess extends TransactionReceipt,
 > = {
   $$success?: Op<TSuccess, $Node>
@@ -93,10 +88,6 @@ type IIntermediateTx<
 }
 
 export const $IntermediateTx = <
-  TAbi extends Abi,
-  TFunctionName extends string,
-  TChain extends Chain,
-  TChainOverride extends Chain,
   TSuccess extends TransactionReceipt,
 >({
   query,
@@ -104,7 +95,7 @@ export const $IntermediateTx = <
   clean = empty(),
   $$success = constant($text(style({ color: pallete.positive }))('Tx Succeeded')),
   showTooltip = false
-}: IIntermediateTx<TAbi, TFunctionName, TChain, TChainOverride, TSuccess>) => {
+}: IIntermediateTx<TSuccess>) => {
 
   const multicastQuery = replayLatest(multicast(query))
 

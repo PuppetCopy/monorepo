@@ -1,7 +1,7 @@
-import { ExtractAbiEvent } from "abitype"
+import type { ExtractAbiEvent } from "abitype"
 import * as viem from "viem"
-import * as CONST from "../const"
-import { IntervalTime } from "../const"
+import * as CONST from "../const/index.js"
+import { IntervalTime } from "../const/index.js"
 
 export type ITokenSymbol = keyof typeof CONST.TOKEN_DESCRIPTION_MAP
 

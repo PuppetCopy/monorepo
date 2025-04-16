@@ -1,4 +1,4 @@
-import { ILogTxType, ILogTypeId } from "gmx-middleware"
+import type { ILogTxType, ILogTypeId } from "../gmx/index.js"
 import * as viem from "viem"
 
 
@@ -39,7 +39,7 @@ export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollecte
   affiliate: viem.Address
   referralCode: viem.Address
   positionKey: viem.Address
-  
+
 
   collateralTokenPriceMin: bigint
   collateralTokenPriceMax: bigint

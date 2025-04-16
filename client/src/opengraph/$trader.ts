@@ -2,8 +2,8 @@
 // import { $column, layoutSheet } from "@aelea/ui-components"
 // import { now } from "@most/core"
 // import { Stream } from "@most/types"
-// import { IntervalTime } from "common-utils"
-// import { IPriceTickListMap } from "gmx-middleware"
+// import { IntervalTime } from "../utils/index.js"
+// import { IPriceTickListMap } from "../gmx/index.js"
 // import { ISetRouteType, queryPosition } from "puppet-middleware"
 // import * as viem from 'viem'
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"

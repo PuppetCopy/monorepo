@@ -1,8 +1,8 @@
-import { O, Op } from '@aelea/core'
-import { component, IBranch, attr, nodeEvent, style, type $Branch } from '@aelea/dom'
-import { Behavior } from '@aelea/core'
+import { O, type Op } from '@aelea/core'
+import { component, type IBranch, attr, nodeEvent, style, type $Branch } from '@aelea/dom'
+import type { Behavior } from '@aelea/core'
 import { constant, map, merge, startWith } from "@most/core"
-import { Route } from "./types.js"
+import type { Route } from "./types.js"
 
 export interface IAnchor {
   url: string,

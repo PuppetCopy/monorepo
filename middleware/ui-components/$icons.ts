@@ -1,5 +1,5 @@
 import { $svg, attr } from "@aelea/dom"
-import { ADDRESS_ZERO, TOKEN_DESCRIPTION_MAP } from "puppet-const"
+import { ADDRESS_ZERO, TOKEN_DESCRIPTION_MAP } from "../const/index.js"
 
 
 export const $path = $svg('path')

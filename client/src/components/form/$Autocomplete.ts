@@ -6,7 +6,7 @@
 // import { append, remove } from "@most/prelude"
 // import { Stream } from "@most/types"
 // import { $xCross } from "ui-components"
-// import { streamOf } from "common-utils"
+// import { streamOf } from "../utils/index.js"
 // import { $caretDown } from "../../common/elements/$icons.js"
 // import { $Select, ISelect } from "./$Select.js"
 

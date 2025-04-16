@@ -1,10 +1,10 @@
-import { Behavior, O } from '@aelea/core'
-import { $element, $node, $text, IBranch, attr, attrBehavior, component, nodeEvent, style, styleBehavior } from '@aelea/dom'
-import { Input, layoutSheet } from "@aelea/ui-components"
+import { type Behavior, O } from '@aelea/core'
+import { $element, $node, $text, type IBranch, attr, attrBehavior, component, nodeEvent, style, styleBehavior } from '@aelea/dom'
+import { type Input, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, mergeArray, startWith } from "@most/core"
 import { dismissOp, interactionOp } from "./common.js"
-import { Stream } from '@most/types'
+import type { Stream } from '@most/types'
 import { $label } from '../$common.js'
 
 

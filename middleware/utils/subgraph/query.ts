@@ -1,6 +1,6 @@
-import { Client, OperationContext } from '@urql/core'
+import { Client, type OperationContext } from '@urql/core'
 import { getAddress } from 'viem'
-import { getMappedValue } from '../utils';
+import { getMappedValue } from '../../utils/index.js';
 
 export type GqlType<T extends string> = { __typename: T }
 

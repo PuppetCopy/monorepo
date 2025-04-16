@@ -1,4 +1,4 @@
-import { ARBITRUM_ADDRESS } from "puppet-const";
+import { ARBITRUM_ADDRESS } from "../const/index.js";
 
 export const MARKET_TOKEN_MAP = {
   "0x70d95587d40A2caf56bd97485aB3Eec10Bee6336": ARBITRUM_ADDRESS.NATIVE_TOKEN,

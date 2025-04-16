@@ -10,6 +10,7 @@ export default [
   ...tseslint.configs.strict,
   {
     rules: {
+      "@typescript-eslint/prefer-literal-enum-member": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",

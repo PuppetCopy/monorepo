@@ -5,7 +5,7 @@
 // import { fromPromise, map, switchLatest, take } from "@most/core"
 // import { Stream } from "@most/types"
 // import { ADDRESS_ZERO, IntervalTime, getMappedValue, readableFactorPercentage, switchMap } from 'common-utils'
-// import * as GMX from "gmx-middleware"
+// import * as GMX "../gmx/index.js"
 // import { IMarket, IMarketFees, IMarketPrice, IMarketUsageInfo, TEMP_MARKET_LIST, getBorrowingFactorPerInterval, getFundingFactorPerInterval } from 'gmx-middleware'
 // import { latestPriceMap } from 'puppet-middleware'
 // import { $Table, $defaultTableRowContainer } from 'ui-components'

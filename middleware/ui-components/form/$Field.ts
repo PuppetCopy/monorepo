@@ -1,10 +1,10 @@
-import { Behavior, O, combineObject } from '@aelea/core'
-import { $element, IBranch, NodeComposeFn, component, nodeEvent, styleBehavior } from '@aelea/dom'
-import { Input, designSheet, layoutSheet } from '@aelea/ui-components'
+import { type Behavior, O, combineObject } from '@aelea/core'
+import { $element, type IBranch, type NodeComposeFn, component, nodeEvent, styleBehavior } from '@aelea/dom'
+import { type Input, designSheet, layoutSheet } from '@aelea/ui-components'
 import { pallete } from '@aelea/ui-components-theme'
 import { empty, filter, map, merge, mergeArray, multicast, never, now, startWith, switchLatest, tap } from '@most/core'
 import { dismissOp, interactionOp } from './common.js'
-import { Optional } from 'common-utils'
+import type { Optional } from '../../utils/index.js'
 
 export interface Field extends Optional<Input<string>, 'value'> {
   $input?: NodeComposeFn<any, HTMLInputElement>

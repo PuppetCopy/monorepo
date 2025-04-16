@@ -1,7 +1,7 @@
-import { Address, Hex } from "viem"
+import { type Address, type Hex } from "viem"
 import { arbitrum, avalanche } from "viem/chains"
-import { ARBITRUM_ADDRESS } from "./chain/arbitrum"
-import { AVALANCHE_ADDRESS } from "./chain/avalanche"
+import { ARBITRUM_ADDRESS } from "./chain/arbitrum.js"
+import { AVALANCHE_ADDRESS } from "./chain/avalanche.js"
 
 export enum IntervalTime {
   SEC = 1,
@@ -38,7 +38,6 @@ export const PUPPET_COLLATERAL_LIST: Address[] = [
   ARBITRUM_ADDRESS.NATIVE_TOKEN,
 ]
 
-
 export const MAX_LEVERAGE_FACTOR = 100n * BASIS_POINTS_DIVISOR
 export const MIN_LEVERAGE_FACTOR = 11000n
 export const DEDUCT_USD_FOR_GAS = 10n ** 30n * 2n
@@ -70,7 +69,6 @@ export const TRADE_CONTRACT_MAPPING = {
 } as const
 
 export type ContractChain = keyof typeof TRADE_CONTRACT_MAPPING
-
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
   const gmap = {} as { [P in B]: R }

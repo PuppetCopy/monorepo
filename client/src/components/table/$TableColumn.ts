@@ -2,13 +2,13 @@ import { O, Tether } from "@aelea/core"
 import { $text, INode, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { map, skipRepeats } from "@most/core"
-import { getBasisPoints, getMappedValue, getTimeSince, readableDate, readablePercentage, streamOf, switchMap } from "common-utils"
+import { getBasisPoints, getMappedValue, getTimeSince, readableDate, readablePercentage, streamOf, switchMap } from "../utils/index.js"
 import { IPosition, getParticiapntPortion, getSettledMpPnL, isPositionSettled, latestPriceMap } from "puppet-middleware"
 import { $infoTooltip, TableColumn } from "ui-components"
 import * as viem from 'viem'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from "../../common/$common.js"
 import { pallete, colorAlpha } from "@aelea/ui-components-theme"
-import { getMarketIndexToken, getPositionPnlUsd } from "gmx-middleware"
+import { getMarketIndexToken, getPositionPnlUsd } from "../gmx/index.js"
 import { $seperator2 } from "../../pages/common"
 
 

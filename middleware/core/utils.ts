@@ -1,7 +1,7 @@
-import { factor, getMappedValue, unixTimestampNow } from "common-utils"
-import { getMarketIndexToken, getTokenDescription, IPriceCandle, IPricefeedMap, OrderType } from "gmx-middleware"
+import { factor, getMappedValue, unixTimestampNow } from "../utils/index.js"
+import { getMarketIndexToken, getTokenDescription, type IPriceCandle, type IPricefeedMap, OrderType } from "../gmx/index.js"
 import * as viem from "viem"
-import { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
+import type { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
   const gmap = {} as { [P in B]: R }

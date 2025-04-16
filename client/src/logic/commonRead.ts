@@ -1,10 +1,10 @@
 
 import { erc20Abi } from "abitype/abis"
-import { getMappedValue } from "common-utils"
+import { getMappedValue } from "../utils/index.js"
 import { Address } from "viem"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"
-import * as PUPPET from "puppet-const"
+import * as PUPPET from "../const/index.js"
 import * as viem from "viem"
 
 

@@ -5,9 +5,9 @@ import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { filterNull, switchMap, unixTimestampNow } from "common-utils"
+import { filterNull, switchMap, unixTimestampNow } from "../utils/index.js"
 import { EIP6963ProviderDetail } from "mipd"
-import { IntervalTime } from "puppet-const"
+import { IntervalTime } from "../const/index.js"
 import { } from "puppet-middleware"
 import { $alertPositiveContainer } from "ui-components"
 import { indexDb, uiStorage } from "ui-storage"

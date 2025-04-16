@@ -4,7 +4,7 @@ import { $row, layoutSheet } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map } from "@most/core"
 import { Stream } from "@most/types"
-import { IntervalTime } from "puppet-const"
+import { IntervalTime } from "../const/index.js"
 import { $anchor, $infoTooltipLabel } from "ui-components"
 
 

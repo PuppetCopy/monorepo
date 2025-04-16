@@ -1,10 +1,10 @@
-import { Behavior, O, Op } from "@aelea/core"
-import { $node, $Node, $svg, attr, component, INode, NodeComposeFn, nodeEvent, style } from '@aelea/dom'
+import { type Behavior, O, type Op } from "@aelea/core"
+import { $node, type $Node, $svg, attr, component, type INode, type NodeComposeFn, nodeEvent, style } from '@aelea/dom'
 import { $column, $icon, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, now, switchLatest } from "@most/core"
-import { Stream } from "@most/types"
-import { $QuantumScroll, IScrollPagable, QuantumScroll, IQuantumScrollPage } from "./$QuantumScroll.js"
+import type { Stream } from "@most/types"
+import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from "./$QuantumScroll.js"
 
 
 

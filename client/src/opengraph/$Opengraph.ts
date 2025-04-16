@@ -2,7 +2,7 @@
 // import * as router from '@aelea/router'
 // import { $column, layoutSheet } from "@aelea/ui-components"
 // import { map, now } from "@most/core"
-// import { IntervalTime } from "common-utils"
+// import { IntervalTime } from "../utils/index.js"
 // import { queryPricefeed, queryRouteTypeList } from "puppet-middleware"
 // import { $rootContainer } from "../pages/common"
 // import { $trader } from "./$trader"

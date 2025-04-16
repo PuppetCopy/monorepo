@@ -2,11 +2,11 @@ import { erc20Abi } from "viem";
 import * as abi from "./abi/__generatedAbi.js";
 
 // gmx v2
-import exchangeRouter from "./abi/exchangeRouter";
-import reader from "./abi/reader";
-import referralStorage from "./abi/referralStorage";
-import gmxEventEmitter from "./abi/gmxEventEmitter";
-import datastore from "./abi/datastore";
+import exchangeRouter from "./abi/exchangeRouter.js";
+import reader from "./abi/reader.js";
+import referralStorage from "./abi/referralStorage.js";
+import gmxEventEmitter from "./abi/gmxEventEmitter.js";
+import datastore from "./abi/datastore.js";
 
 export const CONTRACT = {
   42161: {

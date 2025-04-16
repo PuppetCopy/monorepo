@@ -3,7 +3,7 @@ import { $Branch, $Node, $text, INode, NodeComposeFn, attrBehavior, component, n
 import { $row, Control, layoutSheet } from "@aelea/ui-components"
 import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from "@most/core"
 import { Stream } from "@most/types"
-import { PromiseStateError, PromiseStatus, getSafeMappedValue, promiseState } from "common-utils"
+import { PromiseStateError, PromiseStatus, getSafeMappedValue, promiseState } from "../utils/index.js"
 import { EIP6963ProviderDetail } from "mipd"
 import { $alertPositiveTooltip, $alertTooltip, $intermediateTooltip, $txHashRef } from "ui-components"
 import * as viem from "viem"

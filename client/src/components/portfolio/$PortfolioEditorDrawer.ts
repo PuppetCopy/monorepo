@@ -4,9 +4,9 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, empty, map, mergeArray, skipRepeatsWith, snapshot } from "@most/core"
 import { Stream } from "@most/types"
-import { getDuration, getMappedValue, readableDate, readablePercentage, switchMap } from "common-utils"
+import { getDuration, getMappedValue, readableDate, readablePercentage, switchMap } from "../utils/index.js"
 import { EIP6963ProviderDetail } from "mipd"
-import * as PUPPET from "puppet-const"
+import * as PUPPET from "../const/index.js"
 import { PUPPET_ADDRESSES } from "@puppet/contracts"
 
 

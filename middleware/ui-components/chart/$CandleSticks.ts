@@ -1,8 +1,8 @@
 import { colorAlpha, pallete } from '@aelea/ui-components-theme'
 import {
-  ChartOptions, CrosshairMode, DeepPartial, LineStyle
+  type ChartOptions, CrosshairMode, type DeepPartial, LineStyle
 } from 'lightweight-charts'
-import { $Chart, IChartConfig } from "./$Chart.js"
+import { $Chart, type IChartConfig } from "./$Chart.js"
 
 
 export interface ICandlesticksChart extends IChartConfig<'Candlestick'> {

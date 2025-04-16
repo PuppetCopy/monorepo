@@ -2,7 +2,7 @@ import { $node, $text, component, style } from "@aelea/dom"
 import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { map, multicast } from "@most/core"
-import { combineState, readableLeverage, readableUsd } from "common-utils"
+import { combineState, readableLeverage, readableUsd } from "../utils/index.js"
 import { accountSettledPositionListSummary, IPosition } from "puppet-middleware"
 import { intermediateText } from "ui-components"
 import * as viem from 'viem'

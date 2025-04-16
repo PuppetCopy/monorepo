@@ -5,7 +5,7 @@ import { $column, $icon, $row, designSheet, layoutSheet, screenUtils } from "@ae
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, now } from "@most/core"
 import { Stream } from "@most/types"
-import { filterNull, switchMap } from "common-utils"
+import { filterNull, switchMap } from "../utils/index.js"
 import { $Link, $anchor } from "ui-components"
 import { $gmxLogo, $puppetLogo } from "../common/$icons.js"
 import { $heading1 } from "../common/$text"

@@ -1,5 +1,5 @@
 import { $Node, attr, $text } from "@aelea/dom"
-import { getExplorerUrl, shortenTxAddress } from "common-utils"
+import { getExplorerUrl, shortenTxAddress } from "../utils/index.js"
 import { $anchor } from "ui-components"
 import * as viem from "viem"
 

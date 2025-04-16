@@ -4,7 +4,7 @@ import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, periodic } from "@most/core"
 import { $alertIcon, $defaultDropContainer, $Tooltip } from "ui-components"
 import { $pnlDisplay } from "../../common/$common.js"
-import { readableUsd, unixTimestampNow } from "common-utils"
+import { readableUsd, unixTimestampNow } from "../utils/index.js"
 
 
 export const $alertTooltip = ($content: $Branch) => {

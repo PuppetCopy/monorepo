@@ -5,7 +5,7 @@ import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map } from "@most/core"
 import { Stream } from "@most/types"
 import { $Field, Field } from "./$Field.js"
-import { streamOf } from "common-utils"
+import { streamOf } from "../utils/index.js"
 
 
 

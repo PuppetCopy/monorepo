@@ -81,7 +81,7 @@ export function openDatabase<TName extends string>(
 ): Promise<IDBDatabase> {
   const openDbRequest = indexedDB.open(name, version)
 
-  openDbRequest.onupgradeneeded = event => {
+  openDbRequest.onupgradeneeded = (_) => {
     const db = openDbRequest.result
     try {
       for (const params of storeParamList) {

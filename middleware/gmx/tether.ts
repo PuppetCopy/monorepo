@@ -1,7 +1,7 @@
 import { Pipe } from '@aelea/core'
 import { disposeNone, disposeWith } from '@most/disposable'
 import { remove } from '@most/prelude'
-import { Disposable, Scheduler, Sink, Stream, Time } from '@most/types'
+import type { Disposable, Scheduler, Sink, Stream, Time } from '@most/types'
 
 
 class SourceSink<T> implements Sink<T> {
@@ -28,8 +28,7 @@ class SourceSink<T> implements Sink<T> {
 }
 
 class TetherSink<A> extends Pipe<A, A> {
-
-  constructor(public sink: Sink<A>) {
+  constructor(public override sink: Sink<A>) {
     super(sink)
   }
 

@@ -2,29 +2,16 @@
   // This configuration is used for local development and type checking.
   "extends": "./tsconfig.base.json",
   "include": [
-    "src",
-    "test/src"
+    "middleware",
   ],
   "exclude": [],
   "references": [],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      // Map each workspace package name to its source directory
-      "client/*": [
-        "client/src/*"
+      "*": [
+        "./middleware/*"
       ],
-      "common-utils": [
-        "middleware/utils/src"
-      ], // Assuming index.ts is in src
-      "ui-components": [
-        "middleware/ui-components/src"
-      ],
-      // Add other packages similarly...
-      "@puppet/contracts/*": [
-        "contracts/*"
-      ] // Example if needed
-      
     }
   }
 }

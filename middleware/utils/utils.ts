@@ -1,5 +1,5 @@
 import { curry2 } from "@most/prelude"
-import { BASIS_POINTS_DIVISOR, IntervalTime } from "../const"
+import { BASIS_POINTS_DIVISOR, IntervalTime } from "../const/index.js"
 import * as viem from "viem"
 import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription } from "./types.js"
 

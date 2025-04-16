@@ -1,9 +1,9 @@
-import { Behavior, Op } from "@aelea/core"
-import { $node, $Node, $text, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior } from "@aelea/dom"
+import type { Behavior, Op } from "@aelea/core"
+import { $node, type $Node, $text, component, type INode, type NodeComposeFn, nodeEvent, style, styleBehavior } from "@aelea/dom"
 import { $row } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { constant, map, now, switchLatest } from "@most/core"
-import { Stream } from "@most/types"
+import type { Stream } from "@most/types"
 
 export interface IButtonToggle<T> {
   options: T[]

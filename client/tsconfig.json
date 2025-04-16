@@ -26,38 +26,12 @@
     "skipLibCheck": true,
     /* Path Aliases */
     "paths": {
-      "schema": ["./src/__generated__/ponder.schema.ts"]
+      "schema": [
+        "./src/__generated__/ponder.schema.ts"
+      ]
     }
   },
-  "references": [
-    {
-      "path": "../contracts"
-    },
-    {
-      "path": "../middleware/gmx"
-    },
-    {
-      "path": "../middleware/const"
-    },
-    {
-      "path": "../middleware/utils"
-    },
-    {
-      "path": "../middleware/core"
-    },
-    {
-      "path": "../middleware/ui-components"
-    },
-    {
-      "path": "../middleware/ui-router"
-    },
-    {
-      "path": "../middleware/wallet"
-    },
-    {
-      "path": "../middleware/ui-storage"
-    }
-  ],
+  "references": [],
   "include": [
     "src",
     "src/sw.ts"
