@@ -1,6 +1,7 @@
-import { applyFactor, factor, getTokenUsd } from "../utils/index.js"
 import type { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from "./types.js"
-import { FLOAT_PRECISION, IntervalTime } from "../const/index.js"
+import { applyFactor, factor } from "../utils/mathUtils.js"
+import { getTokenUsd } from "../utils/utils.js"
+import { FLOAT_PRECISION, IntervalTime } from "../const/common.js"
 
 export function getPoolUsd(
   marketInfo: IMarketInfo,

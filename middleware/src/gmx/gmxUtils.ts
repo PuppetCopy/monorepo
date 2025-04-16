@@ -1,8 +1,10 @@
-import { easeInExpo, factor, formatFixed, getBasisPoints, getMappedValue, getPriceDelta, type ITokenDescription } from "../utils/index.js"
 import * as viem from "viem"
+import { BASIS_POINTS_DIVISOR, CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP } from "../const/index.js"
+import { factor, getBasisPoints } from "../utils/mathUtils.js"
+import type { ITokenDescription } from "../utils/types.js"
+import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from "../utils/utils.js"
 import { MARKET_TOKEN_MAP } from "./marketMap.js"
 import type { ILogEvent } from "./types.js"
-import { BASIS_POINTS_DIVISOR, CHAIN_ADDRESS_MAP, CHAIN_NATIVE_DESCRIPTION, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS, TOKEN_ADDRESS_DESCRIPTION_MAP } from "../const/index.js"
 
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {

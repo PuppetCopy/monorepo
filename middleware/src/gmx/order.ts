@@ -1,7 +1,7 @@
 import * as viem from "viem"
 import { getNativeTokenAddress } from "./gmxUtils.js"
-import { getDenominator, getSafeMappedValue } from "../utils/index.js"
 import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from "../const/index.js"
+import { getDenominator, getSafeMappedValue } from "../utils/utils.js"
 
 
 

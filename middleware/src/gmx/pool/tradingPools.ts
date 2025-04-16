@@ -3,11 +3,15 @@ import { awaitPromises, map } from "@most/core"
 import type { Stream } from "@most/types"
 import type { Address, PublicClient } from "viem"
 import { arbitrum, avalanche } from "viem/chains"
-import { ARBITRUM_ADDRESS, AVALANCHE_ADDRESS, FLOAT_PRECISION, TOKEN_DESCRIPTION_MAP } from "../../const/index.js"
-import { expandDecimals, getDenominator, zipState } from "../../utils/index.js"
 import { getNativeTokenDescription } from "../gmxUtils.js"
 import univ2Pool from './uniV2.abi.js'
 import univ3Pool from './uniV3.abi.js'
+import { FLOAT_PRECISION } from "../../const/common.js"
+import { TOKEN_DESCRIPTION_MAP } from "../../const/token.js"
+import { zipState } from "../../utils/stream.js"
+import { expandDecimals, getDenominator } from "../../utils/utils.js"
+import { AVALANCHE_ADDRESS } from "../../const/chain/avalanche.js"
+import { ARBITRUM_ADDRESS } from "../../const/chain/arbitrum.js"
 
 export async function getUniV3PoolPrice(client: PublicClient, decimals: number, poolAddress: Address) {
   const [sqrtPriceX96] = await client.readContract({

@@ -1,8 +1,9 @@
 import * as viem from "viem"
-import { factor, getMappedValue, unixTimestampNow } from "../utils/index.js"
 import type { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
 import { getTokenDescription, getMarketIndexToken } from "../gmx/gmxUtils.js"
 import { OrderType, type IPricefeedMap, type IPriceCandle } from "../gmx/types.js"
+import { getMappedValue, unixTimestampNow } from "../utils/utils.js"
+import { factor } from "../utils/mathUtils.js"
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
   const gmap = {} as { [P in B]: R }

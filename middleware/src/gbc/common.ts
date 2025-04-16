@@ -1,6 +1,6 @@
 import { IAttributeBackground, IAttributeClothes, IAttributeBody, IAttributeExpression, IAttributeFaceAccessory, IAttributeHat, type LabItemSale, type MintRule, type IBerryDisplayTupleMap, IAttributeBadge, type IToken } from "./types.js"
 import { svgParts } from "./mappings/svgParts.js"
-import { unixTimestampNow } from "../utils/index.js"
+import { unixTimestampNow } from "../utils/utils.js"
 
 
 export const labAttributeTuple = [IAttributeBackground, IAttributeClothes, IAttributeBody, IAttributeExpression, IAttributeFaceAccessory, IAttributeHat, IAttributeBadge] as const

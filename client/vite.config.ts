@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths' // Import the plugin
 import { dark } from './src/common/theme.js'
+import { fileURLToPath, URL } from 'node:url';
 
 const SITE_CONFIG = {
   __WEBSITE__: 'https://puppet.house',
@@ -79,5 +80,15 @@ export default defineConfig({
       include: 'index.html',
       ...SITE_CONFIG
     })
-  ]
+  ],
+  resolve: {
+    alias: [
+      {
+        find: '../../../contracts/deployments/addresses.json',
+        // This 'replacement' provides the correct path to the file,
+        // resolved relative to the client project's root directory.
+        replacement: fileURLToPath(new URL('../contracts/deployments/addresses.json', import.meta.url))
+      }
+    ]
+  },
 })

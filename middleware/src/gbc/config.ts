@@ -1,7 +1,7 @@
 import { IAttributeMappings, type LabItemSale, SaleType } from "./types.js"
 import { parseEther } from "viem"
-import { groupArrayByKey, unixTimestampNow } from "../utils/index.js"
 import { IntervalTime } from "../const/index.js"
+import { unixTimestampNow, groupArrayByKey } from "../utils/utils.js"
 
 const date = new Date()
 const timeNow = unixTimestampNow()

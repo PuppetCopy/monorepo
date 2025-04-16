@@ -31,7 +31,11 @@
       ]
     }
   },
-  "references": [],
+  "references": [
+    {
+      "path": "../middleware"
+    }
+  ],
   "include": [
     "src",
     "src/sw.ts"

@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.build.json",
+  "include": [
+    "../contracts/deployments/addresses.json",
+    "./src/**/*.ts",
+  ],
+  "compilerOptions": {
+    "outDir": "dist/esm",
+    "rootDir": "./src",
+    "declarationDir": "dist/types",
+    "emitDeclarationOnly": false
+  } 
+}

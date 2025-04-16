@@ -13,14 +13,12 @@
   ],
   "workspaces": [
     "client",
-    "docs",
     "middleware"
   ],
   "scripts": {
     "build": "bun run build:clean && bun run build:esm && bun run build:types",
-    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./middleware/dist/esm",
-    "build:types": "tsc --project ./tsconfig.build.json --declarationDir ./middleware/dist/types --emitDeclarationOnly --declaration --declarationMap",
-    "build:clean": "rm -rf *.tsbuildinfo middleware/dist",
+    "build:esm": "tsc --project ./middleware/tsconfig.json",
+    "build:clean": "rm -rf middleware/dist",
     "client:build": "cd client && bun run build",
     "wagmi:generate": "wagmi generate",
     "clean:tsc": "rm -fr dist/*",
