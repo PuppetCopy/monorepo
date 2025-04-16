@@ -130,7 +130,11 @@ export function getPublicTransport(
     console.error(`no provider for chain ${chain.name || chain.id}`)
   }
 
-  const publicTransport = matchedPublicTransport || providerList[0]!
+  const publicTransport = matchedPublicTransport || providerList[0]
+
+  if (!publicTransport) {
+    throw new Error('no provider for chain')
+  }
 
   return publicTransport
 }

@@ -1,4 +1,4 @@
-import { factor, getMappedValue, getTokenUsd, unixTimestampNow } from "common-utils"
+import { factor, getMappedValue, unixTimestampNow } from "common-utils"
 import { getMarketIndexToken, getTokenDescription, IPriceCandle, IPricefeedMap, OrderType } from "gmx-middleware"
 import * as viem from "viem"
 import { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"

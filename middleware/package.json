@@ -1,0 +1,88 @@
+{
+  "name": "@puppet/middleware",
+  "license": "BSL-1.1 and MIT",
+  "description": "Copytrading middleware",
+  "version": "2.27.0",
+  "type": "module",
+  "main": "./_cjs/index.js",
+  "module": "./_esm/index.js",
+  "types": "./_types/index.d.ts",
+  "typings": "./_types/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "*",
+    "!**/*.bench.ts",
+    "!**/*.bench-d.ts",
+    "!**/*.test.ts",
+    "!**/*.test.ts.snap",
+    "!**/*.test-d.ts",
+    "!**/*.tsbuildinfo",
+    "!tsconfig.build.json"
+  ],
+  "exports": {
+    ".": {
+      "types": "./_types/index.d.ts",
+      "import": "./_esm/index.js",
+      "default": "./_cjs/index.js"
+    },
+    "./wallet": {
+      "types": "./_types/wallet/index.d.ts",
+      "import": "./_esm/wallet/index.js",
+      "default": "./_cjs/wallet/index.js"
+    },
+    "./utils": {
+      "types": "./_types/utils/index.d.ts",
+      "import": "./_esm/utils/index.js",
+      "default": "./_cjs/utils/index.js"
+    },
+    "./gmx": {
+      "types": "./_types/gmx/index.d.ts",
+      "import": "./_esm/gmx/index.js",
+      "default": "./_cjs/gmx/index.js"
+    },
+    "./const": {
+      "types": "./_types/const/index.d.ts",
+      "import": "./_esm/const/index.js",
+      "default": "./_cjs/const/index.js"
+    },
+    "./@gambitdao-gbc-middleware": {
+      "types": "./_types/@gambitdao-gbc-middleware/index.d.ts",
+      "import": "./_esm/@gambitdao-gbc-middleware/index.js",
+      "default": "./_cjs/@gambitdao-gbc-middleware/index.js"
+    },
+    "./core": {
+      "types": "./_types/core/index.d.ts",
+      "import": "./_esm/core/index.js",
+      "default": "./_cjs/core/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@aelea/core": "^1.3.2",
+    "gmx-middleware": "workspace:*",
+    "puppet-const": "workspace:*",
+    "common-utils": "workspace:*",
+    "@most/core": "^1.6.1",
+    "@most/disposable": "^1.3.0",
+    "@most/prelude": "^1.8.0",
+    "@most/scheduler": "^1.3.0",
+    "@most/types": "^1.1.0",
+    "isomorphic-fetch": "^3.0.0",
+    "@types/isomorphic-fetch": "^0.0.39",
+    "@ponder/client": "^0.10.13",
+    "abitype": "1.0.8",
+    "viem": "^2.26.2"
+  },
+  "homepage": "https://puppet.tech",
+  "repository": "PuppetCopy/monorepo",
+  "keywords": [
+    "puppet",
+    "puppetCopy",
+    "puppet-middleware",
+    "copytrading",
+    "eth",
+    "ethereum",
+    "dapp",
+    "wallet"
+  ]
+}

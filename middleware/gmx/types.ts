@@ -1,6 +1,6 @@
 import { ExtractAbiEvent } from "abitype"
 import * as viem from "viem"
-import * as CONST from "puppet-const"
+import * as CONST from "../const"
 import { IntervalTime } from "puppet-const"
 
 export type ITokenSymbol = keyof typeof CONST.TOKEN_DESCRIPTION_MAP
