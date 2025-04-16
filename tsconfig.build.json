@@ -1,11 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "include": [
-    "middleware"
+    "middleware",
+    "contracts/deployments/addresses.json",
   ],
   "exclude": [],
   "compilerOptions": {
     "sourceMap": true,
-    "rootDir": "./middleware"
+    "tsBuildInfoFile": "./.vscode/tsconfig.tsbuildinfo",
+    "rootDir": "./middleware",
   }
 }

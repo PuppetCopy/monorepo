@@ -4,9 +4,7 @@
   "include": [
     "middleware"
   ],
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": [],
   "references": [],
   "compilerOptions": {
   }
