@@ -1,11 +1,5 @@
 {
   "name": "docs",
-  "scripts": {
-    "dev": "bun docgen && vitepress dev",
-    "preview": "bun docgen && vitepress preview",
-    "build": "bunx --bun vitepress build",
-    "docgen": "bun ./docgen.ts"
-  },
   "dependencies": {
     "vitepress": "1.4.1"
   }
