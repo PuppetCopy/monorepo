@@ -1,6 +1,6 @@
-import { factor, getMappedValue, unixTimestampNow } from "../utils/index.js"
-import { getMarketIndexToken, getTokenDescription, type IPriceCandle, type IPricefeedMap, OrderType } from "../gmx/index.js"
 import * as viem from "viem"
+import { getMarketIndexToken, getTokenDescription, type IPriceCandle, type IPricefeedMap, OrderType } from "@puppet/middleware/gmx"
+import { factor, getMappedValue, unixTimestampNow } from "../utils/index.js"
 import type { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {

@@ -1,5 +1,5 @@
 import { $Node, $svg, $wrapNativeElement, attr } from "@aelea/dom"
-import { IBerryDisplayTupleMap, berryPartsToSvg } from "@gambitdao/gbc-middleware"
+import { IBerryDisplayTupleMap, berryPartsToSvg } from "@puppet/middleware/gbc"
 import { tap } from "@most/core"
 
 
@@ -7,12 +7,14 @@ import { tap } from "@most/core"
 export function $svgContent(content: string): $Node[] {
   const parser = new DOMParser()
   const doc = parser.parseFromString(`<g>${content}</g>`, "image/svg+xml")
+  const childNodes = doc.firstChild?.childNodes
 
-  // @ts-ignore
-  const firstNode = Array.from(doc.firstChild?.childNodes)
+  if (!childNodes) {
+    return []
+  }
 
-  // @ts-ignore
-  return firstNode.map(node => $wrapNativeElement(node)())
+  const firstNode = Array.from(childNodes)
+  return firstNode.map(node => $wrapNativeElement(node as any)())
 }
 
 

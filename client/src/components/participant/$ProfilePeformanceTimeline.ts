@@ -6,7 +6,7 @@ import { awaitPromises, debounce, empty, map, multicast, now, skipRepeatsWith, s
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from "@puppet/middleware/utils"
 import { BaselineData, MouseEventParams, Time } from "lightweight-charts"
 import { IntervalTime } from "@puppet/middleware/const"
-import { isPositionOpen, isPositionSettled } from "puppet-middleware"
+import { isPositionOpen, isPositionSettled } from "@puppet/middleware/core"
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, IMarker } from "@puppet/middleware/ui-components"
 import * as viem from "viem"
 import { $SelectCollateralToken } from "../$CollateralTokenSelector"

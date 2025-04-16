@@ -3,9 +3,9 @@ import { Stream } from '@most/types'
 import { IntervalTime } from '@puppet/middleware/const'
 import { IPriceCandle } from "schema"
 import * as viem from 'viem'
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
-import { IMatchRuleEditorChange } from '../components/portfolio/$MatchRuleEditor'
+import { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
 
 
 export interface IWalletPageParams {

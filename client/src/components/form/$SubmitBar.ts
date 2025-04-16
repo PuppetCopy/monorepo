@@ -7,7 +7,7 @@ import { PromiseStateError, PromiseStatus, getSafeMappedValue, promiseState } fr
 import { EIP6963ProviderDetail } from "mipd"
 import { $alertPositiveTooltip, $alertTooltip, $intermediateTooltip, $txHashRef } from "@puppet/middleware/ui-components"
 import * as viem from "viem"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import { $IntermediateConnectButton } from "../$ConnectWallet.js"
 import { $iconCircular } from "../../common/elements/$common.js"
 import { getContractErrorMessage } from "../../const/contractErrorMessage.js"

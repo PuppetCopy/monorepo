@@ -1,4 +1,4 @@
-import type { ILogTxType, ILogTypeId } from "../gmx/index.js"
+import type { ILogTxType, ILogTypeId } from "@puppet/middleware/gmx"
 import * as viem from "viem"
 
 

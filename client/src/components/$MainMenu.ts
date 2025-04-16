@@ -12,7 +12,6 @@ import { dark, light } from "../common/theme.js"
 import { IPageParams } from "../pages/type.js"
 import { $Popover } from "./$Popover.js"
 import { $Picker } from "./$ThemePicker.js"
-import { $walletProfileDisplay } from "./$WalletProfileDisplay.js"
 import { $ButtonSecondary } from "./form/$Button.js"
 
 

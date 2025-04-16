@@ -5,8 +5,8 @@ import { IntervalTime } from "@puppet/middleware/const"
 import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
-import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import { IUserActivityPageParams } from "../type.js"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor"
 
 
 export interface IPuppetProfile extends IUserActivityPageParams {

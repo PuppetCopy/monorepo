@@ -7,9 +7,9 @@
 // import { Stream } from "@most/types"
 // import * as GMX from '@puppet/middleware/gmx'
 // import { $Table, ISortBy, ScrollRequest } from "@puppet/middleware/ui-components"
-// import { IAbstractPositionParams, pagingQuery, switchMap } from "../gmx/index.js"
+// import { IAbstractPositionParams, pagingQuery, switchMap } from "@puppet/middleware/gmx"
 // import { ROUTE_DESCRIPTION } from "@puppet/middleware/const"
-// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "puppet-middleware"
+// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "@puppet/middleware/core"
 // import { $labelDisplay } from "../../common/$TextField.js"
 // import { $TraderDisplay, $route } from "../../common/$common.js"
 // import { $DropMultiSelect } from "../../components/form/$Dropdown.js"

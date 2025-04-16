@@ -1,11 +1,11 @@
 
 import { ISortBy } from '@puppet/middleware/ui-components'
-import { uiStorage } from 'ui-storage'
+import { uiStorage } from '@puppet/middleware/ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
 import { IntervalTime } from '@puppet/middleware/const'
 
-export default uiStorage.createStoreDefinition('root', 8, {
+export const localStore = uiStorage.createStoreDefinition('root', 8, {
   global: {
     initialState: {
       chain: arbitrum.id,

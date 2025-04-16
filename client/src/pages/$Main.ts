@@ -8,12 +8,12 @@ import { Stream } from "@most/types"
 import { filterNull, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
 import { EIP6963ProviderDetail } from "mipd"
 import { IntervalTime } from "@puppet/middleware/const"
-import { } from "puppet-middleware"
+import { } from "@puppet/middleware/core"
 import { $alertPositiveContainer } from "@puppet/middleware/ui-components"
-import { indexDb, uiStorage } from "ui-storage"
+import { indexDb, uiStorage } from "@puppet/middleware/ui-storage"
 import * as viem from "viem"
 import { arbitrum } from "viem/chains"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import { $midContainer } from "../common/$common.js"
 import { $heading2 } from "../common/$text"
 import { queryPricefeed, subgraphStatus } from "../common/query"
@@ -21,17 +21,18 @@ import { announcedProviderList } from "../components/$ConnectWallet"
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
 import { IDepositEditorChange } from "../components/portfolio/$DepositEditor.js"
-import { IMatchRuleEditorChange } from "../components/portfolio/$MatchRuleEditor"
 import { $PortfolioEditorDrawer } from "../components/portfolio/$PortfolioEditorDrawer.js"
-import { default as localStore, default as localstore } from "../const/localStore"
 import { newUpdateInvoke } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
 import { $Admin } from "./$Admin"
 import { $Home } from "./$Home.js"
 import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
-import { $PublicUserPage } from "./user/$PublicUser.js"
-import { $WalletPage } from "./user/$Wallet.js"
+import { IMatchRuleEditorChange } from "../components/portfolio/$TraderMatchRouteEditor"
+import { localStore } from "../const/localStore"
+
+// import { $PublicUserPage } from "./user/$PublicUser.js"
+// import { $WalletPage } from "./user/$Wallet.js"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -97,7 +98,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
 
   const isDesktopScreen = skipRepeats(map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))))
 
-  const activityTimeframe = uiStorage.replayWrite(localstore.global, changeActivityTimeframe, 'activityTimeframe')
+  const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
   const selectedCollateralTokenList = uiStorage.replayWrite(localStore.global, selectMarketTokenList, 'collateralTokenList')
 
   const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
@@ -192,23 +193,23 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   routeChange: changeRouteTether(),
                 })
               }, isDesktopScreen),
-              router.contains(walletRoute)(
-                $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
-                    changeWallet: changeWalletTether(),
-                    changeRoute: changeRouteTether(),
-                    changeActivityTimeframe: changeActivityTimeframeTether(),
-                    selectMarketTokenList: selectMarketTokenListTether(),
+              // router.contains(walletRoute)(
+              //   $midContainer(
+              //     $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
+              //       changeWallet: changeWalletTether(),
+              //       changeRoute: changeRouteTether(),
+              //       changeActivityTimeframe: changeActivityTimeframeTether(),
+              //       selectMarketTokenList: selectMarketTokenListTether(),
 
-                    changeMatchRuleList: changeMatchRuleListTether(),
-                    changeDepositTokenList: changeDepositTokenListTether(),
-                  })
-                )
-              ),
+              //       changeMatchRuleList: changeMatchRuleListTether(),
+              //       changeDepositTokenList: changeDepositTokenListTether(),
+              //     })
+              //   )
+              // ),
               router.match(leaderboardRoute)(
                 $midContainer(
                   fadeIn($Leaderboard({
-                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, matchRuleList, depositTokenList
+                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, matchRuleList, depositTokenList, pricefeedMapQuery
                   })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
@@ -217,15 +218,15 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   }))
                 )
               ),
-              router.contains(profileRoute)(
-                $midContainer(
-                  fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
-                    changeActivityTimeframe: changeActivityTimeframeTether(),
-                    changeMatchRuleList: changeMatchRuleListTether(),
-                    changeRoute: changeRouteTether(),
-                  }))
-                )
-              ),
+              // router.contains(profileRoute)(
+              //   $midContainer(
+              //     fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
+              //       changeActivityTimeframe: changeActivityTimeframeTether(),
+              //       changeMatchRuleList: changeMatchRuleListTether(),
+              //       changeRoute: changeRouteTether(),
+              //     }))
+              //   )
+              // ),
               router.contains(adminRoute)(
                 $Admin({ walletClientQuery, providerClientQuery })({
                   changeWallet: changeWalletTether(),

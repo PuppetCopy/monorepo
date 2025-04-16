@@ -8,7 +8,7 @@ import { ignoreAll, switchMap } from "@puppet/middleware/utils"
 import { EIP1193Provider, EIP6963ProviderDetail, createStore } from "mipd"
 import { $caretDown, $icon } from "@puppet/middleware/ui-components"
 import { arbitrum } from "viem/chains"
-import * as walletLink from "wallet"
+import * as wallet from "@puppet/middleware/wallet"
 import { IWalletPageParams } from "../pages/type"
 import { $ButtonSecondary } from "./form/$Button.js"
 import { IButtonCore } from "./form/$ButtonCore.js"
@@ -57,7 +57,7 @@ export const announcedProviderList = map(provider => {
 
 
 export interface IConnectWalletPopover extends IWalletPageParams {
-  $$display: Op<walletLink.IWalletClient, $Node>
+  $$display: Op<wallet.IWalletClient, $Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: NodeComposeFn<$Node>
 }

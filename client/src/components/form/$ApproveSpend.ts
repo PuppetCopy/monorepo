@@ -8,7 +8,7 @@ import { promiseState, PromiseStatus, switchMap } from "@puppet/middleware/utils
 import { MAX_UINT256 } from "@puppet/middleware/const"
 import { $alertPositiveTooltip, $alertTooltip, $intermediateTooltip, $txHashRef } from "@puppet/middleware/ui-components"
 import * as viem from "viem"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import { $defaultButtonPrimary } from "./$Button"
 import { $ButtonCore } from "./$ButtonCore"
 

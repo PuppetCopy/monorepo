@@ -9,9 +9,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "./middleware/*"
-      ],
+     
     }
   }
 }

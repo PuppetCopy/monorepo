@@ -10,10 +10,7 @@
   "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
   "files": [
-    "*",
-    "!**/*.test.ts",
-    "!**/*.tsbuildinfo",
-    "!tsconfig.build.json"
+    "dist"
   ],
   "exports": {
     "./const": {

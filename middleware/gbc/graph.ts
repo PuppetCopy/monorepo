@@ -1,6 +1,6 @@
 import { O } from "@aelea/core"
 import { map } from "@most/core"
-import type { IIdentifiableEntity } from "../gmx/index.js"
+import type { IIdentifiableEntity } from "@puppet/middleware/gmx"
 import { numberToHex, type Client } from "viem"
 import type { ILabItem, ILabItemOwnership, IOwner, IToken } from "./types.js"
 import type { IRequestPagePositionApi } from "../utils/index.js"

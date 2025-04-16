@@ -3,7 +3,7 @@ import { erc20Abi } from "abitype/abis"
 import { getMappedValue } from "@puppet/middleware/utils"
 import { Address } from "viem"
 import { readContract } from "viem/actions"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import * as PUPPET from "@puppet/middleware/const"
 import * as viem from "viem"
 

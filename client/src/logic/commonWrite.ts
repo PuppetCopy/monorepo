@@ -1,8 +1,9 @@
 import { Address } from "abitype"
-import { MAX_UINT256, getMappedValue } from "@puppet/middleware/utils"
+import { getMappedValue } from "@puppet/middleware/utils"
 import * as PUPPET from "@puppet/middleware/const"
 import { erc20Abi } from "viem"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
+import { MAX_UINT256 } from "@puppet/middleware/const"
 
 
 

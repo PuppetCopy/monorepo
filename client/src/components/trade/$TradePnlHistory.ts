@@ -3,7 +3,7 @@
 // import { $column, observer } from "@aelea/ui-components"
 // import { map, multicast, skipRepeatsWith, switchLatest } from "@most/core"
 // import { Stream } from "@most/types"
-// import { CHAIN } from "../gmx/index.js"
+// import { CHAIN } from "@puppet/middleware/gmx"
 // import { $Baseline } from "@puppet/middleware/ui-components"
 // import {
 //   IPositionDecrease,
@@ -12,7 +12,7 @@
 //   formatFixed, getDeltaPercentage, getPnL,
 //   isPositionSettled,
 //   unixTimestampNow
-// } from "../gmx/index.js"
+// } from "@puppet/middleware/gmx"
 // import { ChartOptions, DeepPartial, MouseEventParams, Time } from "lightweight-charts"
 // import { IGmxProcessState } from "../../data/process/process.js"
 

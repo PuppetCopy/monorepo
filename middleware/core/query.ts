@@ -2,7 +2,11 @@
 // import { map, multicast } from '@most/core'
 // import type { Stream } from '@most/types'
 // import { type Client } from '@urql/core'
-// import { combineState, getClosestNumber, graph, groupArrayMany, type IRequestSortApi, periodicRun, type StateParams, unixTimestampNow } from '../utils/index.js'
+import type { Stream } from '@most/types'
+import { combineState, getClosestNumber, graph, groupArrayMany, type IRequestSortApi, periodicRun, type StateParams, unixTimestampNow } from '../utils/index.js'
+import { replayLatest } from '@aelea/core'
+import { map, multicast } from '@most/core'
+import { querySignedPrices, type IPriceOracleMap } from '../gmx/index.js'
 // import { type IPriceCandle, type IPricefeedMap, type IPriceOracleMap, querySignedPrices } from '../gmx/index.js'
 // import { IntervalTime, PRICEFEED_INTERVAL } from '../const/index.js'
 // import * as viem from "viem"
@@ -274,14 +278,14 @@
 //   }, combineState(queryParams))
 // }
 
-// export const latestPriceMap: Stream<IPriceOracleMap> = replayLatest(multicast(periodicRun({
-//   startImmediate: true,
-//   interval: 2500,
-//   actionOp: map(async count => {
-//     const newLocal = await querySignedPrices()
-//     return newLocal
-//   }),
-// })))
+export const latestPriceMap: Stream<IPriceOracleMap> = replayLatest(multicast(periodicRun({
+  startImmediate: true,
+  interval: 2500,
+  actionOp: map(async () => {
+    const newLocal = await querySignedPrices()
+    return newLocal
+  }),
+})))
 
 
 

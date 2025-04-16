@@ -13,9 +13,9 @@
 // } from "@most/core"
 // import { Stream } from "@most/types"
 // import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream, switchMap } from "@puppet/middleware/utils"
-// import * as GMX "../gmx/index.js"
-// import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress } from "../gmx/index.js"
-// import { IMirrorPosition, ISetRouteType, latestPriceMap } from "puppet-middleware"
+// import * as GMX "@puppet/middleware/gmx"
+// import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress } from "@puppet/middleware/gmx"
+// import { IMirrorPosition, ISetRouteType, latestPriceMap } from "@puppet/middleware/core"
 // import {
 //   $bear, $bull,
 //   $ButtonToggle,

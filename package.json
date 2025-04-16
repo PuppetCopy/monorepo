@@ -17,14 +17,6 @@
     "middleware",
     "contracts"
   ],
-  "type": "module",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "typings": "./dist/types/index.d.ts",
-  "files": [
-    "middleware",
-    "!**/*.test.ts"
-  ],
   "scripts": {
     "build": "bun run build:clean && bun run build:cjs && bun run build:esm && bun run build:types",
     "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --moduleResolution node --outDir ./middleware/dist/cjs --removeComments --verbatimModuleSyntax false",

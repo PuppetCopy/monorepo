@@ -5,14 +5,14 @@
 // import { fromPromise, map, switchLatest, take } from "@most/core"
 // import { Stream } from "@most/types"
 // import { ADDRESS_ZERO, IntervalTime, getMappedValue, readableFactorPercentage, switchMap } from 'common-utils'
-// import * as GMX "../gmx/index.js"
+// import * as GMX "@puppet/middleware/gmx"
 // import { IMarket, IMarketFees, IMarketPrice, IMarketUsageInfo, TEMP_MARKET_LIST, getBorrowingFactorPerInterval, getFundingFactorPerInterval } from '@puppet/middleware/gmx'
 // import { latestPriceMap } from 'puppet-middleware'
 // import { $Table, $defaultTableRowContainer } from '@puppet/middleware/ui-components'
 // import * as viem from 'viem'
 // import { $marketSmallLabel } from '../common/$common'
 // import { readMarketPoolUsage } from '../logic/tradeRead'
-// import * as walletLink from "wallet"
+// import * as walletLink from "@puppet/middleware/wallet"
 // import { readContract } from 'viem/actions'
 // import { IComponentPageParams } from '../pages/type'
 

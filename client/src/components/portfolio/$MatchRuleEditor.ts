@@ -3,7 +3,7 @@ import { $element, $node, $text, attr, component, style, stylePseudo } from "@ae
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { empty, map, now, sample, snapshot, startWith } from "@most/core"
 import { formatFixed, getDuration, parseBps, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
-import { IMatchRule } from "puppet-middleware"
+import { IMatchRule } from "@puppet/middleware/core"
 import { $Checkbox, $FieldLabeled } from "@puppet/middleware/ui-components"
 import { uiStorage } from "ui-storage"
 import { theme } from "../../assignThemeSync.js"

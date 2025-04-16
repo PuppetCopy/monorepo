@@ -2,7 +2,7 @@ import { Behavior } from "@aelea/core"
 import { component, style } from "@aelea/dom"
 import { $column, layoutSheet } from "@aelea/ui-components"
 import { EIP6963ProviderDetail } from "mipd"
-import * as walletLink from "wallet"
+import * as walletLink from "@puppet/middleware/wallet"
 import { $heading1 } from "../common/$text.js"
 import { IComponentPageParams } from "./type"
 
