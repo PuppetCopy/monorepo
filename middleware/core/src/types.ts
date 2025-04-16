@@ -345,9 +345,6 @@ export interface IMatchRule extends ILogTypeId<'MatchRule'> {
   routeMatch: IMatchRoute
 }
 
-
-
-
 export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
   id: viem.Address
   collateralToken: viem.Address

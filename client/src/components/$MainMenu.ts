@@ -135,16 +135,16 @@ export const $MainMenu = (config: MainMenu) => component((
       ),
 
       $row(layoutSheet.spacingBig, style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
-        style({ padding: 0 })(
-          $pageLink({
-            route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-            // anchorOp: style({  }),
-            url: `/app/wallet`,
-            $content: $walletProfileDisplay({ walletClientQuery })
-          })({
-            click: routeChangeTether(),
-          })
-        ),
+        // style({ padding: 0 })(
+        //   $pageLink({
+        //     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+        //     // anchorOp: style({  }),
+        //     url: `/app/wallet`,
+        //     $content: $walletProfileDisplay({ walletClientQuery })
+        //   })({
+        //     click: routeChangeTether(),
+        //   })
+        // ),
         $pageLink({
           $content: $row(layoutSheet.spacing, style({ alignItems: 'center', cursor: 'pointer',  borderRadius: '50px', pointerEvents: 'none' }))(
             $icon({ $content: $trophy, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
@@ -301,16 +301,16 @@ export const $MainMenuMobile = (config: MainMenu) => component((
 
       $row(layoutSheet.spacing, style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
 
-        style({ padding: 0 })(
-          $pageLink({
-            route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-            // anchorOp: style({  }),
-            url: `/app/wallet`,
-            $content: $walletProfileDisplay({ walletClientQuery })
-          })({
-            click: routeChangeTether(),
-          })
-        ),
+        // style({ padding: 0 })(
+        //   $pageLink({
+        //     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+        //     // anchorOp: style({  }),
+        //     url: `/app/wallet`,
+        //     $content: $walletProfileDisplay({ walletClientQuery })
+        //   })({
+        //     click: routeChangeTether(),
+        //   })
+        // ),
       ),
 
       $row(layoutSheet.spacingBig, style({ placeContent: 'flex-end', flex: 1 }))(

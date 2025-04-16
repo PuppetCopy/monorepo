@@ -390,6 +390,41 @@ export const coreContractAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DeployMatchmaker
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const deployMatchmakerAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'IS_SCRIPT',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getNextCreateAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'count', internalType: 'uint256', type: 'uint256' }],
+    name: 'getNextCreateAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'run',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dictatorship
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -7342,16 +7377,6 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'address', type: 'address' },
-    ],
-    name: 'activityThrottleMap',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
       {
         name: '_callParams',
         internalType: 'struct MirrorPosition.CallPosition',
@@ -7394,7 +7419,9 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+    ],
     name: 'allocationMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -7402,8 +7429,8 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '', internalType: 'bytes32', type: 'bytes32' },
-      { name: '', internalType: 'address', type: 'address' },
+      { name: 'allocationKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'puppet', internalType: 'address', type: 'address' },
     ],
     name: 'allocationPuppetMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -7636,12 +7663,22 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_trader', internalType: 'address', type: 'address' },
+      { name: '_matchingKey', internalType: 'bytes32', type: 'bytes32' },
       { name: '_puppet', internalType: 'address', type: 'address' },
     ],
     name: 'initializeTraderActivityThrottle',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'puppet', internalType: 'address', type: 'address' },
+    ],
+    name: 'lastActivityThrottleMap',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -7705,7 +7742,9 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+    ],
     name: 'positionMap',
     outputs: [
       { name: 'size', internalType: 'uint256', type: 'uint256' },
@@ -7716,7 +7755,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
     name: 'requestAdjustmentMap',
     outputs: [
       { name: 'allocationAddress', internalType: 'address', type: 'address' },
@@ -7781,12 +7820,12 @@ export const mirrorPositionAbi = [
         type: 'tuple',
         components: [
           {
-            name: 'allocationToken',
+            name: 'collateralToken',
             internalType: 'contract IERC20',
             type: 'address',
           },
           {
-            name: 'distributeToken',
+            name: 'distributionToken',
             internalType: 'contract IERC20',
             type: 'address',
           },
@@ -7812,7 +7851,9 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    inputs: [
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+    ],
     name: 'tokenDustThresholdAmountMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',

@@ -8,6 +8,7 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/*.code-search": true,
+    "**/bun.lock": true,
     "**/dist": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",

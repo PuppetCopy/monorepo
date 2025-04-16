@@ -3,7 +3,7 @@
   "license": "BSL-1.1 and MIT",
   "private": true,
   "description": "Puppet Monorepo",
-  "packageManager": "bun@1.2.8",
+  "packageManager": "bun@1.2.9",
   "keywords": [
     "Puppet",
     "Copy Trading",
@@ -16,12 +16,24 @@
     "client",
     "docs",
     "opengraph",
-    "middleware/*"
+    "middleware/*",
+    "contracts"
   ],
   "scripts": {
+    "build": "pnpm clean && pnpm build:cjs && pnpm build:esm && pnpm build:types",
+    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./src/_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./src/_esm/package.json",
     "docs:build": "cd docs && bun run build",
     "client:build": "cd client && bun run build",
-    "wagmi:generate": "wagmi generate --config wagmi.client.config.ts && wagmi generate --config wagmi.subgraph.config.ts"
+    "forge:test": "forge test --match-contract TradingTest -vvvvv",
+    "forge:test:target": "bun run test --match-test testSizeAdjustmentsMatchMirrorPositionLogic",
+    "forge:test:prod": "FOUNDRY_PROFILE=prod bun run test",
+    "forge:test:fork": "forge test --chain arbitrum --match-contract TradingTest -vvvvv --fork-block-number 192315592 --fork-url=$ARBITRUM_RPC_URL",
+    "forge:build": "forge build --sizes",
+    "forge:build:prod": "FOUNDRY_PROFILE=prod forge build --sizes",
+    "forge:deploy": "FOUNDRY_PROFILE=prod CHAIN=42161 SCRIPT='DeployPosition' bun deploy.ts",
+    "forge:docgen": "forge doc --out '.docgen' --build",
+    "forge:gas-report": "forge test --match-contract TradingTest --gas-report",
+    "wagmi:generate": "wagmi generate"
   },
   "devDependencies": {
     "typescript-eslint": "8.29.1",

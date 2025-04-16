@@ -1,15 +1,5 @@
 import { erc20Abi } from "viem";
-import { arbitrum } from "viem/chains";
-import {
-  dictatorshipAbi,
-  puppetTokenAbi,
-  puppetVoteTokenAbi,
-  routerAbi,
-  matchingRuleAbi,
-  mirrorPositionAbi,
-  feeMarketplaceAbi,
-  errorAbi
-} from "./abi/__generatedAbi.js";
+import * as abi from "./abi/__generatedAbi.js";
 
 // gmx v2
 import exchangeRouter from "./abi/exchangeRouter";
@@ -19,40 +9,44 @@ import gmxEventEmitter from "./abi/gmxEventEmitter";
 import datastore from "./abi/datastore";
 
 export const CONTRACT = {
-  [arbitrum.id]: {
-    RouterProxy: {
+  42161: {
+    Router: {
       address: "0x4F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
-      abi: routerAbi,
+      abi: [...abi.routerAbi, ...abi.routerProxyAbi],
     },
 
     Dictatorship: {
       address: "0x583367f217a6684039d378C0a142Cbe17F2FC058",
-      abi: dictatorshipAbi,
+      abi: abi.dictatorshipAbi,
     },
     PuppetToken: {
       address: "0x2F076BdCE9bf6f118d612Ee6bAa9BCF6266De199",
-      abi: puppetTokenAbi,
+      abi: abi.puppetTokenAbi,
     },
     PuppetVoteToken: {
       address: "",
-      abi: puppetVoteTokenAbi,
+      abi: abi.puppetVoteTokenAbi,
     },
     TokenRouter: {
       address: "0xb05Ec3598F5fA2f997B1a79E5e6995a158E8C26D",
-      abi: routerAbi,
+      abi: abi.routerAbi,
+    },
+    AllocationStore: {
+      address: "0x2F076BdCE9bf6f118d612Ee6bAa9BCF6266De199",
+      abi: abi.allocationStoreAbi,
     },
 
-    MatchRule: {
+    MatchingRule: {
       address: "0x1fC2D4aE5E8bA3fE3dF7B6c8D9B1fF8C8E0eA8C7",
-      abi: matchingRuleAbi,
+      abi: abi.matchingRuleAbi,
     },
     MirrorPosition: {
       address: "0x4F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
-      abi: mirrorPositionAbi,
+      abi: abi.mirrorPositionAbi,
     },
     FeeMarketplace: {
       address: "0x5F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
-      abi: feeMarketplaceAbi,
+      abi: abi.feeMarketplaceAbi,
     },
 
 
@@ -86,7 +80,7 @@ export const CONTRACT = {
       abi: gmxEventEmitter,
     },
     CustomError: {
-      abi: errorAbi,
+      abi: abi.errorAbi,
     },
   },
 } as const;

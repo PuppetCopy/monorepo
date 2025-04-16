@@ -17,12 +17,12 @@ import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from "../../com
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../../components/form/$Button"
 import { $SubmitBar } from "../../components/form/$SubmitBar"
 import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.js"
-import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
 import localStore from "../../const/localStore.js"
 import tokenomicsReader from "../../logic/tokenomicsReader.js"
 import { IUserActivityPageParams, IWalletTab } from "../type.js"
 import { $WalletPuppet } from "./$WalletPuppet"
 import { getVestingCursor } from "puppet-middleware"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor"
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -39,7 +39,7 @@ const optionDisplay = {
   },
 }
 
-interface IWalletPageParams extends IUserActivityPageParams {}
+interface IWalletPageParams extends IUserActivityPageParams { }
 
 
 export const $WalletPage = (config: IWalletPageParams) => component((

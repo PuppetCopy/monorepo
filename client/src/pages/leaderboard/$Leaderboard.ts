@@ -4,31 +4,31 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Time } from "@most/types"
-import { getMappedValue, readablePnl, unixTimestampNow } from "common-utils"
+import { desc } from "@ponder/client"
+import { getMappedValue, InferStream, readablePnl, switchMap, unixTimestampNow } from "common-utils"
+import { arrayContains } from "drizzle-orm"
 import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "puppet-const"
 import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from "puppet-middleware"
 import * as schema from "schema"
 import {
-  $Baseline, $bear, $bull, $ButtonToggle, $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer, $icon, $infoLabel,
-  $infoLabeledValue, $IntermediatePromise, $spinner, $Table, IMarker, IQuantumScrollPage, ISortBy, TableColumn
+  $Baseline, $bear, $bull, $ButtonToggle, $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer, $icon,
+  $infoLabeledValue, $IntermediatePromise, $spinner, $Table, IMarker, IQuantumScrollPage, ISortBy,
+  TableColumn
 } from "ui-components"
 import { uiStorage } from "ui-storage"
 import * as viem from "viem"
 import { $roiDisplay, $size, $TraderDisplay } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
-import { query } from "../../common/query"
+import { client, queryPricefeed } from "../../common/query"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
-import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
-import { $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor.js"
+import { $TraderMatchingRouteEditor, IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { getPositionListTimelinePerformance, IPerformanceTimelineTick } from "../../components/trade/$ProfilePerformanceGraph"
 import localStore from "../../const/localStore.js"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { desc } from "@ponder/client"
-import { getMarketIndexToken } from "gmx-middleware"
 
 export interface ILeaderboardMatchStats extends IMatchRouteStats {
   timeline: IPerformanceTimelineTick[]
@@ -48,78 +48,55 @@ export const $Leaderboard = (config: ILeaderboard) => component((
 
   [routeChange, routeChangeTether]: Behavior<any, string>,
   [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
+  [filterAccount, filterAccountTether]: Behavior<string | undefined>,
 
   [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
 ) => {
 
-  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, pricefeedMapQuery, matchRuleList, route } = config
+  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, matchRuleList, route } = config
+
+  const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
+
 
   const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
+  const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
 
-  const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-  const routeStatsList = map(async filterParams => {
-    const metrictList = await query.db.query.traderRouteMetric.findMany({
-      where: ((t, f) =>
-        f.and(
-          // ...(filterParams.account ? [f.eq(t.account, filterParams.account)] : []),
-          // ...(filterParams.isLong !== undefined ? [f.eq(t.account, filterParams.account)] : []),
-          f.gte(t.syncTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
-          f.or(
-            ...(filterParams.collateralTokenList.map(token => (
-              f.eq(t.collateralToken, token)
-            )))
-          )
-        )),
-      limit: filterParams.paging.pageSize,
-      offset: filterParams.paging.offset,
-      orderBy: filterParams.sortBy ? desc(schema.traderRouteMetric[filterParams.sortBy.selector]) : undefined,
-      // with: {
-      //   traderRoute: {
-      //     with: {
-      //       decreaseList: true,
-      //       increaseList: true
-      //     }
-      //   }
-      // }
-    })
-    return metrictList
-  }, combineObject({ activityTimeframe, paging, sortBy, isLong, collateralTokenList: selectedCollateralTokenList }))
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
-    const accountStatsListData = await pageParams.routeStatsList
-    const accountStatsList = accountStatsListData
-      .map(stats => {
-        // const list = [...stats.traderRoute.increaseList, ...stats.traderRoute.decreaseList].filter(pos => {
-        //   try {
-        //     getMarketIndexToken(pos.market)
-        //     return pageParams.isLong === undefined || pos.isLong === pageParams.isLong
-        //   } catch (e) {
-        //     console.error(e)
-        //     return false
-        //   }
-        // })
+    // const accountStatsListData = await pageParams.routeStatsList
+    // const accountStatsList = accountStatsListData
+    // .map(stats => {
+    //   // const list = [...stats.traderRoute.increaseList, ...stats.traderRoute.decreaseList].filter(pos => {
+    //   //   try {
+    //   //     getMarketIndexToken(pos.market)
+    //   //     return pageParams.isLong === undefined || pos.isLong === pageParams.isLong
+    //   //   } catch (e) {
+    //   //     console.error(e)
+    //   //     return false
+    //   //   }
+    //   // })
 
-        if (list.length === 0) return null
+    //   // if (list.length === 0) return null
 
 
-        const timeline = getPositionListTimelinePerformance({
-          activityTimeframe: pageParams.activityTimeframe,
-          list,
-          pricefeedMap,
-          tickCount: 25,
-        })
+    //   const timeline = getPositionListTimelinePerformance({
+    //     activityTimeframe: pageParams.activityTimeframe,
+    //     list,
+    //     pricefeedMap,
+    //     tickCount: 25,
+    //   })
 
-        stats.pnl = timeline[timeline.length - 1].pnl
+    //   stats.pnl = timeline[timeline.length - 1].pnl
 
-        return { ...stats, timeline, list }
-      })
-      .filter(pos => pos !== null)
+    //   return { ...stats, timeline, list }
+    // })
+    // .filter(pos => pos !== null)
 
-    return { accountStatsList, pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe }
-  }, combineObject({ sortBy, routeStatsList, pricefeedMapQuery, activityTimeframe, isLong }))
+    return { pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe: pageParams.activityTimeframe }
+  }, combineObject({ sortBy, pricefeedMapQuery, activityTimeframe, isLong }))
 
 
 
@@ -128,9 +105,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
 
       $card2(style({ padding: "0", gap: 0 }))(
         $responsiveFlex(layoutSheet.spacingBig, style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }))(
-          $SelectCollateralToken({
-            selectedList: selectedCollateralTokenList,
-          })({
+          $SelectCollateralToken({ selectedList: selectedCollateralTokenList })({
             selectMarketTokenList: selectMarketTokenListTether()
           }),
           $ButtonToggle({
@@ -158,24 +133,98 @@ export const $Leaderboard = (config: ILeaderboard) => component((
         $IntermediatePromise({
           query: tableParams,
           $$done: map(params => {
-            if (params.accountStatsList.length === 0) {
-              return $column(layoutSheet.spacingSmall, style({ padding: '30px' }))(
-                $text('No positions found'),
-                $infoLabel(`Try changing filters or selecting a different markets`),
-              )
-            }
 
-            // const dataSource: Stream<TablePageResponse<ILeaderboardMatchStats>> = map(scroll => {
+            const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-            //   const newLocal = pagingQuery(
-            //     { ...params.sortBy, ...scroll },
-            //     params.accountStatsList
-            //   )
-            //   return newLocal
-            // }, paging)
+            const dataSource = switchMap(async filterParams => {
+              const metrictList = await client.db.query.traderRouteMetric.findMany({
+                where: ((t, f) =>
+                  f.and(
+                    f.eq(t.interval, filterParams.activityTimeframe),
+                    filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
+                    filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                    f.gte(t.lastUpdatedTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
+                  )),
+                limit: filterParams.paging.pageSize,
+                offset: filterParams.paging.offset,
+                orderBy: filterParams.sortBy ? desc(schema.traderRouteMetric[filterParams.sortBy.selector]) : undefined,
+                columns: {
+                  account: true,
+                  collateralToken: true,
+                  matchingKey: true,
+                  maxSizeInUsd: true,
+                  maxCollateralInUsd: true,
+                  maxSizeInTokens: true,
+                  maxCollateralInTokens: true,
+                  roi: true,
+                  pnl: true,
+                }
+              })
+
+              const page = await Promise.all(metrictList.map(async (routeMetric) => {
+                const [matchingRuleList, increaseList, decreaseList] = await Promise.all([
+                  client.db.query.puppetMatchingRule.findMany({
+                    where: (t, f) => f.and(
+                      f.eq(t.matchingKey, routeMetric.matchingKey),
+                    ),
+                    columns: {
+                      puppet: true,
+                      allowanceRate: true,
+                      expiry: true,
+                      throttleActivity: true
+                    },
+                    limit: 10
+                  }),
+                  client.db.query.positionIncrease.findMany({
+                    where: (t, f) => f.and(
+                      f.eq(t.matchingKey, routeMetric.matchingKey),
+                      f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
+                    ),
+                    columns: {
+                      indexToken: true,
+                      positionKey: true,
+                      sizeInUsd: true,
+                      sizeInTokens: true,
+                      indexTokenPriceMax: true,
+                      isLong: true,
+                      blockTimestamp: true,
+                    }
+                  }),
+                  client.db.query.positionDecrease.findMany({
+                    where: (t, f) => f.and(
+                      f.eq(t.matchingKey, routeMetric.matchingKey),
+                      f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
+                    ),
+                    columns: {
+                      indexToken: true,
+                      positionKey: true,
+                      sizeInUsd: true,
+                      sizeInTokens: true,
+                      indexTokenPriceMax: true,
+                      basePnlUsd: true,
+                      isLong: true,
+                      blockTimestamp: true,
+                    }
+                  })
+                ])
 
 
-            const columns: TableColumn<ILeaderboardMatchStats>[] = [
+                return {
+                  ...routeMetric,
+                  decreaseList,
+                  increaseList,
+                  matchingRuleList
+                }
+              }))
+
+              return { page, offset: filterParams.paging.offset, pageSize: filterParams.paging.pageSize }
+            }, combineObject({ activityTimeframe, paging, sortBy, isLong, collateralTokenList: selectedCollateralTokenList, account }))
+
+            type ILeaderboardDatasource = InferStream<typeof dataSource>
+            type ILeaderboardCellData = ILeaderboardDatasource['page'][number]
+
+
+            const columns: TableColumn<ILeaderboardCellData>[] = [
               {
                 $head: $text('Trader'),
                 gridTemplate: '149px',
@@ -184,20 +233,33 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   return $TraderDisplay({
                     route: config.route,
                     trader: pos.account,
-                    puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
+                    puppetList: [],
+                    // puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
                   })({
                     click: routeChangeTether()
                   })
                 })
               },
               {
-                $head: $text('Collateral Match'),
+                $head: $text('Routes'),
                 gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                 $bodyCallback: map(pos => {
-                  return $TraderMatchRouteEditor({
+                  const tokenList = [...new Set(
+                    [...pos.increaseList.map(x => x.indexToken), ...pos.decreaseList.map(x => viem.getAddress(x.indexToken))]
+                  )]
+
+                  // return $row(
+                  //   ...tokenList.map(token =>
+                  //     $column(layoutSheet.spacingTiny)(
+                  //       $tokenTryLabeled(token)
+                  //     )
+                  //   )
+                  // )
+                  return $TraderMatchingRouteEditor({
                     matchRuleList,
                     walletClientQuery,
-                    matchRoute: pos.matchRoute,
+                    collateralToken: pos.collateralToken,
+                    traderMatchingRuleList: pos.matchingRuleList,
                     trader: pos.account
                   })({
                     changeMatchRuleList: changeMatchRuleListTether(),
@@ -206,14 +268,13 @@ export const $Leaderboard = (config: ILeaderboard) => component((
               },
               ...screenUtils.isDesktopScreen
                 ? [
-
                   {
                     $head: $text('Win/Loss'),
                     gridTemplate: '70px',
                     columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                    $bodyCallback: map((pos: IMatchRouteStats) => {
-                      const totalCount = pos.matchRoute.decreaseList.length
-                      const winCount = pos.matchRoute.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
+                    $bodyCallback: map((pos: ILeaderboardCellData) => {
+                      const totalCount = pos.decreaseList.length
+                      const winCount = pos.decreaseList.reduce((acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0), 0)
                       return $row(layoutSheet.spacingSmall)(
                         $text(`${winCount} / ${totalCount - winCount}`)
                       )
@@ -222,11 +283,11 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   {
                     $head: $column(style({ textAlign: 'right' }))(
                       $text('Size'),
-                      $text(style({ fontSize: '.85rem' }))('Leverage'),
+                      $text(style({ fontSize: '.85rem' }))('Leverage')
                     ),
                     sortBy: 'maxSizeInUsd',
                     columnOp: style({ placeContent: 'flex-end' }),
-                    $bodyCallback: map((pos: IMatchRouteStats) => {
+                    $bodyCallback: map((pos: ILeaderboardCellData) => {
                       return $size(pos.maxSizeInUsd, pos.maxCollateralInUsd)
                     })
                   },
@@ -241,9 +302,16 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   )
                 ),
                 sortBy: 'roi',
-                gridTemplate: screenUtils.isDesktopScreen ? '200px' : '165px',
+                gridTemplate: screenUtils.isDesktopScreen ? '200px' : '140px',
                 $bodyCallback: map(pos => {
-                  const adjustList = [...pos.matchRoute.increaseList, ...pos.matchRoute.decreaseList]
+                  const adjustList = [...pos.increaseList, ...pos.decreaseList]
+
+                  const timeline = getPositionListTimelinePerformance({
+                    activityTimeframe: params.activityTimeframe,
+                    list: adjustList,
+                    pricefeedMap: params.pricefeedMap,
+                    tickCount: 25,
+                  })
 
 
                   const markerList = adjustList
@@ -286,7 +354,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                           },
                           // ...config.chartConfig
                         },
-                        data: pos.timeline as any as BaselineData[],
+                        data: timeline as any as BaselineData[],
                         // containerOp: style({  inset: '0px 0px 0px 0px' }),
                         baselineOptions: {
                           baseValue: {
@@ -296,7 +364,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                           lineWidth: 1,
                           lineType: LineType.Curved,
                         },
-                      })({}),
+                      })({})
                     ),
                     $row(style({ position: 'absolute', background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`, inset: 0, zIndex: 1, alignItems: 'center' }))(
                       $column(layoutSheet.spacingTiny)(
@@ -304,23 +372,31 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                           pos.roi
                         ),
                         $seperator2,
-                        $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl)),
+                        $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl))
                       )
                     )
                   )
                 })
               },
-              // {
-              //   $head: $tableHeader('PnL $', 'ROI %'),
-              //   gridTemplate: screenUtils.isDesktopScreen ? '120px' : '80px',
-              //   sortBy: 'pnl',
-              //   columnOp: style({ placeContent: 'flex-start' }),
-              //   $bodyCallback: map(tr => {
-
-              //     return $PnlAndRoi(tr)
-              //   })
-              // },
             ]
+            // if (params.accountStatsList.length === 0) {
+            //   return $column(layoutSheet.spacingSmall, style({ padding: '30px' }))(
+            //     $text('No positions found'),
+            //     $infoLabel(`Try changing filters or selecting a different markets`),
+            //   )
+            // }
+
+            // const dataSource: Stream<TablePageResponse<ILeaderboardMatchStats>> = map(scroll => {
+
+            //   const newLocal = pagingQuery(
+            //     { ...params.sortBy, ...scroll },
+            //     params.accountStatsList
+            //   )
+            //   return newLocal
+            // }, paging)
+
+
+
 
             return $Table({
               $headerContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),

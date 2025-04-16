@@ -4,11 +4,11 @@ import { Stream } from '@most/types'
 import { type Client } from '@urql/core'
 import { combineState, getClosestNumber, graph, groupArrayMany, IRequestSortApi, periodicRun, StateParams, unixTimestampNow } from 'common-utils'
 import { IPriceCandle, IPricefeedMap, IPriceOracleMap, querySignedPrices } from 'gmx-middleware'
-import * as viem from "viem"
-import { IMatchRoute, IMatchRouteStats, IPositionDecrease, IPositionIncrease } from './types.js'
-import { aggregatePositionList } from './utils.js'
 import { IntervalTime, PRICEFEED_INTERVAL } from 'puppet-const'
+import * as viem from "viem"
 import { schema } from './schema'
+import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from './types.js'
+import { aggregatePositionList } from './utils.js'
 
 
 export interface IQueryPositionParams {

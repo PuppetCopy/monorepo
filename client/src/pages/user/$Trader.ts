@@ -11,7 +11,7 @@ import { $infoLabel, $IntermediatePromise, $Table, IQuantumScrollPage, ISortBy }
 import * as viem from 'viem'
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { IMatchRuleEditorChange } from "../../components/portfolio/$MatchRuleEditor"
-import { $defaultTraderMatchRouteEditorContainer, $TraderMatchRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor"
+import { $defaultTraderMatchRouteEditorContainer, $TraderMatchingRouteEditor } from "../../components/portfolio/$TraderMatchRouteEditor"
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from "../../components/table/$TableColumn.js"
 import { $seperator2 } from "../common"
 import { IPageParams, IUserActivityPageParams } from "../type.js"
@@ -82,7 +82,7 @@ export const $TraderPage = (config: ITraderPage) => component((
 
                 return $column(
                   // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
-                  $TraderMatchRouteEditor({
+                  $TraderMatchingRouteEditor({
                     matchRuleList,
                     walletClientQuery,
                     matchRoute: route.matchRoute,

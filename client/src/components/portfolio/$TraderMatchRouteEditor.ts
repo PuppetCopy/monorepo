@@ -7,28 +7,41 @@ import { constant, map, mergeArray, snapshot } from "@most/core"
 import { Stream } from "@most/types"
 import { switchMap, unixTimestampNow } from "common-utils"
 import { getTokenDescription } from "gmx-middleware"
-import { IMatchRoute, IMatchRule } from "puppet-middleware"
+import { IMatchRule } from "puppet-middleware"
 import { $caretDown, $icon } from "ui-components"
 import * as viem from "viem"
 import { $Popover } from "../$Popover"
-import { $tokenLabeled } from "../../common/$common"
+import { $tokenLabeled, $tokenTryLabeled } from "../../common/$common"
 import { $responsiveFlex } from "../../common/elements/$common.js"
 import { $seperator2 } from "../../pages/common"
 import { IWalletPageParams } from "../../pages/type.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
-import { $MatchRuleEditor, IDraftMatchRule, IMatchRuleEditorChange } from "./$MatchRuleEditor.js"
+import { $MatchRuleEditor, IDraftMatchRule } from "./$MatchRuleEditor.js"
 
 
-interface ITraderMatchRouteEditor extends IWalletPageParams {
+export interface IMatchRuleEditorChange {
+  draft: IDraftMatchRule
   trader: viem.Address
-  matchRoute: IMatchRoute
+  collateralToken: viem.Address
+  // matchRule?: IMatchRule
+}
+
+interface ITraderMatchingRouteEditor extends IWalletPageParams {
+  trader: viem.Address
+  traderMatchingRuleList: {
+    puppet: `0x${string}`;
+    allowanceRate: bigint;
+    throttleActivity: bigint;
+    expiry: bigint;
+  }[]
+  collateralToken: viem.Address
   matchRuleList: Stream<IMatchRuleEditorChange[]>
   $container?: NodeComposeFn<$Node>
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))
 
-export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => component((
+export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) => component((
   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, IMatchRule | undefined>,
 
   [discardDraft, discardDraftTether]: Behavior<IDraftMatchRule>,
@@ -36,8 +49,8 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
 ) => {
 
   const {
-    walletClientQuery, trader, matchRuleList, matchRoute,
-    $container = $defaultTraderMatchRouteEditorContainer
+    $container = $defaultTraderMatchRouteEditorContainer,
+    walletClientQuery, trader, matchRuleList, collateralToken, traderMatchingRuleList
   } = config
 
   const matchRule = switchMap(async walletQuery => {
@@ -47,7 +60,7 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
       return
     }
 
-    return matchRoute.matchRuleList.find(mr => mr.puppet === wallet.account.address)
+    return traderMatchingRuleList.find(mr => mr.puppet === wallet.account.address)
   }, walletClientQuery)
 
   return [
@@ -65,15 +78,13 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
         return $ButtonSecondary({
           $content: $responsiveFlex(style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }))(
             $row(style({ alignItems: 'center' }))(
-              $tokenLabeled(getTokenDescription(matchRoute.collateralToken)),
+              $tokenTryLabeled(collateralToken),
             ),
             $seperator2,
-
             $row(style({ gap: '6px' }))(
               $text(`Copy`),
               $icon({ $content: $caretDown, width: '12px', svgOps: style({ marginTop: '2px', minWidth: '8px' }), viewBox: '0 0 32 32' }),
             ),
-
           ),
           $container: $defaultMiniButtonSecondary(style({
             borderRadius: '16px', padding: '8px', height: 'auto',
@@ -93,10 +104,10 @@ export const $TraderMatchRouteEditor = (config: ITraderMatchRouteEditor) => comp
             x.trader === trader
           )
           const newList = [...list]
-          const change: IMatchRuleEditorChange = {
-            value: params.saveDraft,
+          const change = {
+            draft: params.saveDraft,
             trader,
-            collateralToken: matchRoute.collateralToken,
+            collateralToken: collateralToken,
             matchRule: params.matchRule
           }
           if (index === -1) {

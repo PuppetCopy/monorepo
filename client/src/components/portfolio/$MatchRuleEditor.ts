@@ -22,13 +22,6 @@ export interface IDraftMatchRule {
   throttleActivity: bigint
 }
 
-export interface IMatchRuleEditorChange {
-  value: IDraftMatchRule
-  trader: viem.Address
-  collateralToken: viem.Address
-  matchRule?: IMatchRule
-}
-
 
 export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) => component((
   [inputEndDate, inputEndDateTether]: Behavior<any, bigint>,
@@ -54,7 +47,7 @@ export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) => component
       $text('The following rules will apply to this trader whenever he opens and maintain a position'),
 
       $FieldLabeled({
-        label: 'Match Allocation %',
+        label: 'Allocate %',
         value: map(x => x ? `${formatFixed(4, x) * 100}` : '', inputAllowance),
         placeholder: `${formatFixed(4, matchRule?.allowanceRate || BigInt(1000)) * 100}`,
         labelWidth: 150,

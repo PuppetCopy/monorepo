@@ -8,12 +8,15 @@ import { $QuantumScroll, IScrollPagable, QuantumScroll, IQuantumScrollPage } fro
 
 
 
-export type TablePageResponse<T> = T[] | Omit<IScrollPagable, '$items'> & { page: T[] }
+
+export type TablePageResponse<T> = IQuantumScrollPage & {
+  page: T[]
+}
 
 export interface TableOption<T> {
   columns: TableColumn<T>[]
   gridTemplateColumns?: string
-  dataSource: Stream<TablePageResponse<T>>
+  dataSource: Stream<TablePageResponse<T> | T[]>
 
   $between?: $Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
@@ -121,7 +124,7 @@ export const $Table = <T>({
 
   const $body = $QuantumScroll({
     ...scrollConfig,
-    dataSource: map((res) => {
+    dataSource: map(res => {
       const $items = (Array.isArray(res) ? res : res.page).map(rowData => {
         return $rowCallback
           ? switchLatest(map($rowContainer => {

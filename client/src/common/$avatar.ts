@@ -2,7 +2,6 @@ import { $element, $svg, attr } from "@aelea/dom"
 import * as viem from "viem"
 // @ts-ignore
 import MersenneTwister from "mersenne-twister"
-// @ts-ignore
 import Color from 'color'
 import { tap } from "@most/core"
 

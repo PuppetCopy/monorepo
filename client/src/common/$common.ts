@@ -5,7 +5,7 @@ import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from "@ael
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, skipRepeats } from "@most/core"
 import { Stream } from "@most/types"
-import { getBasisPoints, getMappedValue, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, streamOf } from "common-utils"
+import { getBasisPoints, getMappedValue, getSafeMappedValue, getTokenUsd, ITokenDescription, lst, readableDate, readableLeverage, readablePercentage, readablePnl, readableUsd, shortenAddress, streamOf } from "common-utils"
 import { getMarketIndexToken, getPositionPnlUsd, getRoughLiquidationPrice, getTokenDescription, IMarket, liquidationWeight } from "gmx-middleware"
 import { IMatchRoute, IPosition, isPositionSettled, latestPriceMap } from "puppet-middleware"
 import { $infoLabel, $infoLabeledValue, $labeledDivider, $Link, $tokenIconMap, $Tooltip } from "ui-components"
@@ -13,7 +13,7 @@ import * as viem from "viem"
 import { $AccountLabel, $profileAvatar } from "../components/$AccountProfile.js"
 import { $seperator2 } from "../pages/common.js"
 import { IWalletTab } from "../pages/type.js"
-import { ADDRESS_ZERO } from "puppet-const"
+import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from "puppet-const"
 
 
 export const $midContainer = $column(
@@ -100,9 +100,18 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
+export const $tokenTryLabeled = (token: viem.Address) => {
+  const description = getSafeMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token, ADDRESS_ZERO)
+  
+  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+    style({ width: '18px', height: '18px' })($tokenIcon(description)),
+    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  shortenAddress(indexToken)}`),
+  )
+}
 
-export const $tokenIcon = (tokenDesc: ITokenDescription) => {
-  const $token = $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[ADDRESS_ZERO]
+
+export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
+  const $token = tokenDesc ? $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[ADDRESS_ZERO] : $tokenIconMap[ADDRESS_ZERO]
 
   if (!$token) {
     throw new Error('Unable to find matched token')

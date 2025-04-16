@@ -2,7 +2,7 @@ import { arbitrum, avalanche } from "viem/chains"
 import { TOKEN_SYMBOL } from "./symbol"
 import { ARBITRUM_ADDRESS } from "./chain/arbitrum"
 import { AVALANCHE_ADDRESS } from "./chain/avalanche"
-import { mapArrayBy } from "./common"
+import { ADDRESS_ZERO, mapArrayBy } from "./common"
 
 
 
@@ -430,6 +430,7 @@ export const CHAIN_NATIVE_DESCRIPTION = {
 export const TOKEN_ADDRESS_DESCRIPTION_MAP = {
   // [ARBITRUM_ADDRESS.PUPPET]: TOKEN_DESCRIPTION_MAP.PUPPET,
 
+  [ADDRESS_ZERO]: null,
   [ARBITRUM_ADDRESS.NATIVE_TOKEN]: TOKEN_DESCRIPTION_MAP.WETH,
 
   [ARBITRUM_ADDRESS.GMX]: TOKEN_DESCRIPTION_MAP.GMX,

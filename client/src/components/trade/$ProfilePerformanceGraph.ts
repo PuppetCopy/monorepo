@@ -28,8 +28,8 @@ export type IPerformanceTimelineTick = {
   openPnlMap: Map<viem.Hex, OpenPnl>
 }
 
-type IAbstractUpdate = {
-  market: viem.Address
+export type IAbstractUpdate = {
+  indexToken: viem.Address
   positionKey: viem.Hex
   sizeInUsd: bigint
   sizeInTokens: bigint
@@ -40,7 +40,7 @@ type IAbstractUpdate = {
 }
 
 export interface IPerformanceTimeline {
-  pricefeedMap: Record<viem.Address, IPriceCandle[]>
+  pricefeedMap: Record<viem.Address, { token: viem.Address, c: bigint, slotTime: number}[]>
   activityTimeframe: IntervalTime
   list: IAbstractUpdate[]
   tickCount: number
@@ -56,7 +56,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   const startTime = timeNow - config.activityTimeframe
   const initialPositionTime = config.list.map(pos => pos.blockTimestamp).reduce((a, b) => Math.min(a, b), config.list[0].blockTimestamp)
   const uniqueIndexTokenList = [...new Set(
-    config.list.map(update => getMarketIndexToken(update.market))
+    config.list.map(update => update.indexToken)
   )]
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
     .flatMap(indexToken =>
@@ -104,7 +104,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
       let openPosition = acc.openPnlMap.get(next.positionKey)
 
       if (!openPosition) {
-        openPosition = { pnl: 0n, update: next, indexToken: getMarketIndexToken(next.market) }
+        openPosition = { pnl: 0n, update: next, indexToken: next.indexToken }
         acc.openPnlMap.set(next.positionKey, openPosition)
       }
 

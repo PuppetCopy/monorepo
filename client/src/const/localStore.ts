@@ -23,6 +23,7 @@ export default uiStorage.createStoreDefinition('root', 8, {
     initialState: {
       sortBy: { direction: 'desc', selector: 'roi' } as ISortBy,
       isLong: undefined as boolean | undefined,
+      account: undefined as string | undefined,
     }
   },
   wallet: {

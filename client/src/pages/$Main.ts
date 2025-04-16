@@ -208,7 +208,7 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               router.match(leaderboardRoute)(
                 $midContainer(
                   fadeIn($Leaderboard({
-                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList, depositTokenList
+                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, matchRuleList, depositTokenList
                   })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),

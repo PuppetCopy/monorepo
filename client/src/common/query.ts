@@ -1,16 +1,16 @@
 import { replayLatest } from "@aelea/core";
 import { map, multicast } from "@most/core";
-import { and, createClient, desc, eq, gte, or, Status } from "@ponder/client";
-import { combineState, getClosestNumber, periodicRun, StateParams, unixTimestampNow } from "common-utils";
+import { createClient, Status } from "@ponder/client";
+import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "common-utils";
 import { IntervalTime, PRICEFEED_INTERVAL } from "puppet-const";
 import * as schema from "schema";
 import * as viem from "viem";
 
-export const query = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, });
+export const client = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, });
 
 
 export const getSubgraphStatus = async (): Promise<Status> => {
-  return query.getStatus()
+  return client.getStatus()
 }
 
 export const subgraphStatus = replayLatest(multicast(periodicRun({
@@ -28,21 +28,20 @@ export function queryPricefeed(
   estTickAmout = 10
 ) {
   return map(async params => {
-    return query.db.select().from(schema.priceCandle)
-      .where(
-        and(
-          eq(schema.priceCandle.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
-          gte(schema.priceCandle.slotTime, unixTimestampNow() - params.activityTimeframe),
-          or(
-            ...(params.tokenList?.map(token => (
-              eq(schema.priceCandle.token, token)
-            )) ?? [])
-          )
-        )
-      )
-      .orderBy(
-        desc(schema.priceCandle.slotTime)
-    )
+    const priceList = await client.db.query.priceCandle.findMany({
+      columns: {
+        c: true,
+        slotTime: true,
+        token: true
+      },
+      where: (t, f) => f.and(
+        f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
+        f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
+        params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
+      ),
+    });
+    return groupArrayMany(priceList, c => c.token)
+
     // map results by token
 
   }, combineState(queryParams))

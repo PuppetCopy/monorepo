@@ -41,7 +41,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) => component((
 
     if (wallet === null) return 0n
 
-    return puppetReader.PuppetStore.getUserBalance(wallet, collateralToken, wallet.account.address)
+    return puppetReader.getUserBalance(wallet, collateralToken, wallet.account.address)
   }, walletClientQuery)
   const collateralTokenDescription = getTokenDescription(collateralToken)
 

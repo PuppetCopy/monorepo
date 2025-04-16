@@ -33,7 +33,7 @@ const ESTIMATED_GAS_FEE_MULTIPLIER_FACTOR = "ESTIMATED_GAS_FEE_MULTIPLIER_FACTOR
 export async function readMarketPoolUsage(
   provider: walletLink.IClient,
   market: IMarket,
-  contractDefs = getMappedValue(CONTRACT, provider.chain.id),
+  contractDefs = CONTRACT,
 ): Promise<IMarketUsageInfo> {
   const datastoreContract = contractDefs.Datastore
   // const v2Reader = contractReader(readerV2)
@@ -357,7 +357,7 @@ export async function readMarketConfig(
   provider: walletLink.IPublicProvider,
   market: IMarket,
 ): Promise<IMarketConfig> {
-  const datastoreContract = getMappedValue(CONTRACT, provider.chain.id).Datastore
+  const datastoreContract = CONTRACT.Datastore
 
 
   const reserveFactorLong = readContract(provider, {
