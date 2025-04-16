@@ -3,9 +3,9 @@ import { http } from "@aelea/ui-components"
 import { empty, map, mergeArray, now, scan, skip } from "@most/core"
 import { Stream } from "@most/types"
 import { erc20Abi } from "abitype/abis"
-import { ITokenDescription, filterNull, getDenominator, getMappedValue, parseFixed } from "../utils/index.js"
-import { hashData, resolveAddress } from "../gmx/index.js"
-import * as PUPPET from "../const/index.js"
+import { ITokenDescription, filterNull, getDenominator, getMappedValue, parseFixed } from "@puppet/middleware/utils"
+import { hashData, resolveAddress } from "@puppet/middleware/gmx"
+import * as PUPPET from "@puppet/middleware/const"
 import * as viem from "viem"
 import { getBalance } from "viem/actions"
 import * as walletLink from "@puppet/middleware/wallet"
@@ -176,9 +176,9 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
   const json = await res.json()
 
   return Object.keys(json).reduce((seed, key) => {
-    seed[key] = json[key]
+    seed[key as viem.Address] = BigInt(json[key])
     return seed
-  }, {})
+  }, {} as { [key in viem.Address]: bigint })
 }
 
 

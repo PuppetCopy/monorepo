@@ -4,56 +4,62 @@
   "description": "Copytrading middleware",
   "version": "2.27.0",
   "type": "module",
-  "main": "./_cjs/index.js",
-  "module": "./_esm/index.js",
-  "types": "./_types/index.d.ts",
-  "typings": "./_types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
   "files": [
     "*",
-    "!**/*.bench.ts",
-    "!**/*.bench-d.ts",
     "!**/*.test.ts",
-    "!**/*.test.ts.snap",
-    "!**/*.test-d.ts",
     "!**/*.tsbuildinfo",
     "!tsconfig.build.json"
   ],
   "exports": {
-    ".": {
-      "types": "./_types/index.d.ts",
-      "import": "./_esm/index.js",
-      "default": "./_cjs/index.js"
-    },
     "./const": {
-      "types": "./_types/const/index.d.ts",
-      "import": "./_esm/const/index.js",
-      "default": "./_cjs/const/index.js"
+      "types": "./dist/types/const/index.d.ts",
+      "import": "./dist/esm/const/index.js",
+      "default": "./dist/cjs/const/index.js"
     },
     "./core": {
-      "types": "./_types/core/index.d.ts",
-      "import": "./_esm/core/index.js",
-      "default": "./_cjs/core/index.js"
+      "types": "./dist/types/core/index.d.ts",
+      "import": "./dist/esm/core/index.js",
+      "default": "./dist/cjs/core/index.js"
     },
     "./wallet": {
-      "types": "./_types/wallet/index.d.ts",
-      "import": "./_esm/wallet/index.js",
-      "default": "./_cjs/wallet/index.js"
+      "types": "./dist/types/wallet/index.d.ts",
+      "import": "./dist/esm/wallet/index.js",
+      "default": "./dist/cjs/wallet/index.js"
     },
     "./utils": {
-      "types": "./_types/utils/index.d.ts",
-      "import": "./_esm/utils/index.js",
-      "default": "./_cjs/utils/index.js"
+      "types": "./dist/types/utils/index.d.ts",
+      "import": "./dist/esm/utils/index.js",
+      "default": "./dist/cjs/utils/index.js"
     },
     "./gmx": {
-      "types": "./_types/gmx/index.d.ts",
-      "import": "./_esm/gmx/index.js",
-      "default": "./_cjs/gmx/index.js"
+      "types": "./dist/types/gmx/index.d.ts",
+      "import": "./dist/esm/gmx/index.js",
+      "default": "./dist/cjs/gmx/index.js"
     },
     "./gbc": {
-      "types": "./_types/gbc/index.d.ts",
-      "import": "./_esm/gbc/index.js",
-      "default": "./_cjs/gbc/index.js"
+      "types": "./dist/types/gbc/index.d.ts",
+      "import": "./dist/esm/gbc/index.js",
+      "default": "./dist/cjs/gbc/index.js"
+    },
+    "./ui-components": {
+      "types": "./dist/types/ui-components/index.d.ts",
+      "import": "./dist/esm/ui-components/index.js",
+      "default": "./dist/cjs/ui-components/index.js"
+    },
+    "./ui-router": {
+      "types": "./dist/types/ui-router/index.d.ts",
+      "import": "./dist/esm/ui-router/index.js",
+      "default": "./dist/cjs/ui-router/index.js"
+    },
+    "./ui-storage": {
+      "types": "./dist/types/ui-storage/index.d.ts",
+      "import": "./dist/esm/ui-storage/index.js",
+      "default": "./dist/cjs/ui-storage/index.js"
     },
     "./package.json": "./package.json"
   },

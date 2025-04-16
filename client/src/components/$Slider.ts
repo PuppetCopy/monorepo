@@ -4,7 +4,7 @@ import { $column, $row, Input, observer } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { join, map, mergeArray, now, snapshot, until } from "@most/core"
 import { Stream } from "@most/types"
-import { invertColor } from "../utils/index.js"
+import { invertColor } from "@puppet/middleware/utils"
 
 export interface ISliderParams extends Input<number> {
   step?: number

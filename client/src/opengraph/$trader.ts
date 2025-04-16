@@ -2,7 +2,7 @@
 // import { $column, layoutSheet } from "@aelea/ui-components"
 // import { now } from "@most/core"
 // import { Stream } from "@most/types"
-// import { IntervalTime } from "../utils/index.js"
+// import { IntervalTime } from "@puppet/middleware/utils"
 // import { IPriceTickListMap } from "../gmx/index.js"
 // import { ISetRouteType, queryPosition } from "puppet-middleware"
 // import * as viem from 'viem'

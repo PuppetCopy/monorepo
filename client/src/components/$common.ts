@@ -2,7 +2,7 @@ import { style, stylePseudo } from "@aelea/dom"
 import { $column, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { IAttributeBackground, IAttributeBadge, IAttributeMappings, IBerryDisplayTupleMap, IToken, getBerryFromItems, getLabItemTupleIndex, tokenIdAttributeTuple } from "@gambitdao/gbc-middleware"
-import { $Table, $defaultTableCell, $defaultTableRowContainer, $defaultVScrollContainer, $infoLabeledValue, $spinner, TableOption } from "ui-components"
+import { $Table, $defaultTableCell, $defaultTableRowContainer, $defaultVScrollContainer, $infoLabeledValue, $spinner, TableOption } from "@puppet/middleware/ui-components"
 import { $berry } from "./$DisplayBerry.js"
 
 

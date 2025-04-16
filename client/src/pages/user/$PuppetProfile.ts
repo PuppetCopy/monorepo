@@ -1,7 +1,7 @@
 import { Behavior } from "@aelea/core"
 import { component, style } from "@aelea/dom"
 import { $column, layoutSheet, screenUtils } from "@aelea/ui-components"
-import { IntervalTime } from "../const/index.js"
+import { IntervalTime } from "@puppet/middleware/const"
 import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"

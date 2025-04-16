@@ -12,7 +12,7 @@
 //   switchLatest
 // } from "@most/core"
 // import { Stream } from "@most/types"
-// import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream, switchMap } from "../utils/index.js"
+// import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream, switchMap } from "@puppet/middleware/utils"
 // import * as GMX "../gmx/index.js"
 // import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress } from "../gmx/index.js"
 // import { IMirrorPosition, ISetRouteType, latestPriceMap } from "puppet-middleware"
@@ -25,14 +25,14 @@
 //   $intermediateText,
 //   $moreDots,
 //   $tokenIconMap, $tokenLabelFromSummary
-// } from "ui-components"
+// } from "@puppet/middleware/ui-components"
 // import * as viem from "viem"
 // // import { $MarketInfoList } from "../$MarketList"
 // import { $Popover } from "../$Popover"
 // import { $defaultSliderThumb, $Slider } from "../$Slider.js"
 // import { $gmxLogo } from "../../common/$icons"
 // import { $heading2 } from "../../common/$text.js"
-// import { $FieldLabeled } from "ui-components"
+// import { $FieldLabeled } from "@puppet/middleware/ui-components"
 // import { boxShadow } from "../../common/elements/$common"
 // import { $caretDown } from "../../common/elements/$icons.js"
 // import * as trade from "../../logic/traderRead.js"

@@ -4,10 +4,10 @@ import { $NumberTicker, $column, $icon, $row, layoutSheet, screenUtils } from "@
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, multicast, skipRepeatsWith, startWith } from "@most/core"
 import { Stream } from "@most/types"
-import { filterNull, parseReadableNumber, readableUnitAmount } from "../utils/index.js"
+import { filterNull, parseReadableNumber, readableUnitAmount } from "@puppet/middleware/utils"
 import { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from "lightweight-charts"
 import { IPosition } from "puppet-middleware"
-import { $Baseline, $bear, $bull, $infoTooltipLabel } from "ui-components"
+import { $Baseline, $bear, $bull, $infoTooltipLabel } from "@puppet/middleware/ui-components"
 import { IPerformanceTimeline, getPositionListTimelinePerformance } from "./$ProfilePerformanceGraph.js"
 
 

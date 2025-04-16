@@ -1,6 +1,6 @@
 import { $Node, attr, $text } from "@aelea/dom"
-import { getExplorerUrl, shortenTxAddress } from "../utils/index.js"
-import { $anchor } from "ui-components"
+import { getExplorerUrl, shortenTxAddress } from "@puppet/middleware/utils"
+import { $anchor } from "@puppet/middleware/ui-components"
 import * as viem from "viem"
 
 

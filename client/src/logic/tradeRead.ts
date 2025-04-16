@@ -1,7 +1,7 @@
-import { applyFactor, getMappedValue } from "../utils/index.js"
+import { applyFactor, getMappedValue } from "@puppet/middleware/utils"
 import * as GMX "../gmx/index.js"
 import { IMarket, IMarketConfig, IMarketFees, IMarketInfo, IMarketPool, IMarketPrice, IMarketUsageInfo, hashData } from "../gmx/index.js"
-import { CONTRACT } from "../const/index.js"
+import { CONTRACT } from "@puppet/middleware/const"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"
 

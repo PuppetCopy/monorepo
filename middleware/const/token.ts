@@ -2,7 +2,7 @@ import { arbitrum, avalanche } from "viem/chains"
 import { TOKEN_SYMBOL } from "./symbol.js"
 import { ARBITRUM_ADDRESS } from "./chain/arbitrum.js"
 import { AVALANCHE_ADDRESS } from "./chain/avalanche.js"
-import { ADDRESS_ZERO, mapArrayBy } from "./common.js"
+import { mapArrayBy } from "../core/index.js"
 
 
 

@@ -5,7 +5,7 @@ import { $column, $row, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { awaitPromises, constant, empty, map, multicast, snapshot, switchLatest } from '@most/core'
 import { Stream } from "@most/types"
-import { $Link, $anchor, $discord, $gitbook, $github, $icon, $instagram, $moreDots, $twitter } from "ui-components"
+import { $Link, $anchor, $discord, $gitbook, $github, $icon, $instagram, $moreDots, $twitter } from "@puppet/middleware/ui-components"
 import { $gmxLogo, $puppetLogo } from "../common/$icons.js"
 import { $stackedCoins, $trophy } from "../common/elements/$icons.js"
 import { dark, light } from "../common/theme.js"

@@ -1,12 +1,12 @@
-import { replayLatest } from "@aelea/core";
-import { map, multicast } from "@most/core";
-import { createClient, Status } from "@ponder/client";
-import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "../utils/index.js";
-import { IntervalTime, PRICEFEED_INTERVAL } from "../const/index.js";
-import * as schema from "schema";
-import * as viem from "viem";
+import { replayLatest } from "@aelea/core"
+import { map, multicast } from "@most/core"
+import { createClient, Status } from "@ponder/client"
+import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "@puppet/middleware/utils"
+import { IntervalTime, PRICEFEED_INTERVAL } from "@puppet/middleware/const"
+import * as schema from "schema"
+import * as viem from "viem"
 
-export const client = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, });
+export const client = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, })
 
 
 export const getSubgraphStatus = async (): Promise<Status> => {
@@ -39,7 +39,7 @@ export function queryPricefeed(
         f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
         params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
       ),
-    });
+    })
     return groupArrayMany(priceList, c => c.token)
 
     // map results by token

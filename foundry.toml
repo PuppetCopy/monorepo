@@ -35,7 +35,7 @@
 
 [fmt]
   bracket_spacing = false
-  int_types = "short"
+  inttypes = "short"
   number_underscore = "preserve"
   quote_style = "double"
   multiline_func_header = "params_first"

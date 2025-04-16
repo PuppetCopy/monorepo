@@ -5,8 +5,8 @@ import { pallete } from "@aelea/ui-components-theme"
 import { constant, empty, filter, map, merge, mergeArray, multicast, never, now, scan, skip, skipRepeats, snapshot, startWith, switchLatest, take, tap, zip } from "@most/core"
 import { append, remove } from "@most/prelude"
 import { Stream } from "@most/types"
-import { $caretDown, $xCross } from "ui-components"
-import { streamOf } from "../utils/index.js"
+import { $caretDown, $xCross } from "@puppet/middleware/ui-components"
+import { streamOf } from "@puppet/middleware/utils"
 import { $Select, ISelect } from "./$Select.js"
 
 

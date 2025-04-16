@@ -18,19 +18,19 @@
     "contracts"
   ],
   "type": "module",
-  "main": "./dist/_cjs/index.js",
-  "module": "./dist/_esm/index.js",
-  "typings": "./dist/_types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "typings": "./dist/types/index.d.ts",
   "files": [
     "middleware",
     "!**/*.test.ts"
   ],
   "scripts": {
     "build": "bun run build:clean && bun run build:cjs && bun run build:esm && bun run build:types",
-    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --moduleResolution node --outDir ./middleware/dist/_cjs --removeComments --verbatimModuleSyntax false",
-    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./middleware/dist/_esm",
-    "build:types": "tsc --project ./tsconfig.build.json --declarationDir ./middleware/dist/_types --emitDeclarationOnly --declaration --declarationMap",
-    "build:clean": "rm -rf *.tsbuildinfo middleware/dist/*.tsbuildinfo middleware/dist/_esm middleware/dist/_cjs middleware/dist/_types",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --moduleResolution node --outDir ./middleware/dist/cjs --removeComments --verbatimModuleSyntax false",
+    "build:esm": "tsc --project ./tsconfig.build.json --outDir ./middleware/dist/esm",
+    "build:types": "tsc --project ./tsconfig.build.json --declarationDir ./middleware/dist/types --emitDeclarationOnly --declaration --declarationMap",
+    "build:clean": "rm -rf *.tsbuildinfo middleware/dist/*.tsbuildinfo middleware/dist/esm middleware/dist/cjs middleware/dist/types",
     "docs:build": "cd docs && bun run build",
     "client:build": "cd client && bun run build",
     "forge:test": "forge test --match-contract TradingTest -vvvvv",

@@ -4,7 +4,7 @@
 // import { map, multicast, skipRepeatsWith, switchLatest } from "@most/core"
 // import { Stream } from "@most/types"
 // import { CHAIN } from "../gmx/index.js"
-// import { $Baseline } from "ui-components"
+// import { $Baseline } from "@puppet/middleware/ui-components"
 // import {
 //   IPositionDecrease,
 //   IPositionIncrease,

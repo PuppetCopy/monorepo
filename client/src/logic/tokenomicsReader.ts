@@ -1,6 +1,6 @@
 
-import { getMappedValue } from "../utils/index.js"
-import * as PUPPET from "../const/index.js"
+import { getMappedValue } from "@puppet/middleware/utils"
+import * as PUPPET from "@puppet/middleware/const"
 import { Address } from "viem/accounts"
 import { readContract } from "viem/actions"
 import * as walletLink from "wallet"

@@ -2,9 +2,9 @@ import { $text, style, attr, $element, $Branch } from "@aelea/dom"
 import { $row, $column, $icon } from "@aelea/ui-components"
 import { pallete } from "@aelea/ui-components-theme"
 import { empty, map, periodic } from "@most/core"
-import { $alertIcon, $defaultDropContainer, $Tooltip } from "ui-components"
+import { $alertIcon, $defaultDropContainer, $Tooltip } from "@puppet/middleware/ui-components"
 import { $pnlDisplay } from "../../common/$common.js"
-import { readableUsd, unixTimestampNow } from "../utils/index.js"
+import { readableUsd, unixTimestampNow } from "@puppet/middleware/utils"
 
 
 export const $alertTooltip = ($content: $Branch) => {
