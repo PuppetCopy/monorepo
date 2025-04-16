@@ -1,5 +1,6 @@
-import type { ILogTxType, ILogTypeId } from "@puppet/middleware/gmx"
+
 import * as viem from "viem"
+import type { ILogTxType, ILogTypeId } from "../gmx/types.js"
 
 
 // type PositionFeesCollected {

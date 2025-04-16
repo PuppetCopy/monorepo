@@ -1,5 +1,6 @@
 import { erc20Abi } from "viem";
 import * as abi from "./abi/__generatedAbi.js";
+import addresses from '../../contracts/deployments/addresses.json' with { type: "json" };
 
 // gmx v2
 import exchangeRouter from "./abi/exchangeRouter.js";
@@ -10,17 +11,17 @@ import datastore from "./abi/datastore.js";
 
 export const CONTRACT = {
   42161: {
-    Router: {
-      address: "0x4F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
+    RouterProxy: {
+      address: addresses[42161].RouterProxy,
       abi: [...abi.routerAbi, ...abi.routerProxyAbi],
     },
 
     Dictatorship: {
-      address: "0x583367f217a6684039d378C0a142Cbe17F2FC058",
+      address: addresses[42161].Dictatorship,
       abi: abi.dictatorshipAbi,
     },
     PuppetToken: {
-      address: "0x2F076BdCE9bf6f118d612Ee6bAa9BCF6266De199",
+      address: addresses[42161].PuppetToken,
       abi: abi.puppetTokenAbi,
     },
     PuppetVoteToken: {
@@ -28,26 +29,26 @@ export const CONTRACT = {
       abi: abi.puppetVoteTokenAbi,
     },
     TokenRouter: {
-      address: "0xb05Ec3598F5fA2f997B1a79E5e6995a158E8C26D",
+      address: addresses[42161].TokenRouter,
       abi: abi.routerAbi,
     },
     AllocationStore: {
-      address: "0x2F076BdCE9bf6f118d612Ee6bAa9BCF6266De199",
+      address: "",
       abi: abi.allocationStoreAbi,
     },
 
     MatchingRule: {
-      address: "0x1fC2D4aE5E8bA3fE3dF7B6c8D9B1fF8C8E0eA8C7",
+      address: "",
       abi: abi.matchingRuleAbi,
     },
     MirrorPosition: {
-      address: "0x4F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
+      address: "",
       abi: abi.mirrorPositionAbi,
     },
     FeeMarketplace: {
-      address: "0x5F2B5C8D3E1A7F6C9D5B2A8E4F8C8E0eA8C7",
+      address: "",
       abi: abi.feeMarketplaceAbi,
-    },
+    }
 
 
     GMX: {

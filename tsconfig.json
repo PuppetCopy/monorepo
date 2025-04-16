@@ -7,9 +7,6 @@
   "exclude": [],
   "references": [],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-     
-    }
+
   }
 }

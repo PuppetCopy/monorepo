@@ -1,5 +1,5 @@
+import type { IPriceCandle } from "../gmx/types.js"
 import type { IResponsePageApi } from "../utils/index.js"
-import type { IPriceCandle } from "@puppet/middleware/gmx"
 
 export type IPrice = {
   priceUsd: bigint

@@ -1,10 +1,10 @@
 import { O } from "@aelea/core"
 import { map } from "@most/core"
-import type { IIdentifiableEntity } from "@puppet/middleware/gmx"
 import { numberToHex, type Client } from "viem"
 import type { ILabItem, ILabItemOwnership, IOwner, IToken } from "./types.js"
 import type { IRequestPagePositionApi } from "../utils/index.js"
 import { cacheExchange, createClient, fetchExchange, gql, type ClientOptions, type OperationContext, type TypedDocumentNode } from "@urql/core"
+import type { IIdentifiableEntity } from "../gmx/index.js"
 export { type Stream } from "@most/types"
 
 

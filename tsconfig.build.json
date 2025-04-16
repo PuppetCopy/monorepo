@@ -8,6 +8,6 @@
   ],
   "compilerOptions": {
     "sourceMap": true,
-    "rootDir": "./middleware"
+    "resolveJsonModule": true
   }
 }
