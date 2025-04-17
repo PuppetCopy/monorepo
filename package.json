@@ -16,8 +16,8 @@
     "middleware"
   ],
   "scripts": {
-    "build": "bun run build:clean && bun run build:esm && bun run build:types",
-    "build:esm": "tsc --project ./middleware/tsconfig.json",
+    "build": "bun run build:clean && bun run build:esm",
+    "build:esm": "cp ./contracts/deployments/addresses.json ./middleware/src/const/ && tsc -b ./middleware/tsconfig.json",
     "build:clean": "rm -rf middleware/dist",
     "client:build": "cd client && bun run build",
     "wagmi:generate": "wagmi generate",

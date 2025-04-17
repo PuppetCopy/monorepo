@@ -3,10 +3,11 @@
 // import type { Stream } from '@most/types'
 // import { type Client } from '@urql/core'
 import type { Stream } from '@most/types'
-import { combineState, getClosestNumber, graph, groupArrayMany, type IRequestSortApi, periodicRun, type StateParams, unixTimestampNow } from '../utils/index.js'
 import { replayLatest } from '@aelea/core'
 import { map, multicast } from '@most/core'
-import { querySignedPrices, type IPriceOracleMap } from '../gmx/index.js'
+import { periodicRun } from '../utils/stream.js'
+import type { IPriceOracleMap } from '../gmx/types.js'
+import { querySignedPrices } from '../gmx/price.js'
 // import { type IPriceCandle, type IPricefeedMap, type IPriceOracleMap, querySignedPrices } from '../gmx/index.js'
 // import { IntervalTime, PRICEFEED_INTERVAL } from '../const/index.js'
 // import * as viem from "viem"
