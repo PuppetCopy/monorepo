@@ -42,11 +42,11 @@ export const $WalletPuppet = (config: IWalletPuppet) => component((
 
   const tableParams = map(async params => {
     const activityTimeframe = params.activityTimeframe
-    const positionList = await params.positionListQuery
+    // const positionList = await params.positionListQuery
     const collateralTokenList = params.selectedCollateralTokenList
 
-    return { positionList, activityTimeframe, collateralTokenList }
-  }, combineObject({ positionListQuery, activityTimeframe, selectedCollateralTokenList }))
+    return {  activityTimeframe, collateralTokenList }
+  }, combineObject({ activityTimeframe, selectedCollateralTokenList }))
 
 
   return [

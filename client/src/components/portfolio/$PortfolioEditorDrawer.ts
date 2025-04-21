@@ -20,6 +20,7 @@ import { $SubmitBar } from "../form/$SubmitBar.js"
 import { DepositEditorAction, IDepositEditorChange } from "./$DepositEditor.js"
 import { $RouteDepositEditor } from "./$RouteDepositEditor.js"
 import { IMatchRuleEditorChange } from "./$TraderMatchRouteEditor"
+import { CONTRACT } from "@puppet/middleware/const"
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
@@ -169,7 +170,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) => compon
               click: requestChangeSubscriptionTether(
                 map(async (wallet) => {
                   const callStack: viem.Hex[] = []
-                  const contractDefs = PUPPET_ADDRESSES[42161].RouterProxy
+                  const contractDefs = CONTRACT[42161].RouterProxy
 
 
                   if (params.matchRuleList.length > 0) {
@@ -183,7 +184,6 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) => compon
 
                         return viem.encodeFunctionData({
                           ...contractDefs,
-                          abi: [...PUPPET_ADDRESSES[42161].CustomError.abi, ...contractDefs.abi],
                           functionName: 'setMatchingRule',
                           args: [matchRule.collateralToken, matchRule.trader, ruleParams]
                         })
@@ -197,13 +197,11 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) => compon
                         deposit.action === DepositEditorAction.DEPOSIT
                           ? viem.encodeFunctionData({
                             ...contractDefs,
-                            abi: [...PUPPET_ADDRESSES[42161].CustomError.abi, ...contractDefs.abi],
                             functionName: 'deposit',
                             args: [deposit.token, deposit.value.amount]
                           })
                           : viem.encodeFunctionData({
                             ...contractDefs,
-                            abi: [...PUPPET_ADDRESSES[42161].CustomError.abi, ...contractDefs.abi],
                             functionName: 'withdraw',
                             args: [deposit.token, wallet.account.address, deposit.value.amount]
                           })

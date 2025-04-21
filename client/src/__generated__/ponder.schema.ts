@@ -138,6 +138,7 @@ export const puppetMatchingRule = onchainTable("PuppetMatchingRule", t => ({
   id: t.hex().primaryKey(),
   matchingKey: t.hex().notNull(),
 
+  collateralToken: t.hex().notNull(),
   puppet: t.hex().notNull(),
   trader: t.hex().notNull(),
 
@@ -146,6 +147,30 @@ export const puppetMatchingRule = onchainTable("PuppetMatchingRule", t => ({
   expiry: t.bigint().notNull(),
 }))
 export type IMatchingRule = typeof puppetMatchingRule.$inferInsert
+
+export const deposit = onchainTable("Deposit", t => ({
+  id: t.text().primaryKey(),
+  collateralToken: t.hex().notNull(),
+  user: t.hex().notNull(),
+  balance: t.bigint().notNull(),
+  amount: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+}))
+
+export const withdraw = onchainTable("Withdraw", t => ({
+  id: t.text().primaryKey(),
+  collateralToken: t.hex().notNull(),
+  user: t.hex().notNull(),
+  receiver: t.hex().notNull(),
+  balance: t.bigint().notNull(),
+  amount: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+}))
+export type IWithdraw = typeof withdraw.$inferInsert;
 
 // ---- GMX derived data ----
 

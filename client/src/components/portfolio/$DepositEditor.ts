@@ -16,6 +16,7 @@ import { readAddressTokenBalance } from "../../logic/traderRead.js"
 import { IComponentPageParams } from "../../pages/type.js"
 import { $ApproveSpend } from "../form/$ApproveSpend.js"
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
+import { CONTRACT } from "@puppet/middleware/const"
 
 export enum DepositEditorAction {
   DEPOSIT,
@@ -138,7 +139,7 @@ export const $DepositEditor = (config: IDepositEditor) => component((
             const isSpendPending = startWith(false, map(s => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend)))
 
             return $ApproveSpend({
-              spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
+              spender: CONTRACT[42161].TokenRouter.address,
               token: change.token,
               amount: map(params => params.action === DepositEditorAction.DEPOSIT ? params.amount : 0n, combineObject({ amount, action })),
               walletClient: wallet,

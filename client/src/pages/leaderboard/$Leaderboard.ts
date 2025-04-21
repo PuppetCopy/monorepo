@@ -4,7 +4,7 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Time } from "@most/types"
-import { desc } from "@ponder/client"
+import { desc, asc } from "@ponder/client"
 import { getMappedValue, InferStream, readablePnl, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
 import { arrayContains } from "drizzle-orm"
 import { BaselineData, LineType } from "lightweight-charts"
@@ -147,7 +147,11 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   )),
                 limit: filterParams.paging.pageSize,
                 offset: filterParams.paging.offset,
-                orderBy: filterParams.sortBy ? desc(schema.traderRouteMetric[filterParams.sortBy.selector]) : undefined,
+                orderBy: filterParams.sortBy
+                  ? filterParams.sortBy.direction === 'asc'
+                    ? asc(schema.traderRouteMetric[filterParams.sortBy.selector])
+                    : desc(schema.traderRouteMetric[filterParams.sortBy.selector])
+                  : undefined,
                 columns: {
                   account: true,
                   collateralToken: true,
@@ -188,7 +192,10 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                       indexTokenPriceMax: true,
                       isLong: true,
                       blockTimestamp: true,
-                    }
+                    },
+                    // with: {
+                    //   feeCollected: true
+                    // }
                   }),
                   client.db.query.positionDecrease.findMany({
                     where: (t, f) => f.and(

@@ -10,9 +10,12 @@ import { $gmxLogo, $puppetLogo } from "../common/$icons.js"
 import { $stackedCoins, $trophy } from "../common/elements/$icons.js"
 import { dark, light } from "../common/theme.js"
 import { IPageParams } from "../pages/type.js"
-import { $Popover } from "./$Popover.js"
 import { $Picker } from "./$ThemePicker.js"
 import { $ButtonSecondary } from "./form/$Button.js"
+import { $walletProfileDisplay } from "./$WalletProfileDisplay"
+import { $IntermediateConnectButton } from "./$ConnectWallet"
+import { EIP6963ProviderDetail } from "mipd"
+import { $Popover } from "./$Popover"
 
 
 
@@ -26,7 +29,8 @@ interface MainMenu extends IPageParams {
 export const $MainMenu = (config: MainMenu) => component((
   [routeChange, routeChangeTether]: Behavior<string, string>,
   [clickPopoverClaim, clickPopoverClaimTether]: Behavior<any, any>,
-  [walletChange, walletChangeTether]: Behavior<any, any>,
+  [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>,
+
 ) => {
 
   const { route, showAccount, walletClientQuery } = config
@@ -41,7 +45,7 @@ export const $MainMenu = (config: MainMenu) => component((
   const $extraMenuPopover = $Popover({
     open: constant(
       $column(layoutSheet.spacingBig)(
-        
+
         // ...screenUtils.isMobileScreen ? $menuItemList : [],
         // $row(layoutSheet.spacingBig, style({ flexWrap: 'wrap', width: '210px' }))(
         //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://docs.blueberry.club/' }))(
@@ -66,25 +70,25 @@ export const $MainMenu = (config: MainMenu) => component((
         })({}),
 
 
-        switchLatest(snapshot((_, walletQuery) => {
-          if (walletQuery === null) {
-            return empty()
-          }
+        // switchLatest(snapshot((_, walletQuery) => {
+        //   if (walletQuery === null) {
+        //     return empty()
+        //   }
 
-          return $ButtonSecondary({
-            $content: $text('Disconnect Wallet')
-          })({
-            click: walletChangeTether(
-              map(async xx => {
+        //   return $ButtonSecondary({
+        //     $content: $text('Disconnect Wallet')
+        //   })({
+        //     click: changeWalletTether(
+        //       map(async xx => {
 
-                // Check if connection is already established
-                // await disconnect(wagmiConfig)
+        //         // Check if connection is already established
+        //         await disconnect(wagmiConfig)
 
-              }),
-              awaitPromises
-            )
-          })
-        }, walletChange, walletClientQuery)),
+        //       }),
+        //       awaitPromises
+        //     )
+        //   })
+        // }, changeWallet, walletClientQuery)),
 
       ),
       clickPopoverClaim
@@ -119,10 +123,11 @@ export const $MainMenu = (config: MainMenu) => component((
       style({
         transition: 'width .3s ease-in-out', overflow: 'hidden',
         zIndex: 22, padding: '18px 12px', maxHeight: '100vh', flexShrink: 0,
-        placeContent: 'space-between' })
+        placeContent: 'space-between'
+      })
     )(
 
- 
+
       $column(layoutSheet.spacingBig, style({ flex: 1, alignItems: 'flex-start' }))(
         $RouterAnchor({
           url: '/',
@@ -134,18 +139,18 @@ export const $MainMenu = (config: MainMenu) => component((
       ),
 
       $row(layoutSheet.spacingBig, style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
-        // style({ padding: 0 })(
-        //   $pageLink({
-        //     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-        //     // anchorOp: style({  }),
-        //     url: `/app/wallet`,
-        //     $content: $walletProfileDisplay({ walletClientQuery })
-        //   })({
-        //     click: routeChangeTether(),
-        //   })
-        // ),
+        style({ padding: 0 })(
+          $pageLink({
+            route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+            // anchorOp: style({  }),
+            url: `/app/wallet`,
+            $content: $walletProfileDisplay({ walletClientQuery })
+          })({
+            click: routeChangeTether(),
+          })
+        ),
         $pageLink({
-          $content: $row(layoutSheet.spacing, style({ alignItems: 'center', cursor: 'pointer',  borderRadius: '50px', pointerEvents: 'none' }))(
+          $content: $row(layoutSheet.spacing, style({ alignItems: 'center', cursor: 'pointer', borderRadius: '50px', pointerEvents: 'none' }))(
             $icon({ $content: $trophy, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
             $text(style({ fontSize: '1.15rem' }))('Leaderboard')
           ),
@@ -182,7 +187,7 @@ export const $MainMenu = (config: MainMenu) => component((
     ),
 
     {
-      routeChange,
+      routeChange, changeWallet
     }
   ]
 })
@@ -209,9 +214,9 @@ export const $MainMenuMobile = (config: MainMenu) => component((
 
   const $extraMenuPopover = $Popover({
     open: constant(
-      $column(layoutSheet.spacingBig, style({ marginTop: '-40px' }))(
+      $column(layoutSheet.spacingBig)(
         $Link({ $content: $popoverPageLink($gmxLogo, 'Trade'), url: '/app/trade', route: route.create({ fragment: 'feefwefwe' }) })({
-        // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/app/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
+          // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/app/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
           click: routeChangeTether()
         }),
         $Link({ $content: $popoverPageLink($stackedCoins, 'Leaderboard'), url: '/app/leaderboard', route: route.create({ fragment: 'feefwefwe' }) })({
@@ -299,17 +304,16 @@ export const $MainMenuMobile = (config: MainMenu) => component((
       ),
 
       $row(layoutSheet.spacing, style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
-
-        // style({ padding: 0 })(
-        //   $pageLink({
-        //     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-        //     // anchorOp: style({  }),
-        //     url: `/app/wallet`,
-        //     $content: $walletProfileDisplay({ walletClientQuery })
-        //   })({
-        //     click: routeChangeTether(),
-        //   })
-        // ),
+        style({ padding: 0 })(
+          $pageLink({
+            route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+            // anchorOp: style({  }),
+            url: `/app/wallet`,
+            $content: $walletProfileDisplay({ walletClientQuery })
+          })({
+            click: routeChangeTether(),
+          })
+        ),
       ),
 
       $row(layoutSheet.spacingBig, style({ placeContent: 'flex-end', flex: 1 }))(
@@ -332,7 +336,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: $Node }) => {
     [focus, focusTether]: Behavior<boolean, boolean>,
   ) => {
     const $anchorEl = $anchor(
-      style({ borderRadius: '50px', padding: '11px 22px', border: `1px solid ${ colorAlpha(pallete.foreground, .2) }` }),
+      style({ borderRadius: '50px', padding: '11px 22px', border: `1px solid ${colorAlpha(pallete.foreground, .2)}` }),
       styleBehavior(
         combineArray((isActive, isFocus): StyleCSS | null => {
           return isActive ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground, borderColor: `${pallete.primary} !important`, cursor: `default  !important` }
@@ -355,7 +359,6 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: $Node }) => {
 
       { click, active, focus }
     ]
-  }) 
+  })
 }
 
-  

@@ -1,4 +1,4 @@
-import { erc20Abi } from "viem";
+import { erc20Abi, type Address } from "viem";
 import * as abi from "./abi/__generatedAbi.js";
 import addresses from './addresses.json' with { type: "json" };
 
@@ -12,41 +12,41 @@ import datastore from "./abi/datastore.js";
 export const CONTRACT = {
   42161: {
     RouterProxy: {
-      address: addresses[42161].RouterProxy,
-      abi: [...abi.routerAbi, ...abi.routerProxyAbi],
+      address: addresses[42161].RouterProxy as Address,
+      abi: [...abi.errorAbi, ...abi.routerAbi, ...abi.routerProxyAbi],
     },
 
     Dictatorship: {
-      address: addresses[42161].Dictatorship,
+      address: addresses[42161].Dictatorship as Address,
       abi: abi.dictatorshipAbi,
     },
     PuppetToken: {
-      address: addresses[42161].PuppetToken,
+      address: addresses[42161].PuppetToken as Address,
       abi: abi.puppetTokenAbi,
     },
     PuppetVoteToken: {
-      address: "",
+      address: "", // Address not found in addresses.json
       abi: abi.puppetVoteTokenAbi,
     },
     TokenRouter: {
-      address: addresses[42161].TokenRouter,
+      address: addresses[42161].TokenRouter as Address,
       abi: abi.routerAbi,
     },
     AllocationStore: {
-      address: "",
+      address: addresses[42161].AllocationStore as Address,
       abi: abi.allocationStoreAbi,
     },
 
     MatchingRule: {
-      address: "",
+      address: addresses[42161].MatchingRule as Address,
       abi: abi.matchingRuleAbi,
     },
     MirrorPosition: {
-      address: "",
+      address: addresses[42161].MirrorPosition as Address,
       abi: abi.mirrorPositionAbi,
     },
     FeeMarketplace: {
-      address: "",
+      address: addresses[42161].FeeMarketplace as Address,
       abi: abi.feeMarketplaceAbi,
     },
 

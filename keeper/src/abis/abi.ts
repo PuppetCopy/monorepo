@@ -1567,9 +1567,9 @@ export const errorAbi = [
     inputs: [
       { name: 'allowanceCap', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__AllowanceAboveLimit',
+    name: 'MatchRule__AllowanceAboveLimit',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'MatchRule__InsufficientBalance' },
   {
     type: 'error',
     inputs: [
@@ -1584,7 +1584,7 @@ export const errorAbi = [
         type: 'uint256',
       },
     ],
-    name: 'MatchingRule__InvalidActivityThrottle',
+    name: 'MatchRule__InvalidActivityThrottle',
   },
   {
     type: 'error',
@@ -1592,17 +1592,17 @@ export const errorAbi = [
       { name: 'min', internalType: 'uint256', type: 'uint256' },
       { name: 'max', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__InvalidAllowanceRate',
+    name: 'MatchRule__InvalidAllowanceRate',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
+  { type: 'error', inputs: [], name: 'MatchRule__InvalidAmount' },
   {
     type: 'error',
     inputs: [
       { name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__InvalidExpiryDuration',
+    name: 'MatchRule__InvalidExpiryDuration',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
+  { type: 'error', inputs: [], name: 'MatchRule__TokenNotAllowed' },
   {
     type: 'error',
     inputs: [],
@@ -2126,7 +2126,7 @@ export const gmxExecutionCallbackAbi = [
     inputs: [
       { name: 'key', internalType: 'bytes32', type: 'bytes32' },
       {
-        name: '',
+        name: 'order',
         internalType: 'struct GmxPositionUtils.Props',
         type: 'tuple',
         components: [
@@ -2233,7 +2233,7 @@ export const gmxExecutionCallbackAbi = [
           },
         ],
       },
-      { name: '', internalType: 'bytes', type: 'bytes' },
+      { name: 'eventData', internalType: 'bytes', type: 'bytes' },
     ],
     name: 'afterOrderCancellation',
     outputs: [],
@@ -2362,7 +2362,7 @@ export const gmxExecutionCallbackAbi = [
     inputs: [
       { name: 'key', internalType: 'bytes32', type: 'bytes32' },
       {
-        name: '',
+        name: 'order',
         internalType: 'struct GmxPositionUtils.Props',
         type: 'tuple',
         components: [
@@ -2469,7 +2469,7 @@ export const gmxExecutionCallbackAbi = [
           },
         ],
       },
-      { name: '', internalType: 'bytes', type: 'bytes' },
+      { name: 'eventData', internalType: 'bytes', type: 'bytes' },
     ],
     name: 'afterOrderFrozen',
     outputs: [],
@@ -2514,6 +2514,124 @@ export const gmxExecutionCallbackAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      {
+        name: '_order',
+        internalType: 'struct GmxPositionUtils.Props',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addresses',
+            internalType: 'struct GmxPositionUtils.Addresses',
+            type: 'tuple',
+            components: [
+              { name: 'account', internalType: 'address', type: 'address' },
+              { name: 'receiver', internalType: 'address', type: 'address' },
+              {
+                name: 'callbackContract',
+                internalType: 'address',
+                type: 'address',
+              },
+              {
+                name: 'uiFeeReceiver',
+                internalType: 'address',
+                type: 'address',
+              },
+              { name: 'market', internalType: 'address', type: 'address' },
+              {
+                name: 'initialCollateralToken',
+                internalType: 'contract IERC20',
+                type: 'address',
+              },
+              {
+                name: 'swapPath',
+                internalType: 'address[]',
+                type: 'address[]',
+              },
+            ],
+          },
+          {
+            name: 'numbers',
+            internalType: 'struct GmxPositionUtils.Numbers',
+            type: 'tuple',
+            components: [
+              {
+                name: 'orderType',
+                internalType: 'enum GmxPositionUtils.OrderType',
+                type: 'uint8',
+              },
+              {
+                name: 'decreasePositionSwapType',
+                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
+                type: 'uint8',
+              },
+              {
+                name: 'initialCollateralDeltaAmount',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'sizeDeltaUsd',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'triggerPrice',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'acceptablePrice',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'executionFee',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'callbackGasLimit',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'minOutputAmount',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'updatedAtBlock',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+            ],
+          },
+          {
+            name: 'flags',
+            internalType: 'struct GmxPositionUtils.Flags',
+            type: 'tuple',
+            components: [
+              { name: 'isLong', internalType: 'bool', type: 'bool' },
+              {
+                name: 'shouldUnwrapNativeToken',
+                internalType: 'bool',
+                type: 'bool',
+              },
+              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
+            ],
+          },
+        ],
+      },
+      { name: '_key', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_eventData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'storeUnhandledCallback',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [],
     name: 'unhandledCallbackListId',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -2530,11 +2648,130 @@ export const gmxExecutionCallbackAbi = [
     ],
     name: 'unhandledCallbackMap',
     outputs: [
+      {
+        name: 'order',
+        internalType: 'struct GmxPositionUtils.Props',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addresses',
+            internalType: 'struct GmxPositionUtils.Addresses',
+            type: 'tuple',
+            components: [
+              { name: 'account', internalType: 'address', type: 'address' },
+              { name: 'receiver', internalType: 'address', type: 'address' },
+              {
+                name: 'callbackContract',
+                internalType: 'address',
+                type: 'address',
+              },
+              {
+                name: 'uiFeeReceiver',
+                internalType: 'address',
+                type: 'address',
+              },
+              { name: 'market', internalType: 'address', type: 'address' },
+              {
+                name: 'initialCollateralToken',
+                internalType: 'contract IERC20',
+                type: 'address',
+              },
+              {
+                name: 'swapPath',
+                internalType: 'address[]',
+                type: 'address[]',
+              },
+            ],
+          },
+          {
+            name: 'numbers',
+            internalType: 'struct GmxPositionUtils.Numbers',
+            type: 'tuple',
+            components: [
+              {
+                name: 'orderType',
+                internalType: 'enum GmxPositionUtils.OrderType',
+                type: 'uint8',
+              },
+              {
+                name: 'decreasePositionSwapType',
+                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
+                type: 'uint8',
+              },
+              {
+                name: 'initialCollateralDeltaAmount',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'sizeDeltaUsd',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'triggerPrice',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'acceptablePrice',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'executionFee',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'callbackGasLimit',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'minOutputAmount',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'updatedAtBlock',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+            ],
+          },
+          {
+            name: 'flags',
+            internalType: 'struct GmxPositionUtils.Flags',
+            type: 'tuple',
+            components: [
+              { name: 'isLong', internalType: 'bool', type: 'bool' },
+              {
+                name: 'shouldUnwrapNativeToken',
+                internalType: 'bool',
+                type: 'bool',
+              },
+              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
+            ],
+          },
+        ],
+      },
       { name: 'operator', internalType: 'address', type: 'address' },
+      { name: 'eventData', internalType: 'bytes', type: 'bytes' },
       { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'bytes', type: 'bytes' },
     ],
     stateMutability: 'view',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'orderType',
+        internalType: 'enum GmxPositionUtils.OrderType',
+        type: 'uint8',
+      },
+    ],
+    name: 'GmxExecutionCallback__InvalidOrderType',
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
@@ -7089,10 +7326,10 @@ export const iWeightedPoolFactoryAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MatchingRule
+// MatchRule
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const matchingRuleAbi = [
+export const matchRuleAbi = [
   {
     type: 'constructor',
     inputs: [
@@ -7113,15 +7350,6 @@ export const matchingRuleAbi = [
       },
     ],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [
-      { name: '', internalType: 'contract AllocationStore', type: 'address' },
-    ],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -7173,14 +7401,14 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_matchKey', internalType: 'bytes32', type: 'bytes32' },
       { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
     ],
     name: 'getRuleList',
     outputs: [
       {
         name: '_ruleList',
-        internalType: 'struct MatchingRule.Rule[]',
+        internalType: 'struct MatchRule.Rule[]',
         type: 'tuple[]',
         components: [
           { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
@@ -7198,23 +7426,14 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'matchKey', internalType: 'bytes32', type: 'bytes32' },
       { name: 'puppet', internalType: 'address', type: 'address' },
     ],
-    name: 'matchingRuleMap',
+    name: 'matchRuleMap',
     outputs: [
       { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
       { name: 'throttleActivity', internalType: 'uint256', type: 'uint256' },
       { name: 'expiry', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'mirrorPosition',
-    outputs: [
-      { name: '', internalType: 'contract MirrorPosition', type: 'address' },
     ],
     stateMutability: 'view',
   },
@@ -7248,7 +7467,7 @@ export const matchingRuleAbi = [
       { name: '_trader', internalType: 'address', type: 'address' },
       {
         name: '_ruleParams',
-        internalType: 'struct MatchingRule.Rule',
+        internalType: 'struct MatchRule.Rule',
         type: 'tuple',
         components: [
           { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
@@ -7286,9 +7505,9 @@ export const matchingRuleAbi = [
     inputs: [
       { name: 'allowanceCap', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__AllowanceAboveLimit',
+    name: 'MatchRule__AllowanceAboveLimit',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'MatchRule__InsufficientBalance' },
   {
     type: 'error',
     inputs: [
@@ -7303,7 +7522,7 @@ export const matchingRuleAbi = [
         type: 'uint256',
       },
     ],
-    name: 'MatchingRule__InvalidActivityThrottle',
+    name: 'MatchRule__InvalidActivityThrottle',
   },
   {
     type: 'error',
@@ -7311,17 +7530,17 @@ export const matchingRuleAbi = [
       { name: 'min', internalType: 'uint256', type: 'uint256' },
       { name: 'max', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__InvalidAllowanceRate',
+    name: 'MatchRule__InvalidAllowanceRate',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
+  { type: 'error', inputs: [], name: 'MatchRule__InvalidAmount' },
   {
     type: 'error',
     inputs: [
       { name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'MatchingRule__InvalidExpiryDuration',
+    name: 'MatchRule__InvalidExpiryDuration',
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
+  { type: 'error', inputs: [], name: 'MatchRule__TokenNotAllowed' },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
 ] as const
@@ -7345,8 +7564,8 @@ export const mirrorPositionAbi = [
         type: 'address',
       },
       {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
+        name: '_matchRule',
+        internalType: 'contract MatchRule',
         type: 'address',
       },
       {
@@ -7356,6 +7575,16 @@ export const mirrorPositionAbi = [
       },
     ],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'address', type: 'address' },
+    ],
+    name: 'activityThrottleMap',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -7402,9 +7631,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     name: 'allocationMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -7412,20 +7639,11 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'allocationKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'puppet', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'bytes32', type: 'bytes32' },
+      { name: '', internalType: 'address', type: 'address' },
     ],
     name: 'allocationPuppetMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [
-      { name: '', internalType: 'contract AllocationStore', type: 'address' },
-    ],
     stateMutability: 'view',
   },
   {
@@ -7525,28 +7743,10 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'feeMarket',
-    outputs: [
-      { name: '', internalType: 'contract FeeMarketplace', type: 'address' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-    ],
-    name: 'getAllocation',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [
       { name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' },
     ],
-    name: 'getAllocationByKey',
+    name: 'getAllocation',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
@@ -7607,7 +7807,7 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
+      { name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' },
     ],
     name: 'getPosition',
     outputs: [
@@ -7638,11 +7838,7 @@ export const mirrorPositionAbi = [
         internalType: 'struct MirrorPosition.RequestAdjustment',
         type: 'tuple',
         components: [
-          {
-            name: 'allocationAddress',
-            internalType: 'address',
-            type: 'address',
-          },
+          { name: 'allocationKey', internalType: 'bytes32', type: 'bytes32' },
           { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
           {
             name: 'traderTargetLeverage',
@@ -7664,40 +7860,12 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_trader', internalType: 'address', type: 'address' },
       { name: '_puppet', internalType: 'address', type: 'address' },
     ],
     name: 'initializeTraderActivityThrottle',
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'matchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'puppet', internalType: 'address', type: 'address' },
-    ],
-    name: 'lastActivityThrottleMap',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-    ],
-    name: 'liquidate',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'matchingRule',
-    outputs: [
-      { name: '', internalType: 'contract MatchingRule', type: 'address' },
-    ],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -7737,7 +7905,6 @@ export const mirrorPositionAbi = [
     ],
     name: 'mirror',
     outputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
       { name: '_nextAllocationId', internalType: 'uint256', type: 'uint256' },
       { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' },
     ],
@@ -7752,9 +7919,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     name: 'positionMap',
     outputs: [
       { name: 'size', internalType: 'uint256', type: 'uint256' },
@@ -7765,10 +7930,10 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     name: 'requestAdjustmentMap',
     outputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'allocationKey', internalType: 'bytes32', type: 'bytes32' },
       { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
       {
         name: 'traderTargetLeverage',
@@ -7830,12 +7995,12 @@ export const mirrorPositionAbi = [
         type: 'tuple',
         components: [
           {
-            name: 'collateralToken',
+            name: 'allocationToken',
             internalType: 'contract IERC20',
             type: 'address',
           },
           {
-            name: 'distributionToken',
+            name: 'distributeToken',
             internalType: 'contract IERC20',
             type: 'address',
           },
@@ -7861,9 +8026,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
     name: 'tokenDustThresholdAmountMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -10910,8 +11073,8 @@ export const routerAbi = [
     type: 'constructor',
     inputs: [
       {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
+        name: '_matchRule',
+        internalType: 'contract MatchRule',
         type: 'address',
       },
       {
@@ -10955,9 +11118,9 @@ export const routerAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'matchingRule',
+    name: 'matchRule',
     outputs: [
-      { name: '', internalType: 'contract MatchingRule', type: 'address' },
+      { name: '', internalType: 'contract MatchRule', type: 'address' },
     ],
     stateMutability: 'view',
   },
@@ -10972,7 +11135,7 @@ export const routerAbi = [
       { name: 'trader', internalType: 'address', type: 'address' },
       {
         name: 'ruleParams',
-        internalType: 'struct MatchingRule.Rule',
+        internalType: 'struct MatchRule.Rule',
         type: 'tuple',
         components: [
           { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
@@ -10985,7 +11148,7 @@ export const routerAbi = [
         ],
       },
     ],
-    name: 'setMatchingRule',
+    name: 'setMatchRule',
     outputs: [],
     stateMutability: 'nonpayable',
   },

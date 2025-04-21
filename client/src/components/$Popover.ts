@@ -6,7 +6,13 @@ import { constant, empty, filter, map, merge, mergeArray, multicast, switchLates
 import { Stream } from "@most/types"
 
 
-export const $defaultPopoverContentContainer = $column(style({ backgroundColor: pallete.middleground, padding: '36px', borderRadius: '24px', border: '1px solid ' + pallete.background, boxShadow: '0 0 10px 0 ' + colorAlpha(pallete.background, .5) }))
+export const $defaultPopoverContentContainer = $column(style({
+  backgroundColor: pallete.middleground,
+  padding: '36px',
+  borderRadius: '24px',
+  border: '1px solid ' + pallete.background,
+  boxShadow: '0 0 10px 0 ' + colorAlpha(pallete.background, .5)
+}))
 
 interface IPocus {
   open: Stream<$Node>
@@ -40,29 +46,32 @@ export const $Popover = ({
     ),
     styleBehavior(
       zip(([contentRect], [targetRect]) => {
-        targetRect.target.querySelector('#scrolled-parent');
-
-        // Get the scroll position
-        // const scrollTop = getScrollParent(targetRect.target)?.scrollTop || 0
-
-        const screenWidth = targetRect.rootBounds ? targetRect.rootBounds.width : window.innerWidth
+        const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
         const targetBound = targetRect.intersectionRect
-        const bottomSpcace = window.innerHeight - targetBound.bottom
-        const goDown = bottomSpcace > targetBound.bottom
+        const bottomSpace = window.innerHeight - targetBound.bottom
+        const goDown = bottomSpace > targetBound.bottom
 
-        const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing)  + 'px'
-        const width = Math.min(contentRect.contentRect.width, screenWidth - spacing)
-        const center = targetBound.x + (targetBound.width / 2)
-        const centerWidth = width / 2
-        const rightOffset = center - screenWidth
-        const leftOffset = center - centerWidth + Math.min(rightOffset < 0 ? Math.abs(rightOffset) : 0, 0)
-        const left = Math.max(leftOffset, spacing) + 'px'
+        // clamp width to screen minus both side‑spacings
+        const maxWidth = screenWidth - (spacing * 2)
+        
+        const measured = contentRect.target.clientWidth
+        const width = Math.min(measured, maxWidth)
 
+        // center on target, then clamp left within [spacing, screenWidth - width - spacing]
+        const centerX = targetBound.x + targetBound.width / 2
+        const rawLeft = centerX - (width / 2)
+        const maxLeft = screenWidth - width - spacing
+        const left = Math.max(spacing, Math.min(rawLeft, maxLeft)) + 'px'
+
+        const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing) + 'px'
 
         return {
-          top, left,
-
-          transition: 'opacity .2s ease-in-out', visibility: 'visible',
+          top,
+          left,
+          width: width + 'px',
+          maxWidth: maxWidth + 'px',
+          transition: 'opacity .2s ease-in-out',
+          visibility: 'visible',
           transform: `translate(0, ${goDown ? '0' : '-100%'})`
         }
       }, popoverContentDimension, targetIntersection)
@@ -136,27 +145,4 @@ export const $Popover = ({
   ]
 })
 
-/**
- * Returns the nearest scrollable parent of an element.
- * @param {HTMLElement} element - The element whose scrollable parent is to be found.
- * @returns {HTMLElement} - The nearest scrollable parent element.
- */
-function getScrollParent(element: Element): Element | null | undefined {
-  let parent = element.parentElement;
-
-  while (parent) {
-    const style = window.getComputedStyle(parent);
-    const overflowY = style.getPropertyValue('overflow-y');
-    const isScrollable = overflowY === 'auto' || overflowY === 'scroll';
-
-    if (isScrollable && parent.scrollHeight > parent.clientHeight) {
-      return parent;
-    }
-
-    parent = parent.parentElement;
-  }
-
-  // Fallback to document scrolling element (usually <html> or <body>)
-  return document.scrollingElement || document.documentElement;
-}
 

@@ -1,18 +1,18 @@
 import { Behavior, combineObject, fromCallback, replayLatest } from "@aelea/core"
-import { $element, $node, $text, component, eventElementTarget, style } from "@aelea/dom"
+import { $element, $node, $text, component, eventElementTarget, style, styleBehavior } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
-import { pallete } from "@aelea/ui-components-theme"
+import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
 import { Stream } from "@most/types"
-import { filterNull, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
-import { EIP6963ProviderDetail } from "mipd"
 import { IntervalTime } from "@puppet/middleware/const"
-import { $alertPositiveContainer } from "@puppet/middleware/ui-components"
+import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from "@puppet/middleware/ui-components"
 import { indexDb, uiStorage } from "@puppet/middleware/ui-storage"
+import { filterNull, getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from "@puppet/middleware/utils"
+import * as walletLink from "@puppet/middleware/wallet"
+import { EIP6963ProviderDetail } from "mipd"
 import * as viem from "viem"
 import { arbitrum } from "viem/chains"
-import * as walletLink from "@puppet/middleware/wallet"
 import { $midContainer } from "../common/$common.js"
 import { $heading2 } from "../common/$text"
 import { queryPricefeed, subgraphStatus } from "../common/query"
@@ -21,17 +21,15 @@ import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
 import { IDepositEditorChange } from "../components/portfolio/$DepositEditor.js"
 import { $PortfolioEditorDrawer } from "../components/portfolio/$PortfolioEditorDrawer.js"
+import { IMatchRuleEditorChange } from "../components/portfolio/$TraderMatchRouteEditor"
+import { localStore } from "../const/localStore"
 import { newUpdateInvoke } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
 import { $Admin } from "./$Admin"
 import { $Home } from "./$Home.js"
 import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
-import { IMatchRuleEditorChange } from "../components/portfolio/$TraderMatchRouteEditor"
-import { localStore } from "../const/localStore"
-
-// import { $PublicUserPage } from "./user/$PublicUser.js"
-// import { $WalletPage } from "./user/$Wallet.js"
+import { $WalletPage } from "./user/$Wallet.js"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -110,7 +108,6 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   }, subgraphStatus)
   const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
-  //  fromPromise(indexDb.get(store.global, 'wallet'))
 
   const changeWalletProviderRdns = map(detail => {
     return detail ? detail.info.rdns : null
@@ -184,7 +181,8 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               switchMap(isDesktop => {
                 if (isDesktop) {
                   return $MainMenu({ route: appRoute, walletClientQuery, providerClientQuery })({
-                    routeChange: changeRouteTether()
+                    routeChange: changeRouteTether(),
+                    changeWallet: changeWalletTether(),
                   })
                 }
 
@@ -192,19 +190,19 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   routeChange: changeRouteTether(),
                 })
               }, isDesktopScreen),
-              // router.contains(walletRoute)(
-              //   $midContainer(
-              //     $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
-              //       changeWallet: changeWalletTether(),
-              //       changeRoute: changeRouteTether(),
-              //       changeActivityTimeframe: changeActivityTimeframeTether(),
-              //       selectMarketTokenList: selectMarketTokenListTether(),
+              router.contains(walletRoute)(
+                $midContainer(
+                  $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
+                    changeWallet: changeWalletTether(),
+                    changeRoute: changeRouteTether(),
+                    changeActivityTimeframe: changeActivityTimeframeTether(),
+                    selectMarketTokenList: selectMarketTokenListTether(),
 
-              //       changeMatchRuleList: changeMatchRuleListTether(),
-              //       changeDepositTokenList: changeDepositTokenListTether(),
-              //     })
-              //   )
-              // ),
+                    changeMatchRuleList: changeMatchRuleListTether(),
+                    changeDepositTokenList: changeDepositTokenListTether(),
+                  })
+                )
+              ),
               router.match(leaderboardRoute)(
                 $midContainer(
                   fadeIn($Leaderboard({
@@ -258,41 +256,48 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
               ),
               $row(layoutSheet.spacing, style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
                 $row(
-                  // $Tooltip({
-                  //   $content: switchMap(params => {
-                  //     const blocksBehind = $text(readableUnitAmount(Math.max(0, Number(params.latestBlock) - params.subgraphStatus.status.arbitrum.block.number)))
-                  //     const timeSince = getTimeSince(new Date(params.subgraphStatus.status?.block?.timestamp || 0).getTime())
+                  $Tooltip({
+                    $content: switchMap(params => {
+                      const status = params.subgraphStatus['arbitrum']
+
+                      if (!status.ready || status.block === null) {
+                        return $column(layoutSheet.spacingTiny)(
+                          $text('Subgraph Status'),
+                          $alertNegativeContainer($text('Indexing is currently experiencing issues, please try again later.')),
+                        )
+                      }
+
+                      const blocksBehind = $text(readableUnitAmount(Number(params.latestBlock) - status.block.number))
+                      const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
 
 
-                  //     return $column(layoutSheet.spacingTiny)(
-                  //       $text('Subgraph Status'),
-                  //       $column(
-                  //         // params.subgraphStatus.hasIndexingErrors
-                  //         //   ? $alertPositiveContainer($text('Indexing has experienced errors')) : empty(),
-                  //         $infoLabeledValue('Latest Sync', timeSince),
-                  //         $infoLabeledValue('blocks behind', blocksBehind),
-                  //       )
-                  //     )
-                  //   }, zipState({ subgraphStatus: subgraphStatusStream, latestBlock })),
-                  //   $anchor: $row(
-                  //     style({ width: '8px', height: '8px', borderRadius: '50%', outlineOffset: '4px', padding: '6px' }),
-                  //     styleBehavior(map(color => {
-                  //       return { backgroundColor: colorAlpha(color, .5), outlineColor: color }
-                  //     }, subgraphStatusColorOnce))
-                  //   )(
-                  //     $node(
-                  //       style({
-                  //         position: 'absolute', top: 'calc(50% - 20px)', left: 'calc(50% - 20px)', width: '40px', height: '40px',
-                  //         borderRadius: '50%', border: `1px solid rgba(74, 180, 240, 0.12)`, opacity: 0,
-                  //         animationName: 'signal', animationDuration: '2s',
-                  //         animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                  //       }),
-                  //       styleBehavior(map(color => {
-                  //         return { backgroundColor: colorAlpha(color, .5), animationIterationCount: color === pallete.negative ? 'infinite' : 1 }
-                  //       }, subgraphStatusColorOnce))
-                  //     )()
-                  //   ),
-                  // })({}),
+                      return $column(layoutSheet.spacingTiny)(
+                        $text('Subgraph Status'),
+                        $column(
+                          $infoLabeledValue('Latest Sync', timeSince),
+                          $infoLabeledValue('blocks behind', blocksBehind),
+                        )
+                      )
+                    }, zipState({ subgraphStatus: subgraphStatus, latestBlock })),
+                    $anchor: $row(
+                      style({ width: '8px', height: '8px', borderRadius: '50%', outlineOffset: '4px', padding: '6px' }),
+                      styleBehavior(map(color => {
+                        return { backgroundColor: colorAlpha(color, .5), outlineColor: color }
+                      }, subgraphStatusColorOnce))
+                    )(
+                      $node(
+                        style({
+                          position: 'absolute', top: 'calc(50% - 20px)', left: 'calc(50% - 20px)', width: '40px', height: '40px',
+                          borderRadius: '50%', border: `1px solid rgba(74, 180, 240, 0.12)`, opacity: 0,
+                          animationName: 'signal', animationDuration: '2s',
+                          animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                        }),
+                        styleBehavior(map(color => {
+                          return { backgroundColor: colorAlpha(color, .5), animationIterationCount: color === pallete.negative ? 'infinite' : 1 }
+                        }, subgraphStatusColorOnce))
+                      )()
+                    ),
+                  })({}),
                 ),
 
               ),
