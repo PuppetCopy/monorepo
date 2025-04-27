@@ -1,9 +1,8 @@
 {
   "name": "docs",
   "scripts": {
-    "middleware:build": "cd middleware && bun run build",
     "dev": "bun docgen && vitepress dev",
-    "preview": "bun docgen && vitepress preview",
+    "preview": "vitepress preview",
     "build": "vitepress build",
     "docgen": "bun ./docgen.ts"
   },
