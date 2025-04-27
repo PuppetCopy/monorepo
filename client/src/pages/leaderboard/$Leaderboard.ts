@@ -13,8 +13,7 @@ import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from "@puppet/
 import * as schema from "schema"
 import {
   $Baseline, $bear, $bull, $ButtonToggle, $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer, $icon,
-  $infoLabeledValue, $IntermediatePromise, $spinner, $Table, IMarker, IQuantumScrollPage, ISortBy,
-  TableColumn
+  $infoLabeledValue, $IntermediatePromise, $spinner, $Table, IMarker, IQuantumScrollPage, ISortBy, TableColumn
 } from "@puppet/middleware/ui-components"
 import { uiStorage } from "@puppet/middleware/ui-storage"
 import * as viem from "viem"
@@ -36,8 +35,7 @@ export interface ILeaderboardMatchStats extends IMatchRouteStats {
 }
 
 
-interface ILeaderboard extends IUserActivityPageParams {
-}
+interface ILeaderboard extends IUserActivityPageParams {}
 
 export const $Leaderboard = (config: ILeaderboard) => component((
   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,

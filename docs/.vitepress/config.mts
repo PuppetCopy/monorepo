@@ -33,18 +33,18 @@ export default defineConfig({
       {
         collapsed: false,
         text: 'Sources',
-        link: '/pages/generated-sources/contracts',
+        link: '/pages/__generated/contracts',
         items: [
           {
             text: 'Position',
             items: [
               {
                 text: 'MirrorPosition',
-                link: '/pages/generated-sources/position/MirrorPosition',
+                link: '/pages/__generated/position/MirrorPosition',
               },
               {
-                text: 'MatchRule',
-                link: '/pages/generated-sources/position/MatchRule',
+                text: 'MatchingRule',
+                link: '/pages/__generated/position/MatchingRule',
               },
             ]
           },
@@ -54,21 +54,21 @@ export default defineConfig({
 
               {
                 text: 'PuppetToken.sol',
-                link: '/pages/generated-sources/tokenomics/PuppetToken',
+                link: '/pages/__generated/tokenomics/PuppetToken',
               },
               {
                 text: 'RewardDistributor.sol',
-                link: '/pages/generated-sources/tokenomics/RewardDistributor',
+                link: '/pages/__generated/tokenomics/RewardDistributor',
               },
               {
                 text: 'VotingEscrow.sol',
-                link: '/pages/generated-sources/tokenomics/VotingEscrow',
+                link: '/pages/__generated/tokenomics/VotingEscrow',
               }
             ]
           },
           {
             text: 'License',
-            link: '/pages/generated-sources/license',
+            link: '/pages/__generated/license',
           },
         ]
       }

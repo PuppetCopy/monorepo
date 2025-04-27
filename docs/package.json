@@ -1,6 +1,13 @@
 {
   "name": "docs",
+  "scripts": {
+    "middleware:build": "cd middleware && bun run build",
+    "dev": "bun docgen && vitepress dev",
+    "preview": "bun docgen && vitepress preview",
+    "build": "vitepress build",
+    "docgen": "bun ./docgen.ts"
+  },
   "dependencies": {
-    "vitepress": "1.4.1"
+    "vitepress": "2.0.0-alpha.5"
   }
 }

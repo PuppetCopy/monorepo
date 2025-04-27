@@ -1,5 +1,5 @@
 import { erc20Abi, type Address } from "viem";
-import * as abi from "./abi/__generatedAbi.js";
+import * as abi from "./abi/__generated/abi.js";
 import addresses from './addresses.json' with { type: "json" };
 
 // gmx v2

@@ -1,4 +1,3 @@
-import { type Address, type Hex } from "viem"
 import { arbitrum, avalanche } from "viem/chains"
 import { ARBITRUM_ADDRESS } from "./chain/arbitrum.js"
 import { AVALANCHE_ADDRESS } from "./chain/avalanche.js"
@@ -21,8 +20,8 @@ export enum IntervalTime {
   YEAR = 31536000
 }
 
-export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000" as Address
-export const BYTES32_ZERO = "0x0000000000000000000000000000000000000000000000000000000000000000" as Hex
+export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000" as const
+export const BYTES32_ZERO = "0x0000000000000000000000000000000000000000000000000000000000000000" as const
 
 export const BASIS_POINTS_DIVISOR = 10000n
 
@@ -33,10 +32,10 @@ export const MAX_UINT256 = 2n ** 256n - 1n
 export const INITIAL_SUPPLY = 10n ** 100_000n
 export const MAX_LOCK_SCHEDULE = IntervalTime.WEEK * 105
 
-export const PUPPET_COLLATERAL_LIST: Address[] = [
+export const PUPPET_COLLATERAL_LIST= [
   ARBITRUM_ADDRESS.USDC,
   ARBITRUM_ADDRESS.NATIVE_TOKEN,
-]
+] as const
 
 export const MAX_LEVERAGE_FACTOR = 100n * BASIS_POINTS_DIVISOR
 export const MIN_LEVERAGE_FACTOR = 11000n

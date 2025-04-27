@@ -82,7 +82,7 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
     // const chainId = await params.walletProvider.request({ method: 'eth_chainId' })
 
 
-    if (accountList.length === 0) {
+    if (accountList.length === 0 || !accountList[0]) {
       return null
     }
 

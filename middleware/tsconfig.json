@@ -6,8 +6,8 @@
   ],
   "compilerOptions": {
     "outDir": "dist/esm",
-    "sourceMap": true,
     "rootDir": "./src",
+    "declaration": true,
     "declarationDir": "dist/types"
-  } 
+  }
 }

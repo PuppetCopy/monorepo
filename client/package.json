@@ -3,14 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun run generate-abi && bun vite",
+    "dev": "bun vite",
     "build": "bun vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
     "clean:rimraf": "rimraf dist && tsc -build --clean",
     "preview": "bunx --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
-    "generate-abi": "wagmi generate",
     "copy:schema": "mkdir -p ./src/__generated__ && cp ../subgraph/ponder.schema.ts ./src/__generated__/ponder.schema.ts"
   },
   "dependencies": {
@@ -25,7 +24,7 @@
     "@most/scheduler": "^1.3.0",
     "@most/types": "^1.1.0",
     "@ponder/client": "0.10.16",
-    "ponder": "0.10.16",
+    "ponder": "0.10.18",
     "@walletconnect/ethereum-provider": "2.20.0",
     "abitype": "1.0.8",
     "color": "^5.0.0",
@@ -40,7 +39,6 @@
     "vite-tsconfig-paths": "5.1.4",
     "@rollup/plugin-replace": "^6.0.2",
     "@vite-pwa/assets-generator": "^1.0.0",
-    "buffer": "^6.0.3",
     "dotenv": "^16.5.0",
     "rimraf": "^6.0.1",
     "vite": "^6.3.0",

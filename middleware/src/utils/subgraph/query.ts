@@ -1,4 +1,3 @@
-import { Client, type OperationContext } from '@urql/core'
 import { getAddress } from 'viem'
 import { getMappedValue } from '../../utils/index.js';
 
@@ -87,47 +86,47 @@ export interface IQuerySubgraph<
 }
 
 
-export const querySubgraph = <
-  Type extends GqlType<any>,
-  TQueryFilter extends IQueryFilter<Type>,
-  TQuery
->(
-  client: Client,
-  params: IQuerySubgraph<Type, TQueryFilter, TQuery>,
-  context?: Partial<OperationContext>,
-): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
-  const typename = params.schema.__typename
-  if (typename === undefined) {
-    throw new Error('No __typename in schema')
-  }
+// export const querySubgraph = <
+//   Type extends GqlType<any>,
+//   TQueryFilter extends IQueryFilter<Type>,
+//   TQuery
+// >(
+//   client: Client,
+//   params: IQuerySubgraph<Type, TQueryFilter, TQuery>,
+//   context?: Partial<OperationContext>,
+// ): Promise<TQuery extends unknown ? Type[] : PrettifyT<ISchemaQuery<Type, TQuery>>[]> => {
+//   const typename = params.schema.__typename
+//   if (typename === undefined) {
+//     throw new Error('No __typename in schema')
+//   }
 
-  const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
-  const orderByFilterParam = params.sortBy ? parseFilterObject({ orderBy: params.sortBy }) : ''
-  const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
-  const limit = params.limit ? `limit: ${params.limit},` : ''
-  const filter = whereClause ? `(${limit}, ${orderByFilterParam} ${whereClause})` : ''
+//   const whereClause = params.filter ? parseFilterObject({ where: params.filter }) : ''
+//   const orderByFilterParam = params.sortBy ? parseFilterObject({ orderBy: params.sortBy }) : ''
+//   const fieldStructure = parseQueryObject(params.document ? params.document : fillQuery(params.schema))
+//   const limit = params.limit ? `limit: ${params.limit},` : ''
+//   const filter = whereClause ? `(${limit}, ${orderByFilterParam} ${whereClause})` : ''
 
-  const entry = `${typename}${filter} { ${fieldStructure} }`
+//   const entry = `${typename}${filter} { ${fieldStructure} }`
 
-  const newLogsFilter = client.query(`{ ${entry} }`, {}, context)
-    .then(response => {
-      if (response.error) throw new Error(`${typename} query error: ${response.error.message}`)
+//   const newLogsFilter = client.query(`{ ${entry} }`, {}, context)
+//     .then(response => {
+//       if (response.error) throw new Error(`${typename} query error: ${response.error.message}`)
 
-      if (!(typename as string in response.data)) {
-        throw new Error(`No ${typename} found in subgraph response`)
-      }
+//       if (!(typename as string in response.data)) {
+//         throw new Error(`No ${typename} found in subgraph response`)
+//       }
 
-      const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[typename]
+//       const list: PrettifyT<ISchemaQuery<Type, TQuery>>[] = response.data[typename]
 
-      if (list instanceof Array) {
-        return list.map(item => parseQueryResults(item, params.schema))
-      }
+//       if (list instanceof Array) {
+//         return list.map(item => parseQueryResults(item, params.schema))
+//       }
 
-      throw new Error(`No ${typename} found in subgraph response`)
-    })
+//       throw new Error(`No ${typename} found in subgraph response`)
+//     })
 
-  return newLogsFilter as any
-}
+//   return newLogsFilter as any
+// }
 
 // recursively parse a json object to query result
 export function parseQueryResults(json: any, schema: any) {

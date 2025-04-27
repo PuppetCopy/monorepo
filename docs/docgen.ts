@@ -1,8 +1,8 @@
 import { $, Glob, write, file } from "bun";
 
 
-const generatedTemp = 'generated'
-const generatedDist = 'generated-sources'
+const generatedTemp = '__temp__generated'
+const generatedDist = '__generated'
 
 await $`cd ../contracts && bun docgen`;
 await $`cp -R ../contracts/.docgen/src/. ${generatedTemp}`;

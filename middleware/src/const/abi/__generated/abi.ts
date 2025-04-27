@@ -1664,6 +1664,11 @@ export const errorAbi = [
   {
     type: 'error',
     inputs: [],
+    name: 'MirrorPosition__KeeperExecutionFeeNotFullyCovered',
+  },
+  {
+    type: 'error',
+    inputs: [],
     name: 'MirrorPosition__KeeperFeeExceedsCostFactor',
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
@@ -1671,6 +1676,11 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'MirrorPosition__NoDustToCollect' },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoNetFundsAllocated' },
   { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
+  {
+    type: 'error',
+    inputs: [{ name: 'remaining', internalType: 'uint256', type: 'uint256' }],
+    name: 'MirrorPosition__PaymasterExecutionFeeNotFullyCovered',
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__PositionNotFound' },
   { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
   {
@@ -7915,6 +7925,11 @@ export const mirrorPositionAbi = [
     type: 'error',
     inputs: [],
     name: 'MirrorPosition__KeeperAdjustmentExecutionFeeExceedsAllocatedAmount',
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'MirrorPosition__KeeperExecutionFeeNotFullyCovered',
   },
   {
     type: 'error',
