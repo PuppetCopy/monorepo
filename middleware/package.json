@@ -9,11 +9,11 @@
   "typings": "./dist/types/index.d.ts",
   "scripts": {
     "dev:generate-abi": "wagmi generate",
+    "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/",
     "build": "bun run build:clean && bun run build:esm",
-    "build:esm": "cp ../contracts/deployments/addresses.json ./src/const/ && tsc -b",
+    "build:esm": "tsc -b",
     "build:clean": "rm -rf middleware/dist",
-    "clean:tsc": "rm -fr dist/*",
-    "generate-abi": "wagmi generate"
+    "clean:tsc": "rm -fr dist/*"
   },
   "sideEffects": true,
   "files": [
