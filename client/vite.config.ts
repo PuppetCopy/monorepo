@@ -17,24 +17,74 @@ const SITE_CONFIG = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  server: {
-    port: Number(process.env.PORT) || 3000,
+  logLevel: 'info',
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          subgraph: [
+            "ponder",
+            "@ponder/client",
+          ],
+          web3: [
+            "abitype",
+            "viem",
+          ],
+          vendor: [
+            '@puppet/middleware/const',
+            '@puppet/middleware/core',
+            '@puppet/middleware/wallet',
+            '@puppet/middleware/utils',
+            '@puppet/middleware/gmx',
+            '@puppet/middleware/gbc',
+            '@puppet/middleware/ui-components',
+            '@puppet/middleware/ui-router',
+            '@puppet/middleware/ui-storage',
+            "@aelea/core",
+            "@aelea/dom",
+            "@aelea/router",
+            "@aelea/ui-components",
+            "@aelea/ui-components-theme",
+            "@most/core",
+            "@most/disposable",
+            "@most/prelude",
+            "@most/scheduler",
+            "@most/types",
+            "color",
+            "mersenne-twister",
+          ],
+          wallet: [
+            'mipd',
+            '@walletconnect/ethereum-provider'
+          ],
+          charts: [
+            'lightweight-charts'
+          ]
+        }
+      }
+    }
   },
   plugins: [
     tsconfigPaths(),
     VitePWA({
+      mode: 'development',
       registerType: 'autoUpdate',
-      strategies: 'injectManifest',
-      injectManifest: {
-        maximumFileSizeToCacheInBytes: 15000000,
-        globPatterns: ['**/*.{js,html,woff2}']
-      },
+      strategies: 'generateSW',
+      // injectManifest: {
+      //   maximumFileSizeToCacheInBytes: 15000000,
+      //   globPatterns: ['**/*.{js,html,woff2}']
+      // },
       injectRegister: 'auto',
       srcDir: 'src/service-worker',
       filename: 'sw.ts',
+      includeAssets: [
+        'favicon.svg',
+        'assets/font/*.woff2'
+      ],
       pwaAssets: {
-        disabled: false,
         config: true,
+        overrideManifestIcons: true,
       },
       manifest: {
         name: SITE_CONFIG.__APP_NAME__,
@@ -46,7 +96,7 @@ export default defineConfig({
         start_url: '/app/leaderboard',
         display: "standalone",
         orientation: "any",
-        categories: ["Copy Trading", "Decentralized Perpetual Exchange", "DeFi"],
+        categories: ["Copy Trading", "DeFi", "Social Trading", "Investing"],
         screenshots: [
           { src: "assets/screenshot/narrow1.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
           { src: "assets/screenshot/narrow2.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
@@ -67,7 +117,13 @@ export default defineConfig({
           },
         ]
       },
-      mode: 'development',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 15000000,
+        skipWaiting: true,
+      },
       devOptions: {
         enabled: false,
         navigateFallback: 'index.html',
@@ -76,6 +132,7 @@ export default defineConfig({
       },
     }),
     replace({
+      preventAssignment: true,
       include: 'index.html',
       ...SITE_CONFIG
     })

@@ -9,6 +9,8 @@
     "types": [
       "vite/client",
       "vite-plugin-pwa/vanillajs",
+      "vite-plugin-pwa/info",
+      "vite-plugin-pwa/pwa-assets"
     ],
     "module": "ESNext",
     /* Bundler mode */
