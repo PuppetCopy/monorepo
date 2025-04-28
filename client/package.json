@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "bun vite",
+    "dev:schema": "mkdir -p ./src/__generated__ && cp ../subgraph/ponder.schema.ts ./src/__generated__/ponder.schema.ts",
     "build": "bun vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
     "clean:rimraf": "rimraf dist && tsc -build --clean",
     "preview": "bunx --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
-    "build:clean:all": "bun --filter '*' clean:tsc",
-    "copy:schema": "mkdir -p ./src/__generated__ && cp ../subgraph/ponder.schema.ts ./src/__generated__/ponder.schema.ts"
+    "build:clean:all": "bun --filter '*' clean:tsc"
   },
   "dependencies": {
     "@aelea/core": "^1.3.2",

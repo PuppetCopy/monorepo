@@ -16,8 +16,11 @@
     "middleware"
   ],
   "scripts": {
+    "contracts:build": "cd contracts && bun run build",
     "middleware:build": "cd middleware && bun run build",
-    "docs:build": "cd docs && bun vitepress build"
+    "docs:build": "cd docs && bun vitepress build",
+    "client:build": "cd client && bun run build",
+    "build": "bun run contracts:build && bun run middleware:build && bun run docs:build && bun run client:build"
   },
   "devDependencies": {
     "typescript-eslint": "8.30.1",

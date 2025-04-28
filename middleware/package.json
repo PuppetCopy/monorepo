@@ -8,7 +8,8 @@
   "types": "./dist/types/index.d.ts",
   "typings": "./dist/types/index.d.ts",
   "scripts": {
-    "build": "bun run generate-abi && bun run build:clean && bun run build:esm",
+    "dev:generate-abi": "wagmi generate",
+    "build": "bun run build:clean && bun run build:esm",
     "build:esm": "cp ../contracts/deployments/addresses.json ./src/const/ && tsc -b",
     "build:clean": "rm -rf middleware/dist",
     "clean:tsc": "rm -fr dist/*",
