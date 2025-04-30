@@ -1,31 +1,26 @@
-
 import type { Theme } from "@aelea/ui-components-theme"
 import { dark, light } from "./common/theme.js"
 
 const THEME_PALLETE_SELECTED_KEY = `!!THEME_PALLETE_SELECTED_KEY`
-const storedThemeName = localStorage.getItem(THEME_PALLETE_SELECTED_KEY)
 const themeList = [dark, light]
 
-function setTheme(themeName: string) {
+// Function to update local storage (side effect only)
+function storeThemePreference(themeName: string) {
   localStorage.setItem(THEME_PALLETE_SELECTED_KEY, themeName)
-  return theme
 }
-const darkModePreferance = self?.matchMedia('(prefers-color-scheme: dark)')?.matches
-const defaultTheme = darkModePreferance ? light : dark
+
+const prefersDarkMode = self?.matchMedia('(prefers-color-scheme: dark)')?.matches
+const defaultTheme = prefersDarkMode ? dark : light
+const storedThemeName = localStorage.getItem(THEME_PALLETE_SELECTED_KEY)
+const matchedStoredTheme = themeList.find(t => t.name === storedThemeName)
 
 let theme: Theme
-
-if (storedThemeName && typeof storedThemeName === 'string') {
-  const matchedTheme = themeList.find(t => t.name === storedThemeName)
-
-  if (matchedTheme) {
-    theme = setTheme(matchedTheme.name)
-  } else {
-    theme = setTheme(defaultTheme.name)
-  }
+if (matchedStoredTheme) {
+  theme = matchedStoredTheme
+  storeThemePreference(theme.name)
 } else {
-  setTheme(defaultTheme.name)
   theme = defaultTheme
+  storeThemePreference(theme.name)
 }
 
 export { theme }
