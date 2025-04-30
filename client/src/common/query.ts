@@ -1,22 +1,16 @@
 import { replayLatest } from "@aelea/core"
 import { map, multicast } from "@most/core"
-import { createClient, Status } from "@ponder/client"
-import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "@puppet/middleware/utils"
 import { IntervalTime, PRICEFEED_INTERVAL } from "@puppet/middleware/const"
-import * as schema from "schema"
+import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "@puppet/middleware/utils"
 import * as viem from "viem"
+import { getStatus, queryDb } from "./sqlClient"
 
-export const client = createClient(import.meta.env.VITE_INDEXR_ENDPOINT, { schema, })
 
-
-export const getSubgraphStatus = async (): Promise<Status> => {
-  return client.getStatus()
-}
 
 export const subgraphStatus = replayLatest(multicast(periodicRun({
   startImmediate: true,
   interval: 2500,
-  actionOp: map(() => getSubgraphStatus()),
+  actionOp: map(() => getStatus()),
 })))
 
 
@@ -28,7 +22,7 @@ export function queryPricefeed(
   estTickAmout = 10
 ) {
   return map(async params => {
-    const priceList = await client.db.query.priceCandle.findMany({
+    const priceList = await queryDb.query.priceCandle.findMany({
       columns: {
         c: true,
         slotTime: true,

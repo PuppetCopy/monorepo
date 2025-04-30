@@ -1,26 +1,40 @@
-import { $text, style } from "@aelea/dom"
+import { behavior } from "@aelea/core"
+import { $text, nodeEvent, style } from "@aelea/dom"
 import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { map, switchLatest } from "@most/core"
-import { applyFactor, combineState, readableTokenAmountLabel, switchMap } from "@puppet/middleware/utils"
-import { ARBITRUM_ADDRESS, TOKEN_DESCRIPTION_MAP } from "@puppet/middleware/const"
-import { $infoLabel, intermediateText } from "@puppet/middleware/ui-components"
-import tokenomicsReader from "../logic/tokenomicsReader"
+import { startWith, switchLatest, tap } from "@most/core"
+import { ignoreAll, switchMap } from "@puppet/middleware/utils"
+import { getAccount } from "@wagmi/core"
 import { $seperator2 } from "../pages/common"
 import { IWalletPageParams } from "../pages/type"
+import { accountChange, wagmiConfig, walletConnectAppkit } from "../walletConnect"
 import { $disconnectedWalletDisplay, $profileDisplay } from "./$AccountProfile.js"
 
 export interface IWalletDisplay extends IWalletPageParams {
 }
 
 export const $walletProfileDisplay = (config: IWalletDisplay) => {
-  const { walletClientQuery } = config
 
 
-  return switchLatest(switchMap(async walletQuery => {
-    const wallet = await walletQuery
 
-    if (wallet === null) {
-      return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
+  const accountStatus = getAccount(wagmiConfig)
+  const account = accountStatus.connector === undefined ? startWith(accountStatus, accountChange) : accountChange
+
+
+  const [click, clickTether] = behavior()
+
+  return switchLatest(switchMap(async accountInfo => {
+
+    if (!accountInfo.address) {
+      return $row(
+        clickTether(
+          nodeEvent('pointerdown'),
+          tap(es => {
+            walletConnectAppkit.open()
+          })
+        ),
+        layoutSheet.spacingSmall, style({ alignItems: 'center', paddingRight: '16px' })
+      )(
+        ignoreAll(click),
         $disconnectedWalletDisplay(),
         $seperator2,
         $column(
@@ -30,11 +44,10 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
       )
     }
 
-    const address = wallet.account.address
 
     return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }))(
-      address
-        ? $profileDisplay({ account: address })
+      accountInfo.address
+        ? $profileDisplay({ account: accountInfo.address })
         : style({ cursor: 'pointer' }, $disconnectedWalletDisplay()),
 
       // $seperator2,
@@ -67,7 +80,7 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
       //   )
       // )
     )
-  }, walletClientQuery))
+  }, account))
 }
 
 

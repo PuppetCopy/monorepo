@@ -1,14 +1,9 @@
 {
   // This configuration is used for local development and type checking.
   "extends": "./tsconfig.base.json",
-  "include": [
-    "middleware"
-  ],
   "references": [],
-  "compilerOptions": {
-    
-  },
+  "compilerOptions": {},
   "exclude": [
-    "node_modules",
+    "**/node_modules",
   ]
 }

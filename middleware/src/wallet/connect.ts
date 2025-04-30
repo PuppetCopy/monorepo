@@ -2,10 +2,10 @@ import { combineObject, fromCallback, replayLatest } from "@aelea/core"
 import { constant, map, mergeArray, multicast, now, startWith } from "@most/core"
 import { disposeWith } from "@most/disposable"
 import type { Stream } from "@most/types"
-import { EthereumProvider } from "@walletconnect/ethereum-provider"
 import type { EIP1193Provider } from "mipd"
 import { createPublicClient, createWalletClient, custom, fallback, getAddress, type Account, type Chain, type CustomTransport, type EIP1193EventMap, type PublicClient, type Transport, type WalletClient } from "viem"
 import { switchMap } from "../utils/index.js"
+import { createAppKit } from '@reown/appkit/core'
 
 
 export type IPublicProvider = PublicClient<Transport, Chain>
@@ -156,23 +156,6 @@ export async function getPublicClient(
   })
 }
 
-export async function walletConnectConnector(chainList: Chain[], projectId: string) {
-  const ethereumProvider = await EthereumProvider.init({
-    chains: chainList.map(chain => chain.id) as any,
-    projectId,
-    showQrModal: true,
-  })
-
-  await ethereumProvider.connect()
-
-  const accounts = ethereumProvider.accounts
-
-  if (accounts.length === 0) {
-    return null
-  }
-
-  return ethereumProvider
-}
 
 
 type EthereumProvider = { request(...args: any): Promise<any>, name: string }

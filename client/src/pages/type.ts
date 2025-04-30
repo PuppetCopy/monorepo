@@ -9,11 +9,9 @@ import { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRout
 
 
 export interface IWalletPageParams {
-  walletClientQuery: Stream<Promise<walletLink.IWalletClient | null>>
 }
 
 export interface IComponentPageParams extends IWalletPageParams {
-  providerClientQuery: Stream<Promise<walletLink.IPublicProvider>>
 }
 
 export interface IPageParams extends IComponentPageParams {

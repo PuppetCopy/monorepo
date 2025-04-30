@@ -17,21 +17,15 @@ const SITE_CONFIG = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  logLevel: 'info',
   build: {
     sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
           subgraph: [
-            "ponder",
-            "@ponder/client",
+            'ponder',
           ],
-          web3: [
-            "abitype",
-            "viem",
-          ],
-          vendor: [
+          middleware: [
             '@puppet/middleware/const',
             '@puppet/middleware/core',
             '@puppet/middleware/wallet',
@@ -41,47 +35,48 @@ export default defineConfig({
             '@puppet/middleware/ui-components',
             '@puppet/middleware/ui-router',
             '@puppet/middleware/ui-storage',
-            "@aelea/core",
-            "@aelea/dom",
-            "@aelea/router",
-            "@aelea/ui-components",
-            "@aelea/ui-components-theme",
-            "@most/core",
-            "@most/disposable",
-            "@most/prelude",
-            "@most/scheduler",
-            "@most/types",
-            "color",
-            "mersenne-twister",
+          ],
+          vendor: [
+            '@aelea/core',
+            '@aelea/dom',
+            '@aelea/router',
+            '@aelea/ui-components',
+            '@aelea/ui-components-theme',
+            '@most/core',
+            '@most/disposable',
+            '@most/prelude',
+            '@most/scheduler',
+            '@most/types',
+            'color',
+            'mersenne-twister',
+            'abitype',
+            'viem',
           ],
           wallet: [
-            'mipd',
-            '@walletconnect/ethereum-provider'
+            "@reown/appkit",
+            "@reown/appkit-adapter-wagmi",
+            "@wagmi/core"
           ],
-          charts: [
-            'lightweight-charts'
-          ]
-        }
-      }
-    }
+          charts: ['lightweight-charts'],
+        },
+      },
+    },
+  },
+  server: {
+    port: Number(process.env.PORT) || 3000,
   },
   plugins: [
     tsconfigPaths(),
     VitePWA({
-      mode: 'development',
       registerType: 'autoUpdate',
-      strategies: 'generateSW',
-      // injectManifest: {
-      //   maximumFileSizeToCacheInBytes: 15000000,
-      //   globPatterns: ['**/*.{js,html,woff2}']
-      // },
+      strategies: 'injectManifest',
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 3000000,
+        globPatterns: ['**/*.{js,html,woff2}']
+      },
       injectRegister: 'auto',
-      srcDir: 'src/service-worker',
-      filename: 'sw.ts',
-      includeAssets: [
-        'favicon.svg',
-        'assets/font/*.woff2'
-      ],
+      srcDir: 'src/sw',
+      filename: 'service-worker.ts',
       pwaAssets: {
         config: true,
         overrideManifestIcons: true,
@@ -93,39 +88,28 @@ export default defineConfig({
         theme_color: SITE_CONFIG.__THEME_BACKGROUND__,
         background_color: SITE_CONFIG.__THEME_BACKGROUND__,
         lang: "en",
-        start_url: '/app/leaderboard',
+        // start_url: '/',
         display: "standalone",
-        orientation: "any",
-        categories: ["Copy Trading", "DeFi", "Social Trading", "Investing"],
+        orientation: "portrait-primary",
+        categories: ["Copy Trading", "Decentralized Perpetual Exchange", "DeFi"],
         screenshots: [
           { src: "assets/screenshot/narrow1.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
           { src: "assets/screenshot/narrow2.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
 
           { src: "assets/screenshot/wide1.png", type: "image/png", sizes: "3260x1692", form_factor: "wide" },
           { src: "assets/screenshot/wide2.png", type: "image/png", sizes: "3260x1692", form_factor: "wide" }
-        ],
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
-        maximumFileSizeToCacheInBytes: 15000000,
         skipWaiting: true,
+        
       },
+      mode: 'development',
       devOptions: {
-        enabled: false,
+        enabled: true,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module',

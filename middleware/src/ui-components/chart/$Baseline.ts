@@ -1,6 +1,7 @@
 import { pallete } from '@aelea/ui-components-theme'
 import {
   type BarPrice,
+  BaselineSeries,
   type BaselineSeriesPartialOptions,
   type ChartOptions,
   type DeepPartial,
@@ -86,7 +87,7 @@ export const $Baseline = (config: IBaselineChart) => {
     ...config,
     chartConfig,
     getSeriesApi: api => {
-      const series = api.addBaselineSeries(baselineOptions)
+      const series = api.addSeries(BaselineSeries, baselineOptions)
       setTimeout(() => {
         api.timeScale().fitContent()
       }, 55)

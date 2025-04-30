@@ -22,7 +22,6 @@ export const traderRouteMetric = onchainTable("TraderRouteMetric", t => ({
   lastUpdatedTimestamp: t.integer().notNull(),
   marketList: t.hex().array().notNull(),
 }))
-export type ITraderRouteMetric = typeof traderRouteMetric.$inferInsert
 
 export const puppetSettle = onchainTable("PuppetSettle", t => ({
   id: t.hex().primaryKey(),
@@ -30,7 +29,6 @@ export const puppetSettle = onchainTable("PuppetSettle", t => ({
   amount: t.bigint().notNull(),
   settleId: t.hex().notNull(),
 }))
-export type IPuppetSettle = typeof settle.$inferInsert
 
 export const puppetSettleRelations = relations(puppetSettle, ({ one }) => ({
   settle: one(settle, { fields: [puppetSettle.settleId], references: [settle.id] }),
@@ -54,7 +52,6 @@ export const settle = onchainTable("Settle", t => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 }))
-export type ISettle = typeof settle.$inferInsert
 
 export const settleRelations = relations(settle, ({ one }) => ({
   puppetSettle: one(puppetSettle, { fields: [settle.id], references: [puppetSettle.settleId] }),
@@ -78,7 +75,6 @@ export const adjust = onchainTable("Adjust", t => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 }))
-export type IAdjust = typeof adjust.$inferInsert
 
 export const mirror = onchainTable("Mirror", t => ({
   matchingKey: t.hex().notNull(),
@@ -96,7 +92,6 @@ export const mirror = onchainTable("Mirror", t => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 }))
-export type IMirror = typeof mirror.$inferInsert
 
 export const puppetAllocate = onchainTable("PuppetAllocate", t => ({
   id: t.hex().primaryKey(),
@@ -109,7 +104,6 @@ export const puppetAllocate = onchainTable("PuppetAllocate", t => ({
   mirrorPositionId: t.hex().notNull(),
   allocationKey: t.hex().notNull(),
 }))
-export type IPuppetAllocation = typeof puppetAllocate.$inferInsert
 
 export const puppetAllocationRelations = relations(puppetAllocate, ({ one }) => ({
   allocation: one(allocation, { fields: [puppetAllocate.allocationKey], references: [allocation.allocationKey] }),
@@ -127,7 +121,6 @@ export const allocation = onchainTable("Allocation", t => ({
   size: t.bigint().notNull(),
   cumulativeKeeperFee: t.bigint().notNull(),
 }))
-export type IAllocation = typeof allocation.$inferInsert
 
 export const allocationRelations = relations(allocation, ({ many, one }) => ({
   mirror: one(mirror, { fields: [allocation.allocationAddress], references: [mirror.allocationAddress] }),
@@ -146,7 +139,6 @@ export const puppetMatchingRule = onchainTable("PuppetMatchingRule", t => ({
   throttleActivity: t.bigint().notNull(),
   expiry: t.bigint().notNull(),
 }))
-export type IMatchingRule = typeof puppetMatchingRule.$inferInsert
 
 export const deposit = onchainTable("Deposit", t => ({
   id: t.text().primaryKey(),
@@ -170,7 +162,6 @@ export const withdraw = onchainTable("Withdraw", t => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 }))
-export type IWithdraw = typeof withdraw.$inferInsert;
 
 // ---- GMX derived data ----
 
@@ -180,7 +171,6 @@ export const traderOpenPnl = onchainTable("TraderOpenPnl", t => ({
   account: t.hex().notNull(),
 })
 )
-export type ITraderOpenPnl = typeof traderOpenPnl.$inferInsert
 
 export const positionIncrease = onchainTable("PositionIncrease", t => ({
   orderKey: t.hex().primaryKey(),
@@ -219,7 +209,6 @@ export const positionIncrease = onchainTable("PositionIncrease", t => ({
 
   feeCollectedId: t.hex().notNull(),
 }))
-export type IPositionIncrease = typeof positionIncrease.$inferInsert
 
 export const positionIncreaseRelations = relations(positionIncrease, ({ one }) => ({
   feeCollected: one(positionFeesCollected, { fields: [positionIncrease.feeCollectedId], references: [positionFeesCollected.id] }),
@@ -264,7 +253,6 @@ export const positionDecrease = onchainTable("PositionDecrease", t => ({
 
   feeCollectedId: t.hex().notNull(),
 }))
-export type IPositionDecrease = typeof positionDecrease.$inferInsert
 
 export const positionDecreaseRelations = relations(positionDecrease, ({ one }) => ({
   feeCollected: one(positionFeesCollected, { fields: [positionDecrease.feeCollectedId], references: [positionFeesCollected.id] }),
@@ -304,7 +292,12 @@ export const positionFeesCollected = onchainTable("PositionFeesCollected", t => 
   transactionHash: t.hex().notNull(),
 })
 )
-export type IPositionFeesCollected = typeof positionFeesCollected.$inferInsert
+
+export const oraclePrice = onchainTable("OraclePrice", t => ({
+  token: t.hex().primaryKey(),
+  price: t.bigint().notNull(),
+  updateTimestamp: t.integer().notNull(),
+}))
 
 export const priceCandle = onchainTable("PriceCandle", t => ({
   id: t.text().primaryKey(),
@@ -316,7 +309,6 @@ export const priceCandle = onchainTable("PriceCandle", t => ({
   l: t.bigint().notNull(),
   c: t.bigint().notNull(),
 }))
-export type IPriceCandle = typeof priceCandle.$inferInsert
 
 export const market = onchainTable("Market", t => ({
   id: t.hex().primaryKey(),
@@ -325,4 +317,3 @@ export const market = onchainTable("Market", t => ({
   shortToken: t.hex().notNull(),
   marketType: t.hex(),
 }))
-export type IMarket = typeof market.$inferInsert

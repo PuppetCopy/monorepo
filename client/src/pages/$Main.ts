@@ -1,9 +1,9 @@
-import { Behavior, combineObject, fromCallback, replayLatest } from "@aelea/core"
+import { Behavior, fromCallback, replayLatest } from "@aelea/core"
 import { $element, $node, $text, component, eventElementTarget, style, styleBehavior } from "@aelea/dom"
 import * as router from '@aelea/router'
 import { $column, $row, designSheet, layoutSheet } from '@aelea/ui-components'
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
-import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, switchLatest, take, tap } from '@most/core'
+import { constant, fromPromise, map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
 import { Stream } from "@most/types"
 import { IntervalTime } from "@puppet/middleware/const"
 import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from "@puppet/middleware/ui-components"
@@ -16,20 +16,22 @@ import { arbitrum } from "viem/chains"
 import { $midContainer } from "../common/$common.js"
 import { $heading2 } from "../common/$text"
 import { queryPricefeed, subgraphStatus } from "../common/query"
-import { announcedProviderList } from "../components/$ConnectWallet"
+// import { announcedProviderList } from "../components/$ConnectWallet"
+import { connect, disconnect, reconnect, watchAccount, watchBlockNumber, watchBlocks } from '@wagmi/core'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../components/form/$Button"
 import { IDepositEditorChange } from "../components/portfolio/$DepositEditor.js"
 import { $PortfolioEditorDrawer } from "../components/portfolio/$PortfolioEditorDrawer.js"
 import { IMatchRuleEditorChange } from "../components/portfolio/$TraderMatchRouteEditor"
 import { localStore } from "../const/localStore"
-import { newUpdateInvoke } from "../sw/swUtils"
+import { pwaUpgradeNotification } from "../sw/swUtils"
 import { fadeIn } from "../transitions/enter.js"
 import { $Admin } from "./$Admin"
 import { $Home } from "./$Home.js"
 import { $rootContainer } from "./common"
 import { $Leaderboard } from "./leaderboard/$Leaderboard.js"
 import { $WalletPage } from "./user/$Wallet.js"
+import { wagmiConfig, walletConnectAppkit } from "../walletConnect"
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -42,16 +44,6 @@ interface IApp {
   baseRoute?: string
 }
 
-export const chains = [arbitrum] as const
-
-export const publicTransportMap: walletLink.IWalletLinkConfig['publicTransportMap'] = {
-  [arbitrum.id]: viem.fallback([
-    viem.webSocket('wss://arb-mainnet.g.alchemy.com/v2/sI7JV4ahbI8oNlOosnZ7klOi8vsxdVwm'),
-    viem.http('https://arb1.arbitrum.io/rpc'),
-
-  ]),
-  // [CHAIN.AVALANCHE]: avaGlobalProvider,
-}
 
 
 
@@ -68,6 +60,8 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
   [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
 ) => {
 
+  walletConnectAppkit.getIsConnectedState()
+
   const changes = merge(locationChange, multicast(routeChanges))
   const fragmentsChange = map(() => {
     const trailingSlash = /\/$/
@@ -79,15 +73,15 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
 
 
   const rootRoute = router.create({ fragment: baseRoute, title: 'Puppet', fragmentsChange })
-  const appRoute = rootRoute.create({ fragment: 'app', title: '' })
+  // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
-  const profileRoute = appRoute.create({ fragment: 'profile' })
-  const walletRoute = appRoute.create({ fragment: 'wallet', title: 'Portfolio' })
-  const tradeRoute = appRoute.create({ fragment: 'trade' })
-  const tradeTermsAndConditions = appRoute.create({ fragment: 'terms-and-conditions' })
+  const profileRoute = rootRoute.create({ fragment: 'profile' })
+  const walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
+  const tradeRoute = rootRoute.create({ fragment: 'trade' })
+  const tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
 
-  const leaderboardRoute = appRoute.create({ fragment: 'leaderboard' })
-  const adminRoute = appRoute.create({ fragment: 'admin' })
+  const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
+  const adminRoute = rootRoute.create({ fragment: 'admin' })
 
   const opengraph = rootRoute.create({ fragment: 'og' })
 
@@ -107,43 +101,17 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
     return color
   }, subgraphStatus)
   const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
-
-
-  const changeWalletProviderRdns = map(detail => {
-    return detail ? detail.info.rdns : null
-  }, changeWallet)
-
-
-  const walletRdnsStore = uiStorage.replayWrite(localStore.global, changeWalletProviderRdns, 'wallet')
-  const initWalletProvider: Stream<EIP6963ProviderDetail | null> = map(params => {
-
-    return params.walletRdnsStore ? params.announcedProviderList.find(p => p.info.rdns === params.walletRdnsStore) || null : null
-  }, combineObject({ announcedProviderList, walletRdnsStore }))
-
-
-  // hanlde disconnect and account change
-  const walletProvider = map(d => d?.provider || null, mergeArray([initWalletProvider, changeWallet]))
-
-
-  const chainIdQuery = indexDb.get(localStore.global, 'chain')
-  const chainQuery: Stream<Promise<viem.Chain>> = now(chainIdQuery.then(id => chains.find(c => c.id === id) || arbitrum))
-
-  const {
-    providerClientQuery,
-    publicProviderClientQuery,
-    walletClientQuery
-  } = walletLink.initWalletLink({ publicTransportMap, chainQuery, walletProvider })
-
-  const block = switchMap(async query => (await query).getBlockNumber(), providerClientQuery)
-  const latestBlock: Stream<bigint> = switchLatest(switchMap(async query => {
-    const provider = await query
-    const blockChange = fromCallback(cb => provider.watchBlockNumber({
-      onBlockNumber: bn => {
-        return cb(bn)
-      }
-    }))
-    return mergeArray([blockChange, block])
-  }, providerClientQuery))
+  
+  const latestBlock: Stream<bigint> = mergeArray([
+    // fromPromise(useBlockNumber().promise),
+    fromCallback(cb =>
+      watchBlockNumber(wagmiConfig,{
+        onBlockNumber(blockNumber) {
+          cb(blockNumber)
+        },
+      })
+    )
+  ])
 
 
   const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchRuleEditorChange[])
@@ -169,8 +137,8 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
           )
 
         )
-      }, newUpdateInvoke),
-      router.contains(appRoute)(
+      }, pwaUpgradeNotification),
+      router.contains(rootRoute)(
         $rootContainer(
           $column(style({ flex: 1, position: 'relative' }))(
 
@@ -180,19 +148,19 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
             )(
               switchMap(isDesktop => {
                 if (isDesktop) {
-                  return $MainMenu({ route: appRoute, walletClientQuery, providerClientQuery })({
+                  return $MainMenu({ route: rootRoute })({
                     routeChange: changeRouteTether(),
                     changeWallet: changeWalletTether(),
                   })
                 }
 
-                return $MainMenuMobile({ route: rootRoute, walletClientQuery, providerClientQuery })({
+                return $MainMenuMobile({ route: rootRoute })({
                   routeChange: changeRouteTether(),
                 })
               }, isDesktopScreen),
               router.contains(walletRoute)(
                 $midContainer(
-                  $WalletPage({ route: walletRoute, providerClientQuery, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, walletClientQuery })({
+                  $WalletPage({ route: walletRoute, depositTokenList, matchRuleList, activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery })({
                     changeWallet: changeWalletTether(),
                     changeRoute: changeRouteTether(),
                     changeActivityTimeframe: changeActivityTimeframeTether(),
@@ -203,10 +171,10 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   })
                 )
               ),
-              router.match(leaderboardRoute)(
+              router.match(rootRoute)(
                 $midContainer(
                   fadeIn($Leaderboard({
-                    route: leaderboardRoute, providerClientQuery, activityTimeframe, walletClientQuery, selectedCollateralTokenList, matchRuleList, depositTokenList, pricefeedMapQuery
+                    route: leaderboardRoute, activityTimeframe, selectedCollateralTokenList, matchRuleList, depositTokenList, pricefeedMapQuery
                   })({
                     changeActivityTimeframe: changeActivityTimeframeTether(),
                     selectMarketTokenList: selectMarketTokenListTether(),
@@ -215,45 +183,45 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
                   }))
                 )
               ),
-              // router.contains(profileRoute)(
-              //   $midContainer(
-              //     fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
-              //       changeActivityTimeframe: changeActivityTimeframeTether(),
-              //       changeMatchRuleList: changeMatchRuleListTether(),
-              //       changeRoute: changeRouteTether(),
-              //     }))
-              //   )
+              // // router.contains(profileRoute)(
+              // //   $midContainer(
+              // //     fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
+              // //       changeActivityTimeframe: changeActivityTimeframeTether(),
+              // //       changeMatchRuleList: changeMatchRuleListTether(),
+              // //       changeRoute: changeRouteTether(),
+              // //     }))
+              // //   )
+              // // ),
+              // router.contains(adminRoute)(
+              //   $Admin({ walletClientQuery, providerClientQuery })({
+              //     changeWallet: changeWalletTether(),
+              //   })
               // ),
-              router.contains(adminRoute)(
-                $Admin({ walletClientQuery, providerClientQuery })({
-                  changeWallet: changeWalletTether(),
-                })
-              ),
-              router.match(tradeTermsAndConditions)(
-                fadeIn(
-                  $midContainer(layoutSheet.spacing, style({ maxWidth: '680px', alignSelf: 'center' }))(
-                    $heading2(style({ fontSize: '3em', textAlign: 'center' }))('Puppet DAO'),
-                    $node(),
-                    $text(style({ fontSize: '1.5rem', textAlign: 'center', fontWeight: 'bold' }))('Terms And Conditions'),
-                    $text(style({ whiteSpace: 'pre-wrap' }))(`By accessing, I agree that ${document.location.host} is not responsible for any loss of funds, and I agree to the following terms and conditions:`),
-                    $element('ul')(layoutSheet.spacing, style({}))(
-                      $liItem(
-                        $text(`I am not a United States person or entity;`),
-                      ),
-                      $liItem(
-                        $text(`I am not a resident, national, or agent of any country to which the United States, the United Kingdom, the United Nations, or the European Union embargoes goods or imposes similar sanctions, including without limitation the U.S. Office of Foreign Asset Control, Specifically Designated Nationals and Blocked Person List;`),
-                      ),
-                      $liItem(
-                        $text(`I am legally entitled to access the Interface under the laws of the jurisdiction where I am located;`),
-                      ),
-                      $liItem(
-                        $text(`I am responsible for the risks using the Interface, including, but not limited to, the following: (i) the use of Puppet smart contracts; (ii) leverage trading, the risk may result in the total loss of my deposit.`),
-                      ),
-                    ),
-                    $node(style({ height: '100px' }))(),
-                  )
-                ),
-              ),
+              // router.match(tradeTermsAndConditions)(
+              //   fadeIn(
+              //     $midContainer(layoutSheet.spacing, style({ maxWidth: '680px', alignSelf: 'center' }))(
+              //       $heading2(style({ fontSize: '3em', textAlign: 'center' }))('Puppet DAO'),
+              //       $node(),
+              //       $text(style({ fontSize: '1.5rem', textAlign: 'center', fontWeight: 'bold' }))('Terms And Conditions'),
+              //       $text(style({ whiteSpace: 'pre-wrap' }))(`By accessing, I agree that ${document.location.host} is not responsible for any loss of funds, and I agree to the following terms and conditions:`),
+              //       $element('ul')(layoutSheet.spacing, style({}))(
+              //         $liItem(
+              //           $text(`I am not a United States person or entity;`),
+              //         ),
+              //         $liItem(
+              //           $text(`I am not a resident, national, or agent of any country to which the United States, the United Kingdom, the United Nations, or the European Union embargoes goods or imposes similar sanctions, including without limitation the U.S. Office of Foreign Asset Control, Specifically Designated Nationals and Blocked Person List;`),
+              //         ),
+              //         $liItem(
+              //           $text(`I am legally entitled to access the Interface under the laws of the jurisdiction where I am located;`),
+              //         ),
+              //         $liItem(
+              //           $text(`I am responsible for the risks using the Interface, including, but not limited to, the following: (i) the use of Puppet smart contracts; (ii) leverage trading, the risk may result in the total loss of my deposit.`),
+              //         ),
+              //       ),
+              //       $node(style({ height: '100px' }))(),
+              //     )
+              //   ),
+              // ),
               $row(layoutSheet.spacing, style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
                 $row(
                   $Tooltip({
@@ -304,37 +272,39 @@ export const $Main = ({ baseRoute = '' }: IApp) => component((
             )
           ),
 
-          $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
-            $PortfolioEditorDrawer({
-              depositTokenList,
-              providerClientQuery,
-              walletClientQuery,
-              matchRuleList
-            })({
-              changeWallet: changeWalletTether(),
-              changeMatchRuleList: changeMatchRuleListTether(),
-              changeDepositTokenList: changeDepositTokenListTether(),
-            })
-          )
+          // $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
+          //   $PortfolioEditorDrawer({
+          //     depositTokenList,
+          //     providerClientQuery,
+          //     walletClientQuery,
+          //     matchRuleList
+          //   })({
+          //     changeWallet: changeWalletTether(),
+          //     changeMatchRuleList: changeMatchRuleListTether(),
+          //     changeDepositTokenList: changeDepositTokenListTether(),
+          //   })
+          // )
+
+          
         )
       ),
 
-      router.match(rootRoute)(
-        $rootContainer(
-          designSheet.customScroll,
-          style({
-            scrollSnapType: 'y mandatory',
-            fontSize: '1.15rem',
-            overflow: 'hidden scroll',
-            maxHeight: '100vh',
-            margin: '0 auto', width: '100%'
-          })
-        )(
-          $Home({
-            parentRoute: rootRoute,
-          })({ routeChanges: changeRouteTether() })
-        )
-      ),
+      // router.match(rootRoute)(
+      //   $rootContainer(
+      //     designSheet.customScroll,
+      //     style({
+      //       scrollSnapType: 'y mandatory',
+      //       fontSize: '1.15rem',
+      //       overflow: 'hidden scroll',
+      //       maxHeight: '100vh',
+      //       margin: '0 auto', width: '100%'
+      //     })
+      //   )(
+      //     $Home({
+      //       parentRoute: rootRoute,
+      //     })({ routeChanges: changeRouteTether() })
+      //   )
+      // ),
 
       // router.contains(opengraph)(
       //   $Opengraph(opengraph)({

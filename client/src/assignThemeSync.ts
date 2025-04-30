@@ -3,41 +3,31 @@ import type { Theme } from "@aelea/ui-components-theme"
 import { dark, light } from "./common/theme.js"
 
 const THEME_PALLETE_SELECTED_KEY = `!!THEME_PALLETE_SELECTED_KEY`
-const themeFromStorage = localStorage.getItem(THEME_PALLETE_SELECTED_KEY)
+const storedThemeName = localStorage.getItem(THEME_PALLETE_SELECTED_KEY)
 const themeList = [dark, light]
 
-function setTheme<T extends Theme>(theme: T) {
-  localStorage.setItem(THEME_PALLETE_SELECTED_KEY, JSON.stringify(theme))
+function setTheme(themeName: string) {
+  localStorage.setItem(THEME_PALLETE_SELECTED_KEY, themeName)
   return theme
 }
-const darkModePreferance = self?.matchMedia('(prefers-color-scheme: dark)').matches
-const defaultTheme = dark // darkModePreferance ? light : dark
+const darkModePreferance = self?.matchMedia('(prefers-color-scheme: dark)')?.matches
+const defaultTheme = darkModePreferance ? light : dark
 
-let theme = defaultTheme
+let theme: Theme
 
-if (themeFromStorage === null) {
-  setTheme(defaultTheme)
-} else {
-  const currentTheme = themeList.find(t => JSON.stringify(t) === themeFromStorage)
+if (storedThemeName && typeof storedThemeName === 'string') {
+  const matchedTheme = themeList.find(t => t.name === storedThemeName)
 
-  if (currentTheme) {
-    theme = setTheme(currentTheme)
+  if (matchedTheme) {
+    theme = setTheme(matchedTheme.name)
   } else {
-    console.warn('unable to set theme, stored version seems different. reassigning local version')
-
-    try {
-      const parsedStorageThemeName: string = JSON.parse(themeFromStorage).name
-      const matchedTheme = themeList.find(t => t.name === parsedStorageThemeName)
-      theme = setTheme(matchedTheme!)
-    } catch (err) {
-      console.error(err)
-      theme = setTheme(defaultTheme)
-    }
+    theme = setTheme(defaultTheme.name)
   }
-  
+} else {
+  setTheme(defaultTheme.name)
+  theme = defaultTheme
 }
 
 export { theme }
 
-// document.body.style.backgroundColor = theme.pallete.background
 

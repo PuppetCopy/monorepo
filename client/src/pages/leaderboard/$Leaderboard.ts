@@ -4,30 +4,31 @@ import { $column, $row, layoutSheet, screenUtils } from "@aelea/ui-components"
 import { colorAlpha, pallete } from "@aelea/ui-components-theme"
 import { empty, map, now, startWith } from "@most/core"
 import { Time } from "@most/types"
-import { desc, asc } from "@ponder/client"
-import { getMappedValue, InferStream, readablePnl, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
-import { arrayContains } from "drizzle-orm"
-import { BaselineData, LineType } from "lightweight-charts"
 import { IntervalTime } from "@puppet/middleware/const"
 import { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from "@puppet/middleware/core"
-import * as schema from "schema"
 import {
   $Baseline, $bear, $bull, $ButtonToggle, $defaultTableCell, $defaultTableContainer, $defaultTableRowContainer, $icon,
   $infoLabeledValue, $IntermediatePromise, $spinner, $Table, IMarker, IQuantumScrollPage, ISortBy, TableColumn
 } from "@puppet/middleware/ui-components"
 import { uiStorage } from "@puppet/middleware/ui-storage"
+import { getMappedValue, InferStream, readablePnl, switchMap, unixTimestampNow } from "@puppet/middleware/utils"
+import { BaselineData, LineType } from "lightweight-charts"
+import { asc, desc } from "ponder"
+import * as schema from "schema"
 import * as viem from "viem"
 import { $roiDisplay, $size, $TraderDisplay } from "../../common/$common.js"
 import { $card2, $responsiveFlex } from "../../common/elements/$common.js"
-import { client, queryPricefeed } from "../../common/query"
+import { queryPricefeed } from "../../common/query"
+import { queryDb } from "../../common/sqlClient"
 import { $SelectCollateralToken } from "../../components/$CollateralTokenSelector"
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from "../../components/$LastActivity.js"
 import { $TraderMatchingRouteEditor, IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 import { $tableHeader } from "../../components/table/$TableColumn.js"
 import { getPositionListTimelinePerformance, IPerformanceTimelineTick } from "../../components/trade/$ProfilePerformanceGraph"
+import { localStore } from "../../const/localStore"
+import { accountChange } from "../../walletConnect"
 import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { localStore } from "../../const/localStore"
 
 export interface ILeaderboardMatchStats extends IMatchRouteStats {
   timeline: IPerformanceTimelineTick[]
@@ -39,7 +40,7 @@ interface ILeaderboard extends IUserActivityPageParams {}
 
 export const $Leaderboard = (config: ILeaderboard) => component((
   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
-  [sortByChange, sortByChangeTether]: Behavior<ISortBy<schema.ITraderRouteMetric>>,
+  [sortByChange, sortByChangeTether]: Behavior<ISortBy<typeof schema['traderRouteMetric']['$inferInsert']>>,
 
   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
@@ -51,7 +52,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
 ) => {
 
-  const { activityTimeframe, selectedCollateralTokenList, walletClientQuery, matchRuleList, route } = config
+  const { activityTimeframe, selectedCollateralTokenList, matchRuleList, route } = config
 
   const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
@@ -60,7 +61,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
   const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
   const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
 
-
+  const accountInfo = accountChange
 
   const tableParams = map(async pageParams => {
     const pricefeedMap = await pageParams.pricefeedMapQuery
@@ -93,8 +94,8 @@ export const $Leaderboard = (config: ILeaderboard) => component((
     // })
     // .filter(pos => pos !== null)
 
-    return { pricefeedMap, sortBy: pageParams.sortBy, activityTimeframe: pageParams.activityTimeframe }
-  }, combineObject({ sortBy, pricefeedMapQuery, activityTimeframe, isLong }))
+    return { pricefeedMap, accountInfo: pageParams.accountInfo, sortBy: pageParams.sortBy, activityTimeframe: pageParams.activityTimeframe }
+  }, combineObject({ sortBy, pricefeedMapQuery, activityTimeframe, isLong, accountInfo }))
 
 
 
@@ -135,12 +136,12 @@ export const $Leaderboard = (config: ILeaderboard) => component((
             const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
             const dataSource = switchMap(async filterParams => {
-              const metrictList = await client.db.query.traderRouteMetric.findMany({
+              const metrictList = await queryDb.query.traderRouteMetric.findMany({
                 where: ((t, f) =>
                   f.and(
                     f.eq(t.interval, filterParams.activityTimeframe),
                     filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
-                    filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                    // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
                     f.gte(t.lastUpdatedTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
                   )),
                 limit: filterParams.paging.pageSize,
@@ -160,12 +161,12 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   maxCollateralInTokens: true,
                   roi: true,
                   pnl: true,
-                }
+                },
               })
 
               const page = await Promise.all(metrictList.map(async (routeMetric) => {
                 const [matchingRuleList, increaseList, decreaseList] = await Promise.all([
-                  client.db.query.puppetMatchingRule.findMany({
+                  queryDb.query.puppetMatchingRule.findMany({
                     where: (t, f) => f.and(
                       f.eq(t.matchingKey, routeMetric.matchingKey),
                     ),
@@ -177,7 +178,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                     },
                     limit: 10
                   }),
-                  client.db.query.positionIncrease.findMany({
+                  queryDb.query.positionIncrease.findMany({
                     where: (t, f) => f.and(
                       f.eq(t.matchingKey, routeMetric.matchingKey),
                       f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
@@ -195,7 +196,7 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                     //   feeCollected: true
                     // }
                   }),
-                  client.db.query.positionDecrease.findMany({
+                  queryDb.query.positionDecrease.findMany({
                     where: (t, f) => f.and(
                       f.eq(t.matchingKey, routeMetric.matchingKey),
                       f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
@@ -262,9 +263,9 @@ export const $Leaderboard = (config: ILeaderboard) => component((
                   // )
                   return $TraderMatchingRouteEditor({
                     matchRuleList,
-                    walletClientQuery,
                     collateralToken: pos.collateralToken,
                     traderMatchingRuleList: pos.matchingRuleList,
+                    accountInfo: params.accountInfo,
                     trader: pos.account
                   })({
                     changeMatchRuleList: changeMatchRuleListTether(),

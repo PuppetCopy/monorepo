@@ -1,5 +1,6 @@
 import { colorAlpha, pallete } from '@aelea/ui-components-theme'
 import {
+  CandlestickSeries,
   type ChartOptions, CrosshairMode, type DeepPartial, LineStyle
 } from 'lightweight-charts'
 import { $Chart, type IChartConfig } from "./$Chart.js"
@@ -58,7 +59,7 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
     ...config.chartConfig
   }
 
-  return $Chart({ ...config, chartConfig, getSeriesApi: api => api.addCandlestickSeries(config.seriesConfig) })
+  return $Chart({ ...config, chartConfig, getSeriesApi: api => api.addSeries(CandlestickSeries, config.seriesConfig) })
 }
 
 

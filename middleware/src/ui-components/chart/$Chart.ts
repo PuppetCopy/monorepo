@@ -12,16 +12,18 @@ import {
   type IPriceLine,
   type ISeriesApi,
   LineStyle, type LogicalRange, type MouseEventParams, type PriceLineOptions,
-  type Range,
   type SeriesDataItemTypeMap, type SeriesMarker,
   type SeriesPartialOptionsMap,
-  type Time
+  type Time,
+  createSeriesMarkers, // Import createSeriesMarkers
+  type IRange
 } from 'lightweight-charts'
 import { filterNull } from "../../utils/index.js"
 
-export interface IMarker extends SeriesMarker<Time> {
 
-}
+export type ISeriesTime = Time
+export type IMarker = SeriesMarker<ISeriesTime> & {}
+export type ISeriesType = SeriesDataItemTypeMap<ISeriesTime>
 
 export interface ICHartAxisChange {
   coords: Stream<Coordinate | null>
@@ -29,14 +31,13 @@ export interface ICHartAxisChange {
   price: Stream<number | null>
 }
 
-
-export interface IChartConfig<TSeriesType extends keyof SeriesDataItemTypeMap> {
+export interface IChartConfig<TType extends keyof ISeriesType> {
   chartConfig?: DeepPartial<ChartOptions>
   containerOp?: Op<INode, INode>
-  seriesConfig?: SeriesPartialOptionsMap[TSeriesType]
+  seriesConfig?: SeriesPartialOptionsMap[TType]
 
-  data: Array<SeriesDataItemTypeMap[TSeriesType]>
-  appendData?: Stream<SeriesDataItemTypeMap[TSeriesType]>
+  data: Array<ISeriesType[TType]>
+  appendData?: Stream<ISeriesType[TType]>
   priceLines?: Stream<Partial<PriceLineOptions> & Pick<PriceLineOptions, "price"> | null>[]
   markers?: Stream<IMarker[]>
 
@@ -45,11 +46,11 @@ export interface IChartConfig<TSeriesType extends keyof SeriesDataItemTypeMap> {
   yAxisState?: ICHartAxisChange
 }
 
-export interface IChart<TSeriesType extends keyof SeriesDataItemTypeMap> extends IChartConfig<TSeriesType> {
-  getSeriesApi: (api: IChartApi) => ISeriesApi<TSeriesType>,
+export interface IChart<TSeriesType extends keyof ISeriesType> extends IChartConfig<TSeriesType> {
+  getSeriesApi: (api: IChartApi) => ISeriesApi<TSeriesType>, // Note: The implementation of this function where it's passed *into* $Chart needs to be updated to use chart.addSeries(Type, options)
 }
 
-export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: IChart<TSeriesType>) => component((
+export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSeriesType>) => component((
   // [sampleCrosshairMove, crosshairMove]: Behavior<MouseEventParams, MouseEventParams>,
   [containerDimension, sampleContainerDimension]: Behavior<INode, ResizeObserverEntry[]>
 ) => {
@@ -118,6 +119,7 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
 
 
   const seriesApi: ISeriesApi<TSeriesType> = config.getSeriesApi(chartApi)
+  const seriesMarkers = createSeriesMarkers(seriesApi) // Create the marker primitive
 
   seriesApi.setData(config.data)
 
@@ -147,8 +149,8 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
   )
 
   const visibleTimeRangeChange = multicast(
-    fromCallback<Range<Time> | null>(cb => {
-      timeScale.subscribeVisibleTimeRangeChange(cb)
+    fromCallback<IRange<Time> | null>(cb => {
+      timeScale.subscribeVisibleTimeRangeChange(x => cb(x))
       return disposeWith(handler => timeScale.unsubscribeVisibleTimeRangeChange(handler), cb)
     })
   )
@@ -156,11 +158,8 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
 
 
   const ignoreAll = filter(() => false)
-
   const priceLineConfigList = config.priceLines || []
-
-
-
+  const markers = config.markers || empty()
 
   return [
     $wrapNativeElement(containerEl)(
@@ -218,8 +217,8 @@ export const $Chart = <TSeriesType extends keyof SeriesDataItemTypeMap>(config: 
           }, null as IPriceLine | null, lineStreamConfig)
         }),
         tap(next => {
-          seriesApi.setMarkers(next)
-        }, config.markers || empty()),
+          seriesMarkers.setMarkers(next)
+        }, markers),
         combineArray(([containerDimension]) => {
           const { width, height } = containerDimension.contentRect
           chartApi.resize(width, height)
