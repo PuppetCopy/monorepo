@@ -1,22 +1,18 @@
 {
-  "npm.packageManager": "bun",
   "[solidity]": {
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
   },
+  "npm.packageManager": "bun",
+  "npm.scriptRunner": "bun",
   "files.exclude": {
     "**/.git": true,
-    "**/.DS_Store": true,
-    // "**/dist": true
+    "**/.DS_Store": true
   },
   "search.exclude": {
     "**/node_modules": true,
-    "**/*.code-search": true,
     "**/bun.lock": true,
     "**/dist": true
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
-  "editor.insertSpaces": true,
-  "typescript.format.enable": true,
-  "npm.scriptRunner": "bun"
 }
