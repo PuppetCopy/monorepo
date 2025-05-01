@@ -9,7 +9,7 @@ import * as viem from 'viem'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from "../../common/$common.js"
 import { pallete, colorAlpha } from "@aelea/ui-components-theme"
 import { getMarketIndexToken, getPositionPnlUsd } from "@puppet/middleware/gmx"
-import { $seperator2 } from "../../pages/common"
+import { $seperator2 } from "../../pages/common.js"
 
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) => $column(style({ textAlign: 'right' }))(

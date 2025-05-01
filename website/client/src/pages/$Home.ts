@@ -8,7 +8,7 @@ import { Stream } from "@most/types"
 import { filterNull, switchMap } from "@puppet/middleware/utils"
 import { $Link, $anchor } from "@puppet/middleware/ui-components"
 import { $gmxLogo, $puppetLogo } from "../common/$icons.js"
-import { $heading1 } from "../common/$text"
+import { $heading1 } from "../common/$text.js"
 import { $labeledDivider } from "../common/elements/$common.js"
 import { $ButtonSecondary } from "../components/form/$Button.js"
 

@@ -12,7 +12,7 @@ import { $ButtonSecondary } from "../form/$Button.js"
 import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown.js"
 import { Stream } from "@most/types"
 import { IntervalTime } from "@puppet/middleware/const"
-import { localStore } from "../../const/localStore"
+import { localStore } from "../../const/localStore.js"
 
 
 export interface IDraftMatchRule {

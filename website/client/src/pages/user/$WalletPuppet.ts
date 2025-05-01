@@ -11,10 +11,10 @@ import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
 import { IDepositEditorChange } from "../../components/portfolio/$DepositEditor.js"
-import { $RouteDepositEditor } from "../../components/portfolio/$RouteDepositEditor"
-import { $seperator2 } from "../common"
+import { $RouteDepositEditor } from "../../components/portfolio/$RouteDepositEditor.js"
+import { $seperator2 } from "../common.js"
 import { IUserActivityPageParams } from "../type.js"
-import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 
 
 interface IWalletPuppet extends  IUserActivityPageParams {

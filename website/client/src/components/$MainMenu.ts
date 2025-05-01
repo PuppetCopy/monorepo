@@ -11,9 +11,9 @@ import { $gmxLogo, $puppetLogo } from "../common/$icons.js"
 import { $stackedCoins, $trophy } from "../common/elements/$icons.js"
 import { dark, light } from "../common/theme.js"
 import { IPageParams } from "../pages/type.js"
-import { $Popover } from "./$Popover"
+import { $Popover } from "./$Popover.js"
 import { $Picker } from "./$ThemePicker.js"
-import { $walletProfileDisplay } from "./$WalletProfileDisplay"
+import { $walletProfileDisplay } from "./$WalletProfileDisplay.js"
 import { $ButtonSecondary } from "./form/$Button.js"
 
 

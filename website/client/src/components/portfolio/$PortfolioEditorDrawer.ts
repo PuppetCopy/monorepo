@@ -19,7 +19,7 @@ import { $ButtonCircular } from "../form/$Button.js"
 import { $SubmitBar } from "../form/$SubmitBar.js"
 import { DepositEditorAction, IDepositEditorChange } from "./$DepositEditor.js"
 import { $RouteDepositEditor } from "./$RouteDepositEditor.js"
-import { IMatchRuleEditorChange } from "./$TraderMatchRouteEditor"
+import { IMatchRuleEditorChange } from "./$TraderMatchRouteEditor.js"
 import { CONTRACT } from "@puppet/middleware/const"
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {

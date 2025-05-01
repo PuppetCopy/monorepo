@@ -9,11 +9,11 @@ import { getTokenDescription } from "@puppet/middleware/gmx"
 import { EIP6963ProviderDetail } from "mipd"
 import { $infoLabel, $labeledhintAdjustment } from "@puppet/middleware/ui-components"
 import * as viem from "viem"
-import { $Popover } from "../$Popover"
+import { $Popover } from "../$Popover.js"
 import { $route } from "../../common/$common.js"
 import puppetReader from "../../logic/puppetReader.js"
 import { IComponentPageParams } from "../../pages/type.js"
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button"
+import { $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 import { $DepositEditor, DepositEditorAction, IDepositEditorChange } from "./$DepositEditor.js"
 
 

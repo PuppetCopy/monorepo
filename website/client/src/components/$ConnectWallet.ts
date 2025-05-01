@@ -7,13 +7,13 @@ import { switchMap } from "@puppet/middleware/utils"
 import * as wallet from "@puppet/middleware/wallet"
 import { EIP6963ProviderDetail } from "mipd"
 import { http, type Chain, type HttpTransport } from 'viem'
-import { IWalletPageParams } from "../pages/type"
+import { IWalletPageParams } from "../pages/type.js"
 import { $ButtonSecondary } from "./form/$Button.js"
 import { IButtonCore } from "./form/$ButtonCore.js"
 
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
-import { accountChange, walletConnectAppkit } from "../walletConnect"
+import { accountChange, walletConnectAppkit } from "../walletConnect.js"
 import { GetAccountReturnType } from "@wagmi/core"
 
 

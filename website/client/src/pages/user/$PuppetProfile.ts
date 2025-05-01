@@ -6,7 +6,7 @@ import * as viem from "viem"
 import { $card, $card2 } from "../../common/elements/$common.js"
 import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline.js"
 import { IUserActivityPageParams } from "../type.js"
-import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor"
+import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor.js"
 
 
 export interface IPuppetProfile extends IUserActivityPageParams {

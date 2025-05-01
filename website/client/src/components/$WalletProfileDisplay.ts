@@ -4,9 +4,9 @@ import { $column, $row, layoutSheet } from "@aelea/ui-components"
 import { startWith, switchLatest, tap } from "@most/core"
 import { ignoreAll, switchMap } from "@puppet/middleware/utils"
 import { getAccount } from "@wagmi/core"
-import { $seperator2 } from "../pages/common"
-import { IWalletPageParams } from "../pages/type"
-import { accountChange, wagmiConfig, walletConnectAppkit } from "../walletConnect"
+import { $seperator2 } from "../pages/common.js"
+import { IWalletPageParams } from "../pages/type.js"
+import { accountChange, wagmiConfig, walletConnectAppkit } from "../walletConnect.js"
 import { $disconnectedWalletDisplay, $profileDisplay } from "./$AccountProfile.js"
 
 export interface IWalletDisplay extends IWalletPageParams {
