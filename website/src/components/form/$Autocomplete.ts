@@ -1,4 +1,4 @@
-// import { Behavior, combineState, isEmpty, O, Op } from "aelea/core"
+// import { IBehavior, combineState, isEmpty, O, Op } from "aelea/core"
 // import { $element, $Node, $text, attr, component, eventElementTarget, IBranch, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from "aelea/core"
 // import { $column, $icon, $row, Input, layoutSheet, observer } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
@@ -18,8 +18,8 @@
 //   selector: ISelect<T>
 //   dropWidth?: number,
 //   $selection: I$Node
-//   $container?: NodeComposeFn<$Node>
-//   $option?: NodeComposeFn<$Node>
+//   $container?: INodeCompose<I$Node>
+//   $option?: INodeCompose<I$Node>
 
 //   openMenuOp?: Op<MouseEvent, MouseEvent>
 // }
@@ -41,7 +41,7 @@
 //   })
 // )
 
-// export const $defaultDropMultiSelectContainer = $row(spacing.defaultTiny, style({ borderBottom: `1px solid ${pallete.message}` }))
+// export const $defaultDropMultiSelectContainer = $row(spacing.tiny, style({ borderBottom: `1px solid ${pallete.message}` }))
 // export const $defaultDropMultiSelectOption = $row(spacing.small,
 //   style({
 //     overflow: 'hidden', border: `1px solid ${pallete.message}`,
@@ -60,18 +60,18 @@
 
 //   $label?: I$Node
 
-//   $container?: NodeComposeFn<$Node>
-//   $fieldcontainer?: NodeComposeFn<$Node>
-//   $dropdownContainer?: NodeComposeFn<$Node>
+//   $container?: INodeCompose<I$Node>
+//   $fieldcontainer?: INodeCompose<I$Node>
+//   $dropdownContainer?: INodeCompose<I$Node>
 
-//   $chip?: NodeComposeFn<$Node>
-//   $input?: NodeComposeFn<$Node<HTMLInputElement>>
+//   $chip?: INodeCompose<I$Node>
+//   $input?: INodeCompose<$Node<HTMLInputElement>>
 //   $$chip: Op<T, $Node>
 //   openMenu?: Stream<any>
 // }
 
 // export const $DropMultiSelect = <T>({
-//   $container = $column(spacing.defaultTiny, style({ display: 'flex', position: 'relative' })),
+//   $container = $column(spacing.tiny, style({ display: 'flex', position: 'relative' })),
 //   $fieldcontainer = $defaultDropMultiSelectContainer,
 //   $$chip,
 //   $label = empty(),
@@ -86,15 +86,15 @@
 //   getId,
 // }: IMultiselectDrop<T>
 // ) => component((
-//   [pick, pickTether]: Behavior<T, T>,
-//   [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
+//   [pick, pickTether]: IBehavior<T, T>,
+//   [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
 
-//   [interaction, interactionTether]: Behavior<IBranch, true>,
-//   [blur, blurTether]: Behavior<IBranch, false>,
+//   [interaction, interactionTether]: IBehavior<IBranch, true>,
+//   [blur, blurTether]: IBehavior<IBranch, false>,
 
-//   [focusField, focusFieldTether]: Behavior<IBranch, FocusEvent>,
-//   [inputSearch, inputSearchTether]: Behavior<IBranch<HTMLInputElement>, string>,
-//   [clickOptionRemove, clickOptionRemoveTether]: Behavior<INode, T>,
+//   [focusField, focusFieldTether]: IBehavior<IBranch, FocusEvent>,
+//   [inputSearch, inputSearchTether]: IBehavior<IBranch<HTMLInputElement>, string>,
+//   [clickOptionRemove, clickOptionRemoveTether]: IBehavior<INode, T>,
 // ) => {
 
 //   const openTrigger = mergeArray([focusField, constant(true, openMenu)])
@@ -126,7 +126,7 @@
 //   return [
 //     $container(
 
-//       $row(layoutSheet.flex, spacing.defaultTiny, style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
+//       $row(layoutSheet.flex, spacing.tiny, style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
 //         isEmpty($label)
 //           ? empty()
 //           : $row(style({ alignSelf: 'flex-end', cursor: 'pointer' }))(

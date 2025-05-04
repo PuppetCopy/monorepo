@@ -1,4 +1,4 @@
-// import { Behavior, component } from "aelea/core"
+// import { IBehavior, component } from "aelea/core"
 // import { pallete } from 'aelea/ui-components-theme'
 // import { LineStyle, MouseEventParams, SeriesMarker, SeriesType } from 'lightweight-charts'
 // import { $Chart, IChart } from './$Chart'
@@ -7,8 +7,8 @@
 // }
 
 // export const $Line = (config: ILine) => component((
-//   [sampleData, data]: Behavior<any, any>,
-//   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>
+//   [sampleData, data]: IBehavior<any, any>,
+//   [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>
 // ) => {
 
 //   return [

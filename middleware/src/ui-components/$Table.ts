@@ -9,12 +9,12 @@ import {
   type IBehavior,
   type INode,
   type IOps,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   style
 } from 'aelea/core'
-import { $column, $icon, $row, isDesktopScreen, layoutSheet, screenUtils, spacing } from 'aelea/ui-components'
+import { $column, $icon, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
 
@@ -30,15 +30,15 @@ export interface TableOption<T> {
   $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
 
-  $rowCallback?: Op<T, NodeComposeFn<$Node>>
+  $rowCallback?: Op<T, INodeCompose<I$Node>>
 
-  $container?: NodeComposeFn<$Node>
-  $rowContainer?: NodeComposeFn<$Node>
-  $headerContainer?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
+  $rowContainer?: INodeCompose<I$Node>
+  $headerContainer?: INodeCompose<I$Node>
 
-  $cell?: NodeComposeFn<$Node>
-  $bodyCell?: NodeComposeFn<$Node>
-  $headerCell?: NodeComposeFn<$Node>
+  $cell?: INodeCompose<I$Node>
+  $bodyCell?: INodeCompose<I$Node>
+  $headerCell?: INodeCompose<I$Node>
 
   sortBy?: ISortBy
   $sortArrowDown?: I$Node
@@ -99,8 +99,8 @@ export const $Table = <T>({
 }: TableOption<T>) =>
   component(
     (
-      [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage, IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: Behavior<INode, string>
+      [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage, IQuantumScrollPage>,
+      [sortByChange, sortByChangeTether]: IBehavior<INode, string>
     ) => {
       const gridTemplateColumns = style({
         display: 'grid',
@@ -110,9 +110,9 @@ export const $Table = <T>({
       const $header = $headerContainer(gridTemplateColumns)(
         ...columns.map((col) => {
           if (col.sortBy) {
-            const behavior = sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
+            const IBehavior = sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
 
-            return $headerCell(col.columnOp || O(), behavior)(
+            return $headerCell(col.columnOp || O(), IBehavior)(
               style({ cursor: 'pointer' }, col.$head),
               sortBy
                 ? $column(

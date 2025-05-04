@@ -1,4 +1,4 @@
-// import { Behavior } from "aelea/core"
+// import { IBehavior } from "aelea/core"
 // import { $node, $text, component, style } from "aelea/core"
 // import * as router from 'aelea/router'
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
@@ -25,11 +25,11 @@
 // }
 
 // export const $PublicUserPage = (config: IUserActivityPageParams) => component((
-//   [changeRoute, changeRouteTether]: Behavior<string, string>,
-//   [selectProfileMode, selectProfileModeTether]: Behavior<IRouteOption, IRouteOption>,
-//   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-//   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
-//   [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
+//   [changeRoute, changeRouteTether]: IBehavior<string, string>,
+//   [selectProfileMode, selectProfileModeTether]: IBehavior<IRouteOption, IRouteOption>,
+//   [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
+//   [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+//   [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
 
 // ) => {
 
@@ -94,14 +94,14 @@
 
 //               return $column(spacing.big)(
 //                 $column(spacing.default, style({ minHeight: '90px' }))(
-//                   $node(style({ display: 'flex', flexDirection: screenUtils.isDesktopScreen ? 'row' : 'column', gap: screenUtils.isDesktopScreen ? '56px' : '26px', zIndex: 10, placeContent: 'center', alignItems: 'center', padding: '0 8px' }))(
+//                   $node(style({ display: 'flex', flexDirection: isDesktopScreen ? 'row' : 'column', gap: isDesktopScreen ? '56px' : '26px', zIndex: 10, placeContent: 'center', alignItems: 'center', padding: '0 8px' }))(
 //                     $row(
 //                       $TraderDisplay({
 //                         route: config.route,
 //                         trader: account,
 //                         puppetList: [],
 //                         labelSize: '22px',
-//                         profileSize: screenUtils.isDesktopScreen ? 80 : 80
+//                         profileSize: isDesktopScreen ? 80 : 80
 //                       })({
 //                         click: changeRouteTether()
 //                       }),
@@ -173,7 +173,7 @@
 //         //       return $column(spacing.big)(
 //         //         $PuppetSummary({ ...config, account, puppet: address, positionListQuery })({}),
 
-//         //         $column(spacing.defaultTiny)(
+//         //         $column(spacing.tiny)(
 //         //           $PuppetProfile({
 //         //             ...config,
 //         //             openPositionListQuery,

@@ -1,11 +1,11 @@
 import { constant, empty, map, skip, skipRepeats, startWith, switchLatest, zip } from '@most/core'
-import type { Behavior } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
 import {
   component,
   eventElementTarget,
   type I$Node,
   type INode,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   style,
   styleInline
@@ -16,8 +16,8 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 export interface TooltipConfig {
   $anchor: I$Node
   $content: I$Node
-  $container?: NodeComposeFn<$Node>
-  $dropContainer?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
+  $dropContainer?: INodeCompose<I$Node>
 
   offset?: number
 }
@@ -46,9 +46,9 @@ export const $Tooltip = ({
 }: TooltipConfig) =>
   component(
     (
-      [hover, hoverTether]: Behavior<INode, boolean>,
-      [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
-      [contentIntersection, contentIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>
+      [hover, hoverTether]: IBehavior<INode, boolean>,
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
+      [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
       const isTouchDevice = 'ontouchstart' in window
 

@@ -17,7 +17,7 @@ import {
   type I$Node,
   type IBehavior,
   isStream,
-  type NodeComposeFn,
+  type INodeCompose,
   style
 } from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
@@ -37,11 +37,11 @@ interface IApproveSpend extends ISpend {
   disabled?: Stream<boolean>
   txQuery: Stream<walletLink.IWriteContractReturn>
   $content?: I$Node
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
 }
 
 export const $ApproveSpend = (config: IApproveSpend) =>
-  component(([approveTokenSpend, approveTokenSpendTether]: Behavior<PointerEvent, walletLink.IWriteContractReturn>) => {
+  component(([approveTokenSpend, approveTokenSpendTether]: IBehavior<PointerEvent, walletLink.IWriteContractReturn>) => {
     const {
       $content,
       amount,

@@ -18,7 +18,7 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   style,
@@ -38,7 +38,7 @@ export interface ISubmitBar {
   walletClientQuery: Stream<Promise<walletLink.IWalletClient | null>>
   txQuery: Stream<walletLink.IWriteContractReturn>
   alert?: Stream<string | null>
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   $submitContent: I$Node
   $barContent?: I$Node
   disabled?: Stream<boolean>
@@ -49,9 +49,9 @@ export interface ISubmitBar {
 export const $SubmitBar = (config: ISubmitBar) =>
   component(
     (
-      [click, clickTether]: Behavior<PointerEvent, walletLink.IWalletClient>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-      [approveTokenSpend, approveTokenSpendTether]: Behavior<walletLink.IWriteContractReturn>
+      [click, clickTether]: IBehavior<PointerEvent, walletLink.IWalletClient>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
+      [approveTokenSpend, approveTokenSpendTether]: IBehavior<walletLink.IWriteContractReturn>
     ) => {
       const {
         disabled = now(false),
@@ -170,7 +170,7 @@ interface IButtonCircular extends Control {
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>
-  component(([click, clickTether]: Behavior<INode, PointerEvent>) => {
+  component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {
     const ops = O(
       clickTether(nodeEvent('pointerup')),
       styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),

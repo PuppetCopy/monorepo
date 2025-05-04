@@ -1,4 +1,4 @@
-// import { Behavior, replayLatest } from "aelea/core"
+// import { IBehavior, replayLatest } from "aelea/core"
 // import { $node, $text, component, nodeEvent, style } from "aelea/core"
 // import * as router from "aelea/router"
 // import { $column, $icon, $row, layoutSheet, screenUtils } from "aelea/ui-components"
@@ -28,11 +28,11 @@
 // }
 
 // export const $PuppetTraderTradeRoute = (config: IPuppetTraderTradeRoute) => component((
-//   [modifySubscriber, modifySubscriberTether]: Behavior<IChangeSubscription>,
-//   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, bigint>,
-//   [changeRoute, changeRouteTether]: Behavior<string, string>,
-//   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
-//   [toggleHistoryPanel, toggleHistoryPanelTether]: Behavior<any, boolean>,
+//   [modifySubscriber, modifySubscriberTether]: IBehavior<IChangeSubscription>,
+//   [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, bigint>,
+//   [changeRoute, changeRouteTether]: IBehavior<string, string>,
+//   [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
+//   [toggleHistoryPanel, toggleHistoryPanelTether]: IBehavior<any, boolean>,
 
 // ) => {
 
@@ -89,7 +89,7 @@
 //           dismiss: modifySubscriber,
 //           $target: switchMap(expiry => {
 //             return $ButtonSecondary({
-//               $content: $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+//               $content: $row(spacing.tiny, style({ alignItems: 'center' }))(
 //                 $puppets(summary.puppets),
 //                 $icon({ $content: $puppetLogo, width: '26px', svgOps: style({ backgroundColor: pallete.background, borderRadius: '50%', padding: '4px', border: `1px solid ${pallete.message}`, marginRight: '-18px' }), viewBox: '0 0 32 32' }),
 //               ),
@@ -102,7 +102,7 @@
 
 //         $node(style({ flex: 1 }))(),
 
-//         screenUtils.isDesktopScreen
+//         isDesktopScreen
 //           ? $row(spacing.big, style({ alignItems: 'flex-end' }))(
 //             style({ flexDirection: 'column' })(
 //               $infoLabeledValue(
@@ -125,7 +125,7 @@
 //           )
 //           : empty(),
 
-//         screenUtils.isDesktopScreen
+//         isDesktopScreen
 //           ? $ProfilePerformanceGraph({
 //             puppet: config.puppetTradeRoute.puppet,
 //             $container: $column(style({ width: '300px', padding: 0, height: '75px', position: 'relative', margin: '-16px 0' })),
@@ -147,7 +147,7 @@
 //         return $Table({
 //           dataSource,
 //           columns: [
-//             ...screenUtils.isDesktopScreen ? [positionTimeColumn] : [],
+//             ...isDesktopScreen ? [positionTimeColumn] : [],
 //             entryColumn,
 //             settledSizeColumn(puppetTradeRoute.puppet),
 //             pnlColumn(puppetTradeRoute.puppet),

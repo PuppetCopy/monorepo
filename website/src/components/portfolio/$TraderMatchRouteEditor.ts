@@ -4,7 +4,7 @@ import type { IMatchRule } from '@puppet/middleware/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
 import { switchMap, unixTimestampNow } from '@puppet/middleware/utils'
 import type { GetAccountReturnType } from '@wagmi/core'
-import { $text, combineState, component, type I$Node, type IBehavior, type NodeComposeFn, style } from 'aelea/core'
+import { $text, combineState, component, type I$Node, type IBehavior, type INodeCompose, style } from 'aelea/core'
 import { $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -35,7 +35,7 @@ interface ITraderMatchingRouteEditor extends IWalletPageParams {
   }[]
   collateralToken: viem.Address
   matchRuleList: Stream<IMatchRuleEditorChange[]>
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
@@ -43,10 +43,10 @@ export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style
 export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =>
   component(
     (
-      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, IMatchRule | undefined>,
+      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchRule | undefined>,
 
-      [discardDraft, discardDraftTether]: Behavior<IDraftMatchRule>,
-      [saveDraft, saveDraftTether]: Behavior<IDraftMatchRule>
+      [discardDraft, discardDraftTether]: IBehavior<IDraftMatchRule>,
+      [saveDraft, saveDraftTether]: IBehavior<IDraftMatchRule>
     ) => {
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
@@ -72,7 +72,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           dismiss: mergeArray([saveDraft, discardDraft]),
           $target: $ButtonSecondary({
             $content: $responsiveFlex(
-              style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' })
+              style({ alignItems: 'center', gap: isDesktopScreen ? '12px' : '4px' })
             )(
               $row(style({ alignItems: 'center' }))($tokenTryLabeled(collateralToken)),
               $seperator2,

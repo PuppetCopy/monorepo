@@ -50,14 +50,14 @@ interface IDepositEditor extends IComponentPageParams {
 export const $DepositEditor = (config: IDepositEditor) =>
   component(
     (
-      [approveTokenSpend, approveTokenSpendTether]: Behavior<walletLink.IWriteContractReturn>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+      [approveTokenSpend, approveTokenSpendTether]: IBehavior<walletLink.IWriteContractReturn>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [clickMax, clickMaxTether]: Behavior<any>,
-      [changeAmount, changeAmountTether]: Behavior<string, bigint>,
-      [changeDepositMode, changeDepositModeTether]: Behavior<DepositEditorAction>,
+      [clickMax, clickMaxTether]: IBehavior<any>,
+      [changeAmount, changeAmountTether]: IBehavior<string, bigint>,
+      [changeDepositMode, changeDepositModeTether]: IBehavior<DepositEditorAction>,
 
-      [clickSave, clickSaveTether]: Behavior<PointerEvent>
+      [clickSave, clickSaveTether]: IBehavior<PointerEvent>
     ) => {
       const { walletClientQuery, change, depositBalanceQuery } = config
 

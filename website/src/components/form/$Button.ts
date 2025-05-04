@@ -103,8 +103,8 @@ export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
 export const $Submit = (config: IButtonPrimaryCtx) =>
   component(
     (
-      [click, clickTether]: Behavior<PointerEvent, PointerEvent>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>
+      [click, clickTether]: IBehavior<PointerEvent, PointerEvent>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
@@ -165,7 +165,7 @@ interface IButtonCircular extends Control {
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>
-  component(([click, clickTether]: Behavior<INode, PointerEvent>) => {
+  component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {
     const ops = O(
       clickTether(nodeEvent('pointerup')),
       styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),

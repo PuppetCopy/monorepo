@@ -1,6 +1,6 @@
 // import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
 import { awaitPromises, empty, now } from '@most/core'
-import { $node, $text, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import { $node, $text, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -13,9 +13,9 @@ export interface IAccountPreview {
 }
 
 export interface IProfilePreview extends IAccountPreview {
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   showAddress?: boolean
-  $labelContainer?: NodeComposeFn<$Node>
+  $labelContainer?: INodeCompose<I$Node>
 }
 
 export const $profileDisplay = (config: IProfilePreview) => {

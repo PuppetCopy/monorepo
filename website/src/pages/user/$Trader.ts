@@ -1,4 +1,4 @@
-// import { Behavior, combineState, replayLatest } from "aelea/core"
+// import { IBehavior, combineState, replayLatest } from "aelea/core"
 // import { $text, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { map, startWith } from "@most/core"
@@ -22,12 +22,12 @@
 // }
 
 // export const $TraderPage = (config: ITraderPage) => component((
-//   [changeRoute, changeRouteTether]: Behavior<any, string>,
-//   [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
-//   [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
-//   [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-//   [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
-//   [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
+//   [changeRoute, changeRouteTether]: IBehavior<any, string>,
+//   [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
+//   [sortByChange, sortByChangeTether]: IBehavior<ISortBy>,
+//   [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
+//   [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+//   [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
 // ) => {
 
 //   const {
@@ -47,7 +47,7 @@
 //   return [
 //     $column(spacing.big)(
 //       $card(spacing.big, style({ flex: 1, width: '100%' }))(
-//         $card2(style({ padding: 0, height: screenUtils.isDesktopScreen ? '200px' : '200px', position: 'relative', margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
+//         $card2(style({ padding: 0, height: isDesktopScreen ? '200px' : '200px', position: 'relative', margin: isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px` }))(
 //           $ProfilePeformanceTimeline({ ...config })({
 //             selectMarketTokenList: selectMarketTokenListTether(),
 //             changeActivityTimeframe: changeActivityTimeframeTether(),
@@ -95,7 +95,7 @@
 //                       dataSource,
 //                       sortBy: params.sortBy,
 //                       columns: [
-//                         ...screenUtils.isDesktopScreen ? [timeColumn] : [],
+//                         ...isDesktopScreen ? [timeColumn] : [],
 //                         entryColumn,
 //                         puppetsColumn(changeRouteTether),
 //                         sizeColumn(),

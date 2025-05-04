@@ -35,7 +35,7 @@ import {
   type INode,
   type IOps,
   isEmpty,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   style,
@@ -53,8 +53,8 @@ export interface IDropdown<T> {
   selector: ISelect<T>
   dropWidth?: number
   $selection: I$Node
-  $container?: NodeComposeFn<$Node>
-  $option?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
+  $option?: INodeCompose<I$Node>
 
   openMenuOp?: Op<MouseEvent, MouseEvent>
 }
@@ -78,7 +78,7 @@ export const $defaultSelectContainer = $column(
 )
 
 export function $Dropdown<T>({
-  $container = $column(spacing.defaultTiny, style({ position: 'relative' })),
+  $container = $column(spacing.tiny, style({ position: 'relative' })),
   $selection,
   $option = $defaultOptionContainer,
   selector,
@@ -86,10 +86,10 @@ export function $Dropdown<T>({
 }: IDropdown<T>) {
   return component(
     (
-      [select, selectTether]: Behavior<T, T>,
-      [openMenu, openMenuTether]: Behavior<INode, any>,
-      [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
-      [contentIntersection, contentIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>
+      [select, selectTether]: IBehavior<T, T>,
+      [openMenu, openMenuTether]: IBehavior<INode, any>,
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
+      [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
       const openTrigger = constant(true, mergeArray([openMenu]))
       const windowClick = switchLatest(
@@ -172,7 +172,7 @@ export function $Dropdown<T>({
 }
 
 export const $defaultDropMultiSelectContainer = $row(
-  spacing.defaultTiny,
+  spacing.tiny,
   style({ borderBottom: `1px solid ${pallete.message}` })
 )
 export const $defaultDropMultiSelectOption = $row(
@@ -205,18 +205,18 @@ export interface IMultiselectDrop<T> extends Input<T[]> {
 
   $label?: I$Node
 
-  $container?: NodeComposeFn<$Node>
-  $fieldcontainer?: NodeComposeFn<$Node>
-  $dropdownContainer?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
+  $fieldcontainer?: INodeCompose<I$Node>
+  $dropdownContainer?: INodeCompose<I$Node>
 
-  $chip?: NodeComposeFn<$Node>
-  $input?: NodeComposeFn<$Node<HTMLInputElement>>
+  $chip?: INodeCompose<I$Node>
+  $input?: INodeCompose<$Node<HTMLInputElement>>
   $$chip: Op<T, $Node>
   openMenu?: Stream<any>
 }
 
 export const $DropMultiSelect = <T>({
-  $container = $column(spacing.defaultTiny, style({ display: 'flex', position: 'relative' })),
+  $container = $column(spacing.tiny, style({ display: 'flex', position: 'relative' })),
   $fieldcontainer = $defaultDropMultiSelectContainer,
   $$chip,
   $label = empty(),
@@ -232,15 +232,15 @@ export const $DropMultiSelect = <T>({
 }: IMultiselectDrop<T>) =>
   component(
     (
-      [pick, pickTether]: Behavior<T, T>,
-      [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
+      [pick, pickTether]: IBehavior<T, T>,
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
 
-      [interaction, interactionTether]: Behavior<IBranch, true>,
-      [blur, blurTether]: Behavior<IBranch, false>,
+      [interaction, interactionTether]: IBehavior<IBranch, true>,
+      [blur, blurTether]: IBehavior<IBranch, false>,
 
-      [focusField, focusFieldTether]: Behavior<IBranch, FocusEvent>,
-      [inputSearch, inputSearchTether]: Behavior<IBranch<HTMLInputElement>, string>,
-      [clickOptionRemove, clickOptionRemoveTether]: Behavior<INode, T>
+      [focusField, focusFieldTether]: IBehavior<IBranch, FocusEvent>,
+      [inputSearch, inputSearchTether]: IBehavior<IBranch<HTMLInputElement>, string>,
+      [clickOptionRemove, clickOptionRemoveTether]: IBehavior<INode, T>
     ) => {
       const openTrigger = mergeArray([focusField, constant(true, openMenu)])
       const closeTrigger = constant(
@@ -282,7 +282,7 @@ export const $DropMultiSelect = <T>({
         $container(
           $row(
             layoutSheet.flex,
-            spacing.defaultTiny,
+            spacing.tiny,
             style({ display: 'flex', flexDirection: 'row', position: 'relative' })
           )(
             isEmpty($label) ? empty() : $row(style({ alignSelf: 'flex-end', cursor: 'pointer' }))($label),

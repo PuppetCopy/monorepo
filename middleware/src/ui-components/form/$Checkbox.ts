@@ -26,9 +26,9 @@ export interface Checkbox extends Input<boolean> {
 export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
   component(
     (
-      [focusStyle, interactionTether]: Behavior<IBranch, true>,
-      [dismissstyle, dismissTether]: Behavior<IBranch, false>,
-      [check, checkTether]: Behavior<IBranch<HTMLInputElement>, boolean>
+      [focusStyle, interactionTether]: IBehavior<IBranch, true>,
+      [dismissstyle, dismissTether]: IBehavior<IBranch, false>,
+      [check, checkTether]: IBehavior<IBranch<HTMLInputElement>, boolean>
     ) => {
       const $overlay = $node(
         layoutSheet.stretch,

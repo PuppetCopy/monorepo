@@ -6,7 +6,7 @@ import {
   type IBehavior,
   type IBranch,
   type INode,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   styleBehavior
@@ -26,7 +26,7 @@ export const dismissOp = O(
 )
 
 export interface IButtonCore extends Control {
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   $content: I$Node
 }
 
@@ -35,9 +35,9 @@ export const $defaultButtonCore = $element('button')(designSheet.btn)
 export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disabled }: IButtonCore) =>
   component(
     (
-      [focusStyle, interactionTether]: Behavior<IBranch, true>,
-      [dismissstyle, dismissTether]: Behavior<IBranch, false>,
-      [click, clickTether]: Behavior<INode, PointerEvent>
+      [focusStyle, interactionTether]: IBehavior<IBranch, true>,
+      [dismissstyle, dismissTether]: IBehavior<IBranch, false>,
+      [click, clickTether]: IBehavior<INode, PointerEvent>
     ) => {
       const $button = $container(
         clickTether(nodeEvent('pointerup')),

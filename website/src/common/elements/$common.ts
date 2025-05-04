@@ -19,7 +19,7 @@ export const $card = $column(
   style({
     borderRadius: '20px',
     boxShadow: boxShadow,
-    padding: screenUtils.isDesktopScreen ? '36px' : '12px',
+    padding: isDesktopScreen ? '36px' : '12px',
     backgroundColor: pallete.background
   })
 )
@@ -35,7 +35,7 @@ export const $card2 = $column(
 )
 
 export const $seperator = $text(style({ color: pallete.foreground, pointerEvents: 'none' }))('|')
-export const $responsiveFlex = screenUtils.isDesktopScreen ? $row : $column
+export const $responsiveFlex = isDesktopScreen ? $row : $column
 
 function convertMsToGoogleCalendarDate(ms: Date) {
   const date = new Date(ms)

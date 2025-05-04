@@ -1,4 +1,4 @@
-// import { Behavior, combineState, O } from "aelea/core"
+// import { IBehavior, combineState, O } from "aelea/core"
 // import { $element, $node, $Node, $text, attr, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline } from "aelea/core"
 // import { Route } from "aelea/router"
 // import { $column, $icon, $row, layoutSheet, screenUtils } from "aelea/ui-components"
@@ -101,7 +101,7 @@
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>
 //   resetAdjustments: Stream<any>
-//   $container: NodeComposeFn<$Node>
+//   $container: INodeCompose<I$Node>
 // }
 
 // const BOX_SPACING = 24
@@ -109,24 +109,24 @@
 // const MIN_LEVERAGE_NORMAL = formatFixed(4, GMX.MIN_LEVERAGE_FACTOR) / LIMIT_LEVERAGE_NORMAL
 
 // export const $PositionEditor = (config: IPositionEditorConfig) => component((
-//   [clickSettingsPopover, clickSettingsPopoverTether]: Behavior<any, boolean>,
-//   [switchIsLong, switchIsLongTether]: Behavior<boolean>,
+//   [clickSettingsPopover, clickSettingsPopoverTether]: IBehavior<any, boolean>,
+//   [switchIsLong, switchIsLongTether]: IBehavior<boolean>,
 
-//   [switchFocusMode, switchFocusModeTether]: Behavior<any, ITradeFocusMode>,
+//   [switchFocusMode, switchFocusModeTether]: IBehavior<any, ITradeFocusMode>,
 
-//   [inputPrimaryAmount, inputPrimaryAmountTether]: Behavior<INode, bigint>,
-//   [inputSizeDeltaUsd, inputSizeDeltaTetherUsd]: Behavior<INode, bigint>,
+//   [inputPrimaryAmount, inputPrimaryAmountTether]: IBehavior<INode, bigint>,
+//   [inputSizeDeltaUsd, inputSizeDeltaTetherUsd]: IBehavior<INode, bigint>,
 
-//   [changePrimaryToken, changePrimaryTokenTether]: Behavior<viem.Address, viem.Address>,
-//   [changeMarketToken, changeMarketTokenTether]: Behavior<any, viem.Address>,
-//   [clickChooseMarketPopover, clickChooseMarketPopoverTether]: Behavior<any>,
-//   // [changeIsUsdCollateralToken, changeIsUsdCollateralTokenTether]: Behavior<boolean>,
+//   [changePrimaryToken, changePrimaryTokenTether]: IBehavior<viem.Address, viem.Address>,
+//   [changeMarketToken, changeMarketTokenTether]: IBehavior<any, viem.Address>,
+//   [clickChooseMarketPopover, clickChooseMarketPopoverTether]: IBehavior<any>,
+//   // [changeIsUsdCollateralToken, changeIsUsdCollateralTokenTether]: IBehavior<boolean>,
 
-//   [slideLeverage, slideLeverageTether]: Behavior<number>,
-//   [changeSlippage, changeSlippageTether]: Behavior<string, bigint>,
-//   [changeExecutionFeeBuffer, changeExecutionFeeBufferTether]: Behavior<string, bigint>,
+//   [slideLeverage, slideLeverageTether]: IBehavior<number>,
+//   [changeSlippage, changeSlippageTether]: IBehavior<string, bigint>,
+//   [changeExecutionFeeBuffer, changeExecutionFeeBufferTether]: IBehavior<string, bigint>,
 
-//   [clickPrimary, clickPrimaryTether]: Behavior<any>,
+//   [clickPrimary, clickPrimaryTether]: IBehavior<any>,
 // ) => {
 
 //   const { walletClientQuery, providerClientQuery } = config
@@ -281,7 +281,7 @@
 //             false,
 //           ],
 //           $$option: map(isLong => {
-//             return $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+//             return $row(spacing.tiny, style({ alignItems: 'center' }))(
 //               $icon({ $content: isLong ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
 //               $text(isLong ? 'Long' : 'Short'),
 //             )
@@ -306,7 +306,7 @@
 
 //         $ButtonSecondary({
 //           disabled: now(true),
-//           $content: $row(spacing.defaultTiny, style({ alignItems: 'center', cursor: 'pointer' }))(
+//           $content: $row(spacing.tiny, style({ alignItems: 'center', cursor: 'pointer' }))(
 //             $icon({ $content: $gmxLogo, width: '18px', viewBox: '0 0 32 32' }),
 //             $text('GMX V2'),
 //             $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
@@ -391,7 +391,7 @@
 //               ),
 //             ),
 //             $hintAdjustment({
-//               label: screenUtils.isDesktopScreen ? `Collateral` : undefined,
+//               label: isDesktopScreen ? `Collateral` : undefined,
 //               change: map(params => {
 //                 if (params.mirrorPosition === null) return null
 //                 const collateralDeltaUsd = params.collateralDeltaAmount * params.primaryPrice
@@ -416,7 +416,7 @@
 //                   : getTokenDescription(resolveAddress(config.chain, token))
 
 //                 return $ButtonSecondary({
-//                   $content: $row(spacing.defaultTiny, style({ alignItems: 'center', cursor: 'pointer' }))(
+//                   $content: $row(spacing.tiny, style({ alignItems: 'center', cursor: 'pointer' }))(
 //                     $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '34px', svgOps: style({ paddingRight: '4px' }), viewBox: '0 0 32 32' }),
 //                     $heading2(tokenDesc.symbol),
 //                     $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
@@ -425,7 +425,7 @@
 //                 })({})
 //               }, primaryToken)),
 //               // $selection: switchLatest(map(option => {
-//               //   return $row(spacing.defaultTiny, style({ alignItems: 'center', cursor: 'pointer' }))(
+//               //   return $row(spacing.tiny, style({ alignItems: 'center', cursor: 'pointer' }))(
 //               //     $icon({
 //               //       $content: $tokenIconMap[option.symbol],
 //               //       svgOps: styleBehavior(map(isIncrease => ({ fill: isIncrease ? pallete.message : pallete.indeterminate }), config.tradeConfig.isIncrease)),
@@ -683,7 +683,7 @@
 
 //                 return $ButtonSecondary({
 //                   $container: $defaultMiniButtonSecondary(style({ borderColor: colorAlpha(pallete.foreground, .2) })),
-//                   $content: $row(spacing.defaultTiny, style({ alignItems: 'center', cursor: 'pointer' }))(
+//                   $content: $row(spacing.tiny, style({ alignItems: 'center', cursor: 'pointer' }))(
 //                     $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '34px', svgOps: style({ paddingRight: '4px' }), viewBox: '0 0 32 32' }),
 //                     $heading2(tokenDesc.symbol),
 //                     $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
@@ -749,21 +749,21 @@
 //             $row(spacing.small, style({ alignItems: 'center' }))(
 //               $infoTooltipLabel(
 //                 `will be deposited & borrowed to maintain a Position`,
-//                 screenUtils.isDesktopScreen ? 'Collateral in' : undefined
+//                 isDesktopScreen ? 'Collateral in' : undefined
 //               ),
 
 //               switchMap(params => {
 //                 const token = params.isUsdCollateralToken ? params.market.shortToken : params.market.longToken
 //                 const tokenDesc = getTokenDescription(token)
 
-//                 return $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+//                 return $row(spacing.tiny, style({ alignItems: 'center' }))(
 //                   $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '14px', viewBox: '0 0 32 32' }),
 //                   $text(tokenDesc.symbol)
 //                 )
 //                 // return $Dropdown({
 //                 //   $container: $row(style({ position: 'relative', alignSelf: 'center' })),
 //                 //   $selection: $row(style({ alignItems: 'center', cursor: 'pointer' }))(
-//                 //     $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+//                 //     $row(spacing.tiny, style({ alignItems: 'center' }))(
 //                 //       $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '14px', viewBox: '0 0 32 32' }),
 //                 //       $text(tokenDesc.symbol)
 //                 //     ),
@@ -781,7 +781,7 @@
 //                 //       return $row(style({ placeContent: 'space-between', flex: 1 }))(
 //                 //         $tokenLabelFromSummary(desc),
 
-//                 //         // $column(spacing.defaultTiny, style({ alignItems: 'flex-end', placeContent: 'center' }))(
+//                 //         // $column(spacing.tiny, style({ alignItems: 'flex-end', placeContent: 'center' }))(
 //                 //         //   $text(map(amountUsd => readableFixedUSD30(amountUsd), liquidity)),
 //                 //         //   $row(style({ whiteSpace: 'pre' }))(
 //                 //         //     $text(map(info => readablePercentage(info.rate), poolInfo)),
@@ -803,7 +803,7 @@
 //             ),
 
 //             $hintAdjustment({
-//               label: screenUtils.isDesktopScreen ? `Size` : undefined,
+//               label: isDesktopScreen ? `Size` : undefined,
 //               change: map((params) => {
 //                 if (params.mirrorPosition === null) return null
 //                 const totalSize = params.sizeDeltaUsd + params.mirrorPosition.sizeInUsd

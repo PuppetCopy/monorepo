@@ -13,7 +13,7 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import { isPositionOpen, isPositionSettled } from '@puppet/middleware/core'
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, type IMarker } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, MOTION_NO_WOBBLE, motion, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, motion, style } from 'aelea/core'
 import { $column, $NumberTicker, $row, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams, Time } from 'lightweight-charts'
@@ -28,9 +28,9 @@ interface IProfilePeformanceTimeline extends IUserActivityPageParams {}
 export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =>
   component(
     (
-      [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>
+      [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
       const {
         activityTimeframe,
@@ -121,7 +121,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                           const newLocal = parseReadableNumber(newLocal2)
                           return newLocal
                         },
-                        motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
+                        motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
                       ),
                       incrementColor: pallete.positive,
                       decrementColor: pallete.negative
@@ -148,7 +148,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
 
               if (positionCount === 0) {
                 return $row(
-                  spacing.defaultTiny,
+                  spacing.tiny,
                   style({ textAlign: 'center', placeSelf: 'center' })
                 )($text(style({ color: pallete.foreground }))('No activity found'))
               }

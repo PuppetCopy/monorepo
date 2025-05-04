@@ -17,9 +17,9 @@
 // import { IComponentPageParams } from '../pages/type'
 
 // interface IMarketList extends IComponentPageParams {
-//   $container?: NodeComposeFn<$Node>
+//   $container?: INodeCompose<I$Node>
 //   chain: viem.Chain
-//   $rowCallback?: Op<{ market: IMarket, price: IMarketPrice }, NodeComposeFn<$Node>>
+//   $rowCallback?: Op<{ market: IMarket, price: IMarketPrice }, INodeCompose<I$Node>>
 // }
 
 // export const $MarketInfoList = (config: IMarketList) => component((

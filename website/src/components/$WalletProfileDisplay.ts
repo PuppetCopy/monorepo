@@ -1,7 +1,7 @@
 import { startWith, switchLatest, tap } from '@most/core'
 import { ignoreAll, switchMap } from '@puppet/middleware/utils'
 import { getAccount } from '@wagmi/core'
-import { $text, behavior, nodeEvent, style } from 'aelea/core'
+import { $text, IBehavior, nodeEvent, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import type { IWalletPageParams } from '../pages/type.js'
@@ -14,7 +14,7 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
   const accountStatus = getAccount(wagmiConfig)
   const account = accountStatus.connector === undefined ? startWith(accountStatus, accountChange) : accountChange
 
-  const [click, clickTether] = behavior()
+  const [click, clickTether] = IBehavior()
 
   return switchLatest(
     switchMap(async (accountInfo) => {

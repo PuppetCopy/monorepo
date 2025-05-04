@@ -1,5 +1,5 @@
 import type * as walletLink from '@puppet/middleware/wallet'
-import type { Behavior } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
 import { component, style } from 'aelea/core'
 import { $column, layoutSheet } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -11,8 +11,8 @@ interface IAdminPageParams extends IComponentPageParams {}
 export const $Admin = (config: IAdminPageParams) =>
   component(
     (
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-      [requestAdvanceEpoch, requestAdvanceEpochTether]: Behavior<walletLink.IWalletClient, any>
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
+      [requestAdvanceEpoch, requestAdvanceEpochTether]: IBehavior<walletLink.IWalletClient, any>
     ) => {
       const { walletClientQuery, providerClientQuery } = config
 
@@ -59,7 +59,7 @@ export const $Admin = (config: IAdminPageParams) =>
   )
 
 // component((
-//   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+//   [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 // ) => {
 
 //   return [

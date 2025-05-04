@@ -10,7 +10,7 @@ import {
   type I$Node,
   type IBehavior,
   type IBranch,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   style,
   styleBehavior,
@@ -23,7 +23,7 @@ export interface ISliderParams extends Input<number> {
   step?: number
 
   $thumb?: I$Node
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   disabled?: Stream<boolean>
   min?: Stream<number>
   max?: Stream<number>
@@ -69,8 +69,8 @@ export const $Slider = ({
 }: ISliderParams) =>
   component(
     (
-      [changeSliderDimension, changeSliderDimensionTether]: Behavior<IBranch<HTMLInputElement>, ResizeObserverEntry>,
-      [thumbePositionDelta, thumbePositionDeltaTether]: Behavior<IBranch<HTMLInputElement>, number>
+      [changeSliderDimension, changeSliderDimensionTether]: IBehavior<IBranch<HTMLInputElement>, ResizeObserverEntry>,
+      [thumbePositionDelta, thumbePositionDeltaTether]: IBehavior<IBranch<HTMLInputElement>, number>
     ) => {
       const $rangeWrapper = $row(
         style({ height: '2px', pointerEvents: 'none', background: pallete.background, position: 'relative' })

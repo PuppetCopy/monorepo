@@ -1,4 +1,4 @@
-// import { Behavior, combineArray } from "aelea/core"
+// import { IBehavior, combineArray } from "aelea/core"
 // import { $Node, INode, NodeComposeFn, component, style } from "aelea/core"
 // import { $column, observer } from "aelea/ui-components"
 // import { map, multicast, skipRepeatsWith, switchLatest } from "@most/core"
@@ -17,7 +17,7 @@
 // import { IGmxProcessState } from "../../data/process/process.js"
 
 // interface ITradePnlPreview {
-//   $container: NodeComposeFn<$Node>
+//   $container: INodeCompose<I$Node>
 //   updateList: (IPositionIncrease | IPositionDecrease)[]
 //   chartConfig?: DeepPartial<ChartOptions>
 //   pixelsPerBar?: number
@@ -38,8 +38,8 @@
 // }
 
 // export const $TradePnlHistory = (config: ITradePnlPreview) => component((
-//   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
-//   [containerDimension, sampleContainerDimension]: Behavior<INode, ResizeObserverEntry[]>
+//   [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>,
+//   [containerDimension, sampleContainerDimension]: IBehavior<INode, ResizeObserverEntry[]>
 // ) => {
 
 //   const pixelsPerBar = config.pixelsPerBar || 5

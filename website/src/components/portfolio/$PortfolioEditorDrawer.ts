@@ -5,7 +5,7 @@ import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@pupp
 import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
-import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
@@ -35,11 +35,11 @@ interface IPortfolioRoute {
 export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
   component(
     (
-      [requestChangeSubscription, requestChangeSubscriptionTether]: Behavior<walletLink.IWalletClient, any>,
-      [clickClose, clickCloseTether]: Behavior<any>,
-      [clickRemoveSubsc, clickRemoveSubscTether]: Behavior<any, IMatchRuleEditorChange>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
+      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<walletLink.IWalletClient, any>,
+      [clickClose, clickCloseTether]: IBehavior<any>,
+      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchRuleEditorChange>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
       const { matchRuleList, providerClientQuery, walletClientQuery, depositTokenList } = config
 
@@ -114,7 +114,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   style({
                     overflow: 'auto',
                     maxHeight: '35vh',
-                    padding: `0 ${screenUtils.isDesktopScreen ? '24px' : '12px'}`
+                    padding: `0 ${isDesktopScreen ? '24px' : '12px'}`
                   })
                 )(
                   ...portfolioRouteList.map((route) => {
@@ -142,21 +142,21 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 ? {
                                     fill: pallete.negative,
                                     icon: $xCross,
-                                    label: screenUtils.isDesktopScreen ? 'Remove' : '-'
+                                    label: isDesktopScreen ? 'Remove' : '-'
                                   }
                                 : {
                                     fill: pallete.message,
                                     icon: $target,
-                                    label: screenUtils.isDesktopScreen ? 'Edit' : '~'
+                                    label: isDesktopScreen ? 'Edit' : '~'
                                   }
                               : {
                                   fill: pallete.positive,
                                   icon: $check,
-                                  label: screenUtils.isDesktopScreen ? 'Add' : '+'
+                                  label: isDesktopScreen ? 'Add' : '+'
                                 }
 
                             return $row(
-                              screenUtils.isDesktopScreen ? spacing.big : spacing.default,
+                              isDesktopScreen ? spacing.big : spacing.default,
                               style({ alignItems: 'center', padding: '14px 0' })
                             )(
                               O(
@@ -169,7 +169,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                     backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
                                     marginLeft: '-42px',
                                     borderRadius: '6px',
-                                    padding: screenUtils.isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
+                                    padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
                                     color: iconColorParams.fill
                                   })
                                 )(iconColorParams.label)
@@ -208,7 +208,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   $node(),
                   $SubmitBar({
                     walletClientQuery,
-                    $submitContent: $text(screenUtils.isDesktopScreen ? 'Save Changes' : 'Save'),
+                    $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
                     txQuery: requestChangeSubscription
                     // alert: validationError
                   })({

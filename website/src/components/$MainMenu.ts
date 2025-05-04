@@ -47,9 +47,9 @@ interface MainMenu extends IPageParams {
 export const $MainMenu = (config: MainMenu) =>
   component(
     (
-      [routeChange, routeChangeTether]: Behavior<string, string>,
-      [clickPopoverClaim, clickPopoverClaimTether]: Behavior<any, any>,
-      [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>
+      [routeChange, routeChangeTether]: IBehavior<string, string>,
+      [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
+      [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>
     ) => {
       const { route, showAccount } = config
 
@@ -69,7 +69,7 @@ export const $MainMenu = (config: MainMenu) =>
       const $extraMenuPopover = $Popover({
         open: constant(
           $column(spacing.big)(
-            // ...screenUtils.isMobileScreen ? $menuItemList : [],
+            // ...isMobileScreen ? $menuItemList : [],
             // $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
             //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://docs.blueberry.club/' }))(
             //     $icon({ $content: $gitbook, width: '22px', viewBox: `0 0 32 32` })
@@ -226,9 +226,9 @@ export const $MainMenu = (config: MainMenu) =>
 export const $MainMenuMobile = (config: MainMenu) =>
   component(
     (
-      [routeChange, routeChangeTether]: Behavior<string, string>,
-      [clickPopoverClaim, clickPopoverClaimTether]: Behavior<any, any>,
-      [walletChange, walletChangeTether]: Behavior<any, any>
+      [routeChange, routeChangeTether]: IBehavior<string, string>,
+      [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
+      [walletChange, walletChangeTether]: IBehavior<any, any>
     ) => {
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
@@ -277,7 +277,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
               click: routeChangeTether()
             }),
 
-            // ...screenUtils.isMobileScreen ? $menuItemList : [],
+            // ...isMobileScreen ? $menuItemList : [],
             $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
               $anchor(
                 layoutSheet.displayFlex,
@@ -446,9 +446,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
 const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
   return component(
     (
-      [click, clickTether]: Behavior<string, string>,
-      [active, containsTether]: Behavior<boolean, boolean>,
-      [focus, focusTether]: Behavior<boolean, boolean>
+      [click, clickTether]: IBehavior<string, string>,
+      [active, containsTether]: IBehavior<boolean, boolean>,
+      [focus, focusTether]: IBehavior<boolean, boolean>
     ) => {
       const $anchorEl = $anchor(
         style({

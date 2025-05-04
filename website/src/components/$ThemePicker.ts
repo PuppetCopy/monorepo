@@ -4,7 +4,7 @@ import { $icon, $row, layoutSheet } from 'aelea/ui-components'
 import { changeTheme, pallete, THEME_PALLETE_SELECTED_KEY, type Theme } from 'aelea/ui-components-theme'
 
 export const $Picker = (themes: Theme[]) =>
-  component(([changeThemeEffect, changeThemeEffectTether]: Behavior<any, any>) => {
+  component(([changeThemeEffect, changeThemeEffectTether]: IBehavior<any, any>) => {
     const current = JSON.parse(localStorage.getItem(THEME_PALLETE_SELECTED_KEY)!) as Theme
 
     const applyOps = O(

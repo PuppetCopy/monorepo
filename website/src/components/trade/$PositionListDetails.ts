@@ -1,4 +1,4 @@
-// import { Behavior, combineState } from "aelea/core"
+// import { IBehavior, combineState } from "aelea/core"
 // import { $Node, $text, NodeComposeFn, component, style, styleBehavior } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
@@ -19,17 +19,17 @@
 //   chain: viem.Chain
 //   positionListQuery: Stream<Promise<IMirrorPosition[]>>
 //   tradeState: StateStream<ITradeParams>
-//   $container: NodeComposeFn<$Node>
+//   $container: INodeCompose<I$Node>
 //   requestTrade: Stream<IRequestTrade>
 //   mirrorPosition: Stream<IMirrorPosition | null>
 // }
 // export const $PositionListDetails = (config: IPositionListDetails) => component((
-//   [switchPosition, switchPositionTether]: Behavior<any, IMirrorPosition>,
-//   [clickClose, clickCloseTeter]: Behavior<any, IMirrorPosition>,
+//   [switchPosition, switchPositionTether]: IBehavior<any, IMirrorPosition>,
+//   [clickClose, clickCloseTeter]: IBehavior<any, IMirrorPosition>,
 
-//   [changeMarket, changeMarketTether]: Behavior<IMarket>,
-//   [switchIsLong, switchIsLongTether]: Behavior<boolean>,
-//   [switchIsIncrease, switchIsIncreaseTether]: Behavior<boolean>,
+//   [changeMarket, changeMarketTether]: IBehavior<IMarket>,
+//   [switchIsLong, switchIsLongTether]: IBehavior<boolean>,
+//   [switchIsIncrease, switchIsIncreaseTether]: IBehavior<boolean>,
 // ) => {
 
 //   const { chain, positionListQuery, tradeState, $container, requestTrade, mirrorPosition } = config
@@ -49,7 +49,7 @@
 //               // }, combineState({ positionMarkPrice, cumulativeFee }))
 
 //               return $column(spacing.default)(
-//                 style({ marginRight: screenUtils.isDesktopScreen ? '-16px' : '' })($seperator2),
+//                 style({ marginRight: isDesktopScreen ? '-16px' : '' })($seperator2),
 
 //                 $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
 //                   $ButtonPrimary({

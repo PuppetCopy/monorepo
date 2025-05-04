@@ -5,7 +5,7 @@ import {
   component,
   type IBehavior,
   type IBranch,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   style,
@@ -17,16 +17,16 @@ import type { Optional } from '../../utils/index.js'
 import { dismissOp, interactionOp } from './common.js'
 
 export interface Field extends Optional<Input<string>, 'value'> {
-  $input?: NodeComposeFn<any, HTMLInputElement>
+  $input?: INodeCompose<any, HTMLInputElement>
 }
 
 export const $Field = ({ value = empty(), disabled, validation = never, $input = $element('input') }: Field) =>
   component(
     (
-      [focusStyle, interactionTether]: Behavior<IBranch, true>,
-      [dismissstyle, dismissTether]: Behavior<IBranch, false>,
-      [blur, blurTether]: Behavior<IBranch, FocusEvent>,
-      [change, changeTether]: Behavior<IBranch<HTMLInputElement>, string>
+      [focusStyle, interactionTether]: IBehavior<IBranch, true>,
+      [dismissstyle, dismissTether]: IBehavior<IBranch, false>,
+      [blur, blurTether]: IBehavior<IBranch, FocusEvent>,
+      [change, changeTether]: IBehavior<IBranch<HTMLInputElement>, string>
     ) => {
       const multicastValidation = O(validation, startWith(''), multicast)
 

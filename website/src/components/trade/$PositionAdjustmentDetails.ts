@@ -1,4 +1,4 @@
-// import { Behavior, combineState, replayLatest } from "aelea/core"
+// import { IBehavior, combineState, replayLatest } from "aelea/core"
 // import { $Node, $node, $text, NodeComposeFn, attr, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
@@ -38,18 +38,18 @@
 //   pricefeed: Stream<IPriceCandle[]>
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>
-//   $container: NodeComposeFn<$Node>
+//   $container: INodeCompose<I$Node>
 // }
 
 // export const $PositionAdjustmentDetails = (config: IPositionAdjustmentDetails) => component((
-//   [openEnableTradingPopover, openEnableTradingPopoverTether]: Behavior<any, any>,
-//   [dismissEnableTradingOverlay, dismissEnableTradingOverlayTether]: Behavior<any, false>,
+//   [openEnableTradingPopover, openEnableTradingPopoverTether]: IBehavior<any, any>,
+//   [dismissEnableTradingOverlay, dismissEnableTradingOverlayTether]: IBehavior<any, false>,
 
-//   [approveTrading, approveTradingTether]: Behavior<PointerEvent, true>,
-//   [requestTokenSpend, requestTokenSpendTether]: Behavior<walletLink.IWalletClient, IApproveSpendReturn>,
-//   [clickResetPosition, clickResetPositionTether]: Behavior<any, IMirrorPosition | null>,
-//   [clickProposeTrade, clickProposeTradeTether]: Behavior<walletLink.IWalletClient>,
-//   [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+//   [approveTrading, approveTradingTether]: IBehavior<PointerEvent, true>,
+//   [requestTokenSpend, requestTokenSpendTether]: IBehavior<walletLink.IWalletClient, IApproveSpendReturn>,
+//   [clickResetPosition, clickResetPositionTether]: IBehavior<any, IMirrorPosition | null>,
+//   [clickProposeTrade, clickProposeTradeTether]: IBehavior<walletLink.IWalletClient>,
+//   [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
 // ) => {
 

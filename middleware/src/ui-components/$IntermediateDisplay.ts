@@ -62,7 +62,7 @@ export const $IntermediatePromise = <T>({
             (data) => ({ status: IIntermediateStatus.DONE, data }),
             fromPromise(prom)
           )
-          const loading: Stream<IIntermediateState<$Node>> = now({ status: IIntermediateStatus.LOADING, data: $loader })
+          const loading: Stream<IIntermediateState<I$Node>> = now({ status: IIntermediateStatus.LOADING, data: $loader })
           const settledOrError = recoverWith(
             (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
             doneData

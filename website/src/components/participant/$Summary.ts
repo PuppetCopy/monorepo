@@ -36,8 +36,8 @@ export const $PuppetSummary = (config: IAccountSummary) =>
         $node(
           style({
             display: 'flex',
-            flexDirection: screenUtils.isDesktopScreen ? 'row' : 'column',
-            gap: screenUtils.isDesktopScreen ? '56px' : '26px',
+            flexDirection: isDesktopScreen ? 'row' : 'column',
+            gap: isDesktopScreen ? '56px' : '26px',
             zIndex: 10,
             placeContent: 'center',
             alignItems: 'center',
@@ -48,7 +48,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
             $profileDisplay({
               account,
               labelSize: '22px',
-              profileSize: screenUtils.isDesktopScreen ? 90 : 90
+              profileSize: isDesktopScreen ? 90 : 90
             })
           ),
           $row(spacing.big, style({ alignItems: 'flex-end' }))(
@@ -96,12 +96,12 @@ export const $PuppetSummary = (config: IAccountSummary) =>
     ]
   })
 
-export const $metricRow = $column(spacing.defaultTiny, style({ placeContent: 'center', alignItems: 'center' }))
+export const $metricRow = $column(spacing.tiny, style({ placeContent: 'center', alignItems: 'center' }))
 export const $metricLabel = $row(
   style({
     color: pallete.foreground,
     letterSpacing: '1px',
-    fontSize: screenUtils.isDesktopScreen ? '.85rem' : '.85rem'
+    fontSize: isDesktopScreen ? '.85rem' : '.85rem'
   })
 )
 export const $metricValue = $row(style({ fontWeight: 900, letterSpacing: '1px', fontSize: '1.85rem' }))

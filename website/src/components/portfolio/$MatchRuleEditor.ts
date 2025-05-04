@@ -33,12 +33,12 @@ export interface IDraftMatchRule {
 export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
   component(
     (
-      [inputEndDate, inputEndDateTether]: Behavior<any, bigint>,
-      [inputAllowance, inputAllowanceTether]: Behavior<any, bigint>,
-      [clickRemove, clickRemoveTether]: Behavior<any, IDraftMatchRule>,
-      [changeActivityThrottle, changeActivityThrottleTether]: Behavior<number, bigint>,
-      [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: Behavior<boolean>,
-      [saveMatchRule, saveMatchRuleTether]: Behavior<PointerEvent, IDraftMatchRule>
+      [inputEndDate, inputEndDateTether]: IBehavior<any, bigint>,
+      [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
+      [clickRemove, clickRemoveTether]: IBehavior<any, IDraftMatchRule>,
+      [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
+      [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
+      [saveMatchRule, saveMatchRuleTether]: IBehavior<PointerEvent, IDraftMatchRule>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
         localStore.ruleEditor,

@@ -3,8 +3,8 @@ import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import { getMarketIndexToken, getPositionPnlUsd, type IPricetick } from '@puppet/middleware/gmx'
 import { $Baseline, type IMarker } from '@puppet/middleware/ui-components'
 import { createTimeline, formatFixed, unixTimestampNow } from '@puppet/middleware/utils'
-import type { Behavior } from 'aelea/core'
-import { component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
+import { component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   type BaselineData,
@@ -151,8 +151,8 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
 
 type IPricetickWithIndexToken = IPricetick & { indexToken: viem.Address }
 
-export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $container: NodeComposeFn<$Node> }) =>
-  component(([crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>) => {
+export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $container: INodeCompose<I$Node> }) =>
+  component(([crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>) => {
     const timeline = getPositionListTimelinePerformance(config)
 
     // const openMarkerList = config.list.filter(isUpdateIncrease).map((pos): IMarker => {

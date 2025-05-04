@@ -78,26 +78,26 @@ interface IWalletPageParams extends IUserActivityPageParams {}
 export const $WalletPage = (config: IWalletPageParams) =>
   component(
     (
-      [changeRoute, changeRouteTether]: Behavior<string, string>,
-      [selectProfileMode, selectProfileModeTether]: Behavior<IWalletTab>,
+      [changeRoute, changeRouteTether]: IBehavior<string, string>,
+      [selectProfileMode, selectProfileModeTether]: IBehavior<IWalletTab>,
 
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, PUPPET.IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, PUPPET.IntervalTime>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
 
-      [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>,
+      [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>,
 
-      [requestTx, requestTxTether]: Behavior<walletLink.IWalletClient, any>,
-      [checkCashoutMode, checkCashoutModeTether]: Behavior<boolean>,
-      [changeScheduleFactor, changeScheduleFactorTether]: Behavior<number>,
-      [popoverInputAmount, popoverInputAmountTether]: Behavior<string, bigint>,
-      [popoverAddWallet, popoverAddWalletTether]: Behavior<any>,
-      [popoverWithdrawLocked, popoverWithdrawLockedTether]: Behavior<any>,
-      [popoverClickMaxDeposit, popoverClickMaxDepositTether]: Behavior<any>,
-      [popoverRequestWithdraw, popoverRequestWithdrawTether]: Behavior<walletLink.IWalletClient, any>,
-      [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: Behavior<any, bigint>
+      [requestTx, requestTxTether]: IBehavior<walletLink.IWalletClient, any>,
+      [checkCashoutMode, checkCashoutModeTether]: IBehavior<boolean>,
+      [changeScheduleFactor, changeScheduleFactorTether]: IBehavior<number>,
+      [popoverInputAmount, popoverInputAmountTether]: IBehavior<string, bigint>,
+      [popoverAddWallet, popoverAddWalletTether]: IBehavior<any>,
+      [popoverWithdrawLocked, popoverWithdrawLockedTether]: IBehavior<any>,
+      [popoverClickMaxDeposit, popoverClickMaxDepositTether]: IBehavior<any>,
+      [popoverRequestWithdraw, popoverRequestWithdrawTether]: IBehavior<walletLink.IWalletClient, any>,
+      [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: IBehavior<any, bigint>
     ) => {
       const {
         route,
@@ -374,7 +374,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
               // const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
               // const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
 
-              // return $column(spacing.defaultTiny)(
+              // return $column(spacing.tiny)(
               //   $TraderPage({ ...config, positionListQuery })({
               //     changeActivityTimeframe: changeActivityTimeframeTether(),
               //   })
@@ -990,11 +990,11 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
 // function $ContributionTooling(config: IPageParams) {
 //   return component((
-//     [inputDepositAmount, inputDepositAmountTether]: Behavior<string, bigint>,
-//     [submitContribute, submitContributeTether]: Behavior<walletLink.IWalletClient, any>,
+//     [inputDepositAmount, inputDepositAmountTether]: IBehavior<string, bigint>,
+//     [submitContribute, submitContributeTether]: IBehavior<walletLink.IWalletClient, any>,
 
-//     [inputBuybackAmount, inputBuybackAmountTether]: Behavior<string, bigint>,
-//     [submitBuyback, submitBuybackTether]: Behavior<walletLink.IWalletClient, any>
+//     [inputBuybackAmount, inputBuybackAmountTether]: IBehavior<string, bigint>,
+//     [submitBuyback, submitBuybackTether]: IBehavior<walletLink.IWalletClient, any>
 
 //   ) => {
 

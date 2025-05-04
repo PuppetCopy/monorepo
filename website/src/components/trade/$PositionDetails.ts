@@ -35,10 +35,10 @@
 //       return $Table({
 //         $headerContainer: I$Node(spacing.small, style({ display: 'grid', padding: `12px` })),
 //         $rowContainer: I$Node(spacing.small, style({ padding: `12px` })),
-//         // headerCellOp: style({ padding: screenUtils.isDesktopScreen ? '15px 15px' : '6px 4px' }),
-//         // cellOp: style({ padding: screenUtils.isDesktopScreen ? '4px 15px' : '6px 4px' }),
+//         // headerCellOp: style({ padding: isDesktopScreen ? '15px 15px' : '6px 4px' }),
+//         // cellOp: style({ padding: isDesktopScreen ? '4px 15px' : '6px 4px' }),
 //         dataSource: dataSource,
-//         // $container: $defaultTableContainer(screenUtils.isDesktopScreen ? style({ flex: '1 1 0', minHeight: '100px' }) : style({})),
+//         // $container: $defaultTableContainer(isDesktopScreen ? style({ flex: '1 1 0', minHeight: '100px' }) : style({})),
 //         scrollConfig: {
 //           insertAscending: true,
 //           $emptyMessage: style({ alignSelf: 'center', padding: '26px' })(
@@ -54,7 +54,7 @@
 //               const isKeeperReq = 'slippage' in req
 //               const timestamp = isKeeperReq ? unixTimestampNow() : Number(req.blockTimestamp)
 
-//               return $column(spacing.defaultTiny, style({ fontSize: '.85rem' }))(
+//               return $column(spacing.tiny, style({ fontSize: '.85rem' }))(
 //                 $text(getTimeSince(timestamp)),
 //                 $text(readableDate(timestamp)),
 //               )
@@ -105,7 +105,7 @@
 
 //             })
 //           },
-//           ...screenUtils.isDesktopScreen
+//           ...isDesktopScreen
 //             ? [
 //               {
 //                 $head: $text('PnL Realised'),

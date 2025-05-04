@@ -6,7 +6,7 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
-  type NodeComposeFn,
+  type INodeCompose,
   nodeEvent,
   O,
   style,
@@ -26,13 +26,13 @@ export const $defaultPopoverContentContainer = $column(
 )
 
 interface IPocus {
-  open: Stream<$Node>
+  open: Stream<I$Node>
   dismiss?: Stream<any>
 
   $target: I$Node
 
-  $contentContainer?: NodeComposeFn<$Node>
-  $container?: NodeComposeFn<$Node>
+  $contentContainer?: INodeCompose<I$Node>
+  $container?: INodeCompose<I$Node>
   spacing?: number
 }
 
@@ -46,9 +46,9 @@ export const $Popover = ({
 }: IPocus) =>
   component(
     (
-      [overlayClick, overlayClickTether]: Behavior<INode, false>,
-      [targetIntersection, targetIntersectionTether]: Behavior<INode, IntersectionObserverEntry[]>,
-      [popoverContentDimension, popoverContentDimensionTether]: Behavior<INode, ResizeObserverEntry[]>
+      [overlayClick, overlayClickTether]: IBehavior<INode, false>,
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
+      [popoverContentDimension, popoverContentDimensionTether]: IBehavior<INode, ResizeObserverEntry[]>
     ) => {
       const openMulticast = multicast(open)
 

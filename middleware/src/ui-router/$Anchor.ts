@@ -1,5 +1,5 @@
 import { constant, map, merge, startWith } from '@most/core'
-import type { Behavior } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
 import { type I$Branch, attr, component, type IBranch, type IOps, nodeEvent, O, style } from 'aelea/core'
 import type { Route } from './types.js'
 
@@ -11,7 +11,7 @@ export interface IAnchor {
 }
 
 export const $RouterAnchor = ({ url, route, $anchor, anchorOp = O() }: IAnchor) =>
-  component(([click, clickTether]: Behavior<IBranch, string>, [focus, focusTether]: Behavior<IBranch, boolean>) => {
+  component(([click, clickTether]: IBehavior<IBranch, string>, [focus, focusTether]: IBehavior<IBranch, boolean>) => {
     const trailingSlash = /\/$/
     const href = url.replace(trailingSlash, '')
 

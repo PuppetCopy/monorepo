@@ -81,16 +81,16 @@ interface IApp {
 export const $Main = ({ baseRoute = '' }: IApp) =>
   component(
     (
-      [routeChanges, changeRouteTether]: Behavior<any, string>,
-      [clickUpdateVersion, clickUpdateVersionTether]: Behavior<any, bigint>,
+      [routeChanges, changeRouteTether]: IBehavior<any, string>,
+      [clickUpdateVersion, clickUpdateVersionTether]: IBehavior<any, bigint>,
 
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
 
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
       walletConnectAppkit.getIsConnectedState()
 
@@ -281,7 +281,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                             const status = params.subgraphStatus.arbitrum
 
                             if (!status.ready || status.block === null) {
-                              return $column(spacing.defaultTiny)(
+                              return $column(spacing.tiny)(
                                 $text('Subgraph Status'),
                                 $alertNegativeContainer(
                                   $text('Indexing is currently experiencing issues, please try again later.')
@@ -294,7 +294,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                             )
                             const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
 
-                            return $column(spacing.defaultTiny)(
+                            return $column(spacing.tiny)(
                               $text('Subgraph Status'),
                               $column(
                                 $infoLabeledValue('Latest Sync', timeSince),

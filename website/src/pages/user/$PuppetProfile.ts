@@ -1,7 +1,7 @@
 import type { IntervalTime } from '@puppet/middleware/const'
-import type { Behavior } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
 import { component, style } from 'aelea/core'
-import { $column, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import type * as viem from 'viem'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { $ProfilePeformanceTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
@@ -15,11 +15,11 @@ export interface IPuppetProfile extends IUserActivityPageParams {
 export const $PuppetProfile = (config: IPuppetProfile) =>
   component(
     (
-      [changeRoute, changeRouteTether]: Behavior<string, string>,
-      [modifySubscriber, modifySubscriberTether]: Behavior<IMatchRuleEditorChange>,
+      [changeRoute, changeRouteTether]: IBehavior<string, string>,
+      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchRuleEditorChange>,
 
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>
     ) => {
       const {
         activityTimeframe,
@@ -39,9 +39,9 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
             $card2(
               style({
                 padding: 0,
-                height: screenUtils.isDesktopScreen ? '200px' : '200px',
+                height: isDesktopScreen ? '200px' : '200px',
                 position: 'relative',
-                margin: screenUtils.isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
+                margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
               })
             )(
               $ProfilePeformanceTimeline({ ...config })({

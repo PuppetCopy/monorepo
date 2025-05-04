@@ -32,7 +32,7 @@ import {
   readableUsd,
   streamOf
 } from '@puppet/middleware/utils'
-import type { Behavior, Tether } from 'aelea/core'
+import type { IBehavior, Tether } from 'aelea/core'
 import { $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from 'aelea/ui-components'
@@ -46,14 +46,14 @@ export const $midContainer = $column(
   style({
     margin: '0 auto',
     maxWidth: '980px',
-    padding: `0 ${screenUtils.isDesktopScreen ? '12px' : '0'} 26px`,
-    gap: screenUtils.isDesktopScreen ? '50px' : '50px',
+    padding: `0 ${isDesktopScreen ? '12px' : '0'} 26px`,
+    gap: isDesktopScreen ? '50px' : '50px',
     width: '100%'
   })
 )
 
 export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) => {
-  return $column(spacing.defaultTiny, style({ textAlign: 'right' }))(
+  return $column(spacing.tiny, style({ textAlign: 'right' }))(
     $text(readableUsd(size)),
     $divider,
     $leverage(size, collateral)
@@ -82,7 +82,7 @@ export const $entry = (pos: IPosition) => {
       ),
       $anchor: $route(indexDescription, false)
     })({}),
-    $column(spacing.defaultTiny)(
+    $column(spacing.tiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))(pos.isLong ? 'LONG' : 'SHORT')),
       $text(style({ fontSize: '.85rem' }))(readableUsd(pos.avgEntryPrice))
     )
@@ -104,7 +104,7 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
       })($tokenIcon(collateralTokenDescription))
     ),
     displayLabel
-      ? $column(spacing.defaultTiny)($text(style({ fontSize: '1rem' }))(`${collateralTokenDescription.symbol}`))
+      ? $column(spacing.tiny)($text(style({ fontSize: '1rem' }))(`${collateralTokenDescription.symbol}`))
       : empty()
   )
 }
@@ -351,7 +351,7 @@ interface ITraderDisplay {
   profileSize?: number
 }
 export const $TraderDisplay = (config: ITraderDisplay) =>
-  component(([click, clickTether]: Behavior<any, viem.Address>) => {
+  component(([click, clickTether]: IBehavior<any, viem.Address>) => {
     const { route, trader, puppetList } = config
 
     return [

@@ -2,7 +2,7 @@ import { constant, map } from '@most/core'
 import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet/middleware/const'
 import { $anchor, $infoTooltipLabel } from '@puppet/middleware/ui-components'
-import type { Behavior } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
 import { $text, component, nodeEvent, style, styleBehavior } from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -15,7 +15,7 @@ export const LAST_ACTIVITY_LABEL_MAP = {
 }
 
 export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
-  component(([changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>) => {
+  component(([changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>) => {
     const options = Object.entries(LAST_ACTIVITY_LABEL_MAP)
 
     return [

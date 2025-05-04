@@ -9,20 +9,20 @@ import {
   component,
   type I$Node,
   type IBehavior,
-  MOTION_NO_WOBBLE,
   motion,
-  type NodeComposeFn,
+  type INodeCompose,
   replayLatest,
-  style
+  style,
+  $node
 } from 'aelea/core'
-import { $column, $icon, $NumberTicker, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $icon, $NumberTicker, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from 'lightweight-charts'
 import { getPositionListTimelinePerformance, type IPerformanceTimeline } from './$ProfilePerformanceGraph.js'
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
   mp: IPosition
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   chartConfig?: DeepPartial<ChartOptions>
   latestPrice: Stream<bigint>
   animatePnl?: boolean
@@ -31,8 +31,8 @@ export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionL
 export const $TradeCardPreview = (config: ITradeCardPreview) =>
   component(
     (
-      [accountPreviewClick, accountPreviewClickTether]: Behavior<string, string>,
-      [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>
+      [accountPreviewClick, accountPreviewClickTether]: IBehavior<string, string>,
+      [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>
     ) => {
       const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
       const timeline = getPositionListTimelinePerformance({ ...config, list: [config.mp] })
@@ -84,12 +84,12 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
         $container(
           $column(
             $row(
-              screenUtils.isDesktopScreen ? spacing.big : spacing.default,
+              isDesktopScreen ? spacing.big : spacing.default,
               style({
                 placeContent: 'center',
                 alignItems: 'center',
                 fontFamily: 'Moderat',
-                padding: screenUtils.isDesktopScreen ? '25px 35px 0px' : '35px 35px 0px',
+                padding: isDesktopScreen ? '25px 35px 0px' : '35px 35px 0px',
                 zIndex: 11
               })
             )(
@@ -106,7 +106,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                     )
                   ),
                   $column(style({ gap: '6px' }))(
-                    $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+                    $row(spacing.tiny, style({ alignItems: 'center' }))(
                       // $icon({
                       //   $content: newLocal,
                       //   viewBox: '0 0 32 32',
@@ -141,7 +141,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
 
               // !isSettled
               //   ? $RiskLiquidator(mirroredPosition, latestPrice)({})
-              //   : $column(spacing.defaultTiny, style({ textAlign: 'center' }))(
+              //   : $column(spacing.tiny, style({ textAlign: 'center' }))(
               //     $text(readableUSD(mirroredPosition.size)),
               //     $seperator,
               //     style({ textAlign: 'center', fontSize: '.85rem' }, $text(style({ fontWeight: 'bold' }))(`${readableNumber(bnDiv(mirroredPosition.size, mirroredPosition.collateral))}x`)),
@@ -169,13 +169,13 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                 })
               )(
                 !config.mp
-                  ? $text(
+                  ? $node(
                       style({
                         fontSize: '.85rem',
                         color: pallete.foreground,
                         textAlign: 'center'
                       })
-                    )('No trades yet')
+                    )($text('No trades yet'))
                   : empty(),
                 $column(style({ alignItems: 'center' }))(
                   $NumberTicker({
@@ -190,7 +190,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                         const newLocal = parseReadableNumber(newLocal2)
                         return newLocal
                       },
-                      motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
+                      motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
                     ),
                     incrementColor: pallete.positive,
                     decrementColor: pallete.negative

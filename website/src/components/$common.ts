@@ -38,11 +38,11 @@ export const $CardTable = <T>(config: TableOption<T>) => {
       })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
     },
     $headerContainer: $defaultTableRowContainer(
-      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })
+      style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
     ),
     $rowContainer: $defaultTableRowContainer(
       stylePseudo(':last-child', { borderRadius: '0 0 18px 18px', marginBottom: '2px' }),
-      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })
+      style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
     ),
     // $bodyRowContainer: $defaultTableRowContainer(
     //   style({ margin: '0 1px' })

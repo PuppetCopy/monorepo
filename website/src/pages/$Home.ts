@@ -46,8 +46,8 @@ const installUserChoice: Stream<any> = fromCallback((cb) => {
 export const $Home = (config: ITreasury) =>
   component(
     (
-      [routeChanges, linkClickTether]: Behavior<any, any>,
-      [clickDownloadBtn, clickDownloadBtnTether]: Behavior<any, any>
+      [routeChanges, linkClickTether]: IBehavior<any, any>,
+      [clickDownloadBtn, clickDownloadBtnTether]: IBehavior<any, any>
     ) => {
       const $snapSection = $column(
         style({
@@ -125,7 +125,7 @@ export const $Home = (config: ITreasury) =>
                 $text(
                   style({
                     fontWeight: 'bold',
-                    fontSize: screenUtils.isDesktopScreen ? '2.5em' : '1.85rem',
+                    fontSize: isDesktopScreen ? '2.5em' : '1.85rem',
                     whiteSpace: 'pre-wrap',
                     letterSpacing: '2px'
                   })
@@ -143,7 +143,7 @@ export const $Home = (config: ITreasury) =>
               $node(),
 
               $column(spacing.default, style({ minWidth: '250px' }))(
-                screenUtils.isMobileScreen ? $text(style({ textAlign: 'center' }))('< Comming Soon >') : empty(),
+                isMobileScreen ? $text(style({ textAlign: 'center' }))('< Comming Soon >') : empty(),
 
                 $row(spacing.default, style({ alignItems: 'center' }))(
                   // $Link({
@@ -184,7 +184,7 @@ export const $Home = (config: ITreasury) =>
                   // })({
                   //   click: linkClickTether()
                   // }),
-                  // screenUtils.isDesktopScreen ? $text('< Comming Soon >') : empty(),
+                  // isDesktopScreen ? $text('< Comming Soon >') : empty(),
                   // $Link({
                   //   disabled: now(true),
                   //   $content: $anchor(
@@ -224,7 +224,7 @@ export const $Home = (config: ITreasury) =>
                   // }),
                 ),
 
-                screenUtils.isMobileScreen
+                isMobileScreen
                   ? switchMap((deferredPrompt) => {
                       return $column(spacing.default)(
                         filterNull(
@@ -351,7 +351,7 @@ export const $Home = (config: ITreasury) =>
           //       $snapSection(
 
           //         $column(style({ textAlign: 'center' }))(
-          //           $text(style({ fontWeight: 'bold', fontSize: screenUtils.isDesktopScreen ? '2.5em' : '1.85rem' }))('Matching top Traders with Investors'),
+          //           $text(style({ fontWeight: 'bold', fontSize: isDesktopScreen ? '2.5em' : '1.85rem' }))('Matching top Traders with Investors'),
           //         ),
           //         $text(style({ whiteSpace: 'pre-wrap', maxWidth: '878px' }))(` A Copy Trading Platform for Simplified and Reduced-Risk-Managed Portfolio
 

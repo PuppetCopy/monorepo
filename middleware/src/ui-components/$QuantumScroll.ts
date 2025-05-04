@@ -1,7 +1,7 @@
 import { constant, filter, join, map, mergeArray, now, recoverWith, until } from '@most/core'
 import type { Stream } from '@most/types'
-import type { Behavior } from 'aelea/core'
-import { type I$Branch, $custom, $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import type { IBehavior } from 'aelea/core'
+import { type I$Branch, $custom, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { $column, layoutSheet, observer } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $alertNegativeContainer } from './$common.js'
@@ -18,7 +18,7 @@ export type IScrollPagable = IQuantumScrollPage & {
 export interface QuantumScroll {
   insertAscending?: boolean
   dataSource: Stream<IScrollPagable>
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
   $loader?: I$Node
   $emptyMessage?: I$Node
 }
@@ -35,7 +35,7 @@ export const $QuantumScroll = ({
   insertAscending = false
   // scrollRequest = empty()
 }: QuantumScroll) =>
-  component(([nextScrollRequest, nextScrollRequestTether]: Behavior<any, IQuantumScrollPage>) => {
+  component(([nextScrollRequest, nextScrollRequestTether]: IBehavior<any, IQuantumScrollPage>) => {
     const $itemLoader = map((nextResponse) => {
       const itemCount = Array.isArray(nextResponse) ? nextResponse.length : nextResponse.$items.length
 

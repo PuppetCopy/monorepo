@@ -70,8 +70,8 @@ export interface IChart<TSeriesType extends keyof ISeriesType> extends IChartCon
 export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSeriesType>) =>
   component(
     (
-      // [sampleCrosshairMove, crosshairMove]: Behavior<MouseEventParams, MouseEventParams>,
-      [containerDimension, sampleContainerDimension]: Behavior<INode, ResizeObserverEntry[]>
+      // [sampleCrosshairMove, crosshairMove]: IBehavior<MouseEventParams, MouseEventParams>,
+      [containerDimension, sampleContainerDimension]: IBehavior<INode, ResizeObserverEntry[]>
     ) => {
       const containerEl = document.createElement('chart')
 

@@ -30,9 +30,9 @@ const $anchor = $element('a')(
 export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: ILink) =>
   component(
     (
-      [click, clickTether]: Behavior<string, string>,
-      [active, containsTether]: Behavior<boolean, boolean>,
-      [focus, focusTether]: Behavior<boolean, boolean>
+      [click, clickTether]: IBehavior<string, string>,
+      [active, containsTether]: IBehavior<boolean, boolean>,
+      [focus, focusTether]: IBehavior<boolean, boolean>
     ) => {
       const $anchorEl = $anchor(
         styleBehavior(

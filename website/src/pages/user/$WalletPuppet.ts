@@ -23,15 +23,15 @@ interface IWalletPuppet extends IUserActivityPageParams {
 export const $WalletPuppet = (config: IWalletPuppet) =>
   component(
     (
-      [changeRoute, changeRouteTether]: Behavior<string, string>,
-      [modifySubscriber, modifySubscriberTether]: Behavior<IMatchRuleEditorChange>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+      [changeRoute, changeRouteTether]: IBehavior<string, string>,
+      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchRuleEditorChange>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
       const { activityTimeframe, depositTokenList, selectedCollateralTokenList } = config
 
@@ -48,9 +48,9 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
           $card2(
             style({
               padding: 0,
-              height: screenUtils.isDesktopScreen ? '200px' : '200px',
+              height: isDesktopScreen ? '200px' : '200px',
               position: 'relative',
-              margin: screenUtils.isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
+              margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
             })
           )(
             $ProfilePeformanceTimeline({ ...config })({
@@ -94,9 +94,9 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                         // ...[].map(modSubsc => {
                         //   const iconColorParams = modSubsc.matchRule
                         //     ? modSubsc.expiry === 0n
-                        //       ? { fill: pallete.negative, icon: $xCross, label: screenUtils.isDesktopScreen ? 'Remove' : '-' } : { fill: pallete.message, icon: $target, label: screenUtils.isDesktopScreen ? 'Edit' : '~' }
-                        //     : { fill: pallete.positive, icon: $check, label: screenUtils.isDesktopScreen ? 'Add' : '+' }
-                        //   return $row(screenUtils.isDesktopScreen ? spacing.big : spacing.default, style({ alignItems: 'center', padding: `14px 0` }))(
+                        //       ? { fill: pallete.negative, icon: $xCross, label: isDesktopScreen ? 'Remove' : '-' } : { fill: pallete.message, icon: $target, label: isDesktopScreen ? 'Edit' : '~' }
+                        //     : { fill: pallete.positive, icon: $check, label: isDesktopScreen ? 'Add' : '+' }
+                        //   return $row(isDesktopScreen ? spacing.big : spacing.default, style({ alignItems: 'center', padding: `14px 0` }))(
                         //     // O(
                         //     //   style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
                         //     //   clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
@@ -104,7 +104,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                         //     //   $iconCircular($xCross)
                         //     // ),
                         //     $row(
-                        //       $text(style({ backgroundColor: colorAlpha(iconColorParams.fill, .1), marginLeft: `-42px`, borderRadius: '6px', padding: screenUtils.isDesktopScreen ? `6px 12px 6px 22px` : `6px 8px 6px 30px`, color: iconColorParams.fill, }))(iconColorParams.label),
+                        //       $text(style({ backgroundColor: colorAlpha(iconColorParams.fill, .1), marginLeft: `-42px`, borderRadius: '6px', padding: isDesktopScreen ? `6px 12px 6px 22px` : `6px 8px 6px 30px`, color: iconColorParams.fill, }))(iconColorParams.label),
                         //     ),
                         //     // switchMap(amount => {
                         //     //   return $text(tokenAmountLabel(routeType.indexToken, amount))

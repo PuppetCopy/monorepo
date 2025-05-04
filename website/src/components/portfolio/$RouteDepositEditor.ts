@@ -23,10 +23,10 @@ interface IRouteDepositEditor extends IComponentPageParams {
 export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
   component(
     (
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [popDepositEdtior, popDepositEdtiorTether]: Behavior<any>,
-      [saveChange, saveChangeTether]: Behavior<IDepositEditorChange>
+      [popDepositEdtior, popDepositEdtiorTether]: IBehavior<any>,
+      [saveChange, saveChangeTether]: IBehavior<IDepositEditorChange>
     ) => {
       const { providerClientQuery, depositTokenList, walletClientQuery, collateralToken } = config
 

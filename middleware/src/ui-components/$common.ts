@@ -24,7 +24,7 @@ import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './
 import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
 
 export const $anchor = $element('a')(
-  spacing.defaultTiny,
+  spacing.tiny,
   attr({ target: '_blank' }),
   stylePseudo(':hover', { color: `${pallete.foreground}!important`, fill: pallete.foreground }),
   style({
@@ -225,7 +225,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   const displayChange = skipRepeats(map((str) => !!str, startWith('', change)))
   const arrowColor = color ?? now(pallete.foreground)
 
-  return $row(spacing.defaultTiny, style({ lineHeight: 1, alignItems: 'center' }))(
+  return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(
       map((str) => (str ? { color: pallete.foreground } : {}), change),
       isStream($val) ? $val : $text($val)

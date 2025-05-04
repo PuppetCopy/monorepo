@@ -21,11 +21,11 @@ export const $rootContainer = $column(
     // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
     backgroundColor: pallete.horizon,
     fontSize: '1rem',
-    // fontSize: screenUtils.isDesktopScreen ? '1.15rem' : '1rem',
+    // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
     minHeight: '100vh',
     fontWeight: 400
     // flexDirection: 'row',
   }),
 
-  screenUtils.isMobileScreen ? style({ userSelect: 'none' }) : style({})
+  isMobileScreen ? style({ userSelect: 'none' }) : style({})
 )

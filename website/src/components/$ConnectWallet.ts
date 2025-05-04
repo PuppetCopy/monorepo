@@ -5,8 +5,8 @@ import * as wallet from '@puppet/middleware/wallet'
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
 import type { GetAccountReturnType } from '@wagmi/core'
-import type { Behavior, Op } from 'aelea/core'
-import { $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import type { IBehavior, Op } from 'aelea/core'
+import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Chain, type HttpTransport, http } from 'viem'
@@ -55,11 +55,11 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
 export interface IConnectWalletPopover extends IWalletPageParams {
   $$display: Op<GetAccountReturnType, $Node>
   primaryButtonConfig?: Partial<IButtonCore>
-  $container?: NodeComposeFn<$Node>
+  $container?: INodeCompose<I$Node>
 }
 
 export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
-  component(([changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>) => {
+  component(([changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>) => {
     const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
 
     return [
@@ -83,7 +83,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
   })
 
 export const $ConnectChoiceList = () =>
-  component(([changeWallet, changeWalletTether]: Behavior<any>) => {
+  component(([changeWallet, changeWalletTether]: IBehavior<any>) => {
     return [
       $ButtonSecondary({
         $content: $row(spacing.default, style({ alignItems: 'center' }))(

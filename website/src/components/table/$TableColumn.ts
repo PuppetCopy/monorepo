@@ -29,7 +29,7 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
 
 export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
   $head: $tableHeader('Size', 'Leverage'),
-  columnOp: O(spacing.defaultTiny, style({ flex: 1.2, placeContent: 'flex-end' })),
+  columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
   $bodyCallback: map((mp) => {
     const size = getParticiapntPortion(mp, mp.maxSizeInUsd, puppet)
     const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
@@ -96,7 +96,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
 
     return isSettled
       ? $pnlDisplay(pnl)
-      : $column(spacing.defaultTiny)(
+      : $column(spacing.tiny)(
           $row(style({ alignItems: 'center' }))(
             switchMap((color) => {
               return style({ backgroundColor: colorAlpha(color, 0.1), borderRadius: '50%' })(
@@ -121,7 +121,7 @@ export const timeColumn: TableColumn<IPosition> = {
   gridTemplate: 'minmax(110px, 120px)',
   sortBy: 'openTimestamp',
   $bodyCallback: map((pos) => {
-    return $column(spacing.defaultTiny)(
+    return $column(spacing.tiny)(
       $text(getTimeSince(pos.openTimestamp)),
       $row(spacing.small)($text(style({ fontSize: '.85rem' }))(readableDate(pos.openTimestamp)))
     )

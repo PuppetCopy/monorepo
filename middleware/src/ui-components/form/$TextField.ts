@@ -6,7 +6,7 @@ import {
   attrBehavior,
   component,
   type IBehavior,
-  type NodeComposeFn,
+  type INodeCompose,
   O,
   style,
   stylePseudo
@@ -56,7 +56,7 @@ export interface ITextField extends Field {
   hint?: string | Stream<string>
   placeholder?: string | Stream<string>
 
-  $container?: NodeComposeFn<any, HTMLLabelElement>
+  $container?: INodeCompose<any, HTMLLabelElement>
   labelWidth?: number
 }
 
@@ -67,7 +67,7 @@ export const $FieldLabeled = ({
   labelWidth,
   $container = $defaultTextFieldContainer
 }: ITextField) =>
-  component(([change, sampleValue]: Behavior<string, string>) => {
+  component(([change, sampleValue]: IBehavior<string, string>) => {
     const $field = overideInputStyle(
       $Field({})({
         change: sampleValue()

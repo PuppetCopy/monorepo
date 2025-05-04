@@ -1,4 +1,4 @@
-// import { Behavior, O, combineState } from "aelea/core"
+// import { IBehavior, O, combineState } from "aelea/core"
 // import { $element, $text, component, style } from "aelea/core"
 // import * as router from 'aelea/router'
 // import { $column, $row, layoutSheet } from "aelea/ui-components"
@@ -30,11 +30,11 @@
 // }
 
 // export const $TopOpen = (config: ITopOpen) => component((
-//   [routeChange, routeChangeTether]: Behavior<any, string>,
-//   [modifySubscriber, modifySubscriberTether]: Behavior<IPuppetSubscritpion>,
-//   [sortByChange, sortByChangeTether]: Behavior<ISortBy>,
-//   [scrollRequest, scrollRequestTether]: Behavior<ScrollRequest>,
-//   [routeTypeChange, routeTypeChangeTether]: Behavior<IAbstractPositionParams[]>,
+//   [routeChange, routeChangeTether]: IBehavior<any, string>,
+//   [modifySubscriber, modifySubscriberTether]: IBehavior<IPuppetSubscritpion>,
+//   [sortByChange, sortByChangeTether]: IBehavior<ISortBy>,
+//   [scrollRequest, scrollRequestTether]: IBehavior<ScrollRequest>,
+//   [routeTypeChange, routeTypeChangeTether]: IBehavior<IAbstractPositionParams[]>,
 
 // ) => {
 

@@ -59,17 +59,17 @@ interface ILeaderboard extends IUserActivityPageParams {}
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
-      [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: Behavior<ISortBy<(typeof schema)['traderRouteMetric']['$inferInsert']>>,
+      [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<(typeof schema)['traderRouteMetric']['$inferInsert']>>,
 
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
 
-      [routeChange, routeChangeTether]: Behavior<any, string>,
-      [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
-      [filterAccount, filterAccountTether]: Behavior<string | undefined>,
+      [routeChange, routeChangeTether]: IBehavior<any, string>,
+      [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
+      [filterAccount, filterAccountTether]: IBehavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>
     ) => {
       const { activityTimeframe, selectedCollateralTokenList, matchRuleList, route } = config
 
@@ -136,7 +136,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 selected: isLong,
                 options: [undefined, true, false],
                 $$option: map((il) => {
-                  return $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
+                  return $row(spacing.tiny, style({ alignItems: 'center' }))(
                     il === undefined
                       ? empty()
                       : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
@@ -278,7 +278,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   },
                   {
                     $head: $text('Routes'),
-                    gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
+                    gridTemplate: isDesktopScreen ? '210px' : undefined,
                     $bodyCallback: map((pos) => {
                       const _tokenList = [
                         ...new Set([
@@ -289,7 +289,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                       // return $row(
                       //   ...tokenList.map(token =>
-                      //     $column(spacing.defaultTiny)(
+                      //     $column(spacing.tiny)(
                       //       $tokenTryLabeled(token)
                       //     )
                       //   )
@@ -305,7 +305,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       })
                     })
                   },
-                  ...(screenUtils.isDesktopScreen
+                  ...(isDesktopScreen
                     ? [
                         {
                           $head: $text('Win/Loss'),
@@ -342,7 +342,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       )
                     ),
                     sortBy: 'roi',
-                    gridTemplate: screenUtils.isDesktopScreen ? '200px' : '140px',
+                    gridTemplate: isDesktopScreen ? '200px' : '140px',
                     $bodyCallback: map((pos) => {
                       const adjustList = [...pos.increaseList, ...pos.decreaseList]
 
@@ -414,7 +414,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             alignItems: 'center'
                           })
                         )(
-                          $column(spacing.defaultTiny)(
+                          $column(spacing.tiny)(
                             $roiDisplay(pos.roi),
                             $seperator2,
                             $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl))
@@ -446,7 +446,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     style({
                       backgroundColor: pallete.background,
                       borderTop: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                      padding: screenUtils.isDesktopScreen ? '36px' : '14px 8px'
+                      padding: isDesktopScreen ? '36px' : '14px 8px'
                     })
                   ),
                   $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
@@ -460,10 +460,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       padding: '16px 0'
                     })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
                   },
-                  // $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })),
+                  // $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })),
                   // $rowContainer: $defaultTableRowContainer(
                   //   stylePseudo(':last-child', { borderRadius: '0 0 18px 18px', marginBottom: '2px' }),
-                  //   style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })
+                  //   style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
                   // ),
                   // $bodyRowContainer: $defaultTableRowContainer(
                   //   style({ margin: '0 1px' })
