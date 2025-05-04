@@ -21,6 +21,7 @@
     "sherif:fix": "sherif --fix",
     "biome:check": "biome check",
     "biome:check:fix": "biome check --fix",
+    "biome:check:fix:unsafe": "biome check --fix --unsafe",
     "changeset:publish": "changeset publish --access public",
     "changeset:version": "changeset version",
     "contracts:build": "cd contracts && bun run build",

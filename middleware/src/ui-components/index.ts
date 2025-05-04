@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/performance/noBarrelFile: entrypoint module file */
 export * from './$avatar.js'
 export * from './$ButtonToggle.js'
 export * from './$common.js'

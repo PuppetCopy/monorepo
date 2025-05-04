@@ -34,7 +34,6 @@
       },
       "performance": {
         "noBarrelFile": "error",
-        "noReExportAll": "error",
         "noDelete": "off",
         "noAccumulatingSpread": "off"
       },
@@ -47,7 +46,6 @@
             "syntax": "shorthand"
           }
         },
-        "useLiteralEnumMembers": "error",
         "noCommaOperator": "error",
         "useNodejsImportProtocol": "error",
         "useAsConstAssertion": "error",
