@@ -1,6 +1,6 @@
-import { O, type Op } from '@aelea/core'
-import { component, type IBranch, attr, nodeEvent, style, type $Branch } from '@aelea/dom'
-import type { Behavior } from '@aelea/core'
+import { O, type Op } from 'aelea/core'
+import { component, type IBranch, attr, nodeEvent, style, type $Branch } from 'aelea/dom'
+import type { Behavior } from 'aelea/core'
 import { constant, map, merge, startWith } from "@most/core"
 import type { Route } from "./types.js"
 

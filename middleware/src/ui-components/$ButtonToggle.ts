@@ -1,7 +1,7 @@
-import type { Behavior, Op } from "@aelea/core"
-import { $node, type $Node, $text, component, type INode, type NodeComposeFn, nodeEvent, style, styleBehavior } from "@aelea/dom"
-import { $row } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
+import type { Behavior, Op } from "aelea/core"
+import { $node, type $Node, $text, component, type INode, type NodeComposeFn, nodeEvent, style, styleBehavior } from "aelea/dom"
+import { $row } from "aelea/ui-components"
+import { pallete } from "aelea/ui-components-theme"
 import { constant, map, now, switchLatest } from "@most/core"
 import type { Stream } from "@most/types"
 

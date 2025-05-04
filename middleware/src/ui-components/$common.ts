@@ -1,7 +1,7 @@
-import { combineObject, isStream, O, type Op } from "@aelea/core"
-import { $element, $node, type $Node, $svg, $text, attr, type IBranch, style, styleBehavior, stylePseudo } from "@aelea/dom"
-import { $column, $row, layoutSheet } from "@aelea/ui-components"
-import { colorAlpha, pallete } from "@aelea/ui-components-theme"
+import { combineState, isStream, O, type Op } from "aelea/core"
+import { $element, $node, type $Node, $svg, $text, attr, type IBranch, style, styleBehavior, stylePseudo } from "aelea/dom"
+import { $column, $row, layoutSheet } from "aelea/ui-components"
+import { colorAlpha, pallete } from "aelea/ui-components-theme"
 import { empty, fromPromise, map, now, skipRepeats, startWith } from "@most/core"
 import type { Stream } from "@most/types"
 import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress, switchMap } from "../utils/index.js"
@@ -12,7 +12,7 @@ import { $defaultDropContainer, $Tooltip } from "./$Tooltip.js"
 
 
 export const $anchor = $element('a')(
-  layoutSheet.spacingTiny,
+  spacing.defaultTiny,
   attr({ target: '_blank' }),
   stylePseudo(':hover', { color: pallete.foreground + '!important', fill: pallete.foreground }),
   style({
@@ -23,20 +23,20 @@ export const $anchor = $element('a')(
   }),
 )
 
-export const $alertNegativeContainer = $row(layoutSheet.spacingSmall, style({
+export const $alertNegativeContainer = $row(spacing.small, style({
   minWidth: 0, maxWidth: '100%',
   borderRadius: '100px', alignItems: 'center', fontSize: '.85rem',
   border: `1px dashed ${pallete.negative}`, padding: '8px 12px',
 }))
 
-export const $alertPositiveContainer = $row(layoutSheet.spacingSmall, style({
+export const $alertPositiveContainer = $row(spacing.small, style({
   minWidth: 0, maxWidth: '100%',
   borderRadius: '100px', alignItems: 'center', fontSize: '.85rem',
   border: `1px dashed ${pallete.positive}`, padding: '8px 12px',
 }))
 
 
-export const $alertIntermediateContainer = (...$content: $Node[]) => $row(layoutSheet.spacingSmall, style({
+export const $alertIntermediateContainer = (...$content: $Node[]) => $row(spacing.small, style({
   minWidth: 0, maxWidth: '100%',
   borderRadius: '100px', alignItems: 'center', fontSize: '.85rem',
   padding: '9px 12px', position: 'relative', overflow: 'hidden',
@@ -111,7 +111,7 @@ export const $infoLabel = (label: string | $Node) => {
 export const $infoLabeledValue = (label: string | $Node, value: string | $Node, collapseMobile = false) => {
   const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
 
-  return $container(layoutSheet.spacingSmall)(
+  return $container(spacing.small)(
     $infoLabel(label),
     isStream(value) ? value : $text(value)
   )
@@ -140,9 +140,9 @@ export const $infoTooltip = (text: string | $Node, color = pallete.foreground, s
 
 
 export const $labeledDivider = (label: string) => {
-  return $row(layoutSheet.spacing, style({ placeContent: 'center', alignItems: 'center' }))(
+  return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
-    $row(layoutSheet.spacingSmall, style({ color: pallete.foreground, alignItems: 'center' }))(
+    $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
       $text(style({ fontSize: '.85rem' }))(label),
       $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground }),
     ),
@@ -151,7 +151,7 @@ export const $labeledDivider = (label: string) => {
 }
 
 export const $tokenLabel = (token: ITokenDescription, $iconPath: $Node, $label?: $Node) => {
-  return $row(layoutSheet.spacing, style({ cursor: 'pointer', alignItems: 'center' }))(
+  return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconPath, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $text(style({ fontWeight: 'bold' }))(token.symbol),
@@ -165,7 +165,7 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: $Node, $label?:
 export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: $Node) => {
   const $iconG = getMappedValue($tokenIconMap, token.symbol)
 
-  return $row(layoutSheet.spacing, style({ cursor: 'pointer', alignItems: 'center', }))(
+  return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center', }))(
     $icon({ $content: $iconG, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $text(style({ fontWeight: 'bold' }))(token.symbol),
@@ -198,7 +198,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   const displayChange = skipRepeats(map(str => !!str, startWith('', change)))
   const arrowColor = color ?? now(pallete.foreground)
 
-  return $row(layoutSheet.spacingTiny, style({ lineHeight: 1, alignItems: 'center' }))(
+  return $row(spacing.defaultTiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(map(str => str ? { color: pallete.foreground } : {}, change), isStream($val) ? $val : $text($val)),
 
     $icon({
@@ -206,7 +206,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
       width: '10px',
       svgOps: styleBehavior(map(params => {
         return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
-      }, combineObject({ displayChange, arrowColor }))),
+      }, combineState({ displayChange, arrowColor }))),
       viewBox: '0 0 32 32'
     }),
 
@@ -215,7 +215,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
 }
 
 export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: ILabeledHintAdjustment) => {
-  return $row(layoutSheet.spacingSmall, style({ alignItems: 'center' }))(
+  return $row(spacing.small, style({ alignItems: 'center' }))(
     tooltip
       ? $infoTooltipLabel(tooltip, label)
       : label
@@ -254,7 +254,7 @@ export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'):
   return text
 }
 export const $label = $element('label')(
-  layoutSheet.spacingSmall,
+  spacing.small,
   style({ color: pallete.foreground, cursor: 'pointer', display: 'flex' })
 )
 

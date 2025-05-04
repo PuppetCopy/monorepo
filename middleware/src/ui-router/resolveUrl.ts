@@ -1,7 +1,7 @@
 
 import { constant, filter, join, map, skipRepeatsWith, switchLatest, tap, until } from '@most/core'
 import type { Stream } from '@most/types'
-import { O } from '@aelea/core'
+import { O } from 'aelea/core'
 import type { Fragment, Path, PathEvent, Route, RouteConfig } from './types.js'
 
 

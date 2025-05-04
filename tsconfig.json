@@ -1,9 +1,7 @@
 {
   // This configuration is used for local development and type checking.
   "extends": "./tsconfig.base.json",
-  "references": [],
-  "compilerOptions": {},
-  "exclude": [
-    "**/node_modules",
+  "include": [
+    "**/src"
   ]
 }

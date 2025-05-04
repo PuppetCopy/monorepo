@@ -1,7 +1,7 @@
-import { type Op, replayLatest } from "@aelea/core"
-import { type $Node, $node, $text, component, style } from "@aelea/dom"
-import { $row, layoutSheet } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
+import { type Op, replayLatest } from "aelea/core"
+import { type $Node, $node, $text, component, style } from "aelea/dom"
+import { $row, layoutSheet } from "aelea/ui-components"
+import { pallete } from "aelea/ui-components-theme"
 import { constant, empty, fromPromise, map, merge, mergeArray, multicast, now, recoverWith, startWith, switchLatest } from "@most/core"
 import type { Stream } from "@most/types"
 import type { Chain, TransactionReceipt } from "viem"
@@ -105,14 +105,14 @@ export const $IntermediateTx = <
       return x
     }, multicastQuery),
     $$done: map((res) => {
-      return $row(layoutSheet.spacingSmall, style({ color: pallete.positive }))(
+      return $row(spacing.small, style({ color: pallete.positive }))(
         switchLatest($$success(now(res))),
         $txHashRef(res.transactionHash, chain)
       )
     }),
     $loader: switchLatest(map(c => {
 
-      return $row(layoutSheet.spacingSmall, style({ alignItems: 'center', fontSize: '.85rem' }))(
+      return $row(spacing.small, style({ alignItems: 'center', fontSize: '.85rem' }))(
         $spinner,
         $text(startWith('Wallet Request...', map(() => 'Awaiting confirmation...', fromPromise(c)))),
         $node(style({ flex: 1 }))(),

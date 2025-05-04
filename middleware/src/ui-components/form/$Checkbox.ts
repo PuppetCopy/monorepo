@@ -1,7 +1,7 @@
-import { type Behavior, O } from '@aelea/core'
-import { $element, $node, $text, type IBranch, attr, attrBehavior, component, nodeEvent, style, styleBehavior } from '@aelea/dom'
-import { type Input, layoutSheet } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
+import { type Behavior, O } from 'aelea/core'
+import { $element, $node, $text, type IBranch, attr, attrBehavior, component, nodeEvent, style, styleBehavior } from 'aelea/dom'
+import { type Input, layoutSheet } from "aelea/ui-components"
+import { pallete } from "aelea/ui-components-theme"
 import { empty, map, mergeArray, startWith } from "@most/core"
 import { dismissOp, interactionOp } from "./common.js"
 import type { Stream } from '@most/types'

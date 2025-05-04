@@ -1,4 +1,4 @@
-import { colorAlpha, pallete } from '@aelea/ui-components-theme'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   CandlestickSeries,
   type ChartOptions, CrosshairMode, type DeepPartial, LineStyle

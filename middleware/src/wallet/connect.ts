@@ -1,4 +1,4 @@
-import { combineObject, fromCallback, replayLatest } from "@aelea/core"
+import { combineState, fromCallback, replayLatest } from "aelea/core"
 import { constant, map, mergeArray, multicast, now, startWith } from "@most/core"
 import { disposeWith } from "@most/disposable"
 import type { Stream } from "@most/types"
@@ -57,13 +57,13 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
     const chain = await params.chainQuery
     const transport = getPublicTransport(publicTransportMap, chain)
     return { transport, chain }
-  }, combineObject({ chainQuery }))))
+  }, combineState({ chainQuery }))))
 
   const providerClientQuery = replayLatest(multicast(map(async params => {
     const { chain, transport } = await params.publicTransportParamsQuery
 
     return createPublicClient({ chain, transport })
-  }, combineObject({ publicTransportParamsQuery }))))
+  }, combineState({ publicTransportParamsQuery }))))
 
   const walletClientQuery: Stream<Promise<IWalletClient | null>> = replayLatest(multicast(map(async params => {
     const { chain, transport } = await params.publicTransportParamsQuery
@@ -99,14 +99,14 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
     }
 
     return walletClient
-  }, combineObject({ walletProvider, publicTransportParamsQuery }))))
+  }, combineState({ walletProvider, publicTransportParamsQuery }))))
 
 
   const publicProviderClientQuery = replayLatest(multicast(map(async params => {
     const { chain, transport } = await params.publicTransportParamsQuery
 
     return createPublicClient({ chain, transport })
-  }, combineObject({ publicTransportParamsQuery }))))
+  }, combineState({ publicTransportParamsQuery }))))
 
 
   return { walletClientQuery, providerClientQuery, publicProviderClientQuery }

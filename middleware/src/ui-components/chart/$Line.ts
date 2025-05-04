@@ -1,5 +1,5 @@
-// import { Behavior, component } from "@aelea/dom"
-// import { pallete } from '@aelea/ui-components-theme'
+// import { Behavior, component } from "aelea/dom"
+// import { pallete } from 'aelea/ui-components-theme'
 // import { LineStyle, MouseEventParams, SeriesMarker, SeriesType } from 'lightweight-charts'
 // import { $Chart, IChart } from './$Chart'
 

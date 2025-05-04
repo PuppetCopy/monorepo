@@ -1,4 +1,4 @@
-import { $svg, attr } from "@aelea/dom"
+import { $svg, attr } from "aelea/dom"
 import { ADDRESS_ZERO, TOKEN_DESCRIPTION_MAP } from "../const/index.js"
 
 

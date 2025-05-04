@@ -1,7 +1,7 @@
-import { type Behavior, combineArray, combineObject, fromCallback, O, type Op } from "@aelea/core"
-import { type $Node, $wrapNativeElement, component, type INode, style, styleInline } from "@aelea/dom"
-import { $row, observer } from '@aelea/ui-components'
-import { colorAlpha, pallete } from '@aelea/ui-components-theme'
+import { type Behavior, combineArray, combineState, fromCallback, O, type Op } from "aelea/core"
+import { type $Node, $wrapNativeElement, component, type INode, style, styleInline } from "aelea/dom"
+import { $row, observer } from 'aelea/ui-components'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { empty, filter, map, mergeArray, multicast, scan, snapshot, tap } from '@most/core'
 import { disposeWith } from '@most/disposable'
 import type { Stream } from '@most/types'
@@ -184,7 +184,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                 top: params.coords + 'px',
                 display: 'flex'
               }
-            }, combineObject(config.yAxisState))
+            }, combineState(config.yAxisState))
           )
         )(config.$content || empty())
         : empty(),
@@ -239,14 +239,14 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
             }
 
             return coords.crosshairMove?.point?.y || null
-          }, combineObject({ crosshairMove, isFocused: config.yAxisState.isFocused })),
+          }, combineState({ crosshairMove, isFocused: config.yAxisState.isFocused })),
           snapshot((params) => {
             if (params.isFocused && params.price) {
               return seriesApi.priceToCoordinate(params.price)
             }
 
             return null
-          }, combineObject(config.yAxisState), visibleLogicalRangeChange),
+          }, combineState(config.yAxisState), visibleLogicalRangeChange),
 
         ]) : empty(),
       focusPrice: config.yAxisState
@@ -257,14 +257,14 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
             }
 
             return ev.point ? seriesApi.coordinateToPrice(ev.point.y) : null
-          }, combineObject(config.yAxisState), click),
+          }, combineState(config.yAxisState), click),
           snapshot((params, coords) => {
             if (params.isFocused) {
               return null
             }
 
             return coords ? seriesApi.coordinateToPrice(coords) : null
-          }, combineObject(config.yAxisState), config.yAxisState.coords)
+          }, combineState(config.yAxisState), config.yAxisState.coords)
         ])) : empty(),
       isFocused: config.yAxisState ? snapshot(focused => !focused, config.yAxisState.isFocused, click) : empty(),
       crosshairMove,

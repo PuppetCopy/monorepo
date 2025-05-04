@@ -5,12 +5,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev:generate-abi": "wagmi generate",
-    "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/",
     "build": "bun run build:clean && bun run build:esm",
     "build:esm": "tsc -b",
     "build:clean": "rm -rf middleware/dist",
-    "clean:tsc": "rm -fr dist/*"
+    "clean:tsc": "rm -fr dist/*",
+    "dev:generate-abi": "wagmi generate",
+    "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
   },
   "files": [
     "dist"
@@ -55,7 +55,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "aelea": "^1.3.2",
+    "aelea": "1.2.0",
     "@most/core": "^1.6.1",
     "@most/disposable": "^1.3.0",
     "@most/prelude": "^1.8.0",

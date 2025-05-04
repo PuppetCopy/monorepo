@@ -1,4 +1,4 @@
-import { pallete } from '@aelea/ui-components-theme'
+import { pallete } from 'aelea/ui-components-theme'
 import {
   type BarPrice,
   BaselineSeries,

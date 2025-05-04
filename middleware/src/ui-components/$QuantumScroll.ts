@@ -1,8 +1,8 @@
 
-import type { Behavior } from '@aelea/core'
-import { type $Branch, type $Node, $custom, $text, type NodeComposeFn, component, style } from '@aelea/dom'
-import { $column, layoutSheet, observer } from "@aelea/ui-components"
-import { pallete } from "@aelea/ui-components-theme"
+import type { Behavior } from 'aelea/core'
+import { type $Branch, type $Node, $custom, $text, type NodeComposeFn, component, style } from 'aelea/dom'
+import { $column, layoutSheet, observer } from "aelea/ui-components"
+import { pallete } from "aelea/ui-components-theme"
 import { constant, filter, join, map, mergeArray, now, recoverWith, until } from "@most/core"
 import type { Stream } from '@most/types'
 import { $alertNegativeContainer } from './$common.js'
@@ -28,8 +28,8 @@ export interface QuantumScroll {
 
 
 export const $defaultVScrollLoader = $text(style({ color: pallete.foreground, padding: '3px 10px' }))('loading...')
-export const $defaultVScrollContainer = $column(layoutSheet.spacing)
-const $defaultEmptyMessage = $column(layoutSheet.spacing, style({ padding: '20px' }))(
+export const $defaultVScrollContainer = $column(spacing.default)
+const $defaultEmptyMessage = $column(spacing.default, style({ padding: '20px' }))(
   $text('No items to display')
 )
 
