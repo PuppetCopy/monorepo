@@ -20,15 +20,15 @@ export const queryDb: ReadonlyDrizzle<typeof schema> = drizzle(
 
     return {
       ...result,
-      rows: result.rows.map((row: object) => Object.values(row)),
+      rows: result.rows.map((row: object) => Object.values(row))
     }
   },
-  { schema, casing: 'snake_case' },
+  { schema, casing: 'snake_case' }
 ) as any
 
 export async function getStatus() {
   const response = await fetch(getUrl(baseUrl, 'status'), {
-    method: 'POST',
+    method: 'POST'
   })
 
   return response.json()

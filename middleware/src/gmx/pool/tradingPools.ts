@@ -16,7 +16,7 @@ export async function getUniV3PoolPrice(client: PublicClient, decimals: number, 
   const [sqrtPriceX96] = await client.readContract({
     abi: univ3Pool,
     address: poolAddress,
-    functionName: 'slot0',
+    functionName: 'slot0'
   })
 
   const denominator = getDenominator(decimals)
@@ -28,7 +28,7 @@ export async function getUniV2PoolPrice(client: PublicClient, decimals: number, 
   const [reserve0, reserve1] = await client.readContract({
     abi: univ2Pool,
     address: poolAddress,
-    functionName: 'getReserves',
+    functionName: 'getReserves'
   })
 
   const denominator = getDenominator(decimals)
@@ -71,7 +71,7 @@ export async function getAvalancheNetworkTokenUsd(client: PublicClient) {
   const price = await getUniV2PoolPrice(
     client,
     TOKEN_DESCRIPTION_MAP.WAVAX.decimals,
-    '0xf4003f4efbe8691b60249e6afbd307abe7758adb',
+    '0xf4003f4efbe8691b60249e6afbd307abe7758adb'
   )
 
   const usdPrice = expandDecimals(price, 30 - TOKEN_DESCRIPTION_MAP.USDC.decimals)
@@ -87,7 +87,7 @@ export async function getArbitrumNetworkTokenUsd(client: PublicClient) {
   const price = await getUniV3PoolPrice(
     client,
     TOKEN_DESCRIPTION_MAP.WETH.decimals,
-    '0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',
+    '0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443'
   )
 
   const usdPrice = expandDecimals(price, 30 - TOKEN_DESCRIPTION_MAP.USDC.decimals)
@@ -108,7 +108,7 @@ export function getClientNativeTokenUsd(client: Stream<PublicClient>) {
       }
 
       throw new Error('unsupported chain')
-    }, client),
+    }, client)
   )
   return nativeTokenPrice
 }

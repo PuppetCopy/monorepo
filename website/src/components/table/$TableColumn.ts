@@ -1,10 +1,10 @@
 import { map, skipRepeats } from '@most/core'
 import {
-  type IPosition,
   getParticiapntPortion,
   getSettledMpPnL,
+  type IPosition,
   isPositionSettled,
-  latestPriceMap,
+  latestPriceMap
 } from '@puppet/middleware/core'
 import { getMarketIndexToken, getPositionPnlUsd } from '@puppet/middleware/gmx'
 import { $infoTooltip, type TableColumn } from '@puppet/middleware/ui-components'
@@ -15,10 +15,9 @@ import {
   readableDate,
   readablePercentage,
   streamOf,
-  switchMap,
+  switchMap
 } from '@puppet/middleware/utils'
-import { O, type Tether } from 'aelea/core'
-import { $text, type INode, style } from 'aelea/core'
+import { $text, type INode, O, style, type Tether } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -36,14 +35,14 @@ export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
     const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
 
     return $size(size, collateral)
-  }),
+  })
 })
 
 export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),
   $bodyCallback: map((pos) => {
     return $entry(pos)
-  }),
+  })
 }
 
 export const puppetsColumn = (click: Tether<INode, string>): TableColumn<IPosition> => ({
@@ -51,7 +50,7 @@ export const puppetsColumn = (click: Tether<INode, string>): TableColumn<IPositi
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
     return $puppetList(pos.puppetList?.map((m) => m.account) || [], click)
-  }),
+  })
 })
 
 export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
@@ -66,15 +65,15 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
     const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
     const totalPositionFeeAmount = updateList.reduce(
       (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-      0n,
+      0n
     )
     const totalBorrowingFeeAmount = updateList.reduce(
       (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-      0n,
+      0n
     )
     const totalFundingFeeAmount = updateList.reduce(
       (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-      0n,
+      0n
     )
 
     const totalFeesUsd = totalPositionFeeAmount + totalBorrowingFeeAmount + totalFundingFeeAmount
@@ -92,7 +91,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
     const displayColor = skipRepeats(
       map((value) => {
         return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
-      }, streamOf(pnl)),
+      }, streamOf(pnl))
     )
 
     return isSettled
@@ -101,20 +100,20 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
           $row(style({ alignItems: 'center' }))(
             switchMap((color) => {
               return style({ backgroundColor: colorAlpha(color, 0.1), borderRadius: '50%' })(
-                $infoTooltip($openPositionBreakdown(pos), color, '18px'),
+                $infoTooltip($openPositionBreakdown(pos), color, '18px')
               )
             }, displayColor),
-            $pnlDisplay(pnl),
+            $pnlDisplay(pnl)
           ),
           $seperator2,
           // $liquidationSeparator(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, pos.lastUpdate.collateralAmount, latestPrice),
           $text(style({ fontSize: '.85rem' }))(
             map((value) => {
               return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
-            }, streamOf(pnl)),
-          ),
+            }, streamOf(pnl))
+          )
         )
-  }),
+  })
 })
 
 export const timeColumn: TableColumn<IPosition> = {
@@ -124,7 +123,7 @@ export const timeColumn: TableColumn<IPosition> = {
   $bodyCallback: map((pos) => {
     return $column(spacing.defaultTiny)(
       $text(getTimeSince(pos.openTimestamp)),
-      $row(spacing.small)($text(style({ fontSize: '.85rem' }))(readableDate(pos.openTimestamp))),
+      $row(spacing.small)($text(style({ fontSize: '.85rem' }))(readableDate(pos.openTimestamp)))
     )
-  }),
+  })
 }

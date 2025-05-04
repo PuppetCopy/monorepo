@@ -19,7 +19,7 @@ export function getCappedPositionPnlUsd(
   isLong: boolean,
   sizeInUsd: bigint,
   sizeInTokens: bigint,
-  markPrice: bigint,
+  markPrice: bigint
 ) {
   const totalPnl = getPositionPnlUsd(isLong, sizeInUsd, sizeInTokens, markPrice)
 
@@ -56,7 +56,7 @@ const FLOAT_PRECISION_SQRT = 10n ** 15n
 export function getFundingAmount(
   latestFundingAmountPerSize: bigint,
   positionFundingAmountPerSize: bigint,
-  positionSizeInUsd: bigint,
+  positionSizeInUsd: bigint
 ): bigint {
   // a user could avoid paying funding fees by continually updating the position
   // before the funding fee becomes large enough to be chargeable
@@ -80,19 +80,19 @@ export function getPositionFundingFees(positionFees: IPositionFees, position: IP
   const fundingFeeAmount = getFundingAmount(
     positionFees.funding.latestFundingFeeAmountPerSize,
     position.fundingFeeAmountPerSize,
-    position.sizeInUsd,
+    position.sizeInUsd
   )
 
   const claimableLongTokenAmount = getFundingAmount(
     positionFees.funding.latestLongTokenClaimableFundingAmountPerSize,
     position.longTokenClaimableFundingAmountPerSize,
-    position.sizeInUsd,
+    position.sizeInUsd
   )
 
   const claimableShortTokenAmount = getFundingAmount(
     positionFees.funding.latestShortTokenClaimableFundingAmountPerSize,
     position.shortTokenClaimableFundingAmountPerSize,
-    position.sizeInUsd,
+    position.sizeInUsd
   )
 
   return { fundingFeeAmount, claimableLongTokenAmount, claimableShortTokenAmount }
@@ -124,7 +124,7 @@ export function getPositionNetValue(
   pendingFundingFeesUsd: bigint,
   pendingBorrowingFeesUsd: bigint,
   pnl: bigint,
-  closingFeeUsd: bigint,
+  closingFeeUsd: bigint
 ) {
   const pendingFeesUsd = pendingFundingFeesUsd + pendingBorrowingFeesUsd
 
@@ -146,7 +146,7 @@ export function getLiquidationPrice(
   pendingFundingFeesUsd = 0n,
   pendingBorrowingFeesUsd = 0n,
   // minCollateralUsd: bigint,
-  useMaxPriceImpact = true,
+  useMaxPriceImpact = true
 ) {
   if (sizeInUsd <= 0n) return 0n
 
@@ -222,7 +222,7 @@ export function getRoughLiquidationPrice(
   sizeInUsd: bigint,
   sizeInTokens: bigint,
   collateralUsd: bigint,
-  collateralAmount: bigint,
+  collateralAmount: bigint
 ) {
   return isLong
     ? (sizeInUsd + collateralUsd) / (sizeInTokens + collateralAmount)
@@ -234,7 +234,7 @@ export function getLeverageFactor(
   collateralUsd: bigint,
   pnl: bigint,
   pendingFundingFeesUsd: bigint,
-  pendingBorrowingFeesUsd: bigint,
+  pendingBorrowingFeesUsd: bigint
 ) {
   const totalPendingFeesUsd = pendingFundingFeesUsd + pendingBorrowingFeesUsd
   const remainingCollateralUsd = collateralUsd + pnl - totalPendingFeesUsd

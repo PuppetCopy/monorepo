@@ -9,11 +9,10 @@ import {
   now,
   recoverWith,
   startWith,
-  switchLatest,
+  switchLatest
 } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IOps, replayLatest } from 'aelea/core'
-import { $node, $text, type I$Node, component, style } from 'aelea/core'
+import { $node, $text, component, type I$Node, type IOps, replayLatest, style } from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
@@ -23,8 +22,8 @@ export const $spinner = $node(
   style({
     margin: 'auto',
     placeSelf: 'center',
-    alignSelf: 'center',
-  }),
+    alignSelf: 'center'
+  })
 )($text('Loading...'))
 
 export interface IIntermediatPromise<T> {
@@ -40,7 +39,7 @@ export interface IIntermediatPromise<T> {
 export enum IIntermediateStatus {
   LOADING,
   DONE,
-  ERROR,
+  ERROR
 }
 
 export interface IIntermediateState<T> {
@@ -53,7 +52,7 @@ export const $IntermediatePromise = <T>({
   query,
   $$fail = map((res) => style({ placeSelf: 'center', margin: 'auto' })($alert($text(res.message)))),
   $$done,
-  clean = empty(),
+  clean = empty()
 }: IIntermediatPromise<T>) =>
   component(() => {
     const state: Stream<IIntermediateState<T | $Node | Error>> = multicast(
@@ -61,17 +60,17 @@ export const $IntermediatePromise = <T>({
         map((prom) => {
           const doneData: Stream<IIntermediateState<T>> = map(
             (data) => ({ status: IIntermediateStatus.DONE, data }),
-            fromPromise(prom),
+            fromPromise(prom)
           )
           const loading: Stream<IIntermediateState<$Node>> = now({ status: IIntermediateStatus.LOADING, data: $loader })
           const settledOrError = recoverWith(
             (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
-            doneData,
+            doneData
           )
 
           return merge(settledOrError, loading)
-        }, query),
-      ),
+        }, query)
+      )
     )
 
     return [
@@ -88,13 +87,13 @@ export const $IntermediatePromise = <T>({
               }
 
               return $$done(now(state.data))
-            }, state),
+            }, state)
           ),
-          constant(empty(), clean),
-        ]),
+          constant(empty(), clean)
+        ])
       ),
 
-      { state },
+      { state }
     ]
   })
 
@@ -111,7 +110,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
   chain,
   clean = empty(),
   $$success = constant($text(style({ color: pallete.positive }))('Tx Succeeded')),
-  showTooltip = false,
+  showTooltip = false
 }: IIntermediateTx<TSuccess>) => {
   const multicastQuery = replayLatest(multicast(query))
 
@@ -123,7 +122,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
     $$done: map((res) => {
       return $row(spacing.small, style({ color: pallete.positive }))(
         switchLatest($$success(now(res))),
-        $txHashRef(res.transactionHash, chain),
+        $txHashRef(res.transactionHash, chain)
       )
     }),
     $loader: switchLatest(
@@ -133,18 +132,18 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
           $text(
             startWith(
               'Wallet Request...',
-              map(() => 'Awaiting confirmation...', fromPromise(c)),
-            ),
+              map(() => 'Awaiting confirmation...', fromPromise(c))
+            )
           ),
           $node(style({ flex: 1 }))(),
-          switchLatest(map((txHash) => $txHashRef(txHash.transactionHash, chain), fromPromise(c))),
+          switchLatest(map((txHash) => $txHashRef(txHash.transactionHash, chain), fromPromise(c)))
         )
-      }, multicastQuery),
+      }, multicastQuery)
     ),
     $$fail: map((res) => {
       const error = String(res)
 
       return showTooltip ? $alertTooltip($text(error)) : $alert($text(error))
-    }),
+    })
   })
 }

@@ -1,7 +1,17 @@
 import { empty, filter, map, merge, mergeArray, multicast, never, now, startWith, switchLatest, tap } from '@most/core'
-import { type IBehavior, O, combineState } from 'aelea/core'
-import { $element, type IBranch, type NodeComposeFn, component, nodeEvent, style, styleBehavior } from 'aelea/core'
-import { type Input, designSheet } from 'aelea/ui-components'
+import {
+  $element,
+  combineState,
+  component,
+  type IBehavior,
+  type IBranch,
+  type NodeComposeFn,
+  nodeEvent,
+  O,
+  style,
+  styleBehavior
+} from 'aelea/core'
+import { designSheet, type Input } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Optional } from '../../utils/index.js'
 import { dismissOp, interactionOp } from './common.js'
@@ -16,7 +26,7 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
       [focusStyle, interactionTether]: Behavior<IBranch, true>,
       [dismissstyle, dismissTether]: Behavior<IBranch, false>,
       [blur, blurTether]: Behavior<IBranch, FocusEvent>,
-      [change, changeTether]: Behavior<IBranch<HTMLInputElement>, string>,
+      [change, changeTether]: Behavior<IBranch<HTMLInputElement>, string>
     ) => {
       const multicastValidation = O(validation, startWith(''), multicast)
 
@@ -37,14 +47,14 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
                 return text || ''
               }
               return ''
-            }),
+            })
           ),
 
           styleBehavior(
             mergeArray([
               startWith(
                 { opacity: '.5' },
-                map(() => ({ opacity: '' }), value),
+                map(() => ({ opacity: '' }), value)
               ),
               map(({ focus, alert }) => {
                 if (alert) {
@@ -52,8 +62,8 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
                 }
 
                 return focus ? { borderBottom: `2px solid ${pallete.primary}` } : null
-              }, state),
-            ]),
+              }, state)
+            ])
           ),
 
           interactionTether(interactionOp),
@@ -66,8 +76,8 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
                   (isDisabled) => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
-                  startWith(true, disabled),
-                ),
+                  startWith(true, disabled)
+                )
               )
             : O(),
 
@@ -80,20 +90,20 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
                   tap((val) => {
                     // applying by setting `HTMLInputElement.value` imperatively(only way known to me)
                     node.element.value = String(val)
-                  }, value),
-                ),
-              ),
+                  }, value)
+                )
+              )
             ),
-            switchLatest,
-          ),
+            switchLatest
+          )
         )(),
 
         {
           change,
-          blur,
-        },
+          blur
+        }
       ]
-    },
+    }
   )
 
 export const $form = $element('form')(style({ display: 'flex', flexDirection: 'column' }))

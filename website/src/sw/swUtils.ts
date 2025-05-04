@@ -26,7 +26,7 @@ export const pwaUpgradeNotification: Stream<() => void> = fromCallback((cb) => {
       //   setInterval(async () => {
       //   }, 20000 /* 20s for testing purposes */)
       // }
-    },
+    }
   })
 
   return reloadCb

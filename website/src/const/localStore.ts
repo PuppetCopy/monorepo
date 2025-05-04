@@ -10,30 +10,30 @@ export const localStore = uiStorage.createStoreDefinition('root', 8, {
       chain: arbitrum.id,
       wallet: null as null | string,
       activityTimeframe: IntervalTime.WEEK,
-      collateralTokenList: [] as string[],
-    },
+      collateralTokenList: [] as string[]
+    }
   },
   ruleEditor: {
     initialState: {
-      advancedRouteEditorEnabled: false,
-    },
+      advancedRouteEditorEnabled: false
+    }
   },
   leaderboard: {
     initialState: {
       sortBy: { direction: 'desc', selector: 'roi' } as ISortBy,
       isLong: undefined as boolean | undefined,
-      account: undefined as string | undefined,
-    },
+      account: undefined as string | undefined
+    }
   },
   wallet: {
     initialState: {
-      selectedTab: IWalletTab.PUPPET,
-    },
+      selectedTab: IWalletTab.PUPPET
+    }
   },
   earnings: {
     initialState: {
       cashout: false,
-      scheduleFactor: 1,
-    },
-  },
+      scheduleFactor: 1
+    }
+  }
 })

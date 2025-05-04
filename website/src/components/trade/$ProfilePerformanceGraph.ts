@@ -1,10 +1,10 @@
 import { now, skipRepeatsWith } from '@most/core'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
-import { type IPricetick, getMarketIndexToken, getPositionPnlUsd } from '@puppet/middleware/gmx'
+import { getMarketIndexToken, getPositionPnlUsd, type IPricetick } from '@puppet/middleware/gmx'
 import { $Baseline, type IMarker } from '@puppet/middleware/ui-components'
 import { createTimeline, formatFixed, unixTimestampNow } from '@puppet/middleware/utils'
 import type { Behavior } from 'aelea/core'
-import { type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import { component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   type BaselineData,
@@ -12,7 +12,7 @@ import {
   type DeepPartial,
   LineType,
   type MouseEventParams,
-  type Time,
+  type Time
 } from 'lightweight-charts'
 import { IPriceCandle } from 'schema'
 import type * as viem from 'viem'
@@ -66,7 +66,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   const priceUpdateTicks: IPricetickWithIndexToken[] = uniqueIndexTokenList
     .flatMap(
       (indexToken) =>
-        config.pricefeedMap[indexToken]?.map((x) => ({ indexToken, price: x.c, timestamp: x.slotTime })) ?? [],
+        config.pricefeedMap[indexToken]?.map((x) => ({ indexToken, price: x.c, timestamp: x.slotTime })) ?? []
     )
     .filter((tick) => tick.timestamp > initialPositionTime)
 
@@ -77,7 +77,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
     openPnlMap: new Map<viem.Hex, OpenPnl>(),
     pnl: 0n,
     roi: 0n,
-    time: startTime,
+    time: startTime
   }
   const data = createTimeline({
     source: [...config.list, ...priceUpdateTicks],
@@ -98,7 +98,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
             openPosition.update.isLong,
             openPosition.update.sizeInUsd,
             openPosition.update.sizeInTokens,
-            next.price,
+            next.price
           )
 
           nextTick.openPnl += currentPnl - openPosition.pnl
@@ -122,7 +122,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
         openPosition.update.isLong,
         openPosition.update.sizeInUsd,
         openPosition.update.sizeInTokens,
-        next.indexTokenPriceMax,
+        next.indexTokenPriceMax
       )
 
       nextTick.openPnl += currentPnl - openPosition.pnl
@@ -143,7 +143,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
       nextTick.value = formatFixed(USD_DECIMALS, nextTick.pnl)
 
       return nextTick
-    },
+    }
   })
 
   return data
@@ -172,7 +172,7 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
         color: colorAlpha(pallete.message, 0.15),
         time: Number(pos.blockTimestamp) as Time,
         size: 0.1,
-        shape: 'circle',
+        shape: 'circle'
       }
     })
 
@@ -190,22 +190,22 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
               ticksVisible: true,
               scaleMargins: {
                 top: 0,
-                bottom: 0,
-              },
+                bottom: 0
+              }
             },
             crosshair: {
               horzLine: {
-                visible: false,
+                visible: false
               },
               vertLine: {
-                visible: false,
-              },
+                visible: false
+              }
             },
             // height: 150,
             // width: 100,
             timeScale: {
-              visible: false,
-            },
+              visible: false
+            }
             // ...config.chartConfig
           },
           data: timeline as any as BaselineData[],
@@ -213,19 +213,19 @@ export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $conta
           baselineOptions: {
             baseValue: {
               price: 0,
-              type: 'price',
+              type: 'price'
             },
             lineWidth: 1,
-            lineType: LineType.Curved,
-          },
+            lineType: LineType.Curved
+          }
         })({
-          crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x)),
-        }),
+          crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x))
+        })
       ),
 
       {
-        crosshairMove,
+        crosshairMove
         // requestPricefeed
-      },
+      }
     ]
   })

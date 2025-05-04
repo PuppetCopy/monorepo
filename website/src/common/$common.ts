@@ -3,37 +3,37 @@ import type { Stream } from '@most/types'
 import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet/middleware/const'
 import { type IPosition, isPositionSettled, latestPriceMap } from '@puppet/middleware/core'
 import {
-  type IMarket,
   getMarketIndexToken,
   getPositionPnlUsd,
   getRoughLiquidationPrice,
   getTokenDescription,
-  liquidationWeight,
+  type IMarket,
+  liquidationWeight
 } from '@puppet/middleware/gmx'
 import {
-  $Link,
-  $Tooltip,
   $infoLabel,
   $infoLabeledValue,
+  $Link,
   $labeledDivider,
-  $tokenIconMap,
+  $Tooltip,
+  $tokenIconMap
 } from '@puppet/middleware/ui-components'
 import {
-  type ITokenDescription,
   getBasisPoints,
   getMappedValue,
   getSafeMappedValue,
   getTokenUsd,
+  type ITokenDescription,
   lst,
   readableDate,
   readableLeverage,
   readablePercentage,
   readablePnl,
   readableUsd,
-  streamOf,
+  streamOf
 } from '@puppet/middleware/utils'
 import type { Behavior, Tether } from 'aelea/core'
-import { $text, type INode, component, nodeEvent, style, styleInline } from 'aelea/core'
+import { $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -48,15 +48,15 @@ export const $midContainer = $column(
     maxWidth: '980px',
     padding: `0 ${screenUtils.isDesktopScreen ? '12px' : '0'} 26px`,
     gap: screenUtils.isDesktopScreen ? '50px' : '50px',
-    width: '100%',
-  }),
+    width: '100%'
+  })
 )
 
 export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) => {
   return $column(spacing.defaultTiny, style({ textAlign: 'right' }))(
     $text(readableUsd(size)),
     $divider,
-    $leverage(size, collateral),
+    $leverage(size, collateral)
   )
 }
 
@@ -76,16 +76,16 @@ export const $entry = (pos: IPosition) => {
         isPositionSettled(pos)
           ? $infoLabeledValue(
               $label('Close Time'),
-              $text(style({ fontSize: '.85rem' }))(readableDate(pos.settledTimestamp)),
+              $text(style({ fontSize: '.85rem' }))(readableDate(pos.settledTimestamp))
             )
-          : empty(),
+          : empty()
       ),
-      $anchor: $route(indexDescription, false),
+      $anchor: $route(indexDescription, false)
     })({}),
     $column(spacing.defaultTiny)(
       $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))(pos.isLong ? 'LONG' : 'SHORT')),
-      $text(style({ fontSize: '.85rem' }))(readableUsd(pos.avgEntryPrice)),
-    ),
+      $text(style({ fontSize: '.85rem' }))(readableUsd(pos.avgEntryPrice))
+    )
   )
 }
 
@@ -100,19 +100,19 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
       style({
         width: '32px',
         height: '34x',
-        marginLeft: `-15px`,
-      })($tokenIcon(collateralTokenDescription)),
+        marginLeft: `-15px`
+      })($tokenIcon(collateralTokenDescription))
     ),
     displayLabel
       ? $column(spacing.defaultTiny)($text(style({ fontSize: '1rem' }))(`${collateralTokenDescription.symbol}`))
-      : empty(),
+      : empty()
   )
 }
 
 export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: '18px', height: '18px' })($tokenIcon(indexDescription)),
-    $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`),
+    $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`)
   )
 }
 
@@ -121,9 +121,9 @@ export const $tokenTryLabeled = (token: viem.Address) => {
 
   return $row(
     spacing.small,
-    style({ alignItems: 'center' }),
+    style({ alignItems: 'center' })
   )(
-    style({ width: '18px', height: '18px' })($tokenIcon(description)),
+    style({ width: '18px', height: '18px' })($tokenIcon(description))
     // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  shortenAddress(indexToken)}`),
   )
 }
@@ -140,7 +140,7 @@ export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
   return $icon({
     $content: $token,
     svgOps: style({ fill: pallete.message, width: '24px', height: '24px' }),
-    viewBox: '0 0 32 32',
+    viewBox: '0 0 32 32'
   })
 }
 
@@ -165,16 +165,16 @@ export const $puppetList = (puppets?: viem.Address[], click?: Tether<INode, stri
 
           history.pushState({}, '', url)
           return url
-        }),
+        })
       )(style({ marginRight: '-12px', border: '2px solid black' })($profileAvatar({ account, profileSize: 25 })))
-    }),
+    })
     // $content
   )
 }
 
 export const $leverage = (size: bigint, collateral: bigint) => {
   return $text(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '0.85rem' }))(
-    readableLeverage(size, collateral),
+    readableLeverage(size, collateral)
   )
 }
 
@@ -184,13 +184,13 @@ export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
   const displayColor = skipRepeats(
     map((value) => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
-    }, pnl),
+    }, pnl)
   )
 
   const colorStyle = styleInline(
     map((color) => {
       return { color }
-    }, displayColor),
+    }, displayColor)
   )
 
   const $testStr = $text(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))
@@ -204,13 +204,13 @@ export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
   const displayColor = skipRepeats(
     map((value) => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
-    }, roi),
+    }, roi)
   )
 
   const colorStyle = styleInline(
     map((color) => {
       return { color }
-    }, displayColor),
+    }, displayColor)
   )
 
   const $testStr = $text(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))
@@ -238,7 +238,7 @@ export function $liquidationSeparator(
   sizeUsd: bigint,
   sizeInTokens: bigint,
   collateralAmount: bigint,
-  markPrice: Stream<bigint>,
+  markPrice: Stream<bigint>
 ) {
   const liqWeight = map((price) => {
     const collateralUsd = getTokenUsd(price, collateralAmount)
@@ -251,9 +251,9 @@ export function $liquidationSeparator(
     map((weight) => {
       return {
         width: '100%',
-        background: `linear-gradient(90deg, ${pallete.negative} ${`${weight * 100}%`}, ${pallete.foreground} 0)`,
+        background: `linear-gradient(90deg, ${pallete.negative} ${`${weight * 100}%`}, ${pallete.foreground} 0)`
       }
-    }, liqWeight),
+    }, liqWeight)
   )($seperator)
 }
 
@@ -269,10 +269,10 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
       ? $column(layoutSheet.flex)(
           $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol),
           $text(style({ fontSize: '.75rem', color: pallete.foreground }))(
-            `${longTokenDescription.symbol}/${shortTokenDescription.symbol}`,
-          ),
+            `${longTokenDescription.symbol}/${shortTokenDescription.symbol}`
+          )
         )
-      : empty(),
+      : empty()
   )
 }
 
@@ -282,7 +282,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 
   return $row(spacing.small, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconG, width: '24px', viewBox: '0 0 32 32' }),
-    $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol),
+    $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol)
   )
 }
 
@@ -293,15 +293,15 @@ export const $openPositionBreakdown = (pos: IPosition) => {
   const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const totalPositionFeeAmount = updateList.reduce(
     (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-    0n,
+    0n
   )
   const totalBorrowingFeeAmount = updateList.reduce(
     (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-    0n,
+    0n
   )
   const totalFundingFeeAmount = updateList.reduce(
     (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-    0n,
+    0n
   )
 
   const latestUpdate = pos.lastUpdate
@@ -311,35 +311,35 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground, flex: 1 }))('Collateral'),
-      $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax)),
+      $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax))
     ),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground, flex: 1 }))('Open Pnl'),
       $pnlDisplay(
         map((markPrice) => {
           return getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
-        }, latestPrice),
-      ),
+        }, latestPrice)
+      )
     ),
 
     $labeledDivider('Realised'),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground }))('Margin Fee'),
-      $pnlDisplay(-totalPositionFeeAmount),
+      $pnlDisplay(-totalPositionFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground }))('Borrowing Fee'),
-      $pnlDisplay(-totalBorrowingFeeAmount),
+      $pnlDisplay(-totalBorrowingFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground }))('Funding Fee'),
-      $pnlDisplay(-totalFundingFeeAmount),
+      $pnlDisplay(-totalFundingFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
       $text(style({ color: pallete.foreground }))('Realised Pnl'),
       // $pnlValue(now(mp.realisedPnl))
-      $pnlDisplay(pos.realisedPnlUsd),
-    ),
+      $pnlDisplay(pos.realisedPnlUsd)
+    )
   )
 }
 
@@ -364,20 +364,20 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
               ? $row(style({ alignItems: 'center' }))(
                   ...puppetList.map((puppet) => {
                     return style({ marginRight: '-12px', border: '2px solid black' })(
-                      $profileAvatar({ account: puppet, profileSize: 25 }),
+                      $profileAvatar({ account: puppet, profileSize: 25 })
                     )
                   }),
-                  $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(`${puppetList.length}`),
+                  $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(`${puppetList.length}`)
                 )
               : $row(style({ alignItems: 'center' }))(
-                  $text(style({ color: pallete.foreground, fontSize: '.85em' }))(`0 puppets`),
-                ),
-          ),
+                  $text(style({ color: pallete.foreground, fontSize: '.85em' }))(`0 puppets`)
+                )
+          )
         ),
         route: route.create({ fragment: 'baseRoute' }),
-        url: `/app/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`,
+        url: `/app/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`
       })({ click: clickTether() }),
 
-      { click },
+      { click }
     ]
   })

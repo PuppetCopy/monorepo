@@ -5,12 +5,12 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 export const $metricEntry = (label: string, value: string) =>
   $row(style({ fontSize: '.85rem', alignItems: 'center' }))(
     $text(style({ color: pallete.foreground, flex: 1 }))(label),
-    $text(style({ fontWeight: 'bold' }))(value),
+    $text(style({ fontWeight: 'bold' }))(value)
   )
 
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
-  $seperator,
+  $seperator
 )
 
 export const $rootContainer = $column(
@@ -23,9 +23,9 @@ export const $rootContainer = $column(
     fontSize: '1rem',
     // fontSize: screenUtils.isDesktopScreen ? '1.15rem' : '1rem',
     minHeight: '100vh',
-    fontWeight: 400,
+    fontWeight: 400
     // flexDirection: 'row',
   }),
 
-  screenUtils.isMobileScreen ? style({ userSelect: 'none' }) : style({}),
+  screenUtils.isMobileScreen ? style({ userSelect: 'none' }) : style({})
 )

@@ -192,5 +192,5 @@ export const abiParamParseMap = {
   address: getAddress,
   'address[]': (arrx: string[]) => arrx.map((x) => getAddress(x)),
   bool: Boolean,
-  'bool[]': (x: boolean[]) => x.map(Boolean),
+  'bool[]': (x: boolean[]) => x.map(Boolean)
 } as const

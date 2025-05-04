@@ -1,27 +1,28 @@
 import { constant, filter, map, merge, mergeArray, startWith } from '@most/core'
-import { type IBehavior, O } from 'aelea/core'
 import {
   $element,
+  component,
   type I$Node,
+  type IBehavior,
   type IBranch,
   type INode,
   type NodeComposeFn,
-  component,
   nodeEvent,
-  styleBehavior,
+  O,
+  styleBehavior
 } from 'aelea/core'
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
 export const interactionOp = O(
   (src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)),
-  constant(true),
+  constant(true)
 )
 
 export const dismissOp = O(
   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
   filter((x) => document.activeElement !== x.target), // focused elements cannot be dismissed
-  constant(false),
+  constant(false)
 )
 
 export interface IButtonCore extends Control {
@@ -36,7 +37,7 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
     (
       [focusStyle, interactionTether]: Behavior<IBranch, true>,
       [dismissstyle, dismissTether]: Behavior<IBranch, false>,
-      [click, clickTether]: Behavior<INode, PointerEvent>,
+      [click, clickTether]: Behavior<INode, PointerEvent>
     ) => {
       const $button = $container(
         clickTether(nodeEvent('pointerup')),
@@ -46,25 +47,25 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
                 (isDisabled) => {
                   return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                 },
-                startWith(true, disabled),
-              ),
+                startWith(true, disabled)
+              )
             )
           : (O() as any),
 
         styleBehavior(
-          map((active) => (active ? { borderColor: pallete.primary } : null), mergeArray([focusStyle, dismissstyle])),
+          map((active) => (active ? { borderColor: pallete.primary } : null), mergeArray([focusStyle, dismissstyle]))
         ),
 
         interactionTether(interactionOp),
-        dismissTether(dismissOp),
+        dismissTether(dismissOp)
       )
 
       return [
         $button($content),
 
         {
-          click,
-        },
+          click
+        }
       ]
-    },
+    }
   )

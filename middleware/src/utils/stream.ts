@@ -13,13 +13,13 @@ import {
   recoverWith,
   switchLatest,
   takeWhile,
-  zipArray,
+  zipArray
 } from '@most/core'
 import { disposeNone } from '@most/disposable'
 import { curry2 } from '@most/prelude'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
-import { type IOps, O, combineArray, isStream } from 'aelea/core'
+import { combineArray, type IOps, isStream, O } from 'aelea/core'
 import { countdownFn, unixTimestampNow } from './utils.js'
 
 export type StateParams<T> = {
@@ -49,7 +49,7 @@ export function combineState<A, K extends keyof A = keyof A>(state: StateParams<
         return seed
       }, {} as A)
     },
-    ...streams,
+    ...streams
   )
 
   return zipped
@@ -64,7 +64,7 @@ export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
       const res = !fn(x)
       last = x
       return res
-    }, s),
+    }, s)
   )
 }
 
@@ -99,7 +99,7 @@ function switchMapFn<T, R>(cb: (t: T) => IStreamOrPromise<R>, s: Stream<T>) {
       const cbRes = cb(cbParam)
 
       return isStream(cbRes) ? cbRes : fromPromise(cbRes)
-    }, s),
+    }, s)
   )
 }
 
@@ -121,7 +121,7 @@ export const periodicRun = <T>({
   actionOp,
   interval = 1000,
   startImmediate = true,
-  recoverError = true,
+  recoverError = true
 }: IPeriodRun<T>): Stream<T> => {
   const tickDelay = at(interval, null)
   const tick = startImmediate ? merge(now(null), tickDelay) : tickDelay
@@ -139,7 +139,7 @@ export const periodicRun = <T>({
       : O(),
     continueWith(() => {
       return periodicRun({ interval, actionOp, recoverError, startImmediate: false })
-    }),
+    })
   )(tick)
 }
 
@@ -170,7 +170,7 @@ export const periodicSample = <T>(sample: Stream<T>, options: IPeriodSample = de
       : O(),
     continueWith(() => {
       return periodicSample(sample, { ...params, startImmediate: false })
-    }),
+    })
   )(tick)
 }
 
@@ -207,7 +207,7 @@ export function importGlobal<T>(queryCb: () => Promise<T>): Stream<T> {
         })
 
       return disposeNone()
-    },
+    }
   }
 }
 
@@ -222,7 +222,7 @@ export const ignoreAll = filter(() => false)
 export enum PromiseStatus {
   DONE,
   PENDING,
-  ERROR,
+  ERROR
 }
 
 export type PromiseStateDone<T> = { state: PromiseStatus.DONE; value: T }
@@ -234,7 +234,7 @@ export const promiseState = <T>(querySrc: Stream<Promise<T>>): Stream<PromiseSta
   return {
     run(sink, scheduler) {
       return querySrc.run(new PromiseStateSink(sink, scheduler), scheduler)
-    },
+    }
   }
 }
 
@@ -243,7 +243,7 @@ class PromiseStateSink<T> implements Sink<Promise<T>> {
 
   constructor(
     private readonly sink: Sink<PromiseState<T>>,
-    private readonly scheduler: Scheduler,
+    private readonly scheduler: Scheduler
   ) {
     this.sink = sink
     this.scheduler = scheduler

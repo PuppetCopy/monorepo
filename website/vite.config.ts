@@ -12,7 +12,7 @@ const SITE_CONFIG = {
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
   __OG_IMAGE__: '/.netlify/functions/og-middlware',
   __THEME_PRIMARY__: dark.pallete.primary,
-  __THEME_BACKGROUND__: dark.pallete.horizon,
+  __THEME_BACKGROUND__: dark.pallete.horizon
 }
 
 // https://vitejs.dev/config/
@@ -32,7 +32,7 @@ export default defineConfig({
             '@puppet/middleware/gbc',
             '@puppet/middleware/ui-components',
             '@puppet/middleware/ui-router',
-            '@puppet/middleware/ui-storage',
+            '@puppet/middleware/ui-storage'
           ],
           vendor: [
             'aelea',
@@ -44,16 +44,16 @@ export default defineConfig({
             'color',
             'mersenne-twister',
             'abitype',
-            'viem',
+            'viem'
           ],
           wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
-          charts: ['lightweight-charts'],
-        },
-      },
-    },
+          charts: ['lightweight-charts']
+        }
+      }
+    }
   },
   server: {
-    port: Number(process.env.PORT) || 3000,
+    port: Number(process.env.PORT) || 3000
   },
   plugins: [
     tsconfigPaths(),
@@ -62,14 +62,14 @@ export default defineConfig({
       strategies: 'injectManifest',
       injectManifest: {
         maximumFileSizeToCacheInBytes: 3000000,
-        globPatterns: ['**/*.{js,html,woff2}'],
+        globPatterns: ['**/*.{js,html,woff2}']
       },
       injectRegister: 'auto',
       srcDir: 'src/sw',
       filename: 'service-worker.ts',
       pwaAssets: {
         config: true,
-        overrideManifestIcons: true,
+        overrideManifestIcons: true
       },
       manifest: {
         name: SITE_CONFIG.__APP_NAME__,
@@ -87,27 +87,27 @@ export default defineConfig({
           { src: 'assets/screenshot/narrow2.png', type: 'image/png', sizes: '828x1792', form_factor: 'narrow' },
 
           { src: 'assets/screenshot/wide1.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' },
-          { src: 'assets/screenshot/wide2.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' },
-        ],
+          { src: 'assets/screenshot/wide2.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' }
+        ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
-        skipWaiting: true,
+        skipWaiting: true
       },
       mode: 'development',
       devOptions: {
         enabled: true,
         navigateFallback: 'index.html',
         suppressWarnings: true,
-        type: 'module',
-      },
+        type: 'module'
+      }
     }),
     replace({
       preventAssignment: true,
       include: 'index.html',
-      ...SITE_CONFIG,
-    }),
-  ],
+      ...SITE_CONFIG
+    })
+  ]
 })

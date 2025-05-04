@@ -3,7 +3,7 @@ import type { DecodeErrorResultReturnType } from 'viem'
 
 const errorMessages = {
   VotingEscrowLogic__ZeroAmount: () => 'Zero amount in voting escrow logic.',
-  VotingEscrow__Unsupported: () => 'Unsupported operation in voting escrow.',
+  VotingEscrow__Unsupported: () => 'Unsupported operation in voting escrow.'
 }
 
 export function getContractErrorMessage(data: DecodeErrorResultReturnType): string | undefined {

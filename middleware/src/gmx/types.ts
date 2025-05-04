@@ -118,7 +118,7 @@ export const OrderType = {
   // @dev StopLossDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
   StopLossDecrease: 6n,
   // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
-  Liquidation: 7n,
+  Liquidation: 7n
 } as const
 
 export interface PositionReferralFees {

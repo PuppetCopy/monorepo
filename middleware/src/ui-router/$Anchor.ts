@@ -1,7 +1,6 @@
 import { constant, map, merge, startWith } from '@most/core'
-import { type IOps, O } from 'aelea/core'
 import type { Behavior } from 'aelea/core'
-import { type $Branch, type IBranch, attr, component, nodeEvent, style } from 'aelea/core'
+import { type $Branch, attr, component, type IBranch, type IOps, nodeEvent, O, style } from 'aelea/core'
 import type { Route } from './types.js'
 
 export interface IAnchor {
@@ -38,7 +37,7 @@ export const $RouterAnchor = ({ url, route, $anchor, anchorOp = O() }: IAnchor) 
           } else {
             throw new Error('target anchor contains no href')
           }
-        }),
+        })
       ),
       focusTether(($anchor) => {
         const focus = constant(true, merge(nodeEvent('focus', $anchor), nodeEvent('pointerenter', $anchor)))
@@ -46,12 +45,12 @@ export const $RouterAnchor = ({ url, route, $anchor, anchorOp = O() }: IAnchor) 
 
         return startWith(false, merge(focus, blur))
       }),
-      anchorOp,
+      anchorOp
     )
 
     return [
       anchorOps($anchor),
 
-      { click, match: route.match, contains, focus },
+      { click, match: route.match, contains, focus }
     ]
   })

@@ -1,6 +1,6 @@
 import { $anchor } from '@puppet/middleware/ui-components'
 import { getExplorerUrl, shortenTxAddress } from '@puppet/middleware/utils'
-import { $text, type I$Node, attr } from 'aelea/core'
+import { $text, attr, type I$Node } from 'aelea/core'
 import type * as viem from 'viem'
 
 export const $txHashRef = (txHash: string, chain: viem.Chain, label?: I$Node) => {

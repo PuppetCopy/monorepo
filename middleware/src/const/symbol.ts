@@ -45,5 +45,5 @@ export const TOKEN_SYMBOL = {
   BTC: 'BTC',
   USDCE: 'USDCE',
   WBTCE: 'WBTCE',
-  ESGMX: 'ESGMX',
+  ESGMX: 'ESGMX'
 } as const

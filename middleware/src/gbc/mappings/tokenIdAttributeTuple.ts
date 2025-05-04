@@ -10001,7 +10001,7 @@ const tokenIdAttributeTuple: IBerryDisplayTupleMap[] = [
   [16, 119, 5, 22, 44, 84],
   [3, 66, 5, 36, 10, 108],
   [39, 113, 5, 36, 102, 117],
-  [46, 43, 5, 32, 124, 45],
+  [46, 43, 5, 32, 124, 45]
 ]
 
 export { tokenIdAttributeTuple }

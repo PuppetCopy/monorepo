@@ -1,8 +1,7 @@
 import { startWith, switchLatest, tap } from '@most/core'
 import { ignoreAll, switchMap } from '@puppet/middleware/utils'
 import { getAccount } from '@wagmi/core'
-import { behavior } from 'aelea/core'
-import { $text, nodeEvent, style } from 'aelea/core'
+import { $text, behavior, nodeEvent, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import type { IWalletPageParams } from '../pages/type.js'
@@ -25,28 +24,28 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
             nodeEvent('pointerdown'),
             tap((es) => {
               walletConnectAppkit.open()
-            }),
+            })
           ),
           spacing.small,
-          style({ alignItems: 'center', paddingRight: '16px' }),
+          style({ alignItems: 'center', paddingRight: '16px' })
         )(
           ignoreAll(click),
           $disconnectedWalletDisplay(),
           $seperator2,
           $column(
             style({ fontSize: '.75rem' })($text('Click to')),
-            style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Connect')),
-          ),
+            style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Connect'))
+          )
         )
       }
 
       return $row(
         spacing.small,
-        style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' }),
+        style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' })
       )(
         accountInfo.address
           ? $profileDisplay({ account: accountInfo.address })
-          : style({ cursor: 'pointer' }, $disconnectedWalletDisplay()),
+          : style({ cursor: 'pointer' }, $disconnectedWalletDisplay())
 
         // $seperator2,
 
@@ -77,6 +76,6 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
         //   )
         // )
       )
-    }, account),
+    }, account)
   )
 }

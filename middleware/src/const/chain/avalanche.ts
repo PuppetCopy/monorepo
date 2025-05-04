@@ -39,7 +39,7 @@ export const AVALANCHE_ADDRESS = {
   PositionRouter: '0xffF6D276Bc37c61A23f06410Dce4A400f66420f8',
   PositionManager: '0x87a4088Bd721F83b6c2E5102e2FA47022Cb1c831',
 
-  TraderJoeUniPool: '0x0c91a070f862666bbcce281346be45766d874d98',
+  TraderJoeUniPool: '0x0c91a070f862666bbcce281346be45766d874d98'
 } as const
 
 export type AvalancheAddress = typeof AVALANCHE_ADDRESS

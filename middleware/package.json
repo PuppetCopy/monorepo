@@ -12,7 +12,9 @@
     "dev:generate-abi": "wagmi generate",
     "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     "./const": {
       "types": "./dist/types/const/index.d.ts",
@@ -66,5 +68,14 @@
   },
   "homepage": "https://puppet.tech",
   "repository": "PuppetCopy/monorepo",
-  "keywords": ["puppet", "puppetCopy", "puppet-middleware", "copytrading", "eth", "ethereum", "dapp", "wallet"]
+  "keywords": [
+    "puppet",
+    "puppetCopy",
+    "puppet-middleware",
+    "copytrading",
+    "eth",
+    "ethereum",
+    "dapp",
+    "wallet"
+  ]
 }

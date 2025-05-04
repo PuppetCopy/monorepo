@@ -7,7 +7,7 @@ import {
   getDenominator,
   getMappedValue,
   getTokenUsd,
-  groupArrayByKeyMap,
+  groupArrayByKeyMap
 } from '../utils/index.js'
 import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from './types.js'
 
@@ -18,7 +18,7 @@ export function getPriceImpactUsd(
   nextShortUsd: bigint,
   factorPositive: bigint,
   factorNegative: bigint,
-  exponentFactor: bigint,
+  exponentFactor: bigint
 ) {
   if (nextLongUsd < 0n || nextShortUsd < 0n) {
     return 0n
@@ -44,7 +44,7 @@ export function calculateImpactForSameSideRebalance(
   nextDiff: bigint,
   hasPositiveImpact: boolean,
   factor: bigint,
-  exponentFactor: bigint,
+  exponentFactor: bigint
 ) {
   const currentImpact = applyImpactFactor(currentDiff, factor, exponentFactor)
   const nextImpact = applyImpactFactor(nextDiff, factor, exponentFactor)
@@ -59,7 +59,7 @@ export function calculateImpactForCrossoverRebalance(
   nextDiff: bigint,
   factorPositive: bigint,
   factorNegative: bigint,
-  exponentFactor: bigint,
+  exponentFactor: bigint
 ) {
   const positiveImpact = applyImpactFactor(currentDiff, factorPositive, exponentFactor)
   const negativeImpactUsd = applyImpactFactor(nextDiff, factorNegative, exponentFactor)
@@ -73,7 +73,7 @@ export function getCappedPositionImpactUsd(
   marketPrice: IMarketPrice,
   marketPoolInfo: IMarketInfo,
   sizeDeltaUsd: bigint,
-  isLong: boolean,
+  isLong: boolean
 ) {
   const priceImpactDeltaUsd = getPriceImpactForPosition(marketPoolInfo, sizeDeltaUsd, isLong)
 
@@ -113,7 +113,7 @@ export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd:
     nextShortUsd,
     marketInfo.config.positionImpactFactorPositive,
     marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor,
+    marketInfo.config.positionImpactExponentFactor
   )
 
   if (priceImpactUsd > 0n) {
@@ -127,7 +127,7 @@ export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd:
   const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
     marketInfo.fees.virtualInventory.virtualInventoryForPositions,
     sizeDeltaUsd,
-    isLong,
+    isLong
   )
 
   const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
@@ -137,7 +137,7 @@ export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd:
     virtualInventoryParams.nextShortUsd,
     marketInfo.config.positionImpactFactorPositive,
     marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor,
+    marketInfo.config.positionImpactExponentFactor
   )
 
   return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
@@ -182,7 +182,7 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
     currentLongUsd,
     currentShortUsd,
     nextLongUsd,
-    nextShortUsd,
+    nextShortUsd
   }
 }
 
@@ -217,7 +217,7 @@ export function getPriceImpactByAcceptablePrice(
   acceptablePrice: bigint,
   indexPrice: bigint,
   isLong: boolean,
-  isIncrease: boolean,
+  isIncrease: boolean
 ) {
   const shouldFlipPriceDiff = isIncrease ? !isLong : isLong
   const priceDiff = (indexPrice - acceptablePrice) * (shouldFlipPriceDiff ? -1n : 1n)
@@ -226,7 +226,7 @@ export function getPriceImpactByAcceptablePrice(
 
   return {
     priceImpactDeltaUsd,
-    priceImpactDeltaAmount,
+    priceImpactDeltaAmount
   }
 }
 
@@ -315,8 +315,8 @@ export async function querySignedPrices(): Promise<IPriceOracleMap> {
         timestamp: price.maxBlockTimestamp,
         token,
         min: priceMin,
-        max: priceMax,
+        max: priceMax
       }
-    },
+    }
   )
 }

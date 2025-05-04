@@ -24,7 +24,7 @@ export interface IStoreDefinition<T, Type extends { [P in keyof T]: T[P] } = any
 export async function set<TSchema, TKey extends GetKey<TSchema>, TData extends TSchema[TKey]>(
   params: IStoreDefinition<TSchema>,
   key: IDBValidKey,
-  data: TData,
+  data: TData
 ): Promise<TData> {
   const db = await params.dbQuery
   const tx = db.transaction(params.name, 'readwrite')
@@ -35,7 +35,7 @@ export async function set<TSchema, TKey extends GetKey<TSchema>, TData extends T
 
 export async function get<TSchema, TKey extends GetKey<TSchema>, TData extends TSchema[TKey]>(
   params: IStoreDefinition<TSchema>,
-  key: TKey,
+  key: TKey
 ): Promise<TData> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readonly').objectStore(params.name)
@@ -62,7 +62,7 @@ export async function clear<TResult>(params: IDbStoreParams): Promise<TResult> {
 export async function cursor(
   params: IDbStoreParams,
   query?: IDBValidKey | IDBKeyRange | null,
-  direction?: IDBCursorDirection,
+  direction?: IDBCursorDirection
 ): Promise<IDBCursorWithValue | null> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readwrite').objectStore(params.name)
@@ -72,7 +72,7 @@ export async function cursor(
 export function openDatabase<TName extends string>(
   name: TName,
   version: number,
-  storeParamList: IDbParams[],
+  storeParamList: IDbParams[]
 ): Promise<IDBDatabase> {
   const openDbRequest = indexedDB.open(name, version)
 

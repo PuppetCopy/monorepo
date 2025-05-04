@@ -9,15 +9,15 @@ import {
   skipRepeats,
   startWith,
   take,
-  tap,
+  tap
 } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import {
-  $Tooltip,
   $alertNegativeContainer,
   $alertPositiveContainer,
   $infoLabeledValue,
+  $Tooltip
 } from '@puppet/middleware/ui-components'
 import { indexDb, uiStorage } from '@puppet/middleware/ui-storage'
 import {
@@ -26,13 +26,23 @@ import {
   readableUnitAmount,
   switchMap,
   unixTimestampNow,
-  zipState,
+  zipState
 } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 // import { announcedProviderList } from "../components/$ConnectWallet"
 import { connect, disconnect, reconnect, watchAccount, watchBlockNumber, watchBlocks } from '@wagmi/core'
-import { type IBehavior, fromCallback, replayLatest } from 'aelea/core'
-import { $element, $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
+import {
+  $element,
+  $node,
+  $text,
+  component,
+  eventElementTarget,
+  fromCallback,
+  type IBehavior,
+  replayLatest,
+  style,
+  styleBehavior
+} from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, $row, designSheet, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -80,7 +90,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
     ) => {
       walletConnectAppkit.getIsConnectedState()
 
@@ -111,14 +121,14 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const $liItem = $element('li')(style({ marginBottom: '14px' }))
 
       const isDesktopScreen = skipRepeats(
-        map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window))),
+        map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window)))
       )
 
       const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
       const selectedCollateralTokenList = uiStorage.replayWrite(
         localStore.global,
         selectMarketTokenList,
-        'collateralTokenList',
+        'collateralTokenList'
       )
 
       const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
@@ -138,9 +148,9 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           watchBlockNumber(wagmiConfig, {
             onBlockNumber(blockNumber) {
               cb(blockNumber)
-            },
-          }),
-        ),
+            }
+          })
+        )
       ])
 
       const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchRuleEditorChange[])
@@ -156,11 +166,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 $text('New version Available'),
                 $ButtonSecondary({
                   $container: $defaultMiniButtonSecondary,
-                  $content: $text('Update'),
+                  $content: $text('Update')
                 })({
-                  click: clickUpdateVersionTether(tap(cb)),
-                }),
-              ),
+                  click: clickUpdateVersionTether(tap(cb))
+                })
+              )
             )
           }, pwaUpgradeNotification),
           router.contains(rootRoute)(
@@ -168,18 +178,18 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               $column(style({ flex: 1, position: 'relative' }))(
                 $column(
                   designSheet.customScroll,
-                  style({ flex: 1, position: 'absolute', inset: 0, overflowY: 'scroll', overflowX: 'hidden' }),
+                  style({ flex: 1, position: 'absolute', inset: 0, overflowY: 'scroll', overflowX: 'hidden' })
                 )(
                   switchMap((isDesktop) => {
                     if (isDesktop) {
                       return $MainMenu({ route: rootRoute })({
                         routeChange: changeRouteTether(),
-                        changeWallet: changeWalletTether(),
+                        changeWallet: changeWalletTether()
                       })
                     }
 
                     return $MainMenuMobile({ route: rootRoute })({
-                      routeChange: changeRouteTether(),
+                      routeChange: changeRouteTether()
                     })
                   }, isDesktopScreen),
                   router.contains(walletRoute)(
@@ -190,7 +200,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                         matchRuleList,
                         activityTimeframe,
                         selectedCollateralTokenList,
-                        pricefeedMapQuery,
+                        pricefeedMapQuery
                       })({
                         changeWallet: changeWalletTether(),
                         changeRoute: changeRouteTether(),
@@ -198,9 +208,9 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                         selectMarketTokenList: selectMarketTokenListTether(),
 
                         changeMatchRuleList: changeMatchRuleListTether(),
-                        changeDepositTokenList: changeDepositTokenListTether(),
-                      }),
-                    ),
+                        changeDepositTokenList: changeDepositTokenListTether()
+                      })
+                    )
                   ),
                   router.match(rootRoute)(
                     $midContainer(
@@ -211,15 +221,15 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                           selectedCollateralTokenList,
                           matchRuleList,
                           depositTokenList,
-                          pricefeedMapQuery,
+                          pricefeedMapQuery
                         })({
                           changeActivityTimeframe: changeActivityTimeframeTether(),
                           selectMarketTokenList: selectMarketTokenListTether(),
                           routeChange: changeRouteTether(),
-                          changeMatchRuleList: changeMatchRuleListTether(),
-                        }),
-                      ),
-                    ),
+                          changeMatchRuleList: changeMatchRuleListTether()
+                        })
+                      )
+                    )
                   ),
                   // // router.contains(profileRoute)(
                   // //   $midContainer(
@@ -262,7 +272,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   // ),
                   $row(
                     spacing.default,
-                    style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }),
+                    style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' })
                   )(
                     $row(
                       $Tooltip({
@@ -274,13 +284,13 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                               return $column(spacing.defaultTiny)(
                                 $text('Subgraph Status'),
                                 $alertNegativeContainer(
-                                  $text('Indexing is currently experiencing issues, please try again later.'),
-                                ),
+                                  $text('Indexing is currently experiencing issues, please try again later.')
+                                )
                               )
                             }
 
                             const blocksBehind = $text(
-                              readableUnitAmount(Number(params.latestBlock) - status.block.number),
+                              readableUnitAmount(Number(params.latestBlock) - status.block.number)
                             )
                             const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
 
@@ -288,11 +298,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                               $text('Subgraph Status'),
                               $column(
                                 $infoLabeledValue('Latest Sync', timeSince),
-                                $infoLabeledValue('blocks behind', blocksBehind),
-                              ),
+                                $infoLabeledValue('blocks behind', blocksBehind)
+                              )
                             )
                           },
-                          zipState({ subgraphStatus: subgraphStatus, latestBlock }),
+                          zipState({ subgraphStatus: subgraphStatus, latestBlock })
                         ),
                         $anchor: $row(
                           style({
@@ -300,13 +310,13 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                             height: '8px',
                             borderRadius: '50%',
                             outlineOffset: '4px',
-                            padding: '6px',
+                            padding: '6px'
                           }),
                           styleBehavior(
                             map((color) => {
                               return { backgroundColor: colorAlpha(color, 0.5), outlineColor: color }
-                            }, subgraphStatusColorOnce),
-                          ),
+                            }, subgraphStatusColorOnce)
+                          )
                         )(
                           $node(
                             style({
@@ -320,23 +330,23 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                               opacity: 0,
                               animationName: 'signal',
                               animationDuration: '2s',
-                              animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                              animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                             }),
                             styleBehavior(
                               map((color) => {
                                 return {
                                   backgroundColor: colorAlpha(color, 0.5),
-                                  animationIterationCount: color === pallete.negative ? 'infinite' : 1,
+                                  animationIterationCount: color === pallete.negative ? 'infinite' : 1
                                 }
-                              }, subgraphStatusColorOnce),
-                            ),
-                          )(),
-                        ),
-                      })({}),
-                    ),
-                  ),
-                ),
-              ),
+                              }, subgraphStatusColorOnce)
+                            )
+                          )()
+                        )
+                      })({})
+                    )
+                  )
+                )
+              )
 
               // $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
               //   $PortfolioEditorDrawer({
@@ -350,8 +360,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               //     changeDepositTokenList: changeDepositTokenListTether(),
               //   })
               // )
-            ),
-          ),
+            )
+          )
 
           // router.match(rootRoute)(
           //   $rootContainer(
@@ -375,7 +385,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           //     changeRoute: changeRouteTether()
           //   })
           // )
-        ),
+        )
       ]
-    },
+    }
   )

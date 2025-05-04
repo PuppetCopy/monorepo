@@ -1,10 +1,10 @@
 import type { Stream } from '@most/types'
 import { createAppKit } from '@reown/appkit'
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import type { AppKitNetwork } from '@reown/appkit/networks'
-import { type GetAccountReturnType, createConfig, watchAccount, watchBlockNumber } from '@wagmi/core'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { createConfig, type GetAccountReturnType, watchAccount, watchBlockNumber } from '@wagmi/core'
 import { fromCallback, replayLatest } from 'aelea/core'
-import { http, fallback, webSocket } from 'viem'
+import { fallback, http, webSocket } from 'viem'
 import { arbitrum } from 'viem/chains'
 
 const projectId = import.meta.env.VITE_WC_PROJECT_ID as string
@@ -12,19 +12,19 @@ const projectId = import.meta.env.VITE_WC_PROJECT_ID as string
 export const publicTransportMap = {
   [arbitrum.id]: fallback([
     webSocket('wss://arb-mainnet.g.alchemy.com/v2/sI7JV4ahbI8oNlOosnZ7klOi8vsxdVwm'),
-    http('https://arb1.arbitrum.io/rpc'),
-  ]),
+    http('https://arb1.arbitrum.io/rpc')
+  ])
   // [CHAIN.AVALANCHE]: avaGlobalProvider,
 } as const
 
 export const wagmiConfig = createConfig({
   chains: [arbitrum],
-  transports: publicTransportMap,
+  transports: publicTransportMap
 })
 
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks: wagmiConfig.chains as any as [AppKitNetwork],
+  networks: wagmiConfig.chains as any as [AppKitNetwork]
 })
 
 export const walletConnectAppkit = createAppKit({
@@ -36,14 +36,14 @@ export const walletConnectAppkit = createAppKit({
   features: {
     connectMethodsOrder: ['wallet', 'social'],
     collapseWallets: false,
-    analytics: true,
+    analytics: true
   },
   metadata: {
     name: '__APP_NAME__',
     description: '__APP_DESC_SHORT__',
     url: window.location.host,
-    icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg'],
-  },
+    icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg']
+  }
 })
 
 // Subscribe to state changes
@@ -82,5 +82,5 @@ export const blockChange: Stream<bigint> = fromCallback((cb) => {
 export const accountChange: Stream<GetAccountReturnType> = replayLatest(
   fromCallback((cb) => {
     return watchAccount(wagmiConfig, { onChange: (res) => cb(res) })
-  }),
+  })
 )

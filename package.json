@@ -4,8 +4,18 @@
   "license": "BSL-1.1 and MIT",
   "description": "Puppet Monorepo",
   "packageManager": "bun@1.2.9",
-  "keywords": ["Puppet", "Copy Trading", "DEX", "Ethereum", "Arbitrum", "DeFi"],
-  "workspaces": ["website", "middleware"],
+  "keywords": [
+    "Puppet",
+    "Copy Trading",
+    "DEX",
+    "Ethereum",
+    "Arbitrum",
+    "DeFi"
+  ],
+  "workspaces": [
+    "website",
+    "middleware"
+  ],
   "scripts": {
     "sherif": "sherif",
     "sherif:fix": "sherif --fix",

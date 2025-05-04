@@ -2,7 +2,7 @@ import { constant, now, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
 import { streamOf, switchMap } from '@puppet/middleware/utils'
 import type { Behavior, Op } from 'aelea/core'
-import { type I$Node, type IBranch, type NodeComposeFn, component, nodeEvent, style } from 'aelea/core'
+import { component, type I$Node, type IBranch, type NodeComposeFn, nodeEvent, style } from 'aelea/core'
 import { $defaultSelectContainer } from './$Dropdown.js'
 
 export interface ISelect<T> {
@@ -24,12 +24,12 @@ export const $Select = <T>({ list, $$option, $container = $defaultSelectContaine
             const $opt = style({ cursor: 'pointer' })(switchLatest($$option(now(item))))
 
             return selectBehavior($opt)
-          }),
+          })
         )
       }, streamOf(list)),
 
       {
-        select,
-      },
+        select
+      }
     ]
   })

@@ -1,7 +1,19 @@
 import { constant, empty, map, now, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IBehavior, type IOps, O } from 'aelea/core'
-import { $node, $svg, type I$Node, type INode, type NodeComposeFn, attr, component, nodeEvent, style } from 'aelea/core'
+import {
+  $node,
+  $svg,
+  attr,
+  component,
+  type I$Node,
+  type IBehavior,
+  type INode,
+  type IOps,
+  type NodeComposeFn,
+  nodeEvent,
+  O,
+  style
+} from 'aelea/core'
 import { $column, $icon, $row, isDesktopScreen, layoutSheet, screenUtils, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
@@ -54,13 +66,13 @@ export interface ISortBy<T = any, K extends keyof T = keyof T> {
 
 const $caretDown = $svg('path')(
   attr({
-    d: 'M4.616.296c.71.32 1.326.844 2.038 1.163L13.48 4.52a6.105 6.105 0 005.005 0l6.825-3.061c.71-.32 1.328-.84 2.038-1.162l.125-.053A3.308 3.308 0 0128.715 0a3.19 3.19 0 012.296.976c.66.652.989 1.427.989 2.333 0 .906-.33 1.681-.986 2.333L18.498 18.344a3.467 3.467 0 01-1.14.765c-.444.188-.891.291-1.345.314a3.456 3.456 0 01-1.31-.177 2.263 2.263 0 01-1.038-.695L.95 5.64A3.22 3.22 0 010 3.309C0 2.403.317 1.628.95.98c.317-.324.68-.568 1.088-.732a3.308 3.308 0 011.24-.244 3.19 3.19 0 011.338.293z',
-  }),
+    d: 'M4.616.296c.71.32 1.326.844 2.038 1.163L13.48 4.52a6.105 6.105 0 005.005 0l6.825-3.061c.71-.32 1.328-.84 2.038-1.162l.125-.053A3.308 3.308 0 0128.715 0a3.19 3.19 0 012.296.976c.66.652.989 1.427.989 2.333 0 .906-.33 1.681-.986 2.333L18.498 18.344a3.467 3.467 0 01-1.14.765c-.444.188-.891.291-1.345.314a3.456 3.456 0 01-1.31-.177 2.263 2.263 0 01-1.038-.695L.95 5.64A3.22 3.22 0 010 3.309C0 2.403.317 1.628.95.98c.317-.324.68-.568 1.088-.732a3.308 3.308 0 011.24-.244 3.19 3.19 0 011.338.293z'
+  })
 )()
 
 export const $defaultTableCell = $row(
   spacing.small,
-  style({ padding: '6px 0', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' }),
+  style({ padding: '6px 0', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
 )
 export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground }))
 export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
@@ -83,16 +95,16 @@ export const $Table = <T>({
 
   sortBy,
   $between = empty(),
-  $sortArrowDown = $caretDown,
+  $sortArrowDown = $caretDown
 }: TableOption<T>) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: Behavior<IQuantumScrollPage, IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: Behavior<INode, string>,
+      [sortByChange, sortByChangeTether]: Behavior<INode, string>
     ) => {
       const gridTemplateColumns = style({
         display: 'grid',
-        gridTemplateColumns: columns.map((col) => col.gridTemplate || '1fr').join(' '),
+        gridTemplateColumns: columns.map((col) => col.gridTemplate || '1fr').join(' ')
       })
 
       const $header = $headerContainer(gridTemplateColumns)(
@@ -112,7 +124,7 @@ export const $Table = <T>({
                       fill:
                         sortBy.selector === col.sortBy && sortBy.direction === 'desc'
                           ? ''
-                          : colorAlpha(pallete.message, 0.3),
+                          : colorAlpha(pallete.message, 0.3)
                     }),
                     $icon({
                       $content: $sortArrowDown,
@@ -121,17 +133,17 @@ export const $Table = <T>({
                           ? ''
                           : colorAlpha(pallete.message, 0.3),
                       width: '8px',
-                      viewBox: '0 0 32 19.43',
-                    }),
+                      viewBox: '0 0 32 19.43'
+                    })
                   )
-                : empty(),
+                : empty()
             )
           }
 
           const $headCell = $headerCell(col.columnOp || O())(col.$head)
 
           return $headCell
-        }),
+        })
       )
 
       const $body = $QuantumScroll({
@@ -145,16 +157,16 @@ export const $Table = <T>({
                       return $rowContainer(gridTemplateColumns)(
                         ...columns.map((col) => {
                           return $bodyCell(col.columnOp || O())(switchLatest(col.$bodyCallback(now(rowData))))
-                        }),
+                        })
                       )
                     },
-                    $rowCallback(now(rowData)),
-                  ),
+                    $rowCallback(now(rowData))
+                  )
                 )
               : $rowContainer(gridTemplateColumns)(
                   ...columns.map((col) => {
                     return $bodyCell(col.columnOp || O())(switchLatest(col.$bodyCallback(now(rowData))))
-                  }),
+                  })
                 )
           })
 
@@ -164,11 +176,11 @@ export const $Table = <T>({
           return {
             $items,
             offset: res.offset,
-            pageSize: res.pageSize,
+            pageSize: res.pageSize
           }
-        }, dataSource),
+        }, dataSource)
       })({
-        scrollRequest: scrollRequestTether(),
+        scrollRequest: scrollRequestTether()
       })
 
       return [
@@ -188,8 +200,8 @@ export const $Table = <T>({
             }
 
             return { direction: sortBy.direction, selector }
-          }, sortByChange),
-        },
+          }, sortByChange)
+        }
       ]
-    },
+    }
   )

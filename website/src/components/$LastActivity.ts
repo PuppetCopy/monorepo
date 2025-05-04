@@ -11,7 +11,7 @@ export const LAST_ACTIVITY_LABEL_MAP = {
   [IntervalTime.DAY]: '24h',
   [IntervalTime.WEEK]: '7d',
   [IntervalTime.MONTH]: '28d',
-  [IntervalTime.YEAR]: '14w',
+  [IntervalTime.YEAR]: '14w'
 }
 
 export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
@@ -25,14 +25,14 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
           ...options.map(([interval, label]) => {
             return $anchor(
               styleBehavior(
-                map((tf) => (tf === Number(interval) ? { color: pallete.primary } : null), activityTimeframe),
+                map((tf) => (tf === Number(interval) ? { color: pallete.primary } : null), activityTimeframe)
               ),
-              changeActivityTimeframeTether(nodeEvent('click'), constant(Number(interval))),
+              changeActivityTimeframeTether(nodeEvent('click'), constant(Number(interval)))
             )($text(label))
-          }),
-        ),
+          })
+        )
       ),
 
-      { changeActivityTimeframe },
+      { changeActivityTimeframe }
     ]
   })

@@ -1,7 +1,16 @@
 import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IBehavior, O, combineArray } from 'aelea/core'
-import { type $Branch, $element, type StyleCSS, component, style, styleBehavior } from 'aelea/core'
+import {
+  type $Branch,
+  $element,
+  combineArray,
+  component,
+  type IBehavior,
+  O,
+  type StyleCSS,
+  style,
+  styleBehavior
+} from 'aelea/core'
 import { $RouterAnchor, type IAnchor } from 'aelea/router'
 import { pallete } from 'aelea/ui-components-theme'
 
@@ -14,8 +23,8 @@ const $anchor = $element('a')(
   style({
     flexShrink: 0,
     minWidth: 0,
-    color: pallete.message,
-  }),
+    color: pallete.message
+  })
 )
 
 export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: ILink) =>
@@ -23,7 +32,7 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: IL
     (
       [click, clickTether]: Behavior<string, string>,
       [active, containsTether]: Behavior<boolean, boolean>,
-      [focus, focusTether]: Behavior<boolean, boolean>,
+      [focus, focusTether]: Behavior<boolean, boolean>
     ) => {
       const $anchorEl = $anchor(
         styleBehavior(
@@ -36,22 +45,22 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: IL
                   : null
             },
             active,
-            focus,
-          ),
+            focus
+          )
         ),
-        styleBehavior(map((isDisabled) => (isDisabled ? { pointerEvents: 'none', opacity: 0.3 } : {}), disabled)),
+        styleBehavior(map((isDisabled) => (isDisabled ? { pointerEvents: 'none', opacity: 0.3 } : {}), disabled))
       )($content)
 
       return [
         $RouterAnchor({ $anchor: $anchorEl, url, route, anchorOp: O(anchorOp || O(), style({ padding: 0 })) })({
           click: clickTether(),
           focus: focusTether(),
-          contains: containsTether(),
+          contains: containsTether()
         }),
 
-        { click, active, focus },
+        { click, active, focus }
       ]
-    },
+    }
   )
 
 export const $AnchorLink = (config: ILink) => {
@@ -59,7 +68,7 @@ export const $AnchorLink = (config: ILink) => {
     ...config,
     anchorOp: O(
       config.anchorOp || O(),
-      style({ textDecoration: 'underline', minWidth: 0, textDecorationColor: pallete.primary }),
-    ),
+      style({ textDecoration: 'underline', minWidth: 0, textDecorationColor: pallete.primary })
+    )
   })
 }

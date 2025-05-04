@@ -12,6 +12,6 @@ export async function readBalanceOf(wallet: walletLink.IClient, token: Address, 
     abi: erc20Abi,
     provider: wallet,
     functionName: 'balanceOf',
-    args: [user],
+    args: [user]
   })
 }

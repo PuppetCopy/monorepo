@@ -1,19 +1,20 @@
 import { join, map, mergeArray, now, snapshot, until } from '@most/core'
 import type { Stream } from '@most/types'
 import { invertColor } from '@puppet/middleware/utils'
-import { type IBehavior, combineState } from 'aelea/core'
 import {
   $text,
-  type I$Node,
-  type IBranch,
-  type NodeComposeFn,
+  combineState,
   component,
   drawLatest,
   eventElementTarget,
+  type I$Node,
+  type IBehavior,
+  type IBranch,
+  type NodeComposeFn,
   nodeEvent,
   style,
   styleBehavior,
-  styleInline,
+  styleInline
 } from 'aelea/core'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -48,12 +49,12 @@ export const $defaultSliderThumb = $row(
     border: `2px solid ${pallete.primary}`,
     // borderWidth: '2px',
     width: '38px',
-    height: '38px',
-  }),
+    height: '38px'
+  })
 )
 
 export const $sliderDefaultContainer = $column(
-  style({ minHeight: '26px', zIndex: 0, touchAction: 'none', placeContent: 'center', cursor: 'pointer' }),
+  style({ minHeight: '26px', zIndex: 0, touchAction: 'none', placeContent: 'center', cursor: 'pointer' })
 )
 
 export const $Slider = ({
@@ -64,22 +65,22 @@ export const $Slider = ({
   min = now(0),
   max = now(1),
   $thumb,
-  $container = $sliderDefaultContainer,
+  $container = $sliderDefaultContainer
 }: ISliderParams) =>
   component(
     (
       [changeSliderDimension, changeSliderDimensionTether]: Behavior<IBranch<HTMLInputElement>, ResizeObserverEntry>,
-      [thumbePositionDelta, thumbePositionDeltaTether]: Behavior<IBranch<HTMLInputElement>, number>,
+      [thumbePositionDelta, thumbePositionDeltaTether]: Behavior<IBranch<HTMLInputElement>, number>
     ) => {
       const $rangeWrapper = $row(
-        style({ height: '2px', pointerEvents: 'none', background: pallete.background, position: 'relative' }),
+        style({ height: '2px', pointerEvents: 'none', background: pallete.background, position: 'relative' })
       )
 
       return [
         $container(
           changeSliderDimensionTether(
             observer.resize({}),
-            map((res) => res[0]),
+            map((res) => res[0])
           ),
           thumbePositionDeltaTether(
             nodeEvent('pointerdown'),
@@ -108,7 +109,7 @@ export const $Slider = ({
                         const steppedVal = step > 0 ? (cVal / step) * step : cVal
 
                         return steppedVal
-                      }, drag),
+                      }, drag)
                     )
 
                     return mergeArray([initialOffset, moveDelta])
@@ -127,15 +128,15 @@ export const $Slider = ({
                       const steppedVal = step > 0 ? (cVal / step) * step : cVal
 
                       return steppedVal
-                    }, drag),
+                    }, drag)
                   )
                 },
                 combineState({ value, min, max, color, changeSliderDimension }),
-                downSrc,
+                downSrc
               )
             },
-            join,
-          ),
+            join
+          )
         )(
           $rangeWrapper(
             styleInline(
@@ -148,8 +149,8 @@ export const $Slider = ({
 
                 const background = `linear-gradient(90deg, ${minArea} ${valArea} ${freeArea} ${maxArea}`
                 return { background }
-              }, combineState({ value, min, max, color })),
-            ),
+              }, combineState({ value, min, max, color }))
+            )
           )(
             $row(
               styleInline(map((val) => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
@@ -159,31 +160,31 @@ export const $Slider = ({
                 position: 'absolute',
                 transition: 'left 175ms cubic-bezier(0.25, 0.8, 0.25, 1) 0s',
                 alignItems: 'center',
-                placeContent: 'center',
-              }),
+                placeContent: 'center'
+              })
             )(
               styleBehavior(
                 map((params) => {
                   return params.disabled
                     ? {
                         borderColor: colorAlpha(pallete.foreground, 0.2),
-                        pointerEvents: params.disabled ? 'none' : 'all',
+                        pointerEvents: params.disabled ? 'none' : 'all'
                       }
                     : { borderColor: params.color }
-                }, combineState({ disabled, color })),
+                }, combineState({ disabled, color }))
               )(
                 $thumb
                   ? $thumb
                   : $defaultSliderThumb(
-                      $text(style({ paddingTop: '2px' }))(map((n) => Math.floor(n * 100) + '%', value)),
-                    ),
-              ),
-            ),
-          ),
+                      $text(style({ paddingTop: '2px' }))(map((n) => Math.floor(n * 100) + '%', value))
+                    )
+              )
+            )
+          )
         ),
         {
-          change: thumbePositionDelta,
-        },
+          change: thumbePositionDelta
+        }
       ]
-    },
+    }
   )

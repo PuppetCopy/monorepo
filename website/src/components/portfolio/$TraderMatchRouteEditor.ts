@@ -4,17 +4,16 @@ import type { IMatchRule } from '@puppet/middleware/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
 import { switchMap, unixTimestampNow } from '@puppet/middleware/utils'
 import type { GetAccountReturnType } from '@wagmi/core'
-import { type IBehavior, combineState } from 'aelea/core'
-import { $text, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import { $text, combineState, component, type I$Node, type IBehavior, type NodeComposeFn, style } from 'aelea/core'
 import { $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
-import { $Popover } from '../$Popover.js'
 import { $tokenTryLabeled } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IWalletPageParams } from '../../pages/type.js'
 import { accountChange } from '../../walletConnect.js'
+import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $MatchRuleEditor, type IDraftMatchRule } from './$MatchRuleEditor.js'
 
@@ -47,14 +46,14 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: Behavior<any, IMatchRule | undefined>,
 
       [discardDraft, discardDraftTether]: Behavior<IDraftMatchRule>,
-      [saveDraft, saveDraftTether]: Behavior<IDraftMatchRule>,
+      [saveDraft, saveDraftTether]: Behavior<IDraftMatchRule>
     ) => {
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
         trader,
         matchRuleList,
         collateralToken,
-        traderMatchingRuleList,
+        traderMatchingRuleList
       } = config
 
       const rule = config.accountInfo.address
@@ -67,13 +66,13 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           open: map((matchRule) => {
             return $MatchRuleEditor(matchRule)({
               remove: discardDraftTether(),
-              save: saveDraftTether(),
+              save: saveDraftTether()
             })
           }, popRouteSubscriptionEditor),
           dismiss: mergeArray([saveDraft, discardDraft]),
           $target: $ButtonSecondary({
             $content: $responsiveFlex(
-              style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' }),
+              style({ alignItems: 'center', gap: screenUtils.isDesktopScreen ? '12px' : '4px' })
             )(
               $row(style({ alignItems: 'center' }))($tokenTryLabeled(collateralToken)),
               $seperator2,
@@ -83,9 +82,9 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                   $content: $caretDown,
                   width: '12px',
                   svgOps: style({ marginTop: '2px', minWidth: '8px' }),
-                  viewBox: '0 0 32 32',
-                }),
-              ),
+                  viewBox: '0 0 32 32'
+                })
+              )
             ),
             $container: $defaultMiniButtonSecondary(
               style({
@@ -93,12 +92,12 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                 padding: '8px',
                 height: 'auto',
                 borderColor:
-                  rule && rule.expiry > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, 0.25),
-              }),
-            ),
+                  rule && rule.expiry > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, 0.25)
+              })
+            )
           })({
-            click: popRouteSubscriptionEditorTether(constant(rule)),
-          }),
+            click: popRouteSubscriptionEditorTether(constant(rule))
+          })
         })({}),
         {
           changeMatchRuleList: mergeArray([
@@ -110,7 +109,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                   draft: params.saveDraft,
                   trader,
                   collateralToken: collateralToken,
-                  matchRule: rule,
+                  matchRule: rule
                 }
                 if (index === -1) {
                   newList.push(change)
@@ -121,7 +120,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                 return newList
               },
               matchRuleList,
-              combineState({ saveDraft }),
+              combineState({ saveDraft })
             ),
             snapshot(
               (list, draft) => {
@@ -136,10 +135,10 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                 return newList
               },
               matchRuleList,
-              discardDraft,
-            ),
-          ]),
-        },
+              discardDraft
+            )
+          ])
+        }
       ]
-    },
+    }
   )

@@ -3,34 +3,33 @@ import type { Stream } from '@most/types'
 import * as PUPPET from '@puppet/middleware/const'
 import { CONTRACT } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $ButtonToggle, $FieldLabeled, $defaulButtonToggleContainer } from '@puppet/middleware/ui-components'
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet/middleware/ui-components'
 import {
-  PromiseStatus,
   combineState,
   getMappedValue,
+  PromiseStatus,
   parseFixed,
   parseReadableNumber,
   promiseState,
   readableTokenAmount,
   readableTokenAmountLabel,
-  switchMap,
+  switchMap
 } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
-import { type IBehavior, combineArray, combineState, replayLatest } from 'aelea/core'
-import { $node, $text, component, style } from 'aelea/core'
+import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
-import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { readAddressTokenBalance } from '../../logic/traderRead.js'
 import type { IComponentPageParams } from '../../pages/type.js'
+import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $ApproveSpend } from '../form/$ApproveSpend.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
 export enum DepositEditorAction {
   DEPOSIT,
-  WITHDRAW,
+  WITHDRAW
 }
 
 export interface IDepositEditorValue {
@@ -58,7 +57,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
       [changeAmount, changeAmountTether]: Behavior<string, bigint>,
       [changeDepositMode, changeDepositModeTether]: Behavior<DepositEditorAction>,
 
-      [clickSave, clickSaveTether]: Behavior<PointerEvent>,
+      [clickSave, clickSaveTether]: Behavior<PointerEvent>
     ) => {
       const { walletClientQuery, change, depositBalanceQuery } = config
 
@@ -78,7 +77,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
 
       const amount = replayLatest(
         multicast(mergeArray([clickMax, changeAmount, constant(0n, changeDepositMode)])),
-        change.value.amount,
+        change.value.amount
       )
 
       return [
@@ -93,9 +92,9 @@ export const $DepositEditor = (config: IDepositEditor) =>
               }
 
               return $text(style({ width: '100px', textAlign: 'center' }))('Withdraw')
-            }),
+            })
           })({
-            select: changeDepositModeTether(),
+            select: changeDepositModeTether()
           }),
 
           $node(),
@@ -105,7 +104,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
               label: 'Amount',
               value: map(
                 (value) => (value ? readableTokenAmount(tokenDescription, value) : ''),
-                mergeArray([now(change.value.amount), clickMax, constant(0n, changeDepositMode)]),
+                mergeArray([now(change.value.amount), clickMax, constant(0n, changeDepositMode)])
               ),
               placeholder: 'Enter amount',
               hint: map((params) => {
@@ -114,13 +113,13 @@ export const $DepositEditor = (config: IDepositEditor) =>
                 }
 
                 return ` `
-              }, combineState({ max, action })),
+              }, combineState({ max, action }))
             })({
               change: changeAmountTether(
                 map((val) => {
                   return val ? parseFixed(tokenDescription.decimals, parseReadableNumber(val)) : 0n
-                }),
-              ),
+                })
+              )
             }),
             $ButtonSecondary({
               $container: $defaultMiniButtonSecondary(
@@ -128,13 +127,13 @@ export const $DepositEditor = (config: IDepositEditor) =>
                   position: 'absolute',
                   borderColor: colorAlpha(pallete.foreground, 0.35),
                   right: '6px',
-                  top: '8px',
-                }),
+                  top: '8px'
+                })
               ),
-              $content: $text('Max'),
+              $content: $text('Max')
             })({
-              click: clickMaxTether(sample(max)),
-            }),
+              click: clickMaxTether(sample(max))
+            })
           ),
 
           $row(
@@ -146,13 +145,13 @@ export const $DepositEditor = (config: IDepositEditor) =>
                 if (wallet === null) {
                   return $ButtonSecondary({
                     disabled: now(true),
-                    $content: $text('Save'),
+                    $content: $text('Save')
                   })({})
                 }
 
                 const isSpendPending = startWith(
                   false,
-                  map((s) => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend)),
+                  map((s) => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({
@@ -160,7 +159,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
                   token: change.token,
                   amount: map(
                     (params) => (params.action === DepositEditorAction.DEPOSIT ? params.amount : 0n),
-                    combineState({ amount, action }),
+                    combineState({ amount, action })
                   ),
                   walletClient: wallet,
                   txQuery: approveTokenSpend,
@@ -179,19 +178,19 @@ export const $DepositEditor = (config: IDepositEditor) =>
 
                       return false
                     }, combineState({ max, amount, action })),
-                    $content: $text('Save'),
+                    $content: $text('Save')
                   })({
-                    click: clickSaveTether(),
+                    click: clickSaveTether()
                   }),
-                  disabled: combineArray((params) => params.isSpendPending, combineState({ isSpendPending })),
+                  disabled: combineArray((params) => params.isSpendPending, combineState({ isSpendPending }))
                 })({
-                  approveTokenSpend: approveTokenSpendTether(),
+                  approveTokenSpend: approveTokenSpendTether()
                 })
-              }),
+              })
             })({
-              changeWallet: changeWalletTether(),
-            }),
-          ),
+              changeWallet: changeWalletTether()
+            })
+          )
         ),
 
         {
@@ -201,15 +200,15 @@ export const $DepositEditor = (config: IDepositEditor) =>
                 token: change.token,
                 action: params.action,
                 value: {
-                  amount: params.amount,
-                },
+                  amount: params.amount
+                }
               }
             },
             combineState({ amount, action }),
-            clickSave,
+            clickSave
           ),
-          changeWallet,
-        },
+          changeWallet
+        }
       ]
-    },
+    }
   )

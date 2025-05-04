@@ -17,14 +17,14 @@ const DEFAULT_BASE_COLORS = [
   '#F3C100', // goldenrod
   '#1598F2', // lightning blue
   '#2465E1', // sail blue
-  '#F19E02', // gold
+  '#F19E02' // gold
 ]
 
 function jazzicon(
   address: string,
   shapeCount = DEFAULT_SHAPE_COUNT,
   wobble = DEFAULT_WOBBLE,
-  baseColors = DEFAULT_BASE_COLORS,
+  baseColors = DEFAULT_BASE_COLORS
 ): string {
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) throw new Error('Invalid address')
   if (shapeCount + 1 > baseColors.length) throw new Error('Insufficient base colors')
@@ -60,7 +60,7 @@ function jazzicon(
   shapes.push('<rect x="0" y="0" width="100%" height="100%" fill="' + nextColor() + '" />')
   for (let i = 0; i < shapeCount; i++) {
     shapes.push(
-      '<rect x="0" y="0" width="100%" height="100%" transform="' + nextTransform(i) + '" fill="' + nextColor() + '" />',
+      '<rect x="0" y="0" width="100%" height="100%" transform="' + nextTransform(i) + '" fill="' + nextColor() + '" />'
     )
   }
   return shapes.join('')
@@ -71,7 +71,7 @@ export function $jazzicon(address: viem.Address) {
     tap((node) => {
       node.element.innerHTML = jazzicon(address)
       return node
-    }),
+    })
   )()
   // return $element('img')(attr({ src: buildDataUrl(address) }))()
 }

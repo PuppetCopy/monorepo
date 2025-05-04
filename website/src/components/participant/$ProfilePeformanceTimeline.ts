@@ -7,21 +7,20 @@ import {
   now,
   skipRepeatsWith,
   startWith,
-  switchLatest,
+  switchLatest
 } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { isPositionOpen, isPositionSettled } from '@puppet/middleware/core'
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, type IMarker } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from '@puppet/middleware/utils'
-import { type IBehavior, combineState } from 'aelea/core'
-import { $node, $text, MOTION_NO_WOBBLE, component, motion, style } from 'aelea/core'
-import { $NumberTicker, $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $node, $text, combineState, component, type IBehavior, MOTION_NO_WOBBLE, motion, style } from 'aelea/core'
+import { $column, $NumberTicker, $row, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams, Time } from 'lightweight-charts'
 import type * as viem from 'viem'
+import type { IUserActivityPageParams } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
-import type { IUserActivityPageParams } from '../../pages/type.js'
 import { getPositionListTimelinePerformance } from '../trade/$ProfilePerformanceGraph.js'
 
 interface IProfilePeformanceTimeline extends IUserActivityPageParams {}
@@ -31,7 +30,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
     (
       [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams>,
       [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
-      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
+      [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>
     ) => {
       const {
         activityTimeframe,
@@ -40,12 +39,12 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
         depositTokenList,
         matchRuleList,
         providerClientQuery,
-        route,
+        route
       } = config
 
       const debouncedState = debounce(
         40,
-        combineState({ selectedCollateralTokenList, pricefeedMapQuery, activityTimeframe, matchRuleList }),
+        combineState({ selectedCollateralTokenList, pricefeedMapQuery, activityTimeframe, matchRuleList })
       )
       const positionParams = multicast(
         map(async (params) => {
@@ -55,11 +54,11 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
             list: list.flatMap((pos) => [...pos.decreaseList, ...pos.increaseList]),
             tickCount: 100,
             activityTimeframe: params.activityTimeframe,
-            pricefeedMap: await params.pricefeedMapQuery,
+            pricefeedMap: await params.pricefeedMapQuery
           })
 
           return { timeline, list }
-        }, debouncedState),
+        }, debouncedState)
       )
 
       return [
@@ -72,15 +71,15 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
               right: '20px',
               alignSelf: 'center',
               zIndex: 11,
-              alignItems: 'flex-start',
-            }),
+              alignItems: 'flex-start'
+            })
           )(
             $row(style({ flex: 1 }))(
               $SelectCollateralToken({
-                selectedList: selectedCollateralTokenList,
+                selectedList: selectedCollateralTokenList
               })({
-                selectMarketTokenList: selectMarketTokenListTether(),
-              }),
+                selectMarketTokenList: selectMarketTokenListTether()
+              })
             ),
             switchLatest(
               awaitPromises(
@@ -94,7 +93,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
 
                   const pnlCrossHairTimeChange = startWith(
                     null,
-                    skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove),
+                    skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove)
                   )
                   const hoverChartPnl = filterNull(
                     map((cross) => {
@@ -106,14 +105,14 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                       const data = params.timeline
                       const value = data[data.length - 1]?.value
                       return value || null
-                    }, pnlCrossHairTimeChange),
+                    }, pnlCrossHairTimeChange)
                   )
 
                   return $column(style({ flex: 1, alignItems: 'center' }))(
                     $NumberTicker({
                       textStyle: {
                         fontSize: '1.85rem',
-                        fontWeight: '900',
+                        fontWeight: '900'
                       },
                       // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
                       value$: map(
@@ -122,25 +121,25 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                           const newLocal = parseReadableNumber(newLocal2)
                           return newLocal
                         },
-                        motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl),
+                        motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
                       ),
                       incrementColor: pallete.positive,
-                      decrementColor: pallete.negative,
+                      decrementColor: pallete.negative
                     }),
                     $infoTooltipLabel(
                       'The total combined settled and open trades',
-                      $text(style({ fontSize: '.85rem' }))('PnL'),
-                    ),
+                      $text(style({ fontSize: '.85rem' }))('PnL')
+                    )
                   )
-                }, positionParams),
-              ),
+                }, positionParams)
+              )
             ),
             $row(style({ flex: 1 }))(
               $node(style({ flex: 1 }))(),
               $LastAtivity(config.activityTimeframe)({
-                changeActivityTimeframe: changeActivityTimeframeTether(),
-              }),
-            ),
+                changeActivityTimeframe: changeActivityTimeframeTether()
+              })
+            )
           ),
           $IntermediatePromise({
             query: positionParams,
@@ -150,7 +149,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
               if (positionCount === 0) {
                 return $row(
                   spacing.defaultTiny,
-                  style({ textAlign: 'center', placeSelf: 'center' }),
+                  style({ textAlign: 'center', placeSelf: 'center' })
                 )($text(style({ color: pallete.foreground }))('No activity found'))
               }
 
@@ -161,7 +160,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                   color: pnl < 0n ? pallete.negative : pallete.positive,
                   time: unixTimestampNow() as Time,
                   size: 1.5,
-                  shape: 'circle',
+                  shape: 'circle'
                 }
               })
               const settledMarkerList = params.list
@@ -173,12 +172,12 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                     color: colorAlpha(pallete.message, 0.5),
                     time: Number(pos.blockTimestamp) as Time,
                     size: 0.1,
-                    shape: 'circle',
+                    shape: 'circle'
                   }
                 })
 
               const allMarkerList = [...settledMarkerList, ...openMarkerList].sort(
-                (a, b) => Number(a.time) - Number(b.time),
+                (a, b) => Number(a.time) - Number(b.time)
               )
 
               return $Baseline({
@@ -189,9 +188,9 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                     ticksVisible: true,
                     scaleMargins: {
                       top: 0.4,
-                      bottom: 0,
-                    },
-                  },
+                      bottom: 0
+                    }
+                  }
                   // timeScale: {}
                 },
                 baselineOptions: {
@@ -200,8 +199,8 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                   lineWidth: 2,
                   baseValue: {
                     price: 0,
-                    type: 'price',
-                  },
+                    type: 'price'
+                  }
                 },
                 // appendData: scan((prev, next) => {
                 //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
@@ -216,15 +215,15 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                 //     time
                 //   }
                 // }, data[data.length - 1], config.processData),
-                data: params.timeline as any as BaselineData[],
+                data: params.timeline as any as BaselineData[]
               })({
-                crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x)),
+                crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x))
               })
-            }),
-          })({}),
+            })
+          })({})
         ),
 
-        { selectMarketTokenList, changeActivityTimeframe },
+        { selectMarketTokenList, changeActivityTimeframe }
       ]
-    },
+    }
   )

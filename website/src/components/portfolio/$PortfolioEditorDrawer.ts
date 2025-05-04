@@ -4,18 +4,17 @@ import { CONTRACT } from '@puppet/middleware/const'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@puppet/middleware/ui-components'
 import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
-import { type IBehavior, O, combineState } from 'aelea/core'
-import { $node, $text, component, nodeEvent, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
 import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
-import { $profileDisplay } from '../$AccountProfile.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2, $iconCircular, $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { fadeIn } from '../../transitions/enter.js'
+import { $profileDisplay } from '../$AccountProfile.js'
 import { $ButtonCircular } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import { DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
@@ -40,13 +39,13 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
       [clickClose, clickCloseTether]: Behavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: Behavior<any, IMatchRuleEditorChange>,
       [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
     ) => {
       const { matchRuleList, providerClientQuery, walletClientQuery, depositTokenList } = config
 
       const hasDraft = skipRepeatsWith(
         (draft) => draft.matchRuleList.length > 0 || draft.depositTokenList.length > 0,
-        combineState({ matchRuleList, depositTokenList }),
+        combineState({ matchRuleList, depositTokenList })
       )
 
       return [
@@ -70,7 +69,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
               const newDraft: IPortfolioRoute = {
                 collateralToken,
                 deposit: null,
-                matchRuleList: [],
+                matchRuleList: []
               }
 
               if ('draft' in item) {
@@ -91,23 +90,23 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
                 padding: '18px 0',
                 borderBottom: 'none',
-                borderRadius: '20px 20px 0 0',
-              }),
+                borderRadius: '20px 20px 0 0'
+              })
             )(
               $column(spacing.default)(
                 $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
                   $heading3('Portfolio Changes'),
                   $infoTooltip(
-                    'The following rules will apply to these traders in your portfolio. visit Profile to view your portfolio',
+                    'The following rules will apply to these traders in your portfolio. visit Profile to view your portfolio'
                   ),
 
                   $node(style({ flex: 1 }))(),
 
                   $ButtonCircular({
-                    $iconPath: $xCross,
+                    $iconPath: $xCross
                   })({
-                    click: clickCloseTether(),
-                  }),
+                    click: clickCloseTether()
+                  })
                 ),
 
                 $column(
@@ -115,24 +114,24 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   style({
                     overflow: 'auto',
                     maxHeight: '35vh',
-                    padding: `0 ${screenUtils.isDesktopScreen ? '24px' : '12px'}`,
-                  }),
+                    padding: `0 ${screenUtils.isDesktopScreen ? '24px' : '12px'}`
+                  })
                 )(
                   ...portfolioRouteList.map((route) => {
                     return $column(style({ paddingLeft: '16px' }))(
                       $row(
                         spacing.big,
-                        style({ padding: '6px 0' }),
+                        style({ padding: '6px 0' })
                       )(
                         $RouteDepositEditor({
                           collateralToken: route.collateralToken,
                           depositTokenList,
                           providerClientQuery,
-                          walletClientQuery,
+                          walletClientQuery
                         })({
                           changeDepositTokenList: changeDepositTokenListTether(),
-                          changeWallet: changeWalletTether(),
-                        }),
+                          changeWallet: changeWalletTether()
+                        })
                       ),
                       $row(spacing.default)(
                         $seperator2,
@@ -143,26 +142,26 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 ? {
                                     fill: pallete.negative,
                                     icon: $xCross,
-                                    label: screenUtils.isDesktopScreen ? 'Remove' : '-',
+                                    label: screenUtils.isDesktopScreen ? 'Remove' : '-'
                                   }
                                 : {
                                     fill: pallete.message,
                                     icon: $target,
-                                    label: screenUtils.isDesktopScreen ? 'Edit' : '~',
+                                    label: screenUtils.isDesktopScreen ? 'Edit' : '~'
                                   }
                               : {
                                   fill: pallete.positive,
                                   icon: $check,
-                                  label: screenUtils.isDesktopScreen ? 'Add' : '+',
+                                  label: screenUtils.isDesktopScreen ? 'Add' : '+'
                                 }
 
                             return $row(
                               screenUtils.isDesktopScreen ? spacing.big : spacing.default,
-                              style({ alignItems: 'center', padding: `14px 0` }),
+                              style({ alignItems: 'center', padding: `14px 0` })
                             )(
                               O(
                                 style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
-                                clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc)),
+                                clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
                               )($iconCircular($xCross)),
                               $row(
                                 $text(
@@ -171,9 +170,9 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                     marginLeft: `-42px`,
                                     borderRadius: '6px',
                                     padding: screenUtils.isDesktopScreen ? `6px 12px 6px 22px` : `6px 8px 6px 30px`,
-                                    color: iconColorParams.fill,
-                                  }),
-                                )(iconColorParams.label),
+                                    color: iconColorParams.fill
+                                  })
+                                )(iconColorParams.label)
                               ),
 
                               // switchMap(amount => {
@@ -181,28 +180,28 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
 
                               $profileDisplay({
-                                account: modSubsc.trader,
+                                account: modSubsc.trader
                                 // $profileContainer: $defaultBerry(style({ width: '50px' }))
                               }),
 
                               $responsiveFlex(spacing.default, style({ flex: 1 }))(
                                 $infoLabeledValue(
                                   'Allowance Rate',
-                                  $text(`${readablePercentage(modSubsc.draft.allowanceRate)}`),
+                                  $text(`${readablePercentage(modSubsc.draft.allowanceRate)}`)
                                 ),
                                 $infoLabeledValue('Expiry', readableDate(Number(modSubsc.draft.expiry))),
                                 $infoLabeledValue(
                                   'Throttle Duration',
-                                  $text(`${getDuration(modSubsc.draft.throttleActivity)}`),
-                                ),
-                              ),
+                                  $text(`${getDuration(modSubsc.draft.throttleActivity)}`)
+                                )
+                              )
                             )
-                          }),
-                        ),
+                          })
+                        )
                       ),
-                      $seperator2,
+                      $seperator2
                     )
-                  }),
+                  })
                 ),
 
                 $row(spacing.small, style({ placeContent: 'space-between', padding: '0 24px' }))(
@@ -210,7 +209,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   $SubmitBar({
                     walletClientQuery,
                     $submitContent: $text(screenUtils.isDesktopScreen ? 'Save Changes' : 'Save'),
-                    txQuery: requestChangeSubscription,
+                    txQuery: requestChangeSubscription
                     // alert: validationError
                   })({
                     changeWallet: changeWalletTether(),
@@ -225,15 +224,15 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               const ruleParams = {
                                 allowanceRate: matchRule.draft.allowanceRate,
                                 throttleActivity: matchRule.draft.throttleActivity,
-                                expiry: matchRule.draft.expiry,
+                                expiry: matchRule.draft.expiry
                               }
 
                               return viem.encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'setMatchingRule',
-                                args: [matchRule.collateralToken, matchRule.trader, ruleParams],
+                                args: [matchRule.collateralToken, matchRule.trader, ruleParams]
                               })
-                            }),
+                            })
                           )
                         }
 
@@ -244,14 +243,14 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 ? viem.encodeFunctionData({
                                     ...contractDefs,
                                     functionName: 'deposit',
-                                    args: [deposit.token, deposit.value.amount],
+                                    args: [deposit.token, deposit.value.amount]
                                   })
                                 : viem.encodeFunctionData({
                                     ...contractDefs,
                                     functionName: 'withdraw',
-                                    args: [deposit.token, wallet.account.address, deposit.value.amount],
-                                  }),
-                            ),
+                                    args: [deposit.token, wallet.account.address, deposit.value.amount]
+                                  })
+                            )
                           )
                         }
 
@@ -259,14 +258,14 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                           ...contractDefs,
                           walletClient: wallet,
                           functionName: 'multicall',
-                          args: [callStack],
+                          args: [callStack]
                         })
-                      }),
-                    ),
-                  }),
-                ),
-              ),
-            ),
+                      })
+                    )
+                  })
+                )
+              )
+            )
           )
         }, hasDraft),
 
@@ -286,12 +285,12 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 return list
               },
               matchRuleList,
-              clickRemoveSubsc,
+              clickRemoveSubsc
             ),
-            constant([], clickClose),
+            constant([], clickClose)
           ]),
-          changeDepositTokenList: mergeArray([changeDepositTokenList, map((x) => [], clickClose)]),
-        },
+          changeDepositTokenList: mergeArray([changeDepositTokenList, map((x) => [], clickClose)])
+        }
       ]
-    },
+    }
   )

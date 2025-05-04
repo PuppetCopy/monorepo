@@ -5,7 +5,7 @@ import {
   type BaselineSeriesPartialOptions,
   type ChartOptions,
   type DeepPartial,
-  LineStyle,
+  LineStyle
 } from 'lightweight-charts'
 import { readableUnitAmount } from '../../utils/index.js'
 import { $Chart, type IChartConfig } from './$Chart.js'
@@ -18,7 +18,7 @@ export const $Baseline = (config: IBaselineChart) => {
   const baselineOptions: BaselineSeriesPartialOptions = {
     priceFormat: {
       type: 'custom',
-      formatter: (priceValue: BarPrice) => readableUnitAmount(priceValue.valueOf()),
+      formatter: (priceValue: BarPrice) => readableUnitAmount(priceValue.valueOf())
     },
     baseLineStyle: LineStyle.Dashed,
     lineStyle: LineStyle.Solid,
@@ -26,7 +26,7 @@ export const $Baseline = (config: IBaselineChart) => {
     bottomLineColor: pallete.negative,
     baseValue: {
       type: 'price',
-      price: 0,
+      price: 0
     },
     // baseLineStyle: LineStyle.Dashed,
     // lineWidth: 2,
@@ -36,25 +36,25 @@ export const $Baseline = (config: IBaselineChart) => {
     baseLineVisible: true,
     // lastValueVisible: false,
     priceLineVisible: false,
-    ...config.baselineOptions,
+    ...config.baselineOptions
   }
 
   const chartConfig: DeepPartial<ChartOptions> = {
     layout: {
       attributionLogo: false,
       background: {
-        color: 'transparent',
+        color: 'transparent'
       },
       textColor: pallete.foreground,
-      fontSize: 10,
+      fontSize: 10
     },
     leftPriceScale: {
       autoScale: true,
       ticksVisible: true,
       scaleMargins: {
         top: 0.1,
-        bottom: 0.1,
-      },
+        bottom: 0.1
+      }
     },
     // rightPriceScale: {
     //   // mode: PriceScaleMode.Logarithmic,
@@ -75,9 +75,9 @@ export const $Baseline = (config: IBaselineChart) => {
       fixRightEdge: true,
       fixLeftEdge: true,
       borderVisible: false,
-      rightOffset: 0,
+      rightOffset: 0
     },
-    ...(config.chartConfig || {}),
+    ...(config.chartConfig || {})
   }
 
   return $Chart({
@@ -90,6 +90,6 @@ export const $Baseline = (config: IBaselineChart) => {
       }, 55)
 
       return series
-    },
+    }
   })
 }

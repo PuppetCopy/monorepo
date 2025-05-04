@@ -8,10 +8,10 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
   const chartConfig: DeepPartial<ChartOptions> = {
     overlayPriceScales: {
       borderColor: pallete.indeterminate,
-      borderVisible: false,
+      borderVisible: false
     },
     leftPriceScale: {
-      visible: false,
+      visible: false
     },
     rightPriceScale: {
       borderColor: 'yellow',
@@ -19,8 +19,8 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
       visible: false,
       scaleMargins: {
         top: 0.4,
-        bottom: 0,
-      },
+        bottom: 0
+      }
     },
     timeScale: {
       fixLeftEdge: true,
@@ -28,7 +28,7 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
       rightOffset: 0,
       rightBarStaysOnScroll: true,
       secondsVisible: true,
-      timeVisible: true,
+      timeVisible: true
     },
     crosshair: {
       mode: CrosshairMode.Normal,
@@ -38,7 +38,7 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
         labelBackgroundColor: pallete.foreground,
         color: colorAlpha(pallete.foreground, 0.2),
         width: 1,
-        style: LineStyle.Solid,
+        style: LineStyle.Solid
       },
       vertLine: {
         // visible: false,
@@ -46,15 +46,15 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
         labelBackgroundColor: pallete.indeterminate,
         color: colorAlpha(pallete.indeterminate, 0.2),
         width: 1,
-        style: LineStyle.Solid,
-      },
+        style: LineStyle.Solid
+      }
     },
-    ...config.chartConfig,
+    ...config.chartConfig
   }
 
   return $Chart({
     ...config,
     chartConfig,
-    getSeriesApi: (api) => api.addSeries(CandlestickSeries, config.seriesConfig),
+    getSeriesApi: (api) => api.addSeries(CandlestickSeries, config.seriesConfig)
   })
 }

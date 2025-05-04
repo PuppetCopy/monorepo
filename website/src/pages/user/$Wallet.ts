@@ -10,19 +10,19 @@ import {
   periodic,
   sample,
   snapshot,
-  startWith,
+  startWith
 } from '@most/core'
 import * as PUPPET from '@puppet/middleware/const'
 import { getVestingCursor } from '@puppet/middleware/core'
 import {
   $ButtonToggle,
-  $FieldLabeled,
   $defaulButtonToggleContainer,
+  $FieldLabeled,
   $infoLabeledValue,
   $infoTooltip,
   $infoTooltipLabel,
   $labeledhintAdjustment,
-  intermediateText,
+  intermediateText
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import {
@@ -36,11 +36,10 @@ import {
   readableTokenAmount,
   readableTokenAmountLabel,
   readableUnitAmount,
-  switchMap,
+  switchMap
 } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
-import { type IBehavior, combineState, replayLatest } from 'aelea/core'
-import { $node, $text, component, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -49,7 +48,7 @@ import { $heading3 } from '../../common/$text.js'
 import { $card, $labeledDivider, $responsiveFlex } from '../../common/elements/$common.js'
 import { $IntermediateConnectButton } from '../../components/$ConnectWallet.js'
 import { $Popover } from '../../components/$Popover.js'
-import { $Slider, $defaultSliderThumb, $sliderDefaultContainer } from '../../components/$Slider.js'
+import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from '../../components/$Slider.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../../components/form/$Button.js'
 import { $SubmitBar } from '../../components/form/$SubmitBar.js'
 import type { IDepositEditorChange } from '../../components/portfolio/$DepositEditor.js'
@@ -62,16 +61,16 @@ import { $WalletPuppet } from './$WalletPuppet.js'
 const optionDisplay = {
   [IWalletTab.EARN]: {
     label: 'Earn',
-    url: '/earn',
+    url: '/earn'
   },
   [IWalletTab.PUPPET]: {
     label: 'Puppet',
-    url: '/puppet',
+    url: '/puppet'
   },
   [IWalletTab.TRADER]: {
     label: 'Trader',
-    url: '/trader',
-  },
+    url: '/trader'
+  }
 }
 
 interface IWalletPageParams extends IUserActivityPageParams {}
@@ -98,7 +97,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
       [popoverWithdrawLocked, popoverWithdrawLockedTether]: Behavior<any>,
       [popoverClickMaxDeposit, popoverClickMaxDepositTether]: Behavior<any>,
       [popoverRequestWithdraw, popoverRequestWithdrawTether]: Behavior<walletLink.IWalletClient, any>,
-      [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: Behavior<any, bigint>,
+      [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: Behavior<any, bigint>
     ) => {
       const {
         route,
@@ -108,7 +107,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
         selectedCollateralTokenList,
         pricefeedMapQuery,
         depositTokenList,
-        matchRuleList,
+        matchRuleList
       } = config
 
       const profileMode = uiStorage.replayWrite(localStore.wallet, selectProfileMode, 'selectedTab')
@@ -127,8 +126,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             if (!wallet) return 0n
 
             return tokenomicsReader.VotingEscrowLogic.baseMultiplier(wallet)
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
 
       const baselineEmissionRateQuery = replayLatest(
@@ -139,8 +138,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             if (!wallet) return 0n
 
             return tokenomicsReader.ContributeLogic.getConfig(wallet)
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
 
       const claimableContributionQuery = replayLatest(
@@ -153,10 +152,10 @@ export const $WalletPage = (config: IWalletPageParams) =>
             return tokenomicsReader.ContributeLogic.getClaimable(
               wallet,
               [PUPPET.ARBITRUM_ADDRESS.USDC, PUPPET.ARBITRUM_ADDRESS.NATIVE_TOKEN],
-              wallet.account.address,
+              wallet.account.address
             )
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
       const claimableLockRewardQuery = replayLatest(
         multicast(
@@ -166,8 +165,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             if (!wallet) return 0n
 
             return tokenomicsReader.RewardLogic.getClaimable(wallet, wallet.account.address)
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
 
       const lockAmountQuery = replayLatest(
@@ -178,8 +177,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             if (!wallet) return 0n
 
             return tokenomicsReader.PuppetVoteToken.getBalanceOf(wallet, wallet.account.address)
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
 
       const lockDurationQuery = replayLatest(
@@ -190,8 +189,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             if (!wallet) return 0n
 
             return tokenomicsReader.VotingEscrowStore.getLockDuration(wallet, wallet.account.address)
-          }, walletClientQuery),
-        ),
+          }, walletClientQuery)
+        )
       )
 
       const vestedCursorQuery = replayLatest(
@@ -206,9 +205,9 @@ export const $WalletPage = (config: IWalletPageParams) =>
               return getVestingCursor(vested)
             },
             walletClientQuery,
-            periodic(1000),
-          ),
-        ),
+            periodic(1000)
+          )
+        )
       )
 
       const walletBalance = switchMap(async (walletQuery) => {
@@ -227,7 +226,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
         return mergeArray([
           uiStorage.replayWrite(localStore.earnings, debounce(250, changeScheduleFactor), 'scheduleFactor'),
-          changeScheduleFactor,
+          changeScheduleFactor
         ])
       }, cashout)
 
@@ -250,7 +249,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
               const lockDurationDelta = BigInt(Math.floor(params.lockSchedule * PUPPET.MAX_LOCK_SCHEDULE))
               const vestedDurationBonusMultiplier = calcDurationMultiplier(
                 await params.durationBaseMultiplierQuery,
-                lockDurationDelta,
+                lockDurationDelta
               )
               const lockDurationBonusInVest = applyFactor(lockAmountDelta, vestedDurationBonusMultiplier)
               const vestedAmount = vested ? getVestingCursor(vested).accrued : 0n
@@ -279,7 +278,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 claimableVestedReward,
                 lockDurationBonusInVest,
                 lockDurationDelta,
-                includeDepositAmount: params.includeDepositAmount,
+                includeDepositAmount: params.includeDepositAmount
               }
             },
             combineState({
@@ -293,10 +292,10 @@ export const $WalletPage = (config: IWalletPageParams) =>
               vestedCursorQuery,
               cashout,
               lockAmountQuery,
-              lockDurationQuery,
-            }),
-          ),
-        ),
+              lockDurationQuery
+            })
+          )
+        )
       )
 
       // const sliderFactor = mergeArray([
@@ -320,14 +319,14 @@ export const $WalletPage = (config: IWalletPageParams) =>
               $$display: map((wallet) => {
                 // return empty()
                 return $ButtonSecondary({
-                  $content: $text('Disconnect'),
+                  $content: $text('Disconnect')
                 })({
-                  click: changeWalletTether(constant(null)),
+                  click: changeWalletTether(constant(null))
                 })
-              }),
+              })
             })({
-              changeWallet: changeWalletTether(),
-            }),
+              changeWallet: changeWalletTether()
+            })
           ),
 
           $row(
@@ -338,9 +337,9 @@ export const $WalletPage = (config: IWalletPageParams) =>
               options: [IWalletTab.PUPPET, IWalletTab.TRADER],
               $$option: map((option) => {
                 return $text(optionDisplay[option].label)
-              }),
+              })
             })({ select: selectProfileModeTether() }),
-            $node(style({ flex: 1 }))(),
+            $node(style({ flex: 1 }))()
           ),
 
           switchMap((params) => {
@@ -360,14 +359,14 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 selectedCollateralTokenList,
                 providerClientQuery,
                 matchRuleList,
-                depositTokenList,
+                depositTokenList
               })({
                 changeWallet: changeWalletTether(),
                 changeRoute: changeRouteTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether(),
                 selectMarketTokenList: selectMarketTokenListTether(),
                 changeDepositTokenList: changeDepositTokenListTether(),
-                changeMatchRuleList: changeMatchRuleListTether(),
+                changeMatchRuleList: changeMatchRuleListTether()
               })
             } else if (params.profileMode === IWalletTab.TRADER) {
               return $text('Trader (WIP)')
@@ -474,7 +473,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
               $card(
                 spacing.big,
-                style({ maxWidth: '600px', width: '100%', alignSelf: 'center' }),
+                style({ maxWidth: '600px', width: '100%', alignSelf: 'center' })
               )(
                 $responsiveFlex(spacing.big)(
                   $column(spacing.default, style({ flex: 1 }))(
@@ -482,8 +481,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       $row(style({ alignItems: 'center' }))(
                         $heading3('Voting Power'),
                         $infoTooltip(
-                          `The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.`,
-                        ),
+                          `The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.`
+                        )
                       ),
                       $node(style({ flex: 1 }))(),
                       $Popover({
@@ -500,33 +499,33 @@ export const $WalletPage = (config: IWalletPageParams) =>
                                   '',
                                   map(
                                     (amount) => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
-                                    maxBalance,
-                                  ),
+                                    maxBalance
+                                  )
                                 ),
                                 placeholder: 'Enter amount',
                                 hint: map(
                                   (amount) =>
                                     `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`,
-                                  lockedAmount,
-                                ),
+                                  lockedAmount
+                                )
                               })({
                                 change: popoverInputAmountTether(
                                   map((amount) => {
                                     return parseFixed(
                                       PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals,
-                                      parseReadableNumber(amount),
+                                      parseReadableNumber(amount)
                                     )
-                                  }),
-                                ),
+                                  })
+                                )
                               }),
                               $ButtonSecondary({
                                 $container: $defaultMiniButtonSecondary(
-                                  style({ position: 'absolute', right: 0, bottom: '28px' }),
+                                  style({ position: 'absolute', right: 0, bottom: '28px' })
                                 ),
-                                $content: $text('Max'),
+                                $content: $text('Max')
                               })({
-                                click: popoverClickMaxDepositTether(),
-                              }),
+                                click: popoverClickMaxDepositTether()
+                              })
                             ),
 
                             $SubmitBar({
@@ -534,39 +533,39 @@ export const $WalletPage = (config: IWalletPageParams) =>
                               spend: {
                                 token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
                                 spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
-                                amount: lockedAmount,
+                                amount: lockedAmount
                               },
                               txQuery: popoverRequestWithdraw,
                               walletClientQuery,
-                              $submitContent: $text('Vest'),
+                              $submitContent: $text('Vest')
                             })({
                               changeWallet: changeWalletTether(),
                               click: popoverRequestWithdrawTether(
                                 snapshot(async (amount, wallet) => {
                                   const rewardRouterContractDefs = getMappedValue(
                                     PUPPET.CONTRACT,
-                                    wallet.chain.id,
+                                    wallet.chain.id
                                   ).TokenomicsRouter
 
                                   return walletLink.writeContract({
                                     ...rewardRouterContractDefs,
                                     walletClient: wallet,
                                     functionName: 'vest',
-                                    args: [amount, wallet.account.address],
+                                    args: [amount, wallet.account.address]
                                   })
-                                }, withdrawAmount),
-                              ),
-                            }),
+                                }, withdrawAmount)
+                              )
+                            })
                           )
                         }, popoverWithdrawLocked),
                         $target: $ButtonSecondary({
                           $container: $defaultMiniButtonSecondary,
                           disabled: map((amount) => amount === 0n, lockedAmount),
-                          $content: $text('Withdraw'),
+                          $content: $text('Withdraw')
                         })({
-                          click: popoverWithdrawLockedTether(),
+                          click: popoverWithdrawLockedTether()
                         }),
-                        dismiss: popoverSaveDepositAmount,
+                        dismiss: popoverSaveDepositAmount
                       })({}),
                       $labeledhintAdjustment({
                         color: now(pallete.positive),
@@ -579,10 +578,10 @@ export const $WalletPage = (config: IWalletPageParams) =>
                         $val: $text(
                           switchMap(
                             async (amount) => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await amount),
-                            lockAmountQuery,
-                          ),
-                        ),
-                      }),
+                            lockAmountQuery
+                          )
+                        )
+                      })
                     ),
                     style({ placeContent: 'space-between' })(
                       $labeledhintAdjustment({
@@ -599,9 +598,9 @@ export const $WalletPage = (config: IWalletPageParams) =>
                         $val: $text(
                           switchMap(async (durationQuery) => {
                             return getDuration(Number(await durationQuery))
-                          }, lockDurationQuery),
-                        ),
-                      }),
+                          }, lockDurationQuery)
+                        )
+                      })
                     ),
                     style({ placeContent: 'space-between' })(
                       $labeledhintAdjustment({
@@ -614,7 +613,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                           return readableTokenAmountLabel(
                             PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET,
-                            params.vestedAmount + params.lockDurationBonusInVest,
+                            params.vestedAmount + params.lockDurationBonusInVest
                           )
                         }, claimableState),
                         $val: $text(
@@ -624,11 +623,11 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                             return readableTokenAmountLabel(
                               PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET,
-                              vested.amount - vested.accrued,
+                              vested.amount - vested.accrued
                             )
-                          }, vestedCursorQuery),
-                        ),
-                      }),
+                          }, vestedCursorQuery)
+                        )
+                      })
                     ),
 
                     $node(),
@@ -636,7 +635,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                     $labeledDivider(
                       $row(spacing.default, style({ alignItems: 'center' }))(
                         $infoTooltip(
-                          'lock PUPPET for up to two years, Longer lockups yield greater rewards. different duration will average the lockup duration.',
+                          'lock PUPPET for up to two years, Longer lockups yield greater rewards. different duration will average the lockup duration.'
                         ),
                         $ButtonToggle({
                           $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
@@ -648,13 +647,13 @@ export const $WalletPage = (config: IWalletPageParams) =>
                             }
 
                             return $text('Lock-In')
-                          }),
+                          })
                         })({
-                          select: checkCashoutModeTether(),
+                          select: checkCashoutModeTether()
                         }),
-                        $infoTooltip(`Receive the claimable amount directly to wallet.`),
+                        $infoTooltip(`Receive the claimable amount directly to wallet.`)
                       ),
-                      false,
+                      false
                     ),
 
                     $node(),
@@ -668,7 +667,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                           $row(spacing.big)(
                             $infoTooltipLabel(
                               'The bonus % applied to the total claimable amount. the bonus amount will undergo vesting and released over the picked duration',
-                              'Vesting Bonus',
+                              'Vesting Bonus'
                             ),
                             $Slider({
                               $container: $sliderDefaultContainer(style({ flex: 1 })),
@@ -685,17 +684,17 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                                       return `${readableUnitAmount(factor)}%`
                                     }, slideDuration)
-                                  }, awaitPromises(durationBaseMultiplierQuery)),
-                                ),
-                              ),
+                                  }, awaitPromises(durationBaseMultiplierQuery))
+                                )
+                              )
                             })({
-                              change: changeScheduleFactorTether(),
-                            }),
+                              change: changeScheduleFactorTether()
+                            })
                           ),
                           $row(spacing.big, style({ placeContent: 'space-between' }))(
                             $infoTooltipLabel(
                               'Include wallet tokens to Lock-In together with claimable rewards if present',
-                              'Wallet',
+                              'Wallet'
                             ),
 
                             $row(spacing.default, style({ alignItems: 'center' }))(
@@ -712,64 +711,64 @@ export const $WalletPage = (config: IWalletPageParams) =>
                                           map(
                                             (amount) =>
                                               readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
-                                            maxBalance,
-                                          ),
+                                            maxBalance
+                                          )
                                         ),
                                         placeholder: 'Enter amount',
                                         hint: map(
                                           (amount) =>
                                             `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`,
-                                          walletBalance,
-                                        ),
+                                          walletBalance
+                                        )
                                       })({
                                         change: popoverInputAmountTether(
                                           map((amount) => {
                                             return parseFixed(
                                               PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals,
-                                              parseReadableNumber(amount),
+                                              parseReadableNumber(amount)
                                             )
-                                          }),
-                                        ),
+                                          })
+                                        )
                                       }),
                                       $ButtonSecondary({
                                         $container: $defaultMiniButtonSecondary(
-                                          style({ position: 'absolute', right: 0, bottom: '28px' }),
+                                          style({ position: 'absolute', right: 0, bottom: '28px' })
                                         ),
-                                        $content: $text('Max'),
+                                        $content: $text('Max')
                                       })({
-                                        click: popoverClickMaxDepositTether(),
-                                      }),
+                                        click: popoverClickMaxDepositTether()
+                                      })
                                     ),
 
                                     $row(
                                       $node(style({ flex: 1 }))(),
                                       $ButtonSecondary({
-                                        $content: $text('Save'),
+                                        $content: $text('Save')
                                       })({
                                         click: popoverSaveDepositAmountTether(
-                                          sample(mergeArray([popoverInputAmount, maxBalance])),
-                                        ),
-                                      }),
-                                    ),
+                                          sample(mergeArray([popoverInputAmount, maxBalance]))
+                                        )
+                                      })
+                                    )
                                   )
                                 }, popoverAddWallet),
                                 $target: $ButtonSecondary({
                                   $container: $defaultMiniButtonSecondary,
                                   disabled: map((amount) => amount === 0n, walletBalance),
-                                  $content: $text('Add'),
+                                  $content: $text('Add')
                                 })({
-                                  click: popoverAddWalletTether(),
+                                  click: popoverAddWalletTether()
                                 }),
-                                dismiss: popoverSaveDepositAmount,
+                                dismiss: popoverSaveDepositAmount
                               })({}),
                               $text(style({ placeContent: 'space-between' }))(
                                 map(
                                   (amount) => readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
-                                  walletLockAmount,
-                                ),
-                              ),
-                            ),
-                          ),
+                                  walletLockAmount
+                                )
+                              )
+                            )
+                          )
                         )
                       }, cashout),
 
@@ -784,11 +783,11 @@ export const $WalletPage = (config: IWalletPageParams) =>
                                   '+' +
                                   readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.totalClaimable)
                                 )
-                              }, awaitPromises(claimableState)),
-                            ),
-                          ),
-                        ),
-                      ),
+                              }, awaitPromises(claimableState))
+                            )
+                          )
+                        )
+                      )
 
                       // style({ placeContent: 'space-between' })(
                       //   $infoLabeledValue(
@@ -831,12 +830,12 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       spend: {
                         token: getMappedValue(PUPPET.CONTRACT, 42161).PuppetToken.address,
                         spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
-                        amount: awaitPromises(claimableContributionQuery),
+                        amount: awaitPromises(claimableContributionQuery)
                       },
                       $container: $row,
                       txQuery: requestTx,
                       walletClientQuery,
-                      $submitContent: $text(map((mode) => (mode ? 'Cash-Out' : `Lock-In`), cashout)),
+                      $submitContent: $text(map((mode) => (mode ? 'Cash-Out' : `Lock-In`), cashout))
                     })({
                       changeWallet: changeWalletTether(),
                       click: requestTxTether(
@@ -854,9 +853,9 @@ export const $WalletPage = (config: IWalletPageParams) =>
                                 args: [
                                   [PUPPET.ARBITRUM_ADDRESS.USDC, PUPPET.ARBITRUM_ADDRESS.NATIVE_TOKEN],
                                   wallet.account.address,
-                                  params.claimableContributionReward,
-                                ],
-                              }),
+                                  params.claimableContributionReward
+                                ]
+                              })
                             )
                           }
 
@@ -865,8 +864,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                               viem.encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'claimEmission',
-                                args: [wallet.account.address, params.claimableLockReward],
-                              }),
+                                args: [wallet.account.address, params.claimableLockReward]
+                              })
                             )
                           }
 
@@ -875,8 +874,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                               viem.encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'claimVested',
-                                args: [wallet.account.address, params.claimableVestedReward],
-                              }),
+                                args: [wallet.account.address, params.claimableVestedReward]
+                              })
                             )
                           }
 
@@ -885,8 +884,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                               viem.encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'lock',
-                                args: [params.lockAmountDelta, params.lockDurationDelta],
-                              }),
+                                args: [params.lockAmountDelta, params.lockDurationDelta]
+                              })
                             )
                           }
 
@@ -894,14 +893,14 @@ export const $WalletPage = (config: IWalletPageParams) =>
                             ...contractDefs,
                             walletClient: wallet,
                             functionName: 'multicall',
-                            args: [callStack],
+                            args: [callStack]
                           })
 
                           return writeQuery
-                        }, claimableState),
-                      ),
-                    }),
-                  ),
+                        }, claimableState)
+                      )
+                    })
+                  )
 
                   // $seperator2,
                   // $column(spacing.default, style({ flex: 1 }))(
@@ -965,12 +964,12 @@ export const $WalletPage = (config: IWalletPageParams) =>
                   //     )
                   //   )
                   // ),
-                ),
-              ),
+                )
+              )
             )
           }, combineState({ profileMode })),
 
-          $node(),
+          $node()
 
           // $ContributionTooling(config)({})
         ),
@@ -981,10 +980,10 @@ export const $WalletPage = (config: IWalletPageParams) =>
           changeRoute,
           changeWallet,
           changeMatchRuleList,
-          changeDepositTokenList,
-        },
+          changeDepositTokenList
+        }
       ]
-    },
+    }
   )
 
 // function $ContributionTooling(config: IPageParams) {

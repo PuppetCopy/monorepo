@@ -3,11 +3,11 @@ import type { Stream } from '@most/types'
 import * as PUPPET from '@puppet/middleware/const'
 import { hashData, resolveAddress } from '@puppet/middleware/gmx'
 import {
-  type ITokenDescription,
   filterNull,
   getDenominator,
   getMappedValue,
-  parseFixed,
+  type ITokenDescription,
+  parseFixed
 } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { erc20Abi } from 'abitype/abis'
@@ -44,7 +44,7 @@ const derievedSymbolMapping = {
   [PUPPET.TOKEN_DESCRIPTION_MAP.BTCB.symbol]: 'BTC',
   [PUPPET.TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: 'BTC',
   [PUPPET.TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: 'AVAX',
-  [PUPPET.TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL',
+  [PUPPET.TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL'
 } as const
 
 const gmxIoPricefeedIntervalLabel = {
@@ -52,7 +52,7 @@ const gmxIoPricefeedIntervalLabel = {
   [PUPPET.IntervalTime.MIN15]: '15m',
   [PUPPET.IntervalTime.HR]: '1h',
   [PUPPET.IntervalTime.HR4]: '4h',
-  [PUPPET.IntervalTime.DAY]: '1d',
+  [PUPPET.IntervalTime.DAY]: '1d'
 }
 
 // const GMX_URL_CHAIN = {
@@ -81,19 +81,19 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
 
   const binance = http.fromWebsocket(
     'wss://stream.binance.com:9443/ws',
-    now({ params: [`${symbol}usdt@trade`.toLowerCase()], method: 'SUBSCRIBE', id: 1 }),
+    now({ params: [`${symbol}usdt@trade`.toLowerCase()], method: 'SUBSCRIBE', id: 1 })
   )
   const bitfinex = http.fromWebsocket(
     'wss://api-pub.bitfinex.com/ws/2',
-    now({ symbol: `${symbol}USD`, event: 'subscribe', channel: 'ticker' }),
+    now({ symbol: `${symbol}USD`, event: 'subscribe', channel: 'ticker' })
   )
   const coinbase = http.fromWebsocket(
     'wss://ws-feed.pro.coinbase.com',
-    now({ product_ids: [`${symbol}-USD`], type: 'subscribe', channels: ['ticker'] }),
+    now({ product_ids: [`${symbol}-USD`], type: 'subscribe', channels: ['ticker'] })
   )
   const kraken = http.fromWebsocket(
     'wss://ws.kraken.com',
-    now({ event: 'subscribe', pair: [`${symbol.toUpperCase()}/USD`], subscription: { name: 'ticker' } }),
+    now({ event: 'subscribe', pair: [`${symbol.toUpperCase()}/USD`], subscription: { name: 'ticker' } })
   )
 
   const allSources: Stream<number> = filterNull(
@@ -129,8 +129,8 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
         }
         // console.warn(ev)
         return null
-      }, coinbase),
-    ]),
+      }, coinbase)
+    ])
   )
 
   const avgPrice = skip(
@@ -140,8 +140,8 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
         return prev === 0 ? next : (prev + next) / 2
       },
       0,
-      allSources,
-    ),
+      allSources
+    )
   )
 
   return map((ev) => parseFixed(PUPPET.USD_DECIMALS, ev) / getDenominator(tokendescription.decimals), avgPrice)
@@ -150,7 +150,7 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
 export async function readAddressTokenBalance(
   provider: walletLink.IClient,
   token: viem.Address | typeof PUPPET.ADDRESS_ZERO,
-  address: viem.Address,
+  address: viem.Address
 ): Promise<bigint> {
   if (token === PUPPET.ADDRESS_ZERO) {
     return getBalance(provider, { address })
@@ -170,7 +170,7 @@ export async function readAddressTokenBalance(
       address: tokenAddress,
       abi: erc20Abi,
       functionName: 'balanceOf',
-      args: [address],
+      args: [address]
     })
     .catch(() => 0n)
 
@@ -203,7 +203,7 @@ export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Addr
       seed[key as viem.Address] = BigInt(json[key])
       return seed
     },
-    {} as { [key in viem.Address]: bigint },
+    {} as { [key in viem.Address]: bigint }
   )
 }
 
@@ -227,6 +227,6 @@ export async function readMinExecutionFee(wallet: walletLink.IClient): Promise<b
     ...puppetContractMap.Datastore,
     provider: wallet,
     functionName: 'getUint',
-    args: [minExecutionFeeKey],
+    args: [minExecutionFeeKey]
   })
 }

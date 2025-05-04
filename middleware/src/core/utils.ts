@@ -9,13 +9,13 @@ import type {
   IPositionIncrease,
   IPositionListSummary,
   IPuppetPosition,
-  IVested,
+  IVested
 } from './types.js'
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(
   list: readonly A[],
   mapKey: (v: A) => B,
-  mapValue: (v: A) => R,
+  mapValue: (v: A) => R
 ) {
   const gmap = {} as { [P in B]: R }
 
@@ -29,7 +29,7 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 
 export function accountSettledPositionListSummary(
   positionList: IPosition[],
-  puppet?: viem.Address,
+  puppet?: viem.Address
 ): IPositionListSummary {
   const seedAccountSummary: IPositionListSummary = {
     size: 0n,
@@ -43,7 +43,7 @@ export function accountSettledPositionListSummary(
     fee: 0n,
     lossCount: 0,
     winCount: 0,
-    pnl: 0n,
+    pnl: 0n
   }
 
   const summary = positionList.reduce((seed, next, idx): IPositionListSummary => {
@@ -77,7 +77,7 @@ export function accountSettledPositionListSummary(
       lossCount,
       pnl,
       winCount,
-      puppets,
+      puppets
     }
   }, seedAccountSummary)
 
@@ -129,7 +129,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
         collateralList: [],
 
-        lastUpdate: next,
+        lastUpdate: next
       }
 
       openPositionMap.set(next.positionKey, position)
@@ -285,7 +285,7 @@ export function getVestingCursor(vested: IVested): IVested {
 
 export function getMatchKey(collateralToken: viem.Address, trader: viem.Address) {
   return viem.keccak256(
-    viem.encodeAbiParameters(viem.parseAbiParameters('address, address'), [collateralToken, trader]),
+    viem.encodeAbiParameters(viem.parseAbiParameters('address, address'), [collateralToken, trader])
   )
 }
 
@@ -294,7 +294,7 @@ export function getAllocationKey(puppetList: viem.Address[], matchKey: viem.Hex,
     viem.encodeAbiParameters(viem.parseAbiParameters('address[], bytes32, uint256'), [
       puppetList,
       matchKey,
-      allocationId,
-    ]),
+      allocationId
+    ])
   )
 }

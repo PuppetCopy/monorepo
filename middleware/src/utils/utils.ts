@@ -44,7 +44,7 @@ export function parseReadableNumber(stringNumber: string, locale?: Intl.NumberFo
   const parsed = Number.parseFloat(
     stringNumber
       .replace(new RegExp('\\' + thousandSeparator, 'g'), '')
-      .replace(new RegExp('\\' + decimalSeparator), '.'),
+      .replace(new RegExp('\\' + decimalSeparator), '.')
   )
   return parsed
 }
@@ -100,7 +100,7 @@ export function readableFileSize(sizeBytes: number | bigint): string {
     style: 'unit',
     unit: UNITS[u],
     unitDisplay: 'short',
-    maximumFractionDigits: 1,
+    maximumFractionDigits: 1
   }).format(size)
 }
 
@@ -243,7 +243,7 @@ export interface ICreateTimeline<T, R, RTime extends R & TimelineTime = R & Time
 }
 
 export function createTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime>(
-  config: ICreateTimeline<T, R, RTime>,
+  config: ICreateTimeline<T, R, RTime>
 ) {
   const { source, seed, seedMap, gapMap = (prev) => prev, squashMap = seedMap, getTime, ticks = 90 } = config
 
@@ -264,7 +264,7 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
   const normalizedSeed = { ...seed, time: seedSlot * interval } as RTime
 
   const timeslotMap: { [k: number]: RTime } = {
-    [seedSlot]: normalizedSeed,
+    [seedSlot]: normalizedSeed
   }
 
   return sortedSource.reduce(
@@ -310,7 +310,7 @@ export function createTimeline<T, R, RTime extends R & TimelineTime = R & Timeli
 
       return timeline
     },
-    [normalizedSeed],
+    [normalizedSeed]
   )
 }
 
@@ -326,7 +326,7 @@ export type IPagingQueryParams = (IRequestPagePositionApi & IRequestSortApi) | I
 export function pagingQuery<T, TParams extends IPagingQueryParams>(
   queryParams: TParams,
   res: T[],
-  customComperator?: (a: T, b: T) => number,
+  customComperator?: (a: T, b: T) => number
 ): IResponsePageApi<T> {
   let list = res
   if ('selector' in queryParams) {
@@ -392,7 +392,7 @@ export const cacheMap =
 export function groupArrayManyMap<A, B extends string | symbol | number, R>(
   list: A[],
   getKey: (v: A) => B,
-  mapFn: (v: A, key: B) => R,
+  mapFn: (v: A, key: B) => R
 ): Record<B, R[]> {
   const gmap = {} as { [P in B]: R[] }
 
@@ -422,7 +422,7 @@ export function groupArrayByKey<A, B extends string | symbol | number>(list: A[]
 export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
   list: A[],
   getKey: (v: A) => B,
-  mapFn: (v: A, key: B, seed: number) => R,
+  mapFn: (v: A, key: B, seed: number) => R
 ) {
   const gmap = {} as { [P in B]: R }
 
@@ -446,7 +446,7 @@ export function getSafeMappedValue<T extends object>(contractMap: T, prop: any, 
 
 export function getMappedValue<TMap extends object, TMapkey extends keyof TMap>(
   contractMap: TMap,
-  prop: unknown,
+  prop: unknown
 ): TMap[TMapkey] {
   if (contractMap[prop as TMapkey]) {
     return contractMap[prop as TMapkey]
@@ -466,7 +466,7 @@ export function splitIntoChunkList<T, R>(array: T[], chunkSize: number, mapFn: (
 export function splitIntoChunkList<T, R>(
   array: T[],
   chunkSize: number,
-  mapFn?: (item: T, index: number) => R,
+  mapFn?: (item: T, index: number) => R
 ): T[][] | R[][] {
   if (chunkSize <= 0) {
     throw new Error('Chunk size must be a positive integer')
@@ -510,7 +510,7 @@ const intervals = [
   { label: 'day', seconds: IntervalTime.DAY },
   { label: 'hr', seconds: IntervalTime.HR },
   { label: 'min', seconds: IntervalTime.MIN },
-  { label: 'sec', seconds: IntervalTime.SEC },
+  { label: 'sec', seconds: IntervalTime.SEC }
 ] as const
 
 export function getDuration(time: number | bigint, threshold = IntervalTime.MONTH, none = 'None') {

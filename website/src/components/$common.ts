@@ -2,19 +2,19 @@ import {
   type AttributeBackground,
   type AttributeBadge,
   type AttributeMappings,
-  type IBerryDisplayTupleMap,
   getBerryFromItems,
   getLabItemTupleIndex,
-  tokenIdAttributeTuple,
+  type IBerryDisplayTupleMap,
+  tokenIdAttributeTuple
 } from '@puppet/middleware/gbc'
 import {
-  $Table,
   $defaultTableCell,
   $defaultTableRowContainer,
   $defaultVScrollContainer,
   $infoLabeledValue,
   $spinner,
-  type TableOption,
+  $Table,
+  type TableOption
 } from '@puppet/middleware/ui-components'
 import { style, stylePseudo } from 'aelea/core'
 import { $column, screenUtils } from 'aelea/ui-components'
@@ -34,20 +34,20 @@ export const $CardTable = <T>(config: TableOption<T>) => {
         margin: '0 1px',
         background: pallete.background,
         flexDirection: 'row-reverse',
-        padding: '16px 0',
-      })($infoLabeledValue('Loading', style({ margin: '' })($spinner))),
+        padding: '16px 0'
+      })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
     },
     $headerContainer: $defaultTableRowContainer(
-      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' }),
+      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })
     ),
     $rowContainer: $defaultTableRowContainer(
       stylePseudo(':last-child', { borderRadius: '0 0 18px 18px', marginBottom: '2px' }),
-      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' }),
+      style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })
     ),
     // $bodyRowContainer: $defaultTableRowContainer(
     //   style({ margin: '0 1px' })
     // ),
-    ...config,
+    ...config
   })
 }
 
@@ -63,7 +63,7 @@ export const $berryByLabItems = (
   backgroundId: AttributeBackground,
   labItemId: AttributeMappings,
   badgeId: AttributeBadge,
-  tuple: Partial<IBerryDisplayTupleMap> = [...tokenIdAttributeTuple[berryId - 1]],
+  tuple: Partial<IBerryDisplayTupleMap> = [...tokenIdAttributeTuple[berryId - 1]]
 ) => {
   if (labItemId) {
     const customIdx = getLabItemTupleIndex(labItemId)

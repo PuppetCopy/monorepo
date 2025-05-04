@@ -5,32 +5,31 @@ import type { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from '@pu
 import {
   $Baseline,
   $ButtonToggle,
-  $IntermediatePromise,
-  $Table,
   $bear,
   $bull,
   $defaultTableCell,
   $defaultTableContainer,
   $defaultTableRowContainer,
+  $IntermediatePromise,
   $icon,
   $infoLabeledValue,
   $spinner,
+  $Table,
   type IMarker,
   type IQuantumScrollPage,
   type ISortBy,
-  type TableColumn,
+  type TableColumn
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { type InferStream, getMappedValue, readablePnl, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
-import { type IBehavior, combineState } from 'aelea/core'
-import { $text, component, style } from 'aelea/core'
+import { getMappedValue, type InferStream, readablePnl, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
+import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
 import * as schema from 'schema'
 import * as viem from 'viem'
-import { $TraderDisplay, $roiDisplay, $size } from '../../common/$common.js'
+import { $roiDisplay, $size, $TraderDisplay } from '../../common/$common.js'
 import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
 import { queryPricefeed } from '../../common/query.js'
 import { queryDb } from '../../common/sqlClient.js'
@@ -38,12 +37,12 @@ import { $SelectCollateralToken } from '../../components/$CollateralTokenSelecto
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
 import {
   $TraderMatchingRouteEditor,
-  type IMatchRuleEditorChange,
+  type IMatchRuleEditorChange
 } from '../../components/portfolio/$TraderMatchRouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import {
-  type IPerformanceTimelineTick,
   getPositionListTimelinePerformance,
+  type IPerformanceTimelineTick
 } from '../../components/trade/$ProfilePerformanceGraph.js'
 import { localStore } from '../../const/localStore.js'
 import { accountChange } from '../../walletConnect.js'
@@ -70,7 +69,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       [switchIsLong, switchIsLongTether]: Behavior<boolean | undefined>,
       [filterAccount, filterAccountTether]: Behavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>
     ) => {
       const { activityTimeframe, selectedCollateralTokenList, matchRuleList, route } = config
 
@@ -116,22 +115,22 @@ export const $Leaderboard = (config: ILeaderboard) =>
           pricefeedMap,
           accountInfo: pageParams.accountInfo,
           sortBy: pageParams.sortBy,
-          activityTimeframe: pageParams.activityTimeframe,
+          activityTimeframe: pageParams.activityTimeframe
         }
       }, combineState({ sortBy, pricefeedMapQuery, activityTimeframe, isLong, accountInfo }))
 
       return [
         $column(
           spacing.default,
-          style({ paddingTop: '36px' }),
+          style({ paddingTop: '36px' })
         )(
           $card2(style({ padding: '0', gap: 0 }))(
             $responsiveFlex(
               spacing.big,
-              style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }),
+              style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' })
             )(
               $SelectCollateralToken({ selectedList: selectedCollateralTokenList })({
-                selectMarketTokenList: selectMarketTokenListTether(),
+                selectMarketTokenList: selectMarketTokenListTether()
               }),
               $ButtonToggle({
                 selected: isLong,
@@ -141,15 +140,15 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     il === undefined
                       ? empty()
                       : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
-                    $text(il === undefined ? 'Both' : il ? 'Long' : 'Short'),
+                    $text(il === undefined ? 'Both' : il ? 'Long' : 'Short')
                   )
-                }),
+                })
               })({
-                select: switchIsLongTether(),
+                select: switchIsLongTether()
               }),
               $LastAtivity(activityTimeframe)({
-                changeActivityTimeframe: changeActivityTimeframeTether(),
-              }),
+                changeActivityTimeframe: changeActivityTimeframeTether()
+              })
             ),
             $IntermediatePromise({
               query: tableParams,
@@ -164,7 +163,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           f.eq(t.interval, filterParams.activityTimeframe),
                           filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
                           // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                          f.gte(t.lastUpdatedTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
+                          f.gte(t.lastUpdatedTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
                         ),
                       limit: filterParams.paging.pageSize,
                       offset: filterParams.paging.offset,
@@ -182,8 +181,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         maxSizeInTokens: true,
                         maxCollateralInTokens: true,
                         roi: true,
-                        pnl: true,
-                      },
+                        pnl: true
+                      }
                     })
 
                     const page = await Promise.all(
@@ -195,15 +194,15 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               puppet: true,
                               allowanceRate: true,
                               expiry: true,
-                              throttleActivity: true,
+                              throttleActivity: true
                             },
-                            limit: 10,
+                            limit: 10
                           }),
                           queryDb.query.positionIncrease.findMany({
                             where: (t, f) =>
                               f.and(
                                 f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
+                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
                               ),
                             columns: {
                               indexToken: true,
@@ -212,8 +211,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               sizeInTokens: true,
                               indexTokenPriceMax: true,
                               isLong: true,
-                              blockTimestamp: true,
-                            },
+                              blockTimestamp: true
+                            }
                             // with: {
                             //   feeCollected: true
                             // }
@@ -222,7 +221,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             where: (t, f) =>
                               f.and(
                                 f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe),
+                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
                               ),
                             columns: {
                               indexToken: true,
@@ -232,18 +231,18 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               indexTokenPriceMax: true,
                               basePnlUsd: true,
                               isLong: true,
-                              blockTimestamp: true,
-                            },
-                          }),
+                              blockTimestamp: true
+                            }
+                          })
                         ])
 
                         return {
                           ...routeMetric,
                           decreaseList,
                           increaseList,
-                          matchingRuleList,
+                          matchingRuleList
                         }
-                      }),
+                      })
                     )
 
                     return { page, offset: filterParams.paging.offset, pageSize: filterParams.paging.pageSize }
@@ -254,8 +253,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     sortBy,
                     isLong,
                     collateralTokenList: selectedCollateralTokenList,
-                    account,
-                  }),
+                    account
+                  })
                 )
 
                 type ILeaderboardDatasource = InferStream<typeof dataSource>
@@ -270,12 +269,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return $TraderDisplay({
                         route: config.route,
                         trader: pos.account,
-                        puppetList: [],
+                        puppetList: []
                         // puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
                       })({
-                        click: routeChangeTether(),
+                        click: routeChangeTether()
                       })
-                    }),
+                    })
                   },
                   {
                     $head: $text('Routes'),
@@ -284,8 +283,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       const tokenList = [
                         ...new Set([
                           ...pos.increaseList.map((x) => x.indexToken),
-                          ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken)),
-                        ]),
+                          ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
+                        ])
                       ]
 
                       // return $row(
@@ -300,11 +299,11 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         collateralToken: pos.collateralToken,
                         traderMatchingRuleList: pos.matchingRuleList,
                         accountInfo: params.accountInfo,
-                        trader: pos.account,
+                        trader: pos.account
                       })({
-                        changeMatchRuleList: changeMatchRuleListTether(),
+                        changeMatchRuleList: changeMatchRuleListTether()
                       })
-                    }),
+                    })
                   },
                   ...(screenUtils.isDesktopScreen
                     ? [
@@ -316,22 +315,22 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             const totalCount = pos.decreaseList.length
                             const winCount = pos.decreaseList.reduce(
                               (acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0),
-                              0,
+                              0
                             )
                             return $row(spacing.small)($text(`${winCount} / ${totalCount - winCount}`))
-                          }),
+                          })
                         },
                         {
                           $head: $column(style({ textAlign: 'right' }))(
                             $text('Size'),
-                            $text(style({ fontSize: '.85rem' }))('Leverage'),
+                            $text(style({ fontSize: '.85rem' }))('Leverage')
                           ),
                           sortBy: 'maxSizeInUsd',
                           columnOp: style({ placeContent: 'flex-end' }),
                           $bodyCallback: map((pos: ILeaderboardCellData) => {
                             return $size(pos.maxSizeInUsd, pos.maxCollateralInUsd)
-                          }),
-                        },
+                          })
+                        }
                       ]
                     : []),
                   {
@@ -339,8 +338,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between' }))(
                       $tableHeader('ROI %', 'PnL $'),
                       $text(style({ alignSelf: 'center' }))(
-                        map((tf) => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe),
-                      ),
+                        map((tf) => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
+                      )
                     ),
                     sortBy: 'roi',
                     gridTemplate: screenUtils.isDesktopScreen ? '200px' : '140px',
@@ -351,7 +350,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         activityTimeframe: params.activityTimeframe,
                         list: adjustList,
                         pricefeedMap: params.pricefeedMap,
-                        tickCount: 25,
+                        tickCount: 25
                       })
 
                       const markerList = adjustList
@@ -360,7 +359,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           color: colorAlpha(pallete.message, 0.15),
                           time: pos.blockTimestamp as Time,
                           size: 0.1,
-                          shape: 'circle',
+                          shape: 'circle'
                         }))
                         .sort((a, b) => Number(a.time) - Number(b.time))
 
@@ -376,22 +375,22 @@ export const $Leaderboard = (config: ILeaderboard) =>
                                 ticksVisible: true,
                                 scaleMargins: {
                                   top: 0,
-                                  bottom: 0,
-                                },
+                                  bottom: 0
+                                }
                               },
                               crosshair: {
                                 horzLine: {
-                                  visible: false,
+                                  visible: false
                                 },
                                 vertLine: {
-                                  visible: false,
-                                },
+                                  visible: false
+                                }
                               },
                               // height: 150,
                               // width: 100,
                               timeScale: {
-                                visible: false,
-                              },
+                                visible: false
+                              }
                               // ...config.chartConfig
                             },
                             data: timeline as any as BaselineData[],
@@ -399,12 +398,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             baselineOptions: {
                               baseValue: {
                                 price: 0,
-                                type: 'price',
+                                type: 'price'
                               },
                               lineWidth: 1,
-                              lineType: LineType.Curved,
-                            },
-                          })({}),
+                              lineType: LineType.Curved
+                            }
+                          })({})
                         ),
                         $row(
                           style({
@@ -412,18 +411,18 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`,
                             inset: 0,
                             zIndex: 1,
-                            alignItems: 'center',
-                          }),
+                            alignItems: 'center'
+                          })
                         )(
                           $column(spacing.defaultTiny)(
                             $roiDisplay(pos.roi),
                             $seperator2,
-                            $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl)),
-                          ),
-                        ),
+                            $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl))
+                          )
+                        )
                       )
-                    }),
-                  },
+                    })
+                  }
                 ]
                 // if (params.accountStatsList.length === 0) {
                 //   return $column(spacing.small, style({ padding: '30px' }))(
@@ -447,8 +446,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     style({
                       backgroundColor: pallete.background,
                       borderTop: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                      padding: screenUtils.isDesktopScreen ? '36px' : '14px 8px',
-                    }),
+                      padding: screenUtils.isDesktopScreen ? '36px' : '14px 8px'
+                    })
                   ),
                   $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
                   scrollConfig: {
@@ -458,8 +457,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       margin: '0 1px',
                       background: pallete.background,
                       flexDirection: 'row-reverse',
-                      padding: '16px 0',
-                    })($infoLabeledValue('Loading', style({ margin: '' })($spinner))),
+                      padding: '16px 0'
+                    })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
                   },
                   // $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: screenUtils.isDesktopScreen ? '8px 26px' : '8px' })),
                   // $rowContainer: $defaultTableRowContainer(
@@ -471,22 +470,22 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   // ),
                   sortBy: params.sortBy,
                   dataSource,
-                  columns,
+                  columns
                 })({
                   sortBy: sortByChangeTether(),
-                  scrollRequest: scrollRequestTether(),
+                  scrollRequest: scrollRequestTether()
                 })
-              }),
-            })({}),
-          ),
+              })
+            })({})
+          )
         ),
 
         {
           routeChange,
           changeActivityTimeframe,
           selectMarketTokenList,
-          changeMatchRuleList,
-        },
+          changeMatchRuleList
+        }
       ]
-    },
+    }
   )

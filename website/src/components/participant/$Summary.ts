@@ -1,14 +1,14 @@
 import { map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IPosition, accountSettledPositionListSummary } from '@puppet/middleware/core'
+import { accountSettledPositionListSummary, type IPosition } from '@puppet/middleware/core'
 import { intermediateText } from '@puppet/middleware/ui-components'
 import { combineState, readableLeverage, readableUsd } from '@puppet/middleware/utils'
 import { $node, $text, component, style } from 'aelea/core'
 import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
-import { $profileDisplay } from '../$AccountProfile.js'
 import { $heading2 } from '../../common/$text.js'
+import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
   positionListQuery: Stream<Promise<IPosition[]>>
@@ -25,13 +25,13 @@ export const $PuppetSummary = (config: IAccountSummary) =>
         const allPositions = await params.positionListQuery
 
         return accountSettledPositionListSummary(allPositions, puppet)
-      }, combineState({ positionListQuery })),
+      }, combineState({ positionListQuery }))
     )
 
     return [
       $column(
         spacing.default,
-        style({ minHeight: '90px' }),
+        style({ minHeight: '90px' })
       )(
         $node(
           style({
@@ -41,15 +41,15 @@ export const $PuppetSummary = (config: IAccountSummary) =>
             zIndex: 10,
             placeContent: 'center',
             alignItems: 'center',
-            padding: '0 8px',
-          }),
+            padding: '0 8px'
+          })
         )(
           $row(
             $profileDisplay({
               account,
               labelSize: '22px',
-              profileSize: screenUtils.isDesktopScreen ? 90 : 90,
-            }),
+              profileSize: screenUtils.isDesktopScreen ? 90 : 90
+            })
           ),
           $row(spacing.big, style({ alignItems: 'flex-end' }))(
             $metricRow(
@@ -59,10 +59,10 @@ export const $PuppetSummary = (config: IAccountSummary) =>
                     const summary = await summaryQuery
 
                     return `${summary.winCount} / ${summary.lossCount}`
-                  }, metricsQuery),
-                ),
+                  }, metricsQuery)
+                )
               ),
-              $metricLabel($text('Win / Loss')),
+              $metricLabel($text('Win / Loss'))
             ),
 
             $metricRow(
@@ -72,10 +72,10 @@ export const $PuppetSummary = (config: IAccountSummary) =>
                     const summary = await summaryQuery
 
                     return readableUsd(summary.avgCollateral)
-                  }, metricsQuery),
-                ),
+                  }, metricsQuery)
+                )
               ),
-              $metricLabel($text('Avg Collateral')),
+              $metricLabel($text('Avg Collateral'))
             ),
             $metricRow(
               $heading2(
@@ -84,15 +84,15 @@ export const $PuppetSummary = (config: IAccountSummary) =>
                     const summary = await summaryQuery
 
                     return readableLeverage(summary.avgSize, summary.avgCollateral)
-                  }, metricsQuery),
-                ),
+                  }, metricsQuery)
+                )
               ),
-              $metricLabel($text('Avg Leverage')),
-            ),
-          ),
-        ),
+              $metricLabel($text('Avg Leverage'))
+            )
+          )
+        )
       ),
-      {},
+      {}
     ]
   })
 
@@ -101,7 +101,7 @@ export const $metricLabel = $row(
   style({
     color: pallete.foreground,
     letterSpacing: '1px',
-    fontSize: screenUtils.isDesktopScreen ? '.85rem' : '.85rem',
-  }),
+    fontSize: screenUtils.isDesktopScreen ? '.85rem' : '.85rem'
+  })
 )
 export const $metricValue = $row(style({ fontWeight: 900, letterSpacing: '1px', fontSize: '1.85rem' }))

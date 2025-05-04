@@ -4,24 +4,24 @@ export default [
       {
         internalType: 'uint32[]',
         name: '',
-        type: 'uint32[]',
-      },
+        type: 'uint32[]'
+      }
     ],
     name: 'observe',
     outputs: [
       {
         internalType: 'int56[]',
         name: 'tickCumulatives',
-        type: 'int56[]',
+        type: 'int56[]'
       },
       {
         internalType: 'uint160[]',
         name: 'secondsPerLiquidityCumulativeX128s',
-        type: 'uint160[]',
-      },
+        type: 'uint160[]'
+      }
     ],
     stateMutability: 'pure',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
@@ -30,41 +30,41 @@ export default [
       {
         internalType: 'uint160',
         name: 'sqrtPriceX96',
-        type: 'uint160',
+        type: 'uint160'
       },
       {
         internalType: 'int24',
         name: 'tick',
-        type: 'int24',
+        type: 'int24'
       },
       {
         internalType: 'uint16',
         name: 'observationIndex',
-        type: 'uint16',
+        type: 'uint16'
       },
       {
         internalType: 'uint16',
         name: 'observationCardinality',
-        type: 'uint16',
+        type: 'uint16'
       },
       {
         internalType: 'uint16',
         name: 'observationCardinalityNext',
-        type: 'uint16',
+        type: 'uint16'
       },
       {
         internalType: 'uint8',
         name: 'feeProtocol',
-        type: 'uint8',
+        type: 'uint8'
       },
       {
         internalType: 'bool',
         name: 'unlocked',
-        type: 'bool',
-      },
+        type: 'bool'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
@@ -73,10 +73,10 @@ export default [
       {
         internalType: 'int24',
         name: '',
-        type: 'int24',
-      },
+        type: 'int24'
+      }
     ],
     stateMutability: 'pure',
-    type: 'function',
-  },
+    type: 'function'
+  }
 ] as const

@@ -1,24 +1,27 @@
 import { empty, fromPromise, map, now, skipRepeats, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IOps, O, combineState, isStream } from 'aelea/core'
 import {
   $element,
   $node,
   $svg,
   $text,
+  attr,
+  combineState,
   type I$Node,
   type IBranch,
-  attr,
+  type IOps,
+  isStream,
+  O,
   style,
   styleBehavior,
-  stylePseudo,
+  stylePseudo
 } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type Chain, arbitrum } from 'viem/chains'
-import { type ITokenDescription, getExplorerUrl, getMappedValue, shortenTxAddress, switchMap } from '../utils/index.js'
-import { $Tooltip, $defaultDropContainer } from './$Tooltip.js'
+import { arbitrum, type Chain } from 'viem/chains'
+import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress, switchMap } from '../utils/index.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
+import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
 
 export const $anchor = $element('a')(
   spacing.defaultTiny,
@@ -28,8 +31,8 @@ export const $anchor = $element('a')(
     cursor: 'pointer',
     color: pallete.message,
     alignItems: 'center',
-    display: 'inline-flex',
-  }),
+    display: 'inline-flex'
+  })
 )
 
 export const $alertNegativeContainer = $row(
@@ -41,8 +44,8 @@ export const $alertNegativeContainer = $row(
     alignItems: 'center',
     fontSize: '.85rem',
     border: `1px dashed ${pallete.negative}`,
-    padding: '8px 12px',
-  }),
+    padding: '8px 12px'
+  })
 )
 
 export const $alertPositiveContainer = $row(
@@ -54,8 +57,8 @@ export const $alertPositiveContainer = $row(
     alignItems: 'center',
     fontSize: '.85rem',
     border: `1px dashed ${pallete.positive}`,
-    padding: '8px 12px',
-  }),
+    padding: '8px 12px'
+  })
 )
 
 export const $alertIntermediateContainer = (...$content: I$Node[]) =>
@@ -69,8 +72,8 @@ export const $alertIntermediateContainer = (...$content: I$Node[]) =>
       fontSize: '.85rem',
       padding: '9px 12px',
       position: 'relative',
-      overflow: 'hidden',
-    }),
+      overflow: 'hidden'
+    })
   )(
     $node(
       style({
@@ -79,24 +82,24 @@ export const $alertIntermediateContainer = (...$content: I$Node[]) =>
         aspectRatio: '1 / 1',
         animation: `rotate 3.5s linear infinite`,
         position: 'absolute',
-        background: `conic-gradient(transparent, transparent, transparent, ${pallete.indeterminate})`,
-      }),
+        background: `conic-gradient(transparent, transparent, transparent, ${pallete.indeterminate})`
+      })
     )(),
     $node(
       style({
         inset: '1px',
         position: 'absolute',
         background: colorAlpha(pallete.background, 0.9),
-        borderRadius: '100px',
-      }),
+        borderRadius: '100px'
+      })
     )(),
-    ...$content,
+    ...$content
   )
 
 export const $alert = ($content: I$Node) =>
   $alertNegativeContainer(style({ alignSelf: 'flex-start' }))(
     $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
-    $content,
+    $content
   )
 
 export const $alertTooltip = ($content: I$Node) => {
@@ -105,8 +108,8 @@ export const $alertTooltip = ($content: I$Node) => {
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertNegativeContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
-      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content),
-    ),
+      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+    )
   })({})
 }
 
@@ -116,8 +119,8 @@ export const $alertPositiveTooltip = ($content: I$Node) => {
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertPositiveContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
-      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content),
-    ),
+      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+    )
   })({})
 }
 
@@ -130,10 +133,10 @@ export const $intermediateTooltip = ($content: I$Node) => {
         $content: $alertIcon,
         viewBox: '0 0 24 24',
         width: '18px',
-        svgOps: style({ minWidth: '18px', position: 'relative' }),
+        svgOps: style({ minWidth: '18px', position: 'relative' })
       }),
-      style({ position: 'relative', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content),
-    ),
+      style({ position: 'relative', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+    )
   })({})
 }
 
@@ -161,8 +164,8 @@ export const $infoTooltip = (text: string | $Node, color = pallete.foreground, s
       $content: $info,
       viewBox: '0 0 32 32',
       fill: color,
-      svgOps: style({ width: size, height: size, padding: '2px 4px' }),
-    }),
+      svgOps: style({ width: size, height: size, padding: '2px 4px' })
+    })
   })({})
 }
 
@@ -171,9 +174,9 @@ export const $labeledDivider = (label: string) => {
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
     $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
       $text(style({ fontSize: '.85rem' }))(label),
-      $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground }),
+      $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
     ),
-    $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
+    $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))()
   )
 }
 
@@ -182,9 +185,9 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
     $icon({ $content: $iconPath, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $text(style({ fontWeight: 'bold' }))(token.symbol),
-      $text(style({ fontSize: '.85rem', color: pallete.foreground }))(token.symbol),
+      $text(style({ fontSize: '.85rem', color: pallete.foreground }))(token.symbol)
     ),
-    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty()),
+    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
   )
 }
 
@@ -195,9 +198,9 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Node
     $icon({ $content: $iconG, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $text(style({ fontWeight: 'bold' }))(token.symbol),
-      $text(style({ color: pallete.foreground }))(token.name),
+      $text(style({ color: pallete.foreground }))(token.name)
     ),
-    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty()),
+    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
   )
 }
 
@@ -225,7 +228,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   return $row(spacing.defaultTiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(
       map((str) => (str ? { color: pallete.foreground } : {}), change),
-      isStream($val) ? $val : $text($val),
+      isStream($val) ? $val : $text($val)
     ),
 
     $icon({
@@ -234,12 +237,12 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
       svgOps: styleBehavior(
         map((params) => {
           return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
-        }, combineState({ displayChange, arrowColor })),
+        }, combineState({ displayChange, arrowColor }))
       ),
-      viewBox: '0 0 32 32',
+      viewBox: '0 0 32 32'
     }),
 
-    $text(map((str) => str ?? '', change)),
+    $text(map((str) => str ?? '', change))
   )
 }
 
@@ -247,7 +250,7 @@ export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: 
   return $row(spacing.small, style({ alignItems: 'center' }))(
     tooltip ? $infoTooltipLabel(tooltip, label) : label ? $infoLabel(label) : empty(),
 
-    $hintAdjustment({ change, color, $val }),
+    $hintAdjustment({ change, color, $val })
   )
 }
 
@@ -277,5 +280,5 @@ export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'):
 }
 export const $label = $element('label')(
   spacing.small,
-  style({ color: pallete.foreground, cursor: 'pointer', display: 'flex' }),
+  style({ color: pallete.foreground, cursor: 'pointer', display: 'flex' })
 )

@@ -3,12 +3,22 @@ import type { Stream } from '@most/types'
 import type { IPosition } from '@puppet/middleware/core'
 import { $Baseline, $bear, $bull, $infoTooltipLabel } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount } from '@puppet/middleware/utils'
-import { type IBehavior, combineState, replayLatest } from 'aelea/core'
-import { $text, type I$Node, MOTION_NO_WOBBLE, type NodeComposeFn, component, motion, style } from 'aelea/core'
-import { $NumberTicker, $column, $icon, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import {
+  $text,
+  combineState,
+  component,
+  type I$Node,
+  type IBehavior,
+  MOTION_NO_WOBBLE,
+  motion,
+  type NodeComposeFn,
+  replayLatest,
+  style
+} from 'aelea/core'
+import { $column, $icon, $NumberTicker, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from 'lightweight-charts'
-import { type IPerformanceTimeline, getPositionListTimelinePerformance } from './$ProfilePerformanceGraph.js'
+import { getPositionListTimelinePerformance, type IPerformanceTimeline } from './$ProfilePerformanceGraph.js'
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
   mp: IPosition
@@ -22,7 +32,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
   component(
     (
       [accountPreviewClick, accountPreviewClickTether]: Behavior<string, string>,
-      [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
+      [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>
     ) => {
       const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))
       const timeline = getPositionListTimelinePerformance({ ...config, list: [config.mp] })
@@ -30,9 +40,9 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
         multicast(
           startWith(
             null,
-            skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove),
-          ),
-        ),
+            skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove)
+          )
+        )
       )
 
       const hoverChartPnl = filterNull(
@@ -45,7 +55,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
           const data = timeline
           const value = data[data.length - 1]?.value
           return value || null
-        }, combineState({ pnlCrossHairTimeChange })),
+        }, combineState({ pnlCrossHairTimeChange }))
       )
 
       // const openMarkerList = config.openPositionList.map((pos): IMarker => {
@@ -80,8 +90,8 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                 alignItems: 'center',
                 fontFamily: 'Moderat',
                 padding: screenUtils.isDesktopScreen ? '25px 35px 0px' : '35px 35px 0px',
-                zIndex: 11,
-              }),
+                zIndex: 11
+              })
             )(
               $row(style({ fontFamily: 'ModeratMono', alignItems: 'center', placeContent: 'space-evenly' }))(
                 $row(spacing.default, style({ alignItems: 'center' }))(
@@ -91,9 +101,9 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                         $content: config.mp.isLong ? $bull : $bear,
                         width: '38px',
                         fill: pallete.background,
-                        viewBox: '0 0 32 32',
-                      }),
-                    ),
+                        viewBox: '0 0 32 32'
+                      })
+                    )
                   ),
                   $column(style({ gap: '6px' }))(
                     $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
@@ -103,7 +113,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                       //   width: '18px'
                       // }),
                       // $text(readableFixedUSD30(config.position.averagePrice))
-                    ),
+                    )
                     // $row(spacing.small, style({ color: isSettled ? '' : pallete.indeterminate, fontSize: '.85rem' }))(
                     //   $text(tradeTitle(mirroredPosition)),
                     //   $row(style({ gap: '3px', alignItems: 'baseline' }))(
@@ -123,9 +133,9 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                     //     )
                     //   )
                     // ),
-                  ),
-                ),
-              ),
+                  )
+                )
+              )
 
               // style({ alignSelf: 'stretch' }, $seperator),
 
@@ -155,23 +165,23 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                   alignSelf: 'center',
                   zIndex: 11,
                   alignItems: 'center',
-                  placeSelf: 'center',
-                }),
+                  placeSelf: 'center'
+                })
               )(
                 !config.mp
                   ? $text(
                       style({
                         fontSize: '.85rem',
                         color: pallete.foreground,
-                        textAlign: 'center',
-                      }),
+                        textAlign: 'center'
+                      })
                     )('No trades yet')
                   : empty(),
                 $column(style({ alignItems: 'center' }))(
                   $NumberTicker({
                     textStyle: {
                       fontSize: '1.85rem',
-                      fontWeight: '900',
+                      fontWeight: '900'
                     },
                     // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
                     value$: map(
@@ -180,16 +190,16 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                         const newLocal = parseReadableNumber(newLocal2)
                         return newLocal
                       },
-                      motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl),
+                      motion({ ...MOTION_NO_WOBBLE, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
                     ),
                     incrementColor: pallete.positive,
-                    decrementColor: pallete.negative,
+                    decrementColor: pallete.negative
                   }),
                   $infoTooltipLabel(
                     'The total combined settled and open trades',
-                    $text(style({ fontSize: '.85rem' }))('PnL'),
-                  ),
-                ),
+                    $text(style({ fontSize: '.85rem' }))('PnL')
+                  )
+                )
               ),
               $Baseline({
                 // markers: now(allMarkerList),
@@ -199,9 +209,9 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                     ticksVisible: true,
                     scaleMargins: {
                       top: 0.35,
-                      bottom: 0,
-                    },
-                  },
+                      bottom: 0
+                    }
+                  }
                 },
                 baselineOptions: {
                   baseLineColor: pallete.message,
@@ -209,8 +219,8 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                   lineWidth: 2,
                   baseValue: {
                     price: 0,
-                    type: 'price',
-                  },
+                    type: 'price'
+                  }
                 },
                 // appendData: scan((prev, next) => {
                 //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
@@ -225,11 +235,11 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                 //     time
                 //   }
                 // }, data[data.length - 1], config.processData),
-                data: timeline as any as BaselineData[],
+                data: timeline as any as BaselineData[]
               })({
-                crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x)),
-              }),
-            ),
+                crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x))
+              })
+            )
 
             // $row(spacing.default, style({ alignItems: 'baseline', placeContent: 'center', pointerEvents: 'none' }))(
             //   $row(style({ fontSize: '2.25em', alignItems: 'baseline', paddingTop: '26px', paddingBottom: '26px' }))(
@@ -271,12 +281,12 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
             //   // requestTradePricefeed: requestTradePricefeedTether(),
             //   crosshairMove: crosshairMoveTether()
             // })
-          ),
+          )
         ),
 
         {
-          accountPreviewClick,
-        },
+          accountPreviewClick
+        }
       ]
-    },
+    }
   )

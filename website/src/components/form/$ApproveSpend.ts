@@ -5,13 +5,21 @@ import {
   $alertPositiveTooltip,
   $alertTooltip,
   $intermediateTooltip,
-  $txHashRef,
+  $txHashRef
 } from '@puppet/middleware/ui-components'
 import { PromiseStatus, promiseState, switchMap } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { erc20Abi } from 'abitype/abis'
-import { type IBehavior, combineState, isStream } from 'aelea/core'
-import { $text, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import {
+  $text,
+  combineState,
+  component,
+  type I$Node,
+  type IBehavior,
+  isStream,
+  type NodeComposeFn,
+  style
+} from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
 import * as viem from 'viem'
 import { $defaultButtonPrimary } from './$Button'
@@ -42,7 +50,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
       spender,
       $label,
       disabled,
-      $container = $row(style({ minWidth: 0 })),
+      $container = $row(style({ minWidth: 0 }))
     } = config
 
     const allowance = mergeArray([
@@ -55,9 +63,9 @@ export const $ApproveSpend = (config: IApproveSpend) =>
           address: token,
           abi: erc20Abi,
           functionName: 'allowance',
-          args: [walletClient.account.address, spender],
-        }),
-      ),
+          args: [walletClient.account.address, spender]
+        })
+      )
     ])
 
     const requestStatus = mergeArray([promiseState(config.txQuery)])
@@ -93,20 +101,20 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                   return $alertPositiveTooltip(
                     $row(spacing.small)(
                       $text('Transaction confirmed'),
-                      $txHashRef(status.value.transactionReceipt.transactionHash),
-                    ),
+                      $txHashRef(status.value.transactionReceipt.transactionHash)
+                    )
                   )
-                }, requestStatus),
+                }, requestStatus)
               ),
               $ButtonCore({
                 disabled,
                 $container: $defaultButtonPrimary(
                   style({
                     position: 'relative',
-                    overflow: 'hidden',
-                  }),
+                    overflow: 'hidden'
+                  })
                 ),
-                $content: $label ? (isStream($label) ? $label : $text($label)) : $text('Approve spend'),
+                $content: $label ? (isStream($label) ? $label : $text($label)) : $text('Approve spend')
               })({
                 click: approveTokenSpendTether(
                   map(async () => {
@@ -116,18 +124,18 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                       abi: erc20Abi,
                       eventName: 'Approval',
                       functionName: 'approve',
-                      args: [spender, params.amount] as const,
+                      args: [spender, params.amount] as const
                     })
-                  }),
-                ),
-              }),
+                  })
+                )
+              })
             )
           },
-          combineState({ allowance, amount: amount ?? now(MAX_UINT256) }),
-        ),
+          combineState({ allowance, amount: amount ?? now(MAX_UINT256) })
+        )
       ),
       {
-        approveTokenSpend,
-      },
+        approveTokenSpend
+      }
     ]
   })

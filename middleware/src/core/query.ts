@@ -274,9 +274,9 @@ export const latestPriceMap: Stream<IPriceOracleMap> = replayLatest(
       actionOp: map(async () => {
         const newLocal = await querySignedPrices()
         return newLocal
-      }),
-    }),
-  ),
+      })
+    })
+  )
 )
 
 // export type { Client }

@@ -2,19 +2,18 @@ import { awaitPromises, join, map, now } from '@most/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
 import { switchMap } from '@puppet/middleware/utils'
 import * as wallet from '@puppet/middleware/wallet'
-import type { Behavior, Op } from 'aelea/core'
-import { $text, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
-import type { EIP6963ProviderDetail } from 'mipd'
-import { http, type Chain, type HttpTransport } from 'viem'
-import type { IWalletPageParams } from '../pages/type.js'
-import { $ButtonSecondary } from './form/$Button.js'
-import type { IButtonCore } from './form/$ButtonCore.js'
-
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
 import type { GetAccountReturnType } from '@wagmi/core'
+import type { Behavior, Op } from 'aelea/core'
+import { $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import { $row, layoutSheet } from 'aelea/ui-components'
+import type { EIP6963ProviderDetail } from 'mipd'
+import { type Chain, type HttpTransport, http } from 'viem'
+import type { IWalletPageParams } from '../pages/type.js'
 import { accountChange, walletConnectAppkit } from '../walletConnect.js'
+import { $ButtonSecondary } from './form/$Button.js'
+import type { IButtonCore } from './form/$ButtonCore.js'
 
 // -- Helpers ------------------------------------------------------------------
 const RPC_URL = CoreHelperUtil.getBlockchainApiUrl()
@@ -69,17 +68,17 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
           // no wallet connected, show connection flow
           if (!wallet) {
             return $ConnectChoiceList()({
-              changeWallet: changeWalletTether(),
+              changeWallet: changeWalletTether()
             })
           }
 
           return join(config.$$display(now(wallet)))
-        }, accountChange),
+        }, accountChange)
       ),
 
       {
-        changeWallet,
-      },
+        changeWallet
+      }
     ]
   })
 
@@ -89,16 +88,16 @@ export const $ConnectChoiceList = () =>
       $ButtonSecondary({
         $content: $row(spacing.default, style({ alignItems: 'center' }))(
           $text('Connect Wallet'),
-          $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
-        ),
+          $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' })
+        )
       })({
         click: changeWalletTether(
           map(async (xx) => {
             walletConnectAppkit.open({})
 
             return null
-          }),
-        ),
+          })
+        )
       }),
       // switchMap(announcedProviderList => {
       //   return $Dropdown({
@@ -145,7 +144,7 @@ export const $ConnectChoiceList = () =>
       // }, announcedProviderList ),
 
       {
-        changeWallet,
-      },
+        changeWallet
+      }
     ]
   })

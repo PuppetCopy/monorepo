@@ -4,13 +4,13 @@ import type { Behavior, Op } from 'aelea/core'
 import {
   $node,
   $text,
+  component,
   type I$Node,
   type INode,
   type NodeComposeFn,
-  component,
   nodeEvent,
   style,
-  styleBehavior,
+  styleBehavior
 } from 'aelea/core'
 import { $row } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -36,8 +36,8 @@ export const $defaulButtonToggleBtn = $row(
     border: '1px solid transparent',
     cursor: 'pointer',
     margin: '-2px',
-    textAlign: 'center',
-  }),
+    textAlign: 'center'
+  })
 )
 
 export const $defaulButtonToggleContainer = $node(
@@ -47,8 +47,8 @@ export const $defaulButtonToggleContainer = $node(
     gridAutoColumns: 'minmax(50px, 1fr)',
     borderRadius: '20px',
     border: `1px solid ${pallete.horizon}`,
-    backgroundColor: pallete.background,
-  }),
+    backgroundColor: pallete.background
+  })
 )
 
 const defaultOption = map(<T>(o: T) => $text(String(o)))
@@ -58,7 +58,7 @@ export const $ButtonToggle = <T>({
   selected,
   $$option = defaultOption,
   $button = $defaulButtonToggleBtn,
-  $container = $defaulButtonToggleContainer,
+  $container = $defaulButtonToggleContainer
 }: IButtonToggle<T>) =>
   component(([select, sampleSelect]: Behavior<INode, T>) => {
     return [
@@ -71,12 +71,12 @@ export const $ButtonToggle = <T>({
                 return selectedOpt === opt
                   ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, cursor: 'default' }
                   : { color: pallete.foreground }
-              }, selected),
-            ),
-          )(switchLatest($$option(now(opt)))),
-        ),
+              }, selected)
+            )
+          )(switchLatest($$option(now(opt))))
+        )
       ),
 
-      { select },
+      { select }
     ]
   })

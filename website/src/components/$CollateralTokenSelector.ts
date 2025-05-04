@@ -4,7 +4,7 @@ import { PUPPET_COLLATERAL_LIST } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $labelDisplay } from '@puppet/middleware/ui-components'
 import type { Behavior } from 'aelea/core'
-import { $element, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import { $element, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $tokenIcon, $tokenLabeled } from '../common/$common'
@@ -29,19 +29,19 @@ export const $SelectCollateralToken = (config: ISelectCollateralToken) =>
           $$option: map((tr) => {
             return style(
               {
-                padding: '8px',
+                padding: '8px'
               },
-              $tokenLabeled(getTokenDescription(tr)),
+              $tokenLabeled(getTokenDescription(tr))
             )
-          }),
+          })
         },
-        value: config.selectedList,
+        value: config.selectedList
       })({
-        select: selectMarketTokenListTether(),
+        select: selectMarketTokenListTether()
       }),
 
       {
-        selectMarketTokenList,
-      },
+        selectMarketTokenList
+      }
     ]
   })

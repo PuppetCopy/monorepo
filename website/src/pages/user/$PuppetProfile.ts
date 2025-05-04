@@ -19,7 +19,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
       [modifySubscriber, modifySubscriberTether]: Behavior<IMatchRuleEditorChange>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: Behavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>
     ) => {
       const {
         activityTimeframe,
@@ -27,28 +27,28 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
         providerClientQuery,
         pricefeedMapQuery,
         selectedCollateralTokenList,
-        route,
+        route
       } = config
 
       return [
         $column(spacing.big)(
           $card(
             spacing.big,
-            style({ flex: 1, width: '100%' }),
+            style({ flex: 1, width: '100%' })
           )(
             $card2(
               style({
                 padding: 0,
                 height: screenUtils.isDesktopScreen ? '200px' : '200px',
                 position: 'relative',
-                margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px`,
-              }),
+                margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px`
+              })
             )(
               $ProfilePeformanceTimeline({ ...config })({
                 selectMarketTokenList: selectMarketTokenListTether(),
-                changeActivityTimeframe: changeActivityTimeframeTether(),
-              }),
-            ),
+                changeActivityTimeframe: changeActivityTimeframeTether()
+              })
+            )
 
             // $column(spacing.default)(
             //   $heading3('Active Trader Routes'),
@@ -90,15 +90,15 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
             //     )
             //   }, combineState({ puppetTradeRouteListQuery, priceTickMapQuery, activityTimeframe, collateralToken, routeTypeListQuery })))),
             // ),
-          ),
+          )
         ),
 
         {
           changeRoute,
           modifySubscriber,
           changeActivityTimeframe,
-          selectMarketTokenList,
-        },
+          selectMarketTokenList
+        }
       ]
-    },
+    }
   )

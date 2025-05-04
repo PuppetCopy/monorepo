@@ -1,7 +1,16 @@
 import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IBehavior, O } from 'aelea/core'
-import { $element, $text, type NodeComposeFn, attrBehavior, component, style, stylePseudo } from 'aelea/core'
+import {
+  $element,
+  $text,
+  attrBehavior,
+  component,
+  type IBehavior,
+  type NodeComposeFn,
+  O,
+  style,
+  stylePseudo
+} from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { streamOf } from '../../utils/index.js'
@@ -15,8 +24,8 @@ export const $defaultTextFieldContainer = $element('label')(
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    color: pallete.foreground,
-  }),
+    color: pallete.foreground
+  })
 )
 
 export const $labelDisplay = $text(
@@ -25,8 +34,8 @@ export const $labelDisplay = $text(
     alignSelf: 'flex-end',
     cursor: 'pointer',
     lineHeight: '42px',
-    borderBottom: `2px solid ${colorAlpha(pallete.message, 0.1)}`,
-  }),
+    borderBottom: `2px solid ${colorAlpha(pallete.message, 0.1)}`
+  })
 )
 
 const overideInputStyle = O(
@@ -35,11 +44,11 @@ const overideInputStyle = O(
     color: pallete.message,
     lineHeight: '42px',
     height: '42px',
-    padding: '0 8px',
+    padding: '0 8px'
   }),
   stylePseudo('::placeholder', {
-    color: colorAlpha(pallete.foreground, 0.8),
-  }),
+    color: colorAlpha(pallete.foreground, 0.8)
+  })
 )
 
 export interface ITextField extends Field {
@@ -56,13 +65,13 @@ export const $FieldLabeled = ({
   placeholder,
   hint,
   labelWidth,
-  $container = $defaultTextFieldContainer,
+  $container = $defaultTextFieldContainer
 }: ITextField) =>
   component(([change, sampleValue]: Behavior<string, string>) => {
     const $field = overideInputStyle(
       $Field({})({
-        change: sampleValue(),
-      }),
+        change: sampleValue()
+      })
     )
 
     return [
@@ -71,8 +80,8 @@ export const $FieldLabeled = ({
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))(label),
           attrBehavior(
             map((placeholder) => ({ placeholder }), streamOf(placeholder)),
-            $field,
-          ),
+            $field
+          )
         ),
         $row(style({ position: 'relative' }))(
           hint
@@ -80,13 +89,13 @@ export const $FieldLabeled = ({
                 style({
                   fontSize: '.85rem',
                   width: '100%',
-                  whiteSpace: 'pre-wrap',
-                }),
+                  whiteSpace: 'pre-wrap'
+                })
               )(hint)
-            : empty(),
-        ),
+            : empty()
+        )
       ),
 
-      { change },
+      { change }
     ]
   })

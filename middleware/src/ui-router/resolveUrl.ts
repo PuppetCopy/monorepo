@@ -23,14 +23,14 @@ function resolveRoute(pathChange: Stream<PathEvent>, parentFragments: Fragment[]
     const diff = O(
       skipRepeatsWith((prev: PathEvent, next: PathEvent) => {
         return next[fragIdx] === prev[fragIdx]
-      }),
+      })
     )
 
     const contains = O(
       diff,
       filter((next) => {
         return isMatched(fragment, next[fragIdx])
-      }),
+      })
     )
 
     const match = O(
@@ -47,12 +47,12 @@ function resolveRoute(pathChange: Stream<PathEvent>, parentFragments: Fragment[]
         if (isMatched) {
           document.title = title || ''
         }
-      }),
+      })
     )
 
     const miss = O(
       diff,
-      filter((next) => !isMatched(fragment, next[fragIdx])),
+      filter((next) => !isMatched(fragment, next[fragIdx]))
     )
 
     return {
@@ -60,7 +60,7 @@ function resolveRoute(pathChange: Stream<PathEvent>, parentFragments: Fragment[]
       contains: contains(pathChange),
       match: match(pathChange),
       miss: miss(pathChange),
-      fragments,
+      fragments
     }
   }
 }

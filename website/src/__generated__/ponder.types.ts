@@ -13,7 +13,7 @@ import type {
   settle,
   traderOpenPnl,
   traderRouteMetric,
-  withdraw,
+  withdraw
 } from './ponder.schema'
 
 export type ITraderRouteMetric = typeof traderRouteMetric.$inferInsert

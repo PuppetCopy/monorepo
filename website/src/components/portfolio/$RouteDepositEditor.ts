@@ -3,16 +3,15 @@ import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet/middleware/ui-components'
 import { readableTokenAmount, switchMap } from '@puppet/middleware/utils'
-import { type IBehavior, combineState } from 'aelea/core'
-import { $text, component, style } from 'aelea/core'
+import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $row, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
-import { $Popover } from '../$Popover.js'
 import { $route } from '../../common/$common.js'
 import puppetReader from '../../logic/puppetReader.js'
 import type { IComponentPageParams } from '../../pages/type.js'
+import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $DepositEditor, DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
 
@@ -27,7 +26,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
       [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
 
       [popDepositEdtior, popDepositEdtiorTether]: Behavior<any>,
-      [saveChange, saveChangeTether]: Behavior<IDepositEditorChange>,
+      [saveChange, saveChangeTether]: Behavior<IDepositEditorChange>
     ) => {
       const { providerClientQuery, depositTokenList, walletClientQuery, collateralToken } = config
 
@@ -56,15 +55,15 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                 change: change || {
                   token: collateralToken,
                   action: DepositEditorAction.DEPOSIT,
-                  value: { amount: 0n },
-                },
+                  value: { amount: 0n }
+                }
               })({
                 changeWallet: changeWalletTether(),
-                save: saveChangeTether(),
+                save: saveChangeTether()
               })
             },
             change,
-            popDepositEdtior,
+            popDepositEdtior
           ),
           $target: $row(spacing.big, style({ padding: '6px 0' }))(
             $route(collateralTokenDescription),
@@ -75,7 +74,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                   color: map(
                     (c) =>
                       c ? (c.action === DepositEditorAction.DEPOSIT ? pallete.positive : pallete.negative) : undefined,
-                    change,
+                    change
                   ),
                   change: switchMap(async (params) => {
                     if (!params.change) return ''
@@ -83,29 +82,29 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                     return params.change.action === DepositEditorAction.DEPOSIT
                       ? readableTokenAmount(
                           collateralTokenDescription,
-                          params.change.value.amount + (await params.initialDepositAmountQuery),
+                          params.change.value.amount + (await params.initialDepositAmountQuery)
                         )
                       : readableTokenAmount(
                           collateralTokenDescription,
-                          (await params.initialDepositAmountQuery) - params.change.value.amount,
+                          (await params.initialDepositAmountQuery) - params.change.value.amount
                         )
                   }, combineState({ initialDepositAmountQuery, change })),
                   $val: $text(
                     switchMap(async (amount) => {
                       return readableTokenAmount(collateralTokenDescription, await amount)
-                    }, initialDepositAmountQuery),
-                  ),
-                }),
+                    }, initialDepositAmountQuery)
+                  )
+                })
               ),
               $ButtonSecondary({
                 $container: $defaultMiniButtonSecondary,
-                $content: $text('Change'),
+                $content: $text('Change')
               })({
-                click: popDepositEdtiorTether(),
-              }),
-            ),
+                click: popDepositEdtiorTether()
+              })
+            )
           ),
-          dismiss: saveChange,
+          dismiss: saveChange
         })({}),
 
         {
@@ -122,10 +121,10 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               return changeList
             },
             depositTokenList,
-            combineState({ saveChange, walletClientQuery }),
+            combineState({ saveChange, walletClientQuery })
           ),
-          changeWallet,
-        },
+          changeWallet
+        }
       ]
-    },
+    }
   )

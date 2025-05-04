@@ -1,4 +1,4 @@
-import { $, Glob, file, write } from 'bun'
+import { $, file, Glob, write } from 'bun'
 
 const generatedTemp = '__temp__generated'
 const generatedDist = '__generated'

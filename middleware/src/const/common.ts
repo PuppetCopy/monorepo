@@ -17,7 +17,7 @@ export enum IntervalTime {
   WEEK = 604800,
   MONTH = 2628000,
   QUARTER = 7884000,
-  YEAR = 31536000,
+  YEAR = 31536000
 }
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000' as const
@@ -56,12 +56,12 @@ export const PRICEFEED_INTERVAL = [
   IntervalTime.HR6,
   IntervalTime.DAY,
   IntervalTime.WEEK,
-  IntervalTime.MONTH,
+  IntervalTime.MONTH
 ] as const
 
 export const TRADE_CONTRACT_MAPPING = {
   [arbitrum.id]: ARBITRUM_ADDRESS,
-  [avalanche.id]: AVALANCHE_ADDRESS,
+  [avalanche.id]: AVALANCHE_ADDRESS
 } as const
 
 export type ContractChain = keyof typeof TRADE_CONTRACT_MAPPING

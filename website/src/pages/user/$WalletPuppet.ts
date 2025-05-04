@@ -3,8 +3,7 @@ import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $IntermediatePromise, $infoLabel } from '@puppet/middleware/ui-components'
-import { type IBehavior, combineState } from 'aelea/core'
-import { $text, component, style } from 'aelea/core'
+import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
@@ -32,13 +31,9 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
       [selectMarketTokenList, selectMarketTokenListTether]: Behavior<viem.Address[]>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: Behavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: Behavior<IDepositEditorChange[]>
     ) => {
-      const {
-        activityTimeframe,
-        depositTokenList,
-        selectedCollateralTokenList
-      } = config
+      const { activityTimeframe, depositTokenList, selectedCollateralTokenList } = config
 
       const tableParams = map(async (params) => {
         const activityTimeframe = params.activityTimeframe
@@ -55,13 +50,13 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
               padding: 0,
               height: screenUtils.isDesktopScreen ? '200px' : '200px',
               position: 'relative',
-              margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px`,
-            }),
+              margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px`
+            })
           )(
             $ProfilePeformanceTimeline({ ...config })({
               selectMarketTokenList: selectMarketTokenListTether(),
-              changeActivityTimeframe: changeActivityTimeframeTether(),
-            }),
+              changeActivityTimeframe: changeActivityTimeframeTether()
+            })
           ),
 
           $IntermediatePromise({
@@ -70,7 +65,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
               if (params.collateralTokenList.length === 0) {
                 return $column(spacing.small)(
                   $text('No active collateral tokens selected'),
-                  $infoLabel(`Select collateral tokens to view activity`),
+                  $infoLabel(`Select collateral tokens to view activity`)
                 )
               }
 
@@ -81,17 +76,17 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                   return $column(style({ paddingLeft: '16px' }))(
                     $row(
                       spacing.big,
-                      style({ padding: '6px 0' }),
+                      style({ padding: '6px 0' })
                     )(
                       $RouteDepositEditor({
                         depositTokenList,
                         collateralToken,
                         providerClientQuery,
-                        walletClientQuery,
+                        walletClientQuery
                       })({
                         changeWallet: changeWalletTether(),
-                        changeDepositTokenList: changeDepositTokenListTether(),
-                      }),
+                        changeDepositTokenList: changeDepositTokenListTether()
+                      })
                     ),
                     $row(spacing.default)(
                       $seperator2,
@@ -125,14 +120,14 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                         //     )
                         //   )
                         // })
-                      ),
+                      )
                     ),
-                    $seperator2,
+                    $seperator2
                   )
-                }),
+                })
               )
-            }),
-          })({}),
+            })
+          })({})
         ),
 
         {
@@ -142,8 +137,8 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
           changeActivityTimeframe,
           selectMarketTokenList,
           changeDepositTokenList,
-          changeMatchRuleList,
-        },
+          changeMatchRuleList
+        }
       ]
-    },
+    }
   )

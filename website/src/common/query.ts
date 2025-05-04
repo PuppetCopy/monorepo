@@ -1,12 +1,12 @@
 import { map, multicast } from '@most/core'
 import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet/middleware/const'
 import {
-  type StateParams,
   combineState,
   getClosestNumber,
   groupArrayMany,
   periodicRun,
-  unixTimestampNow,
+  type StateParams,
+  unixTimestampNow
 } from '@puppet/middleware/utils'
 import { replayLatest } from 'aelea/core'
 import type * as viem from 'viem'
@@ -17,9 +17,9 @@ export const subgraphStatus = replayLatest(
     periodicRun({
       startImmediate: true,
       interval: 2500,
-      actionOp: map(() => getStatus()),
-    }),
-  ),
+      actionOp: map(() => getStatus())
+    })
+  )
 )
 
 export function queryPricefeed(
@@ -27,21 +27,21 @@ export function queryPricefeed(
     tokenList?: viem.Address[]
     activityTimeframe: IntervalTime
   }>,
-  estTickAmout = 10,
+  estTickAmout = 10
 ) {
   return map(async (params) => {
     const priceList = await queryDb.query.priceCandle.findMany({
       columns: {
         c: true,
         slotTime: true,
-        token: true,
+        token: true
       },
       where: (t, f) =>
         f.and(
           f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
           f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
-          params.tokenList ? f.inArray(t.token, params.tokenList) : undefined,
-        ),
+          params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
+        )
     })
     return groupArrayMany(priceList, (c) => c.token)
 

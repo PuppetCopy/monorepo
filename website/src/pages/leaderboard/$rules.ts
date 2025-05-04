@@ -1,5 +1,5 @@
 import { empty, map, periodic } from '@most/core'
-import { $Tooltip, $alertIcon, $defaultDropContainer } from '@puppet/middleware/ui-components'
+import { $alertIcon, $defaultDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
 import { readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
 import { type $Branch, $element, $text, attr, style } from 'aelea/core'
 import { $column, $icon, $row } from 'aelea/ui-components'
@@ -15,8 +15,8 @@ export const $alertTooltip = ($content: $Branch) => {
       viewBox: '0 0 24 24',
       width: '18px',
       fill: pallete.indeterminate,
-      svgOps: style({ minWidth: '18px' }),
-    }),
+      svgOps: style({ minWidth: '18px' })
+    })
   })({})
 }
 
@@ -45,13 +45,13 @@ export const $competitionPrize = (prize: bigint | undefined, realisedPnl: bigint
     $column(style({ alignItems: 'center' }))(
       prize ? style({ fontSize: '1.3em' })($pnlDisplay(prize)) : empty(),
       style({ color: pallete.message })(
-        $text(style({ color: isNeg ? pallete.negative : pallete.positive }))(`${isNeg ? '' : '+'}${val}`),
-      ),
-    ),
+        $text(style({ color: isNeg ? pallete.negative : pallete.positive }))(`${isNeg ? '' : '+'}${val}`)
+      )
+    )
   )
 }
 
 export const $avaxIcon = $element('img')(
   attr({ src: `/assets/avalanche.svg` }),
-  style({ width: '24px', cursor: 'pointer', padding: '3px 6px' }),
+  style({ width: '24px', cursor: 'pointer', padding: '3px 6px' })
 )()

@@ -1,7 +1,7 @@
 import { constant, filter, join, map, mergeArray, now, recoverWith, until } from '@most/core'
 import type { Stream } from '@most/types'
 import type { Behavior } from 'aelea/core'
-import { type $Branch, $custom, $text, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import { type $Branch, $custom, $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
 import { $column, layoutSheet, observer } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $alertNegativeContainer } from './$common.js'
@@ -32,7 +32,7 @@ export const $QuantumScroll = ({
   $container = $defaultVScrollContainer,
   $emptyMessage = $defaultEmptyMessage,
   $loader = $defaultVScrollLoader,
-  insertAscending = false,
+  insertAscending = false
   // scrollRequest = empty()
 }: QuantumScroll) =>
   component(([nextScrollRequest, nextScrollRequestTether]: Behavior<any, IQuantumScrollPage>) => {
@@ -55,8 +55,8 @@ export const $QuantumScroll = ({
           filter(([entry]) => {
             return entry.isIntersecting === true
           }),
-          constant({ offset: nextResponse.offset + nextResponse.pageSize, pageSize: nextResponse.pageSize }),
-        ),
+          constant({ offset: nextResponse.offset + nextResponse.pageSize, pageSize: nextResponse.pageSize })
+        )
       )($loader)
 
       const $items = hasMoreItems
@@ -73,16 +73,16 @@ export const $QuantumScroll = ({
             recoverWith((err) => {
               return now(
                 $alertNegativeContainer(style({ alignSelf: 'center', margin: '10px' }))(
-                  $text(String(err.message || ('reason' in err ? err.cause : 'unknown error'))),
-                ),
+                  $text(String(err.message || ('reason' in err ? err.cause : 'unknown error')))
+                )
               )
-            }, $itemLoader),
-          ]),
-        ),
+            }, $itemLoader)
+          ])
+        )
       ),
 
       {
-        scrollRequest: nextScrollRequest,
-      },
+        scrollRequest: nextScrollRequest
+      }
     ]
   })

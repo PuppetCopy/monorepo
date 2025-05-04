@@ -10,12 +10,12 @@ export function fadeIn($content: I$Node) {
       (opacity, slide) => {
         return {
           opacity: opacity === 100 ? '' : `${opacity}%`,
-          transform: slide === 0 ? '' : `translate(0, ${slide}px)`,
+          transform: slide === 0 ? '' : `translate(0, ${slide}px)`
         }
       },
       fadeIn,
-      slideIn,
-    ),
+      slideIn
+    )
   )
 
   return animation($content)

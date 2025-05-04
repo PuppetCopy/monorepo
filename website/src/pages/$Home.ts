@@ -1,18 +1,19 @@
 import { empty, map, now } from '@most/core'
 import type { Stream } from '@most/types'
-import { $Link, $anchor } from '@puppet/middleware/ui-components'
+import { $anchor, $Link } from '@puppet/middleware/ui-components'
 import { filterNull, switchMap } from '@puppet/middleware/utils'
-import { type IBehavior, fromCallback } from 'aelea/core'
 import {
   $element,
   $node,
   $text,
-  type I$Node,
   attr,
   component,
   eventElementTarget,
+  fromCallback,
+  type I$Node,
+  type IBehavior,
   style,
-  styleInline,
+  styleInline
 } from 'aelea/core'
 import type { Route } from 'aelea/router'
 import { $column, $icon, $row, designSheet, layoutSheet, screenUtils } from 'aelea/ui-components'
@@ -46,7 +47,7 @@ export const $Home = (config: ITreasury) =>
   component(
     (
       [routeChanges, linkClickTether]: Behavior<any, any>,
-      [clickDownloadBtn, clickDownloadBtnTether]: Behavior<any, any>,
+      [clickDownloadBtn, clickDownloadBtnTether]: Behavior<any, any>
     ) => {
       const $snapSection = $column(
         style({
@@ -54,27 +55,27 @@ export const $Home = (config: ITreasury) =>
           gap: '26px',
           scrollSnapAlign: 'start',
           minHeight: '100vh',
-          placeContent: 'center',
-        }),
+          placeContent: 'center'
+        })
       )
 
       const bodyPointerMove = eventElementTarget('pointermove', document.body)
 
       const $windowButton = $row(
-        style({ backgroundColor: pallete.negative, width: '8px', height: '8px', borderRadius: '50%' }),
+        style({ backgroundColor: pallete.negative, width: '8px', height: '8px', borderRadius: '50%' })
       )
       const $windowTopBar = $row(
-        style({ backgroundColor: pallete.background, alignItems: 'center', gap: '3px', padding: '4px 6px' }),
+        style({ backgroundColor: pallete.background, alignItems: 'center', gap: '3px', padding: '4px 6px' })
       )(
         $windowButton(style({ backgroundColor: pallete.negative }))(),
         $windowButton(style({ backgroundColor: pallete.indeterminate }))(),
-        $windowButton(style({ backgroundColor: pallete.positive }))(),
+        $windowButton(style({ backgroundColor: pallete.positive }))()
       )
 
       const $mockWindow = ($content: I$Node) =>
         $column(style({ borderRadius: '4px', overflow: 'hidden', boxShadow: '#00000063 0px 5px 20px 3px' }))(
           $windowTopBar,
-          $content,
+          $content
         )
 
       return [
@@ -91,13 +92,13 @@ export const $Home = (config: ITreasury) =>
               position: 'relative',
               top: 0,
               height: `100vh`,
-              paddingBottom: '30vh',
+              paddingBottom: '30vh'
               // color: 'black'
-            }),
+            })
           )(
             $row(style({ flex: 1, width: '50vh', perspective: '680px', position: 'absolute', bottom: 0 }))(
               style({
-                transform: 'translateY(0px) translateZ(0) rotateX(40deg)',
+                transform: 'translateY(0px) translateZ(0) rotateX(40deg)'
               })(
                 $mockWindow(
                   $element('video')(
@@ -106,21 +107,19 @@ export const $Home = (config: ITreasury) =>
                       width: '100%',
                       height: '100%',
                       loop: '',
-                      autoplay: '',
-                    }),
-                  )(
-                    $element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))(),
-                  ),
-                ),
-              ),
+                      autoplay: ''
+                    })
+                  )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))())
+                )
+              )
             ),
 
             $column(
               spacing.big,
               style({
-                alignItems: 'center',
+                alignItems: 'center'
                 // color: invertColor(pallete.message)
-              }),
+              })
             )(
               $column(style({ textAlign: 'center' }))(
                 $text(
@@ -128,17 +127,17 @@ export const $Home = (config: ITreasury) =>
                     fontWeight: 'bold',
                     fontSize: screenUtils.isDesktopScreen ? '2.5em' : '1.85rem',
                     whiteSpace: 'pre-wrap',
-                    letterSpacing: '2px',
-                  }),
-                )('Matching top Traders\nwith Investors'),
+                    letterSpacing: '2px'
+                  })
+                )('Matching top Traders\nwith Investors')
               ),
               $column(spacing.small, style({ maxWidth: '624px' }))(
                 $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  `Traders seamlessly earn more doing what they do best`,
+                  `Traders seamlessly earn more doing what they do best`
                 ),
                 $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  `Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio`,
-                ),
+                  `Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio`
+                )
               ),
 
               $node(),
@@ -231,7 +230,7 @@ export const $Home = (config: ITreasury) =>
                         filterNull(
                           map((req) => {
                             return null
-                          }, clickDownloadBtn),
+                          }, clickDownloadBtn)
                         ) as any,
 
                         $node(),
@@ -246,18 +245,18 @@ export const $Home = (config: ITreasury) =>
                           $content: $row(spacing.small, style({ alignItems: 'center' }))(
                             $icon({ $content: $puppetLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
                             $text('Download'),
-                            $icon({ $content: $gmxLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
+                            $icon({ $content: $gmxLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' })
                           ),
                           $container: $element('button')(
                             designSheet.btn,
-                            style({ position: 'relative', alignSelf: 'center', borderRadius: '30px' }),
-                          ),
+                            style({ position: 'relative', alignSelf: 'center', borderRadius: '30px' })
+                          )
                         })({
-                          click: clickDownloadBtnTether(map(() => deferredPrompt.prompt())),
-                        }),
+                          click: clickDownloadBtnTether(map(() => deferredPrompt.prompt()))
+                        })
                       )
                     }, installUserChoice)
-                  : empty(),
+                  : empty()
               ),
               $text(
                 style({
@@ -265,10 +264,10 @@ export const $Home = (config: ITreasury) =>
                   position: 'absolute',
                   bottom: '50px',
                   left: '50%',
-                  transform: 'translateX(-50%)',
-                }),
-              )('Learn More'),
-            ),
+                  transform: 'translateX(-50%)'
+                })
+              )('Learn More')
+            )
 
             // $wheelWrapper(style({
             //   right: 'calc(100% + 3vw)',
@@ -305,11 +304,11 @@ export const $Home = (config: ITreasury) =>
             $column(spacing.default, style({ flex: 1 }))(
               $heading1('Pick Top Traders to Copy'),
               $text(
-                `Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.`,
+                `Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.`
               ),
               $text(
-                `every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.`,
-              ),
+                `every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.`
+              )
             ),
             $row(style({ flex: 1 }))(
               $mockWindow(
@@ -319,11 +318,11 @@ export const $Home = (config: ITreasury) =>
                     width: '100%',
                     height: '100%',
                     loop: '',
-                    autoplay: '',
-                  }),
-                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))()),
-              ),
-            ),
+                    autoplay: ''
+                  })
+                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))())
+              )
+            )
           ),
 
           $snapSection(style({ margin: '0 auto', maxWidth: '1240px', flexDirection: 'row', gap: '70px' }))(
@@ -331,8 +330,8 @@ export const $Home = (config: ITreasury) =>
               $heading1('Traders Earn More'),
               $text('Traders earn more by having more puppets copying their trades.'),
               $text(
-                'Trading done seamlessly with their own funds and without directly knowing or managing puppets funds.',
-              ),
+                'Trading done seamlessly with their own funds and without directly knowing or managing puppets funds.'
+              )
             ),
             $row(style({ flex: 1 }))(
               $mockWindow(
@@ -342,12 +341,12 @@ export const $Home = (config: ITreasury) =>
                     width: '100%',
                     height: '100%',
                     loop: '',
-                    autoplay: '',
-                  }),
-                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/trade-adjust.mp4' }))()),
-              ),
-            ),
-          ),
+                    autoplay: ''
+                  })
+                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/trade-adjust.mp4' }))())
+              )
+            )
+          )
 
           //       $snapSection(
 
@@ -375,8 +374,8 @@ export const $Home = (config: ITreasury) =>
         ),
 
         {
-          routeChanges,
-        },
+          routeChanges
+        }
       ]
-    },
+    }
   )

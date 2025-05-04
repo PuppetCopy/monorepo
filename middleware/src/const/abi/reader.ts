@@ -4,17 +4,17 @@ export default [
   {
     inputs: [{ internalType: 'uint256', name: 'x', type: 'uint256' }],
     name: 'PRBMathUD60x18__Exp2InputTooBig',
-    type: 'error',
+    type: 'error'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'x', type: 'uint256' }],
     name: 'PRBMathUD60x18__LogInputTooSmall',
-    type: 'error',
+    type: 'error'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'prod1', type: 'uint256' }],
     name: 'PRBMath__MulDivFixedPointOverflow',
-    type: 'error',
+    type: 'error'
   },
   { inputs: [], name: 'UnableToGetBorrowingFactorEmptyPoolUsd', type: 'error' },
   {
@@ -22,7 +22,7 @@ export default [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
       { internalType: 'address', name: 'account', type: 'address' },
       { internalType: 'uint256', name: 'start', type: 'uint256' },
-      { internalType: 'uint256', name: 'end', type: 'uint256' },
+      { internalType: 'uint256', name: 'end', type: 'uint256' }
     ],
     name: 'getAccountOrders',
     outputs: [
@@ -36,11 +36,11 @@ export default [
               { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
               { internalType: 'address', name: 'market', type: 'address' },
               { internalType: 'address', name: 'initialCollateralToken', type: 'address' },
-              { internalType: 'address[]', name: 'swapPath', type: 'address[]' },
+              { internalType: 'address[]', name: 'swapPath', type: 'address[]' }
             ],
             internalType: 'struct Order.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -53,30 +53,30 @@ export default [
               { internalType: 'uint256', name: 'executionFee', type: 'uint256' },
               { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' },
               { internalType: 'uint256', name: 'minOutputAmount', type: 'uint256' },
-              { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' },
+              { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' }
             ],
             internalType: 'struct Order.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'bool', name: 'isLong', type: 'bool' },
               { internalType: 'bool', name: 'shouldUnwrapNativeToken', type: 'bool' },
-              { internalType: 'bool', name: 'isFrozen', type: 'bool' },
+              { internalType: 'bool', name: 'isFrozen', type: 'bool' }
             ],
             internalType: 'struct Order.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Order.Props[]',
         name: '',
-        type: 'tuple[]',
-      },
+        type: 'tuple[]'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -88,36 +88,36 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices[]',
         name: 'prices',
-        type: 'tuple[]',
+        type: 'tuple[]'
       },
-      { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
+      { internalType: 'address', name: 'uiFeeReceiver', type: 'address' }
     ],
     name: 'getAccountPositionInfoList',
     outputs: [
@@ -129,11 +129,11 @@ export default [
                 components: [
                   { internalType: 'address', name: 'account', type: 'address' },
                   { internalType: 'address', name: 'market', type: 'address' },
-                  { internalType: 'address', name: 'collateralToken', type: 'address' },
+                  { internalType: 'address', name: 'collateralToken', type: 'address' }
                 ],
                 internalType: 'struct Position.Addresses',
                 name: 'addresses',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
@@ -145,22 +145,22 @@ export default [
                   { internalType: 'uint256', name: 'longTokenClaimableFundingAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'shortTokenClaimableFundingAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'increasedAtBlock', type: 'uint256' },
-                  { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' },
+                  { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' }
                 ],
                 internalType: 'struct Position.Numbers',
                 name: 'numbers',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [{ internalType: 'bool', name: 'isLong', type: 'bool' }],
                 internalType: 'struct Position.Flags',
                 name: 'flags',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct Position.Props',
             name: 'position',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -173,11 +173,11 @@ export default [
                   { internalType: 'uint256', name: 'traderDiscountFactor', type: 'uint256' },
                   { internalType: 'uint256', name: 'totalRebateAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'traderDiscountAmount', type: 'uint256' },
-                  { internalType: 'uint256', name: 'affiliateRewardAmount', type: 'uint256' },
+                  { internalType: 'uint256', name: 'affiliateRewardAmount', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionReferralFees',
                 name: 'referral',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
@@ -186,41 +186,41 @@ export default [
                   { internalType: 'uint256', name: 'claimableShortTokenAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'latestFundingFeeAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'latestLongTokenClaimableFundingAmountPerSize', type: 'uint256' },
-                  { internalType: 'uint256', name: 'latestShortTokenClaimableFundingAmountPerSize', type: 'uint256' },
+                  { internalType: 'uint256', name: 'latestShortTokenClaimableFundingAmountPerSize', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionFundingFees',
                 name: 'funding',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'uint256', name: 'borrowingFeeUsd', type: 'uint256' },
                   { internalType: 'uint256', name: 'borrowingFeeAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'borrowingFeeReceiverFactor', type: 'uint256' },
-                  { internalType: 'uint256', name: 'borrowingFeeAmountForFeeReceiver', type: 'uint256' },
+                  { internalType: 'uint256', name: 'borrowingFeeAmountForFeeReceiver', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionBorrowingFees',
                 name: 'borrowing',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
                   { internalType: 'uint256', name: 'uiFeeReceiverFactor', type: 'uint256' },
-                  { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' },
+                  { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionUiFees',
                 name: 'ui',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'uint256', name: 'min', type: 'uint256' },
-                  { internalType: 'uint256', name: 'max', type: 'uint256' },
+                  { internalType: 'uint256', name: 'max', type: 'uint256' }
                 ],
                 internalType: 'struct Price.Props',
                 name: 'collateralTokenPrice',
-                type: 'tuple',
+                type: 'tuple'
               },
               { internalType: 'uint256', name: 'positionFeeFactor', type: 'uint256' },
               { internalType: 'uint256', name: 'protocolFeeAmount', type: 'uint256' },
@@ -230,40 +230,40 @@ export default [
               { internalType: 'uint256', name: 'positionFeeAmountForPool', type: 'uint256' },
               { internalType: 'uint256', name: 'positionFeeAmount', type: 'uint256' },
               { internalType: 'uint256', name: 'totalCostAmountExcludingFunding', type: 'uint256' },
-              { internalType: 'uint256', name: 'totalCostAmount', type: 'uint256' },
+              { internalType: 'uint256', name: 'totalCostAmount', type: 'uint256' }
             ],
             internalType: 'struct PositionPricingUtils.PositionFees',
             name: 'fees',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'int256', name: 'priceImpactUsd', type: 'int256' },
               { internalType: 'uint256', name: 'priceImpactDiffUsd', type: 'uint256' },
-              { internalType: 'uint256', name: 'executionPrice', type: 'uint256' },
+              { internalType: 'uint256', name: 'executionPrice', type: 'uint256' }
             ],
             internalType: 'struct ReaderPricingUtils.ExecutionPriceResult',
             name: 'executionPriceResult',
-            type: 'tuple',
+            type: 'tuple'
           },
           { internalType: 'int256', name: 'basePnlUsd', type: 'int256' },
           { internalType: 'int256', name: 'uncappedBasePnlUsd', type: 'int256' },
-          { internalType: 'int256', name: 'pnlAfterPriceImpactUsd', type: 'int256' },
+          { internalType: 'int256', name: 'pnlAfterPriceImpactUsd', type: 'int256' }
         ],
         internalType: 'struct ReaderUtils.PositionInfo[]',
         name: '',
-        type: 'tuple[]',
-      },
+        type: 'tuple[]'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
       { internalType: 'address', name: 'account', type: 'address' },
       { internalType: 'uint256', name: 'start', type: 'uint256' },
-      { internalType: 'uint256', name: 'end', type: 'uint256' },
+      { internalType: 'uint256', name: 'end', type: 'uint256' }
     ],
     name: 'getAccountPositions',
     outputs: [
@@ -273,11 +273,11 @@ export default [
             components: [
               { internalType: 'address', name: 'account', type: 'address' },
               { internalType: 'address', name: 'market', type: 'address' },
-              { internalType: 'address', name: 'collateralToken', type: 'address' },
+              { internalType: 'address', name: 'collateralToken', type: 'address' }
             ],
             internalType: 'struct Position.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -289,26 +289,26 @@ export default [
               { internalType: 'uint256', name: 'longTokenClaimableFundingAmountPerSize', type: 'uint256' },
               { internalType: 'uint256', name: 'shortTokenClaimableFundingAmountPerSize', type: 'uint256' },
               { internalType: 'uint256', name: 'increasedAtBlock', type: 'uint256' },
-              { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' },
+              { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' }
             ],
             internalType: 'struct Position.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [{ internalType: 'bool', name: 'isLong', type: 'bool' }],
             internalType: 'struct Position.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Position.Props[]',
         name: '',
-        type: 'tuple[]',
-      },
+        type: 'tuple[]'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -320,50 +320,50 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     name: 'getAdlState',
     outputs: [
       { internalType: 'uint256', name: '', type: 'uint256' },
       { internalType: 'bool', name: '', type: 'bool' },
       { internalType: 'int256', name: '', type: 'int256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'bytes32', name: 'key', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'key', type: 'bytes32' }
     ],
     name: 'getDeposit',
     outputs: [
@@ -379,11 +379,11 @@ export default [
               { internalType: 'address', name: 'initialLongToken', type: 'address' },
               { internalType: 'address', name: 'initialShortToken', type: 'address' },
               { internalType: 'address[]', name: 'longTokenSwapPath', type: 'address[]' },
-              { internalType: 'address[]', name: 'shortTokenSwapPath', type: 'address[]' },
+              { internalType: 'address[]', name: 'shortTokenSwapPath', type: 'address[]' }
             ],
             internalType: 'struct Deposit.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -392,26 +392,26 @@ export default [
               { internalType: 'uint256', name: 'minMarketTokens', type: 'uint256' },
               { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' },
               { internalType: 'uint256', name: 'executionFee', type: 'uint256' },
-              { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' },
+              { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' }
             ],
             internalType: 'struct Deposit.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [{ internalType: 'bool', name: 'shouldUnwrapNativeToken', type: 'bool' }],
             internalType: 'struct Deposit.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Deposit.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -420,16 +420,16 @@ export default [
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'indexTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'uint256', name: 'positionSizeInUsd', type: 'uint256' },
       { internalType: 'uint256', name: 'positionSizeInTokens', type: 'uint256' },
       { internalType: 'int256', name: 'sizeDeltaUsd', type: 'int256' },
-      { internalType: 'bool', name: 'isLong', type: 'bool' },
+      { internalType: 'bool', name: 'isLong', type: 'bool' }
     ],
     name: 'getExecutionPrice',
     outputs: [
@@ -437,20 +437,20 @@ export default [
         components: [
           { internalType: 'int256', name: 'priceImpactUsd', type: 'int256' },
           { internalType: 'uint256', name: 'priceImpactDiffUsd', type: 'uint256' },
-          { internalType: 'uint256', name: 'executionPrice', type: 'uint256' },
+          { internalType: 'uint256', name: 'executionPrice', type: 'uint256' }
         ],
         internalType: 'struct ReaderPricingUtils.ExecutionPriceResult',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'address', name: 'key', type: 'address' },
+      { internalType: 'address', name: 'key', type: 'address' }
     ],
     name: 'getMarket',
     outputs: [
@@ -459,20 +459,20 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'salt', type: 'bytes32' }
     ],
     name: 'getMarketBySalt',
     outputs: [
@@ -481,15 +481,15 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -499,36 +499,36 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
+        type: 'tuple'
       },
-      { internalType: 'address', name: 'marketKey', type: 'address' },
+      { internalType: 'address', name: 'marketKey', type: 'address' }
     ],
     name: 'getMarketInfo',
     outputs: [
@@ -539,11 +539,11 @@ export default [
               { internalType: 'address', name: 'marketToken', type: 'address' },
               { internalType: 'address', name: 'indexToken', type: 'address' },
               { internalType: 'address', name: 'longToken', type: 'address' },
-              { internalType: 'address', name: 'shortToken', type: 'address' },
+              { internalType: 'address', name: 'shortToken', type: 'address' }
             ],
             internalType: 'struct Market.Props',
             name: 'market',
-            type: 'tuple',
+            type: 'tuple'
           },
           { internalType: 'uint256', name: 'borrowingFactorPerSecondForLongs', type: 'uint256' },
           { internalType: 'uint256', name: 'borrowingFactorPerSecondForShorts', type: 'uint256' },
@@ -554,55 +554,55 @@ export default [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'fundingFeeAmountPerSize',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'claimableFundingAmountPerSize',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct ReaderUtils.BaseFundingValues',
             name: 'baseFunding',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -613,75 +613,75 @@ export default [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'fundingFeeAmountPerSizeDelta',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'claimableFundingAmountPerSizeDelta',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct MarketUtils.GetNextFundingAmountPerSizeResult',
             name: 'nextFunding',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'virtualPoolAmountForLongToken', type: 'uint256' },
               { internalType: 'uint256', name: 'virtualPoolAmountForShortToken', type: 'uint256' },
-              { internalType: 'int256', name: 'virtualInventoryForPositions', type: 'int256' },
+              { internalType: 'int256', name: 'virtualInventoryForPositions', type: 'int256' }
             ],
             internalType: 'struct Reader.VirtualInventory',
             name: 'virtualInventory',
-            type: 'tuple',
+            type: 'tuple'
           },
-          { internalType: 'bool', name: 'isDisabled', type: 'bool' },
+          { internalType: 'bool', name: 'isDisabled', type: 'bool' }
         ],
         internalType: 'struct Reader.MarketInfo',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -691,37 +691,37 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices[]',
         name: 'marketPricesList',
-        type: 'tuple[]',
+        type: 'tuple[]'
       },
       { internalType: 'uint256', name: 'start', type: 'uint256' },
-      { internalType: 'uint256', name: 'end', type: 'uint256' },
+      { internalType: 'uint256', name: 'end', type: 'uint256' }
     ],
     name: 'getMarketInfoList',
     outputs: [
@@ -732,11 +732,11 @@ export default [
               { internalType: 'address', name: 'marketToken', type: 'address' },
               { internalType: 'address', name: 'indexToken', type: 'address' },
               { internalType: 'address', name: 'longToken', type: 'address' },
-              { internalType: 'address', name: 'shortToken', type: 'address' },
+              { internalType: 'address', name: 'shortToken', type: 'address' }
             ],
             internalType: 'struct Market.Props',
             name: 'market',
-            type: 'tuple',
+            type: 'tuple'
           },
           { internalType: 'uint256', name: 'borrowingFactorPerSecondForLongs', type: 'uint256' },
           { internalType: 'uint256', name: 'borrowingFactorPerSecondForShorts', type: 'uint256' },
@@ -747,55 +747,55 @@ export default [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'fundingFeeAmountPerSize',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'claimableFundingAmountPerSize',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct ReaderUtils.BaseFundingValues',
             name: 'baseFunding',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -806,75 +806,75 @@ export default [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'fundingFeeAmountPerSizeDelta',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'long',
-                    type: 'tuple',
+                    type: 'tuple'
                   },
                   {
                     components: [
                       { internalType: 'uint256', name: 'longToken', type: 'uint256' },
-                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' },
+                      { internalType: 'uint256', name: 'shortToken', type: 'uint256' }
                     ],
                     internalType: 'struct MarketUtils.CollateralType',
                     name: 'short',
-                    type: 'tuple',
-                  },
+                    type: 'tuple'
+                  }
                 ],
                 internalType: 'struct MarketUtils.PositionType',
                 name: 'claimableFundingAmountPerSizeDelta',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct MarketUtils.GetNextFundingAmountPerSizeResult',
             name: 'nextFunding',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'virtualPoolAmountForLongToken', type: 'uint256' },
               { internalType: 'uint256', name: 'virtualPoolAmountForShortToken', type: 'uint256' },
-              { internalType: 'int256', name: 'virtualInventoryForPositions', type: 'int256' },
+              { internalType: 'int256', name: 'virtualInventoryForPositions', type: 'int256' }
             ],
             internalType: 'struct Reader.VirtualInventory',
             name: 'virtualInventory',
-            type: 'tuple',
+            type: 'tuple'
           },
-          { internalType: 'bool', name: 'isDisabled', type: 'bool' },
+          { internalType: 'bool', name: 'isDisabled', type: 'bool' }
         ],
         internalType: 'struct Reader.MarketInfo[]',
         name: '',
-        type: 'tuple[]',
-      },
+        type: 'tuple[]'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -884,41 +884,41 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'indexTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'longTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'shortTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'bytes32', name: 'pnlFactorType', type: 'bytes32' },
-      { internalType: 'bool', name: 'maximize', type: 'bool' },
+      { internalType: 'bool', name: 'maximize', type: 'bool' }
     ],
     name: 'getMarketTokenPrice',
     outputs: [
@@ -935,21 +935,21 @@ export default [
           { internalType: 'uint256', name: 'shortTokenUsd', type: 'uint256' },
           { internalType: 'uint256', name: 'totalBorrowingFees', type: 'uint256' },
           { internalType: 'uint256', name: 'borrowingFeePoolFactor', type: 'uint256' },
-          { internalType: 'uint256', name: 'impactPoolAmount', type: 'uint256' },
+          { internalType: 'uint256', name: 'impactPoolAmount', type: 'uint256' }
         ],
         internalType: 'struct MarketPoolValueInfo.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
       { internalType: 'uint256', name: 'start', type: 'uint256' },
-      { internalType: 'uint256', name: 'end', type: 'uint256' },
+      { internalType: 'uint256', name: 'end', type: 'uint256' }
     ],
     name: 'getMarkets',
     outputs: [
@@ -958,15 +958,15 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props[]',
         name: '',
-        type: 'tuple[]',
-      },
+        type: 'tuple[]'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -976,27 +976,27 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'indexTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
-      { internalType: 'bool', name: 'maximize', type: 'bool' },
+      { internalType: 'bool', name: 'maximize', type: 'bool' }
     ],
     name: 'getNetPnl',
     outputs: [{ internalType: 'int256', name: '', type: 'int256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1006,33 +1006,33 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'indexTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'bool', name: 'isLong', type: 'bool' },
-      { internalType: 'bool', name: 'maximize', type: 'bool' },
+      { internalType: 'bool', name: 'maximize', type: 'bool' }
     ],
     name: 'getOpenInterestWithPnl',
     outputs: [{ internalType: 'int256', name: '', type: 'int256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'bytes32', name: 'key', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'key', type: 'bytes32' }
     ],
     name: 'getOrder',
     outputs: [
@@ -1046,11 +1046,11 @@ export default [
               { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
               { internalType: 'address', name: 'market', type: 'address' },
               { internalType: 'address', name: 'initialCollateralToken', type: 'address' },
-              { internalType: 'address[]', name: 'swapPath', type: 'address[]' },
+              { internalType: 'address[]', name: 'swapPath', type: 'address[]' }
             ],
             internalType: 'struct Order.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -1063,30 +1063,30 @@ export default [
               { internalType: 'uint256', name: 'executionFee', type: 'uint256' },
               { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' },
               { internalType: 'uint256', name: 'minOutputAmount', type: 'uint256' },
-              { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' },
+              { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' }
             ],
             internalType: 'struct Order.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'bool', name: 'isLong', type: 'bool' },
               { internalType: 'bool', name: 'shouldUnwrapNativeToken', type: 'bool' },
-              { internalType: 'bool', name: 'isFrozen', type: 'bool' },
+              { internalType: 'bool', name: 'isFrozen', type: 'bool' }
             ],
             internalType: 'struct Order.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Order.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1096,28 +1096,28 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'indexTokenPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'bool', name: 'isLong', type: 'bool' },
-      { internalType: 'bool', name: 'maximize', type: 'bool' },
+      { internalType: 'bool', name: 'maximize', type: 'bool' }
     ],
     name: 'getPnl',
     outputs: [{ internalType: 'int256', name: '', type: 'int256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1128,47 +1128,47 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'bool', name: 'isLong', type: 'bool' },
-      { internalType: 'bool', name: 'maximize', type: 'bool' },
+      { internalType: 'bool', name: 'maximize', type: 'bool' }
     ],
     name: 'getPnlToPoolFactor',
     outputs: [{ internalType: 'int256', name: '', type: 'int256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'bytes32', name: 'key', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'key', type: 'bytes32' }
     ],
     name: 'getPosition',
     outputs: [
@@ -1178,11 +1178,11 @@ export default [
             components: [
               { internalType: 'address', name: 'account', type: 'address' },
               { internalType: 'address', name: 'market', type: 'address' },
-              { internalType: 'address', name: 'collateralToken', type: 'address' },
+              { internalType: 'address', name: 'collateralToken', type: 'address' }
             ],
             internalType: 'struct Position.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -1194,26 +1194,26 @@ export default [
               { internalType: 'uint256', name: 'longTokenClaimableFundingAmountPerSize', type: 'uint256' },
               { internalType: 'uint256', name: 'shortTokenClaimableFundingAmountPerSize', type: 'uint256' },
               { internalType: 'uint256', name: 'increasedAtBlock', type: 'uint256' },
-              { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' },
+              { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' }
             ],
             internalType: 'struct Position.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [{ internalType: 'bool', name: 'isLong', type: 'bool' }],
             internalType: 'struct Position.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Position.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1225,38 +1225,38 @@ export default [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'uint256', name: 'sizeDeltaUsd', type: 'uint256' },
       { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
-      { internalType: 'bool', name: 'usePositionSizeAsSizeDeltaUsd', type: 'bool' },
+      { internalType: 'bool', name: 'usePositionSizeAsSizeDeltaUsd', type: 'bool' }
     ],
     name: 'getPositionInfo',
     outputs: [
@@ -1268,11 +1268,11 @@ export default [
                 components: [
                   { internalType: 'address', name: 'account', type: 'address' },
                   { internalType: 'address', name: 'market', type: 'address' },
-                  { internalType: 'address', name: 'collateralToken', type: 'address' },
+                  { internalType: 'address', name: 'collateralToken', type: 'address' }
                 ],
                 internalType: 'struct Position.Addresses',
                 name: 'addresses',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
@@ -1284,22 +1284,22 @@ export default [
                   { internalType: 'uint256', name: 'longTokenClaimableFundingAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'shortTokenClaimableFundingAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'increasedAtBlock', type: 'uint256' },
-                  { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' },
+                  { internalType: 'uint256', name: 'decreasedAtBlock', type: 'uint256' }
                 ],
                 internalType: 'struct Position.Numbers',
                 name: 'numbers',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [{ internalType: 'bool', name: 'isLong', type: 'bool' }],
                 internalType: 'struct Position.Flags',
                 name: 'flags',
-                type: 'tuple',
-              },
+                type: 'tuple'
+              }
             ],
             internalType: 'struct Position.Props',
             name: 'position',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -1312,11 +1312,11 @@ export default [
                   { internalType: 'uint256', name: 'traderDiscountFactor', type: 'uint256' },
                   { internalType: 'uint256', name: 'totalRebateAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'traderDiscountAmount', type: 'uint256' },
-                  { internalType: 'uint256', name: 'affiliateRewardAmount', type: 'uint256' },
+                  { internalType: 'uint256', name: 'affiliateRewardAmount', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionReferralFees',
                 name: 'referral',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
@@ -1325,41 +1325,41 @@ export default [
                   { internalType: 'uint256', name: 'claimableShortTokenAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'latestFundingFeeAmountPerSize', type: 'uint256' },
                   { internalType: 'uint256', name: 'latestLongTokenClaimableFundingAmountPerSize', type: 'uint256' },
-                  { internalType: 'uint256', name: 'latestShortTokenClaimableFundingAmountPerSize', type: 'uint256' },
+                  { internalType: 'uint256', name: 'latestShortTokenClaimableFundingAmountPerSize', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionFundingFees',
                 name: 'funding',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'uint256', name: 'borrowingFeeUsd', type: 'uint256' },
                   { internalType: 'uint256', name: 'borrowingFeeAmount', type: 'uint256' },
                   { internalType: 'uint256', name: 'borrowingFeeReceiverFactor', type: 'uint256' },
-                  { internalType: 'uint256', name: 'borrowingFeeAmountForFeeReceiver', type: 'uint256' },
+                  { internalType: 'uint256', name: 'borrowingFeeAmountForFeeReceiver', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionBorrowingFees',
                 name: 'borrowing',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
                   { internalType: 'uint256', name: 'uiFeeReceiverFactor', type: 'uint256' },
-                  { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' },
+                  { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' }
                 ],
                 internalType: 'struct PositionPricingUtils.PositionUiFees',
                 name: 'ui',
-                type: 'tuple',
+                type: 'tuple'
               },
               {
                 components: [
                   { internalType: 'uint256', name: 'min', type: 'uint256' },
-                  { internalType: 'uint256', name: 'max', type: 'uint256' },
+                  { internalType: 'uint256', name: 'max', type: 'uint256' }
                 ],
                 internalType: 'struct Price.Props',
                 name: 'collateralTokenPrice',
-                type: 'tuple',
+                type: 'tuple'
               },
               { internalType: 'uint256', name: 'positionFeeFactor', type: 'uint256' },
               { internalType: 'uint256', name: 'protocolFeeAmount', type: 'uint256' },
@@ -1369,33 +1369,33 @@ export default [
               { internalType: 'uint256', name: 'positionFeeAmountForPool', type: 'uint256' },
               { internalType: 'uint256', name: 'positionFeeAmount', type: 'uint256' },
               { internalType: 'uint256', name: 'totalCostAmountExcludingFunding', type: 'uint256' },
-              { internalType: 'uint256', name: 'totalCostAmount', type: 'uint256' },
+              { internalType: 'uint256', name: 'totalCostAmount', type: 'uint256' }
             ],
             internalType: 'struct PositionPricingUtils.PositionFees',
             name: 'fees',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'int256', name: 'priceImpactUsd', type: 'int256' },
               { internalType: 'uint256', name: 'priceImpactDiffUsd', type: 'uint256' },
-              { internalType: 'uint256', name: 'executionPrice', type: 'uint256' },
+              { internalType: 'uint256', name: 'executionPrice', type: 'uint256' }
             ],
             internalType: 'struct ReaderPricingUtils.ExecutionPriceResult',
             name: 'executionPriceResult',
-            type: 'tuple',
+            type: 'tuple'
           },
           { internalType: 'int256', name: 'basePnlUsd', type: 'int256' },
           { internalType: 'int256', name: 'uncappedBasePnlUsd', type: 'int256' },
-          { internalType: 'int256', name: 'pnlAfterPriceImpactUsd', type: 'int256' },
+          { internalType: 'int256', name: 'pnlAfterPriceImpactUsd', type: 'int256' }
         ],
         internalType: 'struct ReaderUtils.PositionInfo',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1405,57 +1405,57 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'bytes32', name: 'positionKey', type: 'bytes32' },
-      { internalType: 'uint256', name: 'sizeDeltaUsd', type: 'uint256' },
+      { internalType: 'uint256', name: 'sizeDeltaUsd', type: 'uint256' }
     ],
     name: 'getPositionPnlUsd',
     outputs: [
       { internalType: 'int256', name: '', type: 'int256' },
       { internalType: 'int256', name: '', type: 'int256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1465,49 +1465,49 @@ export default [
           { internalType: 'address', name: 'marketToken', type: 'address' },
           { internalType: 'address', name: 'indexToken', type: 'address' },
           { internalType: 'address', name: 'longToken', type: 'address' },
-          { internalType: 'address', name: 'shortToken', type: 'address' },
+          { internalType: 'address', name: 'shortToken', type: 'address' }
         ],
         internalType: 'struct Market.Props',
         name: 'market',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'indexTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'longTokenPrice',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
               { internalType: 'uint256', name: 'min', type: 'uint256' },
-              { internalType: 'uint256', name: 'max', type: 'uint256' },
+              { internalType: 'uint256', name: 'max', type: 'uint256' }
             ],
             internalType: 'struct Price.Props',
             name: 'shortTokenPrice',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct MarketUtils.MarketPrices',
         name: 'prices',
-        type: 'tuple',
+        type: 'tuple'
       },
       { internalType: 'address', name: 'tokenIn', type: 'address' },
       { internalType: 'uint256', name: 'amountIn', type: 'uint256' },
-      { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
+      { internalType: 'address', name: 'uiFeeReceiver', type: 'address' }
     ],
     name: 'getSwapAmountOut',
     outputs: [
@@ -1520,15 +1520,15 @@ export default [
           { internalType: 'uint256', name: 'amountAfterFees', type: 'uint256' },
           { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
           { internalType: 'uint256', name: 'uiFeeReceiverFactor', type: 'uint256' },
-          { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' },
+          { internalType: 'uint256', name: 'uiFeeAmount', type: 'uint256' }
         ],
         internalType: 'struct SwapPricingUtils.SwapFees',
         name: 'fees',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -1540,34 +1540,34 @@ export default [
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'tokenInPrice',
-        type: 'tuple',
+        type: 'tuple'
       },
       {
         components: [
           { internalType: 'uint256', name: 'min', type: 'uint256' },
-          { internalType: 'uint256', name: 'max', type: 'uint256' },
+          { internalType: 'uint256', name: 'max', type: 'uint256' }
         ],
         internalType: 'struct Price.Props',
         name: 'tokenOutPrice',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     name: 'getSwapPriceImpact',
     outputs: [
       { internalType: 'int256', name: '', type: 'int256' },
-      { internalType: 'int256', name: '', type: 'int256' },
+      { internalType: 'int256', name: '', type: 'int256' }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'contract DataStore', name: 'dataStore', type: 'address' },
-      { internalType: 'bytes32', name: 'key', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'key', type: 'bytes32' }
     ],
     name: 'getWithdrawal',
     outputs: [
@@ -1581,11 +1581,11 @@ export default [
               { internalType: 'address', name: 'uiFeeReceiver', type: 'address' },
               { internalType: 'address', name: 'market', type: 'address' },
               { internalType: 'address[]', name: 'longTokenSwapPath', type: 'address[]' },
-              { internalType: 'address[]', name: 'shortTokenSwapPath', type: 'address[]' },
+              { internalType: 'address[]', name: 'shortTokenSwapPath', type: 'address[]' }
             ],
             internalType: 'struct Withdrawal.Addresses',
             name: 'addresses',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [
@@ -1594,25 +1594,25 @@ export default [
               { internalType: 'uint256', name: 'minShortTokenAmount', type: 'uint256' },
               { internalType: 'uint256', name: 'updatedAtBlock', type: 'uint256' },
               { internalType: 'uint256', name: 'executionFee', type: 'uint256' },
-              { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' },
+              { internalType: 'uint256', name: 'callbackGasLimit', type: 'uint256' }
             ],
             internalType: 'struct Withdrawal.Numbers',
             name: 'numbers',
-            type: 'tuple',
+            type: 'tuple'
           },
           {
             components: [{ internalType: 'bool', name: 'shouldUnwrapNativeToken', type: 'bool' }],
             internalType: 'struct Withdrawal.Flags',
             name: 'flags',
-            type: 'tuple',
-          },
+            type: 'tuple'
+          }
         ],
         internalType: 'struct Withdrawal.Props',
         name: '',
-        type: 'tuple',
-      },
+        type: 'tuple'
+      }
     ],
     stateMutability: 'view',
-    type: 'function',
-  },
+    type: 'function'
+  }
 ] as const

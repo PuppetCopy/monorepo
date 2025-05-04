@@ -177,7 +177,7 @@ export enum AttributeMappings {
   'Holographic Badge' = 225,
   'Degen Ape' = 226,
   'NFT Paris Bandana' = 227,
-  'Blueberry Fly' = 228,
+  'Blueberry Fly' = 228
 }
 
 export enum AttributeBody {
@@ -186,7 +186,7 @@ export enum AttributeBody {
   BLACK_AND_WHITE = AttributeMappings['Black and White'],
   LOSER = AttributeMappings.Looser,
   WINNER = AttributeMappings.Winner,
-  NUDE = AttributeMappings.Nude,
+  NUDE = AttributeMappings.Nude
 }
 
 export enum AttributeExpression {
@@ -211,7 +211,7 @@ export enum AttributeExpression {
   WINNER = AttributeMappings.Winner,
   NUDE = AttributeMappings.Nude,
 
-  HIGH = AttributeMappings.High,
+  HIGH = AttributeMappings.High
 }
 
 export enum AttributeClothes {
@@ -276,7 +276,7 @@ export enum AttributeClothes {
   SKELETON = AttributeMappings.Skeleton,
   MARINE_SHIRT = AttributeMappings['Marine Shirt'],
   GIVING_LOVE = AttributeMappings['Giving Love'],
-  ARBITRUM_SWAG = AttributeMappings['Arbitrum Swag'],
+  ARBITRUM_SWAG = AttributeMappings['Arbitrum Swag']
 }
 
 export enum AttributeFaceAccessory {
@@ -316,7 +316,7 @@ export enum AttributeFaceAccessory {
   BEARD_WHITE = AttributeMappings['Beard White'],
   NOODLES = AttributeMappings.Noodles,
   PEPE_FACE = AttributeMappings['Pepe Face'],
-  NFT_PARIS_BANDANA = AttributeMappings['NFT Paris Bandana'],
+  NFT_PARIS_BANDANA = AttributeMappings['NFT Paris Bandana']
 }
 
 export enum AttributeHat {
@@ -386,7 +386,7 @@ export enum AttributeHat {
   // UZUMAKI = IAttributeMappings.Uzumaki,
   XMITHICAL = AttributeMappings.xMithical,
   BIRTHDAY = AttributeMappings.Birthday,
-  DEGEN_APE = AttributeMappings['Degen Ape'],
+  DEGEN_APE = AttributeMappings['Degen Ape']
 }
 
 export enum AttributeBackground {
@@ -407,12 +407,12 @@ export enum AttributeBackground {
   CAMO = AttributeMappings['Camo Background'],
   GIORGIO_BALBI_BG = AttributeMappings['GBC x Giorgio Balbi'],
   HOLOGRAPHIC_BG = AttributeMappings['Holographic Background'],
-  SCARY_NIGHT = AttributeMappings['Scary Night'],
+  SCARY_NIGHT = AttributeMappings['Scary Night']
 }
 
 export enum AttributeBadge {
   HOLOGRAPHIC_BADGE = AttributeMappings['Holographic Badge'],
-  BLUEBERRY_FLY = AttributeMappings['Blueberry Fly'],
+  BLUEBERRY_FLY = AttributeMappings['Blueberry Fly']
 }
 
 export type IBerryDisplayTupleMap = [
@@ -422,7 +422,7 @@ export type IBerryDisplayTupleMap = [
   AttributeExpression,
   AttributeFaceAccessory,
   AttributeHat,
-  AttributeBadge,
+  AttributeBadge
 ]
 
 export type ILabAttributeOptions =
@@ -439,5 +439,5 @@ export type ISvgPartsMap = [
   { [p in AttributeExpression]: string },
   { [p in AttributeFaceAccessory]: string },
   { [p in AttributeHat]: string },
-  { [p in AttributeBadge]: string },
+  { [p in AttributeBadge]: string }
 ]

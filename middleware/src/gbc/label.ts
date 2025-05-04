@@ -7,11 +7,11 @@ export const attributeIndexToLabel: TraitAppearanceValue[] = [
   'Expression',
   'Face Accessory',
   'Hat',
-  'Badge',
+  'Badge'
 ]
 
 export const mintLabelMap = {
   [SaleType.Public]: 'Public',
   [SaleType.holder]: 'Holder',
-  [SaleType.Whitelist]: 'Whitelist',
+  [SaleType.Whitelist]: 'Whitelist'
 }

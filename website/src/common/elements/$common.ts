@@ -1,8 +1,7 @@
 import { empty } from '@most/core'
 import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet/middleware/ui-components'
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet/middleware/utils'
-import { isStream } from 'aelea/core'
-import { type $Branch, $text, type I$Node, attr, style } from 'aelea/core'
+import { type $Branch, $text, attr, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -21,8 +20,8 @@ export const $card = $column(
     borderRadius: '20px',
     boxShadow: boxShadow,
     padding: screenUtils.isDesktopScreen ? '36px' : '12px',
-    backgroundColor: pallete.background,
-  }),
+    backgroundColor: pallete.background
+  })
 )
 
 export const $card2 = $column(
@@ -31,8 +30,8 @@ export const $card2 = $column(
     borderRadius: '20px',
     padding: '20px',
     backgroundColor: pallete.middleground,
-    boxShadow: 'rgba(0, 0, 0, 0.25) 0px 4px 20px 0px',
-  }),
+    boxShadow: 'rgba(0, 0, 0, 0.25) 0px 4px 20px 0px'
+  })
 )
 
 export const $seperator = $text(style({ color: pallete.foreground, pointerEvents: 'none' }))('|')
@@ -57,9 +56,9 @@ export const $labeledDivider = (label: string | $Node, displayIcon = true) => {
       isStream(label) ? label : $text(style({ fontSize: '.85rem' }))(label),
       displayIcon
         ? $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
-        : empty(),
+        : empty()
     ),
-    $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))(),
+    $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))()
   )
 }
 
@@ -111,8 +110,8 @@ ${config.location ? '&location=' + config.location : ''}
       alignItems: 'center',
       placeContent: 'center',
       height: '42px',
-      width: '42px',
-    }),
+      width: '42px'
+    })
   )($icon({ $content: $calendar, width: '22px', viewBox: `0 0 32 32` }))
 }
 
@@ -131,9 +130,9 @@ export const $iconCircular = ($iconPath: $Branch<SVGPathElement>, size = '32px')
       textAlign: 'center',
       lineHeight: '15px',
       fontWeight: 'bold',
-      color: pallete.message,
+      color: pallete.message
     }),
-    viewBox: '0 0 32 32',
+    viewBox: '0 0 32 32'
   })
 }
 
@@ -143,11 +142,11 @@ export const $accountRef = (id: viem.Address, chain: viem.Chain) =>
 export const $accountIconLink = (address: viem.Address, chain: viem.Chain) =>
   $anchor(attr({ href: getAccountExplorerUrl(chain, address) }))(
     $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24', svgOps: style({ margin: '3px 4px 0 0' }) }),
-    $text(style({}))(`${shortenAddress(address)} `),
+    $text(style({}))(`${shortenAddress(address)} `)
   )
 
 export const $txnIconLink = (hash: string, chain: viem.Chain) => {
   return $anchor(attr({ href: getTxExplorerUrl(chain, hash) }))(
-    $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24' }),
+    $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24' })
   )
 }

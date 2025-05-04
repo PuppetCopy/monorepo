@@ -8,15 +8,15 @@ import {
   type Account,
   type Chain,
   type CustomTransport,
-  type EIP1193EventMap,
-  type PublicClient,
-  type Transport,
-  type WalletClient,
   createPublicClient,
   createWalletClient,
   custom,
+  type EIP1193EventMap,
   fallback,
   getAddress,
+  type PublicClient,
+  type Transport,
+  type WalletClient
 } from 'viem'
 import { switchMap } from '../utils/index.js'
 
@@ -66,8 +66,8 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
         const chain = await params.chainQuery
         const transport = getPublicTransport(publicTransportMap, chain)
         return { transport, chain }
-      }, combineState({ chainQuery })),
-    ),
+      }, combineState({ chainQuery }))
+    )
   )
 
   const providerClientQuery = replayLatest(
@@ -76,8 +76,8 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
         const { chain, transport } = await params.publicTransportParamsQuery
 
         return createPublicClient({ chain, transport })
-      }, combineState({ publicTransportParamsQuery })),
-    ),
+      }, combineState({ publicTransportParamsQuery }))
+    )
   )
 
   const walletClientQuery: Stream<Promise<IWalletClient | null>> = replayLatest(
@@ -105,7 +105,7 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
         const walletClient: IWalletClient = createWalletClient({
           account: getAddress(accountList[0]),
           chain,
-          transport: fallback([custom(params.walletProvider), transport]),
+          transport: fallback([custom(params.walletProvider), transport])
         }) as any
 
         const addressList = await walletClient.getAddresses()
@@ -115,8 +115,8 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
         }
 
         return walletClient
-      }, combineState({ walletProvider, publicTransportParamsQuery })),
-    ),
+      }, combineState({ walletProvider, publicTransportParamsQuery }))
+    )
   )
 
   const publicProviderClientQuery = replayLatest(
@@ -125,8 +125,8 @@ export function initWalletLink(config: IWalletLinkConfig): IWalletLink {
         const { chain, transport } = await params.publicTransportParamsQuery
 
         return createPublicClient({ chain, transport })
-      }, combineState({ publicTransportParamsQuery })),
-    ),
+      }, combineState({ publicTransportParamsQuery }))
+    )
   )
 
   return { walletClientQuery, providerClientQuery, publicProviderClientQuery }
@@ -157,7 +157,7 @@ export function getPublicTransport(publicTransportMap: Partial<Record<number, Tr
 export async function getPublicClient(
   publicTransportQuery: Promise<Transport>,
   walletProviderQuery: Promise<EIP1193Provider | null>,
-  chainQuery: Promise<Chain>,
+  chainQuery: Promise<Chain>
 ): Promise<PublicClient> {
   const walletProvider = await walletProviderQuery
   const publicTransport = await publicTransportQuery
@@ -166,7 +166,7 @@ export async function getPublicClient(
   const transport = walletProvider ? [custom(walletProvider), publicTransport] : [publicTransport]
   return createPublicClient({
     chain,
-    transport: fallback(transport),
+    transport: fallback(transport)
   })
 }
 
@@ -199,7 +199,7 @@ export const getInjectedTransport = (name: string): CustomTransport | null => {
 
 export const eip1193ProviderEventFn = <TEvent extends keyof EIP1193EventMap>(
   provider: EIP1193Provider,
-  eventName: TEvent,
+  eventName: TEvent
 ) =>
   fromCallback<any, any>(
     (cb) => {
@@ -208,7 +208,7 @@ export const eip1193ProviderEventFn = <TEvent extends keyof EIP1193EventMap>(
     },
     (a) => {
       return a
-    },
+    }
   )
 
 export const getGasPrice = (providerQuerySrc: Stream<Promise<IPublicProvider>>) => {

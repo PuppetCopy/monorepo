@@ -12,16 +12,16 @@ export const $Admin = (config: IAdminPageParams) =>
   component(
     (
       [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-      [requestAdvanceEpoch, requestAdvanceEpochTether]: Behavior<walletLink.IWalletClient, any>,
+      [requestAdvanceEpoch, requestAdvanceEpochTether]: Behavior<walletLink.IWalletClient, any>
     ) => {
       const { walletClientQuery, providerClientQuery } = config
 
       return [
         $column(
           spacing.default,
-          style({ alignSelf: 'center', minWidth: '680px' }),
+          style({ alignSelf: 'center', minWidth: '680px' })
         )(
-          $heading1('Epoch Starter'),
+          $heading1('Epoch Starter')
 
           // $column(
           //   $heading3('Gauge Controller'),
@@ -52,10 +52,10 @@ export const $Admin = (config: IAdminPageParams) =>
         ),
 
         {
-          changeWallet,
-        },
+          changeWallet
+        }
       ]
-    },
+    }
   )
 
 // component((

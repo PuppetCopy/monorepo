@@ -34,11 +34,11 @@ export interface IEarningsPlan {
 
 export enum ITradeFocusMode {
   collateral,
-  size,
+  size
 }
 
 export enum IWalletTab {
   TRADER = 'Trader',
   PUPPET = 'Puppet',
-  EARN = 'Earn',
+  EARN = 'Earn'
 }

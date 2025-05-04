@@ -8,7 +8,7 @@ import {
   AttributeExpression,
   AttributeFaceAccessory,
   AttributeHat,
-  type IBerryDisplayTupleMap,
+  type IBerryDisplayTupleMap
 } from './types.js'
 
 export const labAttributeTuple = [
@@ -18,7 +18,7 @@ export const labAttributeTuple = [
   AttributeExpression,
   AttributeFaceAccessory,
   AttributeHat,
-  AttributeBadge,
+  AttributeBadge
 ] as const
 
 export const getLabItemTupleIndex = (itemId: number) => {
@@ -55,7 +55,7 @@ export const berryPartsToSvg = ([
   expression,
   faceAccessory,
   hat,
-  badge,
+  badge
 ]: Partial<IBerryDisplayTupleMap>) => {
   return `
     ${background ? svgParts[0][background] : ''}

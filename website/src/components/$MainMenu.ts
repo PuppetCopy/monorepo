@@ -1,28 +1,30 @@
 import { constant, multicast } from '@most/core'
 import type { Stream } from '@most/types'
 import {
-  $Link,
   $anchor,
   $discord,
   $gitbook,
   $github,
   $icon,
   $instagram,
+  $Link,
   $moreDots,
-  $twitter,
+  $twitter
 } from '@puppet/middleware/ui-components'
-import { type IBehavior, O, combineArray } from 'aelea/core'
 import {
   type $Branch,
   $element,
   $text,
-  type I$Node,
-  type StyleCSS,
   attr,
+  combineArray,
   component,
+  type I$Node,
+  type IBehavior,
   nodeEvent,
+  O,
+  type StyleCSS,
   style,
-  styleBehavior,
+  styleBehavior
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
 import { $column, $row, layoutSheet } from 'aelea/ui-components'
@@ -47,7 +49,7 @@ export const $MainMenu = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: Behavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: Behavior<any, any>,
-      [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>,
+      [changeWallet, changeWalletTether]: Behavior<any, EIP6963ProviderDetail | null>
     ) => {
       const { route, showAccount } = config
 
@@ -60,8 +62,8 @@ export const $MainMenu = (config: MainMenu) =>
           alignItems: 'center',
           placeContent: 'center',
           height: '42px',
-          width: '42px',
-        }),
+          width: '42px'
+        })
       )
 
       const $extraMenuPopover = $Popover({
@@ -87,8 +89,8 @@ export const $MainMenu = (config: MainMenu) =>
             // ),
 
             $ButtonSecondary({
-              $content: $Picker([light, dark])({}),
-            })({}),
+              $content: $Picker([light, dark])({})
+            })({})
 
             // switchLatest(snapshot((_, walletQuery) => {
             //   if (walletQuery === null) {
@@ -110,7 +112,7 @@ export const $MainMenu = (config: MainMenu) =>
             //   })
             // }, changeWallet, walletClientQuery)),
           ),
-          clickPopoverClaim,
+          clickPopoverClaim
         ),
         dismiss: routeChange,
         $target: $circleButtonAnchor(
@@ -121,14 +123,14 @@ export const $MainMenu = (config: MainMenu) =>
                 padding: '6px',
                 cursor: 'pointer',
                 alignSelf: 'center',
-                transform: 'rotate(90deg)',
-              }),
+                transform: 'rotate(90deg)'
+              })
             ),
             width: '32px',
             $content: $moreDots,
-            viewBox: '0 0 32 32',
-          }),
-        ),
+            viewBox: '0 0 32 32'
+          })
+        )
       })({
         // overlayClick: clickPopoverClaimTether()
       })
@@ -144,38 +146,38 @@ export const $MainMenu = (config: MainMenu) =>
             padding: '18px 12px',
             maxHeight: '100vh',
             flexShrink: 0,
-            placeContent: 'space-between',
-          }),
+            placeContent: 'space-between'
+          })
         )(
           $column(
             spacing.big,
-            style({ flex: 1, alignItems: 'flex-start' }),
+            style({ flex: 1, alignItems: 'flex-start' })
           )(
             $RouterAnchor({
               url: '/',
               route: route,
               $anchor: $element('a')(style({ padding: '8px', margin: '8px' }))(
-                $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }),
-              ),
+                $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' })
+              )
             })({
-              click: routeChangeTether(),
-            }),
+              click: routeChangeTether()
+            })
           ),
 
           $row(
             spacing.big,
-            style({ flex: 1, alignItems: 'center', placeContent: 'center' }),
+            style({ flex: 1, alignItems: 'center', placeContent: 'center' })
           )(
             style({ padding: 0 })(
               $pageLink({
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
                 url: `/wallet`,
-                $content: $walletProfileDisplay({}),
+                $content: $walletProfileDisplay({})
               })({
-                click: routeChangeTether(),
-              }),
-            ),
+                click: routeChangeTether()
+              })
+            )
             // $pageLink({
             //   $content: $row(spacing.default, style({ alignItems: 'center', cursor: 'pointer', borderRadius: '50px', pointerEvents: 'none' }))(
             //     $icon({ $content: $trophy, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
@@ -208,17 +210,17 @@ export const $MainMenu = (config: MainMenu) =>
             //   $icon({ $content: $discord, fill: pallete.middleground, width: '22px', viewBox: `0 0 32 32` })
             // ),
             $circleButtonAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))(
-              $icon({ $content: $twitter, fill: pallete.foreground, width: '22px', viewBox: `0 0 24 24` }),
-            ),
-          ),
+              $icon({ $content: $twitter, fill: pallete.foreground, width: '22px', viewBox: `0 0 24 24` })
+            )
+          )
         ),
 
         {
           routeChange,
-          changeWallet,
-        },
+          changeWallet
+        }
       ]
-    },
+    }
   )
 
 export const $MainMenuMobile = (config: MainMenu) =>
@@ -226,7 +228,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: Behavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: Behavior<any, any>,
-      [walletChange, walletChangeTether]: Behavior<any, any>,
+      [walletChange, walletChangeTether]: Behavior<any, any>
     ) => {
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
@@ -238,9 +240,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
             width: '16px',
             fill: pallete.foreground,
             svgOps: style({ minWidth: '36px' }),
-            viewBox: '0 0 32 32',
+            viewBox: '0 0 32 32'
           }),
-          $text(text),
+          $text(text)
         )
 
       const $circleButtonAnchor = $anchor(
@@ -252,8 +254,8 @@ export const $MainMenuMobile = (config: MainMenu) =>
           alignItems: 'center',
           placeContent: 'center',
           height: '42px',
-          width: '42px',
-        }),
+          width: '42px'
+        })
       )
 
       const $extraMenuPopover = $Popover({
@@ -262,17 +264,17 @@ export const $MainMenuMobile = (config: MainMenu) =>
             $Link({
               $content: $popoverPageLink($gmxLogo, 'Trade'),
               url: '/app/trade',
-              route: route.create({ fragment: 'feefwefwe' }),
+              route: route.create({ fragment: 'feefwefwe' })
             })({
               // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/app/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
-              click: routeChangeTether(),
+              click: routeChangeTether()
             }),
             $Link({
               $content: $popoverPageLink($stackedCoins, 'Leaderboard'),
               url: '/app/leaderboard',
-              route: route.create({ fragment: 'feefwefwe' }),
+              route: route.create({ fragment: 'feefwefwe' })
             })({
-              click: routeChangeTether(),
+              click: routeChangeTether()
             }),
 
             // ...screenUtils.isMobileScreen ? $menuItemList : [],
@@ -286,9 +288,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   alignItems: 'center',
                   placeContent: 'center',
                   height: '42px',
-                  width: '42px',
+                  width: '42px'
                 }),
-                attr({ href: 'https://docs.blueberry.club/' }),
+                attr({ href: 'https://docs.blueberry.club/' })
               )($icon({ $content: $gitbook, width: '22px', viewBox: `0 0 32 32` })),
               $anchor(
                 layoutSheet.displayFlex,
@@ -299,9 +301,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   alignItems: 'center',
                   placeContent: 'center',
                   height: '42px',
-                  width: '42px',
+                  width: '42px'
                 }),
-                attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' }),
+                attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' })
               )($icon({ $content: $discord, width: '22px', viewBox: `0 0 32 32` })),
               $anchor(
                 layoutSheet.displayFlex,
@@ -312,9 +314,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   alignItems: 'center',
                   placeContent: 'center',
                   height: '42px',
-                  width: '42px',
+                  width: '42px'
                 }),
-                attr({ href: 'https://twitter.com/PuppetFinance' }),
+                attr({ href: 'https://twitter.com/PuppetFinance' })
               )($icon({ $content: $twitter, width: '22px', viewBox: `0 0 24 24` })),
               $anchor(
                 layoutSheet.displayFlex,
@@ -325,9 +327,9 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   alignItems: 'center',
                   placeContent: 'center',
                   height: '42px',
-                  width: '42px',
+                  width: '42px'
                 }),
-                attr({ href: 'https://www.instagram.com/blueberryclub.eth' }),
+                attr({ href: 'https://www.instagram.com/blueberryclub.eth' })
               )($icon({ $content: $instagram, width: '18px', viewBox: `0 0 32 32` })),
               $anchor(
                 layoutSheet.displayFlex,
@@ -338,15 +340,15 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   alignItems: 'center',
                   placeContent: 'center',
                   height: '42px',
-                  width: '42px',
+                  width: '42px'
                 }),
-                attr({ href: 'https://github.com/nissoh/blueberry-club' }),
-              )($icon({ $content: $github, width: '22px', viewBox: `0 0 32 32` })),
+                attr({ href: 'https://github.com/nissoh/blueberry-club' })
+              )($icon({ $content: $github, width: '22px', viewBox: `0 0 32 32` }))
             ),
 
             $ButtonSecondary({
-              $content: $Picker([light, dark])({}),
-            })({}),
+              $content: $Picker([light, dark])({})
+            })({})
 
             // switchLatest(snapshot((_, wallet) => {
             //   if (wallet === null) {
@@ -368,7 +370,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
             //   })
             // }, walletChange, walletClientQuery)),
           ),
-          clickPopoverClaim,
+          clickPopoverClaim
         ),
         dismiss: routeChangeMulticast,
         $target: $circleButtonAnchor(
@@ -379,14 +381,14 @@ export const $MainMenuMobile = (config: MainMenu) =>
                 padding: '6px',
                 cursor: 'pointer',
                 alignSelf: 'center',
-                transform: 'rotate(90deg)',
-              }),
+                transform: 'rotate(90deg)'
+              })
             ),
             width: '32px',
             $content: $moreDots,
-            viewBox: '0 0 32 32',
-          }),
-        ),
+            viewBox: '0 0 32 32'
+          })
+        )
       })({
         // overlayClick: clickPopoverClaimTether()
       })
@@ -399,46 +401,46 @@ export const $MainMenuMobile = (config: MainMenu) =>
             flexShrink: 0,
             alignItems: 'flex-end',
             borderRadius: '30px',
-            placeContent: 'space-between',
-          }),
+            placeContent: 'space-between'
+          })
         )(
           $row(
             spacing.big,
-            style({ alignItems: 'center', flex: 1 }),
+            style({ alignItems: 'center', flex: 1 })
           )(
             $RouterAnchor({
               url: '/',
               route: route,
-              $anchor: $element('a')($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' })),
+              $anchor: $element('a')($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
             })({
-              click: routeChangeTether(),
-            }),
+              click: routeChangeTether()
+            })
           ),
 
           $row(
             spacing.default,
-            style({ flex: 1, alignItems: 'center', placeContent: 'center' }),
+            style({ flex: 1, alignItems: 'center', placeContent: 'center' })
           )(
             style({ padding: 0 })(
               $pageLink({
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
                 url: `/app/wallet`,
-                $content: $walletProfileDisplay({}),
+                $content: $walletProfileDisplay({})
               })({
-                click: routeChangeTether(),
-              }),
-            ),
+                click: routeChangeTether()
+              })
+            )
           ),
 
-          $row(spacing.big, style({ placeContent: 'flex-end', flex: 1 }))($extraMenuPopover),
+          $row(spacing.big, style({ placeContent: 'flex-end', flex: 1 }))($extraMenuPopover)
         ),
 
         {
-          routeChange: routeChangeMulticast,
-        },
+          routeChange: routeChangeMulticast
+        }
       ]
-    },
+    }
   )
 
 const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
@@ -446,13 +448,13 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
     (
       [click, clickTether]: Behavior<string, string>,
       [active, containsTether]: Behavior<boolean, boolean>,
-      [focus, focusTether]: Behavior<boolean, boolean>,
+      [focus, focusTether]: Behavior<boolean, boolean>
     ) => {
       const $anchorEl = $anchor(
         style({
           borderRadius: '50px',
           padding: '11px 22px',
-          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
+          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
         styleBehavior(
           combineArray(
@@ -462,16 +464,16 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
                     backgroundColor: `${pallete.background} !important`,
                     fill: pallete.foreground,
                     borderColor: `${pallete.primary} !important`,
-                    cursor: `default  !important`,
+                    cursor: `default  !important`
                   }
                 : isFocus
                   ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
                   : null
             },
             active,
-            focus,
-          ),
-        ),
+            focus
+          )
+        )
         // styleBehavior(map(isDisabled => (isDisabled ?  { pointerEvents: 'none', opacity: .3 } : {}), disabled))
       )(config.$content)
 
@@ -479,11 +481,11 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
         $RouterAnchor({ $anchor: $anchorEl, url: config.url, route: config.route })({
           click: clickTether(),
           focus: focusTether(),
-          contains: containsTether(),
+          contains: containsTether()
         }),
 
-        { click, active, focus },
+        { click, active, focus }
       ]
-    },
+    }
   )
 }

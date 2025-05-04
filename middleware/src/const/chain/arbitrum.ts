@@ -95,7 +95,7 @@ export const ARBITRUM_ADDRESS = {
   PositionRouter: '0xb87a436b93ffe9d75c5cfa7bacfff96430b09868',
   PositionManager: '0x87a4088bd721f83b6c2e5102e2fa47022cb1c831',
 
-  UniswapGmxEthPool: '0x80a9ae39310abf666a87c743d6ebbd0e8c42158e',
+  UniswapGmxEthPool: '0x80a9ae39310abf666a87c743d6ebbd0e8c42158e'
 } as const
 
 export type ArbitrumAddress = typeof ARBITRUM_ADDRESS

@@ -5,7 +5,7 @@ import {
   CHAIN_NATIVE_DESCRIPTION,
   FUNDING_RATE_PRECISION,
   MARGIN_FEE_BASIS_POINTS,
-  TOKEN_ADDRESS_DESCRIPTION_MAP,
+  TOKEN_ADDRESS_DESCRIPTION_MAP
 } from '../const/index.js'
 import { factor, getBasisPoints } from '../utils/mathUtils.js'
 import type { ITokenDescription } from '../utils/types.js'
@@ -109,7 +109,7 @@ export function getPositionKey(
   account: viem.Address,
   market: viem.Address,
   collateralToken: viem.Address,
-  isLong: boolean,
+  isLong: boolean
 ) {
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
 }

@@ -20,7 +20,7 @@ export function getPoolUsdWithoutPnl(
   marketPrice: IMarketPrice,
   marketInfo: IMarketInfo,
   isLong: boolean,
-  maximize = false,
+  maximize = false
 ) {
   const poolAmount = isLong ? marketInfo.pool.longTokenAmount : marketInfo.pool.shortTokenAmount
   const price = isLong
@@ -99,7 +99,7 @@ export function getReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketPric
 export function getAvailableUsdLiquidityForPosition(
   marketInfo: IMarketInfo,
   marketPrice: IMarketPrice,
-  isLong: boolean,
+  isLong: boolean
 ) {
   const maxReservedUsd = getMaxReservedUsd(marketInfo, marketPrice, isLong)
   const reservedUsd = getReservedUsd(marketInfo, marketPrice, isLong)
@@ -140,7 +140,7 @@ export function getFundingFactorPerInterval2(
   usage: IMarketUsageInfo,
   fees: IMarketFees,
   isLong: boolean,
-  interval: IntervalTime,
+  interval: IntervalTime
 ) {
   const longsPayShorts = fees.nextFunding.longsPayShorts
   const isLargerSide = isLong ? longsPayShorts : !longsPayShorts

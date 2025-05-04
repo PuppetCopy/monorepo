@@ -1,19 +1,22 @@
 import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
-import { type IBehavior, O, combineArray, combineState } from 'aelea/core'
 import {
   type $Branch,
   $element,
   $node,
-  type INode,
   attrBehavior,
+  combineArray,
+  combineState,
   component,
+  type IBehavior,
+  type INode,
   nodeEvent,
+  O,
   style,
   styleBehavior,
   styleInline,
-  stylePseudo,
+  stylePseudo
 } from 'aelea/core'
 import { $row, type Control, layoutSheet } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -33,8 +36,8 @@ export const $defaultButtonPrimary = $defaultButtonCore(
     padding: '0 24px',
     fontWeight: 'bold',
     border: 'none',
-    backgroundColor: pallete.primary,
-  }),
+    backgroundColor: pallete.primary
+  })
   // stylePseudo(':hover', { backgroundColor: colorAlpha(pallete.primary, .5) })
 )
 
@@ -51,16 +54,16 @@ const secondaryButtonStyle = style({
   padding: '0 24px',
   fontWeight: 'bold',
   border: '1px solid',
-  borderColor: pallete.message,
+  borderColor: pallete.message
 })
 
 export const $defaultButtonSecondary = $defaultButtonCore(
   secondaryButtonStyle,
-  stylePseudo(':hover', { borderColor: pallete.foreground, borderWidth: '1px' }),
+  stylePseudo(':hover', { borderColor: pallete.foreground, borderWidth: '1px' })
 )
 
 export const $defaultMiniButtonSecondary = $defaultButtonSecondary(
-  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.85rem' }),
+  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.85rem' })
 )
 
 export const $buttonAnchor = $element('a')(
@@ -74,21 +77,21 @@ export const $buttonAnchor = $element('a')(
     // padding: '6px 12px',
     display: 'flex',
     cursor: 'pointer',
-    color: pallete.message,
-  }),
+    color: pallete.message
+  })
 )
 
 export const $ButtonPrimary = (config: IButtonCore) => {
   return $ButtonCore({
     $container: $defaultButtonPrimary,
-    ...config,
+    ...config
   })
 }
 
 export const $ButtonSecondary = (config: IButtonCore) => {
   return $ButtonCore({
     $container: $defaultButtonSecondary,
-    ...config,
+    ...config
   })
 }
 
@@ -101,13 +104,13 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
   component(
     (
       [click, clickTether]: Behavior<PointerEvent, PointerEvent>,
-      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
+      [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
       const isTxPending = recoverWith(
         () => now(false),
-        map((s) => s.state === PromiseStatus.PENDING, promiseState(txQuery)),
+        map((s) => s.state === PromiseStatus.PENDING, promiseState(txQuery))
       )
       const isRequestPending = startWith(false, isTxPending)
 
@@ -116,8 +119,8 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
           $container: $defaultButtonPrimary(
             style({
               position: 'relative',
-              overflow: 'hidden',
-            }),
+              overflow: 'hidden'
+            })
           ),
           disabled: combineArray((params) => {
             return params.alert !== null || params.disabled || params.isRequestPending
@@ -130,9 +133,9 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 visibility: 'hidden',
                 animation: `borderRotate .75s linear infinite`,
                 position: 'absolute',
-                background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`,
+                background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending)),
+              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
             $node(
               style({
@@ -140,21 +143,21 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 position: 'absolute',
                 visibility: 'hidden',
                 background: colorAlpha(pallete.background, 0.9),
-                borderRadius: '30px',
+                borderRadius: '30px'
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending)),
+              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
-            style({ position: 'relative' })(config.$content),
-          ),
+            style({ position: 'relative' })(config.$content)
+          )
         })({
-          click: clickTether(),
+          click: clickTether()
         }),
 
         {
-          click: multicast(click),
-        },
+          click: multicast(click)
+        }
       ]
-    },
+    }
   )
 
 interface IButtonCircular extends Control {
@@ -169,15 +172,15 @@ export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircul
       attrBehavior(
         map((d) => {
           return { disabled: d ? 'true' : null }
-        }, disabled),
-      ),
+        }, disabled)
+      )
     )
 
     return [
       ops($row(style({ cursor: 'pointer', padding: '6px', margin: '-6px' }))($iconCircular($iconPath))),
 
       {
-        click,
-      },
+        click
+      }
     ]
   })

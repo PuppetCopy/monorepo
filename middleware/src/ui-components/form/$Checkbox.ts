@@ -1,17 +1,18 @@
 import { empty, map, mergeArray, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IBehavior, O } from 'aelea/core'
 import {
   $element,
   $node,
   $text,
-  type IBranch,
   attr,
   attrBehavior,
   component,
+  type IBehavior,
+  type IBranch,
   nodeEvent,
+  O,
   style,
-  styleBehavior,
+  styleBehavior
 } from 'aelea/core'
 import { type Input, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -27,12 +28,12 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
     (
       [focusStyle, interactionTether]: Behavior<IBranch, true>,
       [dismissstyle, dismissTether]: Behavior<IBranch, false>,
-      [check, checkTether]: Behavior<IBranch<HTMLInputElement>, boolean>,
+      [check, checkTether]: Behavior<IBranch<HTMLInputElement>, boolean>
     ) => {
       const $overlay = $node(
         layoutSheet.stretch,
         style({ flex: 1, margin: '3px' }),
-        styleBehavior(map((ch) => (ch ? { backgroundColor: pallete.message } : null), value)),
+        styleBehavior(map((ch) => (ch ? { backgroundColor: pallete.message } : null), value))
       )
 
       const $checkInput = $element('input')(
@@ -40,12 +41,12 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
         layoutSheet.stretch,
         checkTether(
           nodeEvent('change'),
-          map((evt) => (<HTMLInputElement>evt.target).checked),
+          map((evt) => (<HTMLInputElement>evt.target).checked)
         ),
         attr({ type: 'checkbox' }),
         attrBehavior(map((checked) => ({ checked: checked ? true : null }), value)),
         interactionTether(interactionOp),
-        dismissTether(dismissOp),
+        dismissTether(dismissOp)
       )
 
       return [
@@ -56,24 +57,24 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
                   (isDisabled) => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
-                  startWith(true, disabled),
-                ),
+                  startWith(true, disabled)
+                )
               )
-            : O(),
+            : O()
         )(
           $node(
             styleBehavior(
               map(
                 (active) => (active ? { borderColor: pallete.primary } : null),
-                mergeArray([focusStyle, dismissstyle]),
-              ),
+                mergeArray([focusStyle, dismissstyle])
+              )
             ),
-            style({ position: 'relative', width: '18px', height: '18px', border: `2px solid ${pallete.message}` }),
+            style({ position: 'relative', width: '18px', height: '18px', border: `2px solid ${pallete.message}` })
           )($overlay(), $checkInput()),
 
-          label ? $text(label) : empty(),
+          label ? $text(label) : empty()
         ),
-        { check },
+        { check }
       ]
-    },
+    }
   )

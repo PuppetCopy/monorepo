@@ -7,8 +7,8 @@ export default defineConfig({
     foundry({
       project: '../contracts',
       forge: {
-        clean: true,
-      },
-    }),
-  ],
+        clean: true
+      }
+    })
+  ]
 })
