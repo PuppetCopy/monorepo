@@ -7,7 +7,6 @@ export {
   getLabItemTupleIndex,
   labAttributeTuple
 } from './common.js'
-export { attributeIndexToLabel, mintLabelMap } from './label.js'
 export { svgParts } from './mappings/svgParts.js'
 export { tokenIdAttributeTuple } from './mappings/tokenIdAttributeTuple.js'
 export type {

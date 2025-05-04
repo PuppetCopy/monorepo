@@ -166,7 +166,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: II$Node<SVGPathElement>
+  $iconPath: I$Node<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

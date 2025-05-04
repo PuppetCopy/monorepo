@@ -4,7 +4,7 @@ import { IntervalTime } from '@puppet/middleware/const'
 import { $anchor, $infoTooltipLabel } from '@puppet/middleware/ui-components'
 import type { IBehavior } from 'aelea/core'
 import { $text, component, nodeEvent, style, styleBehavior } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
+import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
 export const LAST_ACTIVITY_LABEL_MAP = {

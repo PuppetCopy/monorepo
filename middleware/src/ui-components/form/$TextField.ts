@@ -69,31 +69,21 @@ export const $FieldLabeled = ({
   $container = $defaultTextFieldContainer
 }: ITextField) =>
   component(([change, sampleValue]: IBehavior<string, string>) => {
-    const $field = overideInputStyle(
-      $Field({})({
-        change: sampleValue()
-      })
-    )
-
     return [
       $container(
         $row(spacing.small, style({ width: '100%' }))(
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
-          attrBehavior(
-            map((placeholder) => ({ placeholder }), streamOf(placeholder)),
-            $field
+          O(
+            // attrBehavior(map((placeholder) => ({ placeholder }), streamOf(placeholder))),
+            overideInputStyle
+          )(
+            $Field({})({
+              change: sampleValue()
+            })
           )
         ),
-        $row(style({ position: 'relative' }))(
-          hint
-            ? $node(
-                style({
-                  fontSize: '.85rem',
-                  width: '100%',
-                  whiteSpace: 'pre-wrap'
-                })
-              )($text(hint))
-            : empty()
+        $row(style({ fontSize: '.85rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' }))(
+          hint ? $text(hint) : empty()
         )
       ),
 

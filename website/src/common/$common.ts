@@ -32,10 +32,10 @@ import {
   readableUsd,
   streamOf
 } from '@puppet/middleware/utils'
-import type { IBehavior, Tether } from 'aelea/core'
-import { $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
+import type { IBehavior, IComposeBehavior } from 'aelea/core'
+import { $node, $text, component, type INode, nodeEvent, O, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
-import { $column, $icon, $row, $seperator, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
@@ -65,26 +65,26 @@ export const $entry = (pos: IPosition) => {
   const indexDescription = getTokenDescription(indexToken)
   const collateralTokenDescription = getTokenDescription(pos.collateralToken)
 
-  const $label = $text(style({ width: '125px' }))
+  const $label = $node(style({ width: '125px' }))
 
   return $row(spacing.small, style({ alignItems: 'center' }))(
     $Tooltip({
       // $dropContainer: $defaultDropContainer,
       $content: $column(spacing.default)(
-        $infoLabeledValue($label('Market Token'), $tokenLabeled(indexDescription)),
-        $infoLabeledValue($label('Collateral Token'), $tokenLabeled(collateralTokenDescription)),
+        $infoLabeledValue($label($text('Market Token')), $tokenLabeled(indexDescription)),
+        $infoLabeledValue($label($text('Collateral Token')), $tokenLabeled(collateralTokenDescription)),
         isPositionSettled(pos)
           ? $infoLabeledValue(
-              $label('Close Time'),
-              $text(style({ fontSize: '.85rem' }))(readableDate(pos.settledTimestamp))
+              $label($text('Close Time')),
+              $node(style({ fontSize: '.85rem' }))($text(readableDate(pos.settledTimestamp)))
             )
           : empty()
       ),
       $anchor: $route(indexDescription, false)
     })({}),
     $column(spacing.tiny)(
-      $infoLabel($text(style({ fontSize: '.65rem', fontWeight: 'bold' }))(pos.isLong ? 'LONG' : 'SHORT')),
-      $text(style({ fontSize: '.85rem' }))(readableUsd(pos.avgEntryPrice))
+      $infoLabel($node(style({ fontSize: '.65rem', fontWeight: 'bold' }))($text(pos.isLong ? 'LONG' : 'SHORT'))),
+      $node(style({ fontSize: '.85rem' }))($text(readableUsd(pos.avgEntryPrice)))
     )
   )
 }
@@ -103,16 +103,14 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
         marginLeft: '-15px'
       })($tokenIcon(collateralTokenDescription))
     ),
-    displayLabel
-      ? $column(spacing.tiny)($text(style({ fontSize: '1rem' }))(`${collateralTokenDescription.symbol}`))
-      : empty()
+    displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty()
   )
 }
 
 export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: '18px', height: '18px' })($tokenIcon(indexDescription)),
-    $text(style({ fontSize: '1rem' }))(`${indexDescription.symbol}`)
+    $text(`${indexDescription.symbol}`)
   )
 }
 
@@ -144,12 +142,12 @@ export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
   })
 }
 
-export const $puppetList = (puppets?: viem.Address[], click?: Tether<INode, string>) => {
+export const $puppetList = (puppets?: viem.Address[], click?: IComposeBehavior<INode, string>) => {
   // const positionMarkPrice = tradeReader.getLatestPrice(now(pos.indexToken))
   // const cumulativeFee = tradeReader.vault.read('cumulativeFundingRates', pos.collateralToken)
 
   if (!puppets || puppets.length === 0) {
-    return $text(style({ fontSize: '0.85rem', color: pallete.foreground }))('-')
+    return $node(style({ fontSize: '0.85rem', color: pallete.foreground }))($text('-'))
   }
 
   return $row(style({ cursor: 'pointer' }))(
@@ -173,8 +171,8 @@ export const $puppetList = (puppets?: viem.Address[], click?: Tether<INode, stri
 }
 
 export const $leverage = (size: bigint, collateral: bigint) => {
-  return $text(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '0.85rem' }))(
-    readableLeverage(size, collateral)
+  return $node(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '0.85rem' }))(
+    $text(readableLeverage(size, collateral))
   )
 }
 
@@ -193,9 +191,7 @@ export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
     }, displayColor)
   )
 
-  const $testStr = $text(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))
-
-  return $testStr(display)
+  return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
 export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
@@ -213,9 +209,7 @@ export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
     }, displayColor)
   )
 
-  const $testStr = $text(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))
-
-  return $testStr(display)
+  return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
 export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
@@ -230,7 +224,7 @@ export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
         const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
         return readablePercentage(getBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
       }, latestPrice)
-  return $text(style({ fontSize: '.85rem' }))(roi)
+  return $node(style({ fontSize: '.85rem' }))($text(roi))
 }
 
 export function $liquidationSeparator(
@@ -267,9 +261,9 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
     $icon({ $content: $iconG, width: '34px', viewBox: '0 0 32 32' }),
     showLabel
       ? $column(layoutSheet.flex)(
-          $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol),
-          $text(style({ fontSize: '.75rem', color: pallete.foreground }))(
-            `${longTokenDescription.symbol}/${shortTokenDescription.symbol}`
+          $node(style({ fontWeight: 'bold' }))($text(indexTokenDescription.symbol)),
+          $node(style({ fontSize: '.75rem', color: pallete.foreground }))(
+            $text(`${longTokenDescription.symbol}/${shortTokenDescription.symbol}`)
           )
         )
       : empty()
@@ -282,7 +276,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 
   return $row(spacing.small, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconG, width: '24px', viewBox: '0 0 32 32' }),
-    $text(style({ fontWeight: 'bold' }))(indexTokenDescription.symbol)
+    $node(style({ fontWeight: 'bold' }))($text(indexTokenDescription.symbol))
   )
 }
 
@@ -310,11 +304,11 @@ export const $openPositionBreakdown = (pos: IPosition) => {
     $text('Net breakdown'),
 
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground, flex: 1 }))('Collateral'),
+      $node(style({ color: pallete.foreground, flex: 1 }))($text('Collateral')),
       $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax))
     ),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground, flex: 1 }))('Open Pnl'),
+      $node(style({ color: pallete.foreground, flex: 1 }))($text('Open Pnl')),
       $pnlDisplay(
         map((markPrice) => {
           return getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
@@ -324,19 +318,19 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 
     $labeledDivider('Realised'),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('Margin Fee'),
+      $node(style({ color: pallete.foreground }))($text('Margin Fee')),
       $pnlDisplay(-totalPositionFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('Borrowing Fee'),
+      $node(style({ color: pallete.foreground }))($text('Borrowing Fee')),
       $pnlDisplay(-totalBorrowingFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('Funding Fee'),
+      $node(style({ color: pallete.foreground }))($text('Funding Fee')),
       $pnlDisplay(-totalFundingFeeAmount)
     ),
     $row(style({ placeContent: 'space-between' }))(
-      $text(style({ color: pallete.foreground }))('Realised Pnl'),
+      $node(style({ color: pallete.foreground }))($text('Realised Pnl')),
       // $pnlValue(now(mp.realisedPnl))
       $pnlDisplay(pos.realisedPnlUsd)
     )
@@ -367,10 +361,10 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                       $profileAvatar({ account: puppet, profileSize: 25 })
                     )
                   }),
-                  $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(`${puppetList.length}`)
+                  $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))($text(`${puppetList.length}`))
                 )
               : $row(style({ alignItems: 'center' }))(
-                  $text(style({ color: pallete.foreground, fontSize: '.85em' }))('0 puppets')
+                  $node(style({ color: pallete.foreground, fontSize: '.85em' }))($text('0 puppets'))
                 )
           )
         ),

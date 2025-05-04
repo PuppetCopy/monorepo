@@ -6,6 +6,7 @@ import {
   attr,
   component,
   type I$Node,
+  type I$Slottable,
   type IBehavior,
   type INode,
   type INodeCompose,
@@ -45,7 +46,7 @@ export interface TableOption<T> {
 }
 
 export interface TableColumn<T> {
-  $head: I$Node
+  $head: I$Slottable
   $bodyCallback: IOps<T, I$Node>
   sortBy?: string
 

@@ -18,7 +18,7 @@ import {
   stylePseudo
 } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
-import { theme } from '../../assignThemeSync.js'
+import { theme } from 'aelea/ui-components-theme'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
@@ -98,7 +98,7 @@ export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
                   value: now(3600),
                   $container: $defaultSelectContainer(style({ right: '0' })),
                   $$option: map((option) => {
-                    return $text(getDuration(Number(option)))
+                    return $node($text(getDuration(Number(option))))
                   }),
                   list: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
                 }

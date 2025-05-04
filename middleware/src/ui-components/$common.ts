@@ -22,7 +22,14 @@ import {
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
-import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress, switchMap } from '../utils/index.js'
+import {
+  getExplorerUrl,
+  getMappedValue,
+  type ITokenDescription,
+  shortenTxAddress,
+  streamOf,
+  switchMap
+} from '../utils/index.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
 import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
 
@@ -143,13 +150,12 @@ export const $intermediateTooltip = ($content: I$Slottable) => {
   })({})
 }
 
-export const $infoLabel = (label: string | I$Node) => {
-  return isStream(label)
-    ? style({ color: pallete.foreground })(label)
-    : $node(style({ color: pallete.foreground }))($text(label))
+export const $infoLabel = (label: string | I$Slottable) => {
+  const $msg = isStream(label) ? label : $text(label)
+  return $node(style({ color: pallete.foreground }))($msg)
 }
 
-export const $infoLabeledValue = (label: string | I$Node, value: string | I$Node, collapseMobile = false) => {
+export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Node, collapseMobile = false) => {
   const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
 
   return $container(spacing.small)($infoLabel(label), isStream(value) ? value : $text(value))

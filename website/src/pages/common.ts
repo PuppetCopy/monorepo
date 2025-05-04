@@ -1,11 +1,11 @@
-import { $text, style } from 'aelea/core'
-import { $column, $row, $seperator, screenUtils } from 'aelea/ui-components'
+import { $node, $text, style } from 'aelea/core'
+import { $column, $row, $seperator, isMobileScreen, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
 export const $metricEntry = (label: string, value: string) =>
   $row(style({ fontSize: '.85rem', alignItems: 'center' }))(
-    $text(style({ color: pallete.foreground, flex: 1 }))(label),
-    $text(style({ fontWeight: 'bold' }))(value)
+    $node(style({ color: pallete.foreground, flex: 1 }))($text(label)),
+    $node(style({ fontWeight: 'bold' }))($text(value))
   )
 
 export const $seperator2 = style(

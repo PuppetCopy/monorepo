@@ -115,7 +115,7 @@ ${config.location ? `&location=${config.location}` : ''}
   )($icon({ $content: $calendar, width: '22px', viewBox: '0 0 32 32' }))
 }
 
-export const $iconCircular = ($iconPath: II$Node<SVGPathElement>, size = '32px') => {
+export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') => {
   return $icon({
     $content: $iconPath,
     svgOps: style({

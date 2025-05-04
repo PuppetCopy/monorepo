@@ -6,7 +6,7 @@ import { component, type I$Node, type INode, type INodeCompose, nodeEvent, style
 import { $defaultSelectContainer } from './$Dropdown.js'
 
 export interface ISelect<T> {
-  list: T[] | Stream<T[]>
+  list: readonly T[] | Stream<readonly T[]>
   value: Stream<T>
 
   $container?: INodeCompose

@@ -22,8 +22,8 @@ import {
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import { getMappedValue, type InferStream, readablePnl, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
-import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
-import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
@@ -323,7 +323,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         {
                           $head: $column(style({ textAlign: 'right' }))(
                             $text('Size'),
-                            $text(style({ fontSize: '.85rem' }))('Leverage')
+                            $node(style({ fontSize: '.85rem' }))($text('Leverage'))
                           ),
                           sortBy: 'maxSizeInUsd',
                           columnOp: style({ placeContent: 'flex-end' }),
@@ -337,9 +337,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     // columnOp: style({ placeContent: 'flex-start' }),
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between' }))(
                       $tableHeader('ROI %', 'PnL $'),
-                      $text(style({ alignSelf: 'center' }))(
-                        map((tf) => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe)
-                      )
+                      $text(map((tf) => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe))
                     ),
                     sortBy: 'roi',
                     gridTemplate: isDesktopScreen ? '200px' : '140px',
@@ -417,7 +415,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           $column(spacing.tiny)(
                             $roiDisplay(pos.roi),
                             $seperator2,
-                            $text(style({ fontSize: '.85rem' }))(readablePnl(pos.pnl))
+                            $node(style({ fontSize: '.85rem' }))($text(readablePnl(pos.pnl)))
                           )
                         )
                       )

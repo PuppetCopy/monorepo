@@ -1,11 +1,12 @@
 import { merge, tap } from '@most/core'
 import { $svg, $text, attr, component, type IBehavior, nodeEvent, O, style, stylePseudo } from 'aelea/core'
-import { $icon, $row, layoutSheet } from 'aelea/ui-components'
-import { changeTheme, pallete, THEME_PALLETE_SELECTED_KEY, type Theme } from 'aelea/ui-components-theme'
+import { $icon, $row, spacing } from 'aelea/ui-components'
+import { pallete, type Theme, theme, themeList } from 'aelea/ui-components-theme'
+import { setTheme } from 'aelea/ui-components-theme-browser'
 
 export const $Picker = (themes: Theme[]) =>
   component(([changeThemeEffect, changeThemeEffectTether]: IBehavior<any, any>) => {
-    const current = JSON.parse(localStorage.getItem(THEME_PALLETE_SELECTED_KEY)!) as Theme
+    const current = theme as Theme
 
     const applyOps = O(
       style({ cursor: 'pointer' }),
@@ -19,7 +20,7 @@ export const $Picker = (themes: Theme[]) =>
         const toIdx = (themeNameList.indexOf(current.name) + 1) % themes.length
         const toTheme = themes[toIdx]
 
-        changeTheme(toTheme)
+        setTheme(themeList, toTheme)
       })
     )
 

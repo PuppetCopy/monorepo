@@ -39,7 +39,7 @@ import {
 } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'

@@ -17,15 +17,18 @@ import {
   streamOf,
   switchMap
 } from '@puppet/middleware/utils'
-import { $text, type INode, O, style, type Tether } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $node, $text, type IComposeBehavior, type INode, O, style } from 'aelea/core'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
-  $column(style({ textAlign: 'right' }))($text(primaryLabel), $text(style({ fontSize: '.85rem' }))(secondaryLabel))
+  $column(style({ textAlign: 'right' }))(
+    $text(primaryLabel),
+    $node(style({ fontSize: '.85rem' }))($text(secondaryLabel))
+  )
 
 export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
   $head: $tableHeader('Size', 'Leverage'),
@@ -45,7 +48,7 @@ export const entryColumn: TableColumn<IPosition> = {
   })
 }
 
-export const puppetsColumn = (click: Tether<INode, string>): TableColumn<IPosition> => ({
+export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColumn<IPosition> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
@@ -107,10 +110,12 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
           ),
           $seperator2,
           // $liquidationSeparator(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, pos.lastUpdate.collateralAmount, latestPrice),
-          $text(style({ fontSize: '.85rem' }))(
-            map((value) => {
-              return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
-            }, streamOf(pnl))
+          $node(style({ fontSize: '.85rem' }))(
+            $text(
+              map((value) => {
+                return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
+              }, streamOf(pnl))
+            )
           )
         )
   })
@@ -123,7 +128,7 @@ export const timeColumn: TableColumn<IPosition> = {
   $bodyCallback: map((pos) => {
     return $column(spacing.tiny)(
       $text(getTimeSince(pos.openTimestamp)),
-      $row(spacing.small)($text(style({ fontSize: '.85rem' }))(readableDate(pos.openTimestamp)))
+      $row(spacing.small)($node(style({ fontSize: '.85rem' }))($text(readableDate(pos.openTimestamp))))
     )
   })
 }

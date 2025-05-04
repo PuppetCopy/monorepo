@@ -27,11 +27,10 @@ import {
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete, themeList } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
 import { $stackedCoins, $trophy } from '../common/elements/$icons.js'
-import { dark, light } from '../common/theme.js'
 import type { IPageParams } from '../pages/type.js'
 import { $Popover } from './$Popover.js'
 import { $Picker } from './$ThemePicker.js'
@@ -88,7 +87,7 @@ export const $MainMenu = (config: MainMenu) =>
             // ),
 
             $ButtonSecondary({
-              $content: $Picker([light, dark])({})
+              $content: $Picker(themeList)({})
             })({})
 
             // switchLatest(snapshot((_, walletQuery) => {
@@ -232,7 +231,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
 
-      const $popoverPageLink = ($iconPath: II$Node<SVGPathElement>, text: string | Stream<string>) =>
+      const $popoverPageLink = ($iconPath: I$Node<SVGPathElement>, text: string | Stream<string>) =>
         $row(style({ alignItems: 'center', cursor: 'pointer' }))(
           $icon({
             $content: $iconPath,
@@ -346,7 +345,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
             ),
 
             $ButtonSecondary({
-              $content: $Picker([light, dark])({})
+              $content: $Picker(themeList)({})
             })({})
 
             // switchLatest(snapshot((_, wallet) => {

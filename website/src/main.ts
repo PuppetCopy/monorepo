@@ -1,9 +1,6 @@
-import { runBrowser } from 'aelea/core'
-import { theme } from './assignThemeSync.js'
-import { $Main } from './pages/$Main.js'
+export { setTheme } from 'aelea/ui-components-theme-browser'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-globalThis.theme = theme
+import { runBrowser } from 'aelea/core'
+import { $Main } from './pages/$Main.js'
 
 runBrowser()($Main({})({}))

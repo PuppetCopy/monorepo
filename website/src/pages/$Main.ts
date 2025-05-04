@@ -1,16 +1,4 @@
-import {
-  constant,
-  fromPromise,
-  map,
-  merge,
-  mergeArray,
-  multicast,
-  now,
-  skipRepeats,
-  startWith,
-  take,
-  tap
-} from '@most/core'
+import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import {
@@ -19,7 +7,7 @@ import {
   $infoLabeledValue,
   $Tooltip
 } from '@puppet/middleware/ui-components'
-import { indexDb, uiStorage } from '@puppet/middleware/ui-storage'
+import { uiStorage } from '@puppet/middleware/ui-storage'
 import {
   filterNull,
   getTimeSince,
@@ -28,9 +16,8 @@ import {
   unixTimestampNow,
   zipState
 } from '@puppet/middleware/utils'
-import * as walletLink from '@puppet/middleware/wallet'
 // import { announcedProviderList } from "../components/$ConnectWallet"
-import { connect, disconnect, reconnect, watchAccount, watchBlockNumber, watchBlocks } from '@wagmi/core'
+import { watchBlockNumber } from '@wagmi/core'
 import {
   $element,
   $node,
@@ -44,25 +31,20 @@ import {
   styleBehavior
 } from 'aelea/core'
 import * as router from 'aelea/router'
-import { $column, $row, designSheet, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
-import { arbitrum } from 'viem/chains'
 import { $midContainer } from '../common/$common.js'
-import { $heading2 } from '../common/$text.js'
 import { queryPricefeed, subgraphStatus } from '../common/query.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
-import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
-import { $Admin } from './$Admin.js'
-import { $Home } from './$Home.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
 import { $WalletPage } from './user/$Wallet.js'
@@ -192,26 +174,26 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                       routeChange: changeRouteTether()
                     })
                   }, isDesktopScreen),
-                  router.contains(walletRoute)(
-                    $midContainer(
-                      $WalletPage({
-                        route: walletRoute,
-                        depositTokenList,
-                        matchRuleList,
-                        activityTimeframe,
-                        selectedCollateralTokenList,
-                        pricefeedMapQuery
-                      })({
-                        changeWallet: changeWalletTether(),
-                        changeRoute: changeRouteTether(),
-                        changeActivityTimeframe: changeActivityTimeframeTether(),
-                        selectMarketTokenList: selectMarketTokenListTether(),
+                  // router.contains(walletRoute)(
+                  //   $midContainer(
+                  //     $WalletPage({
+                  //       route: walletRoute,
+                  //       depositTokenList,
+                  //       matchRuleList,
+                  //       activityTimeframe,
+                  //       selectedCollateralTokenList,
+                  //       pricefeedMapQuery
+                  //     })({
+                  //       changeWallet: changeWalletTether(),
+                  //       changeRoute: changeRouteTether(),
+                  //       changeActivityTimeframe: changeActivityTimeframeTether(),
+                  //       selectMarketTokenList: selectMarketTokenListTether(),
 
-                        changeMatchRuleList: changeMatchRuleListTether(),
-                        changeDepositTokenList: changeDepositTokenListTether()
-                      })
-                    )
-                  ),
+                  //       changeMatchRuleList: changeMatchRuleListTether(),
+                  //       changeDepositTokenList: changeDepositTokenListTether()
+                  //     })
+                  //   )
+                  // ),
                   router.match(rootRoute)(
                     $midContainer(
                       fadeIn(
@@ -289,9 +271,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                               )
                             }
 
-                            const blocksBehind = $text(
-                              readableUnitAmount(Number(params.latestBlock) - status.block.number)
-                            )
+                            const blocksBehind = readableUnitAmount(Number(params.latestBlock) - status.block.number)
                             const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
 
                             return $column(spacing.tiny)(

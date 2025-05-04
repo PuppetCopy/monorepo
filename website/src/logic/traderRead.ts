@@ -11,7 +11,7 @@ import {
 } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { erc20Abi } from 'abitype/abis'
-import { http } from 'aelea/ui-components'
+import { fromWebsocket } from 'aelea/ui-components'
 import type * as viem from 'viem'
 import { getBalance } from 'viem/actions'
 
@@ -79,19 +79,19 @@ export function latestPriceFromExchanges(tokendescription: ITokenDescription): S
     return empty()
   }
 
-  const binance = http.fromWebsocket(
+  const binance = fromWebsocket(
     'wss://stream.binance.com:9443/ws',
     now({ params: [`${symbol}usdt@trade`.toLowerCase()], method: 'SUBSCRIBE', id: 1 })
   )
-  const bitfinex = http.fromWebsocket(
+  const bitfinex = fromWebsocket(
     'wss://api-pub.bitfinex.com/ws/2',
     now({ symbol: `${symbol}USD`, event: 'subscribe', channel: 'ticker' })
   )
-  const coinbase = http.fromWebsocket(
+  const coinbase = fromWebsocket(
     'wss://ws-feed.pro.coinbase.com',
     now({ product_ids: [`${symbol}-USD`], type: 'subscribe', channels: ['ticker'] })
   )
-  const kraken = http.fromWebsocket(
+  const kraken = fromWebsocket(
     'wss://ws.kraken.com',
     now({ event: 'subscribe', pair: [`${symbol.toUpperCase()}/USD`], subscription: { name: 'ticker' } })
   )
