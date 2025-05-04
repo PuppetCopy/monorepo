@@ -155,13 +155,13 @@ export const $infoLabel = (label: string | I$Slottable) => {
   return $node(style({ color: pallete.foreground }))($msg)
 }
 
-export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Node, collapseMobile = false) => {
+export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable, collapseMobile = false) => {
   const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
 
   return $container(spacing.small)($infoLabel(label), isStream(value) ? value : $text(value))
 }
 
-export const $infoTooltipLabel = (text: string | I$Node, label?: string | I$Node) => {
+export const $infoTooltipLabel = (text: string | I$Node, label?: string | I$Slottable) => {
   return $row(style({ alignItems: 'center' }))(label ? $infoLabel(label) : empty(), $infoTooltip(text))
 }
 

@@ -1,4 +1,4 @@
-import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
+import { empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $alertPositiveTooltip,
@@ -16,6 +16,7 @@ import {
   combineState,
   component,
   type I$Node,
+  type I$Slottable,
   type IBehavior,
   type INode,
   type INodeCompose,
@@ -24,7 +25,7 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import { $row, type Control, layoutSheet, spacing } from 'aelea/ui-components'
+import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
 import { $iconCircular } from '../../common/elements/$common.js'
@@ -35,11 +36,10 @@ import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
 export interface ISubmitBar {
-  walletClientQuery: Stream<Promise<walletLink.IWalletClient | null>>
   txQuery: Stream<walletLink.IWriteContractReturn>
   alert?: Stream<string | null>
   $container?: INodeCompose
-  $submitContent: I$Node
+  $submitContent: I$Slottable
   $barContent?: I$Node
   disabled?: Stream<boolean>
 
@@ -57,7 +57,6 @@ export const $SubmitBar = (config: ISubmitBar) =>
         disabled = now(false),
         alert = now(null),
         txQuery,
-        walletClientQuery,
         spend,
         $barContent,
         $container = $row,
@@ -134,7 +133,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 }, combineState({ disabled, isRequestPending, alert })),
                 $content: $row(style({ position: 'relative' })($submitContent))
               })({
-                click: clickTether(constant(wallet))
+                click: clickTether()
               })
 
               if (spend) {

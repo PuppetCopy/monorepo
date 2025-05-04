@@ -14,7 +14,7 @@ import { isPositionOpen, isPositionSettled } from '@puppet/middleware/core'
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, type IMarker } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, motion, style } from 'aelea/core'
-import { $column, $NumberTicker, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $NumberTicker, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams, Time } from 'lightweight-charts'
 import type * as viem from 'viem'
@@ -32,15 +32,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const {
-        activityTimeframe,
-        selectedCollateralTokenList,
-        pricefeedMapQuery,
-        depositTokenList,
-        matchRuleList,
-        providerClientQuery,
-        route
-      } = config
+      const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList } = config
 
       const debouncedState = debounce(
         40,
@@ -149,8 +141,8 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
               if (positionCount === 0) {
                 return $row(
                   spacing.tiny,
-                  style({ textAlign: 'center', placeSelf: 'center' })
-                )($text(style({ color: pallete.foreground }))('No activity found'))
+                  style({ color: pallete.foreground, textAlign: 'center', placeSelf: 'center' })
+                )($text('No activity found'))
               }
 
               const openMarkerList = params.list.filter(isPositionOpen).map((pos): IMarker => {

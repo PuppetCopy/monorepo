@@ -2,6 +2,7 @@ import { join, map, mergeArray, now, snapshot, until } from '@most/core'
 import type { Stream } from '@most/types'
 import { invertColor } from '@puppet/middleware/utils'
 import {
+  $node,
   $text,
   combineState,
   component,
@@ -176,7 +177,7 @@ export const $Slider = ({
                 $thumb
                   ? $thumb
                   : $defaultSliderThumb(
-                      $text(style({ paddingTop: '2px' }))(map((n) => `${Math.floor(n * 100)}%`, value))
+                      $node(style({ paddingTop: '2px' }))($text(map((n) => `${Math.floor(n * 100)}%`, value)))
                     )
               )
             )

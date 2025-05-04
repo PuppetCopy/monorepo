@@ -4,7 +4,7 @@ import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet/middleware/ui-components'
 import { readableTokenAmount, switchMap } from '@puppet/middleware/utils'
 import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
+import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
@@ -28,7 +28,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
       [popDepositEdtior, popDepositEdtiorTether]: IBehavior<any>,
       [saveChange, saveChangeTether]: IBehavior<IDepositEditorChange>
     ) => {
-      const { providerClientQuery, depositTokenList, walletClientQuery, collateralToken } = config
+      const { depositTokenList, collateralToken } = config
 
       const change = map((list) => {
         const newLocal = list.find((ct) => ct.token === collateralToken)

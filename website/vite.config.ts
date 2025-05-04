@@ -46,9 +46,7 @@ export default defineConfig({
             '@most/scheduler',
             '@most/types',
             'color',
-            'mersenne-twister',
-            'abitype',
-            'viem'
+            'mersenne-twister'
           ],
           wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
           charts: ['lightweight-charts']

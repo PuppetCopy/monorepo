@@ -17,7 +17,7 @@ import {
 } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
 import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
@@ -59,7 +59,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
 
       [clickSave, clickSaveTether]: IBehavior<PointerEvent>
     ) => {
-      const { walletClientQuery, change, depositBalanceQuery } = config
+      const { change, depositBalanceQuery } = config
 
       const tokenDescription = getTokenDescription(change.token)
       const action = replayLatest(changeDepositMode, change.action)
@@ -87,11 +87,8 @@ export const $DepositEditor = (config: IDepositEditor) =>
             options: [DepositEditorAction.DEPOSIT, DepositEditorAction.WITHDRAW],
             selected: action,
             $$option: map((action) => {
-              if (action === DepositEditorAction.DEPOSIT) {
-                return $text(style({ width: '100px', textAlign: 'center' }))('Deposit')
-              }
-
-              return $text(style({ width: '100px', textAlign: 'center' }))('Withdraw')
+              const label = action === DepositEditorAction.DEPOSIT ? 'Deposit' : 'Withdraw'
+              return $node(style({ width: '100px', textAlign: 'center' }))($text(label))
             })
           })({
             select: changeDepositModeTether()

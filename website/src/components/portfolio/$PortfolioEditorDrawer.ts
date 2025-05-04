@@ -5,7 +5,7 @@ import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@pupp
 import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
 import * as walletLink from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
-import { $column, $row, isDesktopScreen, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
@@ -41,7 +41,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
-      const { matchRuleList, providerClientQuery, walletClientQuery, depositTokenList } = config
+      const { matchRuleList, depositTokenList } = config
 
       const hasDraft = skipRepeatsWith(
         (draft) => draft.matchRuleList.length > 0 || draft.depositTokenList.length > 0,
@@ -95,7 +95,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
             )(
               $column(spacing.default)(
                 $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
-                  $heading3('Portfolio Changes'),
+                  $heading3($text('Portfolio Changes')),
                   $infoTooltip(
                     'The following rules will apply to these traders in your portfolio. visit Profile to view your portfolio'
                   ),
@@ -125,9 +125,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                       )(
                         $RouteDepositEditor({
                           collateralToken: route.collateralToken,
-                          depositTokenList,
-                          providerClientQuery,
-                          walletClientQuery
+                          depositTokenList
                         })({
                           changeDepositTokenList: changeDepositTokenListTether(),
                           changeWallet: changeWalletTether()
@@ -164,16 +162,14 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
                               )($iconCircular($xCross)),
                               $row(
-                                $text(
-                                  style({
-                                    backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
-                                    marginLeft: '-42px',
-                                    borderRadius: '6px',
-                                    padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
-                                    color: iconColorParams.fill
-                                  })
-                                )(iconColorParams.label)
-                              ),
+                                style({
+                                  backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
+                                  marginLeft: '-42px',
+                                  borderRadius: '6px',
+                                  padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
+                                  color: iconColorParams.fill
+                                })
+                              )($text(iconColorParams.label)),
 
                               // switchMap(amount => {
                               //   return $text(tokenAmountLabel(routeType.indexToken, amount))
@@ -207,7 +203,6 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 $row(spacing.small, style({ placeContent: 'space-between', padding: '0 24px' }))(
                   $node(),
                   $SubmitBar({
-                    walletClientQuery,
                     $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
                     txQuery: requestChangeSubscription
                     // alert: validationError

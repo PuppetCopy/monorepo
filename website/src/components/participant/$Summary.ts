@@ -4,7 +4,7 @@ import { accountSettledPositionListSummary, type IPosition } from '@puppet/middl
 import { intermediateText } from '@puppet/middleware/ui-components'
 import { combineState, readableLeverage, readableUsd } from '@puppet/middleware/utils'
 import { $node, $text, component, style } from 'aelea/core'
-import { $column, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $heading2 } from '../../common/$text.js'
@@ -54,12 +54,14 @@ export const $PuppetSummary = (config: IAccountSummary) =>
           $row(spacing.big, style({ alignItems: 'flex-end' }))(
             $metricRow(
               $heading2(
-                intermediateText(
-                  map(async (summaryQuery) => {
-                    const summary = await summaryQuery
+                $text(
+                  intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
 
-                    return `${summary.winCount} / ${summary.lossCount}`
-                  }, metricsQuery)
+                      return `${summary.winCount} / ${summary.lossCount}`
+                    }, metricsQuery)
+                  )
                 )
               ),
               $metricLabel($text('Win / Loss'))
@@ -67,24 +69,28 @@ export const $PuppetSummary = (config: IAccountSummary) =>
 
             $metricRow(
               $heading2(
-                intermediateText(
-                  map(async (summaryQuery) => {
-                    const summary = await summaryQuery
+                $text(
+                  intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
 
-                    return readableUsd(summary.avgCollateral)
-                  }, metricsQuery)
+                      return readableUsd(summary.avgCollateral)
+                    }, metricsQuery)
+                  )
                 )
               ),
               $metricLabel($text('Avg Collateral'))
             ),
             $metricRow(
               $heading2(
-                intermediateText(
-                  map(async (summaryQuery) => {
-                    const summary = await summaryQuery
+                $text(
+                  intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
 
-                    return readableLeverage(summary.avgSize, summary.avgCollateral)
-                  }, metricsQuery)
+                      return readableLeverage(summary.avgSize, summary.avgCollateral)
+                    }, metricsQuery)
+                  )
                 )
               ),
               $metricLabel($text('Avg Leverage'))

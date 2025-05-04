@@ -17,7 +17,7 @@ import {
   type TableOption
 } from '@puppet/middleware/ui-components'
 import { style, stylePseudo } from 'aelea/core'
-import { $column, screenUtils } from 'aelea/ui-components'
+import { $column, isDesktopScreen } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $berry } from './$DisplayBerry.js'
 
