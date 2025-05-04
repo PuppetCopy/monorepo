@@ -53,21 +53,19 @@ function jazzicon(
     const x = Math.cos(angle) * velocity
     const y = Math.sin(angle) * velocity
     const r = firstRotation * 360 + secondRotation * 180
-    return 'translate(' + x.toFixed(3) + ' ' + y.toFixed(3) + ') rotate(' + r.toFixed(1) + ' 50 50)'
+    return `translate(${x.toFixed(3)} ${y.toFixed(3)}) rotate(${r.toFixed(1)} 50 50)`
   }
 
   const shapes = []
-  shapes.push('<rect x="0" y="0" width="100%" height="100%" fill="' + nextColor() + '" />')
+  shapes.push(`<rect x="0" y="0" width="100%" height="100%" fill="${nextColor()}" />`)
   for (let i = 0; i < shapeCount; i++) {
-    shapes.push(
-      '<rect x="0" y="0" width="100%" height="100%" transform="' + nextTransform(i) + '" fill="' + nextColor() + '" />'
-    )
+    shapes.push(`<rect x="0" y="0" width="100%" height="100%" transform="${nextTransform(i)}" fill="${nextColor()}" />`)
   }
   return shapes.join('')
 }
 
 export function $jazzicon(address: viem.Address) {
-  return $svg('svg')(attr({ xmlns: 'http://www.w3.org/2000/svg', x: 0, y: 0, viewBox: `0 0 100 100` }))(
+  return $svg('svg')(attr({ xmlns: 'http://www.w3.org/2000/svg', x: 0, y: 0, viewBox: '0 0 100 100' }))(
     tap((node) => {
       node.element.innerHTML = jazzicon(address)
       return node

@@ -70,9 +70,8 @@ export function getMaxReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketP
 export function getReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketPrice, isLong: boolean) {
   if (isLong) {
     return getTokenUsd(marketPrice.longTokenPrice.max, marketInfo.usage.longInterestInTokens)
-  } else {
-    return marketInfo.usage.shortInterestUsd
   }
+  return marketInfo.usage.shortInterestUsd
 }
 
 // export function getAvailableUsdLiquidityForPosition(marketInfo: MarketInfo, isLong: boolean) {

@@ -112,7 +112,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
             (changeList, params) => {
               const index = changeList.findIndex((ct) => ct.token === params.saveChange.token)
 
-              if (index == -1) {
+              if (index === -1) {
                 changeList.push(params.saveChange)
               } else {
                 changeList[index] = params.saveChange

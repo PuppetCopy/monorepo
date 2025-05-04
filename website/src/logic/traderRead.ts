@@ -47,7 +47,7 @@ const derievedSymbolMapping = {
   [PUPPET.TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL'
 } as const
 
-const gmxIoPricefeedIntervalLabel = {
+const _gmxIoPricefeedIntervalLabel = {
   [PUPPET.IntervalTime.MIN5]: '5m',
   [PUPPET.IntervalTime.MIN15]: '15m',
   [PUPPET.IntervalTime.HR]: '1h',

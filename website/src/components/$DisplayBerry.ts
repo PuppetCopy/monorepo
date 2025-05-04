@@ -21,7 +21,7 @@ export const $berry = (displayTuple: Partial<IBerryDisplayTupleMap>) => {
       xmlns: 'http://www.w3.org/2000/svg',
       preserveAspectRatio: 'xMidYMin meet',
       fill: 'none',
-      viewBox: `0 0 1500 1500`
+      viewBox: '0 0 1500 1500'
     })
   )(
     tap((node) => {

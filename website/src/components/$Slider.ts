@@ -176,7 +176,7 @@ export const $Slider = ({
                 $thumb
                   ? $thumb
                   : $defaultSliderThumb(
-                      $text(style({ paddingTop: '2px' }))(map((n) => Math.floor(n * 100) + '%', value))
+                      $text(style({ paddingTop: '2px' }))(map((n) => `${Math.floor(n * 100)}%`, value))
                     )
               )
             )

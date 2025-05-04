@@ -26,7 +26,7 @@ export function isAddress(address: any): address is viem.Address {
 }
 
 export function shortenAddress(address: string, padRight = 4, padLeft = 6) {
-  return address.slice(0, padLeft) + '...' + address.slice(address.length - padRight, address.length)
+  return `${address.slice(0, padLeft)}...${address.slice(address.length - padRight, address.length)}`
 }
 
 export function shortPostAdress(address: string) {
@@ -43,8 +43,8 @@ export function parseReadableNumber(stringNumber: string, locale?: Intl.NumberFo
 
   const parsed = Number.parseFloat(
     stringNumber
-      .replace(new RegExp('\\' + thousandSeparator, 'g'), '')
-      .replace(new RegExp('\\' + decimalSeparator), '.')
+      .replace(new RegExp(`\\${thousandSeparator}`, 'g'), '')
+      .replace(new RegExp(`\\${decimalSeparator}`), '.')
   )
   return parsed
 }
@@ -67,10 +67,10 @@ const intlOptions: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'short
 export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)
 export const readableUSD = readableNumber({})
-export const readablePercentage = (amount: bigint) => readableUnitAmount(formatFixed(2, amount)) + '%'
-export const readableFactorPercentage = (amount: bigint) => readableUnitAmount(formatFixed(30, amount) * 100) + '%'
+export const readablePercentage = (amount: bigint) => `${readableUnitAmount(formatFixed(2, amount))}%`
+export const readableFactorPercentage = (amount: bigint) => `${readableUnitAmount(formatFixed(30, amount) * 100)}%`
 export const readableLeverage = (a: bigint, b: bigint) =>
-  (b ? readableUnitAmount(formatFixed(4, (a * BASIS_POINTS_DIVISOR) / b)) : 0n) + 'x'
+  `${b ? readableUnitAmount(formatFixed(4, (a * BASIS_POINTS_DIVISOR) / b)) : 0n}x`
 export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(30, ammount))
 export const readablePnl = (ammount: bigint, decimals = 30) =>
   readableNumber({ signDisplay: 'exceptZero' })(formatFixed(decimals, ammount))
@@ -80,7 +80,7 @@ export const readableTokenUsd = (price: bigint, amount: bigint) => readableUsd(g
 export const readableTokenAmount = (tokenDesc: ITokenDescription, amount: bigint) =>
   readableUnitAmount(formatFixed(tokenDesc.decimals, amount))
 export const readableTokenAmountLabel = (tokenDesc: ITokenDescription, amount: bigint) =>
-  readableTokenAmount(tokenDesc, amount) + ' ' + tokenDesc.symbol
+  `${readableTokenAmount(tokenDesc, amount)} ${tokenDesc.symbol}`
 export const readableTokenPrice = (decimals: number, amount: bigint) =>
   readableAccountingAmount(formatFixed(30 - decimals, amount))
 
@@ -124,7 +124,7 @@ export function expandDecimals(n: bigint, decimals: number) {
 
 function getMultiplier(decimals: number): string {
   if (decimals >= 0 && decimals <= 256 && !(decimals % 1)) {
-    return '1' + zeros.substring(0, decimals)
+    return `1${zeros.substring(0, decimals)}`
   }
 
   throw new Error('invalid decimal size')
@@ -143,7 +143,7 @@ export function formatFixed(decimals: number, value: bigint): number {
   let fraction = (value % multiplierBn).toString()
 
   while (fraction.length < multiplier.length - 1) {
-    fraction = '0' + fraction
+    fraction = `0${fraction}`
   }
 
   const matchFractions = fraction.match(/^([0-9]*[1-9]|0)(0*)/)
@@ -154,10 +154,10 @@ export function formatFixed(decimals: number, value: bigint): number {
 
   const whole = (value / multiplierBn).toString()
 
-  parsedValue = whole + '.' + fraction
+  parsedValue = `${whole}.${fraction}`
 
   if (negative) {
-    parsedValue = '-' + parsedValue
+    parsedValue = `-${parsedValue}`
   }
 
   return Number(parsedValue)
@@ -343,15 +343,15 @@ export const getExplorerUrl = (chain: viem.Chain) => {
   return chain.blockExplorers?.default.url || chain.blockExplorers?.etherscan?.url
 }
 export const getTxExplorerUrl = (chain: viem.Chain, hash: string) => {
-  return getExplorerUrl(chain) + '/tx/' + hash
+  return `${getExplorerUrl(chain)}/tx/${hash}`
 }
 
 export function getAccountExplorerUrl(chain: viem.Chain, account: viem.Address) {
-  return getExplorerUrl(chain) + '/address/' + account
+  return `${getExplorerUrl(chain)}/address/${account}`
 }
 
 export function getDebankProfileUrl(account: viem.Address) {
-  return `https://debank.com/profile/` + account
+  return `https://debank.com/profile/${account}`
 }
 
 export const timespanPassedSinceInvoke = (timespan: number) => {
@@ -381,12 +381,11 @@ export const cacheMap =
 
     if (cacheEntry && !cacheMap[key].lifespanFn()) {
       return cacheEntry.item
-    } else {
-      const lifespanFn = cacheMap[key]?.lifespanFn ?? timespanPassedSinceInvoke(lifespan)
-      const newLocal = { item: cacheFn(), lifespanFn }
-      cacheMap[key] = newLocal
-      return cacheMap[key].item
     }
+    const lifespanFn = cacheMap[key]?.lifespanFn ?? timespanPassedSinceInvoke(lifespan)
+    const newLocal = { item: cacheFn(), lifespanFn }
+    cacheMap[key] = newLocal
+    return cacheMap[key].item
   }
 
 export function groupArrayManyMap<A, B extends string | symbol | number, R>(
@@ -400,7 +399,7 @@ export function groupArrayManyMap<A, B extends string | symbol | number, R>(
     const key = getKey(item)
 
     if (key === undefined) {
-      throw new Error(`key is undefined`)
+      throw new Error('key is undefined')
     }
 
     gmap[key] ??= []
@@ -431,7 +430,7 @@ export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
     const key = getKey(item)
 
     if (key === undefined) {
-      throw new Error(`key is undefined`)
+      throw new Error('key is undefined')
     }
 
     gmap[key] = mapFn(item, key, i)
@@ -456,7 +455,7 @@ export function getMappedValue<TMap extends object, TMapkey extends keyof TMap>(
 }
 
 export function easeInExpo(x: number) {
-  return x === 0 ? 0 : Math.pow(2, 10 * x - 10)
+  return x === 0 ? 0 : 2 ** (10 * x - 10)
 }
 
 export function splitIntoChunkList<T>(array: T[], chunkSize: number): T[][]
@@ -487,21 +486,20 @@ export function splitIntoChunkList<T, R>(
       result.push(chunk)
     }
     return result
-  } else {
-    const result: T[][] = []
-    let chunk: T[] = []
-    for (let i = 0; i < array.length; i++) {
-      chunk.push(array[i])
-      if (chunk.length === chunkSize) {
-        result.push(chunk)
-        chunk = []
-      }
-    }
-    if (chunk.length > 0) {
-      result.push(chunk)
-    }
-    return result
   }
+  const result: T[][] = []
+  let chunk: T[] = []
+  for (let i = 0; i < array.length; i++) {
+    chunk.push(array[i])
+    if (chunk.length === chunkSize) {
+      result.push(chunk)
+      chunk = []
+    }
+  }
+  if (chunk.length > 0) {
+    result.push(chunk)
+  }
+  return result
 }
 
 const intervals = [
@@ -557,7 +555,7 @@ export function countdownFn(targetDate: number | bigint, now: number | bigint) {
   const minutes = Math.floor((distance % (60 * 60)) / 60)
   const seconds = Math.floor(distance % 60)
 
-  return `${days ? days + 'd ' : ''} ${hours ? hours + 'h ' : ''} ${minutes ? minutes + 'm ' : ''} ${seconds ? seconds + 's ' : ''}`
+  return `${days ? `${days}d ` : ''} ${hours ? `${hours}h ` : ''} ${minutes ? `${minutes}m ` : ''} ${seconds ? `${seconds}s ` : ''}`
 }
 
 export function getIntervalBasedOnTimeframe(maxColumns: number, from: number, to: number) {
@@ -605,7 +603,7 @@ export function invertColor(hex: string, bw = true) {
   }
 
   // pad each with zeros and return
-  return '#' + padZero((255 - r).toString(16)) + padZero((255 - g).toString(16)) + padZero((255 - b).toString(16))
+  return `#${padZero((255 - r).toString(16))}${padZero((255 - g).toString(16))}${padZero((255 - b).toString(16))}`
 }
 
 export function getClosestNumber<T extends readonly number[]>(arr: T, chosen: number): T[number] {

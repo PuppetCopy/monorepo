@@ -2,7 +2,7 @@ import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import {
-  type $Branch,
+  type I$Branch,
   $element,
   $node,
   attrBehavior,
@@ -131,7 +131,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 inset: 0,
                 width: '200%',
                 visibility: 'hidden',
-                animation: `borderRotate .75s linear infinite`,
+                animation: 'borderRotate .75s linear infinite',
                 position: 'absolute',
                 background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
               }),
@@ -161,7 +161,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: $Branch<SVGPathElement>
+  $iconPath: I$Branch<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

@@ -31,7 +31,7 @@ const styleEl = document.createElement('style')
 document.getElementsByTagName('head')[0].appendChild(styleEl)
 
 function createAnimationKeyframe(keyframes: string) {
-  const animationId = 'anim' + (Math.random() + 1).toString(36).substring(7)
+  const animationId = `anim${(Math.random() + 1).toString(36).substring(7)}`
 
   const kframes = `@keyframes ${animationId} {${keyframes}}`
   styleEl.innerHTML = `${styleEl.innerHTML}${kframes}`
@@ -59,7 +59,7 @@ export const $Home = (config: ITreasury) =>
         })
       )
 
-      const bodyPointerMove = eventElementTarget('pointermove', document.body)
+      const _bodyPointerMove = eventElementTarget('pointermove', document.body)
 
       const $windowButton = $row(
         style({ backgroundColor: pallete.negative, width: '8px', height: '8px', borderRadius: '50%' })
@@ -91,7 +91,7 @@ export const $Home = (config: ITreasury) =>
               placeSelf: 'center',
               position: 'relative',
               top: 0,
-              height: `100vh`,
+              height: '100vh',
               paddingBottom: '30vh'
               // color: 'black'
             })
@@ -133,10 +133,10 @@ export const $Home = (config: ITreasury) =>
               ),
               $column(spacing.small, style({ maxWidth: '624px' }))(
                 $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  `Traders seamlessly earn more doing what they do best`
+                  'Traders seamlessly earn more doing what they do best'
                 ),
                 $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  `Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio`
+                  'Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio'
                 )
               ),
 
@@ -304,10 +304,10 @@ export const $Home = (config: ITreasury) =>
             $column(spacing.default, style({ flex: 1 }))(
               $heading1('Pick Top Traders to Copy'),
               $text(
-                `Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.`
+                'Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.'
               ),
               $text(
-                `every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.`
+                'every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.'
               )
             ),
             $row(style({ flex: 1 }))(

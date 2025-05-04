@@ -119,9 +119,9 @@ export const $Tooltip = ({
 
                       return {
                         [goDown ? 'top' : 'bottom']: `calc(100% + ${0}px)`,
-                        left: leftPx + 'px',
+                        left: `${leftPx}px`,
                         visibility: 'visible',
-                        transform: `translate(-50%, 0)`
+                        transform: 'translate(-50%, 0)'
                       }
                     },
                     contentIntersection,

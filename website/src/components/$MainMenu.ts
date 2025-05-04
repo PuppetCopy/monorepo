@@ -12,7 +12,7 @@ import {
   $twitter
 } from '@puppet/middleware/ui-components'
 import {
-  type $Branch,
+  type I$Branch,
   $element,
   $text,
   attr,
@@ -22,12 +22,12 @@ import {
   type IBehavior,
   nodeEvent,
   O,
-  type StyleCSS,
+  type IStyleCSS,
   style,
   styleBehavior
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
@@ -172,7 +172,7 @@ export const $MainMenu = (config: MainMenu) =>
               $pageLink({
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
-                url: `/wallet`,
+                url: '/wallet',
                 $content: $walletProfileDisplay({})
               })({
                 click: routeChangeTether()
@@ -210,7 +210,7 @@ export const $MainMenu = (config: MainMenu) =>
             //   $icon({ $content: $discord, fill: pallete.middleground, width: '22px', viewBox: `0 0 32 32` })
             // ),
             $circleButtonAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))(
-              $icon({ $content: $twitter, fill: pallete.foreground, width: '22px', viewBox: `0 0 24 24` })
+              $icon({ $content: $twitter, fill: pallete.foreground, width: '22px', viewBox: '0 0 24 24' })
             )
           )
         ),
@@ -233,7 +233,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
 
-      const $popoverPageLink = ($iconPath: $Branch<SVGPathElement>, text: string | Stream<string>) =>
+      const $popoverPageLink = ($iconPath: I$Branch<SVGPathElement>, text: string | Stream<string>) =>
         $row(style({ alignItems: 'center', cursor: 'pointer' }))(
           $icon({
             $content: $iconPath,
@@ -291,7 +291,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   width: '42px'
                 }),
                 attr({ href: 'https://docs.blueberry.club/' })
-              )($icon({ $content: $gitbook, width: '22px', viewBox: `0 0 32 32` })),
+              )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
               $anchor(
                 layoutSheet.displayFlex,
                 style({
@@ -304,7 +304,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   width: '42px'
                 }),
                 attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' })
-              )($icon({ $content: $discord, width: '22px', viewBox: `0 0 32 32` })),
+              )($icon({ $content: $discord, width: '22px', viewBox: '0 0 32 32' })),
               $anchor(
                 layoutSheet.displayFlex,
                 style({
@@ -317,7 +317,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   width: '42px'
                 }),
                 attr({ href: 'https://twitter.com/PuppetFinance' })
-              )($icon({ $content: $twitter, width: '22px', viewBox: `0 0 24 24` })),
+              )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
               $anchor(
                 layoutSheet.displayFlex,
                 style({
@@ -330,7 +330,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   width: '42px'
                 }),
                 attr({ href: 'https://www.instagram.com/blueberryclub.eth' })
-              )($icon({ $content: $instagram, width: '18px', viewBox: `0 0 32 32` })),
+              )($icon({ $content: $instagram, width: '18px', viewBox: '0 0 32 32' })),
               $anchor(
                 layoutSheet.displayFlex,
                 style({
@@ -343,7 +343,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   width: '42px'
                 }),
                 attr({ href: 'https://github.com/nissoh/blueberry-club' })
-              )($icon({ $content: $github, width: '22px', viewBox: `0 0 32 32` }))
+              )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
             ),
 
             $ButtonSecondary({
@@ -425,7 +425,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
               $pageLink({
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
-                url: `/app/wallet`,
+                url: '/app/wallet',
                 $content: $walletProfileDisplay({})
               })({
                 click: routeChangeTether()
@@ -464,7 +464,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
                     backgroundColor: `${pallete.background} !important`,
                     fill: pallete.foreground,
                     borderColor: `${pallete.primary} !important`,
-                    cursor: `default  !important`
+                    cursor: 'default  !important'
                   }
                 : isFocus
                   ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }

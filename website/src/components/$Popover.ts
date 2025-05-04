@@ -20,8 +20,8 @@ export const $defaultPopoverContentContainer = $column(
     backgroundColor: pallete.middleground,
     padding: '36px',
     borderRadius: '24px',
-    border: '1px solid ' + pallete.background,
-    boxShadow: '0 0 10px 0 ' + colorAlpha(pallete.background, 0.5)
+    border: `1px solid ${pallete.background}`,
+    boxShadow: `0 0 10px 0 ${colorAlpha(pallete.background, 0.5)}`
   })
 )
 
@@ -72,15 +72,15 @@ export const $Popover = ({
               const centerX = targetBound.x + targetBound.width / 2
               const rawLeft = centerX - width / 2
               const maxLeft = screenWidth - width - spacing
-              const left = Math.max(spacing, Math.min(rawLeft, maxLeft)) + 'px'
+              const left = `${Math.max(spacing, Math.min(rawLeft, maxLeft))}px`
 
-              const top = (goDown ? targetBound.bottom + spacing : targetBound.y - spacing) + 'px'
+              const top = `${goDown ? targetBound.bottom + spacing : targetBound.y - spacing}px`
 
               return {
                 top,
                 left,
-                width: width + 'px',
-                maxWidth: maxWidth + 'px',
+                width: `${width}px`,
+                maxWidth: `${maxWidth}px`,
                 transition: 'opacity .2s ease-in-out',
                 visibility: 'visible',
                 transform: `translate(0, ${goDown ? '0' : '-100%'})`

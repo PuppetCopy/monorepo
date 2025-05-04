@@ -103,7 +103,8 @@ export function getClientNativeTokenUsd(client: Stream<PublicClient>) {
 
       if (client.chain.id === arbitrum.id) {
         return getArbitrumNetworkTokenUsd(client)
-      } else if (client.chain.id === avalanche.id) {
+      }
+      if (client.chain.id === avalanche.id) {
         return getArbitrumNetworkTokenUsd(client)
       }
 

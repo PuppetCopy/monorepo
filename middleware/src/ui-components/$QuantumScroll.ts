@@ -1,7 +1,7 @@
 import { constant, filter, join, map, mergeArray, now, recoverWith, until } from '@most/core'
 import type { Stream } from '@most/types'
 import type { Behavior } from 'aelea/core'
-import { type $Branch, $custom, $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
+import { type I$Branch, $custom, $text, component, type I$Node, type NodeComposeFn, style } from 'aelea/core'
 import { $column, layoutSheet, observer } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $alertNegativeContainer } from './$common.js'
@@ -12,7 +12,7 @@ export type IQuantumScrollPage = {
 }
 
 export type IScrollPagable = IQuantumScrollPage & {
-  $items: $Branch[]
+  $items: I$Branch[]
 }
 
 export interface QuantumScroll {

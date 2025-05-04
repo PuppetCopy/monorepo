@@ -104,7 +104,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
           background: {
             color: 'transparent'
           },
-          fontFamily: `-apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif`,
+          fontFamily: '-apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif',
           fontSize: 12
         },
         timeScale: {
@@ -195,7 +195,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
 
                     return {
                       background: colorAlpha(params.isFocused ? pallete.primary : pallete.indeterminate, 0.5),
-                      top: params.coords + 'px',
+                      top: `${params.coords}px`,
                       display: 'flex'
                     }
                   }, combineState(config.yAxisState))
@@ -207,7 +207,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
             mergeArray([
               config.appendData
                 ? tap((next) => {
-                    if (next && next.time) {
+                    if (next?.time) {
                       seriesApi.update(next)
                     }
                   }, config.appendData)
@@ -223,9 +223,8 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                       if (prev) {
                         prev.applyOptions(params)
                         return prev
-                      } else {
-                        return seriesApi.createPriceLine(params)
                       }
+                      return seriesApi.createPriceLine(params)
                     }
 
                     return null

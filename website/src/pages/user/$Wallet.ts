@@ -113,7 +113,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
       const profileMode = uiStorage.replayWrite(localStore.wallet, selectProfileMode, 'selectedTab')
 
       const puppetTokenPriceInUsd = switchMap(async (providerQuery) => {
-        const provider = await providerQuery
+        const _provider = await providerQuery
 
         return 0n
       }, providerClientQuery)
@@ -343,7 +343,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
           ),
 
           switchMap((params) => {
-            const address = switchMap(async (walletQuery) => {
+            const _address = switchMap(async (walletQuery) => {
               return (await walletQuery)?.account.address || PUPPET.ADDRESS_ZERO
             }, walletClientQuery)
 
@@ -368,7 +368,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 changeDepositTokenList: changeDepositTokenListTether(),
                 changeMatchRuleList: changeMatchRuleListTether()
               })
-            } else if (params.profileMode === IWalletTab.TRADER) {
+            }
+            if (params.profileMode === IWalletTab.TRADER) {
               return $text('Trader (WIP)')
               // const settledPositionListQuery = queryPosition(subgraphClient, { activityTimeframe, collateralTokenList, address })
               // const openPositionListQuery = queryPosition(subgraphClient, { address, collateralTokenList })
@@ -481,7 +482,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       $row(style({ alignItems: 'center' }))(
                         $heading3('Voting Power'),
                         $infoTooltip(
-                          `The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.`
+                          'The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.'
                         )
                       ),
                       $node(style({ flex: 1 }))(),
@@ -604,12 +605,13 @@ export const $WalletPage = (config: IWalletPageParams) =>
                     ),
                     style({ placeContent: 'space-between' })(
                       $labeledhintAdjustment({
-                        tooltip: `The vested amount increases either receiving locking duration bonus as vested tokens or vesting existing locked tokens.  `,
+                        tooltip:
+                          'The vested amount increases either receiving locking duration bonus as vested tokens or vesting existing locked tokens.  ',
                         label: 'Vested',
                         color: now(pallete.positive),
                         change: switchMap(async (paramsQuery) => {
                           const params = await paramsQuery
-                          if (params.lockDurationBonusInVest == 0n) return ''
+                          if (params.lockDurationBonusInVest === 0n) return ''
 
                           return readableTokenAmountLabel(
                             PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET,
@@ -651,7 +653,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                         })({
                           select: checkCashoutModeTether()
                         }),
-                        $infoTooltip(`Receive the claimable amount directly to wallet.`)
+                        $infoTooltip('Receive the claimable amount directly to wallet.')
                       ),
                       false
                     ),
@@ -835,7 +837,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       $container: $row,
                       txQuery: requestTx,
                       walletClientQuery,
-                      $submitContent: $text(map((mode) => (mode ? 'Cash-Out' : `Lock-In`), cashout))
+                      $submitContent: $text(map((mode) => (mode ? 'Cash-Out' : 'Lock-In'), cashout))
                     })({
                       changeWallet: changeWalletTether(),
                       click: requestTxTether(

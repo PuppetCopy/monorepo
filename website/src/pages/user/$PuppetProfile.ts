@@ -41,7 +41,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
                 padding: 0,
                 height: screenUtils.isDesktopScreen ? '200px' : '200px',
                 position: 'relative',
-                margin: screenUtils.isDesktopScreen ? `-36px -36px 0` : `-12px -12px 0px`
+                margin: screenUtils.isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
               })
             )(
               $ProfilePeformanceTimeline({ ...config })({

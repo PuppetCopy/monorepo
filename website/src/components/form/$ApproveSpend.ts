@@ -87,7 +87,8 @@ export const $ApproveSpend = (config: IApproveSpend) =>
 
                   if (status.state === PromiseStatus.PENDING) {
                     return $intermediateTooltip($text('Awaiting confirmation'))
-                  } else if (status.state === PromiseStatus.ERROR) {
+                  }
+                  if (status.state === PromiseStatus.ERROR) {
                     const err = status.error
                     let message: string | undefined
 

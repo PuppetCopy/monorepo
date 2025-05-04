@@ -26,7 +26,7 @@ import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
 export const $anchor = $element('a')(
   spacing.defaultTiny,
   attr({ target: '_blank' }),
-  stylePseudo(':hover', { color: pallete.foreground + '!important', fill: pallete.foreground }),
+  stylePseudo(':hover', { color: `${pallete.foreground}!important`, fill: pallete.foreground }),
   style({
     cursor: 'pointer',
     color: pallete.message,
@@ -80,7 +80,7 @@ export const $alertIntermediateContainer = (...$content: I$Node[]) =>
         left: '-50%',
         width: '200%',
         aspectRatio: '1 / 1',
-        animation: `rotate 3.5s linear infinite`,
+        animation: 'rotate 3.5s linear infinite',
         position: 'absolute',
         background: `conic-gradient(transparent, transparent, transparent, ${pallete.indeterminate})`
       })
@@ -205,7 +205,7 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Node
 }
 
 export function $txHashRef(txHash: string, chain: Chain = arbitrum) {
-  const href = getExplorerUrl(chain) + '/tx/' + txHash
+  const href = `${getExplorerUrl(chain)}/tx/${txHash}`
 
   return $anchor(attr({ href }))($text(shortenTxAddress(txHash)))
 }
@@ -265,7 +265,7 @@ interface Icon {
   svgOps?: Op<IBranch<SVGSVGElement>, IBranch<SVGSVGElement>>
 }
 
-export const $icon = ({ $content, width = '24px', viewBox = `0 0 32 32`, fill = 'inherit', svgOps = O() }: Icon) =>
+export const $icon = ({ $content, width = '24px', viewBox = '0 0 32 32', fill = 'inherit', svgOps = O() }: Icon) =>
   $svg('svg')(attr({ viewBox, fill }), style({ width, aspectRatio: '1 /1' }), svgOps)($content)
 
 export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): I$Node => {

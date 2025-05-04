@@ -134,7 +134,7 @@ export function parseQueryResults(json: any, schema: any) {
       const parseFn = getMappedValue(abiParamParseMap, schemaType)
 
       entity[key] = parseFn(value)
-    } else if (value instanceof Array) {
+    } else if (Array.isArray(value)) {
       entity[key] = value.map((item) => parseQueryResults(item, schemaType))
     } else if (value instanceof Object) {
       entity[key] = parseQueryResults(value, schemaType)
@@ -150,7 +150,7 @@ function parseFilterObject(query: any) {
 
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
-    if (value instanceof Array) {
+    if (Array.isArray(value)) {
       if (value.length === 0) return
       fields.push(`${key}: [${value.map((arrVal) => `{${parseFilterObject(arrVal)}}`).join(' ')}]`)
     } else if (value instanceof Object) {

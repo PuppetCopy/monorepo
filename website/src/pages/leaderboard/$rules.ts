@@ -1,12 +1,12 @@
 import { empty, map, periodic } from '@most/core'
 import { $alertIcon, $defaultDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
 import { readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
-import { type $Branch, $element, $text, attr, style } from 'aelea/core'
+import { type I$Branch, $element, $text, attr, style } from 'aelea/core'
 import { $column, $icon, $row } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $pnlDisplay } from '../../common/$common.js'
 
-export const $alertTooltip = ($content: $Branch) => {
+export const $alertTooltip = ($content: I$Branch) => {
   return $Tooltip({
     $content,
     $dropContainer: $defaultDropContainer(style({})),
@@ -28,7 +28,7 @@ function countdownFn(targetDate: number, now: number) {
   const minutes = Math.floor((distance % (60 * 60)) / 60)
   const seconds = Math.floor(distance % 60)
 
-  return `${days ? days + 'd ' : ''} ${hours ? hours + 'h ' : ''} ${minutes ? minutes + 'm ' : ''} ${seconds ? seconds + 's ' : '0s'}`
+  return `${days ? `${days}d ` : ''} ${hours ? `${hours}h ` : ''} ${minutes ? `${minutes}m ` : ''} ${seconds ? `${seconds}s ` : '0s'}`
 }
 
 const everySec = map(unixTimestampNow, periodic(1000))
@@ -52,6 +52,6 @@ export const $competitionPrize = (prize: bigint | undefined, realisedPnl: bigint
 }
 
 export const $avaxIcon = $element('img')(
-  attr({ src: `/assets/avalanche.svg` }),
+  attr({ src: '/assets/avalanche.svg' }),
   style({ width: '24px', cursor: 'pointer', padding: '3px 6px' })
 )()

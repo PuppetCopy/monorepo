@@ -258,13 +258,12 @@ export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
 }
 
 export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
-  if (supply === 0n || amount == 0n) return amount
+  if (supply === 0n || amount === 0n) return amount
 
-  if (share == 0n) {
+  if (share === 0n) {
     return amount
-  } else {
-    return (amount * share) / supply
   }
+  return (amount * share) / supply
 }
 
 export function getVestingCursor(vested: IVested): IVested {

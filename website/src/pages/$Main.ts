@@ -108,17 +108,17 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const rootRoute = router.create({ fragment: baseRoute, title: 'Puppet', fragmentsChange })
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
-      const profileRoute = rootRoute.create({ fragment: 'profile' })
+      const _profileRoute = rootRoute.create({ fragment: 'profile' })
       const walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
-      const tradeRoute = rootRoute.create({ fragment: 'trade' })
-      const tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
+      const _tradeRoute = rootRoute.create({ fragment: 'trade' })
+      const _tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
 
       const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
-      const adminRoute = rootRoute.create({ fragment: 'admin' })
+      const _adminRoute = rootRoute.create({ fragment: 'admin' })
 
-      const opengraph = rootRoute.create({ fragment: 'og' })
+      const _opengraph = rootRoute.create({ fragment: 'og' })
 
-      const $liItem = $element('li')(style({ marginBottom: '14px' }))
+      const _$liItem = $element('li')(style({ marginBottom: '14px' }))
 
       const isDesktopScreen = skipRepeats(
         map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window)))
@@ -134,7 +134,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
 
       const subgraphBeaconStatusColor = map((status) => {
-        const timestampDelta = unixTimestampNow() - new Date(status['arbitrum']?.block?.number || 0).getTime()
+        const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
 
         const color =
           timestampDelta > 60 ? pallete.negative : timestampDelta > 10 ? pallete.indeterminate : pallete.positive
@@ -278,7 +278,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                       $Tooltip({
                         $content: switchMap(
                           (params) => {
-                            const status = params.subgraphStatus['arbitrum']
+                            const status = params.subgraphStatus.arbitrum
 
                             if (!status.ready || status.block === null) {
                               return $column(spacing.defaultTiny)(
@@ -326,7 +326,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                               width: '40px',
                               height: '40px',
                               borderRadius: '50%',
-                              border: `1px solid rgba(74, 180, 240, 0.12)`,
+                              border: '1px solid rgba(74, 180, 240, 0.12)',
                               opacity: 0,
                               animationName: 'signal',
                               animationDuration: '2s',

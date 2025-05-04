@@ -73,7 +73,7 @@ export const $defaultSelectContainer = $column(
     border: `1px solid ${pallete.horizon}`,
     borderRadius: '20px',
     backgroundColor: pallete.background,
-    boxShadow: `rgb(0 0 0 / 21%) 1px 1px 14px`
+    boxShadow: 'rgb(0 0 0 / 21%) 1px 1px 14px'
   })
 )
 
@@ -131,7 +131,7 @@ export function $Dropdown<T>({
 
                       return {
                         [goDown ? 'top' : 'bottom']: 'calc(100% + 5px)',
-                        left: leftOffset + 'px',
+                        left: `${leftOffset}px`,
                         visibility: 'visible'
                       }
                     },

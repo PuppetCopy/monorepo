@@ -9,7 +9,7 @@ import {
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
 import {
-  type $Branch,
+  type I$Branch,
   $text,
   attrBehavior,
   combineArray,
@@ -84,7 +84,8 @@ export const $SubmitBar = (config: ISubmitBar) =>
 
               if (status.state === PromiseStatus.PENDING) {
                 return $intermediateTooltip($text('Awaiting confirmation'))
-              } else if (status.state === PromiseStatus.ERROR) {
+              }
+              if (status.state === PromiseStatus.ERROR) {
                 const err = status.error
                 let message: string | undefined
 
@@ -165,7 +166,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: $Branch<SVGPathElement>
+  $iconPath: I$Branch<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

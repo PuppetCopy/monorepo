@@ -63,7 +63,7 @@ export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
             value: map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), inputAllowance),
             placeholder: `${formatFixed(4, matchRule?.allowanceRate || BigInt(1000)) * 100}`,
             labelWidth: 150,
-            hint: `% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring`
+            hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
             change: inputAllowanceTether(map((x) => parseBps(x / 100)))
           }),
@@ -92,7 +92,7 @@ export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
                   value: map(O(Number, getDuration), changeActivityThrottle),
                   placeholder: getDuration(Number(matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
                   labelWidth: 150,
-                  hint: `Ignore positions that are too close to each other in time`
+                  hint: 'Ignore positions that are too close to each other in time'
                 })({}),
                 selector: {
                   value: now(3600),
@@ -112,7 +112,7 @@ export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
                 $input: $element('input')(
                   attr({ type: 'date' }),
                   stylePseudo('::-webkit-calendar-picker-indicator', {
-                    filter: theme.name === 'dark' ? `invert(1)` : ''
+                    filter: theme.name === 'dark' ? 'invert(1)' : ''
                   })
                 ),
                 hint: 'set a date when this rule will expire, default is 1 year',

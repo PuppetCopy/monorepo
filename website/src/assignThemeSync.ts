@@ -1,7 +1,7 @@
 import type { Theme } from 'aelea/ui-components-theme'
 import { dark, light } from './common/theme.js'
 
-const THEME_PALLETE_SELECTED_KEY = `!!THEME_PALLETE_SELECTED_KEY`
+const THEME_PALLETE_SELECTED_KEY = '!!THEME_PALLETE_SELECTED_KEY'
 const themeList = [dark, light]
 
 // Function to update local storage (side effect only)

@@ -157,7 +157,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
 
                             return $row(
                               screenUtils.isDesktopScreen ? spacing.big : spacing.default,
-                              style({ alignItems: 'center', padding: `14px 0` })
+                              style({ alignItems: 'center', padding: '14px 0' })
                             )(
                               O(
                                 style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
@@ -167,9 +167,9 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 $text(
                                   style({
                                     backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
-                                    marginLeft: `-42px`,
+                                    marginLeft: '-42px',
                                     borderRadius: '6px',
-                                    padding: screenUtils.isDesktopScreen ? `6px 12px 6px 22px` : `6px 8px 6px 30px`,
+                                    padding: screenUtils.isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
                                     color: iconColorParams.fill
                                   })
                                 )(iconColorParams.label)

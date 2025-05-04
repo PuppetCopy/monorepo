@@ -112,7 +112,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
                   return `Wallet Balance: ${readableTokenAmountLabel(tokenDescription, params.max)}`
                 }
 
-                return ` `
+                return ' '
               }, combineState({ max, action }))
             })({
               change: changeAmountTether(

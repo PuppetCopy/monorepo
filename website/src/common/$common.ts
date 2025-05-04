@@ -100,7 +100,7 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
       style({
         width: '32px',
         height: '34x',
-        marginLeft: `-15px`
+        marginLeft: '-15px'
       })($tokenIcon(collateralTokenDescription))
     ),
     displayLabel
@@ -370,7 +370,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                   $text(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(`${puppetList.length}`)
                 )
               : $row(style({ alignItems: 'center' }))(
-                  $text(style({ color: pallete.foreground, fontSize: '.85em' }))(`0 puppets`)
+                  $text(style({ color: pallete.foreground, fontSize: '.85em' }))('0 puppets')
                 )
           )
         ),

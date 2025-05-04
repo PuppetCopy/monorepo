@@ -77,7 +77,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
               $row(style({ alignItems: 'center' }))($tokenTryLabeled(collateralToken)),
               $seperator2,
               $row(style({ gap: '6px' }))(
-                $text(`Copy`),
+                $text('Copy'),
                 $icon({
                   $content: $caretDown,
                   width: '12px',

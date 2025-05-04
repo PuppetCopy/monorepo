@@ -280,7 +280,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $text('Routes'),
                     gridTemplate: screenUtils.isDesktopScreen ? '210px' : undefined,
                     $bodyCallback: map((pos) => {
-                      const tokenList = [
+                      const _tokenList = [
                         ...new Set([
                           ...pos.increaseList.map((x) => x.indexToken),
                           ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
@@ -364,7 +364,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         .sort((a, b) => Number(a.time) - Number(b.time))
 
                       return $row(style({ position: 'relative', flex: 1, height: '100%' }))(
-                        $row(style({ position: 'relative', pointerEvents: 'none', width: `100%` }))(
+                        $row(style({ position: 'relative', pointerEvents: 'none', width: '100%' }))(
                           $Baseline({
                             containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
                             markers: now(markerList as IMarker[]),

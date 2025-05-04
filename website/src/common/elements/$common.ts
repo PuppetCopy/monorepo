@@ -1,7 +1,7 @@
 import { empty } from '@most/core'
 import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet/middleware/ui-components'
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet/middleware/utils'
-import { type $Branch, $text, attr, type I$Node, isStream, style } from 'aelea/core'
+import { type I$Branch, $text, attr, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -40,11 +40,11 @@ export const $responsiveFlex = screenUtils.isDesktopScreen ? $row : $column
 function convertMsToGoogleCalendarDate(ms: Date) {
   const date = new Date(ms)
   const year = date.getUTCFullYear()
-  const month = ('0' + (date.getUTCMonth() + 1)).slice(-2)
-  const day = ('0' + date.getUTCDate()).slice(-2)
-  const hours = ('0' + date.getUTCHours()).slice(-2)
-  const minutes = ('0' + date.getUTCMinutes()).slice(-2)
-  const seconds = ('0' + date.getUTCSeconds()).slice(-2)
+  const month = `0${date.getUTCMonth() + 1}`.slice(-2)
+  const day = `0${date.getUTCDate()}`.slice(-2)
+  const hours = `0${date.getUTCHours()}`.slice(-2)
+  const minutes = `0${date.getUTCMinutes()}`.slice(-2)
+  const seconds = `0${date.getUTCSeconds()}`.slice(-2)
 
   return `${year}${month}${day}T${hours}${minutes}${seconds}Z`
 }
@@ -86,7 +86,7 @@ export const $addToCalendar = (config: IAddtoCalendarButton) => {
   DTEND:${config.time.toISOString()}
   SUMMARY:${config.title}
   DESCRIPTION:${config.description ? encodeURIComponent(config.description) : ''}
-  ${config.location ? 'LOCATION:' + config.location : ''}
+  ${config.location ? `LOCATION:${config.location}` : ''}
   ${config.description ? `LOCATION:${encodeURIComponent(config.description)}` : ''}
   END:VEVENT
   END:VCALENDAR`
@@ -95,7 +95,7 @@ action=TEMPLATE
 &text=${config.title}
 &dates=${convertMsToGoogleCalendarDate(config.time)}/${convertMsToGoogleCalendarDate(config.time)}
 ${config.description ? `&details=${encodeURIComponent(config.description)}` : ''}
-${config.location ? '&location=' + config.location : ''}
+${config.location ? `&location=${config.location}` : ''}
 &trp=false
 &sprop=
 &sprop=name:`
@@ -112,10 +112,10 @@ ${config.location ? '&location=' + config.location : ''}
       height: '42px',
       width: '42px'
     })
-  )($icon({ $content: $calendar, width: '22px', viewBox: `0 0 32 32` }))
+  )($icon({ $content: $calendar, width: '22px', viewBox: '0 0 32 32' }))
 }
 
-export const $iconCircular = ($iconPath: $Branch<SVGPathElement>, size = '32px') => {
+export const $iconCircular = ($iconPath: I$Branch<SVGPathElement>, size = '32px') => {
   return $icon({
     $content: $iconPath,
     svgOps: style({
