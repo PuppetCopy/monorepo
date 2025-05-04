@@ -2,7 +2,6 @@ import replace from '@rollup/plugin-replace'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths' // Import the plugin
-import { dark } from './src/common/theme.js'
 
 const SITE_CONFIG = {
   __WEBSITE__: 'https://puppet.house',
@@ -11,8 +10,8 @@ const SITE_CONFIG = {
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
   __OG_IMAGE__: '/.netlify/functions/og-middlware',
-  __THEME_PRIMARY__: dark.pallete.primary,
-  __THEME_BACKGROUND__: dark.pallete.horizon
+  __THEME_PRIMARY__: '#0085FF',
+  __THEME_BACKGROUND__: '#870B38'
 }
 
 // https://vitejs.dev/config/
@@ -23,6 +22,12 @@ export default defineConfig({
       output: {
         manualChunks: {
           subgraph: ['ponder'],
+          aelea: [
+            'aelea/core',
+            'aelea/ui-components',
+            'aelea/ui-components-theme',
+            'aelea/ui-components-theme-browser'
+          ],
           middleware: [
             '@puppet/middleware/const',
             '@puppet/middleware/core',
@@ -35,7 +40,6 @@ export default defineConfig({
             '@puppet/middleware/ui-storage'
           ],
           vendor: [
-            'aelea',
             '@most/core',
             '@most/disposable',
             '@most/prelude',
