@@ -79,8 +79,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
       const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
       const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
 
-      const accountInfo = accountChange
-
       const tableParams = map(async (pageParams) => {
         const pricefeedMap = await pageParams.pricefeedMapQuery
         // const accountStatsListData = await pageParams.routeStatsList
@@ -113,11 +111,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
         return {
           pricefeedMap,
-          accountInfo: pageParams.accountInfo,
           sortBy: pageParams.sortBy,
           activityTimeframe: pageParams.activityTimeframe
         }
-      }, combineState({ sortBy, pricefeedMapQuery, activityTimeframe, isLong, accountInfo }))
+      }, combineState({ sortBy, pricefeedMapQuery, activityTimeframe, isLong }))
 
       return [
         $column(
@@ -298,7 +295,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         matchRuleList,
                         collateralToken: pos.collateralToken,
                         traderMatchingRuleList: pos.matchingRuleList,
-                        accountInfo: params.accountInfo,
                         trader: pos.account
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()

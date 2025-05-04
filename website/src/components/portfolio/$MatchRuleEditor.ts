@@ -24,13 +24,20 @@ import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 
+export type IMatchingRule = {
+  puppet: `0x${string}`
+  allowanceRate: bigint
+  throttleActivity: bigint
+  expiry: bigint
+}
+
 export interface IDraftMatchRule {
   expiry: bigint
   allowanceRate: bigint
   throttleActivity: bigint
 }
 
-export const $MatchRuleEditor = (matchRule: IMatchRule | undefined) =>
+export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
   component(
     (
       [inputEndDate, inputEndDateTether]: IBehavior<any, bigint>,
