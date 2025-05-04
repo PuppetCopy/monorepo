@@ -1,5 +1,5 @@
 // import { IBehavior, combineState } from "aelea/core"
-// import { $Node, $text, NodeComposeFn, component, style, styleBehavior } from "aelea/core"
+// import { I$Node, $text, NodeComposeFn, component, style, styleBehavior } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { constant, map, mergeArray } from "@most/core"
@@ -19,7 +19,7 @@
 //   chain: viem.Chain
 //   positionListQuery: Stream<Promise<IMirrorPosition[]>>
 //   tradeState: StateStream<ITradeParams>
-//   $container: INodeCompose<I$Node>
+//   $container: INodeCompose
 //   requestTrade: Stream<IRequestTrade>
 //   mirrorPosition: Stream<IMirrorPosition | null>
 // }

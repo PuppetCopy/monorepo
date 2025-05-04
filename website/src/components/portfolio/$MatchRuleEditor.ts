@@ -17,7 +17,7 @@ import {
   style,
   stylePseudo
 } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { theme } from '../../assignThemeSync.js'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'

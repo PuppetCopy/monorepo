@@ -2,13 +2,13 @@ import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import {
-  type I$Branch,
   $element,
   $node,
   attrBehavior,
   combineArray,
   combineState,
   component,
+  type I$Node,
   type IBehavior,
   type INode,
   nodeEvent,
@@ -18,7 +18,7 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
-import { $row, type Control, layoutSheet } from 'aelea/ui-components'
+import { $row, type Control, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $iconCircular } from '../../common/elements/$common.js'
@@ -161,7 +161,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: I$Branch<SVGPathElement>
+  $iconPath: I$Node<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

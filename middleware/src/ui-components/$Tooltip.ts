@@ -16,8 +16,8 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 export interface TooltipConfig {
   $anchor: I$Node
   $content: I$Node
-  $container?: INodeCompose<I$Node>
-  $dropContainer?: INodeCompose<I$Node>
+  $container?: INodeCompose
+  $dropContainer?: INodeCompose
 
   offset?: number
 }

@@ -2,6 +2,7 @@ import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $element,
+  $node,
   $text,
   attrBehavior,
   component,
@@ -28,7 +29,7 @@ export const $defaultTextFieldContainer = $element('label')(
   })
 )
 
-export const $labelDisplay = $text(
+export const $labelDisplay = $node(
   style({
     paddingRight: '4px',
     alignSelf: 'flex-end',
@@ -56,7 +57,7 @@ export interface ITextField extends Field {
   hint?: string | Stream<string>
   placeholder?: string | Stream<string>
 
-  $container?: INodeCompose<any, HTMLLabelElement>
+  $container?: INodeCompose<HTMLLabelElement>
   labelWidth?: number
 }
 
@@ -77,7 +78,7 @@ export const $FieldLabeled = ({
     return [
       $container(
         $row(spacing.small, style({ width: '100%' }))(
-          $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))(label),
+          $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
           attrBehavior(
             map((placeholder) => ({ placeholder }), streamOf(placeholder)),
             $field
@@ -85,13 +86,13 @@ export const $FieldLabeled = ({
         ),
         $row(style({ position: 'relative' }))(
           hint
-            ? $text(
+            ? $node(
                 style({
                   fontSize: '.85rem',
                   width: '100%',
                   whiteSpace: 'pre-wrap'
                 })
-              )(hint)
+              )($text(hint))
             : empty()
         )
       ),

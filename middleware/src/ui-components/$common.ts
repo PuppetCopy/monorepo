@@ -8,15 +8,18 @@ import {
   attr,
   combineState,
   type I$Node,
-  type IBranch,
+  type I$Slottable,
+  type I$Text,
+  type INode,
   type IOps,
+  type ISlottable,
   isStream,
   O,
   style,
   styleBehavior,
   stylePseudo
 } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
 import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress, switchMap } from '../utils/index.js'
@@ -140,26 +143,26 @@ export const $intermediateTooltip = ($content: I$Node) => {
   })({})
 }
 
-export const $infoLabel = (label: string | $Node) => {
+export const $infoLabel = (label: string | I$Node) => {
   return isStream(label)
     ? style({ color: pallete.foreground })(label)
-    : $text(style({ color: pallete.foreground }))(label)
+    : $node(style({ color: pallete.foreground }))($text(label))
 }
 
-export const $infoLabeledValue = (label: string | $Node, value: string | $Node, collapseMobile = false) => {
+export const $infoLabeledValue = (label: string | I$Node, value: string | I$Node, collapseMobile = false) => {
   const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
 
   return $container(spacing.small)($infoLabel(label), isStream(value) ? value : $text(value))
 }
 
-export const $infoTooltipLabel = (text: string | $Node, label?: string | $Node) => {
+export const $infoTooltipLabel = (text: string | I$Node, label?: string | I$Node) => {
   return $row(style({ alignItems: 'center' }))(label ? $infoLabel(label) : empty(), $infoTooltip(text))
 }
 
-export const $infoTooltip = (text: string | $Node, color = pallete.foreground, size = '24px') => {
+export const $infoTooltip = (text: string | I$Node, color = pallete.foreground, size = '24px') => {
   return $Tooltip({
     $dropContainer: $defaultDropContainer,
-    $content: isStream(text) ? text : $text(text),
+    $content: isStream(text) ? text : $node($text(text)),
     $anchor: $icon({
       $content: $info,
       viewBox: '0 0 32 32',
@@ -173,7 +176,7 @@ export const $labeledDivider = (label: string) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
     $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
-      $text(style({ fontSize: '.85rem' }))(label),
+      $node(style({ fontSize: '.85rem' }))($text(label)),
       $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))()
@@ -184,8 +187,8 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconPath, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
-      $text(style({ fontWeight: 'bold' }))(token.symbol),
-      $text(style({ fontSize: '.85rem', color: pallete.foreground }))(token.symbol)
+      $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
+      $node(style({ fontSize: '.85rem', color: pallete.foreground }))($text(token.symbol))
     ),
     style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
   )
@@ -197,8 +200,8 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Node
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconG, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
-      $text(style({ fontWeight: 'bold' }))(token.symbol),
-      $text(style({ color: pallete.foreground }))(token.name)
+      $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
+      $node(style({ color: pallete.foreground }))($text(token.name))
     ),
     style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
   )
@@ -217,8 +220,8 @@ interface IHintAdjustment {
 }
 
 interface ILabeledHintAdjustment extends IHintAdjustment {
-  label?: string | $Node
-  tooltip?: string | $Node
+  label?: string | I$Node
+  tooltip?: string | I$Node
 }
 
 export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
@@ -228,7 +231,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(
       map((str) => (str ? { color: pallete.foreground } : {}), change),
-      isStream($val) ? $val : $text($val)
+      isStream($val) ? $val : $node($text($val))
     ),
 
     $icon({
@@ -262,14 +265,14 @@ interface Icon {
   fill?: string
 
   $content: I$Node
-  svgOps?: Op<IBranch<SVGSVGElement>, IBranch<SVGSVGElement>>
+  svgOps?: IOps<INode<SVGSVGElement>, INode<SVGSVGElement>>
 }
 
 export const $icon = ({ $content, width = '24px', viewBox = '0 0 32 32', fill = 'inherit', svgOps = O() }: Icon) =>
   $svg('svg')(attr({ viewBox, fill }), style({ width, aspectRatio: '1 /1' }), svgOps)($content)
 
 export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): I$Node => {
-  return $text(intermediateText(querySrc, hint))
+  return $node($text(intermediateText(querySrc, hint)))
 }
 
 export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): Stream<string> => {

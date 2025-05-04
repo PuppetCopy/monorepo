@@ -35,7 +35,7 @@ interface ITraderMatchingRouteEditor extends IWalletPageParams {
   }[]
   collateralToken: viem.Address
   matchRuleList: Stream<IMatchRuleEditorChange[]>
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
@@ -71,9 +71,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           }, popRouteSubscriptionEditor),
           dismiss: mergeArray([saveDraft, discardDraft]),
           $target: $ButtonSecondary({
-            $content: $responsiveFlex(
-              style({ alignItems: 'center', gap: isDesktopScreen ? '12px' : '4px' })
-            )(
+            $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '12px' : '4px' }))(
               $row(style({ alignItems: 'center' }))($tokenTryLabeled(collateralToken)),
               $seperator2,
               $row(style({ gap: '6px' }))(

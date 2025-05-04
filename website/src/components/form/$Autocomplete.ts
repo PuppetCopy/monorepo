@@ -1,5 +1,5 @@
 // import { IBehavior, combineState, isEmpty, O, Op } from "aelea/core"
-// import { $element, $Node, $text, attr, component, eventElementTarget, IBranch, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from "aelea/core"
+// import { $element, I$Node, $text, attr, component, eventElementTarget, INode, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from "aelea/core"
 // import { $column, $icon, $row, Input, layoutSheet, observer } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { constant, empty, filter, map, merge, mergeArray, multicast, never, now, scan, skip, skipRepeats, snapshot, startWith, switchLatest, take, tap, zip } from "@most/core"
@@ -18,10 +18,10 @@
 //   selector: ISelect<T>
 //   dropWidth?: number,
 //   $selection: I$Node
-//   $container?: INodeCompose<I$Node>
-//   $option?: INodeCompose<I$Node>
+//   $container?: INodeCompose
+//   $option?: INodeCompose
 
-//   openMenuOp?: Op<MouseEvent, MouseEvent>
+//   openMenuOp?: IOps<MouseEvent, MouseEvent>
 // }
 
 // export const $defaultOptionContainer = $row(
@@ -60,13 +60,13 @@
 
 //   $label?: I$Node
 
-//   $container?: INodeCompose<I$Node>
-//   $fieldcontainer?: INodeCompose<I$Node>
-//   $dropdownContainer?: INodeCompose<I$Node>
+//   $container?: INodeCompose
+//   $fieldcontainer?: INodeCompose
+//   $dropdownContainer?: INodeCompose
 
-//   $chip?: INodeCompose<I$Node>
+//   $chip?: INodeCompose
 //   $input?: INodeCompose<$Node<HTMLInputElement>>
-//   $$chip: Op<T, $Node>
+//   $$chip: IOps<T, I$Node>
 //   openMenu?: Stream<any>
 // }
 
@@ -89,11 +89,11 @@
 //   [pick, pickTether]: IBehavior<T, T>,
 //   [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
 
-//   [interaction, interactionTether]: IBehavior<IBranch, true>,
-//   [blur, blurTether]: IBehavior<IBranch, false>,
+//   [interaction, interactionTether]: IBehavior<INode, true>,
+//   [blur, blurTether]: IBehavior<INode, false>,
 
-//   [focusField, focusFieldTether]: IBehavior<IBranch, FocusEvent>,
-//   [inputSearch, inputSearchTether]: IBehavior<IBranch<HTMLInputElement>, string>,
+//   [focusField, focusFieldTether]: IBehavior<INode, FocusEvent>,
+//   [inputSearch, inputSearchTether]: IBehavior<INode<HTMLInputElement>, string>,
 //   [clickOptionRemove, clickOptionRemoveTether]: IBehavior<INode, T>,
 // ) => {
 

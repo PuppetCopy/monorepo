@@ -9,12 +9,12 @@ import {
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
 import {
-  type I$Branch,
   $text,
   attrBehavior,
   combineArray,
   combineState,
   component,
+  type I$Node,
   type I$Node,
   type IBehavior,
   type INode,
@@ -38,7 +38,7 @@ export interface ISubmitBar {
   walletClientQuery: Stream<Promise<walletLink.IWalletClient | null>>
   txQuery: Stream<walletLink.IWriteContractReturn>
   alert?: Stream<string | null>
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
   $submitContent: I$Node
   $barContent?: I$Node
   disabled?: Stream<boolean>
@@ -166,7 +166,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: I$Branch<SVGPathElement>
+  $iconPath: I$Node<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

@@ -1,7 +1,7 @@
 // import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
 import { awaitPromises, empty, now } from '@most/core'
 import { $node, $text, type I$Node, type INodeCompose, style } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $jazzicon } from '../common/$avatar.js'
@@ -13,9 +13,9 @@ export interface IAccountPreview {
 }
 
 export interface IProfilePreview extends IAccountPreview {
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
   showAddress?: boolean
-  $labelContainer?: INodeCompose<I$Node>
+  $labelContainer?: INodeCompose
 }
 
 export const $profileDisplay = (config: IProfilePreview) => {
@@ -54,17 +54,17 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
         placeContent: 'center',
         alignItems: 'center'
       })
-    )($text(style({ fontWeight: 800, color: pallete.foreground }))('?')),
+    )($node(style({ fontWeight: 800, color: pallete.foreground }))($text('?'))),
     $column(style({ whiteSpace: 'nowrap', fontSize: '.85rem', alignItems: 'center' }))(
-      $text(style({}))('0x----'),
-      $text(style({ fontSize: '1.55em', lineHeight: 1 }))('----')
+      $node(style({}))($text('0x----')),
+      $node(style({ fontSize: '1.55em', lineHeight: 1 }))($text('----'))
     )
   )
 }
 
 export const $AccountLabel = (address: string, $container = $column) => {
   return $container(style({ alignItems: 'flex-end', flexDirection: 'row' }))(
-    $text(style({ fontSize: '.85em', color: pallete.foreground }))(`${address.slice(0, 6)}..`),
-    $text(style({}))(address.slice(-4))
+    $node(style({ fontSize: '.85em', color: pallete.foreground }))($text(`${address.slice(0, 6)}..`)),
+    $node(style({}))($text(address.slice(-4)))
   )
 }

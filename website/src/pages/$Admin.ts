@@ -1,6 +1,6 @@
 import type * as walletLink from '@puppet/middleware/wallet'
 import type { IBehavior } from 'aelea/core'
-import { component, style } from 'aelea/core'
+import { $text, component, style } from 'aelea/core'
 import { $column, layoutSheet } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $heading1 } from '../common/$text.js'
@@ -21,7 +21,7 @@ export const $Admin = (config: IAdminPageParams) =>
           spacing.default,
           style({ alignSelf: 'center', minWidth: '680px' })
         )(
-          $heading1('Epoch Starter')
+          $heading1($text('Epoch Starter'))
 
           // $column(
           //   $heading3('Gauge Controller'),

@@ -1,5 +1,5 @@
 // import { IBehavior, combineState, replayLatest } from "aelea/core"
-// import { $Node, $node, $text, NodeComposeFn, attr, component, style } from "aelea/core"
+// import { I$Node, $node, $text, NodeComposeFn, attr, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { awaitPromises, constant, empty, map, mergeArray, multicast, sample, skipRepeats, snapshot, startWith, switchLatest } from "@most/core"
@@ -38,7 +38,7 @@
 //   pricefeed: Stream<IPriceCandle[]>
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>
-//   $container: INodeCompose<I$Node>
+//   $container: INodeCompose
 // }
 
 // export const $PositionAdjustmentDetails = (config: IPositionAdjustmentDetails) => component((

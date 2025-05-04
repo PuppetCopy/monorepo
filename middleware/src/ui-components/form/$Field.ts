@@ -4,7 +4,7 @@ import {
   combineState,
   component,
   type IBehavior,
-  type IBranch,
+  type INode,
   type INodeCompose,
   nodeEvent,
   O,
@@ -13,20 +13,21 @@ import {
 } from 'aelea/core'
 import { designSheet, type Input } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import type { Optional } from '../../utils/index.js'
 import { dismissOp, interactionOp } from './common.js'
 
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 export interface Field extends Optional<Input<string>, 'value'> {
-  $input?: INodeCompose<any, HTMLInputElement>
+  $input?: INodeCompose<HTMLInputElement>
 }
 
 export const $Field = ({ value = empty(), disabled, validation = never, $input = $element('input') }: Field) =>
   component(
     (
-      [focusStyle, interactionTether]: IBehavior<IBranch, true>,
-      [dismissstyle, dismissTether]: IBehavior<IBranch, false>,
-      [blur, blurTether]: IBehavior<IBranch, FocusEvent>,
-      [change, changeTether]: IBehavior<IBranch<HTMLInputElement>, string>
+      [focusStyle, interactionTether]: IBehavior<INode, true>,
+      [dismissstyle, dismissTether]: IBehavior<INode, false>,
+      [blur, blurTether]: IBehavior<INode, FocusEvent>,
+      [change, changeTether]: IBehavior<INode<HTMLInputElement>, string>
     ) => {
       const multicastValidation = O(validation, startWith(''), multicast)
 

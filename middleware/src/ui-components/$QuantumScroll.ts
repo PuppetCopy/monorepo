@@ -1,8 +1,8 @@
 import { constant, filter, join, map, mergeArray, now, recoverWith, until } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IBehavior } from 'aelea/core'
-import { type I$Branch, $custom, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
-import { $column, layoutSheet, observer } from 'aelea/ui-components'
+import { $custom, $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
+import { $column, layoutSheet, observer, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $alertNegativeContainer } from './$common.js'
 
@@ -12,18 +12,20 @@ export type IQuantumScrollPage = {
 }
 
 export type IScrollPagable = IQuantumScrollPage & {
-  $items: I$Branch[]
+  $items: I$Node[]
 }
 
 export interface QuantumScroll {
   insertAscending?: boolean
   dataSource: Stream<IScrollPagable>
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
   $loader?: I$Node
   $emptyMessage?: I$Node
 }
 
-export const $defaultVScrollLoader = $text(style({ color: pallete.foreground, padding: '3px 10px' }))('loading...')
+export const $defaultVScrollLoader = $node(style({ color: pallete.foreground, padding: '3px 10px' }))(
+  $text('loading...')
+)
 export const $defaultVScrollContainer = $column(spacing.default)
 const $defaultEmptyMessage = $column(spacing.default, style({ padding: '20px' }))($text('No items to display'))
 

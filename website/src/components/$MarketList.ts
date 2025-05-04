@@ -1,5 +1,5 @@
 // import { Op, combineState } from 'aelea/core'
-// import { $Node, $text, NodeComposeFn, component, style } from 'aelea/core'
+// import { I$Node, $text, NodeComposeFn, component, style } from 'aelea/core'
 // import { $column } from 'aelea/ui-components'
 // import { colorAlpha, pallete } from "aelea/ui-components-theme"
 // import { fromPromise, map, switchLatest, take } from "@most/core"
@@ -17,9 +17,9 @@
 // import { IComponentPageParams } from '../pages/type'
 
 // interface IMarketList extends IComponentPageParams {
-//   $container?: INodeCompose<I$Node>
+//   $container?: INodeCompose
 //   chain: viem.Chain
-//   $rowCallback?: Op<{ market: IMarket, price: IMarketPrice }, INodeCompose<I$Node>>
+//   $rowCallback?: IOps<{ market: IMarket, price: IMarketPrice }, INodeCompose>
 // }
 
 // export const $MarketInfoList = (config: IMarketList) => component((

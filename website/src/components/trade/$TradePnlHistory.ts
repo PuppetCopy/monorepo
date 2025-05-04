@@ -1,5 +1,5 @@
 // import { IBehavior, combineArray } from "aelea/core"
-// import { $Node, INode, NodeComposeFn, component, style } from "aelea/core"
+// import { I$Node, INode, NodeComposeFn, component, style } from "aelea/core"
 // import { $column, observer } from "aelea/ui-components"
 // import { map, multicast, skipRepeatsWith, switchLatest } from "@most/core"
 // import { Stream } from "@most/types"
@@ -17,7 +17,7 @@
 // import { IGmxProcessState } from "../../data/process/process.js"
 
 // interface ITradePnlPreview {
-//   $container: INodeCompose<I$Node>
+//   $container: INodeCompose
 //   updateList: (IPositionIncrease | IPositionDecrease)[]
 //   chartConfig?: DeepPartial<ChartOptions>
 //   pixelsPerBar?: number

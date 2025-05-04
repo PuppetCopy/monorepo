@@ -13,7 +13,7 @@ import {
 } from '@most/core'
 import type { Stream } from '@most/types'
 import { $node, $text, component, type I$Node, type IOps, replayLatest, style } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
+import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
@@ -30,8 +30,8 @@ export interface IIntermediatPromise<T> {
   query: Stream<Promise<T>>
   clean?: Stream<any>
 
-  $$done: Op<T, $Node>
-  $$fail?: Op<Error, $Node>
+  $$done: IOps<T, I$Node>
+  $$fail?: IOps<Error, I$Node>
 
   $loader?: I$Node
 }
@@ -50,19 +50,22 @@ export interface IIntermediateState<T> {
 export const $IntermediatePromise = <T>({
   $loader = $spinner,
   query,
-  $$fail = map((res) => style({ placeSelf: 'center', margin: 'auto' })($alert($text(res.message)))),
+  $$fail = map((res) => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message))))),
   $$done,
   clean = empty()
 }: IIntermediatPromise<T>) =>
   component(() => {
-    const state: Stream<IIntermediateState<T | $Node | Error>> = multicast(
+    const state: Stream<IIntermediateState<T | I$Node | Error>> = multicast(
       switchLatest(
         map((prom) => {
           const doneData: Stream<IIntermediateState<T>> = map(
             (data) => ({ status: IIntermediateStatus.DONE, data }),
             fromPromise(prom)
           )
-          const loading: Stream<IIntermediateState<I$Node>> = now({ status: IIntermediateStatus.LOADING, data: $loader })
+          const loading: Stream<IIntermediateState<I$Node>> = now({
+            status: IIntermediateStatus.LOADING,
+            data: $loader
+          })
           const settledOrError = recoverWith(
             (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
             doneData
@@ -98,7 +101,7 @@ export const $IntermediatePromise = <T>({
   })
 
 type IIntermediateTx<TSuccess extends TransactionReceipt> = {
-  $$success?: Op<TSuccess, $Node>
+  $$success?: IOps<TSuccess, I$Node>
   chain: Chain
   query: Stream<Promise<TSuccess>>
   clean?: Stream<any>
@@ -109,7 +112,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
   query,
   chain,
   clean = empty(),
-  $$success = constant($text(style({ color: pallete.positive }))('Tx Succeeded')),
+  $$success = constant($node(style({ color: pallete.positive }))($text('Transaction confirmed'))),
   showTooltip = false
 }: IIntermediateTx<TSuccess>) => {
   const multicastQuery = replayLatest(multicast(query))
@@ -143,7 +146,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
     $$fail: map((res) => {
       const error = String(res)
 
-      return showTooltip ? $alertTooltip($text(error)) : $alert($text(error))
+      return showTooltip ? $alertTooltip($node($text(error))) : $alert($node($text(error)))
     })
   })
 }

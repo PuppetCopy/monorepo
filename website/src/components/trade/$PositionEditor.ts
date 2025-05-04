@@ -1,5 +1,5 @@
 // import { IBehavior, combineState, O } from "aelea/core"
-// import { $element, $node, $Node, $text, attr, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline } from "aelea/core"
+// import { $element, $node, I$Node, $text, attr, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline } from "aelea/core"
 // import { Route } from "aelea/router"
 // import { $column, $icon, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { colorAlpha, pallete } from "aelea/ui-components-theme"
@@ -101,7 +101,7 @@
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>
 //   resetAdjustments: Stream<any>
-//   $container: INodeCompose<I$Node>
+//   $container: INodeCompose
 // }
 
 // const BOX_SPACING = 24

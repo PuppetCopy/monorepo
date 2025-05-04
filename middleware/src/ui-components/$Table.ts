@@ -8,8 +8,8 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
-  type IOps,
   type INodeCompose,
+  type IOps,
   nodeEvent,
   O,
   style
@@ -30,15 +30,15 @@ export interface TableOption<T> {
   $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
 
-  $rowCallback?: Op<T, INodeCompose<I$Node>>
+  $rowCallback?: IOps<T, INodeCompose>
 
-  $container?: INodeCompose<I$Node>
-  $rowContainer?: INodeCompose<I$Node>
-  $headerContainer?: INodeCompose<I$Node>
+  $container?: INodeCompose
+  $rowContainer?: INodeCompose
+  $headerContainer?: INodeCompose
 
-  $cell?: INodeCompose<I$Node>
-  $bodyCell?: INodeCompose<I$Node>
-  $headerCell?: INodeCompose<I$Node>
+  $cell?: INodeCompose
+  $bodyCell?: INodeCompose
+  $headerCell?: INodeCompose
 
   sortBy?: ISortBy
   $sortArrowDown?: I$Node
@@ -46,12 +46,12 @@ export interface TableOption<T> {
 
 export interface TableColumn<T> {
   $head: I$Node
-  $bodyCallback: Op<T, $Node>
+  $bodyCallback: IOps<T, I$Node>
   sortBy?: string
 
   gridTemplate?: string
 
-  columnOp?: Op<INode, INode>
+  columnOp?: IOps<INode, INode>
 }
 
 export interface IPageRequest {

@@ -16,7 +16,7 @@ import {
   styleInline
 } from 'aelea/core'
 import type { Route } from 'aelea/router'
-import { $column, $icon, $row, designSheet, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, layoutSheet, screenUtils, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
 import { $heading1 } from '../common/$text.js'
@@ -122,28 +122,28 @@ export const $Home = (config: ITreasury) =>
               })
             )(
               $column(style({ textAlign: 'center' }))(
-                $text(
+                $node(
                   style({
                     fontWeight: 'bold',
                     fontSize: isDesktopScreen ? '2.5em' : '1.85rem',
                     whiteSpace: 'pre-wrap',
                     letterSpacing: '2px'
                   })
-                )('Matching top Traders\nwith Investors')
+                )($text('Matching top Traders\nwith Investors')
               ),
               $column(spacing.small, style({ maxWidth: '624px' }))(
-                $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  'Traders seamlessly earn more doing what they do best'
+                $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
+                  $text('Traders seamlessly earn more doing what they do best')
                 ),
-                $text(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  'Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio'
+                $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
+                  $text('Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio')
                 )
               ),
 
               $node(),
 
               $column(spacing.default, style({ minWidth: '250px' }))(
-                isMobileScreen ? $text(style({ textAlign: 'center' }))('< Comming Soon >') : empty(),
+                isMobileScreen ? $node(style({ textAlign: 'center' }))($text('< Comming Soon >')) : empty(),
 
                 $row(spacing.default, style({ alignItems: 'center' }))(
                   // $Link({
@@ -302,7 +302,7 @@ export const $Home = (config: ITreasury) =>
 
           $snapSection(style({ margin: '0 auto', maxWidth: '1240px', flexDirection: 'row', gap: '70px' }))(
             $column(spacing.default, style({ flex: 1 }))(
-              $heading1('Pick Top Traders to Copy'),
+              $heading1($text('Pick Top Traders to Copy')),
               $text(
                 'Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.'
               ),
@@ -327,7 +327,7 @@ export const $Home = (config: ITreasury) =>
 
           $snapSection(style({ margin: '0 auto', maxWidth: '1240px', flexDirection: 'row', gap: '70px' }))(
             $column(spacing.default, style({ flex: 1 }))(
-              $heading1('Traders Earn More'),
+              $heading1($text('Traders Earn More')),
               $text('Traders earn more by having more puppets copying their trades.'),
               $text(
                 'Trading done seamlessly with their own funds and without directly knowing or managing puppets funds.'

@@ -5,7 +5,7 @@ import jazzicon from 'jazzicon'
 
 export function $jazzicon(address: string, size = '24px') {
   const cnt = Number.parseInt(address.slice(2, 10), 16)
-  const el = jazzicon(Number.parseInt(size), cnt)
+  const el: HTMLElement = jazzicon(Number.parseInt(size), cnt)
 
   return $wrapNativeElement(el)(
     map((node) => {

@@ -27,7 +27,6 @@ import {
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import {
   applyFactor,
-  combineState,
   formatFixed,
   getDuration,
   getMappedValue,
@@ -101,8 +100,6 @@ export const $WalletPage = (config: IWalletPageParams) =>
     ) => {
       const {
         route,
-        walletClientQuery,
-        providerClientQuery,
         activityTimeframe,
         selectedCollateralTokenList,
         pricefeedMapQuery,

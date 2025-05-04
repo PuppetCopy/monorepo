@@ -1,12 +1,12 @@
 import { empty, map, periodic } from '@most/core'
 import { $alertIcon, $defaultDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
 import { readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
-import { type I$Branch, $element, $text, attr, style } from 'aelea/core'
+import { $element, $node, $text, attr, type I$Node, style } from 'aelea/core'
 import { $column, $icon, $row } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $pnlDisplay } from '../../common/$common.js'
 
-export const $alertTooltip = ($content: I$Branch) => {
+export const $alertTooltip = ($content: I$Node) => {
   return $Tooltip({
     $content,
     $dropContainer: $defaultDropContainer(style({})),
@@ -45,7 +45,7 @@ export const $competitionPrize = (prize: bigint | undefined, realisedPnl: bigint
     $column(style({ alignItems: 'center' }))(
       prize ? style({ fontSize: '1.3em' })($pnlDisplay(prize)) : empty(),
       style({ color: pallete.message })(
-        $text(style({ color: isNeg ? pallete.negative : pallete.positive }))(`${isNeg ? '' : '+'}${val}`)
+        $node(style({ color: isNeg ? pallete.negative : pallete.positive }))($text(`${isNeg ? '' : '+'}${val}`))
       )
     )
   )

@@ -31,8 +31,8 @@ interface IPocus {
 
   $target: I$Node
 
-  $contentContainer?: INodeCompose<I$Node>
-  $container?: INodeCompose<I$Node>
+  $contentContainer?: INodeCompose
+  $container?: INodeCompose
   spacing?: number
 }
 

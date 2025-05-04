@@ -31,11 +31,11 @@ import {
   eventElementTarget,
   type I$Node,
   type IBehavior,
-  type IBranch,
   type INode,
+  type INode,
+  type INodeCompose,
   type IOps,
   isEmpty,
-  type INodeCompose,
   nodeEvent,
   O,
   style,
@@ -53,10 +53,10 @@ export interface IDropdown<T> {
   selector: ISelect<T>
   dropWidth?: number
   $selection: I$Node
-  $container?: INodeCompose<I$Node>
-  $option?: INodeCompose<I$Node>
+  $container?: INodeCompose
+  $option?: INodeCompose
 
-  openMenuOp?: Op<MouseEvent, MouseEvent>
+  openMenuOp?: IOps<MouseEvent, MouseEvent>
 }
 
 export const $defaultOptionContainer = $row(
@@ -205,13 +205,13 @@ export interface IMultiselectDrop<T> extends Input<T[]> {
 
   $label?: I$Node
 
-  $container?: INodeCompose<I$Node>
-  $fieldcontainer?: INodeCompose<I$Node>
-  $dropdownContainer?: INodeCompose<I$Node>
+  $container?: INodeCompose
+  $fieldcontainer?: INodeCompose
+  $dropdownContainer?: INodeCompose
 
-  $chip?: INodeCompose<I$Node>
+  $chip?: INodeCompose
   $input?: INodeCompose<$Node<HTMLInputElement>>
-  $$chip: Op<T, $Node>
+  $$chip: IOps<T, I$Node>
   openMenu?: Stream<any>
 }
 
@@ -235,11 +235,11 @@ export const $DropMultiSelect = <T>({
       [pick, pickTether]: IBehavior<T, T>,
       [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
 
-      [interaction, interactionTether]: IBehavior<IBranch, true>,
-      [blur, blurTether]: IBehavior<IBranch, false>,
+      [interaction, interactionTether]: IBehavior<INode, true>,
+      [blur, blurTether]: IBehavior<INode, false>,
 
-      [focusField, focusFieldTether]: IBehavior<IBranch, FocusEvent>,
-      [inputSearch, inputSearchTether]: IBehavior<IBranch<HTMLInputElement>, string>,
+      [focusField, focusFieldTether]: IBehavior<INode, FocusEvent>,
+      [inputSearch, inputSearchTether]: IBehavior<INode<HTMLInputElement>, string>,
       [clickOptionRemove, clickOptionRemoveTether]: IBehavior<INode, T>
     ) => {
       const openTrigger = mergeArray([focusField, constant(true, openMenu)])
@@ -280,11 +280,7 @@ export const $DropMultiSelect = <T>({
 
       return [
         $container(
-          $row(
-            layoutSheet.flex,
-            spacing.tiny,
-            style({ display: 'flex', flexDirection: 'row', position: 'relative' })
-          )(
+          $row(layoutSheet.flex, spacing.tiny, style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
             isEmpty($label) ? empty() : $row(style({ alignSelf: 'flex-end', cursor: 'pointer' }))($label),
 
             $fieldcontainer(

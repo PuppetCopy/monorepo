@@ -12,17 +12,17 @@ import {
   $twitter
 } from '@puppet/middleware/ui-components'
 import {
-  type I$Branch,
   $element,
   $text,
   attr,
   combineArray,
   component,
   type I$Node,
+  type I$Node,
   type IBehavior,
+  type IStyleCSS,
   nodeEvent,
   O,
-  type IStyleCSS,
   style,
   styleBehavior
 } from 'aelea/core'
@@ -233,7 +233,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
 
-      const $popoverPageLink = ($iconPath: I$Branch<SVGPathElement>, text: string | Stream<string>) =>
+      const $popoverPageLink = ($iconPath: I$Node<SVGPathElement>, text: string | Stream<string>) =>
         $row(style({ alignItems: 'center', cursor: 'pointer' }))(
           $icon({
             $content: $iconPath,

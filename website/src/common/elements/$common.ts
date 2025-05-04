@@ -1,7 +1,7 @@
 import { empty } from '@most/core'
 import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet/middleware/ui-components'
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet/middleware/utils'
-import { type I$Branch, $text, attr, type I$Node, isStream, style } from 'aelea/core'
+import { $text, attr, type I$Node, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -49,7 +49,7 @@ function convertMsToGoogleCalendarDate(ms: Date) {
   return `${year}${month}${day}T${hours}${minutes}${seconds}Z`
 }
 
-export const $labeledDivider = (label: string | $Node, displayIcon = true) => {
+export const $labeledDivider = (label: string | I$Node, displayIcon = true) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))(),
     $row(spacing.small, style({ alignItems: 'center' }))(
@@ -115,7 +115,7 @@ ${config.location ? `&location=${config.location}` : ''}
   )($icon({ $content: $calendar, width: '22px', viewBox: '0 0 32 32' }))
 }
 
-export const $iconCircular = ($iconPath: I$Branch<SVGPathElement>, size = '32px') => {
+export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') => {
   return $icon({
     $content: $iconPath,
     svgOps: style({

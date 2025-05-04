@@ -8,8 +8,10 @@ import {
   component,
   fromCallback,
   type I$Node,
+  type IBehavior,
   type INode,
   type IOp,
+  type IOps,
   O,
   style,
   styleInline
@@ -50,7 +52,7 @@ export interface ICHartAxisChange {
 
 export interface IChartConfig<TType extends keyof ISeriesType> {
   chartConfig?: DeepPartial<ChartOptions>
-  containerOp?: IOp<INode, INode>
+  containerOp?: IOps<INode, INode>
   seriesConfig?: SeriesPartialOptionsMap[TType]
 
   data: ISeriesType[TType][]

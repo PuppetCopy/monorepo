@@ -1,17 +1,17 @@
 import { constant, map, merge, startWith } from '@most/core'
 import type { IBehavior } from 'aelea/core'
-import { type I$Branch, attr, component, type IBranch, type IOps, nodeEvent, O, style } from 'aelea/core'
+import { attr, component, type I$Node, type INode, type IOps, nodeEvent, O, style } from 'aelea/core'
 import type { Route } from './types.js'
 
 export interface IAnchor {
   url: string
   route: Route
-  $anchor: I$Branch
-  anchorOp?: Op<IBranch<HTMLAnchorElement>, IBranch<HTMLAnchorElement>>
+  $anchor: I$Node
+  anchorOp?: IOps<INode<HTMLAnchorElement>, INode<HTMLAnchorElement>>
 }
 
 export const $RouterAnchor = ({ url, route, $anchor, anchorOp = O() }: IAnchor) =>
-  component(([click, clickTether]: IBehavior<IBranch, string>, [focus, focusTether]: IBehavior<IBranch, boolean>) => {
+  component(([click, clickTether]: IBehavior<INode, string>, [focus, focusTether]: IBehavior<INode, boolean>) => {
     const trailingSlash = /\/$/
     const href = url.replace(trailingSlash, '')
 

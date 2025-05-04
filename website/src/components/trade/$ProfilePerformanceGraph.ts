@@ -151,7 +151,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
 
 type IPricetickWithIndexToken = IPricetick & { indexToken: viem.Address }
 
-export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $container: INodeCompose<I$Node> }) =>
+export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $container: INodeCompose }) =>
   component(([crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>) => {
     const timeline = getPositionListTimelinePerformance(config)
 

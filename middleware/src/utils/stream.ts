@@ -106,7 +106,7 @@ function switchMapFn<T, R>(cb: (t: T) => IStreamOrPromise<R>, s: Stream<T>) {
 export const switchMap: ISwitchMapCurry2 = curry2(switchMapFn)
 
 export interface IPeriodRun<T> {
-  actionOp: Op<number, Promise<T>>
+  actionOp: IOps<number, Promise<T>>
 
   interval?: number
   startImmediate?: boolean

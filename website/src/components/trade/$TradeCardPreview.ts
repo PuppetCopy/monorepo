@@ -4,16 +4,16 @@ import type { IPosition } from '@puppet/middleware/core'
 import { $Baseline, $bear, $bull, $infoTooltipLabel } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount } from '@puppet/middleware/utils'
 import {
+  $node,
   $text,
   combineState,
   component,
   type I$Node,
   type IBehavior,
-  motion,
   type INodeCompose,
+  motion,
   replayLatest,
-  style,
-  $node
+  style
 } from 'aelea/core'
 import { $column, $icon, $NumberTicker, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -22,7 +22,7 @@ import { getPositionListTimelinePerformance, type IPerformanceTimeline } from '.
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {
   mp: IPosition
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
   chartConfig?: DeepPartial<ChartOptions>
   latestPrice: Stream<bigint>
   animatePnl?: boolean
@@ -197,7 +197,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                   }),
                   $infoTooltipLabel(
                     'The total combined settled and open trades',
-                    $text(style({ fontSize: '.85rem' }))('PnL')
+                    $textNode(style({ fontSize: '.85rem' }))('PnL')
                   )
                 )
               ),

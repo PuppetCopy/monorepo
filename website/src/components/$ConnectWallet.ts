@@ -5,9 +5,9 @@ import * as wallet from '@puppet/middleware/wallet'
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
 import type { GetAccountReturnType } from '@wagmi/core'
-import type { IBehavior, Op } from 'aelea/core'
+import type { IBehavior, IOps } from 'aelea/core'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
+import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Chain, type HttpTransport, http } from 'viem'
 import type { IWalletPageParams } from '../pages/type.js'
@@ -53,9 +53,9 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
 // }))
 
 export interface IConnectWalletPopover extends IWalletPageParams {
-  $$display: Op<GetAccountReturnType, $Node>
+  $$display: IOps<GetAccountReturnType, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
 }
 
 export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>

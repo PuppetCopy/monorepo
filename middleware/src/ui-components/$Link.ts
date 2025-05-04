@@ -1,13 +1,13 @@
 import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
 import {
-  type I$Branch,
   $element,
   combineArray,
   component,
+  type I$Node,
   type IBehavior,
-  O,
   type IStyleCSS,
+  O,
   style,
   styleBehavior
 } from 'aelea/core'
@@ -15,7 +15,7 @@ import { $RouterAnchor, type IAnchor } from 'aelea/router'
 import { pallete } from 'aelea/ui-components-theme'
 
 export interface ILink extends Omit<IAnchor, '$anchor'> {
-  $content: I$Branch<HTMLAnchorElement>
+  $content: I$Node<HTMLAnchorElement>
   disabled?: Stream<boolean>
 }
 

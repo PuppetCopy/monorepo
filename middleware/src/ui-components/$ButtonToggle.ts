@@ -1,6 +1,6 @@
 import { constant, map, now, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
-import type { IBehavior, Op } from 'aelea/core'
+import type { IBehavior, IOps } from 'aelea/core'
 import {
   $node,
   $text,
@@ -19,10 +19,10 @@ export interface IButtonToggle<T> {
   options: T[]
   selected: Stream<T>
 
-  $container?: INodeCompose<I$Node>
-  $button?: INodeCompose<I$Node>
+  $container?: INodeCompose
+  $button?: INodeCompose
 
-  $$option?: Op<T, $Node>
+  $$option?: IOps<T, I$Node>
 }
 
 export const $defaulButtonToggleBtn = $row(
@@ -51,7 +51,7 @@ export const $defaulButtonToggleContainer = $node(
   })
 )
 
-const defaultOption = map(<T>(o: T) => $text(String(o)))
+const defaultOption = map(<T>(o: T) => $node($text(String(o))))
 
 export const $ButtonToggle = <T>({
   options,

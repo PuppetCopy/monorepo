@@ -12,7 +12,7 @@ import { $DropMultiSelect } from './form/$Dropdown'
 
 interface ISelectCollateralToken {
   selectedList: Stream<viem.Address[]>
-  $container?: INodeCompose<I$Node>
+  $container?: INodeCompose
 }
 
 export const $SelectCollateralToken = (config: ISelectCollateralToken) =>
