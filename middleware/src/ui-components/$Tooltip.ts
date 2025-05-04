@@ -24,6 +24,7 @@ export interface TooltipConfig {
 
 export const $defaultDropContainer = $column(
   style({
+    whiteSpace: 'pre-wrap',
     maxWidth: '600px',
     userSelect: 'text',
     background: pallete.background,

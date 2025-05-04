@@ -161,7 +161,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: I$Node<SVGPathElement>
+  $iconPath: II$Node<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

@@ -10,7 +10,6 @@ import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/c
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Chain, type HttpTransport, http } from 'viem'
-import type { IWalletPageParams } from '../pages/type.js'
 import { accountChange, walletConnectAppkit } from '../walletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
@@ -52,7 +51,7 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
 //   return { info, provider }
 // }))
 
-export interface IConnectWalletPopover extends IWalletPageParams {
+export interface IConnectWalletPopover {
   $$display: IOps<GetAccountReturnType, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose

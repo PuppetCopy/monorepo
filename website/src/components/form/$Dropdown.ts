@@ -24,6 +24,7 @@ import { $caretDown, $xCross } from '@puppet/middleware/ui-components'
 import { streamOf } from '@puppet/middleware/utils'
 import {
   $element,
+  $node,
   $text,
   attr,
   combineState,
@@ -31,7 +32,6 @@ import {
   eventElementTarget,
   type I$Node,
   type IBehavior,
-  type INode,
   type INode,
   type INodeCompose,
   type IOps,
@@ -43,7 +43,7 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
-import { $column, $icon, $row, type Input, observer, spacing } from 'aelea/ui-components'
+import { $column, $icon, $row, type Input, layoutSheet, observer, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $Select, type ISelect } from './$Select.js'
 
@@ -210,7 +210,7 @@ export interface IMultiselectDrop<T> extends Input<T[]> {
   $dropdownContainer?: INodeCompose
 
   $chip?: INodeCompose
-  $input?: INodeCompose<$Node<HTMLInputElement>>
+  $input?: INodeCompose<HTMLInputElement>
   $$chip: IOps<T, I$Node>
   openMenu?: Stream<any>
 }
@@ -439,7 +439,7 @@ export const $DropMultiSelect = <T>({
                 return empty()
               }
 
-              return $text(style({ color: pallete.negative, fontSize: '.85rem', minHeight: '17px' }))(msg)
+              return $node(style({ color: pallete.negative, fontSize: '.85rem', minHeight: '17px' }))($text(msg))
             }, alert)
           )
         ),

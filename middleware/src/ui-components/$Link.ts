@@ -15,7 +15,7 @@ import { $RouterAnchor, type IAnchor } from 'aelea/router'
 import { pallete } from 'aelea/ui-components-theme'
 
 export interface ILink extends Omit<IAnchor, '$anchor'> {
-  $content: I$Node<HTMLAnchorElement>
+  $content: II$Node<HTMLAnchorElement>
   disabled?: Stream<boolean>
 }
 

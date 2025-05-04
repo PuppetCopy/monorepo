@@ -15,7 +15,7 @@ import { designSheet, type Input } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { dismissOp, interactionOp } from './common.js'
 
-export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export interface Field extends Optional<Input<string>, 'value'> {
   $input?: INodeCompose<HTMLInputElement>

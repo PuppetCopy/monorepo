@@ -1,20 +1,17 @@
 import { startWith, switchLatest, tap } from '@most/core'
 import { ignoreAll, switchMap } from '@puppet/middleware/utils'
 import { getAccount } from '@wagmi/core'
-import { $text, IBehavior, nodeEvent, style } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $node, $text, behavior, IBehavior, nodeEvent, style } from 'aelea/core'
+import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
-import type { IWalletPageParams } from '../pages/type.js'
 import { accountChange, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 
-export interface IWalletDisplay extends IWalletPageParams {}
-
-export const $walletProfileDisplay = (config: IWalletDisplay) => {
+export const $walletProfileDisplay = () => {
   const accountStatus = getAccount(wagmiConfig)
   const account = accountStatus.connector === undefined ? startWith(accountStatus, accountChange) : accountChange
 
-  const [click, clickTether] = IBehavior()
+  const [click, clickTether] = behavior()
 
   return switchLatest(
     switchMap(async (accountInfo) => {
@@ -33,8 +30,8 @@ export const $walletProfileDisplay = (config: IWalletDisplay) => {
           $disconnectedWalletDisplay(),
           $seperator2,
           $column(
-            style({ fontSize: '.75rem' })($text('Click to')),
-            style({ fontSize: '.75rem', fontWeight: 'bold' })($text('Connect'))
+            style({ fontSize: '.75rem' })($node($text('Click to'))),
+            style({ fontSize: '.75rem', fontWeight: 'bold' })($node($text('Connect')))
           )
         )
       }

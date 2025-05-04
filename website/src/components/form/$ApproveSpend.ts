@@ -20,7 +20,7 @@ import {
   isStream,
   style
 } from 'aelea/core'
-import { $row, layoutSheet } from 'aelea/ui-components'
+import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import * as viem from 'viem'
 import { $defaultButtonPrimary } from './$Button'
 import { $ButtonCore } from './$ButtonCore'
@@ -33,7 +33,6 @@ export interface ISpend {
 }
 
 interface IApproveSpend extends ISpend {
-  walletClient: walletLink.IWalletClient
   disabled?: Stream<boolean>
   txQuery: Stream<walletLink.IWriteContractReturn>
   $content?: I$Node
@@ -43,16 +42,7 @@ interface IApproveSpend extends ISpend {
 export const $ApproveSpend = (config: IApproveSpend) =>
   component(
     ([approveTokenSpend, approveTokenSpendTether]: IBehavior<PointerEvent, walletLink.IWriteContractReturn>) => {
-      const {
-        $content,
-        amount,
-        token,
-        walletClient,
-        spender,
-        $label,
-        disabled,
-        $container = $row(style({ minWidth: 0 }))
-      } = config
+      const { $content, amount, token, spender, $label, disabled, $container = $row(style({ minWidth: 0 })) } = config
 
       const allowance = mergeArray([
         switchMap(async (query) => {
@@ -97,7 +87,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                         message = err.shortMessage || err.message
                       }
 
-                      return $alertTooltip($text(style({ whiteSpace: 'pre-wrap' }))(message || 'Transaction failed'))
+                      return $alertTooltip($text(message || 'Transaction failed'))
                     }
 
                     return $alertPositiveTooltip(

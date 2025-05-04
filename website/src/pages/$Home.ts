@@ -1,6 +1,5 @@
 import { empty, map, now } from '@most/core'
 import type { Stream } from '@most/types'
-import { $anchor, $Link } from '@puppet/middleware/ui-components'
 import { filterNull, switchMap } from '@puppet/middleware/utils'
 import {
   $element,
@@ -12,11 +11,10 @@ import {
   fromCallback,
   type I$Node,
   type IBehavior,
-  style,
-  styleInline
+  style
 } from 'aelea/core'
 import type { Route } from 'aelea/router'
-import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, layoutSheet, screenUtils, spacing } from 'aelea/ui-components'
+import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
 import { $heading1 } from '../common/$text.js'
@@ -129,14 +127,16 @@ export const $Home = (config: ITreasury) =>
                     whiteSpace: 'pre-wrap',
                     letterSpacing: '2px'
                   })
-                )($text('Matching top Traders\nwith Investors')
+                )($text('Matching top Traders\nwith Investors'))
               ),
               $column(spacing.small, style({ maxWidth: '624px' }))(
                 $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
                   $text('Traders seamlessly earn more doing what they do best')
                 ),
                 $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  $text('Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio')
+                  $text(
+                    'Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio'
+                  )
                 )
               ),
 
@@ -258,7 +258,7 @@ export const $Home = (config: ITreasury) =>
                     }, installUserChoice)
                   : empty()
               ),
-              $text(
+              $node(
                 style({
                   color: pallete.foreground,
                   position: 'absolute',
@@ -266,7 +266,7 @@ export const $Home = (config: ITreasury) =>
                   left: '50%',
                   transform: 'translateX(-50%)'
                 })
-              )('Learn More')
+              )($text('Learn More'))
             )
 
             // $wheelWrapper(style({

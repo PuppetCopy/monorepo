@@ -9,12 +9,12 @@ import {
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
 import {
+  $node,
   $text,
   attrBehavior,
   combineArray,
   combineState,
   component,
-  type I$Node,
   type I$Node,
   type IBehavior,
   type INode,
@@ -24,7 +24,7 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import { $row, type Control, layoutSheet } from 'aelea/ui-components'
+import { $row, type Control, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
 import { $iconCircular } from '../../common/elements/$common.js'
@@ -83,7 +83,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               }
 
               if (status.state === PromiseStatus.PENDING) {
-                return $intermediateTooltip($text('Awaiting confirmation'))
+                return $intermediateTooltip($node($text('Awaiting confirmation')))
               }
               if (status.state === PromiseStatus.ERROR) {
                 const err = status.error
@@ -101,10 +101,12 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 }
 
                 return $alertTooltip(
-                  $text(style({ whiteSpace: 'pre-wrap' }))(
-                    message ||
-                      getSafeMappedValue(err, 'shortMessage', 'message') ||
-                      'Transaction failed with an unknown error'
+                  $text(
+                    String(
+                      message ||
+                        getSafeMappedValue(err, 'shortMessage', 'message') ||
+                        'Transaction failed with an unknown error'
+                    )
                   )
                 )
               }
@@ -119,7 +121,6 @@ export const $SubmitBar = (config: ISubmitBar) =>
           ),
           $barContent ?? empty(),
           $IntermediateConnectButton({
-            walletClientQuery,
             $$display: map((wallet) => {
               const $btn = $ButtonCore({
                 $container: $defaultButtonPrimary(
@@ -146,7 +147,6 @@ export const $SubmitBar = (config: ISubmitBar) =>
                   ...spend,
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
-                  walletClient: wallet,
                   $content: $btn,
                   disabled: combineArray((params) => params.isSpendPending, combineState({ isSpendPending }))
                 })({
@@ -166,7 +166,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
   )
 
 interface IButtonCircular extends Control {
-  $iconPath: I$Node<SVGPathElement>
+  $iconPath: II$Node<SVGPathElement>
 }
 
 export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>

@@ -1,18 +1,16 @@
-import { constant, empty, map, mergeArray, snapshot } from '@most/core'
+import { constant, map, mergeArray, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IMatchRule } from '@puppet/middleware/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
-import { switchMap, unixTimestampNow } from '@puppet/middleware/utils'
+import { unixTimestampNow } from '@puppet/middleware/utils'
 import type { GetAccountReturnType } from '@wagmi/core'
-import { $text, combineState, component, type I$Node, type IBehavior, type INodeCompose, style } from 'aelea/core'
-import { $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $text, combineState, component, type IBehavior, type INodeCompose, style } from 'aelea/core'
+import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $tokenTryLabeled } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
-import type { IWalletPageParams } from '../../pages/type.js'
-import { accountChange } from '../../walletConnect.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $MatchRuleEditor, type IDraftMatchRule } from './$MatchRuleEditor.js'
@@ -24,7 +22,7 @@ export interface IMatchRuleEditorChange {
   // matchRule?: IMatchRule
 }
 
-interface ITraderMatchingRouteEditor extends IWalletPageParams {
+interface ITraderMatchingRouteEditor {
   trader: viem.Address
   accountInfo: GetAccountReturnType
   traderMatchingRuleList: {

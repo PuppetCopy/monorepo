@@ -3,6 +3,7 @@ import {
   $element,
   component,
   type I$Node,
+  type I$Slottable,
   type IBehavior,
   type INode,
   type INodeCompose,
@@ -26,7 +27,7 @@ export const dismissOp = O(
 
 export interface IButtonCore extends Control {
   $container?: INodeCompose
-  $content: I$Node
+  $content: I$Slottable
 }
 
 export const $defaultButtonCore = $element('button')(designSheet.btn)

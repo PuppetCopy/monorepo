@@ -105,7 +105,7 @@ export const $alert = ($content: I$Node) =>
     $content
   )
 
-export const $alertTooltip = ($content: I$Node) => {
+export const $alertTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
@@ -127,7 +127,7 @@ export const $alertPositiveTooltip = ($content: I$Node) => {
   })({})
 }
 
-export const $intermediateTooltip = ($content: I$Node) => {
+export const $intermediateTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,

@@ -65,7 +65,7 @@
 //   $dropdownContainer?: INodeCompose
 
 //   $chip?: INodeCompose
-//   $input?: INodeCompose<$Node<HTMLInputElement>>
+//   $input?: INodeCompose<I$Node<HTMLInputElement>>
 //   $$chip: IOps<T, I$Node>
 //   openMenu?: Stream<any>
 // }

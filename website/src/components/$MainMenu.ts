@@ -18,7 +18,6 @@ import {
   combineArray,
   component,
   type I$Node,
-  type I$Node,
   type IBehavior,
   type IStyleCSS,
   nodeEvent,
@@ -173,7 +172,7 @@ export const $MainMenu = (config: MainMenu) =>
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
                 url: '/wallet',
-                $content: $walletProfileDisplay({})
+                $content: $walletProfileDisplay()
               })({
                 click: routeChangeTether()
               })
@@ -233,7 +232,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
 
-      const $popoverPageLink = ($iconPath: I$Node<SVGPathElement>, text: string | Stream<string>) =>
+      const $popoverPageLink = ($iconPath: II$Node<SVGPathElement>, text: string | Stream<string>) =>
         $row(style({ alignItems: 'center', cursor: 'pointer' }))(
           $icon({
             $content: $iconPath,
@@ -426,7 +425,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
                 url: '/app/wallet',
-                $content: $walletProfileDisplay({})
+                $content: $walletProfileDisplay()
               })({
                 click: routeChangeTether()
               })
@@ -458,7 +457,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
         }),
         styleBehavior(
           combineArray(
-            (isActive, isFocus): StyleCSS | null => {
+            (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? {
                     backgroundColor: `${pallete.background} !important`,

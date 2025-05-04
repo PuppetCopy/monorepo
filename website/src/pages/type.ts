@@ -2,14 +2,12 @@ import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import * as walletLink from '@puppet/middleware/wallet'
 import type * as router from 'aelea/router'
-import type { IPriceCandle } from 'schema'
 import type * as viem from 'viem'
+import type { IPriceCandle } from '../__generated__/ponder.types'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
 
-export type IWalletPageParams = {}
-
-export interface IComponentPageParams extends IWalletPageParams {}
+export interface IComponentPageParams {}
 
 export interface IPageParams extends IComponentPageParams {
   route: router.Route

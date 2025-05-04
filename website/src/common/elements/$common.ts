@@ -1,8 +1,8 @@
 import { empty } from '@most/core'
 import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet/middleware/ui-components'
 import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet/middleware/utils'
-import { $text, attr, type I$Node, type I$Node, isStream, style } from 'aelea/core'
-import { $ButtonIcon, $column, $icon, $row, layoutSheet, screenUtils } from 'aelea/ui-components'
+import { $node, $text, attr, type I$Node, isStream, style } from 'aelea/core'
+import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $trash } from './$icons.js'
@@ -34,7 +34,7 @@ export const $card2 = $column(
   })
 )
 
-export const $seperator = $text(style({ color: pallete.foreground, pointerEvents: 'none' }))('|')
+export const $seperator = $node(style({ color: pallete.foreground, pointerEvents: 'none' }))($text('|'))
 export const $responsiveFlex = isDesktopScreen ? $row : $column
 
 function convertMsToGoogleCalendarDate(ms: Date) {
@@ -53,7 +53,7 @@ export const $labeledDivider = (label: string | I$Node, displayIcon = true) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))(),
     $row(spacing.small, style({ alignItems: 'center' }))(
-      isStream(label) ? label : $text(style({ fontSize: '.85rem' }))(label),
+      isStream(label) ? label : $node(style({ fontSize: '.85rem' }))($text(label)),
       displayIcon
         ? $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
         : empty()
@@ -115,7 +115,7 @@ ${config.location ? `&location=${config.location}` : ''}
   )($icon({ $content: $calendar, width: '22px', viewBox: '0 0 32 32' }))
 }
 
-export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') => {
+export const $iconCircular = ($iconPath: II$Node<SVGPathElement>, size = '32px') => {
   return $icon({
     $content: $iconPath,
     svgOps: style({
@@ -137,12 +137,12 @@ export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') 
 }
 
 export const $accountRef = (id: viem.Address, chain: viem.Chain) =>
-  $anchor(attr({ href: getAccountExplorerUrl(chain, id) }))($text(style({}))(`${shortenAddress(id)}`))
+  $anchor(attr({ href: getAccountExplorerUrl(chain, id) }))($text(`${shortenAddress(id)}`))
 
 export const $accountIconLink = (address: viem.Address, chain: viem.Chain) =>
   $anchor(attr({ href: getAccountExplorerUrl(chain, address) }))(
     $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24', svgOps: style({ margin: '3px 4px 0 0' }) }),
-    $text(style({}))(`${shortenAddress(address)} `)
+    $text(`${shortenAddress(address)} `)
   )
 
 export const $txnIconLink = (hash: string, chain: viem.Chain) => {
