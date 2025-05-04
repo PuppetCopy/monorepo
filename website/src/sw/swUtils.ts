@@ -4,7 +4,7 @@ import { fromCallback } from 'aelea/core'
 
 export const pwaUpgradeNotification: Stream<() => void> = fromCallback((cb) => {
   const reloadCb = registerSW({
-    // immediate: true,
+    immediate: true,
     // onOfflineReady() {
     //   debugger
 

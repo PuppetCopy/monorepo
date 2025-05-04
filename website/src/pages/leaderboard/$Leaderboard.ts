@@ -1,6 +1,6 @@
 import { empty, map, now, startWith } from '@most/core'
 import type { Time } from '@most/types'
-import type { IntervalTime } from '@puppet/middleware/const'
+import { IntervalTime } from '@puppet/middleware/const'
 import type { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from '@puppet/middleware/core'
 import {
   $Baseline,
@@ -154,13 +154,19 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                 const dataSource = switchMap(
                   async (filterParams) => {
+                    const interval = IntervalTime.HR
+                    const startActivityTimeframe = unixTimestampNow() - filterParams.activityTimeframe
+                    const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
+
+                    console.log('startActivityTimeframeTimeSlot', startActivityTimeframeTimeSlot)
+
                     const metrictList = await queryDb.query.traderRouteMetric.findMany({
                       where: (t, f) =>
                         f.and(
                           f.eq(t.interval, filterParams.activityTimeframe),
                           filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
                           // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                          f.gte(t.lastUpdatedTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
+                          f.gte(t.lastUpdatedTimestamp, startActivityTimeframeTimeSlot)
                         ),
                       limit: filterParams.paging.pageSize,
                       offset: filterParams.paging.offset,
@@ -184,6 +190,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                     const page = await Promise.all(
                       metrictList.map(async (routeMetric) => {
+                        queryDb.select({})
                         const [matchingRuleList, increaseList, decreaseList] = await Promise.all([
                           queryDb.query.puppetMatchingRule.findMany({
                             where: (t, f) => f.and(f.eq(t.matchingKey, routeMetric.matchingKey)),
@@ -192,14 +199,14 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               allowanceRate: true,
                               expiry: true,
                               throttleActivity: true
-                            },
-                            limit: 10
+                            }
+                            // limit: 10
                           }),
                           queryDb.query.positionIncrease.findMany({
                             where: (t, f) =>
                               f.and(
                                 f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
+                                f.gte(t.blockTimestamp, startActivityTimeframeTimeSlot)
                               ),
                             columns: {
                               indexToken: true,
@@ -210,15 +217,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               isLong: true,
                               blockTimestamp: true
                             }
-                            // with: {
-                            //   feeCollected: true
-                            // }
                           }),
                           queryDb.query.positionDecrease.findMany({
                             where: (t, f) =>
                               f.and(
                                 f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, unixTimestampNow() - filterParams.activityTimeframe)
+                                f.gte(t.blockTimestamp, startActivityTimeframeTimeSlot)
                               ),
                             columns: {
                               indexToken: true,

@@ -1,22 +1,19 @@
-import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
+import { map, merge, mergeArray, multicast, now, skipRepeats, startWith, take } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import {
   $alertNegativeContainer,
-  $alertPositiveContainer,
   $infoLabeledValue,
   $Tooltip
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import {
-  filterNull,
   getTimeSince,
   readableUnitAmount,
   switchMap,
   unixTimestampNow,
   zipState
 } from '@puppet/middleware/utils'
-// import { announcedProviderList } from "../components/$ConnectWallet"
 import { watchBlockNumber } from '@wagmi/core'
 import {
   $element,
@@ -38,16 +35,13 @@ import type * as viem from 'viem'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, subgraphStatus } from '../common/query.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor.js'
 import { localStore } from '../const/localStore.js'
-import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
-import { $WalletPage } from './user/$Wallet.js'
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -140,21 +134,21 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       return [
         $column(
-          switchMap((cb) => {
-            return fadeIn(
-              $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-                filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
+          // switchMap((cb) => {
+          //   return fadeIn(
+          //     $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
+          //       filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
 
-                $text('New version Available'),
-                $ButtonSecondary({
-                  $container: $defaultMiniButtonSecondary,
-                  $content: $text('Update')
-                })({
-                  click: clickUpdateVersionTether(tap(cb))
-                })
-              )
-            )
-          }, pwaUpgradeNotification),
+          //       $text('New version Available'),
+          //       $ButtonSecondary({
+          //         $container: $defaultMiniButtonSecondary,
+          //         $content: $text('Update')
+          //       })({
+          //         click: clickUpdateVersionTether(tap(cb))
+          //       })
+          //     )
+          //   )
+          // }, pwaUpgradeNotification),
           router.contains(rootRoute)(
             $rootContainer(
               $column(style({ flex: 1, position: 'relative' }))(
