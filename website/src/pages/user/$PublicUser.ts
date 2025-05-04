@@ -1,5 +1,5 @@
 // import { Behavior } from "aelea/core"
-// import { $node, $text, component, style } from "aelea/dom"
+// import { $node, $text, component, style } from "aelea/core"
 // import * as router from 'aelea/router'
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { map, mergeArray, multicast, now } from "@most/core"
@@ -15,18 +15,14 @@
 // import { $TraderPage } from "./$Trader.js"
 // import { IMatchRuleEditorChange } from "../../components/portfolio/$TraderMatchRouteEditor"
 
-
-
 // export interface IProfile extends IPageParams {
 //   route: router.Route
 // }
-
 
 // type IRouteOption = {
 //   label: string
 //   fragment: string
 // }
-
 
 // export const $PublicUserPage = (config: IUserActivityPageParams) => component((
 //   [changeRoute, changeRouteTether]: Behavior<string, string>,
@@ -46,7 +42,6 @@
 //   })
 //   const puppetRoute = profileAddressRoute.create({ fragment: 'puppet' }).create({ title: 'Puppet', fragment: ETH_ADDRESS_REGEXP })
 
-
 //   const options: IRouteOption[] = [
 //     {
 //       label: 'Puppet',
@@ -57,8 +52,6 @@
 //       fragment: 'trader'
 //     },
 //   ]
-
-
 
 //   return [
 
@@ -96,12 +89,8 @@
 
 //                 console.log(positionList)
 
-
 //                 return accountSettledPositionListSummary(positionList)
 //               }, matchRouteStatsQuery))
-
-
-
 
 //               return $column(spacing.big)(
 //                 $column(spacing.default, style({ minHeight: '90px' }))(
@@ -225,5 +214,4 @@
 //     }
 //   ]
 // })
-
 

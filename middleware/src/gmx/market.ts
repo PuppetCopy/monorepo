@@ -1,40 +1,38 @@
-import type { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from "./types.js"
-import { applyFactor, factor } from "../utils/mathUtils.js"
-import { getTokenUsd } from "../utils/utils.js"
-import { FLOAT_PRECISION, IntervalTime } from "../const/common.js"
+import { FLOAT_PRECISION, type IntervalTime } from '../const/common.js'
+import { applyFactor, factor } from '../utils/mathUtils.js'
+import { getTokenUsd } from '../utils/utils.js'
+import type { IMarketFees, IMarketInfo, IMarketPrice, IMarketUsageInfo } from './types.js'
 
-export function getPoolUsd(
-  marketInfo: IMarketInfo,
-  marketPrice: IMarketPrice,
-  isLong: boolean,
-  maximize: boolean = false
-) {
+export function getPoolUsd(marketInfo: IMarketInfo, marketPrice: IMarketPrice, isLong: boolean, maximize = false) {
   const poolAmount = isLong ? marketInfo.pool.longTokenAmount : marketInfo.pool.shortTokenAmount
   const price = isLong
-    ? maximize ? marketPrice.longTokenPrice.max : marketPrice.longTokenPrice.min
-    : maximize ? marketPrice.shortTokenPrice.max : marketPrice.shortTokenPrice.min
+    ? maximize
+      ? marketPrice.longTokenPrice.max
+      : marketPrice.longTokenPrice.min
+    : maximize
+      ? marketPrice.shortTokenPrice.max
+      : marketPrice.shortTokenPrice.min
 
   return getTokenUsd(price, poolAmount)
 }
-
-
 
 export function getPoolUsdWithoutPnl(
   marketPrice: IMarketPrice,
   marketInfo: IMarketInfo,
   isLong: boolean,
-  maximize: boolean = false
+  maximize = false,
 ) {
   const poolAmount = isLong ? marketInfo.pool.longTokenAmount : marketInfo.pool.shortTokenAmount
   const price = isLong
-    ? maximize ? marketPrice.longTokenPrice.max : marketPrice.longTokenPrice.min
-    : maximize ? marketPrice.shortTokenPrice.max : marketPrice.shortTokenPrice.min
+    ? maximize
+      ? marketPrice.longTokenPrice.max
+      : marketPrice.longTokenPrice.min
+    : maximize
+      ? marketPrice.shortTokenPrice.max
+      : marketPrice.shortTokenPrice.min
 
   return getTokenUsd(price, poolAmount)
 }
-
-
-
 
 export function getAvailableReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketPrice, isLong: boolean) {
   const maxReservedUsd = getMaxReservedUsd(marketInfo, marketPrice, isLong)
@@ -45,17 +43,18 @@ export function getAvailableReservedUsd(marketInfo: IMarketInfo, marketPrice: IM
   return maxReservedUsd - openInterestUsd
 }
 
-
 export function getMaxReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketPrice, isLong: boolean) {
   const poolUsd = getPoolUsd(marketInfo, marketPrice, isLong)
-  const openInterestReserveFactor = isLong ? marketInfo.config.openInterestReserveFactorLong : marketInfo.config.openInterestReserveFactorShort
+  const openInterestReserveFactor = isLong
+    ? marketInfo.config.openInterestReserveFactorLong
+    : marketInfo.config.openInterestReserveFactorShort
   const reserveFactor = isLong ? marketInfo.config.reserveFactorLong : marketInfo.config.reserveFactorShort
 
   if (openInterestReserveFactor < reserveFactor) {
-    return poolUsd * openInterestReserveFactor / FLOAT_PRECISION
+    return (poolUsd * openInterestReserveFactor) / FLOAT_PRECISION
   }
 
-  return poolUsd * reserveFactor / FLOAT_PRECISION
+  return (poolUsd * reserveFactor) / FLOAT_PRECISION
 }
 
 // export function getReservedUsd(marketInfo: MarketInfo, isLong: boolean) {
@@ -97,31 +96,35 @@ export function getReservedUsd(marketInfo: IMarketInfo, marketPrice: IMarketPric
 //   return result.lt(0) ? BigNumber.from(0) : result;
 // }
 
-export function getAvailableUsdLiquidityForPosition(marketInfo: IMarketInfo, marketPrice: IMarketPrice, isLong: boolean) {
+export function getAvailableUsdLiquidityForPosition(
+  marketInfo: IMarketInfo,
+  marketPrice: IMarketPrice,
+  isLong: boolean,
+) {
   const maxReservedUsd = getMaxReservedUsd(marketInfo, marketPrice, isLong)
   const reservedUsd = getReservedUsd(marketInfo, marketPrice, isLong)
 
   // const maxOpenInterest = isLong ? marketInfo.maxOpenInterestLong : marketInfo.maxOpenInterestShort
   const maxOpenInterestUsd = isLong
-    ? getTokenUsd(marketInfo.price.longTokenPrice.max, marketInfo.usage.longInterestInTokensUsingLongToken) + getTokenUsd(marketInfo.price.shortTokenPrice.max, marketInfo.usage.longInterestInTokensUsingShortToken)
-    : getTokenUsd(marketInfo.price.longTokenPrice.max, marketInfo.usage.shortInterestInTokensUsingLongToken) + getTokenUsd(marketInfo.price.shortTokenPrice.max, marketInfo.usage.shortInterestInTokensUsingShortToken)
+    ? getTokenUsd(marketInfo.price.longTokenPrice.max, marketInfo.usage.longInterestInTokensUsingLongToken) +
+      getTokenUsd(marketInfo.price.shortTokenPrice.max, marketInfo.usage.longInterestInTokensUsingShortToken)
+    : getTokenUsd(marketInfo.price.longTokenPrice.max, marketInfo.usage.shortInterestInTokensUsingLongToken) +
+      getTokenUsd(marketInfo.price.shortTokenPrice.max, marketInfo.usage.shortInterestInTokensUsingShortToken)
   const currentOpenInterest = 0n // getOpenInterestUsd(marketInfo, marketPrice, isLong)
 
   const availableLiquidityBasedOnMaxReserve = maxReservedUsd - reservedUsd
   const availableLiquidityBasedOnMaxOpenInterest = maxOpenInterestUsd - currentOpenInterest
 
-  const result = availableLiquidityBasedOnMaxReserve < availableLiquidityBasedOnMaxOpenInterest
-    ? availableLiquidityBasedOnMaxReserve
-    : availableLiquidityBasedOnMaxOpenInterest
+  const result =
+    availableLiquidityBasedOnMaxReserve < availableLiquidityBasedOnMaxOpenInterest
+      ? availableLiquidityBasedOnMaxReserve
+      : availableLiquidityBasedOnMaxOpenInterest
 
   return result < 0n ? 0n : result
 }
 
-
 export function getBorrowingFactorPerInterval(fees: IMarketFees, isLong: boolean, interval: IntervalTime) {
-  const factorPerSecond = isLong
-    ? fees.borrowingFactorPerSecondForLongs
-    : fees.borrowingFactorPerSecondForShorts
+  const factorPerSecond = isLong ? fees.borrowingFactorPerSecondForLongs : fees.borrowingFactorPerSecondForShorts
 
   return factorPerSecond * BigInt(interval)
 }
@@ -132,8 +135,13 @@ export function getFundingFactorPerInterval(usage: IMarketUsageInfo, fees: IMark
   return applyFactor(ratio, fees.nextFunding.fundingFactorPerSecond) * BigInt(interval)
 }
 
-
-export function getFundingFactorPerInterval2(marketPrice: IMarketPrice, usage: IMarketUsageInfo, fees: IMarketFees, isLong: boolean, interval: IntervalTime) {
+export function getFundingFactorPerInterval2(
+  marketPrice: IMarketPrice,
+  usage: IMarketUsageInfo,
+  fees: IMarketFees,
+  isLong: boolean,
+  interval: IntervalTime,
+) {
   const longsPayShorts = fees.nextFunding.longsPayShorts
   const isLargerSide = isLong ? longsPayShorts : !longsPayShorts
 
@@ -145,4 +153,3 @@ export function getFundingFactorPerInterval2(marketPrice: IMarketPrice, usage: I
 
   return applyFactor(ratio, fees.nextFunding.fundingFactorPerSecond) * BigInt(interval)
 }
-

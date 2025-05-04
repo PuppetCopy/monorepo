@@ -1,5 +1,5 @@
 // import { Behavior, combineState, replayLatest } from "aelea/core"
-// import { $text, component, style } from "aelea/dom"
+// import { $text, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { map, startWith } from "@most/core"
 // import { Stream } from "@most/types"
@@ -16,7 +16,6 @@
 // import { $seperator2 } from "../common"
 // import { IPageParams, IUserActivityPageParams } from "../type.js"
 // import { $ProfilePeformanceTimeline } from "../../components/participant/$ProfilePeformanceTimeline"
-
 
 // interface ITraderPage extends IPageParams, IUserActivityPageParams {
 //   matchRouteStatsQuery: Stream<Promise<IMatchRouteStats[]>>
@@ -45,7 +44,6 @@
 //     return { matchRouteList, sortBy: params.sortBy, activityTimeframe }
 //   }, combineState({ sortBy, matchRouteStatsQuery, activityTimeframe }))
 
-
 //   return [
 //     $column(spacing.big)(
 //       $card(spacing.big, style({ flex: 1, width: '100%' }))(
@@ -68,7 +66,6 @@
 //                 $infoLabel(`Try changing the timeframe or selecting a different trade route`),
 //               )
 //             }
-
 
 //             return $column(spacing.default)(
 //               ...list.map(route => {
@@ -119,5 +116,4 @@
 //     { changeRoute, changeActivityTimeframe, selectMarketTokenList, changeMatchRuleList }
 //   ]
 // })
-
 

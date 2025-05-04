@@ -10,11 +10,11 @@ export function safeDiv(a: bigint, b: bigint): bigint {
 }
 
 export function factor(a: bigint, b: bigint): bigint {
-  return a ? a * FLOAT_PRECISION / b : 0n
+  return a ? (a * FLOAT_PRECISION) / b : 0n
 }
 
 export function applyFactor(value: bigint, factorn: bigint): bigint {
-  return value * factorn / FLOAT_PRECISION
+  return (value * factorn) / FLOAT_PRECISION
 }
 
 export function getBasisPoints(numerator: bigint, denominator: bigint) {
@@ -22,9 +22,8 @@ export function getBasisPoints(numerator: bigint, denominator: bigint) {
     return 0n
   }
 
-  return numerator * BASIS_POINTS_DIVISOR / denominator
+  return (numerator * BASIS_POINTS_DIVISOR) / denominator
 }
-
 
 export function min(a: bigint, b: bigint): bigint {
   return a < b ? a : b

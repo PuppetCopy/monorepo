@@ -1,5 +1,3 @@
-
-
 // const screenWidth = window.innerWidth
 // const screenHeight = window.innerHeight
 
@@ -24,7 +22,6 @@
 
 // document.body.appendChild(renderer.domElement)
 
-
 // const material = new THREE.MeshBasicMaterial()
 // const geometry = new THREE.CircleGeometry(0.15)
 // const circle = new THREE.InstancedMesh(geometry, material, 10000)
@@ -42,7 +39,6 @@
 //   updateCircles(clock)
 //   renderer.render(scene, camera)
 // }
-
 
 // function populateCircles(instancedCircles: THREE.InstancedMesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>) {
 //   const vec = new THREE.Vector3()

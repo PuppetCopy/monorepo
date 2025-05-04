@@ -1,9 +1,7 @@
-import type { Stream } from "@most/types"
-
+import type { Stream } from '@most/types'
 
 export type Path = string
 export type Fragment = string | RegExp
-
 
 export type PathEvent = Path[]
 

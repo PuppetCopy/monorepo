@@ -1,5 +1,5 @@
 // import { Behavior, combineState, O } from "aelea/core"
-// import { $element, $node, $Node, $text, attr, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline } from "aelea/dom"
+// import { $element, $node, $Node, $text, attr, component, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline } from "aelea/core"
 // import { Route } from "aelea/router"
 // import { $column, $icon, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { colorAlpha, pallete } from "aelea/ui-components-theme"
@@ -40,8 +40,6 @@
 // import { $ButtonCircular, $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 // import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown.js"
 
-
-
 // export interface ITradeParams {
 //   tradeRoute: viem.Address | null
 //   routeTypeKey: viem.Hex
@@ -75,7 +73,6 @@
 //   marketInfo: IMarketInfo
 // }
 
-
 // export interface ITradeConfig {
 //   focusPrice: number | null
 //   market: IMarket
@@ -93,7 +90,6 @@
 //   executionFeeBuffer: bigint
 // }
 
-
 // export interface IPositionEditorAbstractParams extends IComponentPageParams {
 //   referralCode: viem.Hex
 //   routeTypeListQuery: Stream<Promise<ISetRouteType[]>>
@@ -101,15 +97,12 @@
 //   chain: viem.Chain
 // }
 
-
 // interface IPositionEditorConfig extends IPositionEditorAbstractParams {
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>
 //   resetAdjustments: Stream<any>
 //   $container: NodeComposeFn<$Node>
 // }
-
-
 
 // const BOX_SPACING = 24
 // const LIMIT_LEVERAGE_NORMAL = formatFixed(4, GMX.MAX_LEVERAGE_FACTOR)
@@ -138,13 +131,12 @@
 
 //   const { walletClientQuery, providerClientQuery } = config
 
-
 //   const {
 //     collateralToken, collateralDeltaAmount, focusMode, indexToken,
 //     market, primaryToken, isIncrease, isLong, leverage, sizeDeltaUsd, slippage, isUsdCollateralToken
 //   } = config.tradeConfig
 //   const {
-//     marketAvailableLiquidityUsd, averagePrice, 
+//     marketAvailableLiquidityUsd, averagePrice,
 //     collateralDescription, collateralPrice, adjustmentFeeUsd, executionFee,
 
 //     indexDescription, marketPrice,
@@ -153,7 +145,6 @@
 //     primarySpendAmount, isTradingEnabled, liquidationPrice, marginFeeUsd, tradeRoute,
 //     mirrorPosition, walletBalance, netPositionValueUsd, priceImpactUsd, routeTypeKey
 //   } = config.tradeState
-
 
 //   const clickMaxPrimary = snapshot(params => {
 //     const marginGasFee = params.primaryToken === ADDRESS_ZERO ? params.executionFee * 4n : 0n
@@ -172,19 +163,17 @@
 //     return deltaUsd
 //   }, combineState({ focusMode, isIncrease, primaryToken, walletBalance, primaryPrice, mirrorPosition, marketPrice, executionFee }), clickPrimary)
 
-
 //   const collateralEffects = mergeArray([
 //     inputSizeDeltaUsd,
 //     switchLatest(map(focus => {
 //       if (focus === ITradeFocusMode.collateral) return empty()
-      
+
 //       return mergeArray([
 //         config.tradeConfig.leverage,
 //         config.tradeState.primaryPrice
 //       ])
 //     }, config.tradeConfig.focusMode))
 //   ])
-
 
 //   const autoChangeCollateralAmount = multicast(mergeArray([
 //     constant(0n, config.resetAdjustments),
@@ -198,14 +187,14 @@
 //       if (params.mirrorPosition) {
 //         const positionMultiplier = div(totalSize, params.netPositionValueUsd)
 //         const deltaMultiplier = delta(positionMultiplier, params.leverage)  // params.isIncrease ? positionMultiplier - nextMultiplier : nextMultiplier - positionMultiplier
-        
+
 //         if (deltaMultiplier < 500n) {
 //           if (!params.isIncrease && params.leverage <= GMX.MIN_LEVERAGE_FACTOR) {
 //             return -params.mirrorPosition.sizeInUsd
 //           }
 
 //           return 0n
-//         } 
+//         }
 //       }
 
 //       const nextCollateralDeltaUsd = nextCollateralUsd - params.netPositionValueUsd
@@ -235,7 +224,7 @@
 //       const positionSizeUsd = params.mirrorPosition ? params.mirrorPosition.sizeInUsd : 0n
 //       const collateralDeltaUsd = params.collateralDeltaAmount * params.primaryPrice
 //       const totalCollateral = collateralDeltaUsd + params.netPositionValueUsd + params.adjustmentFeeUsd
-     
+
 //       if (params.mirrorPosition) {
 //         const positionMultiplier = div(params.mirrorPosition.sizeInUsd, totalCollateral)
 //         const deltaMultiplier = delta(positionMultiplier, params.leverage) // params.isIncrease ? params.leverage - positionMultiplier : positionMultiplier - params.leverage
@@ -254,9 +243,6 @@
 //       return nextSize - positionSizeUsd
 //     }, combineState({ leverage, mirrorPosition, adjustmentFeeUsd, isIncrease, netPositionValueUsd, primaryPrice, collateralDeltaAmount }), sizeEffects)
 //   ]))
-
-
-
 
 //   const slideLeverageFormat = map(leverage => {
 //     if (leverage === null) {
@@ -287,7 +273,6 @@
 //         })
 //       )(
 
-        
 //         $ButtonToggle({
 //           $container: $row(spacing.small),
 //           selected: config.tradeConfig.isLong,
@@ -305,8 +290,6 @@
 //           select: switchIsLongTether()
 //         }),
 
-
-
 //         // $ButtonToggle({
 //         //   $container: $row(spacing.small),
 //         //   selected: config.tradeConfig.isIncrease,
@@ -314,7 +297,7 @@
 //         //     true,
 //         //     false,
 //         //   ],
-//         //   $$option: map(option => { 
+//         //   $$option: map(option => {
 //         //     return $text(style({}))(option ? 'Increase' : 'Decrease')
 //         //   })
 //         // })({ select: switchisIncreaseTether() }),
@@ -467,7 +450,6 @@
 //                   }, walletClientQuery)
 //                   const tokenDesc = option === ADDRESS_ZERO ? getNativeTokenDescription(config.chain) : getTokenDescription(option)
 
-
 //                   return $row(style({ placeContent: 'space-between', flex: 1 }))(
 //                     $tokenLabelFromSummary(tokenDesc),
 //                     $column(style({ alignItems: 'flex-end' }))(
@@ -491,7 +473,6 @@
 //             })({
 //               select: changePrimaryTokenTether()
 //             }),
-
 
 //             $ButtonSecondary({
 //               $content: $text('Max'),
@@ -562,13 +543,12 @@
 //               ),
 //             )(),
 
-
 //           ),
 //         ),
 
 //         $column(style({ height: `2px`, placeContent: 'center' }))(
 //           $Slider({
-//             $thumb: $defaultSliderThumb( 
+//             $thumb: $defaultSliderThumb(
 //               styleBehavior(
 //                 map(isInc => {
 //                   return { borderColor: isInc ? pallete.foreground : pallete.indeterminate, pointerEvents: 'all' }
@@ -605,7 +585,6 @@
 //                     return formatDiv(ratio, GMX.MAX_LEVERAGE_FACTOR)
 //                   }
 
-                  
 //                   const collateralDeltaUsd = params.collateralDeltaAmount * params.primaryPrice
 //                   const totalCollateral = params.netPositionValueUsd + collateralDeltaUsd
 
@@ -661,7 +640,6 @@
 //             change: slideLeverageTether()
 //           }),
 //         ),
-
 
 //         $column(spacing.small, style({ padding: `${BOX_SPACING}px`, borderRadius: `0 0 ${BOX_SPACING}px ${BOX_SPACING}px`, border: `1px solid ${colorAlpha(pallete.foreground, .20)}` }),
 //           styleInline(now({ borderTopStyle: 'none' })),
@@ -778,7 +756,6 @@
 //                 const token = params.isUsdCollateralToken ? params.market.shortToken : params.market.longToken
 //                 const tokenDesc = getTokenDescription(token)
 
-
 //                 return $row(spacing.defaultTiny, style({ alignItems: 'center' }))(
 //                   $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '14px', viewBox: '0 0 32 32' }),
 //                   $text(tokenDesc.symbol)
@@ -801,7 +778,6 @@
 //                 //       // const liquidity = tradeReader.getAvailableLiquidityUsd(now(token), now(option))
 //                 //       // const poolInfo = tradeReader.getTokenPoolInfo(now(token))
 
-
 //                 //       return $row(style({ placeContent: 'space-between', flex: 1 }))(
 //                 //         $tokenLabelFromSummary(desc),
 
@@ -823,9 +799,9 @@
 //                 //   select: changeIsUsdCollateralTokenTether()
 //                 // })
 //               }, combineState({ market, isUsdCollateralToken })),
-              
+
 //             ),
-            
+
 //             $hintAdjustment({
 //               label: screenUtils.isDesktopScreen ? `Size` : undefined,
 //               change: map((params) => {
@@ -875,15 +851,10 @@
 //   ]
 // })
 
-
 // const formatLeverageNumber = new Intl.NumberFormat("en-US", {
 //   minimumFractionDigits: 1,
 //   maximumFractionDigits: 1
 // })
 
-
-
 // const $field = $element('input')(attr({ placeholder: '0.0', type: 'text' }), style({ textAlign: 'right', width: '100%', lineHeight: '34px', margin: '14px 0', minWidth: '0', transition: 'background 500ms ease-in', flex: 1, fontSize: '1.85rem', background: 'transparent', border: 'none', outline: 'none', color: pallete.message }))
-
-
 

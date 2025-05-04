@@ -22,9 +22,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          subgraph: [
-            'ponder',
-          ],
+          subgraph: ['ponder'],
           middleware: [
             '@puppet/middleware/const',
             '@puppet/middleware/core',
@@ -48,11 +46,7 @@ export default defineConfig({
             'abitype',
             'viem',
           ],
-          wallet: [
-            "@reown/appkit",
-            "@reown/appkit-adapter-wagmi",
-            "@wagmi/core"
-          ],
+          wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
           charts: ['lightweight-charts'],
         },
       },
@@ -68,7 +62,7 @@ export default defineConfig({
       strategies: 'injectManifest',
       injectManifest: {
         maximumFileSizeToCacheInBytes: 3000000,
-        globPatterns: ['**/*.{js,html,woff2}']
+        globPatterns: ['**/*.{js,html,woff2}'],
       },
       injectRegister: 'auto',
       srcDir: 'src/sw',
@@ -83,25 +77,24 @@ export default defineConfig({
         description: SITE_CONFIG.__APP_DESC_LONG__,
         theme_color: SITE_CONFIG.__THEME_BACKGROUND__,
         background_color: SITE_CONFIG.__THEME_BACKGROUND__,
-        lang: "en",
+        lang: 'en',
         // start_url: '/',
-        display: "standalone",
-        orientation: "portrait-primary",
-        categories: ["Copy Trading", "Decentralized Perpetual Exchange", "DeFi"],
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        categories: ['Copy Trading', 'Decentralized Perpetual Exchange', 'DeFi'],
         screenshots: [
-          { src: "assets/screenshot/narrow1.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
-          { src: "assets/screenshot/narrow2.png", type: "image/png", sizes: "828x1792", form_factor: "narrow" },
+          { src: 'assets/screenshot/narrow1.png', type: 'image/png', sizes: '828x1792', form_factor: 'narrow' },
+          { src: 'assets/screenshot/narrow2.png', type: 'image/png', sizes: '828x1792', form_factor: 'narrow' },
 
-          { src: "assets/screenshot/wide1.png", type: "image/png", sizes: "3260x1692", form_factor: "wide" },
-          { src: "assets/screenshot/wide2.png", type: "image/png", sizes: "3260x1692", form_factor: "wide" }
-        ]
+          { src: 'assets/screenshot/wide1.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' },
+          { src: 'assets/screenshot/wide2.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' },
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
-        
       },
       mode: 'development',
       devOptions: {
@@ -114,7 +107,7 @@ export default defineConfig({
     replace({
       preventAssignment: true,
       include: 'index.html',
-      ...SITE_CONFIG
-    })
+      ...SITE_CONFIG,
+    }),
   ],
 })

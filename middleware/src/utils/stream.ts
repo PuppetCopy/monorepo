@@ -1,4 +1,3 @@
-import { O, type Op, combineArray, isStream } from 'aelea/core'
 import {
   at,
   awaitPromises,
@@ -20,6 +19,7 @@ import { disposeNone } from '@most/disposable'
 import { curry2 } from '@most/prelude'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
+import { type IOps, O, combineArray, isStream } from 'aelea/core'
 import { countdownFn, unixTimestampNow } from './utils.js'
 
 export type StateParams<T> = {

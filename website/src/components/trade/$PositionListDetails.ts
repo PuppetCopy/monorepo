@@ -1,5 +1,5 @@
 // import { Behavior, combineState } from "aelea/core"
-// import { $Node, $text, NodeComposeFn, component, style, styleBehavior } from "aelea/dom"
+// import { $Node, $text, NodeComposeFn, component, style, styleBehavior } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { constant, map, mergeArray } from "@most/core"
@@ -14,9 +14,6 @@
 // import { $ButtonPrimary, $ButtonSecondary, $defaultMiniButtonSecondary } from "../form/$Button.js"
 // import { IRequestTrade } from "./$PositionAdjustmentDetails"
 // import { ITradeParams } from "./$PositionEditor.js"
-
-
-
 
 // interface IPositionListDetails {
 //   chain: viem.Chain
@@ -37,7 +34,6 @@
 
 //   const { chain, positionListQuery, tradeState, $container, requestTrade, mirrorPosition } = config
 
-
 //   return [
 //     config.$container(
 //       $IntermediatePromise({
@@ -45,15 +41,12 @@
 //           return $column(spacing.default, style({ flex: 1 }))(
 //             ...posList.map(mp => {
 
-
 //               // const cumulativeFee = vault.read('cumulativeFundingRates', pos.collateralToken)
 //               // const pnl = map(params => {
 //               //   const delta = getPnL(pos.isLong, pos.averagePrice, params.positionMarkPrice.min, pos.size)
 
 //               //   return pos.realisedPnl + delta - pos.cumulativeFee
 //               // }, combineState({ positionMarkPrice, cumulativeFee }))
-
-
 
 //               return $column(spacing.default)(
 //                 style({ marginRight: screenUtils.isDesktopScreen ? '-16px' : '' })($seperator2),
@@ -81,7 +74,7 @@
 //                     )
 //                   })
 //                 ),
- 
+
 //                 // isActive
 //                 //   ? $column(spacing.default, styleInline(map(mode => ({ display: mode ? 'flex' : 'none' }), inTradeMode)))(
 //                 //     $seperator2,
@@ -116,6 +109,4 @@
 //     }
 //   ]
 // })
-
-
 

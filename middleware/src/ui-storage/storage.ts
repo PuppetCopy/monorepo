@@ -12,13 +12,14 @@ export interface IDbStoreParams {
   dbQuery: Promise<IDBDatabase>
 }
 
-export interface IStoreConfig<TState, TType extends { [P in keyof TState]: TState[P]}> {
+export interface IStoreConfig<TState, TType extends { [P in keyof TState]: TState[P] }> {
   initialState: TType
   options?: IDBObjectStoreParameters
 }
 
-export interface IStoreDefinition<T, Type extends { [P in keyof T]: T[P]} = any> extends IDbStoreParams, IStoreConfig<T, Type> {}
-
+export interface IStoreDefinition<T, Type extends { [P in keyof T]: T[P] } = any>
+  extends IDbStoreParams,
+    IStoreConfig<T, Type> {}
 
 export async function set<TSchema, TKey extends GetKey<TSchema>, TData extends TSchema[TKey]>(
   params: IStoreDefinition<TSchema>,
@@ -43,22 +44,16 @@ export async function get<TSchema, TKey extends GetKey<TSchema>, TData extends T
   return value === undefined ? params.initialState[key] : value
 }
 
-
-export async function add<TResult>(
-  params: IDbStoreParams,
-  list: TResult[]
-): Promise<TResult[]> {
+export async function add<TResult>(params: IDbStoreParams, list: TResult[]): Promise<TResult[]> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readwrite').objectStore(params.name)
-  const requestList = list.map(item => request(store.add(item)))
+  const requestList = list.map((item) => request(store.add(item)))
 
   await Promise.all(requestList)
   return list
 }
 
-export async function clear<TResult>(
-  params: IDbStoreParams,
-): Promise<TResult> {
+export async function clear<TResult>(params: IDbStoreParams): Promise<TResult> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readwrite').objectStore(params.name)
   return request(store.clear())
@@ -67,7 +62,7 @@ export async function clear<TResult>(
 export async function cursor(
   params: IDbStoreParams,
   query?: IDBValidKey | IDBKeyRange | null,
-  direction?: IDBCursorDirection
+  direction?: IDBCursorDirection,
 ): Promise<IDBCursorWithValue | null> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readwrite').objectStore(params.name)
@@ -77,7 +72,7 @@ export async function cursor(
 export function openDatabase<TName extends string>(
   name: TName,
   version: number,
-  storeParamList: IDbParams[]
+  storeParamList: IDbParams[],
 ): Promise<IDBDatabase> {
   const openDbRequest = indexedDB.open(name, version)
 
@@ -88,7 +83,7 @@ export function openDatabase<TName extends string>(
         if (db.objectStoreNames.contains(params.name)) {
           openDbRequest.result.deleteObjectStore(params.name)
         }
-          
+
         openDbRequest.result.createObjectStore(params.name, params)
       }
     } catch (e) {
@@ -99,13 +94,11 @@ export function openDatabase<TName extends string>(
   return request(openDbRequest)
 }
 
-
 function request<TResult>(req: IDBRequest<any>): Promise<TResult> {
   return new Promise<TResult>((resolve, reject) => {
-    req.onerror = err => reject(req.error || new Error(`${err.type}: Unknown error`))
+    req.onerror = (err) => reject(req.error || new Error(`${err.type}: Unknown error`))
     req.onsuccess = () => {
       resolve(req.result)
     }
   })
 }
-

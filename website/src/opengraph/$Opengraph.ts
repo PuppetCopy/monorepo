@@ -1,4 +1,4 @@
-// import { component, eventElementTarget, style } from "aelea/dom"
+// import { component, eventElementTarget, style } from "aelea/core"
 // import * as router from 'aelea/router'
 // import { $column, layoutSheet } from "aelea/ui-components"
 // import { map, now } from "@most/core"
@@ -9,10 +9,9 @@
 // import { Stream } from "@most/types"
 // import { subgraphClient } from "../common/graphClient"
 
-
 // function dispatchPushStateEvent(url: string, title: string = '') {
 //   history.pushState({}, title, url)
-  
+
 //   // Create a new event
 //   const pushStateEvent = new CustomEvent('ogRouteChange', {
 //     detail: {
@@ -62,5 +61,4 @@
 //     }
 //   ]
 // })
-
 

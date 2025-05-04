@@ -1,5 +1,5 @@
 // import { Behavior, replayLatest } from "aelea/core"
-// import { $node, $text, component, nodeEvent, style } from "aelea/dom"
+// import { $node, $text, component, nodeEvent, style } from "aelea/core"
 // import * as router from "aelea/router"
 // import { $column, $icon, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
@@ -35,7 +35,7 @@
 //   [toggleHistoryPanel, toggleHistoryPanelTether]: Behavior<any, boolean>,
 
 // ) => {
-  
+
 //   const { puppetTradeRoute, routeTypeList, route, walletClientQuery, activityTimeframe, priceTickMap } = config
 //   const settledPositionList = puppetTradeRoute.settledList.map(x => x.position)
 //   const openPositionList = puppetTradeRoute.openList.map(x => x.position)
@@ -59,8 +59,6 @@
 //   const dataSource = map(req => {
 //     return pagingQuery(req, allPositionList)
 //   }, paging)
-
-
 
 //   return [
 
@@ -86,7 +84,7 @@
 //           open: map((expiry) => {
 //             return  $RouteSubscriptionEditor({ walletClientQuery, expiry, ...config.puppetTradeRoute })({
 //               modifySubscriber: modifySubscriberTether()
-//             }) 
+//             })
 //           }, popRouteSubscriptionEditor),
 //           dismiss: modifySubscriber,
 //           $target: switchMap(expiry => {
@@ -95,7 +93,7 @@
 //                 $puppets(summary.puppets),
 //                 $icon({ $content: $puppetLogo, width: '26px', svgOps: style({ backgroundColor: pallete.background, borderRadius: '50%', padding: '4px', border: `1px solid ${pallete.message}`, marginRight: '-18px' }), viewBox: '0 0 32 32' }),
 //               ),
-//               $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '6px 2px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' })) 
+//               $container: $defaultMiniButtonSecondary(style({ borderRadius: '16px', padding: '6px 2px', borderColor: Number(expiry) > unixTimestampNow() ? pallete.primary : '' }))
 //             })({
 //               click: popRouteSubscriptionEditorTether(constant(expiry))
 //             })
@@ -159,13 +157,10 @@
 //         })
 //       }, isPanelToggle),
 //     ),
-    
+
 //     {
 //       modifySubscriber, changeRoute
 //     }
 //   ]
 // })
-
-
-
 

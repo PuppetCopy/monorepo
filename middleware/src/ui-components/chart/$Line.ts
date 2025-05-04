@@ -1,10 +1,7 @@
-// import { Behavior, component } from "aelea/dom"
+// import { Behavior, component } from "aelea/core"
 // import { pallete } from 'aelea/ui-components-theme'
 // import { LineStyle, MouseEventParams, SeriesMarker, SeriesType } from 'lightweight-charts'
 // import { $Chart, IChart } from './$Chart'
-
-
-
 
 // export interface ILine extends Omit<IChart<'Line'>, 'initializeSeries'> {
 // }
@@ -60,7 +57,7 @@
 
 //         ...config.chartConfig
 //       },
-//       // historicalData: 
+//       // historicalData:
 //       initializeSeries: (api) => {
 //         const series = api.addAreaSeries({
 //           lineStyle: LineStyle.Solid,
@@ -71,14 +68,11 @@
 
 //           // crosshairMarkerVisible: false,
 //           lineColor: pallete.primary,
-//           topColor: pallete.background,	
+//           topColor: pallete.background,
 //           bottomColor: 'transparent',
 //         })
 
 //         const priceSacle = api.priceScale()
-
-
-
 
 //         // series.createPriceLine({
 //         //   price: 57824,
@@ -95,11 +89,9 @@
 //       crosshairMove: crosshairMoveTether()
 //     }),
 
-
 //     {
 //       crosshairMove
 //     }
 //   ]
 // })
-
 

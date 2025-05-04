@@ -1,5 +1,5 @@
 import { getAddress } from 'viem'
-import { getMappedValue } from '../../utils/index.js';
+import { getMappedValue } from '../../utils/index.js'
 
 export type GqlType<T extends string> = { __typename: T }
 
@@ -17,27 +17,29 @@ type PackedAbiType =
   | 'bool'
   | 'bool[]'
 
-type ISchemaField<T> = T extends GqlType<any>
-  ? ISchema<T>
-  : T extends any[]
-  ? any
-  : PackedAbiType;
+type ISchemaField<T> = T extends GqlType<any> ? ISchema<T> : T extends any[] ? any : PackedAbiType
 
 export type ISchema<T extends GqlType<any>> = {
-  [P in keyof T as P extends '__typename' ? never : P]?: ISchemaField<T[P]>;
-} & { __typename: T['__typename']; }
+  [P in keyof T as P extends '__typename' ? never : P]?: ISchemaField<T[P]>
+} & { __typename: T['__typename'] }
 
 export type ISchemaQuery<TSchema, TQuery> = {
   [P in keyof TQuery]: TQuery[P] extends any[]
-  ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : TQuery[P] extends object
-  ? P extends keyof TSchema ? ISchemaQuery<TSchema[P], TQuery[P]> : never : P extends keyof TSchema
-  ? TSchema[P] : never
+    ? P extends keyof TSchema
+      ? ISchemaQuery<TSchema[P], TQuery[P]>
+      : never
+    : TQuery[P] extends object
+      ? P extends keyof TSchema
+        ? ISchemaQuery<TSchema[P], TQuery[P]>
+        : never
+      : P extends keyof TSchema
+        ? TSchema[P]
+        : never
 }
 
 export type PrettifyT<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
+  [K in keyof T]: T[K]
+} & {}
 
 export type IQueryFilterCoercion<T> = {
   _and?: IQueryFilter<T> | IQueryFilter<T>[]
@@ -69,12 +71,7 @@ export type IQueryOrderBy<T> = {
   [K in keyof T]?: 'asc' | 'asc_nulls_first' | 'asc_nulls_last' | 'desc' | 'desc_nulls_first' | 'desc_nulls_last'
 }
 
-
-export interface IQuerySubgraph<
-  Type extends GqlType<any>,
-  TQueryFilter extends IQueryFilter<Type>,
-  TQuery
-> {
+export interface IQuerySubgraph<Type extends GqlType<any>, TQueryFilter extends IQueryFilter<Type>, TQuery> {
   schema: ISchema<Type>
   document?: TQuery | undefined
   filter?: TQueryFilter
@@ -84,7 +81,6 @@ export interface IQuerySubgraph<
   skip?: number
   sortBy?: IQueryOrderBy<Type>
 }
-
 
 // export const querySubgraph = <
 //   Type extends GqlType<any>,
@@ -145,7 +141,6 @@ export function parseQueryResults(json: any, schema: any) {
     } else {
       entity[key] = value
     }
-
   })
   return entity
 }
@@ -155,16 +150,14 @@ function parseFilterObject(query: any) {
 
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
-
     if (value instanceof Array) {
       if (value.length === 0) return
-      fields.push(`${key}: [${value.map(arrVal => `{${parseFilterObject(arrVal)}}`).join(' ')}]`)
+      fields.push(`${key}: [${value.map((arrVal) => `{${parseFilterObject(arrVal)}}`).join(' ')}]`)
     } else if (value instanceof Object) {
       fields.push(`${key}: { ${parseFilterObject(value)} }`)
     } else if (value !== undefined) {
       fields.push(`${key}: ${value}`)
     }
-
   })
   return fields.join(' ')
 }
@@ -172,18 +165,14 @@ function parseFilterObject(query: any) {
 function parseQueryObject(query: any) {
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
-
     if (value instanceof Object) {
       fields.push(`${key} { ${parseQueryObject(value)} }`)
     } else {
       fields.push(key)
     }
-
   })
   return fields.join(' ')
 }
-
-
 
 function fillQuery(obj: any) {
   return Object.keys(obj).reduce((acc, key) => {
@@ -193,7 +182,6 @@ function fillQuery(obj: any) {
   }, {} as any)
 }
 
-
 export const abiParamParseMap = {
   bigint: BigInt,
   'bigint[]': (x: string[]) => x.map(BigInt),
@@ -202,7 +190,7 @@ export const abiParamParseMap = {
   number: Number,
   'number[]': (x: number[]) => x.map(Number),
   address: getAddress,
-  'address[]': (arrx: string[]) => arrx.map(x => getAddress(x)),
+  'address[]': (arrx: string[]) => arrx.map((x) => getAddress(x)),
   bool: Boolean,
   'bool[]': (x: boolean[]) => x.map(Boolean),
 } as const

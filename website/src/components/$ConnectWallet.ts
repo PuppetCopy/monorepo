@@ -1,25 +1,20 @@
-import { Behavior, Op } from "aelea/core"
-import { $Node, $text, NodeComposeFn, component, style } from "aelea/dom"
-import { $row, layoutSheet } from "aelea/ui-components"
-import { awaitPromises, join, map, now } from "@most/core"
-import { $caretDown, $icon } from "@puppet/middleware/ui-components"
-import { switchMap } from "@puppet/middleware/utils"
-import * as wallet from "@puppet/middleware/wallet"
-import { EIP6963ProviderDetail } from "mipd"
+import { awaitPromises, join, map, now } from '@most/core'
+import { $caretDown, $icon } from '@puppet/middleware/ui-components'
+import { switchMap } from '@puppet/middleware/utils'
+import * as wallet from '@puppet/middleware/wallet'
+import type { Behavior, Op } from 'aelea/core'
+import { $text, type I$Node, type NodeComposeFn, component, style } from 'aelea/core'
+import { $row, layoutSheet } from 'aelea/ui-components'
+import type { EIP6963ProviderDetail } from 'mipd'
 import { http, type Chain, type HttpTransport } from 'viem'
-import { IWalletPageParams } from "../pages/type.js"
-import { $ButtonSecondary } from "./form/$Button.js"
-import { IButtonCore } from "./form/$ButtonCore.js"
+import type { IWalletPageParams } from '../pages/type.js'
+import { $ButtonSecondary } from './form/$Button.js'
+import type { IButtonCore } from './form/$ButtonCore.js'
 
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
-import { accountChange, walletConnectAppkit } from "../walletConnect.js"
-import { GetAccountReturnType } from "@wagmi/core"
-
-
-
-
-
+import type { GetAccountReturnType } from '@wagmi/core'
+import { accountChange, walletConnectAppkit } from '../walletConnect.js'
 
 // -- Helpers ------------------------------------------------------------------
 const RPC_URL = CoreHelperUtil.getBlockchainApiUrl()
@@ -41,10 +36,6 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
   }
 }
 
-
-
-
-
 // const walletConnectProviderQuery: Stream<EIP6963ProviderDetail> = fromPromise(provider.then(async walletConnectProvider => {
 //   if (walletConnectProvider.connected) {
 //     walletConnectProvider.on('disconnect', async () => {
@@ -62,109 +53,99 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
 //   return { info, provider }
 // }))
 
-
-
-
-
-
 export interface IConnectWalletPopover extends IWalletPageParams {
   $$display: Op<GetAccountReturnType, $Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: NodeComposeFn<$Node>
 }
 
+export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
+  component(([changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>) => {
+    const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
 
-export const $IntermediateConnectButton = (config: IConnectWalletPopover) => component((
-  [changeWallet, changeWalletTether]: Behavior<EIP6963ProviderDetail>,
-) => {
+    return [
+      $container(
+        switchMap((wallet) => {
+          // no wallet connected, show connection flow
+          if (!wallet) {
+            return $ConnectChoiceList()({
+              changeWallet: changeWalletTether(),
+            })
+          }
 
-  const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
+          return join(config.$$display(now(wallet)))
+        }, accountChange),
+      ),
 
+      {
+        changeWallet,
+      },
+    ]
+  })
 
-  return [
-    $container(
-      switchMap(wallet => {
-        // no wallet connected, show connection flow
-        if (!wallet) {
-          return $ConnectChoiceList()({
-            changeWallet: changeWalletTether()
-          })
-        }
+export const $ConnectChoiceList = () =>
+  component(([changeWallet, changeWalletTether]: Behavior<any>) => {
+    return [
+      $ButtonSecondary({
+        $content: $row(spacing.default, style({ alignItems: 'center' }))(
+          $text('Connect Wallet'),
+          $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
+        ),
+      })({
+        click: changeWalletTether(
+          map(async (xx) => {
+            walletConnectAppkit.open({})
 
-        return join(config.$$display(now(wallet)))
-      }, accountChange)
-    ),
+            return null
+          }),
+        ),
+      }),
+      // switchMap(announcedProviderList => {
+      //   return $Dropdown({
+      //     $selection: $ButtonSecondary({
+      //       $content: $row(spacing.default, style({ alignItems: 'center' }))(
+      //         $text('Connect Wallet'),
+      //         $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
+      //       )
+      //     })({}),
+      //     selector: {
+      //       value: now(null) as Stream<EIP6963ProviderDetail | null>,
+      //       list: announcedProviderList,
+      //       $$option: map(providerDetail => {
+      //         if (providerDetail === null) return empty()
 
-    {
-      changeWallet
-    }
-  ]
-})
+      //         return $row(spacing.small, style({ alignItems: 'center' }))(
+      //           ignoreAll(changeWallet),
+      //           providerDetail.info.icon ?
+      //             $element('img')(
+      //               style({ width: '24px', height: '24px' }),
+      //               attr({ src: providerDetail.info.icon })
+      //             )()
+      //             : empty(),
+      //           $text(providerDetail.info.name),
+      //         )
+      //       })
+      //     },
+      //   })({
+      //     select: changeWalletTether(
+      //       map(async providerDetail => {
+      //         const provider = providerDetail.provider
+      //         if (providerDetail.info.rdns === 'com.WalletConnect') {
+      //           await providerDetail.provider.connect()
+      //         } else {
+      //           await provider.request({ method: 'eth_requestAccounts' })
+      //         }
 
+      //         return providerDetail
+      //       }),
+      //       awaitPromises,
+      //       multicast
+      //     )
+      //   })
+      // }, announcedProviderList ),
 
-export const $ConnectChoiceList = () => component((
-  [changeWallet, changeWalletTether]: Behavior<any>,
-) => {
-
-  return [
-    $ButtonSecondary({
-      $content: $row(spacing.default, style({ alignItems: 'center' }))(
-        $text('Connect Wallet'),
-        $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
-      )
-    })({
-      click: changeWalletTether(map(async xx => {
-        walletConnectAppkit.open({})
-
-        return null
-      }))
-    }),
-    // switchMap(announcedProviderList => {
-    //   return $Dropdown({
-    //     $selection: $ButtonSecondary({
-    //       $content: $row(spacing.default, style({ alignItems: 'center' }))(
-    //         $text('Connect Wallet'),
-    //         $icon({ $content: $caretDown, width: '14px', viewBox: '0 0 32 32' }),
-    //       )
-    //     })({}),
-    //     selector: {
-    //       value: now(null) as Stream<EIP6963ProviderDetail | null>,
-    //       list: announcedProviderList,
-    //       $$option: map(providerDetail => {
-    //         if (providerDetail === null) return empty()
-
-    //         return $row(spacing.small, style({ alignItems: 'center' }))(
-    //           ignoreAll(changeWallet),
-    //           providerDetail.info.icon ?
-    //             $element('img')(
-    //               style({ width: '24px', height: '24px' }),
-    //               attr({ src: providerDetail.info.icon })
-    //             )()
-    //             : empty(),
-    //           $text(providerDetail.info.name),
-    //         )
-    //       })
-    //     },
-    //   })({
-    //     select: changeWalletTether(
-    //       map(async providerDetail => {
-    //         const provider = providerDetail.provider
-    //         if (providerDetail.info.rdns === 'com.WalletConnect') {
-    //           await providerDetail.provider.connect()
-    //         } else {
-    //           await provider.request({ method: 'eth_requestAccounts' })
-    //         }
-
-    //         return providerDetail
-    //       }),
-    //       awaitPromises,
-    //       multicast
-    //     )
-    //   })
-    // }, announcedProviderList ),
-
-    {
-      changeWallet
-    }
-  ]
-})
+      {
+        changeWallet,
+      },
+    ]
+  })

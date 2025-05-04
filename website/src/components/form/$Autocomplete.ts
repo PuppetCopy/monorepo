@@ -1,5 +1,5 @@
 // import { Behavior, combineState, isEmpty, O, Op } from "aelea/core"
-// import { $element, $Node, $text, attr, component, eventElementTarget, IBranch, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from "aelea/dom"
+// import { $element, $Node, $text, attr, component, eventElementTarget, IBranch, INode, NodeComposeFn, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from "aelea/core"
 // import { $column, $icon, $row, Input, layoutSheet, observer } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { constant, empty, filter, map, merge, mergeArray, multicast, never, now, scan, skip, skipRepeats, snapshot, startWith, switchLatest, take, tap, zip } from "@most/core"
@@ -10,24 +10,19 @@
 // import { $caretDown } from "../../common/elements/$icons.js"
 // import { $Select, ISelect } from "./$Select.js"
 
-
 // export interface IMultiselect<T> extends ISelect<T> {
 
 // }
 
-
-
 // export interface IDropdown<T> {
 //   selector: ISelect<T>
 //   dropWidth?: number,
-//   $selection: $Node
+//   $selection: I$Node
 //   $container?: NodeComposeFn<$Node>
 //   $option?: NodeComposeFn<$Node>
 
 //   openMenuOp?: Op<MouseEvent, MouseEvent>
 // }
-
-
 
 // export const $defaultOptionContainer = $row(
 //   spacing.small,
@@ -46,10 +41,6 @@
 //   })
 // )
 
-
-
-
-
 // export const $defaultDropMultiSelectContainer = $row(spacing.defaultTiny, style({ borderBottom: `1px solid ${pallete.message}` }))
 // export const $defaultDropMultiSelectOption = $row(spacing.small,
 //   style({
@@ -60,8 +51,6 @@
 // )
 // export const $defaultChip = $row(style({ backgroundColor: pallete.primary, paddingLeft: '4px', cursor: 'default', alignItems: 'center', borderRadius: '22px' }))
 
-
-
 // export interface IMultiselectDrop<T> extends Input<T[]> {
 //   placeholder?: string
 //   closeOnSelect?: boolean
@@ -69,7 +58,7 @@
 
 //   selector: Omit<IMultiselect<T>, 'value'>
 
-//   $label?: $Node
+//   $label?: I$Node
 
 //   $container?: NodeComposeFn<$Node>
 //   $fieldcontainer?: NodeComposeFn<$Node>
@@ -108,7 +97,6 @@
 //   [clickOptionRemove, clickOptionRemoveTether]: Behavior<INode, T>,
 // ) => {
 
-
 //   const openTrigger = mergeArray([focusField, constant(true, openMenu)])
 //   const closeTrigger = constant(false, mergeArray([
 //     // delay(100, blur),
@@ -116,7 +104,6 @@
 //   ]))
 //   const isOpen = mergeArray([openTrigger, closeTrigger])
 //   const focus = startWith(false, merge(interaction, blur))
-
 
 //   const select = switchLatest(
 //     map(initSeedList => {
@@ -135,7 +122,6 @@
 //   const selectionChange = merge(select, value)
 //   const alert = validation(selectionChange)
 //   const state = combineState({ focus, alert })
-
 
 //   return [
 //     $container(
@@ -276,7 +262,6 @@
 //         }, combineState({ list: streamOf(selector.list), selectionChange }), isOpen)),
 //       ),
 
-
 //       switchLatest(map(msg => {
 //         if (!msg) {
 //           return empty()
@@ -293,20 +278,16 @@
 //   ]
 // })
 
-
 // export const interactionOp = O(
-//   (src: $Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)),
+//   (src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)),
 //   constant(true)
 // )
 
 // export const dismissOp = O(
-//   (src: $Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
+//   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
 //   filter(x => document.activeElement !== x.target,), // focused elements cannot be dismissed
 //   constant(false)
 // )
-
-
-
 
 // // $Dropdown({
 // //   openMenuOp: tap(event => {
@@ -335,7 +316,6 @@
 // //         nodeEvent('blur'),
 // //         snapshot((state, event) => {
 // //           const target = event.target
-
 
 // //           if (target instanceof HTMLElement) {
 // //             const val = Number(target.innerText)

@@ -1,12 +1,11 @@
-
-import { fromCallback, replayLatest } from 'aelea/core'
-import { Stream } from '@most/types'
+import type { Stream } from '@most/types'
 import { createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { AppKitNetwork } from "@reown/appkit/networks"
-import { createConfig, GetAccountReturnType, watchAccount, watchBlockNumber } from '@wagmi/core'
-import { fallback, http, webSocket } from 'viem'
-import { arbitrum } from "viem/chains"
+import type { AppKitNetwork } from '@reown/appkit/networks'
+import { type GetAccountReturnType, createConfig, watchAccount, watchBlockNumber } from '@wagmi/core'
+import { fromCallback, replayLatest } from 'aelea/core'
+import { http, fallback, webSocket } from 'viem'
+import { arbitrum } from 'viem/chains'
 
 const projectId = import.meta.env.VITE_WC_PROJECT_ID as string
 
@@ -37,14 +36,14 @@ export const walletConnectAppkit = createAppKit({
   features: {
     connectMethodsOrder: ['wallet', 'social'],
     collapseWallets: false,
-    analytics: true
+    analytics: true,
   },
   metadata: {
     name: '__APP_NAME__',
     description: '__APP_DESC_SHORT__',
     url: window.location.host,
-    icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg']
-  }
+    icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg'],
+  },
 })
 
 // Subscribe to state changes
@@ -77,13 +76,11 @@ export const walletConnectAppkit = createAppKit({
 //   console.log('providers', state)
 // })
 
-
-
-export const blockChange: Stream<bigint> = fromCallback(cb => {
-  return watchBlockNumber(wagmiConfig, { onBlockNumber: (res) => cb(res), })
+export const blockChange: Stream<bigint> = fromCallback((cb) => {
+  return watchBlockNumber(wagmiConfig, { onBlockNumber: (res) => cb(res) })
 })
 export const accountChange: Stream<GetAccountReturnType> = replayLatest(
-  fromCallback(cb => {
-    return watchAccount(wagmiConfig, { onChange: res => cb(res) })
-  })
+  fromCallback((cb) => {
+    return watchAccount(wagmiConfig, { onChange: (res) => cb(res) })
+  }),
 )

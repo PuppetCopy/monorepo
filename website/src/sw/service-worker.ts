@@ -1,8 +1,8 @@
+import { clientsClaim } from 'workbox-core'
+import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { CacheFirst } from 'workbox-strategies'
-import { ExpirationPlugin } from 'workbox-expiration'
-import { clientsClaim } from 'workbox-core'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -33,7 +33,6 @@ cleanupOutdatedCaches()
 //   immutableApiCacheStrategy, // Use the same strategy
 //   'GET'
 // );
-
 
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')))

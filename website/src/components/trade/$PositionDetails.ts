@@ -1,5 +1,5 @@
 // import { O } from "aelea/core"
-// import { $node, $text, component, style } from "aelea/dom"
+// import { $node, $text, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet, screenUtils } from "aelea/ui-components"
 // import { map, now } from "@most/core"
 // import { Stream } from "@most/types"
@@ -13,8 +13,6 @@
 // import { IWalletPageParams } from "../../pages/type.js"
 // import { IRequestTrade } from "./$PositionAdjustmentDetails"
 
-
-
 // interface IPositionAdjustmentHistory extends IWalletPageParams {
 //   chain: viem.Chain
 //   pricefeed: Stream<IPriceCandle[]>
@@ -23,15 +21,10 @@
 //   mirrorPosition: Stream<IMirrorPosition | null>
 // }
 
-
-
-
-
 // export const $PositionDetails = (config: IPositionAdjustmentHistory) => component((
 // ) => {
 
 //   const { chain, walletClientQuery, pricefeed, tradeConfig, tradeState, mirrorPosition } = config
-
 
 //   return [
 //     switchMap(pos => {
@@ -40,8 +33,8 @@
 //         : now([])
 
 //       return $Table({
-//         $headerContainer: $node(spacing.small, style({ display: 'grid', padding: `12px` })),
-//         $rowContainer: $node(spacing.small, style({ padding: `12px` })),
+//         $headerContainer: I$Node(spacing.small, style({ display: 'grid', padding: `12px` })),
+//         $rowContainer: I$Node(spacing.small, style({ padding: `12px` })),
 //         // headerCellOp: style({ padding: screenUtils.isDesktopScreen ? '15px 15px' : '6px 4px' }),
 //         // cellOp: style({ padding: screenUtils.isDesktopScreen ? '4px 15px' : '6px 4px' }),
 //         dataSource: dataSource,
@@ -106,7 +99,7 @@
 //               //       req.transactionHash, w3p.chain.id,
 //               //       $text(`${isIncrease ? '↑' : '↓'} ${readableFixedUSD30(pos.acceptablePrice)} ${isIncrease ? '<' : '>'}`)
 //               //     ),
-//               //   ) 
+//               //   )
 //               // }, fromPromise(pos.request)),
 //               // )
 
@@ -143,7 +136,7 @@
 //             $head: $text('Size'),
 //             columnOp: O(style({ flex: .7, placeContent: 'flex-end', textAlign: 'right', alignItems: 'center' })),
 //             $bodyCallback: map((req) => {
-            
+
 //               const delta = req.__typename === 'PositionIncrease'
 //                 ? req.sizeDeltaUsd : -req.sizeDeltaUsd
 
@@ -156,11 +149,7 @@
 
 //     {
 
-
-
 //     }
 //   ]
 // })
-
-
 

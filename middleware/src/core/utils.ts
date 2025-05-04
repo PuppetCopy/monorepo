@@ -1,11 +1,22 @@
-import * as viem from "viem"
-import type { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from "./types.js"
-import { getTokenDescription, getMarketIndexToken } from "../gmx/gmxUtils.js"
-import { OrderType, type IPricefeedMap, type IPriceCandle } from "../gmx/types.js"
-import { getMappedValue, unixTimestampNow } from "../utils/utils.js"
-import { factor } from "../utils/mathUtils.js"
+import * as viem from 'viem'
+import { getMarketIndexToken, getTokenDescription } from '../gmx/gmxUtils.js'
+import { type IPriceCandle, type IPricefeedMap, OrderType } from '../gmx/types.js'
+import { factor } from '../utils/mathUtils.js'
+import { getMappedValue, unixTimestampNow } from '../utils/utils.js'
+import type {
+  IPosition,
+  IPositionDecrease,
+  IPositionIncrease,
+  IPositionListSummary,
+  IPuppetPosition,
+  IVested,
+} from './types.js'
 
-export function mapArrayBy<A, B extends string | symbol | number, R>(list: readonly A[], mapKey: (v: A) => B, mapValue: (v: A) => R) {
+export function mapArrayBy<A, B extends string | symbol | number, R>(
+  list: readonly A[],
+  mapKey: (v: A) => B,
+  mapValue: (v: A) => R,
+) {
   const gmap = {} as { [P in B]: R }
 
   for (const item of list) {
@@ -40,7 +51,8 @@ export function accountSettledPositionListSummary(
 
     const size = seed.size + getParticiapntPortion(next, next.maxSizeInUsd, puppet)
     const collateral = seed.collateral + getParticiapntPortion(next, next.maxCollateralInUsd, puppet)
-    const cumulativeLeverage = seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeInUsd, next.maxCollateralInUsd), puppet)
+    const cumulativeLeverage =
+      seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeInUsd, next.maxCollateralInUsd), puppet)
 
     const avgSize = size / idxBn
     const avgCollateral = collateral / idxBn
@@ -51,7 +63,9 @@ export function accountSettledPositionListSummary(
     const winCount = seed.winCount + (next.realisedPnlUsd > 0n ? 1 : 0)
     const lossCount = seed.lossCount + (next.realisedPnlUsd < 0n ? 1 : 0)
 
-    const puppets = isMirrorPosition(next) ? [...seed.puppets, ...next.puppetList.map(p => p.account).filter(x => !seed.puppets.includes(x))] : seed.puppets
+    const puppets = isMirrorPosition(next)
+      ? [...seed.puppets, ...next.puppetList.map((p) => p.account).filter((x) => !seed.puppets.includes(x))]
+      : seed.puppets
 
     return {
       size,
@@ -67,11 +81,8 @@ export function accountSettledPositionListSummary(
     }
   }, seedAccountSummary)
 
-
   return summary
 }
-
-
 
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
   const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
@@ -132,10 +143,13 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       position.collateralInTokens = next.collateralAmount
       position.collateralInUsd = next.collateralAmount * next.collateralTokenPriceMax
 
-      position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
+      position.maxSizeInTokens =
+        next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
       position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
-      position.maxCollateralInTokens = next.collateralAmount > position.maxCollateralInTokens ? next.collateralAmount : position.maxCollateralInTokens
-      position.maxCollateralInUsd = position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
+      position.maxCollateralInTokens =
+        next.collateralAmount > position.maxCollateralInTokens ? next.collateralAmount : position.maxCollateralInTokens
+      position.maxCollateralInUsd =
+        position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
 
       // position.cumulativeSizeToken += next.sizeInTokens
       // position.cumulativeSizeUsd += next.sizeInUsd
@@ -144,7 +158,6 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
       position.increaseList.push(next)
     } else {
-
       // case where indexing ahead of prior position updates
       // if (position.cumulativeCollateralUsd === 0n) {
       //   position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
@@ -170,26 +183,27 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
     }
 
     if (position.maxSizeInTokens > 0n) {
-      position.avgEntryPrice = position.maxSizeInUsd / position.maxSizeInTokens * getTokenDescription(getMarketIndexToken(next.market)).denominator
+      position.avgEntryPrice =
+        (position.maxSizeInUsd / position.maxSizeInTokens) *
+        getTokenDescription(getMarketIndexToken(next.market)).denominator
     }
-
-
   }
 
   positionList.push(...openPositionMap.values())
   return positionList
 }
 
-
 export function isUpdateIncrease(update: IPositionIncrease | IPositionDecrease): update is IPositionIncrease {
   return update.orderType === OrderType.MarketIncrease || update.orderType === OrderType.LimitIncrease
 }
 
 export function isUpdateDecrease(update: IPositionIncrease | IPositionDecrease): update is IPositionDecrease {
-  return update.orderType === OrderType.MarketDecrease
-    || update.orderType === OrderType.LimitDecrease
-    || update.orderType === OrderType.Liquidation
-    || update.orderType === OrderType.StopLossDecrease
+  return (
+    update.orderType === OrderType.MarketDecrease ||
+    update.orderType === OrderType.LimitDecrease ||
+    update.orderType === OrderType.Liquidation ||
+    update.orderType === OrderType.StopLossDecrease
+  )
 }
 
 export function isCloseUpdate(update: IPositionIncrease | IPositionDecrease): boolean {
@@ -200,7 +214,7 @@ export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Ad
   const feed = getMappedValue(priceFeed, token)
 
   if (feed.length === 0) {
-    throw new Error("Price feed not found")
+    throw new Error('Price feed not found')
   }
 
   // get the latest price based on timestamp from unsorted array
@@ -219,11 +233,10 @@ export function isPositionOpen(trade: IPosition): trade is IPosition {
   return trade.settledTimestamp === 0
 }
 
-
 export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Address): bigint {
-  const position = puppetList.find(p => p.account === puppet)
+  const position = puppetList.find((p) => p.account === puppet)
 
-  if (!position) throw new Error("Puppet not found")
+  if (!position) throw new Error('Puppet not found')
 
   return position.collateral
 }
@@ -244,26 +257,24 @@ export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
   return realisedPnl
 }
 
-
 export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
   if (supply === 0n || amount == 0n) return amount
 
   if (share == 0n) {
     return amount
   } else {
-    return amount * share / supply
+    return (amount * share) / supply
   }
 }
-
 
 export function getVestingCursor(vested: IVested): IVested {
   const now = BigInt(unixTimestampNow())
   const timeElapsed = now - vested.lastAccruedTime
-  const accruedDelta = timeElapsed >= vested.remainingDuration
-    ? vested.amount
-    : timeElapsed * vested.amount / vested.remainingDuration
+  const accruedDelta =
+    timeElapsed >= vested.remainingDuration ? vested.amount : (timeElapsed * vested.amount) / vested.remainingDuration
 
-  vested.remainingDuration = timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
+  vested.remainingDuration =
+    timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
   vested.amount -= accruedDelta
   vested.accrued += accruedDelta
 
@@ -272,30 +283,18 @@ export function getVestingCursor(vested: IVested): IVested {
   return vested
 }
 
-
 export function getMatchKey(collateralToken: viem.Address, trader: viem.Address) {
   return viem.keccak256(
-    viem.encodeAbiParameters(
-      viem.parseAbiParameters('address, address'),
-      [collateralToken, trader]
-    )
+    viem.encodeAbiParameters(viem.parseAbiParameters('address, address'), [collateralToken, trader]),
   )
 }
 
-export function getAllocationKey(
-  puppetList: viem.Address[],
-  matchKey: viem.Hex,
-  allocationId: bigint
-) {
+export function getAllocationKey(puppetList: viem.Address[], matchKey: viem.Hex, allocationId: bigint) {
   return viem.keccak256(
-    viem.encodeAbiParameters(
-      viem.parseAbiParameters('address[], bytes32, uint256'),
-      [puppetList, matchKey, allocationId]
-    )
+    viem.encodeAbiParameters(viem.parseAbiParameters('address[], bytes32, uint256'), [
+      puppetList,
+      matchKey,
+      allocationId,
+    ]),
   )
 }
-
-
-
-
-

@@ -7,9 +7,7 @@ export const accessAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -51,9 +49,7 @@ export const addressAbi = [
 export const allocationAccountAbi = [
   {
     type: 'constructor',
-    inputs: [
-      { name: '_store', internalType: 'contract Access', type: 'address' },
-    ],
+    inputs: [{ name: '_store', internalType: 'contract Access', type: 'address' }],
     stateMutability: 'nonpayable',
   },
   {
@@ -97,9 +93,7 @@ export const allocationStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -121,9 +115,7 @@ export const allocationStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTokenBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -141,9 +133,7 @@ export const allocationStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'recordTransferIn',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable',
@@ -182,9 +172,7 @@ export const allocationStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'syncTokenBalance',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -242,9 +230,7 @@ export const bankStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -256,9 +242,7 @@ export const bankStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTokenBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -276,9 +260,7 @@ export const bankStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'recordTransferIn',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable',
@@ -295,9 +277,7 @@ export const bankStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'syncTokenBalance',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -340,9 +320,7 @@ export const bankStoreAbi = [
 // Checkpoints
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const checkpointsAbi = [
-  { type: 'error', inputs: [], name: 'CheckpointUnorderedInsertion' },
-] as const
+export const checkpointsAbi = [{ type: 'error', inputs: [], name: 'CheckpointUnorderedInsertion' }] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreContract
@@ -353,9 +331,7 @@ export const coreContractAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -396,9 +372,7 @@ export const coreContractAbi = [
 export const dictatorshipAbi = [
   {
     type: 'constructor',
-    inputs: [
-      { name: 'initialOwner', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
     stateMutability: 'nonpayable',
   },
   {
@@ -754,9 +728,7 @@ export const erc1967UtilsAbi = [
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
     name: 'ERC1967InvalidImplementation',
   },
   { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
@@ -1544,9 +1516,7 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'Dictatorship__ContractNotInitialized' },
   {
     type: 'error',
-    inputs: [
-      { name: 'accruedReward', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'accruedReward', internalType: 'uint256', type: 'uint256' }],
     name: 'FeeMarketplace__InsufficientUnlockedBalance',
   },
   { type: 'error', inputs: [], name: 'FeeMarketplace__NotAuctionableToken' },
@@ -1564,9 +1534,7 @@ export const errorAbi = [
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'allowanceCap', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'allowanceCap', internalType: 'uint256', type: 'uint256' }],
     name: 'MatchingRule__AllowanceAboveLimit',
   },
   { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
@@ -1597,9 +1565,7 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
   {
     type: 'error',
-    inputs: [
-      { name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' }],
     name: 'MatchingRule__InvalidExpiryDuration',
   },
   { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
@@ -1721,9 +1687,7 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'TransferUtils__EmptyHoldingAddress' },
   {
     type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: 'token', internalType: 'contract IERC20', type: 'address' }],
     name: 'TransferUtils__EmptyTokenTranferGasLimit',
   },
   {
@@ -1828,9 +1792,7 @@ export const feeMarketplaceAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -1875,18 +1837,14 @@ export const feeMarketplaceAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'feeToken', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: 'feeToken', internalType: 'contract IERC20', type: 'address' }],
     name: 'getPendingUnlock',
     outputs: [{ name: 'pending', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'feeToken', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: 'feeToken', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTotalUnlocked',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -1902,9 +1860,7 @@ export const feeMarketplaceAbi = [
     type: 'function',
     inputs: [],
     name: 'protocolToken',
-    outputs: [
-      { name: '', internalType: 'contract PuppetToken', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract PuppetToken', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -1952,16 +1908,12 @@ export const feeMarketplaceAbi = [
     type: 'function',
     inputs: [],
     name: 'tokenRouter',
-    outputs: [
-      { name: '', internalType: 'contract TokenRouter', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract TokenRouter', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'accruedReward', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'accruedReward', internalType: 'uint256', type: 'uint256' }],
     name: 'FeeMarketplace__InsufficientUnlockedBalance',
   },
   { type: 'error', inputs: [], name: 'FeeMarketplace__NotAuctionableToken' },
@@ -2000,9 +1952,7 @@ export const feeMarketplaceStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -2021,9 +1971,7 @@ export const feeMarketplaceStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTokenBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -2043,16 +1991,12 @@ export const feeMarketplaceStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'protocolToken',
-    outputs: [
-      { name: '', internalType: 'contract PuppetToken', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract PuppetToken', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'recordTransferIn',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable',
@@ -2069,9 +2013,7 @@ export const feeMarketplaceStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'syncTokenBalance',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -2489,9 +2431,7 @@ export const gmxExecutionCallbackAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -4342,9 +4282,7 @@ export const iMulticall3Abi = [
     type: 'function',
     inputs: [],
     name: 'getBlockNumber',
-    outputs: [
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' },
-    ],
+    outputs: [{ name: 'blockNumber', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -4465,20 +4403,14 @@ export const iProtocolFeesCollectorAbi = [
     type: 'function',
     inputs: [],
     name: 'getAuthorizer',
-    outputs: [
-      { name: '', internalType: 'contract IAuthorizer', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthorizer', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'tokens', internalType: 'contract IERC20[]', type: 'address[]' },
-    ],
+    inputs: [{ name: 'tokens', internalType: 'contract IERC20[]', type: 'address[]' }],
     name: 'getCollectedFeeAmounts',
-    outputs: [
-      { name: 'feeAmounts', internalType: 'uint256[]', type: 'uint256[]' },
-    ],
+    outputs: [{ name: 'feeAmounts', internalType: 'uint256[]', type: 'uint256[]' }],
     stateMutability: 'view',
   },
   {
@@ -4621,9 +4553,7 @@ export const iTemporarilyPausableAbi = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [
-      { name: 'paused', internalType: 'bool', type: 'bool', indexed: false },
-    ],
+    inputs: [{ name: 'paused', internalType: 'bool', type: 'bool', indexed: false }],
     name: 'PausedStateChanged',
   },
 ] as const
@@ -4732,9 +4662,7 @@ export const iUniswapV3PoolAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
-    ],
+    inputs: [{ name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' }],
     name: 'initialize',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -4787,9 +4715,7 @@ export const iUniswapV3PoolAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'secondsAgos', internalType: 'uint32[]', type: 'uint32[]' },
-    ],
+    inputs: [{ name: 'secondsAgos', internalType: 'uint32[]', type: 'uint32[]' }],
     name: 'observe',
     outputs: [
       { name: 'tickCumulatives', internalType: 'int56[]', type: 'int56[]' },
@@ -5336,9 +5262,7 @@ export const iUniswapV3PoolActionsAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
-    ],
+    inputs: [{ name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' }],
     name: 'initialize',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -5384,9 +5308,7 @@ export const iUniswapV3PoolActionsAbi = [
 export const iUniswapV3PoolDerivedStateAbi = [
   {
     type: 'function',
-    inputs: [
-      { name: 'secondsAgos', internalType: 'uint32[]', type: 'uint32[]' },
-    ],
+    inputs: [{ name: 'secondsAgos', internalType: 'uint32[]', type: 'uint32[]' }],
     name: 'observe',
     outputs: [
       { name: 'tickCumulatives', internalType: 'int56[]', type: 'int56[]' },
@@ -6073,9 +5995,7 @@ export const iVaultAbi = [
     type: 'function',
     inputs: [],
     name: 'getAuthorizer',
-    outputs: [
-      { name: '', internalType: 'contract IAuthorizer', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthorizer', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -6291,9 +6211,7 @@ export const iVaultAbi = [
       },
     ],
     name: 'queryBatchSwap',
-    outputs: [
-      { name: 'assetDeltas', internalType: 'int256[]', type: 'int256[]' },
-    ],
+    outputs: [{ name: 'assetDeltas', internalType: 'int256[]', type: 'int256[]' }],
     stateMutability: 'nonpayable',
   },
   {
@@ -6486,9 +6404,7 @@ export const iVaultAbi = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [
-      { name: 'paused', internalType: 'bool', type: 'bool', indexed: false },
-    ],
+    inputs: [{ name: 'paused', internalType: 'bool', type: 'bool', indexed: false }],
     name: 'PausedStateChanged',
   },
   {
@@ -7128,18 +7044,14 @@ export const matchingRuleAbi = [
     type: 'function',
     inputs: [],
     name: 'allocationStore',
-    outputs: [
-      { name: '', internalType: 'contract AllocationStore', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -7223,9 +7135,7 @@ export const matchingRuleAbi = [
     type: 'function',
     inputs: [],
     name: 'mirrorPosition',
-    outputs: [
-      { name: '', internalType: 'contract MirrorPosition', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -7293,9 +7203,7 @@ export const matchingRuleAbi = [
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'allowanceCap', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'allowanceCap', internalType: 'uint256', type: 'uint256' }],
     name: 'MatchingRule__AllowanceAboveLimit',
   },
   { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
@@ -7326,9 +7234,7 @@ export const matchingRuleAbi = [
   { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
   {
     type: 'error',
-    inputs: [
-      { name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' }],
     name: 'MatchingRule__InvalidExpiryDuration',
   },
   { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
@@ -7405,16 +7311,12 @@ export const mirrorPositionAbi = [
       { name: '_allocationId', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'adjust',
-    outputs: [
-      { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' },
-    ],
+    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
     stateMutability: 'payable',
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'allocationMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -7433,9 +7335,7 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [],
     name: 'allocationStore',
-    outputs: [
-      { name: '', internalType: 'contract AllocationStore', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -7449,9 +7349,7 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -7537,25 +7435,19 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [],
     name: 'feeMarket',
-    outputs: [
-      { name: '', internalType: 'contract FeeMarketplace', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
     name: 'getAllocation',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' },
-    ],
+    inputs: [{ name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' }],
     name: 'getAllocationByKey',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -7616,9 +7508,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
     name: 'getPosition',
     outputs: [
       {
@@ -7693,9 +7583,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
     name: 'liquidate',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -7704,9 +7592,7 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [],
     name: 'matchingRule',
-    outputs: [
-      { name: '', internalType: 'contract MatchingRule', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -7762,9 +7648,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'positionMap',
     outputs: [
       { name: 'size', internalType: 'uint256', type: 'uint256' },
@@ -7871,9 +7755,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: 'token', internalType: 'contract IERC20', type: 'address' }],
     name: 'tokenDustThresholdAmountMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -8452,9 +8334,7 @@ export const mockUniswapV3PoolAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
-    ],
+    inputs: [{ name: '_sqrtPriceX96', internalType: 'uint160', type: 'uint160' }],
     name: 'initialize',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -9140,9 +9020,7 @@ export const mockWeightedPoolVaultAbi = [
     type: 'function',
     inputs: [],
     name: 'getAuthorizer',
-    outputs: [
-      { name: '', internalType: 'contract IAuthorizer', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthorizer', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -9370,9 +9248,7 @@ export const mockWeightedPoolVaultAbi = [
       },
     ],
     name: 'queryBatchSwap',
-    outputs: [
-      { name: 'assetDeltas', internalType: 'int256[]', type: 'int256[]' },
-    ],
+    outputs: [{ name: 'assetDeltas', internalType: 'int256[]', type: 'int256[]' }],
     stateMutability: 'nonpayable',
   },
   {
@@ -9596,9 +9472,7 @@ export const mockWeightedPoolVaultAbi = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [
-      { name: 'paused', internalType: 'bool', type: 'bool', indexed: false },
-    ],
+    inputs: [{ name: 'paused', internalType: 'bool', type: 'bool', indexed: false }],
     name: 'PausedStateChanged',
   },
   {
@@ -9911,9 +9785,7 @@ export const permissionAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -9965,9 +9837,7 @@ export const precisionAbi = [
 // Proxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const proxyAbi = [
-  { type: 'fallback', stateMutability: 'payable' },
-] as const
+export const proxyAbi = [{ type: 'fallback', stateMutability: 'payable' }] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PuppetToken
@@ -10195,9 +10065,7 @@ export const puppetVoteTokenAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -10637,9 +10505,7 @@ export const rewardDistributorAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -10674,9 +10540,7 @@ export const rewardDistributorAbi = [
     type: 'function',
     inputs: [],
     name: 'config',
-    outputs: [
-      { name: 'distributionWindow', internalType: 'uint256', type: 'uint256' },
-    ],
+    outputs: [{ name: 'distributionWindow', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -10739,9 +10603,7 @@ export const rewardDistributorAbi = [
     type: 'function',
     inputs: [],
     name: 'store',
-    outputs: [
-      { name: '', internalType: 'contract RewardStore', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract RewardStore', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -10822,9 +10684,7 @@ export const rewardStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -10836,9 +10696,7 @@ export const rewardStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTokenBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -10856,9 +10714,7 @@ export const rewardStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'recordTransferIn',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable',
@@ -10875,9 +10731,7 @@ export const rewardStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'syncTokenBalance',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -10962,18 +10816,14 @@ export const routerAbi = [
     type: 'function',
     inputs: [],
     name: 'feeMarketplace',
-    outputs: [
-      { name: '', internalType: 'contract FeeMarketplace', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
     name: 'matchingRule',
-    outputs: [
-      { name: '', internalType: 'contract MatchingRule', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11040,9 +10890,7 @@ export const routerProxyAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11098,9 +10946,7 @@ export const routerProxyAbi = [
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-    ],
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
     name: 'ERC1967InvalidImplementation',
   },
   { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
@@ -11216,9 +11062,7 @@ export const tokenRouterAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11240,9 +11084,7 @@ export const tokenRouterAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_trasnferGasLimit', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: '_trasnferGasLimit', internalType: 'uint256', type: 'uint256' }],
     name: 'setTransferGasLimit',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -11506,9 +11348,7 @@ export const votingEscrowAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11543,9 +11383,7 @@ export const votingEscrowAbi = [
     type: 'function',
     inputs: [],
     name: 'config',
-    outputs: [
-      { name: 'baseMultiplier', internalType: 'uint256', type: 'uint256' },
-    ],
+    outputs: [{ name: 'baseMultiplier', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -11629,27 +11467,21 @@ export const votingEscrowAbi = [
     type: 'function',
     inputs: [],
     name: 'store',
-    outputs: [
-      { name: '', internalType: 'contract VotingEscrowStore', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract VotingEscrowStore', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
     name: 'token',
-    outputs: [
-      { name: '', internalType: 'contract PuppetToken', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract PuppetToken', type: 'address' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
     name: 'vToken',
-    outputs: [
-      { name: '', internalType: 'contract PuppetVoteToken', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract PuppetVoteToken', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11711,9 +11543,7 @@ export const votingEscrowStoreAbi = [
     type: 'function',
     inputs: [],
     name: 'authority',
-    outputs: [
-      { name: '', internalType: 'contract IAuthority', type: 'address' },
-    ],
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -11725,9 +11555,7 @@ export const votingEscrowStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'getTokenBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
@@ -11745,9 +11573,7 @@ export const votingEscrowStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'recordTransferIn',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable',
@@ -11764,9 +11590,7 @@ export const votingEscrowStoreAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-    ],
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
     name: 'syncTokenBalance',
     outputs: [],
     stateMutability: 'nonpayable',

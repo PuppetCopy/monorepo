@@ -1,24 +1,17 @@
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import {
-  CandlestickSeries,
-  type ChartOptions, CrosshairMode, type DeepPartial, LineStyle
-} from 'lightweight-charts'
-import { $Chart, type IChartConfig } from "./$Chart.js"
+import { CandlestickSeries, type ChartOptions, CrosshairMode, type DeepPartial, LineStyle } from 'lightweight-charts'
+import { $Chart, type IChartConfig } from './$Chart.js'
 
-
-export interface ICandlesticksChart extends IChartConfig<'Candlestick'> {
-}
-
+export interface ICandlesticksChart extends IChartConfig<'Candlestick'> {}
 
 export const $CandleSticks = (config: ICandlesticksChart) => {
-
   const chartConfig: DeepPartial<ChartOptions> = {
     overlayPriceScales: {
       borderColor: pallete.indeterminate,
       borderVisible: false,
     },
     leftPriceScale: {
-      visible: false
+      visible: false,
     },
     rightPriceScale: {
       borderColor: 'yellow',
@@ -27,7 +20,7 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
       scaleMargins: {
         top: 0.4,
         bottom: 0,
-      }
+      },
     },
     timeScale: {
       fixLeftEdge: true,
@@ -43,23 +36,25 @@ export const $CandleSticks = (config: ICandlesticksChart) => {
         visible: false,
         labelVisible: false,
         labelBackgroundColor: pallete.foreground,
-        color: colorAlpha(pallete.foreground, .20),
+        color: colorAlpha(pallete.foreground, 0.2),
         width: 1,
-        style: LineStyle.Solid
+        style: LineStyle.Solid,
       },
       vertLine: {
         // visible: false,
         // labelVisible: false,
         labelBackgroundColor: pallete.indeterminate,
-        color: colorAlpha(pallete.indeterminate, .20),
+        color: colorAlpha(pallete.indeterminate, 0.2),
         width: 1,
         style: LineStyle.Solid,
-      }
+      },
     },
-    ...config.chartConfig
+    ...config.chartConfig,
   }
 
-  return $Chart({ ...config, chartConfig, getSeriesApi: api => api.addSeries(CandlestickSeries, config.seriesConfig) })
+  return $Chart({
+    ...config,
+    chartConfig,
+    getSeriesApi: (api) => api.addSeries(CandlestickSeries, config.seriesConfig),
+  })
 }
-
-

@@ -1,21 +1,12 @@
-import * as viem from "viem"
-import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from "../const/index.js"
-import { getPoolUsdWithoutPnl } from "./market.js"
-import { getPriceImpactForPosition } from "./price.js"
-import type { IMarketInfo, IMarketPrice, IPositionFees, IPositionNumbers, PositionReferralFees } from "./types.js"
-import { getDenominator, getMappedValue, getTokenUsd } from "../utils/utils.js"
-import { applyFactor } from "../utils/mathUtils.js"
+import type * as viem from 'viem'
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from '../const/index.js'
+import { applyFactor } from '../utils/mathUtils.js'
+import { getDenominator, getMappedValue, getTokenUsd } from '../utils/utils.js'
+import { getPoolUsdWithoutPnl } from './market.js'
+import { getPriceImpactForPosition } from './price.js'
+import type { IMarketInfo, IMarketPrice, IPositionFees, IPositionNumbers, PositionReferralFees } from './types.js'
 
-
-
-
-
-export function getPositionPnlUsd(
-  isLong: boolean,
-  sizeInUsd: bigint,
-  sizeInTokens: bigint,
-  markPrice: bigint
-) {
+export function getPositionPnlUsd(isLong: boolean, sizeInUsd: bigint, sizeInTokens: bigint, markPrice: bigint) {
   const positionValueUsd = getTokenUsd(markPrice, sizeInTokens)
   const totalPnl = isLong ? positionValueUsd - sizeInUsd : sizeInUsd - positionValueUsd
 
@@ -28,7 +19,7 @@ export function getCappedPositionPnlUsd(
   isLong: boolean,
   sizeInUsd: bigint,
   sizeInTokens: bigint,
-  markPrice: bigint
+  markPrice: bigint,
 ) {
   const totalPnl = getPositionPnlUsd(isLong, sizeInUsd, sizeInTokens, markPrice)
 
@@ -39,14 +30,14 @@ export function getCappedPositionPnlUsd(
   const cappedPnl = getCappedPoolPnl(marketInfo, poolUsd, isLong)
 
   if (cappedPnl !== poolPnl && cappedPnl > 0n && poolPnl > 0n) {
-    return totalPnl * (cappedPnl / WEI_PRECISION) / (poolPnl / WEI_PRECISION)
+    return (totalPnl * (cappedPnl / WEI_PRECISION)) / (poolPnl / WEI_PRECISION)
   }
 
   return totalPnl
 }
 
-
-export function getCappedPoolPnl(marketInfo: IMarketInfo, poolUsd: bigint, isLong: boolean) { // maximize: boolean
+export function getCappedPoolPnl(marketInfo: IMarketInfo, poolUsd: bigint, isLong: boolean) {
+  // maximize: boolean
   const poolPnl = isLong ? marketInfo.pool.longPnl : marketInfo.pool.shortPnl
 
   if (poolPnl <= 0n) return poolPnl
@@ -59,7 +50,6 @@ export function getCappedPoolPnl(marketInfo: IMarketInfo, poolUsd: bigint, isLon
 
   return poolPnl > maxPnl ? maxPnl : poolPnl
 }
-
 
 const FLOAT_PRECISION_SQRT = 10n ** 15n
 
@@ -83,7 +73,7 @@ export function getFundingAmount(
   const fundingDiffFactor = latestFundingAmountPerSize - positionFundingAmountPerSize
 
   const denominator = FLOAT_PRECISION * FLOAT_PRECISION_SQRT
-  return positionSizeInUsd * fundingDiffFactor / denominator
+  return (positionSizeInUsd * fundingDiffFactor) / denominator
 }
 
 export function getPositionFundingFees(positionFees: IPositionFees, position: IPositionNumbers) {
@@ -108,11 +98,6 @@ export function getPositionFundingFees(positionFees: IPositionFees, position: IP
   return { fundingFeeAmount, claimableLongTokenAmount, claimableShortTokenAmount }
 }
 
-
-
-
-
-
 export function getMarginFee(marketInfo: IMarketInfo, forPositiveImpact: boolean, sizeDeltaUsd: bigint) {
   if (sizeDeltaUsd <= 0n) return 0n
 
@@ -122,7 +107,6 @@ export function getMarginFee(marketInfo: IMarketInfo, forPositiveImpact: boolean
 
   return -applyFactor(sizeDeltaUsd, factor)
 }
-
 
 export function getRebateRewardUsd(marginFeeUsd: bigint, referralInfo?: PositionReferralFees) {
   if (referralInfo === undefined) {
@@ -142,13 +126,10 @@ export function getPositionNetValue(
   pnl: bigint,
   closingFeeUsd: bigint,
 ) {
-
   const pendingFeesUsd = pendingFundingFeesUsd + pendingBorrowingFeesUsd
 
   return collateralUsd - pendingFeesUsd - closingFeeUsd + pnl
 }
-
-
 
 export function getLiquidationPrice(
   marketInfo: IMarketInfo,
@@ -207,21 +188,27 @@ export function getLiquidationPrice(
       const denominator = sizeInTokens + collateralAmount
       if (denominator === 0n) return 0n
 
-      liquidationPrice = (sizeInUsd + liquidationCollateralUsd - priceImpactDeltaUsd + totalFeesUsd) / denominator * indexTokenDenominator
+      liquidationPrice =
+        ((sizeInUsd + liquidationCollateralUsd - priceImpactDeltaUsd + totalFeesUsd) / denominator) *
+        indexTokenDenominator
     } else {
       const denominator = sizeInTokens - collateralAmount
       if (denominator === 0n) return 0n
 
-      liquidationPrice = (sizeInUsd - liquidationCollateralUsd + priceImpactDeltaUsd - totalFeesUsd) / denominator * indexTokenDenominator
+      liquidationPrice =
+        ((sizeInUsd - liquidationCollateralUsd + priceImpactDeltaUsd - totalFeesUsd) / denominator) *
+        indexTokenDenominator
     }
   } else {
     if (sizeInTokens === 0n) return 0n
     const remainingCollateralUsd = collateralUsd + priceImpactDeltaUsd - totalPendingFeesUsd - closingFeeUsd
 
     if (isLong) {
-      liquidationPrice = (liquidationCollateralUsd - remainingCollateralUsd + sizeInUsd) / sizeInTokens * indexTokenDenominator
+      liquidationPrice =
+        ((liquidationCollateralUsd - remainingCollateralUsd + sizeInUsd) / sizeInTokens) * indexTokenDenominator
     } else {
-      liquidationPrice = (liquidationCollateralUsd - remainingCollateralUsd - sizeInUsd) / -sizeInTokens * indexTokenDenominator
+      liquidationPrice =
+        ((liquidationCollateralUsd - remainingCollateralUsd - sizeInUsd) / -sizeInTokens) * indexTokenDenominator
     }
   }
 
@@ -230,12 +217,17 @@ export function getLiquidationPrice(
   return liquidationPrice
 }
 
-export function getRoughLiquidationPrice(isLong: boolean, sizeInUsd: bigint, sizeInTokens: bigint, collateralUsd: bigint, collateralAmount: bigint) {
+export function getRoughLiquidationPrice(
+  isLong: boolean,
+  sizeInUsd: bigint,
+  sizeInTokens: bigint,
+  collateralUsd: bigint,
+  collateralAmount: bigint,
+) {
   return isLong
     ? (sizeInUsd + collateralUsd) / (sizeInTokens + collateralAmount)
     : (sizeInUsd - collateralUsd) / (sizeInTokens - collateralAmount)
 }
-
 
 export function getLeverageFactor(
   sizeInUsd: bigint,
@@ -247,8 +239,5 @@ export function getLeverageFactor(
   const totalPendingFeesUsd = pendingFundingFeesUsd + pendingBorrowingFeesUsd
   const remainingCollateralUsd = collateralUsd + pnl - totalPendingFeesUsd
 
-  return sizeInUsd * BASIS_POINTS_DIVISOR / remainingCollateralUsd
+  return (sizeInUsd * BASIS_POINTS_DIVISOR) / remainingCollateralUsd
 }
-
-
-

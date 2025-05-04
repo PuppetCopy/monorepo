@@ -1,7 +1,7 @@
 import { constant, empty, map, now, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
-import { type Behavior, O, type Op } from 'aelea/core'
-import { type $Node, $node, $svg, type INode, type NodeComposeFn, attr, component, nodeEvent, style } from 'aelea/dom'
+import { type IBehavior, type IOps, O } from 'aelea/core'
+import { $node, $svg, type I$Node, type INode, type NodeComposeFn, attr, component, nodeEvent, style } from 'aelea/core'
 import { $column, $icon, $row, isDesktopScreen, layoutSheet, screenUtils, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
@@ -15,7 +15,7 @@ export interface TableOption<T> {
   gridTemplateColumns?: string
   dataSource: Stream<TablePageResponse<T> | T[]>
 
-  $between?: $Node
+  $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
 
   $rowCallback?: Op<T, NodeComposeFn<$Node>>
@@ -29,11 +29,11 @@ export interface TableOption<T> {
   $headerCell?: NodeComposeFn<$Node>
 
   sortBy?: ISortBy
-  $sortArrowDown?: $Node
+  $sortArrowDown?: I$Node
 }
 
 export interface TableColumn<T> {
-  $head: $Node
+  $head: I$Node
   $bodyCallback: Op<T, $Node>
   sortBy?: string
 

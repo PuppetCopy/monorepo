@@ -12,9 +12,7 @@
     "dev:generate-abi": "wagmi generate",
     "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "exports": {
     "./const": {
       "types": "./dist/types/const/index.d.ts",
@@ -55,7 +53,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "aelea": "1.2.0",
+    "aelea": "1.3.0",
     "@most/core": "^1.6.1",
     "@most/disposable": "^1.3.0",
     "@most/prelude": "^1.8.0",
@@ -68,14 +66,5 @@
   },
   "homepage": "https://puppet.tech",
   "repository": "PuppetCopy/monorepo",
-  "keywords": [
-    "puppet",
-    "puppetCopy",
-    "puppet-middleware",
-    "copytrading",
-    "eth",
-    "ethereum",
-    "dapp",
-    "wallet"
-  ]
+  "keywords": ["puppet", "puppetCopy", "puppet-middleware", "copytrading", "eth", "ethereum", "dapp", "wallet"]
 }

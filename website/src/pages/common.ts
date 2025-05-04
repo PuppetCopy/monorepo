@@ -1,15 +1,17 @@
-import { $text, style } from "aelea/dom"
-import { $column, $row, $seperator, screenUtils } from "aelea/ui-components"
-import { colorAlpha, pallete } from "aelea/ui-components-theme"
+import { $text, style } from 'aelea/core'
+import { $column, $row, $seperator, screenUtils } from 'aelea/ui-components'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
+export const $metricEntry = (label: string, value: string) =>
+  $row(style({ fontSize: '.85rem', alignItems: 'center' }))(
+    $text(style({ color: pallete.foreground, flex: 1 }))(label),
+    $text(style({ fontWeight: 'bold' }))(value),
+  )
 
-export const $metricEntry = (label: string, value: string) => $row(style({ fontSize: '.85rem', alignItems: 'center' }))(
-  $text(style({ color: pallete.foreground, flex: 1 }))(label),
-  $text(style({ fontWeight: 'bold' }))(value),
+export const $seperator2 = style(
+  { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
+  $seperator,
 )
-
-export const $seperator2 = style({ backgroundColor: colorAlpha(pallete.foreground, .20), alignSelf: 'stretch', display: 'block' }, $seperator)
-
 
 export const $rootContainer = $column(
   style({
@@ -25,7 +27,5 @@ export const $rootContainer = $column(
     // flexDirection: 'row',
   }),
 
-  screenUtils.isMobileScreen
-    ? style({ userSelect: 'none' })
-    : style({}),
+  screenUtils.isMobileScreen ? style({ userSelect: 'none' }) : style({}),
 )

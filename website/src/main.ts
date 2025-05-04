@@ -1,5 +1,4 @@
-
-import { runBrowser } from 'aelea/dom'
+import { runBrowser } from 'aelea/core'
 import { theme } from './assignThemeSync.js'
 import { $Main } from './pages/$Main.js'
 
@@ -7,6 +6,4 @@ import { $Main } from './pages/$Main.js'
 // @ts-ignore
 globalThis.theme = theme
 
-runBrowser()(
-  $Main({})({})
-)
+runBrowser()($Main({})({}))

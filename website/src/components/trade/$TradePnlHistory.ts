@@ -1,5 +1,5 @@
 // import { Behavior, combineArray } from "aelea/core"
-// import { $Node, INode, NodeComposeFn, component, style } from "aelea/dom"
+// import { $Node, INode, NodeComposeFn, component, style } from "aelea/core"
 // import { $column, observer } from "aelea/ui-components"
 // import { map, multicast, skipRepeatsWith, switchLatest } from "@most/core"
 // import { Stream } from "@most/types"
@@ -37,7 +37,6 @@
 //   pnlPercentage: bigint
 // }
 
-
 // export const $TradePnlHistory = (config: ITradePnlPreview) => component((
 //   [crosshairMove, crosshairMoveTether]: Behavior<MouseEventParams, MouseEventParams>,
 //   [containerDimension, sampleContainerDimension]: Behavior<INode, ResizeObserverEntry[]>
@@ -61,7 +60,6 @@
 //     const timeRange = endtime - startTime
 //     const interval = Math.floor(timeRange / displayColumnCount) || 1
 
-
 //     const initialTick: IPricefeedTick = {
 //       time: startTime,
 //       price: startPrice,
@@ -73,7 +71,6 @@
 //       fee: 0n,
 //       pnlPercentage: 0n
 //     }
-
 
 //     const data = createTimeline({
 //       source: [
@@ -105,7 +102,6 @@
 //       }
 //     })
 
-
 //     const lastChange = data[data.length - 1]
 
 //     if (isPositionSettled(config.position)) {
@@ -119,7 +115,6 @@
 //     return { data, interval }
 //   }, displayColumnCount))
 
-
 //   return [
 
 //     (config.$container || $column(style({ height: '80px' })))(sampleContainerDimension(observer.resize()))(
@@ -127,7 +122,7 @@
 //         combineArray(({ data, interval }) => {
 
 //           return $Baseline({
-            
+
 //             // realtimeSource: isTradeSettled(config.trade)
 //             //   ? empty()
 //             //   : map((price): SingleValueData => {
@@ -188,7 +183,6 @@
 
 //             //   //       // series.setMarkers([...increaseMarkers, ...decreaseMarkers].sort((a, b) => Number(a.time) - Number(b.time)))
 
-
 //             //   //     }
 //             //   //   }
 
@@ -196,11 +190,9 @@
 
 //             //   // }, 90)
 
-
 //             //   return series
 //             // }),
-            
- 
+
 //           })({
 //             crosshairMove: crosshairMoveTether(
 //               skipRepeatsWith((a, b) => a.point?.x === b.point?.x),

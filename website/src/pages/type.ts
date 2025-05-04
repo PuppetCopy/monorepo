@@ -1,23 +1,19 @@
-import * as router from 'aelea/router'
-import { Stream } from '@most/types'
-import { IntervalTime } from '@puppet/middleware/const'
-import { IPriceCandle } from "schema"
-import * as viem from 'viem'
-import * as walletLink from "@puppet/middleware/wallet"
-import { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
-import { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
+import type { Stream } from '@most/types'
+import type { IntervalTime } from '@puppet/middleware/const'
+import * as walletLink from '@puppet/middleware/wallet'
+import type * as router from 'aelea/router'
+import type { IPriceCandle } from 'schema'
+import type * as viem from 'viem'
+import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
+import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
 
+export type IWalletPageParams = {}
 
-export interface IWalletPageParams {
-}
-
-export interface IComponentPageParams extends IWalletPageParams {
-}
+export interface IComponentPageParams extends IWalletPageParams {}
 
 export interface IPageParams extends IComponentPageParams {
   route: router.Route
 }
-
 
 export interface IUserActivityPageParams extends IPageParams {
   selectedCollateralTokenList: Stream<viem.Address[]>
@@ -26,8 +22,6 @@ export interface IUserActivityPageParams extends IPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
   matchRuleList: Stream<IMatchRuleEditorChange[]>
 }
-
-
 
 export interface IEarningsPlan {
   compoundMode: boolean
@@ -43,10 +37,8 @@ export enum ITradeFocusMode {
   size,
 }
 
-
 export enum IWalletTab {
   TRADER = 'Trader',
   PUPPET = 'Puppet',
-  EARN = "Earn"
+  EARN = 'Earn',
 }
-

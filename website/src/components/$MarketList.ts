@@ -1,5 +1,5 @@
 // import { Op, combineState } from 'aelea/core'
-// import { $Node, $text, NodeComposeFn, component, style } from 'aelea/dom'
+// import { $Node, $text, NodeComposeFn, component, style } from 'aelea/core'
 // import { $column } from 'aelea/ui-components'
 // import { colorAlpha, pallete } from "aelea/ui-components-theme"
 // import { fromPromise, map, switchLatest, take } from "@most/core"
@@ -41,7 +41,6 @@
 //       })
 //     return data
 //   }, combineState({ latestPriceMap: take(1, latestPriceMap) }))
-
 
 //   return [
 //     $container(
@@ -91,11 +90,9 @@
 //                   args: [gmxContractMap.Datastore.address, params.price, params.market.marketToken] as any
 //                 }))
 
-
 //                 const shortBorrowRatePerInterval =  map(fees => {
 //                   return getBorrowingFactorPerInterval(fees, true, IntervalTime.MIN60)
 //                 }, marketFees)
-
 
 //                 return $text(map(fr => readableFactorPercentage(fr), shortBorrowRatePerInterval))
 //               })
@@ -110,11 +107,9 @@
 //                   args: [gmxContractMap.Datastore.address, params.price, params.market.marketToken] as any
 //                 }))
 
-
 //                 const shortBorrowRatePerInterval =  map(marketInfo => {
 //                   return getBorrowingFactorPerInterval(marketInfo, false, IntervalTime.MIN60)
 //                 }, marketFees)
-
 
 //                 return $text(map(fr => readableFactorPercentage(fr), shortBorrowRatePerInterval))
 //               })
@@ -135,8 +130,6 @@
 //             //     )
 
 //             //     const poolInfo: Stream<IMarketPoolInfo> = map(([_, marketInfo]) => marketInfo, readPoolInfo)
-
-
 
 //           //     return $text(map(value => readableFixedUSD30(value), availableIndexLiquidityUsd))
 //           //   })

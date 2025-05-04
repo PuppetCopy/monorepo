@@ -1,5 +1,5 @@
 // import { Behavior, combineState, replayLatest } from "aelea/core"
-// import { $Node, $node, $text, NodeComposeFn, attr, component, style } from "aelea/dom"
+// import { $Node, $node, $text, NodeComposeFn, attr, component, style } from "aelea/core"
 // import { $column, $row, layoutSheet } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
 // import { awaitPromises, constant, empty, map, mergeArray, multicast, sample, skipRepeats, snapshot, startWith, switchLatest } from "@most/core"
@@ -24,8 +24,6 @@
 // import { $SubmitBar } from "../form/$Form"
 // import { ITradeConfig, ITradeParams } from "./$PositionEditor.js"
 
-
-
 // export type IRequestTrade = ITradeConfig & {
 //   walletClient: walletLink.IWalletClient
 //   executionFee: bigint
@@ -34,8 +32,6 @@
 //   swapRoute: string[]
 //   request: walletLink.IWriteContractReturn<typeof PUPPET['CONTRACT']['42161']['Orchestrator']['abi']>
 // }
-
-
 
 // interface IPositionAdjustmentDetails extends IWalletPageParams {
 //   chain: viem.Chain
@@ -83,7 +79,6 @@
 //       : params.isIncrease
 //         ? -params.slippage : params.slippage
 
-    
 //     const acceptablePrice = params.indexPrice * (allowedSlippage + BASIS_POINTS_DIVISOR) / BASIS_POINTS_DIVISOR
 //     const isNative = params.primaryToken === ADDRESS_ZERO
 
@@ -94,7 +89,6 @@
 //       ? params.focusPrice ? OrderType.LimitIncrease : OrderType.MarketIncrease
 //       : params.focusPrice ? OrderType.LimitDecrease : OrderType.MarketDecrease
 
-      
 //     const contractDefs = getMappedValue(PUPPET.CONTRACT, config.chain.id).Orchestrator
 
 //     const request = params.tradeRoute
@@ -140,10 +134,8 @@
 //         ]
 //       })
 
-
 //     return { ...params, acceptablePrice, request, swapRoute, walletClient }
 //   }, combineState({ ...config.tradeConfig, executionFee, indexPrice, tradeRoute, routeTypeKey }), clickProposeTrade))
-
 
 //   const displayTokenApproval = skipRepeats(map(params => {
 //     if (params.primarySpendAmount === null) {
@@ -218,7 +210,6 @@
 //     null
 //   )
 
-
 //   const latestWntPrice = map(priceMap => {
 //     const nativeToken = getNativeTokenAddress(config.chain)
 //     const price = priceMap[nativeToken]
@@ -237,7 +228,6 @@
 //   const executionFeeAfterBufferUsd = map(params => {
 //     return getTokenUsd(params.latestWntPrice, params.executionFeeAfterBuffer)
 //   }, zipState({ latestWntPrice, executionFeeAfterBuffer }))
-
 
 //   const isPriceFactorPositive = skipRepeats(map(amountUsd => amountUsd > 0n, priceImpactUsd))
 //   const positionFeeFactor = map(params => {
@@ -286,7 +276,7 @@
 //                       return readablePnl(params.executionFeeAfterBufferUsd)
 //                     }, combineState({ executionFeeAfterBufferUsd, executionFeeAfterBuffer })))
 //                   )
-//                 ), 
+//                 ),
 //               ),
 //               $seperator2,
 //               style({ placeContent: 'space-between' })(
@@ -330,7 +320,7 @@
 //                   changeWallet: changeWalletTether(),
 //                   click: requestTokenSpendTether(
 //                     map(async wallet => {
-//                       const amount = writeApproveSpend(wallet, params.primaryToken) 
+//                       const amount = writeApproveSpend(wallet, params.primaryToken)
 
 //                       return amount
 //                     })
@@ -341,7 +331,7 @@
 //               walletClientQuery,
 //               alert: mergeArray([validationError, constant(null, clickResetPosition)]),
 //               $barContent: style({ padding: '8px', alignSelf: 'center' })(
-//                 $ButtonSecondary({ 
+//                 $ButtonSecondary({
 //                   $content: $text('Reset'),
 //                   disabled: map(params => {
 //                     return params.sizeDeltaUsd === 0n && params.collateralDeltaAmount === 0n && params.isIncrease
@@ -422,9 +412,7 @@
 //         })({
 //           overlayClick: dismissEnableTradingOverlayTether(constant(false))
 //         })
-            
 
-          
 //       }, isTradingEnabled)),
 //     ),
 
@@ -465,6 +453,4 @@
 //     }
 //   ]
 // })
-
-
 

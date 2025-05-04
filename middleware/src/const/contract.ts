@@ -1,13 +1,13 @@
-import { erc20Abi, type Address } from "viem";
-import * as abi from "./abi/__generated/abi.js";
-import addresses from './addresses.json' with { type: "json" };
+import { type Address, erc20Abi } from 'viem'
+import * as abi from './abi/__generated/abi.js'
+import addresses from './addresses.json' with { type: 'json' }
 
+import datastore from './abi/datastore.js'
 // gmx v2
-import exchangeRouter from "./abi/exchangeRouter.js";
-import reader from "./abi/reader.js";
-import referralStorage from "./abi/referralStorage.js";
-import gmxEventEmitter from "./abi/gmxEventEmitter.js";
-import datastore from "./abi/datastore.js";
+import exchangeRouter from './abi/exchangeRouter.js'
+import gmxEventEmitter from './abi/gmxEventEmitter.js'
+import reader from './abi/reader.js'
+import referralStorage from './abi/referralStorage.js'
 
 export const CONTRACT = {
   42161: {
@@ -25,7 +25,7 @@ export const CONTRACT = {
       abi: abi.puppetTokenAbi,
     },
     PuppetVoteToken: {
-      address: "", // Address not found in addresses.json
+      address: '', // Address not found in addresses.json
       abi: abi.puppetVoteTokenAbi,
     },
     TokenRouter: {
@@ -50,9 +50,8 @@ export const CONTRACT = {
       abi: abi.feeMarketplaceAbi,
     },
 
-
     GMX: {
-      address: "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a",
+      address: '0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a',
       abi: erc20Abi,
     },
     ReferralStorage: {
@@ -62,26 +61,26 @@ export const CONTRACT = {
 
     // V2
     ReaderV2: {
-      address: "0x38d91ED96283d62182Fc6d990C24097A918a4d9b",
+      address: '0x38d91ED96283d62182Fc6d990C24097A918a4d9b',
       abi: reader,
     },
     ExchangeRouter: {
-      address: "0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8",
+      address: '0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8',
       abi: exchangeRouter,
     },
     OrderVault: {
-      address: "0x31eF83a530Fde1B38EE9A18093A333D8Bbbc40D5",
+      address: '0x31eF83a530Fde1B38EE9A18093A333D8Bbbc40D5',
     },
     Datastore: {
-      address: "0xFD70de6b91282D8017aA4E741e9Ae325CAb992d8",
+      address: '0xFD70de6b91282D8017aA4E741e9Ae325CAb992d8',
       abi: datastore,
     },
     EventEmitter: {
-      address: "0xC8ee91A54287DB53897056e12D9819156D3822Fb",
+      address: '0xC8ee91A54287DB53897056e12D9819156D3822Fb',
       abi: gmxEventEmitter,
     },
     CustomError: {
       abi: abi.errorAbi,
     },
   },
-} as const;
+} as const

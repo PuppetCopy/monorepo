@@ -1,6 +1,6 @@
-import { arbitrum, avalanche } from "viem/chains"
-import { ARBITRUM_ADDRESS } from "./chain/arbitrum.js"
-import { AVALANCHE_ADDRESS } from "./chain/avalanche.js"
+import { arbitrum, avalanche } from 'viem/chains'
+import { ARBITRUM_ADDRESS } from './chain/arbitrum.js'
+import { AVALANCHE_ADDRESS } from './chain/avalanche.js'
 
 export enum IntervalTime {
   SEC = 1,
@@ -17,11 +17,11 @@ export enum IntervalTime {
   WEEK = 604800,
   MONTH = 2628000,
   QUARTER = 7884000,
-  YEAR = 31536000
+  YEAR = 31536000,
 }
 
-export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000" as const
-export const BYTES32_ZERO = "0x0000000000000000000000000000000000000000000000000000000000000000" as const
+export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000' as const
+export const BYTES32_ZERO = '0x0000000000000000000000000000000000000000000000000000000000000000' as const
 
 export const BASIS_POINTS_DIVISOR = 10000n
 
@@ -32,10 +32,7 @@ export const MAX_UINT256 = 2n ** 256n - 1n
 export const INITIAL_SUPPLY = 10n ** 100_000n
 export const MAX_LOCK_SCHEDULE = IntervalTime.WEEK * 105
 
-export const PUPPET_COLLATERAL_LIST= [
-  ARBITRUM_ADDRESS.USDC,
-  ARBITRUM_ADDRESS.NATIVE_TOKEN,
-] as const
+export const PUPPET_COLLATERAL_LIST = [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN] as const
 
 export const MAX_LEVERAGE_FACTOR = 100n * BASIS_POINTS_DIVISOR
 export const MIN_LEVERAGE_FACTOR = 11000n
@@ -64,8 +61,7 @@ export const PRICEFEED_INTERVAL = [
 
 export const TRADE_CONTRACT_MAPPING = {
   [arbitrum.id]: ARBITRUM_ADDRESS,
-  [avalanche.id]: AVALANCHE_ADDRESS
+  [avalanche.id]: AVALANCHE_ADDRESS,
 } as const
 
 export type ContractChain = keyof typeof TRADE_CONTRACT_MAPPING
-

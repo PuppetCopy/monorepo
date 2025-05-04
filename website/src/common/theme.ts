@@ -1,6 +1,4 @@
-
 import type { Theme } from 'aelea/ui-components-theme'
-
 
 const light: Theme = {
   name: 'light',
@@ -17,7 +15,7 @@ const light: Theme = {
     positive: '#0cab00',
     negative: '#ea004c',
     indeterminate: '#F6964C',
-  }
+  },
 }
 
 const dark: Theme = {
@@ -35,9 +33,7 @@ const dark: Theme = {
     positive: '#38E567',
     negative: '#ff6050',
     indeterminate: '#ffc000',
-  }
+  },
 }
 
-
 export { light, dark }
-

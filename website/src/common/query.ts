@@ -1,43 +1,51 @@
-import { replayLatest } from "aelea/core"
-import { map, multicast } from "@most/core"
-import { IntervalTime, PRICEFEED_INTERVAL } from "@puppet/middleware/const"
-import { combineState, getClosestNumber, groupArrayMany, periodicRun, StateParams, unixTimestampNow } from "@puppet/middleware/utils"
-import * as viem from "viem"
-import { getStatus, queryDb } from "./sqlClient"
+import { map, multicast } from '@most/core'
+import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet/middleware/const'
+import {
+  type StateParams,
+  combineState,
+  getClosestNumber,
+  groupArrayMany,
+  periodicRun,
+  unixTimestampNow,
+} from '@puppet/middleware/utils'
+import { replayLatest } from 'aelea/core'
+import type * as viem from 'viem'
+import { getStatus, queryDb } from './sqlClient'
 
-
-
-export const subgraphStatus = replayLatest(multicast(periodicRun({
-  startImmediate: true,
-  interval: 2500,
-  actionOp: map(() => getStatus()),
-})))
-
+export const subgraphStatus = replayLatest(
+  multicast(
+    periodicRun({
+      startImmediate: true,
+      interval: 2500,
+      actionOp: map(() => getStatus()),
+    }),
+  ),
+)
 
 export function queryPricefeed(
   queryParams: StateParams<{
     tokenList?: viem.Address[]
     activityTimeframe: IntervalTime
   }>,
-  estTickAmout = 10
+  estTickAmout = 10,
 ) {
-  return map(async params => {
+  return map(async (params) => {
     const priceList = await queryDb.query.priceCandle.findMany({
       columns: {
         c: true,
         slotTime: true,
-        token: true
+        token: true,
       },
-      where: (t, f) => f.and(
-        f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
-        f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
-        params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
-      ),
+      where: (t, f) =>
+        f.and(
+          f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
+          f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
+          params.tokenList ? f.inArray(t.token, params.tokenList) : undefined,
+        ),
     })
-    return groupArrayMany(priceList, c => c.token)
+    return groupArrayMany(priceList, (c) => c.token)
 
     // map results by token
-
   }, combineState(queryParams))
 }
 
@@ -58,7 +66,6 @@ export function queryPricefeed(
 //     //     _eq: `"${filterParams.account}"`
 //     //   }
 //     // }
-
 
 //     // const orFilters: any[] = []
 
@@ -92,7 +99,6 @@ export function queryPricefeed(
 //     //   } as any
 //     // }
 
-
 //     // if (orFilters.length) {
 //     //   filter._or = orFilters
 //     // }
@@ -103,7 +109,6 @@ export function queryPricefeed(
 //     // // filter.account_id = {
 //     // //   _eq: '"0x1B4E44f70D1D023784210a9c2F8b84eBD613c29C"'
 //     // // }
-
 
 //     // const list = await graph.querySubgraph(subgraphClient, {
 //     //   schema: schema.routeMatchStats,

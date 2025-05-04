@@ -5,23 +5,20 @@ import {
   type BaselineSeriesPartialOptions,
   type ChartOptions,
   type DeepPartial,
-  LineStyle
+  LineStyle,
 } from 'lightweight-charts'
-import { $Chart, type IChartConfig } from "./$Chart.js"
 import { readableUnitAmount } from '../../utils/index.js'
-
+import { $Chart, type IChartConfig } from './$Chart.js'
 
 export interface IBaselineChart extends IChartConfig<'Baseline'> {
   baselineOptions?: BaselineSeriesPartialOptions
 }
 
-
 export const $Baseline = (config: IBaselineChart) => {
-
   const baselineOptions: BaselineSeriesPartialOptions = {
     priceFormat: {
       type: 'custom',
-      formatter: (priceValue: BarPrice) => readableUnitAmount(priceValue.valueOf())
+      formatter: (priceValue: BarPrice) => readableUnitAmount(priceValue.valueOf()),
     },
     baseLineStyle: LineStyle.Dashed,
     lineStyle: LineStyle.Solid,
@@ -39,17 +36,17 @@ export const $Baseline = (config: IBaselineChart) => {
     baseLineVisible: true,
     // lastValueVisible: false,
     priceLineVisible: false,
-    ...config.baselineOptions
+    ...config.baselineOptions,
   }
 
   const chartConfig: DeepPartial<ChartOptions> = {
     layout: {
       attributionLogo: false,
       background: {
-        color: 'transparent'
+        color: 'transparent',
       },
       textColor: pallete.foreground,
-      fontSize: 10
+      fontSize: 10,
     },
     leftPriceScale: {
       autoScale: true,
@@ -57,7 +54,7 @@ export const $Baseline = (config: IBaselineChart) => {
       scaleMargins: {
         top: 0.1,
         bottom: 0.1,
-      }
+      },
     },
     // rightPriceScale: {
     //   // mode: PriceScaleMode.Logarithmic,
@@ -80,21 +77,19 @@ export const $Baseline = (config: IBaselineChart) => {
       borderVisible: false,
       rightOffset: 0,
     },
-    ...config.chartConfig || {}
+    ...(config.chartConfig || {}),
   }
 
   return $Chart({
     ...config,
     chartConfig,
-    getSeriesApi: api => {
+    getSeriesApi: (api) => {
       const series = api.addSeries(BaselineSeries, baselineOptions)
       setTimeout(() => {
         api.timeScale().fitContent()
       }, 55)
-      
+
       return series
-    }
+    },
   })
 }
-
-

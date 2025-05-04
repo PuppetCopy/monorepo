@@ -1,10 +1,15 @@
-import { abs, applyFactor, delta, getDenominator, getMappedValue, getTokenUsd, groupArrayByKeyMap } from "../utils/index.js"
-import { FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP } from "../const/index.js"
-import * as viem from "viem"
-import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from "./types.js"
-
-
-
+import * as viem from 'viem'
+import { FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/index.js'
+import {
+  abs,
+  applyFactor,
+  delta,
+  getDenominator,
+  getMappedValue,
+  getTokenUsd,
+  groupArrayByKeyMap,
+} from '../utils/index.js'
+import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from './types.js'
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,
@@ -13,9 +18,8 @@ export function getPriceImpactUsd(
   nextShortUsd: bigint,
   factorPositive: bigint,
   factorNegative: bigint,
-  exponentFactor: bigint
+  exponentFactor: bigint,
 ) {
-
   if (nextLongUsd < 0n || nextShortUsd < 0n) {
     return 0n
   }
@@ -25,7 +29,6 @@ export function getPriceImpactUsd(
 
   const isSameSideRebalance = currentLongUsd < currentShortUsd === nextLongUsd < nextShortUsd
 
-
   if (isSameSideRebalance) {
     const hasPositiveImpact = nextDiff < currentDiff
     const factor = hasPositiveImpact ? factorPositive : factorNegative
@@ -33,17 +36,15 @@ export function getPriceImpactUsd(
     return calculateImpactForSameSideRebalance(currentDiff, nextDiff, hasPositiveImpact, factor, exponentFactor)
   }
 
-  return calculateImpactForCrossoverRebalance(currentDiff, nextDiff, factorPositive, factorNegative, exponentFactor,)
+  return calculateImpactForCrossoverRebalance(currentDiff, nextDiff, factorPositive, factorNegative, exponentFactor)
 }
-
-
 
 export function calculateImpactForSameSideRebalance(
   currentDiff: bigint,
   nextDiff: bigint,
   hasPositiveImpact: boolean,
   factor: bigint,
-  exponentFactor: bigint
+  exponentFactor: bigint,
 ) {
   const currentImpact = applyImpactFactor(currentDiff, factor, exponentFactor)
   const nextImpact = applyImpactFactor(nextDiff, factor, exponentFactor)
@@ -52,7 +53,6 @@ export function calculateImpactForSameSideRebalance(
 
   return hasPositiveImpact ? deltaDiff : 0n - deltaDiff
 }
-
 
 export function calculateImpactForCrossoverRebalance(
   currentDiff: bigint,
@@ -69,7 +69,6 @@ export function calculateImpactForCrossoverRebalance(
   return positiveImpact > negativeImpactUsd ? deltaDiffUsd : 0n - deltaDiffUsd
 }
 
-
 export function getCappedPositionImpactUsd(
   marketPrice: IMarketPrice,
   marketPoolInfo: IMarketInfo,
@@ -82,10 +81,7 @@ export function getCappedPositionImpactUsd(
 
   const impactPoolAmount = marketPoolInfo.usage.positionImpactPoolAmount
 
-  const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(
-    marketPrice.indexTokenPrice.min,
-    impactPoolAmount,
-  )
+  const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(marketPrice.indexTokenPrice.min, impactPoolAmount)
 
   let cappedImpactUsd = priceImpactDeltaUsd
 
@@ -103,15 +99,9 @@ export function getCappedPositionImpactUsd(
   return cappedImpactUsd
 }
 
-export function getPriceImpactForPosition(
-  marketInfo: IMarketInfo,
-  sizeDeltaUsd: bigint,
-  isLong: boolean,
-) {
-
+export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd: bigint, isLong: boolean) {
   const longInterestInUsd = marketInfo.usage.longInterestUsd
   const shortInterestInUsd = marketInfo.usage.shortInterestUsd
-
 
   const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
   const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
@@ -130,7 +120,6 @@ export function getPriceImpactForPosition(
     return priceImpactUsd
   }
 
-
   if (!(abs(marketInfo.fees.virtualInventory.virtualInventoryForPositions) > 0n)) {
     return priceImpactUsd
   }
@@ -138,7 +127,7 @@ export function getPriceImpactForPosition(
   const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
     marketInfo.fees.virtualInventory.virtualInventoryForPositions,
     sizeDeltaUsd,
-    isLong
+    isLong,
   )
 
   const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
@@ -154,21 +143,13 @@ export function getPriceImpactForPosition(
   return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
 }
 
-
 export function getMarkPrice(price: IPriceMinMax, isIncrease: boolean, isLong: boolean) {
   const shouldUseMaxPrice = getShouldUseMaxPrice(isIncrease, isLong)
 
   return shouldUseMaxPrice ? price.max : price.min
 }
 
-
-
-function getNextOpenInterestForVirtualInventory(
-  virtualInventory: bigint,
-  deltaUsd: bigint,
-  isLong: boolean,
-) {
-
+function getNextOpenInterestForVirtualInventory(virtualInventory: bigint, deltaUsd: bigint, isLong: boolean) {
   let currentLongUsd = 0n
   let currentShortUsd = 0n
 
@@ -187,13 +168,7 @@ function getNextOpenInterestForVirtualInventory(
   return getNextOpenInterestParams(currentLongUsd, currentShortUsd, deltaUsd, isLong)
 }
 
-function getNextOpenInterestParams(
-  currentLongUsd: bigint,
-  currentShortUsd: bigint,
-  usdDelta: bigint,
-  isLong: boolean,
-) {
-
+function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigint, usdDelta: bigint, isLong: boolean) {
   let nextLongUsd = currentLongUsd
   let nextShortUsd = currentShortUsd
 
@@ -210,8 +185,6 @@ function getNextOpenInterestParams(
     nextShortUsd,
   }
 }
-
-
 
 export function getOraclePriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
   const pickedPrice = pickPriceForPnl(price, isLong, maximize)
@@ -239,18 +212,16 @@ function pickPriceForPnl(price: IOraclePrice, isLong: boolean, maximize: boolean
   return maximize ? price.min : price.max
 }
 
-
 export function getPriceImpactByAcceptablePrice(
   sizeDeltaUsd: bigint,
   acceptablePrice: bigint,
   indexPrice: bigint,
   isLong: boolean,
-  isIncrease: boolean
+  isIncrease: boolean,
 ) {
-
   const shouldFlipPriceDiff = isIncrease ? !isLong : isLong
   const priceDiff = (indexPrice - acceptablePrice) * (shouldFlipPriceDiff ? -1n : 1n)
-  const priceImpactDeltaUsd = sizeDeltaUsd * priceDiff / acceptablePrice
+  const priceImpactDeltaUsd = (sizeDeltaUsd * priceDiff) / acceptablePrice
   const priceImpactDeltaAmount = priceImpactDeltaUsd / indexPrice
 
   return {
@@ -259,12 +230,9 @@ export function getPriceImpactByAcceptablePrice(
   }
 }
 
-
-
 export function getShouldUseMaxPrice(isIncrease: boolean, isLong: boolean) {
   return isIncrease ? isLong : !isLong
 }
-
 
 function applyImpactFactor(diff: bigint, factor: bigint, exponent: bigint): bigint {
   const _diff = Number(diff) / 10 ** 30
@@ -273,10 +241,8 @@ function applyImpactFactor(diff: bigint, factor: bigint, exponent: bigint): bigi
   // Pow and convert back to BigNumber with 30 decimals
   const result = BigInt(Math.round(_diff ** _exponent * 10 ** 30))
 
-  return result * factor / FLOAT_PRECISION
+  return (result * factor) / FLOAT_PRECISION
 }
-
-
 
 // Signed Prices
 // To get the latest signed price information for sending transactions:
@@ -336,20 +302,21 @@ interface ISignedPrice {
 export async function querySignedPrices(): Promise<IPriceOracleMap> {
   const x = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
 
+  const res = (await x.json()) as { signedPrices: ISignedPrice[] }
+  return groupArrayByKeyMap(
+    res.signedPrices,
+    (price) => viem.getAddress(price.tokenAddress),
+    (price, token) => {
+      const priceMin = BigInt(price.minPriceFull)
+      const priceMax = BigInt(price.maxPriceFull)
 
-  const res = await x.json() as { signedPrices: ISignedPrice[] }
-  return groupArrayByKeyMap(res.signedPrices, price => viem.getAddress(price.tokenAddress), (price, token) => {
-
-    const priceMin = BigInt(price.minPriceFull)
-    const priceMax = BigInt(price.maxPriceFull)
-
-    return {
-      priceSourceType: 0n,
-      timestamp: price.maxBlockTimestamp,
-      token,
-      min: priceMin,
-      max: priceMax,
-    }
-  })
+      return {
+        priceSourceType: 0n,
+        timestamp: price.maxBlockTimestamp,
+        token,
+        min: priceMin,
+        max: priceMax,
+      }
+    },
+  )
 }
-

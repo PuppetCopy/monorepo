@@ -1,12 +1,11 @@
-import type { Stream } from "@most/types";
+import type { Stream } from '@most/types'
 
-export type InferStream<T> = T extends Stream<infer U> ? U : T;
+export type InferStream<T> = T extends Stream<infer U> ? U : T
 
 export interface IRequestPagePositionApi {
   offset: number
   pageSize: number
 }
-
 
 export interface IResponsePageApi<T> extends IRequestPagePositionApi {
   page: T[]
@@ -17,7 +16,7 @@ export interface IRequestSortApi {
   direction: 'desc' | 'asc'
 }
 
-export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+export type IOpstional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export type Nullable<T> = {
   [P in keyof T]: T[P] | null
@@ -32,4 +31,3 @@ export interface ITokenDescription {
   decimals: number
   denominator: bigint
 }
-

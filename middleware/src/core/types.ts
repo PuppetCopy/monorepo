@@ -1,7 +1,5 @@
-
-import * as viem from "viem"
-import type { ILogTxType, ILogTypeId } from "../gmx/types.js"
-
+import type * as viem from 'viem'
+import type { ILogTxType, ILogTypeId } from '../gmx/types.js'
 
 // type PositionFeesCollected {
 //   id: Bytes!
@@ -40,7 +38,6 @@ export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollecte
   affiliate: viem.Address
   referralCode: viem.Address
   positionKey: viem.Address
-
 
   collateralTokenPriceMin: bigint
   collateralTokenPriceMax: bigint
@@ -180,7 +177,6 @@ export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
   feeCollected: IPositionFeesCollected
   // matchRoute: IMatchRoute
 }
-
 
 export interface IMirrorRequest {
   puppets: readonly viem.Address[]
@@ -333,7 +329,6 @@ export interface ISettlement extends ILogTypeId<'Settlement'> {
   transactionHash: viem.Address
 }
 
-
 export interface IMatchRule extends ILogTypeId<'MatchRule'> {
   id: viem.Address
   puppet: viem.Address
@@ -354,7 +349,6 @@ export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
 
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
-
 
   // increaseList: {
   //   market: viem.Address
@@ -388,7 +382,6 @@ export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
 
   stats: IMatchRouteStats[]
 }
-
 
 export interface ISettle extends ILogTypeId<'Settle'> {
   id: viem.Address
@@ -435,9 +428,6 @@ export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {
   matchRoute: IMatchRoute
 }
 
-
-
-
 export interface IPositionListSummary {
   puppets: viem.Address[]
   size: bigint
@@ -451,9 +441,3 @@ export interface IPositionListSummary {
   winCount: number
   lossCount: number
 }
-
-
-
-
-
-

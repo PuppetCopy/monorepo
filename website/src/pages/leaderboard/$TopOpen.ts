@@ -1,5 +1,5 @@
 // import { Behavior, O, combineState } from "aelea/core"
-// import { $element, $text, component, style } from "aelea/dom"
+// import { $element, $text, component, style } from "aelea/core"
 // import * as router from 'aelea/router'
 // import { $column, $row, layoutSheet } from "aelea/ui-components"
 // import { pallete } from "aelea/ui-components-theme"
@@ -19,8 +19,6 @@
 // import { $card } from "../../common/elements/$common.js"
 // import * as storage from "../../utils/storage/storeScope.js"
 
-
-
 //   type IPosition = IPositionMirrorOpen & {
 //     pnl: bigint
 //   }
@@ -30,7 +28,6 @@
 //   subscriptionList: Stream<IPuppetSubscritpion[]>
 //   processData: Stream<IGmxProcessState>
 // }
-
 
 // export const $TopOpen = (config: ITopOpen) => component((
 //   [routeChange, routeChangeTether]: Behavior<any, string>,
@@ -43,7 +40,6 @@
 
 //   const exploreStore = storage.createStoreScope(rootStoreScope, 'topOpen' as const)
 
-
 //   const sortBy = storage.replayWrite(exploreStore, { direction: 'desc', selector: 'pnl' } as ISortBy<IPosition>, sortByChange, 'sortBy')
 //   const routeList = map(list => list.map(rt => {
 //     const matchedMemType = ROUTE_DESCRIPTION.find(rtd => getRouteTypeKey(rt.collateralToken, rt.indexToken, rt.isLong) === getRouteTypeKey(rtd.collateralToken, rtd.indexToken, rtd.isLong))
@@ -54,7 +50,6 @@
 
 //     return matchedMemType
 //   }), storage.replayWrite(exploreStore, [] as IAbstractPositionParams[], routeTypeChange, 'filterRouteList'))
-
 
 //   const pageParms = map(params => {
 //     const requestPage = { ...params.sortBy, offset: 0, pageSize: 20 }
@@ -85,14 +80,11 @@
 //       return pagingQuery({ ...params.sortBy, ...req }, flattenMapMap as IPosition[])
 //     }, paging)
 
-
 //     return { ...params, dataSource }
 //   }, combineState({ processData: config.processData, sortBy, routeList }))
 
-
 //   return [
 //     $column(spacing.big)(
-
 
 //       $card(spacing.big, style({ flex: 1 }))(
 
@@ -118,7 +110,7 @@
 //               select: routeTypeChangeTether()
 //             }),
 //           ),
-          
+
 //         ),
 
 //         switchMap(params => {
@@ -136,7 +128,7 @@
 //                     // changeMatchRuleList: config.changeMatchRuleList,
 //                     subscriptionList: config.subscriptionList,
 //                     trader: pos.trader,
-//                   })({ 
+//                   })({
 //                     modifySubscribeList: modifySubscriberTether(),
 //                     clickTrader: routeChangeTether()
 //                   })
@@ -158,10 +150,9 @@
 //             scrollRequest: scrollRequestTether()
 //           })
 //         }, pageParms),
-    
+
 //       ),
 
-      
 //     ),
 
 //     {
@@ -169,8 +160,4 @@
 //     }
 //   ]
 // })
-
-
-
-
 

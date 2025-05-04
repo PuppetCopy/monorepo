@@ -1,7 +1,7 @@
-import type { ExtractAbiEvent } from "abitype"
-import * as viem from "viem"
-import * as CONST from "../const/index.js"
-import { IntervalTime } from "../const/index.js"
+import type { ExtractAbiEvent } from 'abitype'
+import type * as viem from 'viem'
+import type * as CONST from '../const/index.js'
+import type { IntervalTime } from '../const/index.js'
 
 export type ITokenSymbol = keyof typeof CONST.TOKEN_DESCRIPTION_MAP
 
@@ -32,13 +32,24 @@ export type ILogTxType<T extends string> = ILogTypeId<T> & {
   transactionHash: string
 }
 
-
-export type ILogArgs<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.GetEventArgs<TAbi, TEventName, { Required: true }>
-export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.Log<bigint, number, false, ExtractAbiEvent<TAbi, TEventName>, true, TAbi, TEventName> // ILogIndex & ILogOrdered & viem.GetEventArgs<TAbi, TEventName, { Required: true }>
-export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogOrdered & Omit<ILogEvent<TAbi, TEventName>, 'data'>
-export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> & ILogArgs<TAbi, TEventName>
-
-
+export type ILogArgs<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.GetEventArgs<
+  TAbi,
+  TEventName,
+  { Required: true }
+>
+export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.Log<
+  bigint,
+  number,
+  false,
+  ExtractAbiEvent<TAbi, TEventName>,
+  true,
+  TAbi,
+  TEventName
+> // ILogIndex & ILogOrdered & viem.GetEventArgs<TAbi, TEventName, { Required: true }>
+export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogOrdered &
+  Omit<ILogEvent<TAbi, TEventName>, 'data'>
+export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> &
+  ILogArgs<TAbi, TEventName>
 
 export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
   token: viem.Address
@@ -59,31 +70,25 @@ export type IPriceTickListMap = Record<viem.Address, IPricetick[]>
 export type IPricefeedMap = Record<viem.Address, IPriceCandle[]>
 export type IPriceOracleMap = Record<viem.Address, IOraclePrice>
 
-
 export type ILatestPriceMap = Record<viem.Address, IPricetick>
-
-
 
 export interface IChainParamApi {
   chain: number
 }
-
 
 export interface IRequestTimerangeApi {
   from: number
   to: number
 }
 
-
 export type IRequestAccountApi = IChainParamApi & { account: viem.Address }
 
 export type IRequestPriceTimelineApi = IChainParamApi & IRequestTimerangeApi & { tokenAddress: viem.Address }
 export type IRequestAccountHistoricalDataApi = IChainParamApi & IRequestAccountApi & IRequestTimerangeApi
-export type IRequestPricefeedApi = IChainParamApi & IRequestTimerangeApi & { interval: IntervalTime, tokenAddress: viem.Address }
+export type IRequestPricefeedApi = IChainParamApi &
+  IRequestTimerangeApi & { interval: IntervalTime; tokenAddress: viem.Address }
 
-
-export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity { }
-
+export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity {}
 
 export type IPositionNumbers = {
   sizeInUsd: bigint
@@ -116,8 +121,6 @@ export const OrderType = {
   Liquidation: 7n,
 } as const
 
-
-
 export interface PositionReferralFees {
   referralCode: viem.Hex
   affiliate: viem.Address
@@ -128,9 +131,7 @@ export interface PositionReferralFees {
   totalRebateAmount: bigint
   traderDiscountAmount: bigint
   affiliateRewardAmount: bigint
-
 }
-
 
 export interface IPositionFundingFees {
   fundingFeeAmount: bigint
@@ -140,7 +141,6 @@ export interface IPositionFundingFees {
   latestLongTokenClaimableFundingAmountPerSize: bigint
   latestShortTokenClaimableFundingAmountPerSize: bigint
 }
-
 
 export interface PositionBorrowingFees {
   borrowingFeeUsd: bigint
@@ -160,8 +160,6 @@ export interface IPriceMinMax {
   max: bigint
 }
 
-
-
 export interface IPositionFees {
   referral: PositionReferralFees
   funding: IPositionFundingFees
@@ -180,7 +178,6 @@ export interface IPositionFees {
   totalCostAmount: bigint
 }
 
-
 export interface IExecutionPriceResult {
   priceImpactUsd: bigint
   priceImpactDiffUsd: bigint
@@ -193,7 +190,6 @@ export type IOraclePrice = IPriceMinMax & {
   token: viem.Address
 }
 
-
 export type IInsolventClose = {
   orderKey: viem.Hex
   positionCollateralAmount: bigint
@@ -201,11 +197,9 @@ export type IInsolventClose = {
   basePnlUsd: bigint
 }
 
-
-
 export interface IMarketPrice {
-  indexTokenPrice: IPriceMinMax,
-  longTokenPrice: IPriceMinMax,
+  indexTokenPrice: IPriceMinMax
+  longTokenPrice: IPriceMinMax
   shortTokenPrice: IPriceMinMax
 }
 
@@ -288,8 +282,6 @@ export interface IMarketInfo {
   usage: IMarketUsageInfo
 }
 
-
-
 interface ICollateralType {
   longToken: bigint
   shortToken: bigint
@@ -299,7 +291,6 @@ export type IPositionType = {
   long: ICollateralType
   short: ICollateralType
 }
-
 
 export interface IBaseFundingValues {
   fundingFeeAmountPerSize: IPositionType
@@ -319,4 +310,3 @@ export interface IVirtualInventory {
   virtualPoolAmountForShortToken: bigint
   virtualInventoryForPositions: bigint
 }
-

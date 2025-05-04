@@ -4,8 +4,6 @@
 // import * as walletLink from "@puppet/middleware/wallet"
 // import { readContract } from "viem/actions"
 
-
-
 // export function hashKey(key: string) {
 //   return hashData(["string"], [key])
 // }
@@ -27,8 +25,6 @@
 // const ESTIMATED_GAS_FEE_BASE_AMOUNT = "ESTIMATED_GAS_FEE_BASE_AMOUNT"
 // const ESTIMATED_GAS_FEE_MULTIPLIER_FACTOR = "ESTIMATED_GAS_FEE_MULTIPLIER_FACTOR"
 
-
-
 // export async function readMarketPoolUsage(
 //   provider: walletLink.IClient,
 //   market: IMarket,
@@ -36,7 +32,6 @@
 // ): Promise<IMarketUsageInfo> {
 //   const datastoreContract = contractDefs.Datastore
 //   // const v2Reader = contractReader(readerV2)
-
 
 //   // const isDisabled = readContract(wallet, {
 //   //   ...datastoreContract,
@@ -50,13 +45,11 @@
 //   //   args: [hashData(["bytes32", "address", "address"], [hashKey(POOL_AMOUNT_KEY), market.marketToken, market.longToken])],
 //   // })
 
-
 //   // const shortPoolAmount = readContract(wallet, {
 //   //   ...datastoreContract,
 //   //   functionName: 'getUint',
 //   //   args: [hashData(["bytes32", "address", "address"], [hashKey(POOL_AMOUNT_KEY), market.marketToken, market.shortToken])],
 //   // })
-
 
 //   // const maxLongPoolAmount = readContract(wallet, {
 //   //   ...datastoreContract,
@@ -347,8 +340,6 @@
 //   //   args: [hashData(["bytes32", "address"], [hashKey(VIRTUAL_TOKEN_ID_KEY), market.shortToken])],
 //   // })
 
-
-
 //   return newLocal
 // }
 
@@ -357,7 +348,6 @@
 //   market: IMarket,
 // ): Promise<IMarketConfig> {
 //   const datastoreContract = CONTRACT.Datastore
-
 
 //   const reserveFactorLong = readContract(provider, {
 //     ...datastoreContract,
@@ -382,7 +372,6 @@
 //     functionName: 'getUint',
 //     args: [hashData(["bytes32", "address", "bool"], [hashKey(OPEN_INTEREST_RESERVE_FACTOR_KEY), market.marketToken, false])],
 //   })
-
 
 //   const maxPnlFactorForTradersLong = readContract(provider, {
 //     ...datastoreContract,
@@ -426,7 +415,6 @@
 //     args: [hashData(["bytes32", "address", "bool"], [hashKey(MAX_POSITION_IMPACT_FACTOR_KEY), market.marketToken, true])],
 //   })
 
-
 //   const maxPositionImpactFactorForLiquidations = readContract(provider, {
 //     ...datastoreContract,
 //     functionName: 'getUint',
@@ -439,15 +427,11 @@
 //     args: [hashData(["bytes32", "address"], [hashKey(MIN_COLLATERAL_FACTOR_KEY), market.marketToken])],
 //   })
 
-
-
 //   const positionImpactExponentFactor = readContract(provider, {
 //     ...datastoreContract,
 //     functionName: 'getUint',
 //     args: [hashData(["bytes32", "address"], [hashKey(POSITION_IMPACT_EXPONENT_FACTOR_KEY), market.marketToken])],
 //   })
-
-
 
 //   return {
 //     maxPnlFactorForTradersLong: await maxPnlFactorForTradersLong,
@@ -458,7 +442,6 @@
 
 //     openInterestReserveFactorLong: await openInterestReserveFactorLong,
 //     openInterestReserveFactorShort: await openInterestReserveFactorShort,
-
 
 //     positionFeeFactorForPositiveImpact: await positionFeeFactorForPositiveImpact,
 //     positionFeeFactorForNegativeImpact: await positionFeeFactorForNegativeImpact,

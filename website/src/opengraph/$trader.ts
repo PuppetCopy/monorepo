@@ -1,4 +1,4 @@
-// import { style } from "aelea/dom"
+// import { style } from "aelea/core"
 // import { $column, layoutSheet } from "aelea/ui-components"
 // import { now } from "@most/core"
 // import { Stream } from "@most/types"
@@ -9,8 +9,6 @@
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 // import { $TraderSummary } from "../components/participant/$Summary.js"
 // import { subgraphClient } from "../common/graphClient"
-
-
 
 // interface ITrader {
 //   routeTypeListQuery: Stream<Promise<ISetRouteType[]>>
@@ -33,5 +31,4 @@
 //     )
 //   )
 // }
-
 
