@@ -10,7 +10,7 @@ import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/c
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Chain, type HttpTransport, http } from 'viem'
-import { accountChange, walletConnectAppkit } from '../walletConnect.js'
+import { account, walletConnectAppkit } from '../walletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
@@ -72,7 +72,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
           }
 
           return join(config.$$display(now(wallet)))
-        }, accountChange)
+        }, account)
       ),
 
       {

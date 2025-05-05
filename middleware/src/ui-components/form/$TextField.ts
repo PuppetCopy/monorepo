@@ -74,7 +74,7 @@ export const $FieldLabeled = ({
         $row(spacing.small, style({ width: '100%' }))(
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
           O(
-            // attrBehavior(map((placeholder) => ({ placeholder }), streamOf(placeholder))),
+            attrBehavior(map((placeholder) => ({ placeholder }), streamOf(placeholder))),
             overideInputStyle
           )(
             $Field({})({

@@ -1,4 +1,4 @@
-import { constant, multicast } from '@most/core'
+import { constant, multicast, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $anchor,
@@ -19,6 +19,7 @@ import {
   component,
   type I$Node,
   type IBehavior,
+  type ISlottable,
   type IStyleCSS,
   nodeEvent,
   O,
@@ -27,13 +28,13 @@ import {
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete, themeList } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete, type Theme, theme, themeList } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
 import { $stackedCoins, $trophy } from '../common/elements/$icons.js'
 import type { IPageParams } from '../pages/type.js'
 import { $Popover } from './$Popover.js'
-import { $Picker } from './$ThemePicker.js'
+import { $ThemePicker } from './$ThemePicker.js'
 import { $walletProfileDisplay } from './$WalletProfileDisplay.js'
 import { $ButtonSecondary } from './form/$Button.js'
 
@@ -47,7 +48,8 @@ export const $MainMenu = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>
+      [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
+      [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
     ) => {
       const { route, showAccount } = config
 
@@ -64,6 +66,7 @@ export const $MainMenu = (config: MainMenu) =>
         })
       )
 
+      const themeState = startWith(theme, changeTheme)
       const $extraMenuPopover = $Popover({
         open: constant(
           $column(spacing.big)(
@@ -87,7 +90,9 @@ export const $MainMenu = (config: MainMenu) =>
             // ),
 
             $ButtonSecondary({
-              $content: $Picker(themeList)({})
+              $content: $ThemePicker(themeState)({
+                changeTheme: changeThemeTether()
+              })
             })({})
 
             // switchLatest(snapshot((_, walletQuery) => {
@@ -226,7 +231,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [walletChange, walletChangeTether]: IBehavior<any, any>
+      [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
     ) => {
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
@@ -345,7 +350,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
             ),
 
             $ButtonSecondary({
-              $content: $Picker(themeList)({})
+              $content: $ThemePicker(startWith(theme, changeTheme))({})
             })({})
 
             // switchLatest(snapshot((_, wallet) => {

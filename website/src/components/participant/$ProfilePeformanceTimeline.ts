@@ -32,7 +32,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, matchRuleList } = config
+      const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, matchingRuleList } = config
 
       const debouncedState = debounce(
         40,

@@ -4,12 +4,12 @@ import { getAccount } from '@wagmi/core'
 import { $node, $text, behavior, IBehavior, nodeEvent, style } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
-import { accountChange, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
+import { account, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 
 export const $walletProfileDisplay = () => {
   const accountStatus = getAccount(wagmiConfig)
-  const account = accountStatus.connector === undefined ? startWith(accountStatus, accountChange) : accountChange
+  // const account = accountStatus.connector === undefined ? startWith(accountStatus, account) : account
 
   const [click, clickTether] = behavior()
 

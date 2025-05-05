@@ -104,7 +104,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
         selectedCollateralTokenList,
         pricefeedMapQuery,
         depositTokenList,
-        matchRuleList
+        matchingRuleList
       } = config
 
       const profileMode = uiStorage.replayWrite(localStore.wallet, selectProfileMode, 'selectedTab')
@@ -355,7 +355,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 activityTimeframe,
                 selectedCollateralTokenList,
                 providerClientQuery,
-                matchRuleList,
+                matchingRuleList,
                 depositTokenList
               })({
                 changeWallet: changeWalletTether(),

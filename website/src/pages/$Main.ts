@@ -9,6 +9,7 @@ import {
   $element,
   $node,
   $text,
+  combineState,
   component,
   eventElementTarget,
   fromCallback,
@@ -20,16 +21,18 @@ import {
 import * as router from 'aelea/router'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { crudPolicy } from 'drizzle-orm/neon'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
 import { $midContainer } from '../common/$common.js'
-import { queryPricefeed, subgraphStatus } from '../common/query.js'
+import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
+import { queryDb } from '../common/sqlClient.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor.js'
 import { localStore } from '../const/localStore.js'
 import { fadeIn } from '../transitions/enter.js'
-import { wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
+import { account, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
 
@@ -58,7 +61,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
-      walletConnectAppkit.getIsConnectedState()
+      // walletConnectAppkit.getIsConnectedState()
 
       const changes = merge(locationChange, multicast(routeChanges))
       const fragmentsChange = map(() => {
@@ -118,6 +121,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           })
         )
       ])
+
+      const matchingRuleQuery = queryUserMatchingRuleList({
+        account: account
+      })
 
       const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchRuleEditorChange[])
       const depositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorChange[])
@@ -185,7 +192,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                           route: leaderboardRoute,
                           activityTimeframe,
                           selectedCollateralTokenList,
-                          matchRuleList,
+                          matchingRuleQuery,
                           depositTokenList,
                           pricefeedMapQuery
                         })({

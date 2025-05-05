@@ -17,7 +17,7 @@ import type { IUserActivityPageParams } from '../type.js'
 
 interface IWalletPuppet extends IUserActivityPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
-  matchRuleList: Stream<IMatchRuleEditorChange[]>
+  matchingRuleList: Stream<IMatchRuleEditorChange[]>
 }
 
 export const $WalletPuppet = (config: IWalletPuppet) =>

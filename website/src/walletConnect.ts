@@ -1,8 +1,9 @@
+import { empty, mergeArray, now, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { createAppKit } from '@reown/appkit'
 import type { AppKitNetwork } from '@reown/appkit/networks'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { createConfig, type GetAccountReturnType, watchAccount, watchBlockNumber } from '@wagmi/core'
+import { createConfig, type GetAccountReturnType, getAccount, watchAccount, watchBlockNumber } from '@wagmi/core'
 import { fromCallback, replayLatest } from 'aelea/core'
 import { fallback, http, webSocket } from 'viem'
 import { arbitrum } from 'viem/chains'
@@ -79,8 +80,12 @@ export const walletConnectAppkit = createAppKit({
 export const blockChange: Stream<bigint> = fromCallback((cb) => {
   return watchBlockNumber(wagmiConfig, { onBlockNumber: (res) => cb(res) })
 })
-export const accountChange: Stream<GetAccountReturnType> = replayLatest(
+
+const accountStatus = getAccount(wagmiConfig)
+
+export const account: Stream<GetAccountReturnType> = mergeArray([
+  accountStatus.connector === undefined ? now(accountStatus) : empty(),
   fromCallback((cb) => {
     return watchAccount(wagmiConfig, { onChange: (res) => cb(res) })
   })
-)
+])

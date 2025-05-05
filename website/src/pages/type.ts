@@ -3,7 +3,7 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import * as walletLink from '@puppet/middleware/wallet'
 import type * as router from 'aelea/router'
 import type * as viem from 'viem'
-import type { IPriceCandle } from '../__generated__/ponder.types'
+import type { IMatchingRule, IPriceCandle } from '../__generated__/ponder.types'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
 
@@ -18,7 +18,7 @@ export interface IUserActivityPageParams extends IPageParams {
   activityTimeframe: Stream<IntervalTime>
   pricefeedMapQuery: Stream<Promise<Record<viem.Address, IPriceCandle[]>>>
   depositTokenList: Stream<IDepositEditorChange[]>
-  matchRuleList: Stream<IMatchRuleEditorChange[]>
+  matchingRuleQuery: Stream<Promise<IMatchingRule[]>>
 }
 
 export interface IEarningsPlan {

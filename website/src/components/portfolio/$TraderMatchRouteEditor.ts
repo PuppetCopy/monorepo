@@ -8,6 +8,7 @@ import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
+import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $tokenTryLabeled } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
@@ -15,18 +16,13 @@ import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $MatchRuleEditor, type IDraftMatchRule } from './$MatchRuleEditor.js'
 
-export interface IMatchRuleEditorChange {
-  draft: IDraftMatchRule
-  trader: Address
-  expiry: number
-  collateralToken: Address
-}
+export type IMatchRuleEditorChange = IMatchRule
 
 interface ITraderMatchingRouteEditor {
   trader: Address
   matchedPuppetList: Address[]
   collateralToken: Address
-  userMatchingRuleList: Stream<IMatchRuleEditorChange[]>
+  userMatchingRuleList: IMatchingRule[]
   $container?: INodeCompose
 }
 
@@ -50,25 +46,19 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
         matchedPuppetList
       } = config
 
-      const matchedMatchingRule = map((ruleList) => {
-        return ruleList.length
-          ? ruleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === matchingKey)
-          : undefined
-      }, userMatchingRuleList)
+      const matchedMatchingRule = userMatchingRuleList.length
+        ? userMatchingRuleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === matchingKey)
+        : undefined
 
       return [
         $Popover({
           $container,
-          open: snapshot(
-            (matchRule) => {
-              return $MatchRuleEditor(matchRule)({
-                remove: discardDraftTether(),
-                save: saveDraftTether()
-              })
-            },
-            matchedMatchingRule,
-            popRouteSubscriptionEditor
-          ),
+          open: map((matchRule) => {
+            return $MatchRuleEditor(matchedMatchingRule)({
+              remove: discardDraftTether(),
+              save: saveDraftTether()
+            })
+          }, popRouteSubscriptionEditor),
           dismiss: mergeArray([saveDraft, discardDraft]),
           $target: $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '12px' : '4px' }))(
@@ -91,14 +81,12 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
                 height: 'auto'
               }),
 
-              styleBehavior(
-                map((rule) => {
-                  return {
-                    borderColor:
-                      rule && rule.expiry > unixTimestampNow() ? pallete.primary : colorAlpha(pallete.foreground, 0.25)
-                  }
-                }, matchedMatchingRule)
-              )
+              style({
+                borderColor:
+                  matchedMatchingRule && matchedMatchingRule.expiry > unixTimestampNow()
+                    ? pallete.primary
+                    : colorAlpha(pallete.foreground, 0.25)
+              })
             )
           })({
             click: popRouteSubscriptionEditorTether()
@@ -106,42 +94,34 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
         })({}),
         {
           changeMatchRuleList: mergeArray([
-            snapshot(
-              (list, params) => {
-                const index = list.findIndex((x) => x.trader === trader)
-                const newList = [...list]
-                const change = {
-                  draft: params.saveDraft,
-                  trader,
-                  collateralToken: collateralToken,
-                  matchRule: matchedMatchingRule
-                }
-                if (index === -1) {
-                  newList.push(change)
-                  return newList
-                }
-
-                newList[index] = change
+            map((params) => {
+              const index = userMatchingRuleList.findIndex((x) => x.trader === trader)
+              const newList = [...userMatchingRuleList]
+              const change = {
+                ...matchedMatchingRule,
+                ...params.saveDraft,
+                trader,
+                collateralToken: collateralToken
+              }
+              if (index === -1) {
+                newList.push(change)
                 return newList
-              },
-              userMatchingRuleList,
-              combineState({ saveDraft })
-            ),
-            snapshot(
-              (list, draft) => {
-                const index = list.findIndex((x) => x.trader === trader)
-                const newList = [...list]
+              }
 
-                if (index === -1) {
-                  return list
-                }
+              newList[index] = change
+              return newList
+            }, combineState({ saveDraft })),
+            map((draft) => {
+              const index = list.findIndex((x) => x.trader === trader)
+              const newList = [...list]
 
-                newList.splice(index, 1)
-                return newList
-              },
-              userMatchingRuleList,
-              discardDraft
-            )
+              if (index === -1) {
+                return list
+              }
+
+              newList.splice(index, 1)
+              return newList
+            }, discardDraft)
           ])
         }
       ]

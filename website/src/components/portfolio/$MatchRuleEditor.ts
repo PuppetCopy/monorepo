@@ -53,8 +53,9 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
         'advancedRouteEditorEnabled'
       )
 
+      const allowanceRate = startWith(matchRule?.allowanceRate || BigInt(1000), inputAllowance)
       const draft: Stream<IDraftMatchRule> = combineState({
-        allowanceRate: startWith(matchRule?.allowanceRate || BigInt(1000), inputAllowance),
+        allowanceRate: allowanceRate,
         throttleActivity: startWith(matchRule?.throttleActivity || BigInt(IntervalTime.HR), changeActivityThrottle),
         expiry: startWith(matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR), inputEndDate)
       })
