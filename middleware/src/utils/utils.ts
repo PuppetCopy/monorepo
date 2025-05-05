@@ -227,91 +227,97 @@ export function unixTimeTzOffset(ms: number): UTCTimestamp {
   return ms as UTCTimestamp
 }
 
-export type TimelineTime = {
+export type TimelineItem<T> = {
   time: number
+  slot: number
+  value: T
 }
 
-export interface ICreateTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime> {
+export interface ICreateTimeline<TSource, TMap, TResult extends TimelineItem<TMap>> {
   ticks?: number
-  getTime: (t: T) => number
-  seed: R & TimelineTime
-  source: T[]
+  lastTime?: number
+  sourceList: TSource[]
 
-  seedMap: (acc: RTime, next: T, intervalSlot: number) => R
-  gapMap?: (acc: RTime, next: T, intervalSlot: number) => R
-  squashMap?: (acc: RTime, next: T, intervalSlot: number) => R
+  getTime: (t: TSource) => number
+  sourceMap: (next: TSource, timeslot: number) => TMap
+  gapMap?: (next: TResult, timeslot: number) => TResult
+  squashMap?: (conflict: TResult, next: TSource, timeslot: number) => TMap
 }
 
-export function createTimeline<T, R, RTime extends R & TimelineTime = R & TimelineTime>(
-  config: ICreateTimeline<T, R, RTime>
-) {
-  const { source, seed, seedMap, gapMap = (prev) => prev, squashMap = seedMap, getTime, ticks = 90 } = config
+export function fillTimeline<TSource, TMap, TResult extends TimelineItem<TMap>>(
+  config: ICreateTimeline<TSource, TMap, TResult>
+): TResult[] {
+  const {
+    ticks = 90,
+    sourceList,
+    sourceMap,
+    gapMap = (prev) => prev,
+    squashMap = (prev, next, timeslot) => sourceMap(next, timeslot),
+    getTime
+  } = config
 
-  const sortedSource = source.filter((update) => getTime(update) > seed.time).sort((a, b) => getTime(a) - getTime(b))
+  // const sortedSource = source.filter((update, i) => getTime(update, i) > seed.time).sort((a, b) => getTime(a) - getTime(b))
 
-  if (sortedSource.length === 0) {
+  if (sourceList.length === 0) {
     return []
   }
 
-  const lstSrc = sortedSource[sortedSource.length - 1]
-  const lstTime = getTime(lstSrc)
-  if (seed.time > lstTime) {
-    throw new Error('seed time is greater than last time, source is not sorted')
-  }
+  const initialTime = getTime(sourceList[0])
+  const lastTime = getTime(sourceList[sourceList.length - 1])
+  const interval = Math.floor((lastTime - initialTime) / ticks)
 
-  const interval = Math.floor((lstTime - seed.time) / ticks)
-  const seedSlot = Math.floor(seed.time / interval)
-  const normalizedSeed = { ...seed, time: seedSlot * interval } as RTime
+  const seedSlot = Math.floor(initialTime / interval)
+  const seedTimeSlot = seedSlot * interval
+  const seedMap = { time: seedTimeSlot, slot: seedSlot, value: sourceMap(sourceList[0], seedTimeSlot) } as TResult
+  const timelineMap: { [k: number]: TResult } = {}
 
-  const timeslotMap: { [k: number]: RTime } = {
-    [seedSlot]: normalizedSeed
-  }
+  timelineMap[seedSlot] = seedMap
 
-  return sortedSource.reduce(
-    (timeline: RTime[], next: T) => {
-      // ensure previous time is always less than next time
-      const prev = timeline[timeline.length - 1]
-      const nextTime = getTime(next)
-      if (prev.time > nextTime) {
-        throw new Error('source is not sorted')
+  let prev = seedMap
+  for (let i = 1; i < sourceList.length; i++) {
+    const source = sourceList[i]
+    const sourceTime = getTime(sourceList[i])
+
+    if (getTime(sourceList[i - 1]) > sourceTime) {
+      throw new Error('source has to be sorted')
+    }
+
+    const timeSlot = Math.floor(sourceTime / interval)
+    const squashPrev = timelineMap[timeSlot]
+
+    if (squashPrev) {
+      timelineMap[timeSlot] = {
+        time: squashPrev.time,
+        slot: timeSlot,
+        value: squashMap(squashPrev, source, timeSlot)
+      } as TResult
+      continue
+    }
+
+    const gapSpan = timeSlot - prev.slot
+    for (let i = 1; i !== gapSpan; i++) {
+      const gapTimeSlot = prev.slot + i
+
+      if (timelineMap[gapTimeSlot]) {
+        throw new Error('Gap time slot conlides with existing time slot')
       }
 
-      const intervalSlot = Math.floor(nextTime / interval)
-      const squashPrev = timeslotMap[intervalSlot]
+      const gapTimeslot = gapTimeSlot * interval
+      timelineMap[gapTimeSlot] = {
+        time: gapTimeslot,
+        slot: gapTimeSlot,
+        value: gapMap(prev, gapTimeSlot).value
+      } as TResult
+      // prev = timelineMap[prev.time]
+    }
 
-      if (squashPrev) {
-        const newSqush = { ...squashMap(squashPrev, next, intervalSlot), time: squashPrev.time } as RTime
-        const lastIdx = timeline.length - 1
+    const item = { time: timeSlot * interval, slot: timeSlot, value: sourceMap(source, timeSlot) } as TResult
 
-        timeslotMap[intervalSlot] = newSqush
-        timeline.splice(lastIdx, 1, newSqush)
-      } else {
-        const time = intervalSlot * interval
-        const barSpan = (time - prev.time) / interval
-        const barSpanCeil = barSpan - 1
+    timelineMap[timeSlot] = item
+    prev = item
+  }
 
-        for (let i = 1; i <= barSpanCeil; i++) {
-          const gapTime = interval * i
-          const newTime = prev.time + gapTime
-          const newSlot = Math.floor(newTime / interval)
-          const fillNext = gapMap(timeline[timeline.length - 1], next, newSlot)
-          const newTick = { ...fillNext, time: newTime } as RTime
-
-          timeslotMap[newSlot] ??= newTick
-          timeline.push(newTick)
-        }
-
-        const lastTick = seedMap(timeline[timeline.length - 1], next, intervalSlot)
-        const item = { ...lastTick, time: time } as RTime
-
-        timeslotMap[intervalSlot] = item
-        timeline.push(item)
-      }
-
-      return timeline
-    },
-    [normalizedSeed]
-  )
+  return Object.values(timelineMap)
 }
 
 function defaultComperator(queryParams: IRequestSortApi) {

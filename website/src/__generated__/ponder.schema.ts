@@ -18,8 +18,14 @@ export const traderRouteMetric = onchainTable('TraderRouteMetric', (t) => ({
   pnl: t.bigint().notNull(),
   roi: t.bigint().notNull(),
   interval: t.integer().notNull(),
+  winCount: t.integer().notNull(),
+  lossCount: t.integer().notNull(),
+  matchedPuppetCount: t.integer().notNull(),
   lastUpdatedTimestamp: t.integer().notNull(),
-  marketList: t.hex().array().notNull()
+  marketList: t.hex().array().notNull(),
+  pnlList: t.bigint().array().notNull(),
+  pnlTimestampList: t.integer().array().notNull(),
+  matchedPuppetList: t.hex().array().notNull()
 }))
 
 export const puppetSettle = onchainTable('PuppetSettle', (t) => ({

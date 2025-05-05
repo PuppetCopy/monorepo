@@ -288,11 +288,11 @@ export function getMatchKey(collateralToken: viem.Address, trader: viem.Address)
   )
 }
 
-export function getAllocationKey(puppetList: viem.Address[], matchKey: viem.Hex, allocationId: bigint) {
+export function getAllocationKey(puppetList: viem.Address[], matchingKey: viem.Hex, allocationId: bigint) {
   return viem.keccak256(
     viem.encodeAbiParameters(viem.parseAbiParameters('address[], bytes32, uint256'), [
       puppetList,
-      matchKey,
+      matchingKey,
       allocationId
     ])
   )

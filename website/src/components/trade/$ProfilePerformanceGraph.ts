@@ -1,10 +1,10 @@
 import { now, skipRepeatsWith } from '@most/core'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
-import { getMarketIndexToken, getPositionPnlUsd, type IPricetick } from '@puppet/middleware/gmx'
+import { getPositionPnlUsd, type IPricetick } from '@puppet/middleware/gmx'
 import { $Baseline, type IMarker } from '@puppet/middleware/ui-components'
-import { createTimeline, formatFixed, unixTimestampNow } from '@puppet/middleware/utils'
+import { fillTimeline, formatFixed, unixTimestampNow } from '@puppet/middleware/utils'
 import type { IBehavior } from 'aelea/core'
-import { component, type I$Node, type INodeCompose, style } from 'aelea/core'
+import { component, type INodeCompose, style } from 'aelea/core'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   type BaselineData,
@@ -14,10 +14,9 @@ import {
   type MouseEventParams,
   type Time
 } from 'lightweight-charts'
-import { IPriceCandle } from 'schema'
 import type * as viem from 'viem'
 
-type IOpsenPnl = {
+type IOpenPnl = {
   update: { sizeInUsd: bigint; sizeInTokens: bigint; isLong: boolean }
   indexToken: viem.Address
   pnl: bigint
@@ -30,7 +29,7 @@ export type IPerformanceTimelineTick = {
   pnl: bigint
   roi: bigint
   time: number
-  openPnlMap: Map<viem.Hex, OpenPnl>
+  openPnlMap: Map<viem.Hex, IOpenPnl>
 }
 
 export type IAbstractUpdate = {
@@ -70,22 +69,21 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
     )
     .filter((tick) => tick.timestamp > initialPositionTime)
 
-  const seed: IPerformanceTimelineTick = {
+  const acc: IPerformanceTimelineTick = {
     value: 0,
-    realisedPnl: 0n,
     openPnl: 0n,
-    openPnlMap: new Map<viem.Hex, OpenPnl>(),
+    realisedPnl: 0n,
     pnl: 0n,
     roi: 0n,
-    time: startTime
+    time: 0,
+    openPnlMap: new Map()
   }
-  const data = createTimeline({
-    source: [...config.list, ...priceUpdateTicks],
-    seed: seed,
-    getTime(item: IAbstractUpdate | IPricetickWithIndexToken) {
-      return 'price' in item ? item.timestamp : item.blockTimestamp
-    },
-    seedMap: (acc, next) => {
+
+  const data = fillTimeline({
+    sourceList: [...config.list, ...priceUpdateTicks],
+    getTime: (item: IAbstractUpdate | IPricetickWithIndexToken) =>
+      'price' in item ? item.timestamp : item.blockTimestamp,
+    sourceMap: (next) => {
       const nextTick = { ...acc }
 
       if ('price' in next) {

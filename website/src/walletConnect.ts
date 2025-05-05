@@ -41,7 +41,7 @@ export const walletConnectAppkit = createAppKit({
   metadata: {
     name: '__APP_NAME__',
     description: '__APP_DESC_SHORT__',
-    url: window.location.host,
+    url: window.location.origin,
     icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg']
   }
 })

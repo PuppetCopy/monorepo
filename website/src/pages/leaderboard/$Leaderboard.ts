@@ -1,6 +1,6 @@
 import { empty, map, now, startWith } from '@most/core'
 import type { Time } from '@most/types'
-import { IntervalTime } from '@puppet/middleware/const'
+import { IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import type { IMatchRouteStats, IPositionDecrease, IPositionIncrease } from '@puppet/middleware/core'
 import {
   $Baseline,
@@ -21,14 +21,22 @@ import {
   type TableColumn
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { getMappedValue, type InferStream, readablePnl, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
+import {
+  fillTimeline,
+  formatFixed,
+  getMappedValue,
+  type InferStream,
+  readablePnl,
+  switchMap,
+  unixTimestampNow
+} from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
 import * as schema from 'schema'
-import * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { $roiDisplay, $size, $TraderDisplay } from '../../common/$common.js'
 import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
 import { queryPricefeed } from '../../common/query.js'
@@ -63,7 +71,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       [sortByChange, sortByChangeTether]: IBehavior<ISortBy<(typeof schema)['traderRouteMetric']['$inferInsert']>>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
       [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
@@ -184,67 +192,17 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         maxSizeInTokens: true,
                         maxCollateralInTokens: true,
                         roi: true,
-                        pnl: true
+                        pnl: true,
+                        winCount: true,
+                        lossCount: true,
+                        pnlList: true,
+                        pnlTimestampList: true,
+                        matchedPuppetCount: true,
+                        matchedPuppetList: true
                       }
                     })
 
-                    const page = await Promise.all(
-                      metrictList.map(async (routeMetric) => {
-                        queryDb.select({})
-                        const [matchingRuleList, increaseList, decreaseList] = await Promise.all([
-                          queryDb.query.puppetMatchingRule.findMany({
-                            where: (t, f) => f.and(f.eq(t.matchingKey, routeMetric.matchingKey)),
-                            columns: {
-                              puppet: true,
-                              allowanceRate: true,
-                              expiry: true,
-                              throttleActivity: true
-                            }
-                            // limit: 10
-                          }),
-                          queryDb.query.positionIncrease.findMany({
-                            where: (t, f) =>
-                              f.and(
-                                f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, startActivityTimeframeTimeSlot)
-                              ),
-                            columns: {
-                              indexToken: true,
-                              positionKey: true,
-                              sizeInUsd: true,
-                              sizeInTokens: true,
-                              indexTokenPriceMax: true,
-                              isLong: true,
-                              blockTimestamp: true
-                            }
-                          }),
-                          queryDb.query.positionDecrease.findMany({
-                            where: (t, f) =>
-                              f.and(
-                                f.eq(t.matchingKey, routeMetric.matchingKey),
-                                f.gte(t.blockTimestamp, startActivityTimeframeTimeSlot)
-                              ),
-                            columns: {
-                              indexToken: true,
-                              positionKey: true,
-                              sizeInUsd: true,
-                              sizeInTokens: true,
-                              indexTokenPriceMax: true,
-                              basePnlUsd: true,
-                              isLong: true,
-                              blockTimestamp: true
-                            }
-                          })
-                        ])
-
-                        return {
-                          ...routeMetric,
-                          decreaseList,
-                          increaseList,
-                          matchingRuleList
-                        }
-                      })
-                    )
+                    const page = metrictList
 
                     return { page, offset: filterParams.paging.offset, pageSize: filterParams.paging.pageSize }
                   },
@@ -281,12 +239,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $text('Routes'),
                     gridTemplate: isDesktopScreen ? '210px' : undefined,
                     $bodyCallback: map((pos) => {
-                      const _tokenList = [
-                        ...new Set([
-                          ...pos.increaseList.map((x) => x.indexToken),
-                          ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
-                        ])
-                      ]
+                      // const _tokenList = [
+                      //   ...new Set([
+                      //     ...pos.increaseList.map((x) => x.indexToken),
+                      //     ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
+                      //   ])
+                      // ]
 
                       // return $row(
                       //   ...tokenList.map(token =>
@@ -296,9 +254,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       //   )
                       // )
                       return $TraderMatchingRouteEditor({
-                        matchRuleList,
+                        matchedPuppetList: pos.matchedPuppetList,
                         collateralToken: pos.collateralToken,
-                        traderMatchingRuleList: pos.matchingRuleList,
+                        userMatchingRuleList: changeMatchRuleList,
                         trader: pos.account
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()
@@ -312,12 +270,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           gridTemplate: '70px',
                           columnOp: style({ alignItems: 'center', placeContent: 'center' }),
                           $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            const totalCount = pos.decreaseList.length
-                            const winCount = pos.decreaseList.reduce(
-                              (acc, next) => acc + (next.basePnlUsd > 0n ? 1 : 0),
-                              0
-                            )
-                            return $row(spacing.small)($text(`${winCount} / ${totalCount - winCount}`))
+                            const totalCount = pos.winCount + pos.lossCount
+                            return $row(spacing.small)($text(`${pos.winCount} / ${totalCount - pos.lossCount}`))
                           })
                         },
                         {
@@ -337,25 +291,34 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     // columnOp: style({ placeContent: 'flex-start' }),
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between' }))(
                       $tableHeader('ROI %', 'PnL $'),
-                      $text(map((tf) => `${getMappedValue(LAST_ACTIVITY_LABEL_MAP, tf)} Activtiy`, activityTimeframe))
+                      $text(`${getMappedValue(LAST_ACTIVITY_LABEL_MAP, params.activityTimeframe)} Activtiy`)
                     ),
                     sortBy: 'roi',
                     gridTemplate: isDesktopScreen ? '200px' : '140px',
                     $bodyCallback: map((pos) => {
-                      const adjustList = [...pos.increaseList, ...pos.decreaseList]
-
-                      const timeline = getPositionListTimelinePerformance({
-                        activityTimeframe: params.activityTimeframe,
-                        list: adjustList,
-                        pricefeedMap: params.pricefeedMap,
-                        tickCount: 25
+                      const endTime = unixTimestampNow()
+                      const startTime = endTime - params.activityTimeframe
+                      const sourceList = [
+                        { value: 0n, time: startTime },
+                        ...pos.pnlList.map((pnl, index) => ({
+                          value: pnl,
+                          time: pos.pnlTimestampList[index]
+                        })),
+                        { value: pos.pnlList[pos.pnlList.length - 1], time: endTime }
+                      ]
+                      const timeline = fillTimeline({
+                        sourceList,
+                        getTime: (item) => item.time,
+                        sourceMap: (next) => {
+                          return formatFixed(USD_DECIMALS, next.value)
+                        }
                       })
 
-                      const markerList = adjustList
-                        .map((pos) => ({
+                      const markerList = pos.pnlTimestampList
+                        .map((timestmap) => ({
                           position: 'inBar',
                           color: colorAlpha(pallete.message, 0.15),
-                          time: pos.blockTimestamp as Time,
+                          time: timestmap as Time,
                           size: 0.1,
                           shape: 'circle'
                         }))
