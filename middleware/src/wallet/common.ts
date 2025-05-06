@@ -1,6 +1,16 @@
+import type { Connector } from '@wagmi/core'
+import {
+  type GetAccountReturnType,
+  simulateContract,
+  readContract as viemReadContract,
+  writeContract as viemWriteContract,
+  type WriteContractParameters,
+  waitForTransactionReceipt
+} from '@wagmi/core/actions'
 import type * as abitype from 'abitype'
 import {
   type Abi,
+  type Address,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
@@ -10,15 +20,8 @@ import {
   type ReadContractReturnType,
   type TransactionReceipt
 } from 'viem'
-import {
-  simulateContract,
-  readContract as viemReadContract,
-  writeContract as viemWriteContract,
-  type WriteContractParameters,
-  waitForTransactionReceipt
-} from 'viem/actions'
 import type { Chain } from 'viem/chains'
-import type { IClient, IWalletClient } from './connect.js'
+import { wagmiConfig } from './walletConnect.js'
 
 export type IWriteContractReturn<
   TAbi extends abitype.Abi = Abi,
@@ -28,35 +31,23 @@ export type IWriteContractReturn<
   events: ParseEventLogsReturnType<TAbi, TEventName, true>
 }>
 
-export type IWriteContractParams<
-  TAbi extends abitype.Abi,
-  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
-  TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
-  TChain extends Chain,
-  TEventName extends ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined
-> = Omit<WriteContractParameters<TAbi, TFunctionName, TArgs, TChain>, 'account'> & {
-  eventName?: TEventName
-  walletClient: IWalletClient
-}
 export async function writeContract<
   const TAbi extends abitype.Abi,
   TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
   TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
-  TChain extends Chain,
   TEventName extends ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined
 >(
-  writeParams: IWriteContractParams<TAbi, TFunctionName, TArgs, TChain, TEventName>
+  writeParams: Omit<WriteContractParameters<TAbi, TFunctionName, TArgs>, 'account'> & {
+    eventName?: TEventName
+  }
 ): IWriteContractReturn<TAbi, TEventName> {
   try {
-    const walletClient = writeParams.walletClient
-
     // const hash = await viemWriteContract(writeParams.walletClient, { ...writeParams, account: walletClient.account } as any)
-    const sim = await simulateContract(writeParams.walletClient, {
-      ...writeParams,
-      account: walletClient.account
+    const sim = await simulateContract(wagmiConfig, {
+      ...writeParams
     } as any)
-    const hash = await viemWriteContract(writeParams.walletClient, sim.request)
-    const transactionReceipt = await waitForTransactionReceipt(walletClient, { hash })
+    const hash = await viemWriteContract(wagmiConfig, sim.request)
+    const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, { hash })
     const events = parseEventLogs({
       eventName: writeParams.eventName,
       abi: writeParams.abi,
@@ -75,7 +66,21 @@ export async function readContract<
   TFunctionName extends ContractFunctionName<TAbi, 'view'>,
   TArgs extends ContractFunctionArgs<TAbi, 'view', TFunctionName>
 >(
-  parameters: ReadContractParameters<TAbi, TFunctionName, TArgs> & { provider: IClient }
+  parameters: ReadContractParameters<TAbi, TFunctionName, TArgs>
 ): Promise<ReadContractReturnType<TAbi, TFunctionName, TArgs>> {
-  return viemReadContract(parameters.provider, parameters as any)
+  return viemReadContract(wagmiConfig, parameters as any)
+}
+
+export type IWalletClient = GetAccountReturnType
+export type IWalletConnected = {
+  address: Address
+  addresses: readonly [Address, ...Address[]]
+  chain: number
+  chainId: number
+  connector: Connector
+  isConnected: true
+  isConnecting: false
+  isDisconnected: false
+  isReconnecting: false
+  status: 'connected'
 }

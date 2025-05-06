@@ -1,7 +1,6 @@
-import { empty, map, now, sample, snapshot, startWith } from '@most/core'
+import { empty, map, mergeArray, now, sample, snapshot, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet/middleware/const'
-import type { IMatchRule } from '@puppet/middleware/core'
 import { $Checkbox, $FieldLabeled } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import { formatFixed, getDuration, parseBps, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
@@ -17,35 +16,40 @@ import {
   style,
   stylePseudo
 } from 'aelea/core'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
+import type { Address, Hex } from 'viem'
+import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 
-export type IMatchingRule = {
-  puppet: `0x${string}`
+export interface IMatchingRuleEditorChange {
   allowanceRate: bigint
   throttleActivity: bigint
   expiry: bigint
+  matchingKey: Hex
+  collateralToken: Address
+  trader: Address
 }
 
-export interface IDraftMatchRule {
-  expiry: bigint
-  allowanceRate: bigint
-  throttleActivity: bigint
+export type IMatchRuleEditor = {
+  matchingRule?: IMatchingRule
+  matchingKey: Hex
+  collateralToken: Address
+  trader: Address
 }
 
-export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
+export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
   component(
     (
       [inputEndDate, inputEndDateTether]: IBehavior<any, bigint>,
       [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
-      [clickRemove, clickRemoveTether]: IBehavior<any, IDraftMatchRule>,
+      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorChange>,
       [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
       [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
-      [saveMatchRule, saveMatchRuleTether]: IBehavior<PointerEvent, IDraftMatchRule>
+      [saveMatchRule, saveMatchRuleTether]: IBehavior<PointerEvent, IMatchingRuleEditorChange>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
         localStore.ruleEditor,
@@ -53,14 +57,25 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
         'advancedRouteEditorEnabled'
       )
 
-      const allowanceRate = startWith(matchRule?.allowanceRate || BigInt(1000), inputAllowance)
-      const draft: Stream<IDraftMatchRule> = combineState({
-        allowanceRate: allowanceRate,
-        throttleActivity: startWith(matchRule?.throttleActivity || BigInt(IntervalTime.HR), changeActivityThrottle),
-        expiry: startWith(matchRule?.expiry || BigInt(unixTimestampNow() + IntervalTime.YEAR), inputEndDate)
+      const { matchingRule, matchingKey, collateralToken, trader } = config
+
+      const placeholderForm = {
+        allowanceRate: BigInt(1000),
+        throttleActivity: BigInt(IntervalTime.HR),
+        expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
+      }
+
+      const change = combineState({
+        matchingKey: now(matchingKey),
+        allowanceRate: startWith(matchingRule?.allowanceRate || placeholderForm.allowanceRate, inputAllowance),
+        throttleActivity: startWith(
+          matchingRule?.throttleActivity || placeholderForm.throttleActivity,
+          changeActivityThrottle
+        ),
+        expiry: startWith(matchingRule?.expiry || placeholderForm.expiry, inputEndDate)
       })
 
-      const isSubscribed = matchRule && matchRule.expiry > BigInt(unixTimestampNow())
+      const isSubscribed = matchingRule && matchingRule.expiry > BigInt(unixTimestampNow())
 
       return [
         $column(spacing.default, style({ maxWidth: '350px' }))(
@@ -68,8 +83,13 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
 
           $FieldLabeled({
             label: 'Allocate %',
-            value: map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), inputAllowance),
-            placeholder: `${formatFixed(4, matchRule?.allowanceRate || BigInt(1000)) * 100}`,
+            value: mergeArray([
+              matchingRule?.allowanceRate && matchingRule.allowanceRate !== placeholderForm.allowanceRate
+                ? now(matchingRule.allowanceRate)
+                : empty(),
+              map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), inputAllowance)
+            ]),
+            placeholder: `${formatFixed(4, matchingRule?.allowanceRate || placeholderForm.allowanceRate) * 100}`,
             labelWidth: 150,
             hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
@@ -98,7 +118,7 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
                 $selection: $FieldLabeled({
                   label: 'Activity throttle',
                   value: map(O(Number, getDuration), changeActivityThrottle),
-                  placeholder: getDuration(Number(matchRule?.throttleActivity || BigInt(IntervalTime.HR))),
+                  placeholder: getDuration(Number(matchingRule?.throttleActivity || placeholderForm.throttleActivity)),
                   labelWidth: 150,
                   hint: 'Ignore positions that are too close to each other in time'
                 })({}),
@@ -146,7 +166,7 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
 
             $ButtonSecondary({
               $content: $text('Subscribe'),
-              disabled: map((params) => !params.allowanceRate, draft)
+              disabled: map((params) => !params.allowanceRate, change)
             })({
               click: saveMatchRuleTether()
             })
@@ -154,8 +174,12 @@ export const $MatchRuleEditor = (matchRule: IMatchingRule | undefined) =>
         ),
 
         {
-          save: sample(draft, saveMatchRule),
-          remove: snapshot((draft): IDraftMatchRule => ({ ...draft, expiry: 0n }), draft, clickRemove)
+          save: snapshot((draft) => ({ ...draft, collateralToken, trader, matchingKey }), change, saveMatchRule),
+          remove: snapshot(
+            (draft): IMatchingRuleEditorChange => ({ ...draft, matchingKey, collateralToken, trader, expiry: 0n }),
+            change,
+            clickRemove
+          )
         }
       ]
     }

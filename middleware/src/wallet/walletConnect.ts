@@ -1,14 +1,14 @@
-import { empty, mergeArray, now, startWith } from '@most/core'
+import { empty, mergeArray, now } from '@most/core'
 import type { Stream } from '@most/types'
-import { createAppKit } from '@reown/appkit'
+import { createAppKit } from '@reown/appkit/core'
 import type { AppKitNetwork } from '@reown/appkit/networks'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createConfig, type GetAccountReturnType, getAccount, watchAccount, watchBlockNumber } from '@wagmi/core'
-import { fromCallback, replayLatest } from 'aelea/core'
+import { fromCallback } from 'aelea/core'
 import { fallback, http, webSocket } from 'viem'
 import { arbitrum } from 'viem/chains'
 
-const projectId = import.meta.env.VITE_WC_PROJECT_ID as string
+const projectId = '50f28392d528ed7a266e5bd92c22598a'
 
 export const publicTransportMap = {
   [arbitrum.id]: fallback([
@@ -37,6 +37,11 @@ export const walletConnectAppkit = createAppKit({
   features: {
     connectMethodsOrder: ['wallet', 'social'],
     collapseWallets: false,
+    swaps: false,
+    email: false,
+    send: false,
+    history: false,
+    onramp: false,
     analytics: true
   },
   metadata: {
@@ -46,36 +51,6 @@ export const walletConnectAppkit = createAppKit({
     icons: ['https://imagedelivery.net/_aTEfDRm7z3tKgu9JhfeKA/5a7df101-00dc-4856-60a9-921b2879e200/lg']
   }
 })
-
-// Subscribe to state changes
-// walletConnectAppkit.subscribeAccount(state => {
-//   console.log('account state', state)
-// })
-
-// walletConnectAppkit.subscribeNetwork(state => {
-//   console.log('network state', state)
-
-// })
-
-// walletConnectAppkit.subscribeState(state => {
-//   console.log('state', state)
-// })
-
-// walletConnectAppkit.subscribeTheme(state => {
-//   console.log('theme', state)
-// })
-
-// walletConnectAppkit.subscribeEvents(state => {
-//   console.log('events', state)
-// })
-
-// walletConnectAppkit.subscribeWalletInfo(state => {
-//   console.log('wallet info', state)
-// })
-
-// walletConnectAppkit.subscribeProviders(state => {
-//   console.log('providers', state)
-// })
 
 export const blockChange: Stream<bigint> = fromCallback((cb) => {
   return watchBlockNumber(wagmiConfig, { onBlockNumber: (res) => cb(res) })

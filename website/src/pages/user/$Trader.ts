@@ -81,7 +81,7 @@
 //                   // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 //                   $TraderMatchingRouteEditor({
 //                     matchRuleList,
-//                     walletClientQuery,
+//
 //                     matchRoute: route.matchRoute,
 //                     trader: route.account,
 //                     $container: $defaultTraderMatchRouteEditorContainer(style({ marginLeft: '-16px', paddingBottom: '16px' }))

@@ -1,16 +1,14 @@
 import { awaitPromises, join, map, now } from '@most/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
 import { switchMap } from '@puppet/middleware/utils'
-import * as wallet from '@puppet/middleware/wallet'
+import { account, type IWalletClient, type IWalletConnected, walletConnectAppkit } from '@puppet/middleware/wallet'
 import { CoreHelperUtil } from '@reown/appkit-controllers'
 import { ConstantsUtil, PresetsUtil } from '@reown/appkit-utils'
-import type { GetAccountReturnType } from '@wagmi/core'
 import type { IBehavior, IOps } from 'aelea/core'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Chain, type HttpTransport, http } from 'viem'
-import { account, walletConnectAppkit } from '../walletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
@@ -52,7 +50,7 @@ export function walletConnectProvider({ projectId }: Options): (chain: Chain) =>
 // }))
 
 export interface IConnectWalletPopover {
-  $$display: IOps<GetAccountReturnType, I$Node>
+  $$display: IOps<IWalletConnected, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose
 }
@@ -65,13 +63,13 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
       $container(
         switchMap((wallet) => {
           // no wallet connected, show connection flow
-          if (!wallet) {
+          if (!wallet.address) {
             return $ConnectChoiceList()({
               changeWallet: changeWalletTether()
             })
           }
 
-          return join(config.$$display(now(wallet)))
+          return join(config.$$display(now(wallet as any as IWalletConnected)))
         }, account)
       ),
 

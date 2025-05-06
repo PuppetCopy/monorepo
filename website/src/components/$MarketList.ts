@@ -66,7 +66,7 @@
 //               gridTemplate: 'minmax(110px, 120px)',
 //               $bodyCallback: map(params => {
 //               // const fees: Stream<IMarketFees> = v2Reader('getMarketInfo', )
-//                 const fees: Stream<IMarketFees> = fromPromise(readContract(provider, {
+//                 const fees: Stream<IMarketFees> = fromPromise(readContract(wagmiConfig, {
 //                   ...gmxContractMap.ReaderV2,
 //                   functionName: 'getMarketInfo',
 //                   args: [gmxContractMap.Datastore.address, params.price, params.market.marketToken] as any
@@ -84,7 +84,7 @@
 //               $head: $text('Borrow Rate Long'),
 //               gridTemplate: '90px',
 //               $bodyCallback: map(params => {
-//                 const marketFees: Stream<IMarketFees> = fromPromise(readContract(provider, {
+//                 const marketFees: Stream<IMarketFees> = fromPromise(readContract(wagmiConfig, {
 //                   ...gmxContractMap.ReaderV2,
 //                   functionName: 'getMarketInfo',
 //                   args: [gmxContractMap.Datastore.address, params.price, params.market.marketToken] as any
@@ -101,7 +101,7 @@
 //               $head: $text('Borrow Rate Short'),
 //               gridTemplate: '90px',
 //               $bodyCallback: map(params => {
-//                 const marketFees: Stream<IMarketFees> = fromPromise(readContract(provider, {
+//                 const marketFees: Stream<IMarketFees> = fromPromise(readContract(wagmiConfig, {
 //                   ...gmxContractMap.ReaderV2,
 //                   functionName: 'getMarketInfo',
 //                   args: [gmxContractMap.Datastore.address, params.price, params.market.marketToken] as any

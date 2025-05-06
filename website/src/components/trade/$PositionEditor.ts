@@ -129,7 +129,7 @@
 //   [clickPrimary, clickPrimaryTether]: IBehavior<any>,
 // ) => {
 
-//   const { walletClientQuery, providerClientQuery } = config
+//   const {  providerClientQuery } = config
 
 //   const {
 //     collateralToken, collateralDeltaAmount, focusMode, indexToken,
@@ -660,7 +660,7 @@
 //               open: constant(
 //                 $MarketInfoList({
 //                   providerClientQuery,
-//                   walletClientQuery,
+//
 //                   chain: config.chain,
 //                   $rowCallback: map(params => {
 //                     return $defaultTableRowContainer(style({ borderTop: `1px solid ${colorAlpha(pallete.foreground, .20)}` }))(

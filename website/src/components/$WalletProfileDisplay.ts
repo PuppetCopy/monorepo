@@ -1,10 +1,10 @@
-import { startWith, switchLatest, tap } from '@most/core'
+import { switchLatest, tap } from '@most/core'
 import { ignoreAll, switchMap } from '@puppet/middleware/utils'
+import { account, wagmiConfig, walletConnectAppkit } from '@puppet/middleware/wallet'
 import { getAccount } from '@wagmi/core'
-import { $node, $text, behavior, IBehavior, nodeEvent, style } from 'aelea/core'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $node, $text, behavior, nodeEvent, style } from 'aelea/core'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
-import { account, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 
 export const $walletProfileDisplay = () => {

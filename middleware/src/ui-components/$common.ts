@@ -221,7 +221,7 @@ export function $txHashRef(txHash: string, chain: Chain = arbitrum) {
 
 interface IHintAdjustment {
   color?: Stream<string>
-  $val: I$Node | string
+  $val: I$Slottable | string
   change: Stream<string>
 }
 

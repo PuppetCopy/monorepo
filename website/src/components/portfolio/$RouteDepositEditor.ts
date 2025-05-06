@@ -3,6 +3,7 @@ import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet/middleware/ui-components'
 import { readableTokenAmount, switchMap } from '@puppet/middleware/utils'
+import { account } from '@puppet/middleware/wallet'
 import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -35,13 +36,11 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         return newLocal
       }, depositTokenList)
 
-      const initialDepositAmountQuery = map(async (walletQuery) => {
-        const wallet = await walletQuery
+      const initialDepositAmountQuery = map(async (wallet) => {
+        if (!wallet.address) return 0n
 
-        if (wallet === null) return 0n
-
-        return puppetReader.getUserBalance(wallet, collateralToken, wallet.account.address)
-      }, walletClientQuery)
+        return puppetReader.getUserBalance(collateralToken, wallet.address)
+      }, account)
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
       return [
@@ -50,8 +49,6 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
             (change) => {
               return $DepositEditor({
                 depositBalanceQuery: initialDepositAmountQuery,
-                walletClientQuery,
-                providerClientQuery,
                 change: change || {
                   token: collateralToken,
                   action: DepositEditorAction.DEPOSIT,
@@ -121,7 +118,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               return changeList
             },
             depositTokenList,
-            combineState({ saveChange, walletClientQuery })
+            combineState({ saveChange, account })
           ),
           changeWallet
         }

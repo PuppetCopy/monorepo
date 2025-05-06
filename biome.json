@@ -4,8 +4,8 @@
     "includes": ["**/src/**/*.ts", "!**/node_modules"]
   },
   "formatter": {
+    "attributePosition": "multiline",
     "enabled": true,
-    "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 120

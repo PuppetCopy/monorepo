@@ -36,7 +36,7 @@
 
 // ) => {
 
-//   const { puppetTradeRoute, routeTypeList, route, walletClientQuery, activityTimeframe, priceTickMap } = config
+//   const { puppetTradeRoute, routeTypeList, route,  activityTimeframe, priceTickMap } = config
 //   const settledPositionList = puppetTradeRoute.settledList.map(x => x.position)
 //   const openPositionList = puppetTradeRoute.openList.map(x => x.position)
 //   const allPositionList = [...settledPositionList, ...openPositionList]
@@ -82,7 +82,7 @@
 //         }),
 //         $Popover({
 //           open: map((expiry) => {
-//             return  $RouteSubscriptionEditor({ walletClientQuery, expiry, ...config.puppetTradeRoute })({
+//             return  $RouteSubscriptionEditor({  expiry, ...config.puppetTradeRoute })({
 //               modifySubscriber: modifySubscriberTether()
 //             })
 //           }, popRouteSubscriptionEditor),

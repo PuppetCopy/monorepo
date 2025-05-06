@@ -313,7 +313,7 @@
 //               return isDisplay
 //                 ? empty()
 //                 : $Submit({
-//                   walletClientQuery,
+//
 //                   txQuery: requestTokenSpend,
 //                   $content: $text(`Approve ${params.primaryDescription.symbol}`)
 //                 })({
@@ -328,7 +328,7 @@
 //                 })
 //             }, combineState({ displayTokenApproval, primaryToken, primaryDescription })),
 //             $SubmitBar({
-//               walletClientQuery,
+//
 //               alert: mergeArray([validationError, constant(null, clickResetPosition)]),
 //               $barContent: style({ padding: '8px', alignSelf: 'center' })(
 //                 $ButtonSecondary({

@@ -23,7 +23,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
     ) => {
       const {
         activityTimeframe,
-        walletClientQuery,
+
         providerClientQuery,
         pricefeedMapQuery,
         selectedCollateralTokenList,
@@ -76,7 +76,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
             //       //         $seperator2,
             //       //         $column(spacing.default, style({ flex: 1 }))(
             //       //           ...traderPuppetTradeRouteList.map(puppetTradeRoute => {
-            //       //             return $PuppetTraderTradeRoute({ route, puppetTradeRoute, providerClientQuery, routeTypeList, walletClientQuery, activityTimeframe: params.activityTimeframe, priceTickMap })({
+            //       //             return $PuppetTraderTradeRoute({ route, puppetTradeRoute, providerClientQuery, routeTypeList,  activityTimeframe: params.activityTimeframe, priceTickMap })({
             //       //               modifySubscriber: modifySubscriberTether(),
             //       //               changeRoute: changeRouteTether(),
             //       //             })

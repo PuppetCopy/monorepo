@@ -2,6 +2,12 @@
   "[solidity]": {
     "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
   "files.exclude": {
@@ -16,4 +22,7 @@
   "biome.enabled": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
+  // "typescript.suggest.autoImports": true,
+  // "typescript.preferences.preferTypeOnlyAutoImports": true,
+  // "typescript.updateImportsOnPaste.enabled": true,
 }

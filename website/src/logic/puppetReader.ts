@@ -1,41 +1,26 @@
 import * as PUPPET from '@puppet/middleware/const'
-import { getMappedValue } from '@puppet/middleware/utils'
-import type * as walletLink from '@puppet/middleware/wallet'
+import { wagmiConfig } from '@puppet/middleware/wallet'
+import { readContract } from '@wagmi/core/actions'
 import type * as viem from 'viem'
 import type { Hex } from 'viem'
-import { readContract } from 'viem/actions'
 
 export default {
-  getUserBalance: (
-    provider: walletLink.IClient,
-    token: viem.Address,
-    puppet: viem.Address,
-    contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-  ) =>
-    readContract(provider, { ...contractDefs.AllocationStore, functionName: 'userBalanceMap', args: [token, puppet] }),
-  getUserAllocationList: (
-    provider: walletLink.IClient,
-    key: Hex,
-    puppetList: viem.Address[],
-    contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-  ) =>
-    readContract(provider, {
+  getUserBalance: (token: viem.Address, puppet: viem.Address, contractDefs = PUPPET.CONTRACT[42161]) =>
+    readContract(wagmiConfig, {
+      ...contractDefs.AllocationStore,
+      functionName: 'userBalanceMap',
+      args: [token, puppet]
+    }),
+  getUserAllocationList: (key: Hex, puppetList: viem.Address[], contractDefs = PUPPET.CONTRACT[42161]) =>
+    readContract(wagmiConfig, {
       ...contractDefs.AllocationStore,
       functionName: 'getBalanceList',
       args: [key, puppetList]
     }),
-  getMatchRule: (
-    provider: walletLink.IClient,
-    puppet: viem.Address,
-    key: viem.Hex,
-    contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-  ) => readContract(provider, { ...contractDefs.MatchingRule, functionName: 'matchingRuleMap', args: [puppet, key] }),
-  getMatchRuleList: (
-    provider: walletLink.IClient,
-    puppet: viem.Address,
-    keyList: viem.Hex[],
-    contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)
-  ) => readContract(provider, { ...contractDefs.MatchingRule, functionName: 'getRuleList', args: [puppet, keyList] }),
-  getConfig: (provider: walletLink.IClient, contractDefs = getMappedValue(PUPPET.CONTRACT, provider.chain.id)) =>
-    readContract(provider, { ...contractDefs.MatchingRule, functionName: 'config', args: [] })
+  getMatchRule: (puppet: viem.Address, key: viem.Hex, contractDefs = PUPPET.CONTRACT[42161]) =>
+    readContract(wagmiConfig, { ...contractDefs.MatchingRule, functionName: 'matchingRuleMap', args: [puppet, key] }),
+  getMatchRuleList: (puppet: viem.Address, keyList: viem.Hex[], contractDefs = PUPPET.CONTRACT[42161]) =>
+    readContract(wagmiConfig, { ...contractDefs.MatchingRule, functionName: 'getRuleList', args: [puppet, keyList] }),
+  getConfig: (contractDefs = PUPPET.CONTRACT[42161]) =>
+    readContract(wagmiConfig, { ...contractDefs.MatchingRule, functionName: 'config', args: [] })
 }

@@ -256,7 +256,6 @@ export interface IProfile extends ILogTypeId<'Profile'> {
 //   account: PuppetAccount!
 // }
 
-
 export interface IDepositBalance extends ILogTypeId<'DepositBalance'> {
   id: viem.Address
   token: viem.Address
@@ -442,4 +441,3 @@ export interface IPositionListSummary {
   winCount: number
   lossCount: number
 }
-

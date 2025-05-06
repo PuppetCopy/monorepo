@@ -1,6 +1,6 @@
 import { empty, map, now, startWith } from '@most/core'
 import type { Time } from '@most/types'
-import { IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
+import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import {
   $Baseline,
   $ButtonToggle,
@@ -41,10 +41,8 @@ import { queryPricefeed } from '../../common/query.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
-import {
-  $TraderMatchingRouteEditor,
-  type IMatchRuleEditorChange
-} from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
+import { $TraderMatchingRouteEditor } from '../../components/portfolio/$TraderMatchRouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
@@ -65,16 +63,15 @@ export const $Leaderboard = (config: ILeaderboard) =>
       [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
       [filterAccount, filterAccountTether]: IBehavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
     ) => {
       const { activityTimeframe, selectedCollateralTokenList, matchingRuleQuery, route } = config
 
-      const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
+      // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
       const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
       const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
       const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
-
       const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
       return [
@@ -108,13 +105,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
             ),
-
             switchMap((params) => {
-              const interval = IntervalTime.HR
+              // const interval = IntervalTime.MIN
               const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-              const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
-
-              console.log('startActivityTimeframeTimeSlot', startActivityTimeframeTimeSlot)
+              // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = switchMap(
                 async (filterParams) => {
@@ -124,7 +118,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         f.eq(t.interval, params.activityTimeframe),
                         filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
                         // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                        f.gte(t.lastUpdatedTimestamp, startActivityTimeframeTimeSlot)
+                        f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
                       ),
                     limit: filterParams.paging.pageSize,
                     offset: filterParams.paging.offset,
@@ -134,13 +128,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         : desc(schema.traderRouteMetric[filterParams.sortBy.selector])
                       : undefined,
                     columns: {
+                      lastUpdatedTimestamp: true,
                       account: true,
                       collateralToken: true,
                       matchingKey: true,
                       maxSizeInUsd: true,
                       maxCollateralInUsd: true,
-                      maxSizeInTokens: true,
-                      maxCollateralInTokens: true,
                       roi: true,
                       pnl: true,
                       winCount: true,
@@ -154,9 +147,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                   const userMatchingRuleList = await params.matchingRuleQuery
 
-                  return metrictList.map((metric) => {
+                  const page = metrictList.map((metric) => {
                     return { metric, userMatchingRuleList }
                   })
+                  return { ...filterParams.paging, page }
                 },
                 combineState({
                   activityTimeframe,
@@ -168,7 +162,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 })
               )
 
-              type ILeaderboardDatasource = InferStream<typeof dataSource>
+              type ILeaderboardDatasource = InferStream<typeof dataSource>['page']
               type ILeaderboardCellData = ILeaderboardDatasource[number]
 
               const columns: TableColumn<ILeaderboardCellData>[] = [
@@ -252,14 +246,16 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   $bodyCallback: map((pos) => {
                     const endTime = unixTimestampNow()
                     const startTime = endTime - params.activityTimeframe
+                    const newLocal = pos.metric.pnlList.map((pnl, index) => ({
+                      value: pnl,
+                      time: pos.metric.pnlTimestampList[index]
+                    }))
                     const sourceList = [
                       { value: 0n, time: startTime },
-                      ...pos.metric.pnlList.map((pnl, index) => ({
-                        value: pnl,
-                        time: pos.metric.pnlTimestampList[index]
-                      })),
+                      ...newLocal,
                       { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
                     ]
+
                     const timeline = fillTimeline({
                       sourceList,
                       getTime: (item) => item.time,
@@ -375,7 +371,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ sortBy, pricefeedMapQuery, activityTimeframe, matchingRuleQuery }))
+            }, combineState({ sortBy, activityTimeframe, matchingRuleQuery }))
           )
         ),
 

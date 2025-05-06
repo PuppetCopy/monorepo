@@ -14,7 +14,7 @@ export const $Admin = (config: IAdminPageParams) =>
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [requestAdvanceEpoch, requestAdvanceEpochTether]: IBehavior<walletLink.IWalletClient, any>
     ) => {
-      const { walletClientQuery, providerClientQuery } = config
+      const { providerClientQuery } = config
 
       return [
         $column(
@@ -37,7 +37,7 @@ export const $Admin = (config: IAdminPageParams) =>
           //     )
           //   ),
           //   $SubmitBar({
-          //     walletClientQuery,
+          //
           //     $content: $text('Advance Epoch'),
           //     txQuery: requestAdvanceEpoch
           //   })({
@@ -67,7 +67,7 @@ export const $Admin = (config: IAdminPageParams) =>
 //       $heading1('Minter'),
 
 //       $SubmitBar({
-//         walletClientQuery,
+//
 //         $content: $text('Withdraw'),
 //         disabled: map(val => val === 0n, amount),
 //         txQuery: requestDepositAsset

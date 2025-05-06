@@ -7,7 +7,7 @@ import {
   $txHashRef
 } from '@puppet/middleware/ui-components'
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
-import type * as walletLink from '@puppet/middleware/wallet'
+import type { IWalletConnected, IWriteContractReturn } from '@puppet/middleware/wallet'
 import {
   $node,
   $text,
@@ -36,7 +36,7 @@ import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
 export interface ISubmitBar {
-  txQuery: Stream<walletLink.IWriteContractReturn>
+  txQuery: Stream<IWriteContractReturn>
   alert?: Stream<string | null>
   $container?: INodeCompose
   $submitContent: I$Slottable
@@ -49,9 +49,9 @@ export interface ISubmitBar {
 export const $SubmitBar = (config: ISubmitBar) =>
   component(
     (
-      [click, clickTether]: IBehavior<PointerEvent, walletLink.IWalletClient>,
+      [submit, submitTether]: IBehavior<PointerEvent, IWalletConnected>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
-      [approveTokenSpend, approveTokenSpendTether]: IBehavior<walletLink.IWriteContractReturn>
+      [approveTokenSpend, approveTokenSpendTether]: IBehavior<IWriteContractReturn>
     ) => {
       const {
         disabled = now(false),
@@ -133,7 +133,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 }, combineState({ disabled, isRequestPending, alert })),
                 $content: $row(style({ position: 'relative' })($submitContent))
               })({
-                click: clickTether()
+                click: submitTether()
               })
 
               if (spend) {
@@ -144,6 +144,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
 
                 return $ApproveSpend({
                   ...spend,
+                  wallet,
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
                   $content: $btn,
@@ -159,7 +160,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
           })
         ),
 
-        { click, changeWallet }
+        { submit, changeWallet }
       ]
     }
   )

@@ -48,7 +48,7 @@ export default defineConfig({
             'color',
             'mersenne-twister'
           ],
-          wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
+          // wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
           charts: ['lightweight-charts']
         }
       }
@@ -71,7 +71,7 @@ export default defineConfig({
       filename: 'service-worker.ts',
       pwaAssets: {
         config: true,
-        overrideManifestIcons: true
+        overrideManifestIcons: true,
       },
       manifest: {
         name: SITE_CONFIG.__APP_NAME__,

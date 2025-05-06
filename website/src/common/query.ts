@@ -8,7 +8,7 @@ import {
   type StateParams,
   unixTimestampNow
 } from '@puppet/middleware/utils'
-import type { GetAccountReturnType } from '@wagmi/core'
+import type { IWalletClient } from '@puppet/middleware/wallet'
 import { replayLatest } from 'aelea/core'
 import type * as viem from 'viem'
 import { getStatus, queryDb } from './sqlClient'
@@ -52,7 +52,7 @@ export function queryPricefeed(
 
 export function queryUserMatchingRuleList(
   queryParams: StateParams<{
-    account: GetAccountReturnType
+    account: IWalletClient
   }>
 ) {
   return map(async (params) => {

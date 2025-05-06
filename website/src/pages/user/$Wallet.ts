@@ -161,8 +161,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
             if (!wallet) return 0n
 
-            return tokenomicsReader.RewardLogic.getClaimable(wallet, wallet.account.address)
-          }, walletClientQuery)
+            return tokenomicsReader.RewardLogic.getClaimable(wallet, wallet.address)
+          }, walletLink.account)
         )
       )
 
@@ -173,7 +173,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
             if (!wallet) return 0n
 
-            return tokenomicsReader.PuppetVoteToken.getBalanceOf(wallet, wallet.account.address)
+            return tokenomicsReader.PuppetVoteToken.getBalanceOf(wallet, wallet.address)
           }, walletClientQuery)
         )
       )
@@ -201,7 +201,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
               const vested = await tokenomicsReader.VotingEscrowStore.getVested(wallet, wallet.account.address)
               return getVestingCursor(vested)
             },
-            walletClientQuery,
+
             periodic(1000)
           )
         )
@@ -312,7 +312,6 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
           $row(style({ flex: 1, placeContent: 'center' }))(
             $IntermediateConnectButton({
-              walletClientQuery,
               $$display: map((wallet) => {
                 // return empty()
                 return $ButtonSecondary({
@@ -349,7 +348,6 @@ export const $WalletPage = (config: IWalletPageParams) =>
               // const puppetTradeRouteListQuery = queryPuppetTradeRoute(subgraphClient, { address, activityTimeframe, collateralToken })
 
               return $WalletPuppet({
-                walletClientQuery,
                 route,
                 pricefeedMapQuery,
                 activityTimeframe,
@@ -417,7 +415,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
               //               amount: lockedAmount
               //             },
               //             txQuery: popoverRequestWithdraw,
-              //             walletClientQuery,
+              //
               //             $submitContent: $text('Vest')
               //           })({
               //             changeWallet: changeWalletTether(),
@@ -534,11 +532,11 @@ export const $WalletPage = (config: IWalletPageParams) =>
                                 amount: lockedAmount
                               },
                               txQuery: popoverRequestWithdraw,
-                              walletClientQuery,
+
                               $submitContent: $text('Vest')
                             })({
                               changeWallet: changeWalletTether(),
-                              click: popoverRequestWithdrawTether(
+                              submit: popoverRequestWithdrawTether(
                                 snapshot(async (amount, wallet) => {
                                   const rewardRouterContractDefs = getMappedValue(
                                     PUPPET.CONTRACT,
@@ -833,11 +831,11 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       },
                       $container: $row,
                       txQuery: requestTx,
-                      walletClientQuery,
+
                       $submitContent: $text(map((mode) => (mode ? 'Cash-Out' : 'Lock-In'), cashout))
                     })({
                       changeWallet: changeWalletTether(),
-                      click: requestTxTether(
+                      submit: requestTxTether(
                         snapshot(async (paramsQuery, wallet) => {
                           const params = await paramsQuery
                           const callStack: viem.Hex[] = []
@@ -1049,7 +1047,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 //             spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
 //           },
 //           txQuery: submitContribute,
-//           walletClientQuery: config.walletClientQuery,
+//           walletClientQuery: config.
 //           $submitContent: $text('User Contribute USDC'),
 //         })({
 //           // changeWallet: changeWalletTether(),
@@ -1098,7 +1096,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 //             spender: getMappedValue(PUPPET.CONTRACT, 42161).Router.address,
 //           },
 //           txQuery: submitBuyback,
-//           walletClientQuery: config.walletClientQuery,
+//           walletClientQuery: config.
 //           $submitContent: $text('Buyback'),
 //         })({
 //           // changeWallet: changeWalletTether(),

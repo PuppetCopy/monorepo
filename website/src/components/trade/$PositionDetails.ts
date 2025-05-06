@@ -24,7 +24,7 @@
 // export const $PositionDetails = (config: IPositionAdjustmentHistory) => component((
 // ) => {
 
-//   const { chain, walletClientQuery, pricefeed, tradeConfig, tradeState, mirrorPosition } = config
+//   const { chain,  pricefeed, tradeConfig, tradeState, mirrorPosition } = config
 
 //   return [
 //     switchMap(pos => {

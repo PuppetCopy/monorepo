@@ -4,12 +4,12 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import { $alertNegativeContainer, $infoLabeledValue, $Tooltip } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import { getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from '@puppet/middleware/utils'
+import { account, wagmiConfig } from '@puppet/middleware/wallet'
 import { watchBlockNumber } from '@wagmi/core'
 import {
   $element,
   $node,
   $text,
-  combineState,
   component,
   eventElementTarget,
   fromCallback,
@@ -21,18 +21,16 @@ import {
 import * as router from 'aelea/router'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { crudPolicy } from 'drizzle-orm/neon'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
-import { queryDb } from '../common/sqlClient.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
-import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorChange } from '../components/portfolio/$MatchRuleEditor.js'
+import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
 import { fadeIn } from '../transitions/enter.js'
-import { account, wagmiConfig, walletConnectAppkit } from '../walletConnect.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
 
@@ -58,7 +56,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
       // walletConnectAppkit.getIsConnectedState()
@@ -126,7 +124,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         account: account
       })
 
-      const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchRuleEditorChange[])
+      const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchingRuleEditorChange[])
       const depositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorChange[])
 
       return [
@@ -206,7 +204,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   ),
                   // // router.contains(profileRoute)(
                   // //   $midContainer(
-                  // //     fadeIn($PublicUserPage({ route: profileRoute, walletClientQuery, pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
+                  // //     fadeIn($PublicUserPage({ route: profileRoute,  pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
                   // //       changeActivityTimeframe: changeActivityTimeframeTether(),
                   // //       changeMatchRuleList: changeMatchRuleListTether(),
                   // //       changeRoute: changeRouteTether(),
@@ -214,7 +212,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   // //   )
                   // // ),
                   // router.contains(adminRoute)(
-                  //   $Admin({ walletClientQuery, providerClientQuery })({
+                  //   $Admin({  providerClientQuery })({
                   //     changeWallet: changeWalletTether(),
                   //   })
                   // ),
@@ -317,20 +315,18 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                     )
                   )
                 )
-              )
+              ),
 
-              // $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
-              //   $PortfolioEditorDrawer({
-              //     depositTokenList,
-              //     providerClientQuery,
-              //     walletClientQuery,
-              //     matchRuleList
-              //   })({
-              //     changeWallet: changeWalletTether(),
-              //     changeMatchRuleList: changeMatchRuleListTether(),
-              //     changeDepositTokenList: changeDepositTokenListTether(),
-              //   })
-              // )
+              $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
+                $PortfolioEditorDrawer({
+                  depositTokenList,
+                  matchRuleList
+                })({
+                  changeWallet: changeWalletTether(),
+                  changeMatchRuleList: changeMatchRuleListTether(),
+                  changeDepositTokenList: changeDepositTokenListTether()
+                })
+              )
             )
           )
 

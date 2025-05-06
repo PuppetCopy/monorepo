@@ -1,2 +1,2 @@
 export * from './common.js'
-export * from './connect.js'
+export * from './walletConnect.js'

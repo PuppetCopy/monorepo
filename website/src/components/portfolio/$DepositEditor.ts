@@ -5,7 +5,6 @@ import { CONTRACT } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet/middleware/ui-components'
 import {
-  combineState,
   getMappedValue,
   PromiseStatus,
   parseFixed,
@@ -16,12 +15,13 @@ import {
   switchMap
 } from '@puppet/middleware/utils'
 import type * as walletLink from '@puppet/middleware/wallet'
+import { account } from '@puppet/middleware/wallet'
 import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
-import { readAddressTokenBalance } from '../../logic/traderRead.js'
+import { readBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $ApproveSpend } from '../form/$ApproveSpend.js'
@@ -65,13 +65,11 @@ export const $DepositEditor = (config: IDepositEditor) =>
       const action = replayLatest(changeDepositMode, change.action)
       const max = switchMap((a) => {
         return a === DepositEditorAction.DEPOSIT
-          ? switchMap(async (walletQuery) => {
-              const wallet = await walletQuery
+          ? switchMap(async (wallet) => {
+              if (!wallet.address) return 0n
 
-              if (wallet == null) return 0n
-
-              return readAddressTokenBalance(wallet, change.token, wallet.account.address)
-            }, walletClientQuery)
+              return readBalanceOf(change.token, wallet.address)
+            }, account)
           : awaitPromises(depositBalanceQuery)
       }, action)
 
@@ -137,28 +135,20 @@ export const $DepositEditor = (config: IDepositEditor) =>
             $node(style({ flex: 1 }))(),
 
             $IntermediateConnectButton({
-              walletClientQuery,
               $$display: map((wallet) => {
-                if (wallet === null) {
-                  return $ButtonSecondary({
-                    disabled: now(true),
-                    $content: $text('Save')
-                  })({})
-                }
-
                 const isSpendPending = startWith(
                   false,
                   map((s) => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({
+                  wallet,
                   spender: CONTRACT[42161].TokenRouter.address,
                   token: change.token,
                   amount: map(
                     (params) => (params.action === DepositEditorAction.DEPOSIT ? params.amount : 0n),
                     combineState({ amount, action })
                   ),
-                  walletClient: wallet,
                   txQuery: approveTokenSpend,
                   $label: $text('Approve spend'),
                   $content: $ButtonSecondary({

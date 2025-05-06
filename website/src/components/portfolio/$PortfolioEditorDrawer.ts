@@ -3,7 +3,7 @@ import type { Stream } from '@most/types'
 import { CONTRACT } from '@puppet/middleware/const'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@puppet/middleware/ui-components'
 import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
-import * as walletLink from '@puppet/middleware/wallet'
+import { type IWalletClient, type IWalletConnected, writeContract } from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -18,26 +18,26 @@ import { $profileDisplay } from '../$AccountProfile.js'
 import { $ButtonCircular } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import { DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
+import type { IMatchingRuleEditorChange } from './$MatchRuleEditor.js'
 import { $RouteDepositEditor } from './$RouteDepositEditor.js'
-import type { IMatchRuleEditorChange } from './$TraderMatchRouteEditor.js'
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
-  matchRuleList: Stream<IMatchRuleEditorChange[]>
+  matchRuleList: Stream<IMatchingRuleEditorChange[]>
 }
 
 interface IPortfolioRoute {
   collateralToken: viem.Address
   deposit: IDepositEditorChange | null
-  matchRuleList: IMatchRuleEditorChange[]
+  matchRuleList: IMatchingRuleEditorChange[]
 }
 
 export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
   component(
     (
-      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<walletLink.IWalletClient, any>,
+      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletConnected, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
-      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchRuleEditorChange>,
+      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchingRuleEditorChange>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
@@ -60,7 +60,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
             const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
 
             if (existingRoute) {
-              if ('draft' in item) {
+              if ('throttleActivity' in item) {
                 existingRoute.matchRuleList.push(item)
               } else if ('token' in item) {
                 existingRoute.deposit = item
@@ -72,7 +72,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 matchRuleList: []
               }
 
-              if ('draft' in item) {
+              if ('throttleActivity' in item) {
                 newDraft.matchRuleList.push(item)
               } else if ('token' in item) {
                 newDraft.deposit = item
@@ -135,8 +135,8 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                         $seperator2,
                         $column(style({ flex: 1, padding: '12px 0' }))(
                           ...route.matchRuleList.map((modSubsc) => {
-                            const iconColorParams = modSubsc.draft
-                              ? modSubsc.draft.expiry === 0n
+                            const iconColorParams = modSubsc
+                              ? modSubsc.expiry === 0n
                                 ? {
                                     fill: pallete.negative,
                                     icon: $xCross,
@@ -183,12 +183,12 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               $responsiveFlex(spacing.default, style({ flex: 1 }))(
                                 $infoLabeledValue(
                                   'Allowance Rate',
-                                  $text(`${readablePercentage(modSubsc.draft.allowanceRate)}`)
+                                  $text(`${readablePercentage(modSubsc.allowanceRate)}`)
                                 ),
-                                $infoLabeledValue('Expiry', readableDate(Number(modSubsc.draft.expiry))),
+                                $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry))),
                                 $infoLabeledValue(
                                   'Throttle Duration',
-                                  $text(`${getDuration(modSubsc.draft.throttleActivity)}`)
+                                  $text(`${getDuration(modSubsc.throttleActivity)}`)
                                 )
                               )
                             )
@@ -208,7 +208,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                     // alert: validationError
                   })({
                     changeWallet: changeWalletTether(),
-                    click: requestChangeSubscriptionTether(
+                    submit: requestChangeSubscriptionTether(
                       map(async (wallet) => {
                         const callStack: viem.Hex[] = []
                         const contractDefs = CONTRACT[42161].RouterProxy
@@ -217,9 +217,9 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                           callStack.push(
                             ...params.matchRuleList.map((matchRule) => {
                               const ruleParams = {
-                                allowanceRate: matchRule.draft.allowanceRate,
-                                throttleActivity: matchRule.draft.throttleActivity,
-                                expiry: matchRule.draft.expiry
+                                allowanceRate: matchRule.allowanceRate,
+                                throttleActivity: matchRule.throttleActivity,
+                                expiry: matchRule.expiry
                               }
 
                               return viem.encodeFunctionData({
@@ -243,15 +243,14 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 : viem.encodeFunctionData({
                                     ...contractDefs,
                                     functionName: 'withdraw',
-                                    args: [deposit.token, wallet.account.address, deposit.value.amount]
+                                    args: [deposit.token, wallet.address, deposit.value.amount]
                                   })
                             )
                           )
                         }
 
-                        return walletLink.writeContract({
+                        return writeContract({
                           ...contractDefs,
-                          walletClient: wallet,
                           functionName: 'multicall',
                           args: [callStack]
                         })

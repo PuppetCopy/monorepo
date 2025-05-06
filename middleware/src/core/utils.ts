@@ -3,7 +3,14 @@ import { getMarketIndexToken, getTokenDescription } from '../gmx/gmxUtils.js'
 import { type IPriceCandle, type IPricefeedMap, OrderType } from '../gmx/types.js'
 import { factor } from '../utils/mathUtils.js'
 import { getMappedValue, unixTimestampNow } from '../utils/utils.js'
-import type { IPosition, IPositionDecrease, IPositionIncrease, IPositionListSummary, IPuppetPosition, IVested } from './types.js'
+import type {
+  IPosition,
+  IPositionDecrease,
+  IPositionIncrease,
+  IPositionListSummary,
+  IPuppetPosition,
+  IVested
+} from './types.js'
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(
   list: readonly A[],
