@@ -72,19 +72,20 @@ const wagmiConfig = wagmiAdapter.wagmiConfig
 const connectAppkit = createAppKit({
   adapters: [wagmiAdapter],
   networks: [arbitrum],
-  // showWallets: false,
-  // allWallets: 'HIDE',
+  showWallets: false,
+  defaultNetwork: arbitrum,
+  allWallets: 'ONLY_MOBILE',
   projectId,
-  // features: {
-  //   connectMethodsOrder: ['wallet', 'social'],
-  //   collapseWallets: false,
-  //   swaps: false,
-  //   email: false,
-  //   send: false,
-  //   history: false,
-  //   onramp: false,
-  //   analytics: true
-  // },
+  features: {
+    connectMethodsOrder: ['wallet', 'social'],
+    collapseWallets: false,
+    swaps: false,
+    email: false,
+    send: false,
+    history: false,
+    onramp: false,
+    analytics: true
+  },
   metadata: {
     name: '__APP_NAME__',
     description: '__APP_DESC_SHORT__',
