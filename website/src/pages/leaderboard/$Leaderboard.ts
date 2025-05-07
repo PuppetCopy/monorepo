@@ -124,8 +124,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     offset: filterParams.paging.offset,
                     orderBy: params.sortBy
                       ? params.sortBy.direction === 'asc'
-                        ? asc(schema.traderRouteMetric[filterParams.sortBy.selector])
-                        : desc(schema.traderRouteMetric[filterParams.sortBy.selector])
+                        ? asc(schema.traderRouteMetric[params.sortBy.selector])
+                        : desc(schema.traderRouteMetric[params.sortBy.selector])
                       : undefined,
                     columns: {
                       lastUpdatedTimestamp: true,
@@ -153,10 +153,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   return { ...filterParams.paging, page }
                 },
                 combineState({
-                  activityTimeframe,
                   paging,
-                  sortBy,
-                  isLong,
                   selectedCollateralTokenList,
                   account
                 })
