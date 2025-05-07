@@ -1,11 +1,11 @@
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
-import * as walletLink from '@puppet/middleware/wallet'
 import type * as router from 'aelea/router'
 import type * as viem from 'viem'
 import type { IMatchingRule, IPriceCandle } from '../__generated__/ponder.types'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 import type { IMatchRuleEditorChange } from '../components/portfolio/$TraderMatchRouteEditor'
+import * as walletLink from '../wallet'
 
 export interface IComponentPageParams {}
 

@@ -1,17 +1,17 @@
-import { map, now, snapshot } from '@most/core'
+import { map, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet/middleware/ui-components'
 import { readableTokenAmount, switchMap } from '@puppet/middleware/utils'
-import { account } from '@puppet/middleware/wallet'
 import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
-import { $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
 import { $route } from '../../common/$common.js'
 import puppetReader from '../../logic/puppetReader.js'
 import type { IComponentPageParams } from '../../pages/type.js'
+import { wallet } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $DepositEditor, DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
@@ -40,7 +40,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         if (!wallet.address) return 0n
 
         return puppetReader.getUserBalance(collateralToken, wallet.address)
-      }, account)
+      }, wallet.account)
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
       return [
@@ -118,7 +118,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               return changeList
             },
             depositTokenList,
-            combineState({ saveChange, account })
+            combineState({ saveChange })
           ),
           changeWallet
         }

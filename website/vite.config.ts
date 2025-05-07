@@ -31,7 +31,6 @@ export default defineConfig({
           middleware: [
             '@puppet/middleware/const',
             '@puppet/middleware/core',
-            '@puppet/middleware/wallet',
             '@puppet/middleware/utils',
             '@puppet/middleware/gmx',
             '@puppet/middleware/gbc',

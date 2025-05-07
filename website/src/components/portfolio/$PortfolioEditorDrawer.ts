@@ -3,7 +3,6 @@ import type { Stream } from '@most/types'
 import { CONTRACT } from '@puppet/middleware/const'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@puppet/middleware/ui-components'
 import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
-import { type IWalletClient, type IWalletConnected, writeContract } from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -14,6 +13,7 @@ import { $card2, $iconCircular, $responsiveFlex } from '../../common/elements/$c
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { fadeIn } from '../../transitions/enter.js'
+import { type IWalletConnected, wallet } from '../../wallet/wallet.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 import { $ButtonCircular } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
@@ -209,7 +209,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   })({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
-                      map(async (wallet) => {
+                      map(async (account) => {
                         const callStack: viem.Hex[] = []
                         const contractDefs = CONTRACT[42161].RouterProxy
 
@@ -243,13 +243,13 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                 : viem.encodeFunctionData({
                                     ...contractDefs,
                                     functionName: 'withdraw',
-                                    args: [deposit.token, wallet.address, deposit.value.amount]
+                                    args: [deposit.token, account.address, deposit.value.amount]
                                   })
                             )
                           )
                         }
 
-                        return writeContract({
+                        return wallet.write({
                           ...contractDefs,
                           functionName: 'multicall',
                           args: [callStack]

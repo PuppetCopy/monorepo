@@ -1,14 +1,12 @@
 import { switchLatest, tap } from '@most/core'
 import { ignoreAll, switchMap } from '@puppet/middleware/utils'
-import { account, wagmiConfig, walletConnectAppkit } from '@puppet/middleware/wallet'
-import { getAccount } from '@wagmi/core'
 import { $node, $text, behavior, nodeEvent, style } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
+import { wallet } from '../wallet/wallet.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 
 export const $walletProfileDisplay = () => {
-  const accountStatus = getAccount(wagmiConfig)
   // const account = accountStatus.connector === undefined ? startWith(accountStatus, account) : account
 
   const [click, clickTether] = behavior()
@@ -20,7 +18,7 @@ export const $walletProfileDisplay = () => {
           clickTether(
             nodeEvent('pointerdown'),
             tap((es) => {
-              walletConnectAppkit.open()
+              wallet.connectAppkit.open()
             })
           ),
           spacing.small,
@@ -73,6 +71,6 @@ export const $walletProfileDisplay = () => {
         //   )
         // )
       )
-    }, account)
+    }, wallet.account)
   )
 }

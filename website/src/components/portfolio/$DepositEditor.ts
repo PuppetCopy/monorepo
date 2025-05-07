@@ -14,8 +14,6 @@ import {
   readableTokenAmountLabel,
   switchMap
 } from '@puppet/middleware/utils'
-import type * as walletLink from '@puppet/middleware/wallet'
-import { account } from '@puppet/middleware/wallet'
 import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -23,6 +21,7 @@ import type { EIP6963ProviderDetail } from 'mipd'
 import type * as viem from 'viem'
 import { readBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/type.js'
+import { type IWriteContractReturn, wallet } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $ApproveSpend } from '../form/$ApproveSpend.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
@@ -50,7 +49,7 @@ interface IDepositEditor extends IComponentPageParams {
 export const $DepositEditor = (config: IDepositEditor) =>
   component(
     (
-      [approveTokenSpend, approveTokenSpendTether]: IBehavior<walletLink.IWriteContractReturn>,
+      [approveTokenSpend, approveTokenSpendTether]: IBehavior<IWriteContractReturn>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
       [clickMax, clickMaxTether]: IBehavior<any>,
@@ -69,7 +68,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
               if (!wallet.address) return 0n
 
               return readBalanceOf(change.token, wallet.address)
-            }, account)
+            }, wallet.account)
           : awaitPromises(depositBalanceQuery)
       }, action)
 

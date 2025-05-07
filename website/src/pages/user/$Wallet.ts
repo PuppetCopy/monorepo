@@ -37,7 +37,6 @@ import {
   readableUnitAmount,
   switchMap
 } from '@puppet/middleware/utils'
-import * as walletLink from '@puppet/middleware/wallet'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -51,9 +50,10 @@ import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from '../../com
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../../components/form/$Button.js'
 import { $SubmitBar } from '../../components/form/$SubmitBar.js'
 import type { IDepositEditorChange } from '../../components/portfolio/$DepositEditor.js'
-import type { IMatchRuleEditorChange } from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import { localStore } from '../../const/localStore.js'
 import tokenomicsReader from '../../logic/tokenomicsReader.js'
+import type { IWalletClient } from '../../wallet/wallet.js'
 import { type IUserActivityPageParams, IWalletTab } from '../type.js'
 import { $WalletPuppet } from './$WalletPuppet.js'
 
@@ -85,17 +85,17 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
       [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>,
 
-      [requestTx, requestTxTether]: IBehavior<walletLink.IWalletClient, any>,
+      [requestTx, requestTxTether]: IBehavior<IWalletClient, any>,
       [checkCashoutMode, checkCashoutModeTether]: IBehavior<boolean>,
       [changeScheduleFactor, changeScheduleFactorTether]: IBehavior<number>,
       [popoverInputAmount, popoverInputAmountTether]: IBehavior<string, bigint>,
       [popoverAddWallet, popoverAddWalletTether]: IBehavior<any>,
       [popoverWithdrawLocked, popoverWithdrawLockedTether]: IBehavior<any>,
       [popoverClickMaxDeposit, popoverClickMaxDepositTether]: IBehavior<any>,
-      [popoverRequestWithdraw, popoverRequestWithdrawTether]: IBehavior<walletLink.IWalletClient, any>,
+      [popoverRequestWithdraw, popoverRequestWithdrawTether]: IBehavior<IWalletClient, any>,
       [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: IBehavior<any, bigint>
     ) => {
       const {

@@ -4,15 +4,12 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import { $alertNegativeContainer, $infoLabeledValue, $Tooltip } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import { getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from '@puppet/middleware/utils'
-import { account, wagmiConfig } from '@puppet/middleware/wallet'
-import { watchBlockNumber } from '@wagmi/core'
 import {
   $element,
   $node,
   $text,
   component,
   eventElementTarget,
-  fromCallback,
   type IBehavior,
   replayLatest,
   style,
@@ -31,6 +28,7 @@ import type { IMatchingRuleEditorChange } from '../components/portfolio/$MatchRu
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
 import { fadeIn } from '../transitions/enter.js'
+import { wallet } from '../wallet/wallet.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
 
@@ -111,17 +109,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const latestBlock: Stream<bigint> = mergeArray([
         // fromPromise(useBlockNumber().promise),
-        fromCallback((cb) =>
-          watchBlockNumber(wagmiConfig, {
-            onBlockNumber(blockNumber) {
-              cb(blockNumber)
-            }
-          })
-        )
+        wallet.blockChange
       ])
 
       const matchingRuleQuery = queryUserMatchingRuleList({
-        account: account
+        account: wallet.account
       })
 
       const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchingRuleEditorChange[])

@@ -1,6 +1,10 @@
 {
+  "solidity.formatter": "forge",
+  "[svg]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "[solidity]": {
-    "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+    
   },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
@@ -10,19 +14,11 @@
   },
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
-  "files.exclude": {
-    "**/.git": true,
-    "**/.DS_Store": true
-  },
   "search.exclude": {
     "**/node_modules": true,
     "**/bun.lock": true,
     "**/dist": true
   },
   "biome.enabled": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "editor.tabSize": 2,
-  // "typescript.suggest.autoImports": true,
-  // "typescript.preferences.preferTypeOnlyAutoImports": true,
-  // "typescript.updateImportsOnPaste.enabled": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

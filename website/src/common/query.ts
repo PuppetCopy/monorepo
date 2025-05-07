@@ -8,9 +8,9 @@ import {
   type StateParams,
   unixTimestampNow
 } from '@puppet/middleware/utils'
-import type { IWalletClient } from '@puppet/middleware/wallet'
 import { replayLatest } from 'aelea/core'
 import type * as viem from 'viem'
+import type { IWalletClient } from '../wallet'
 import { getStatus, queryDb } from './sqlClient'
 
 export const subgraphStatus = replayLatest(

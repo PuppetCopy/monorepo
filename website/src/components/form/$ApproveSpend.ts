@@ -8,13 +8,6 @@ import {
   $txHashRef
 } from '@puppet/middleware/ui-components'
 import { PromiseStatus, promiseState, switchMap } from '@puppet/middleware/utils'
-import {
-  account,
-  type IWalletConnected,
-  type IWriteContractReturn,
-  readContract,
-  writeContract
-} from '@puppet/middleware/wallet'
 import { erc20Abi } from 'abitype/abis'
 import {
   $text,
@@ -29,6 +22,7 @@ import {
 } from 'aelea/core'
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import * as viem from 'viem'
+import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
 import { $defaultButtonPrimary } from './$Button'
 import { $ButtonCore } from './$ButtonCore'
 
@@ -56,7 +50,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
         return ((await query).events[0].args as any).value as bigint
       }, config.txQuery),
       fromPromise(
-        readContract({
+        wallet.read({
           address: token,
           abi: erc20Abi,
           functionName: 'allowance',
@@ -116,7 +110,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
               })({
                 click: approveTokenSpendTether(
                   map(async () => {
-                    return writeContract({
+                    return wallet.write({
                       address: token,
                       abi: erc20Abi,
                       eventName: 'Approval',

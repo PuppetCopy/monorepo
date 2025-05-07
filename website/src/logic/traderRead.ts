@@ -11,7 +11,6 @@
 // } from '@puppet/middleware/utils'
 // import * as walletLink from '@puppet/middleware/wallet'
 // import { wagmiConfig } from '@puppet/middleware/wallet'
-// import { readContract } from '@wagmi/core/actions'
 // import { erc20Abi } from 'abitype/abis'
 // import { fromWebsocket } from 'aelea/ui-components'
 // import type * as viem from 'viem'

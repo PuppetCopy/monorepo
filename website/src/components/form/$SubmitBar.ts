@@ -7,7 +7,6 @@ import {
   $txHashRef
 } from '@puppet/middleware/ui-components'
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
-import type { IWalletConnected, IWriteContractReturn } from '@puppet/middleware/wallet'
 import {
   $node,
   $text,
@@ -30,6 +29,7 @@ import type { EIP6963ProviderDetail } from 'mipd'
 import * as viem from 'viem'
 import { $iconCircular } from '../../common/elements/$common.js'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
+import type { IWalletConnected, IWriteContractReturn } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $ApproveSpend, type ISpend } from './$ApproveSpend.js'
 import { $defaultButtonPrimary } from './$Button.js'
