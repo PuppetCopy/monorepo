@@ -4,7 +4,7 @@ import type { ReadonlyDrizzle } from 'ponder'
 import * as schema from 'schema'
 import superjson from 'superjson'
 
-const baseUrl: string = import.meta.env.VITE_INDEXR_ENDPOINT
+const baseUrl: string = import.meta.env.VITE__INDEXR_ENDPOINT
 
 export const queryDb: ReadonlyDrizzle<typeof schema> = drizzle(
   async (sql, params, _, typings) => {

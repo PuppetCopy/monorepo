@@ -3,9 +3,7 @@ import type { Stream } from '@most/types'
 import { type Connector, createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 
-
 import {
-  createConfig,
   type GetAccountReturnType,
   getAccount,
   readContract,
@@ -64,10 +62,8 @@ const transport = fallback([
 
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks
+  networks,
 })
-
-const wagmiConfig = wagmiAdapter.wagmiConfig
 
 const connectAppkit = createAppKit({
   adapters: [wagmiAdapter],
@@ -95,15 +91,15 @@ const connectAppkit = createAppKit({
 })
 
 const blockChange: Stream<bigint> = fromCallback((cb) => {
-  return watchBlockNumber(wagmiConfig, { onBlockNumber: (res) => cb(res) })
+  return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: (res) => cb(res) })
 })
 
-const accountStatus = getAccount(wagmiConfig)
+const accountStatus = getAccount(wagmiAdapter.wagmiConfig)
 
 const account: Stream<GetAccountReturnType> = mergeArray([
   accountStatus.connector === undefined ? now(accountStatus) : empty(),
   fromCallback((cb) => {
-    return watchAccount(wagmiConfig, { onChange: (res) => cb(res) })
+    return watchAccount(wagmiAdapter.wagmiConfig, { onChange: (res) => cb(res) })
   })
 ])
 
@@ -114,7 +110,7 @@ async function read<
 >(
   parameters: ReadContractParameters<TAbi, TFunctionName, TArgs>
 ): Promise<ReadContractReturnType<TAbi, TFunctionName, TArgs>> {
-  return readContract(wagmiConfig, parameters as any)
+  return readContract(wagmiAdapter.wagmiConfig, parameters as any)
 }
 
 type IWriteContractReturn<
@@ -137,11 +133,11 @@ async function write<
 ): IWriteContractReturn<TAbi, TEventName> {
   try {
     // const hash = await viemWriteContract(writeParams.walletClient, { ...writeParams, account: walletClient.account } as any)
-    const sim = await simulateContract(wagmiConfig, {
+    const sim = await simulateContract(wagmiAdapter.wagmiConfig, {
       ...writeParams
     } as any)
-    const hash = await writeContract(wagmiConfig, sim.request)
-    const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, { hash })
+    const hash = await writeContract(wagmiAdapter.wagmiConfig, sim.request)
+    const transactionReceipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
     const events = parseEventLogs({
       eventName: writeParams.eventName,
       abi: writeParams.abi,
@@ -155,14 +151,25 @@ async function write<
   }
 }
 
+connectAppkit.subscribeWalletInfo((aaa) => {
+  if (aaa) {
+    console.log('Wallet info:', aaa)
+  }
+})
+
+connectAppkit.subscribeAccount((account) => {
+  if (account) {
+    console.log('Account info:', account)
+  }
+})
+
 export const wallet = {
   read,
   write,
   connectAppkit,
   blockChange,
   account,
-  wagmiConfig,
-  transport,
+  transport
 }
 
 export type { IWalletClient, IWalletConnected, IWriteContractReturn }
