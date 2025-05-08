@@ -4,7 +4,7 @@
 // import { colorAlpha, pallete } from "aelea/ui-components-theme"
 // import { fromPromise, map, switchLatest, take } from "@most/core"
 // import { Stream } from "@most/types"
-// import { ADDRESS_ZERO, IntervalTime, getMappedValue, readableFactorPercentage, switchMap } from 'common-utils'
+// import { ADDRESS_ZERO, IntervalTime, getMappedValue, readableFactorPercentage } from 'common-utils'
 // import * as GMX "@puppet/middleware/gmx"
 // import { IMarket, IMarketFees, IMarketPrice, IMarketUsageInfo, TEMP_MARKET_LIST, getBorrowingFactorPerInterval, getFundingFactorPerInterval } from '@puppet/middleware/gmx'
 // import { latestPriceMap } from 'puppet-middleware'

@@ -3,7 +3,7 @@ import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet/middleware/const'
 import { $Checkbox, $FieldLabeled } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { formatFixed, getDuration, parseBps, switchMap, unixTimestampNow } from '@puppet/middleware/utils'
+import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet/middleware/utils'
 import {
   $element,
   $node,
@@ -14,7 +14,8 @@ import {
   type IBehavior,
   O,
   style,
-  stylePseudo
+  stylePseudo,
+  switchMap
 } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'

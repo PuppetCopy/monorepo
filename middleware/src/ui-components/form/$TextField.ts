@@ -10,11 +10,11 @@ import {
   type INodeCompose,
   O,
   style,
-  stylePseudo
+  stylePseudo,
+  toStream
 } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { streamOf } from '../../utils/index.js'
 import { $Field, type Field } from './$Field.js'
 
 export const $defaultTextFieldContainer = $element('label')(
@@ -74,7 +74,7 @@ export const $FieldLabeled = ({
         $row(spacing.small, style({ width: '100%' }))(
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
           O(
-            attrBehavior(map((placeholder) => ({ placeholder }), streamOf(placeholder))),
+            attrBehavior(map((placeholder) => ({ placeholder }), toStream(placeholder))),
             overideInputStyle
           )(
             $Field({})({
@@ -82,9 +82,9 @@ export const $FieldLabeled = ({
             })
           )
         ),
-        $row(style({ fontSize: '.85rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' }))(
-          hint ? $text(hint) : empty()
-        )
+        $row(
+          style({ fontSize: '.85rem', minHeight: '1rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' })
+        )(hint ? $text(hint) : empty())
       ),
 
       { change }

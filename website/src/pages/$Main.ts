@@ -1,9 +1,9 @@
-import { map, merge, mergeArray, multicast, now, skipRepeats, startWith, take } from '@most/core'
+import { map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { $alertNegativeContainer, $infoLabeledValue, $Tooltip } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { getTimeSince, readableUnitAmount, switchMap, unixTimestampNow, zipState } from '@puppet/middleware/utils'
+import { getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
 import {
   $element,
   $node,
@@ -13,7 +13,8 @@ import {
   type IBehavior,
   replayLatest,
   style,
-  styleBehavior
+  styleBehavior,
+  switchMap
 } from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
@@ -116,8 +117,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         account: wallet.account
       })
 
-      const matchRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchingRuleEditorChange[])
-      const depositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorChange[])
+      const matchRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
+      const depositTokenList = replayLatest(changeDepositTokenList, [] as IDepositEditorChange[])
 
       return [
         $column(

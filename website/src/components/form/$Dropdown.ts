@@ -21,7 +21,6 @@ import {
 import { append, remove } from '@most/prelude'
 import type { Stream } from '@most/types'
 import { $caretDown, $xCross } from '@puppet/middleware/ui-components'
-import { streamOf } from '@puppet/middleware/utils'
 import {
   $element,
   $node,
@@ -41,7 +40,8 @@ import {
   style,
   styleBehavior,
   styleInline,
-  stylePseudo
+  stylePseudo,
+  toStream
 } from 'aelea/core'
 import { $column, $icon, $row, type Input, layoutSheet, observer, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -427,7 +427,7 @@ export const $DropMultiSelect = <T>({
                     })
                   )
                 },
-                combineState({ list: streamOf(selector.list), selectionChange }),
+                combineState({ list: toStream(selector.list), selectionChange }),
                 isOpen
               )
             )

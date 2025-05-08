@@ -18,7 +18,6 @@
 //   type Transport,
 //   type WalletClient
 // } from 'viem'
-// import { switchMap } from '../utils/index.js'
 
 // export type IPublicProvider = PublicClient<Transport, Chain>
 // export type IWalletClient = WalletClient<Transport, Chain, Account>

@@ -1,4 +1,4 @@
-import { empty, mergeArray, now } from '@most/core'
+import { empty, map, mergeArray, now } from '@most/core'
 import type { Stream } from '@most/types'
 import { type Connector, createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
@@ -62,7 +62,7 @@ const transport = fallback([
 
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks,
+  networks
 })
 
 const connectAppkit = createAppKit({
@@ -94,13 +94,13 @@ const blockChange: Stream<bigint> = fromCallback((cb) => {
   return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: (res) => cb(res) })
 })
 
-const accountStatus = getAccount(wagmiAdapter.wagmiConfig)
+const accountChange = fromCallback((cb) => {
+  return watchAccount(wagmiAdapter.wagmiConfig, { onChange: (res) => cb(res) })
+})
 
 const account: Stream<GetAccountReturnType> = mergeArray([
-  accountStatus.connector === undefined ? now(accountStatus) : empty(),
-  fromCallback((cb) => {
-    return watchAccount(wagmiAdapter.wagmiConfig, { onChange: (res) => cb(res) })
-  })
+  map(() => getAccount(wagmiAdapter.wagmiConfig), now(null)),
+  accountChange
 ])
 
 async function read<
@@ -151,17 +151,17 @@ async function write<
   }
 }
 
-connectAppkit.subscribeWalletInfo((aaa) => {
-  if (aaa) {
-    console.log('Wallet info:', aaa)
-  }
-})
+// connectAppkit.subscribeWalletInfo((aaa) => {
+//   if (aaa) {
+//     console.log('Wallet info:', aaa)
+//   }
+// })
 
-connectAppkit.subscribeAccount((account) => {
-  if (account) {
-    console.log('Account info:', account)
-  }
-})
+// connectAppkit.subscribeAccount((account) => {
+//   if (account) {
+//     console.log('Account info:', account)
+//   }
+// })
 
 export const wallet = {
   read,
@@ -169,6 +169,7 @@ export const wallet = {
   connectAppkit,
   blockChange,
   account,
+  accountChange,
   transport
 }
 

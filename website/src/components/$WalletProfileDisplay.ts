@@ -1,6 +1,6 @@
 import { switchLatest, tap } from '@most/core'
-import { ignoreAll, switchMap } from '@puppet/middleware/utils'
-import { $node, $text, behavior, nodeEvent, style } from 'aelea/core'
+import { ignoreAll } from '@puppet/middleware/utils'
+import { $node, $text, behavior, nodeEvent, style, switchMap } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import { wallet } from '../wallet/wallet.js'

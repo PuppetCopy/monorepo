@@ -17,21 +17,19 @@ import {
   O,
   style,
   styleBehavior,
-  stylePseudo
+  stylePseudo,
+  switchMap
 } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
-import {
-  getExplorerUrl,
-  getMappedValue,
-  type ITokenDescription,
-  shortenTxAddress,
-  streamOf,
-  switchMap
-} from '../utils/index.js'
+import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress } from '../utils/index.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
 import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
+
+const $elipsisTextWrapper = $node(
+  style({ overflow: 'hidden', minHeight: 0, whiteSpace: 'nowrap', textOverflow: 'ellipsis' })
+)
 
 export const $anchor = $element('a')(
   spacing.tiny,
@@ -118,7 +116,7 @@ export const $alertTooltip = ($content: I$Slottable) => {
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertNegativeContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
-      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+      $elipsisTextWrapper($content)
     )
   })({})
 }
@@ -129,7 +127,7 @@ export const $alertPositiveTooltip = ($content: I$Node) => {
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertPositiveContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
-      style({ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+      $elipsisTextWrapper($content)
     )
   })({})
 }
@@ -145,7 +143,7 @@ export const $intermediateTooltip = ($content: I$Slottable) => {
         width: '18px',
         svgOps: style({ minWidth: '18px', position: 'relative' })
       }),
-      style({ position: 'relative', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })($content)
+      $elipsisTextWrapper(style({ position: 'relative' }))($content)
     )
   })({})
 }
@@ -189,18 +187,18 @@ export const $labeledDivider = (label: string) => {
   )
 }
 
-export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?: I$Node) => {
+export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?: I$Slottable) => {
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({ $content: $iconPath, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ fontSize: '.85rem', color: pallete.foreground }))($text(token.symbol))
     ),
-    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
+    $label ? $elipsisTextWrapper($label) : empty(),
   )
 }
 
-export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Node) => {
+export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Slottable) => {
   const $iconG = getMappedValue($tokenIconMap, token.symbol)
 
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
@@ -209,7 +207,7 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Node
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ color: pallete.foreground }))($text(token.name))
     ),
-    style({ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }, $label || empty())
+    $label ? $elipsisTextWrapper($label) : empty(),
   )
 }
 
@@ -237,7 +235,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(
       map((str) => (str ? { color: pallete.foreground } : {}), change),
-      isStream($val) ? $val : $node($text($val))
+      $node(isStream($val) ? $val : $text($val))
     ),
 
     $icon({

@@ -31,29 +31,6 @@ export type StateStream<T> = {
 
 type IStreamOrPromise<T> = Stream<T> | Promise<T>
 
-export function combineState<A, K extends keyof A = keyof A>(state: StateParams<A>): Stream<A> {
-  const entries = Object.entries(state) as [keyof A, Stream<A[K]> | A[K]][]
-
-  if (entries.length === 0) {
-    return now({} as A)
-  }
-
-  const streams = entries.map(([_, stream]) => streamOf(stream))
-
-  const zipped = combineArray(
-    (...arrgs: A[K][]) => {
-      return arrgs.reduce((seed, val, idx) => {
-        const key = entries[idx][0]
-        seed[key] = val
-
-        return seed
-      }, {} as A)
-    },
-    ...streams
-  )
-
-  return zipped
-}
 
 export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
   let last: T
@@ -68,9 +45,7 @@ export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
   )
 }
 
-export function streamOf<T>(maybeStream: T | Stream<T>): Stream<T> {
-  return isStream(maybeStream) ? maybeStream : now(maybeStream)
-}
+
 
 export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>): Stream<A> {
   const entries = Object.entries(state) as [keyof A, Stream<A[K]>][]
@@ -88,22 +63,6 @@ export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>):
   return zipped
 }
 
-export interface ISwitchMapCurry2 {
-  <T, R>(cb: (t: T) => IStreamOrPromise<R>, s: Stream<T>): Stream<R>
-  <T, R>(cb: (t: T) => IStreamOrPromise<R>): (s: Stream<T>) => Stream<R>
-}
-
-function switchMapFn<T, R>(cb: (t: T) => IStreamOrPromise<R>, s: Stream<T>) {
-  return switchLatest(
-    map((cbParam) => {
-      const cbRes = cb(cbParam)
-
-      return isStream(cbRes) ? cbRes : fromPromise(cbRes)
-    }, s)
-  )
-}
-
-export const switchMap: ISwitchMapCurry2 = curry2(switchMapFn)
 
 export interface IPeriodRun<T> {
   actionOp: IOps<number, Promise<T>>

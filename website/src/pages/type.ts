@@ -16,8 +16,8 @@ export interface IPageParams extends IComponentPageParams {
 export interface IUserActivityPageParams extends IPageParams {
   selectedCollateralTokenList: Stream<viem.Address[]>
   activityTimeframe: Stream<IntervalTime>
-  pricefeedMapQuery: Stream<Promise<Record<viem.Address, IPriceCandle[]>>>
   depositTokenList: Stream<IDepositEditorChange[]>
+  pricefeedMapQuery: Stream<Promise<Record<viem.Address, IPriceCandle[]>>>
   matchingRuleQuery: Stream<Promise<IMatchingRule[]>>
 }
 

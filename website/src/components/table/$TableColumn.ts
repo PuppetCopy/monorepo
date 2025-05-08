@@ -14,10 +14,8 @@ import {
   getTimeSince,
   readableDate,
   readablePercentage,
-  streamOf,
-  switchMap
 } from '@puppet/middleware/utils'
-import { $node, $text, type IComposeBehavior, type INode, O, style } from 'aelea/core'
+import { $node, $text, type IComposeBehavior, type INode, O, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
@@ -94,7 +92,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
     const displayColor = skipRepeats(
       map((value) => {
         return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
-      }, streamOf(pnl))
+      }, toStream(pnl))
     )
 
     return isSettled
@@ -114,7 +112,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
             $text(
               map((value) => {
                 return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
-              }, streamOf(pnl))
+              }, toStream(pnl))
             )
           )
         )

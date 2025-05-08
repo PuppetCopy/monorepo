@@ -25,10 +25,9 @@ import {
   getMappedValue,
   type InferStream,
   readablePnl,
-  switchMap,
   unixTimestampNow
 } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType } from 'lightweight-charts'
@@ -116,7 +115,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     where: (t, f) =>
                       f.and(
                         f.eq(t.interval, params.activityTimeframe),
-                        filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
+                        params.account ? f.ilike(t.account, params.account) : undefined,
                         // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
                         f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
                       ),
@@ -154,8 +153,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 },
                 combineState({
                   paging,
-                  selectedCollateralTokenList,
-                  account
+                  selectedCollateralTokenList
                 })
               )
 
@@ -243,13 +241,14 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   $bodyCallback: map((pos) => {
                     const endTime = unixTimestampNow()
                     const startTime = endTime - params.activityTimeframe
-                    const newLocal = pos.metric.pnlList.map((pnl, index) => ({
-                      value: pnl,
-                      time: pos.metric.pnlTimestampList[index]
-                    }))
                     const sourceList = [
                       { value: 0n, time: startTime },
-                      ...newLocal,
+                      ...pos.metric.pnlList
+                        .map((pnl, index) => ({
+                          value: pnl,
+                          time: pos.metric.pnlTimestampList[index]
+                        }))
+                        .filter((item) => item.time > startTime),
                       { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
                     ]
 
@@ -368,7 +367,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ sortBy, activityTimeframe, matchingRuleQuery }))
+            }, combineState({ sortBy, activityTimeframe, matchingRuleQuery, account }))
           )
         ),
 

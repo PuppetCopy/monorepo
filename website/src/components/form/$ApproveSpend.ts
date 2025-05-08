@@ -7,7 +7,7 @@ import {
   $intermediateTooltip,
   $txHashRef
 } from '@puppet/middleware/ui-components'
-import { PromiseStatus, promiseState, switchMap } from '@puppet/middleware/utils'
+import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import { erc20Abi } from 'abitype/abis'
 import {
   $text,
@@ -18,7 +18,8 @@ import {
   type IBehavior,
   type INodeCompose,
   isStream,
-  style
+  style,
+  switchMap
 } from 'aelea/core'
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import * as viem from 'viem'

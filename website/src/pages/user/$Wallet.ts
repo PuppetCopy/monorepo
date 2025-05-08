@@ -35,9 +35,8 @@ import {
   readableTokenAmount,
   readableTokenAmountLabel,
   readableUnitAmount,
-  switchMap
 } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'

@@ -1,16 +1,15 @@
 import { map, multicast } from '@most/core'
 import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet/middleware/const'
 import {
-  combineState,
   getClosestNumber,
   groupArrayMany,
   periodicRun,
   type StateParams,
   unixTimestampNow
 } from '@puppet/middleware/utils'
-import { replayLatest } from 'aelea/core'
+import { combineState, replayLatest } from 'aelea/core'
 import type * as viem from 'viem'
-import type { IWalletClient } from '../wallet'
+import type { IWalletClient } from '../wallet/wallet'
 import { getStatus, queryDb } from './sqlClient'
 
 export const subgraphStatus = replayLatest(

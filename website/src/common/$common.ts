@@ -30,10 +30,9 @@ import {
   readablePercentage,
   readablePnl,
   readableUsd,
-  streamOf
 } from '@puppet/middleware/utils'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
-import { $node, $text, component, type INode, nodeEvent, O, style, styleInline } from 'aelea/core'
+import { $node, $text, component, type INode, nodeEvent, O, style, styleInline, toStream } from 'aelea/core'
 import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -177,7 +176,7 @@ export const $leverage = (size: bigint, collateral: bigint) => {
 }
 
 export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
-  const pnl = streamOf(pnlSrc)
+  const pnl = toStream(pnlSrc)
   const display = map((value) => readablePnl(value), pnl)
   const displayColor = skipRepeats(
     map((value) => {
@@ -195,7 +194,7 @@ export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
 }
 
 export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
-  const roi = streamOf(roiSrc)
+  const roi = toStream(roiSrc)
   const display = map((value) => readablePercentage(value), roi)
   const displayColor = skipRepeats(
     map((value) => {

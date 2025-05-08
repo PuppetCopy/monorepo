@@ -24,7 +24,7 @@
     "@reown/appkit-adapter-wagmi": "1.7.4",
     "@wagmi/core": "2.17.1",
     "abitype": "1.0.8",
-    "aelea": "1.8.0",
+    "aelea": "1.8.1",
     "color": "5.0.0",
     "drizzle-orm": "0.43.1",
     "lightweight-charts": "5.0.6",

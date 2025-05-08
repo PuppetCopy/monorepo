@@ -2,12 +2,12 @@ import { constant, empty, map, mergeArray, skipRepeatsWith, snapshot } from '@mo
 import type { Stream } from '@most/types'
 import { CONTRACT } from '@puppet/middleware/const'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@puppet/middleware/ui-components'
-import { getDuration, readableDate, readablePercentage, switchMap } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style } from 'aelea/core'
+import {  getDuration, readableDate, readablePercentage } from '@puppet/middleware/utils'
+import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import * as viem from 'viem'
+import { encodeFunctionData, type Address, type Hex } from 'viem'
 import { $heading3 } from '../../common/$text.js'
 import { $card2, $iconCircular, $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
@@ -27,7 +27,7 @@ interface IPortfolioEditorDrawer extends IComponentPageParams {
 }
 
 interface IPortfolioRoute {
-  collateralToken: viem.Address
+  collateralToken: Address
   deposit: IDepositEditorChange | null
   matchRuleList: IMatchingRuleEditorChange[]
 }
@@ -43,10 +43,11 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
     ) => {
       const { matchRuleList, depositTokenList } = config
 
-      const hasDraft = skipRepeatsWith(
-        (draft) => draft.matchRuleList.length > 0 || draft.depositTokenList.length > 0,
-        combineState({ matchRuleList, depositTokenList })
-      )
+      const openDrawerState = skipRepeatsWith((prev, next) => {
+        const prevCount = prev.matchRuleList.length + prev.depositTokenList.length
+        const nextCount = next.matchRuleList.length + next.depositTokenList.length
+        return prevCount > 0 && nextCount > 0
+      }, combineState({ matchRuleList, depositTokenList }))
 
       return [
         switchMap((params) => {
@@ -200,68 +201,68 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   })
                 ),
 
-                $row(spacing.small, style({ placeContent: 'space-between', padding: '0 24px' }))(
-                  $node(),
-                  $SubmitBar({
-                    $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
-                    txQuery: requestChangeSubscription
-                    // alert: validationError
-                  })({
-                    changeWallet: changeWalletTether(),
-                    submit: requestChangeSubscriptionTether(
-                      map(async (account) => {
-                        const callStack: viem.Hex[] = []
-                        const contractDefs = CONTRACT[42161].RouterProxy
+                // $row(spacing.small, style({ placeContent: 'space-between', padding: '0 24px' }))(
+                //   $node(),
+                //   $SubmitBar({
+                //     $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
+                //     txQuery: requestChangeSubscription
+                //     // alert: validationError
+                //   })({
+                //     changeWallet: changeWalletTether(),
+                //     submit: requestChangeSubscriptionTether(
+                //       map(async (account) => {
+                //         const callStack: Hex[] = []
+                //         const contractDefs = CONTRACT[42161].RouterProxy
 
-                        if (params.matchRuleList.length > 0) {
-                          callStack.push(
-                            ...params.matchRuleList.map((matchRule) => {
-                              const ruleParams = {
-                                allowanceRate: matchRule.allowanceRate,
-                                throttleActivity: matchRule.throttleActivity,
-                                expiry: matchRule.expiry
-                              }
+                //         if (params.matchRuleList.length > 0) {
+                //           callStack.push(
+                //             ...params.matchRuleList.map((matchRule) => {
+                //               const ruleParams = {
+                //                 allowanceRate: matchRule.allowanceRate,
+                //                 throttleActivity: matchRule.throttleActivity,
+                //                 expiry: matchRule.expiry
+                //               }
 
-                              return viem.encodeFunctionData({
-                                ...contractDefs,
-                                functionName: 'setMatchingRule',
-                                args: [matchRule.collateralToken, matchRule.trader, ruleParams]
-                              })
-                            })
-                          )
-                        }
+                //               return encodeFunctionData({
+                //                 ...contractDefs,
+                //                 functionName: 'setMatchingRule',
+                //                 args: [matchRule.collateralToken, matchRule.trader, ruleParams]
+                //               })
+                //             })
+                //           )
+                //         }
 
-                        if (params.depositTokenList.length > 0) {
-                          callStack.push(
-                            ...params.depositTokenList.map((deposit) =>
-                              deposit.action === DepositEditorAction.DEPOSIT
-                                ? viem.encodeFunctionData({
-                                    ...contractDefs,
-                                    functionName: 'deposit',
-                                    args: [deposit.token, deposit.value.amount]
-                                  })
-                                : viem.encodeFunctionData({
-                                    ...contractDefs,
-                                    functionName: 'withdraw',
-                                    args: [deposit.token, account.address, deposit.value.amount]
-                                  })
-                            )
-                          )
-                        }
+                //         if (params.depositTokenList.length > 0) {
+                //           callStack.push(
+                //             ...params.depositTokenList.map((deposit) =>
+                //               deposit.action === DepositEditorAction.DEPOSIT
+                //                 ? encodeFunctionData({
+                //                     ...contractDefs,
+                //                     functionName: 'deposit',
+                //                     args: [deposit.token, deposit.value.amount]
+                //                   })
+                //                 : encodeFunctionData({
+                //                     ...contractDefs,
+                //                     functionName: 'withdraw',
+                //                     args: [deposit.token, account.address, deposit.value.amount]
+                //                   })
+                //             )
+                //           )
+                //         }
 
-                        return wallet.write({
-                          ...contractDefs,
-                          functionName: 'multicall',
-                          args: [callStack]
-                        })
-                      })
-                    )
-                  })
-                )
+                //         return wallet.write({
+                //           ...contractDefs,
+                //           functionName: 'multicall',
+                //           args: [callStack]
+                //         })
+                //       })
+                //     )
+                //   })
+                // )
               )
             )
           )
-        }, hasDraft),
+        }, openDrawerState),
 
         {
           changeWallet,
@@ -283,7 +284,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
             ),
             constant([], clickClose)
           ]),
-          changeDepositTokenList: mergeArray([changeDepositTokenList, map((x) => [], clickClose)])
+          changeDepositTokenList: mergeArray([changeDepositTokenList, constant([], clickClose)])
         }
       ]
     }

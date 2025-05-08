@@ -11,10 +11,9 @@ import {
   parseReadableNumber,
   promiseState,
   readableTokenAmount,
-  readableTokenAmountLabel,
-  switchMap
+  readableTokenAmountLabel
 } from '@puppet/middleware/utils'
-import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style } from 'aelea/core'
+import { $node, $text, combineArray, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
