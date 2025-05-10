@@ -110,7 +110,7 @@ export const $alert = ($content: I$Node) =>
     $content
   )
 
-export const $alertTooltip = ($content: I$Slottable) => {
+export const $alertTooltip = ($content: I$Node) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
@@ -132,7 +132,7 @@ export const $alertPositiveTooltip = ($content: I$Node) => {
   })({})
 }
 
-export const $intermediateTooltip = ($content: I$Slottable) => {
+export const $intermediateTooltip = ($content: I$Node) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
@@ -148,9 +148,13 @@ export const $intermediateTooltip = ($content: I$Slottable) => {
   })({})
 }
 
-export const $infoLabel = (label: string | I$Slottable) => {
-  const $msg = isStream(label) ? label : $text(label)
-  return $node(style({ color: pallete.foreground }))($msg)
+export const $toText = (text: string | I$Text): I$Text => {
+  return isStream(text) ? text : $text(text)
+}
+
+export const $infoLabel = (label: string | I$Text) => {
+  // const $msg = isStream(label) ? label : $toText(label)
+  return $node(style({ color: pallete.foreground }))($toText(label))
 }
 
 export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable, collapseMobile = false) => {
@@ -159,11 +163,11 @@ export const $infoLabeledValue = (label: string | I$Slottable, value: string | I
   return $container(spacing.small)($infoLabel(label), isStream(value) ? value : $text(value))
 }
 
-export const $infoTooltipLabel = (text: string | I$Node, label?: string | I$Slottable) => {
+export const $infoTooltipLabel = (text: string | I$Slottable, label?: string | I$Slottable) => {
   return $row(style({ alignItems: 'center' }))(label ? $infoLabel(label) : empty(), $infoTooltip(text))
 }
 
-export const $infoTooltip = (text: string | I$Node, color = pallete.foreground, size = '24px') => {
+export const $infoTooltip = (text: string | I$Slottable, color = pallete.foreground, size = '24px') => {
   return $Tooltip({
     $dropContainer: $defaultDropContainer,
     $content: isStream(text) ? text : $node($text(text)),
@@ -176,11 +180,11 @@ export const $infoTooltip = (text: string | I$Node, color = pallete.foreground, 
   })({})
 }
 
-export const $labeledDivider = (label: string) => {
+export const $labeledDivider = (label: string | I$Slottable) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
     $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
-      $node(style({ fontSize: '.85rem' }))($text(label)),
+      $node(style({ fontSize: '.85rem' }))($toText(label)),
       $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))()
@@ -194,7 +198,7 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ fontSize: '.85rem', color: pallete.foreground }))($text(token.symbol))
     ),
-    $label ? $elipsisTextWrapper($label) : empty(),
+    $label ? $elipsisTextWrapper($label) : empty()
   )
 }
 
@@ -207,7 +211,7 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Slot
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ color: pallete.foreground }))($text(token.name))
     ),
-    $label ? $elipsisTextWrapper($label) : empty(),
+    $label ? $elipsisTextWrapper($label) : empty()
   )
 }
 
@@ -224,8 +228,8 @@ interface IHintAdjustment {
 }
 
 interface ILabeledHintAdjustment extends IHintAdjustment {
-  label?: string | I$Node
-  tooltip?: string | I$Node
+  label?: string | I$Slottable
+  tooltip?: string | I$Slottable
 }
 
 export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {

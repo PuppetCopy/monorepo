@@ -45,9 +45,11 @@ import { $TraderMatchingRouteEditor } from '../../components/portfolio/$TraderMa
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
-import type { IUserActivityPageParams } from '../type.js'
+import type { IPageFilterParams, IUserActivityPageParams } from '../type.js'
 
-interface ILeaderboard extends IUserActivityPageParams {}
+interface ILeaderboard extends IPageFilterParams {
+  user: IUserActivityPageParams
+}
 
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
@@ -64,7 +66,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
     ) => {
-      const { activityTimeframe, selectedCollateralTokenList, matchingRuleQuery, route } = config
+      const {
+        activityTimeframe,
+        collateralTokenList,
+        user: { depositTokenList, matchingRuleQuery },
+        route
+      } = config
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
@@ -83,7 +90,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               spacing.big,
               style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' })
             )(
-              $SelectCollateralToken({ selectedList: selectedCollateralTokenList })({
+              $SelectCollateralToken({ selectedList: collateralTokenList })({
                 selectMarketTokenList: selectMarketTokenListTether()
               }),
               $ButtonToggle({
@@ -153,7 +160,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 },
                 combineState({
                   paging,
-                  selectedCollateralTokenList
+                  collateralTokenList
                 })
               )
 

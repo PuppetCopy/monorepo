@@ -3,14 +3,6 @@ import { getMarketIndexToken, getTokenDescription } from '../gmx/gmxUtils.js'
 import { type IPriceCandle, type IPricefeedMap, OrderType } from '../gmx/types.js'
 import { factor } from '../utils/mathUtils.js'
 import { getMappedValue, unixTimestampNow } from '../utils/utils.js'
-import type {
-  IPosition,
-  IPositionDecrease,
-  IPositionIncrease,
-  IPositionListSummary,
-  IPuppetPosition,
-  IVested
-} from './types.js'
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(
   list: readonly A[],
@@ -27,260 +19,260 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
   return gmap
 }
 
-export function accountSettledPositionListSummary(
-  positionList: IPosition[],
-  puppet?: viem.Address
-): IPositionListSummary {
-  const seedAccountSummary: IPositionListSummary = {
-    size: 0n,
-    collateral: 0n,
-    cumulativeLeverage: 0n,
-    puppets: [],
+// export function accountSettledPositionListSummary(
+//   positionList: IPosition[],
+//   puppet?: viem.Address
+// ): IPositionListSummary {
+//   const seedAccountSummary: IPositionListSummary = {
+//     size: 0n,
+//     collateral: 0n,
+//     cumulativeLeverage: 0n,
+//     puppets: [],
 
-    avgCollateral: 0n,
-    avgSize: 0n,
+//     avgCollateral: 0n,
+//     avgSize: 0n,
 
-    fee: 0n,
-    lossCount: 0,
-    winCount: 0,
-    pnl: 0n
-  }
+//     fee: 0n,
+//     lossCount: 0,
+//     winCount: 0,
+//     pnl: 0n
+//   }
 
-  const summary = positionList.reduce((seed, next, idx): IPositionListSummary => {
-    const idxBn = BigInt(idx) + 1n
+//   const summary = positionList.reduce((seed, next, idx): IPositionListSummary => {
+//     const idxBn = BigInt(idx) + 1n
 
-    const size = seed.size + getParticiapntPortion(next, next.maxSizeInUsd, puppet)
-    const collateral = seed.collateral + getParticiapntPortion(next, next.maxCollateralInUsd, puppet)
-    const cumulativeLeverage =
-      seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeInUsd, next.maxCollateralInUsd), puppet)
+//     const size = seed.size + getParticiapntPortion(next, next.maxSizeInUsd, puppet)
+//     const collateral = seed.collateral + getParticiapntPortion(next, next.maxCollateralInUsd, puppet)
+//     const cumulativeLeverage =
+//       seed.cumulativeLeverage + getParticiapntPortion(next, factor(next.maxSizeInUsd, next.maxCollateralInUsd), puppet)
 
-    const avgSize = size / idxBn
-    const avgCollateral = collateral / idxBn
+//     const avgSize = size / idxBn
+//     const avgCollateral = collateral / idxBn
 
-    const fee = seed.fee + getParticiapntPortion(next, 0n, puppet)
-    const pnl = seed.pnl + getParticiapntPortion(next, next.realisedPnlUsd, puppet)
+//     const fee = seed.fee + getParticiapntPortion(next, 0n, puppet)
+//     const pnl = seed.pnl + getParticiapntPortion(next, next.realisedPnlUsd, puppet)
 
-    const winCount = seed.winCount + (next.realisedPnlUsd > 0n ? 1 : 0)
-    const lossCount = seed.lossCount + (next.realisedPnlUsd < 0n ? 1 : 0)
+//     const winCount = seed.winCount + (next.realisedPnlUsd > 0n ? 1 : 0)
+//     const lossCount = seed.lossCount + (next.realisedPnlUsd < 0n ? 1 : 0)
 
-    const puppets = isMirrorPosition(next)
-      ? [...seed.puppets, ...next.puppetList.map((p) => p.account).filter((x) => !seed.puppets.includes(x))]
-      : seed.puppets
+//     const puppets = isMirrorPosition(next)
+//       ? [...seed.puppets, ...next.puppetList.map((p) => p.account).filter((x) => !seed.puppets.includes(x))]
+//       : seed.puppets
 
-    return {
-      size,
-      collateral,
-      cumulativeLeverage,
-      avgCollateral,
-      avgSize,
-      fee,
-      lossCount,
-      pnl,
-      winCount,
-      puppets
-    }
-  }, seedAccountSummary)
+//     return {
+//       size,
+//       collateral,
+//       cumulativeLeverage,
+//       avgCollateral,
+//       avgSize,
+//       fee,
+//       lossCount,
+//       pnl,
+//       winCount,
+//       puppets
+//     }
+//   }, seedAccountSummary)
 
-  return summary
-}
+//   return summary
+// }
 
-export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
-  const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
-  const openPositionMap = new Map<viem.Hex, IPosition>()
-  const positionList: IPosition[] = []
+// export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
+//   const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
+//   const openPositionMap = new Map<viem.Hex, IPosition>()
+//   const positionList: IPosition[] = []
 
-  for (let index = 0; index < sortedUpdateList.length; index++) {
-    const next = sortedUpdateList[index]
-    let position = openPositionMap.get(next.positionKey)
+//   for (let index = 0; index < sortedUpdateList.length; index++) {
+//     const next = sortedUpdateList[index]
+//     let position = openPositionMap.get(next.positionKey)
 
-    if (!position) {
-      position = {
-        key: next.positionKey,
-        account: next.account,
-        market: next.market,
-        collateralToken: next.collateralToken,
+//     if (!position) {
+//       position = {
+//         key: next.positionKey,
+//         account: next.account,
+//         market: next.market,
+//         collateralToken: next.collateralToken,
 
-        sizeInUsd: 0n,
-        sizeInTokens: 0n,
-        collateralInTokens: 0n,
-        collateralInUsd: 0n,
-        realisedPnlUsd: 0n,
+//         sizeInUsd: 0n,
+//         sizeInTokens: 0n,
+//         collateralInTokens: 0n,
+//         collateralInUsd: 0n,
+//         realisedPnlUsd: 0n,
 
-        // cumulativeSizeUsd: 0n,
-        // cumulativeSizeToken: 0n,
-        // cumulativeCollateralUsd: 0n,
-        // cumulativeCollateralToken: 0n,
+//         // cumulativeSizeUsd: 0n,
+//         // cumulativeSizeToken: 0n,
+//         // cumulativeCollateralUsd: 0n,
+//         // cumulativeCollateralToken: 0n,
 
-        maxSizeInUsd: 0n,
-        maxSizeInTokens: 0n,
-        maxCollateralInTokens: 0n,
-        maxCollateralInUsd: 0n,
+//         maxSizeInUsd: 0n,
+//         maxSizeInTokens: 0n,
+//         maxCollateralInTokens: 0n,
+//         maxCollateralInUsd: 0n,
 
-        avgEntryPrice: 0n,
+//         avgEntryPrice: 0n,
 
-        isLong: next.isLong,
+//         isLong: next.isLong,
 
-        openTimestamp: next.blockTimestamp,
-        settledTimestamp: 0,
+//         openTimestamp: next.blockTimestamp,
+//         settledTimestamp: 0,
 
-        puppetList: [],
-        increaseList: [],
-        decreaseList: [],
+//         puppetList: [],
+//         increaseList: [],
+//         decreaseList: [],
 
-        collateralList: [],
+//         collateralList: [],
 
-        lastUpdate: next
-      }
+//         lastUpdate: next
+//       }
 
-      openPositionMap.set(next.positionKey, position)
-    }
+//       openPositionMap.set(next.positionKey, position)
+//     }
 
-    position.lastUpdate = next
+//     position.lastUpdate = next
 
-    if (next.__typename === 'PositionIncrease') {
-      position.sizeInUsd = next.sizeInUsd
-      position.sizeInTokens = next.sizeInTokens
-      position.collateralInTokens = next.collateralAmount
-      position.collateralInUsd = next.collateralAmount * next.collateralTokenPriceMax
+//     if (next.__typename === 'PositionIncrease') {
+//       position.sizeInUsd = next.sizeInUsd
+//       position.sizeInTokens = next.sizeInTokens
+//       position.collateralInTokens = next.collateralAmount
+//       position.collateralInUsd = next.collateralAmount * next.collateralTokenPriceMax
 
-      position.maxSizeInTokens =
-        next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
-      position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
-      position.maxCollateralInTokens =
-        next.collateralAmount > position.maxCollateralInTokens ? next.collateralAmount : position.maxCollateralInTokens
-      position.maxCollateralInUsd =
-        position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
+//       position.maxSizeInTokens =
+//         next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
+//       position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
+//       position.maxCollateralInTokens =
+//         next.collateralAmount > position.maxCollateralInTokens ? next.collateralAmount : position.maxCollateralInTokens
+//       position.maxCollateralInUsd =
+//         position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
 
-      // position.cumulativeSizeToken += next.sizeInTokens
-      // position.cumulativeSizeUsd += next.sizeInUsd
-      // position.cumulativeCollateralToken += next.collateralAmount
-      // position.cumulativeCollateralUsd += position.collateralInUsd
+//       // position.cumulativeSizeToken += next.sizeInTokens
+//       // position.cumulativeSizeUsd += next.sizeInUsd
+//       // position.cumulativeCollateralToken += next.collateralAmount
+//       // position.cumulativeCollateralUsd += position.collateralInUsd
 
-      position.increaseList.push(next)
-    } else {
-      // case where indexing ahead of prior position updates
-      // if (position.cumulativeCollateralUsd === 0n) {
-      //   position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
-      //   position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
-      //   position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
-      //   position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
+//       position.increaseList.push(next)
+//     } else {
+//       // case where indexing ahead of prior position updates
+//       // if (position.cumulativeCollateralUsd === 0n) {
+//       //   position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
+//       //   position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
+//       //   position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
+//       //   position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
 
-      //   position.cumulativeCollateralToken = position.maxCollateralInTokens
-      //   position.cumulativeCollateralUsd = position.maxCollateralInUsd
-      //   position.cumulativeSizeToken = position.maxSizeInTokens
-      //   position.cumulativeSizeUsd = position.maxSizeInUsd
-      // }
+//       //   position.cumulativeCollateralToken = position.maxCollateralInTokens
+//       //   position.cumulativeCollateralUsd = position.maxCollateralInUsd
+//       //   position.cumulativeSizeToken = position.maxSizeInTokens
+//       //   position.cumulativeSizeUsd = position.maxSizeInUsd
+//       // }
 
-      position.decreaseList.push(next)
-      position.realisedPnlUsd += next.basePnlUsd
+//       position.decreaseList.push(next)
+//       position.realisedPnlUsd += next.basePnlUsd
 
-      if (next.sizeInTokens === 0n) {
-        position.settledTimestamp = next.blockTimestamp
+//       if (next.sizeInTokens === 0n) {
+//         position.settledTimestamp = next.blockTimestamp
 
-        positionList.push(position)
-        openPositionMap.delete(next.positionKey)
-      }
-    }
+//         positionList.push(position)
+//         openPositionMap.delete(next.positionKey)
+//       }
+//     }
 
-    if (position.maxSizeInTokens > 0n) {
-      position.avgEntryPrice =
-        (position.maxSizeInUsd / position.maxSizeInTokens) *
-        getTokenDescription(getMarketIndexToken(next.market)).denominator
-    }
-  }
+//     if (position.maxSizeInTokens > 0n) {
+//       position.avgEntryPrice =
+//         (position.maxSizeInUsd / position.maxSizeInTokens) *
+//         getTokenDescription(getMarketIndexToken(next.market)).denominator
+//     }
+//   }
 
-  positionList.push(...openPositionMap.values())
-  return positionList
-}
+//   positionList.push(...openPositionMap.values())
+//   return positionList
+// }
 
-export function isUpdateIncrease(update: IPositionIncrease | IPositionDecrease): update is IPositionIncrease {
-  return update.orderType === OrderType.MarketIncrease || update.orderType === OrderType.LimitIncrease
-}
+// export function isUpdateIncrease(update: IPositionIncrease | IPositionDecrease): update is IPositionIncrease {
+//   return update.orderType === OrderType.MarketIncrease || update.orderType === OrderType.LimitIncrease
+// }
 
-export function isUpdateDecrease(update: IPositionIncrease | IPositionDecrease): update is IPositionDecrease {
-  return (
-    update.orderType === OrderType.MarketDecrease ||
-    update.orderType === OrderType.LimitDecrease ||
-    update.orderType === OrderType.Liquidation ||
-    update.orderType === OrderType.StopLossDecrease
-  )
-}
+// export function isUpdateDecrease(update: IPositionIncrease | IPositionDecrease): update is IPositionDecrease {
+//   return (
+//     update.orderType === OrderType.MarketDecrease ||
+//     update.orderType === OrderType.LimitDecrease ||
+//     update.orderType === OrderType.Liquidation ||
+//     update.orderType === OrderType.StopLossDecrease
+//   )
+// }
 
-export function isCloseUpdate(update: IPositionIncrease | IPositionDecrease): boolean {
-  return update.sizeInTokens === 0n
-}
+// export function isCloseUpdate(update: IPositionIncrease | IPositionDecrease): boolean {
+//   return update.sizeInTokens === 0n
+// }
 
-export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): IPriceCandle {
-  const feed = getMappedValue(priceFeed, token)
+// export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): IPriceCandle {
+//   const feed = getMappedValue(priceFeed, token)
 
-  if (feed.length === 0) {
-    throw new Error('Price feed not found')
-  }
+//   if (feed.length === 0) {
+//     throw new Error('Price feed not found')
+//   }
 
-  // get the latest price based on timestamp from unsorted array
-  return feed[0]
-}
+//   // get the latest price based on timestamp from unsorted array
+//   return feed[0]
+// }
 
-export function isMirrorPosition(mp: IPosition): mp is IPosition {
-  return 'mirror' in mp && mp.mirror !== null
-}
+// export function isMirrorPosition(mp: IPosition): mp is IPosition {
+//   return 'mirror' in mp && mp.mirror !== null
+// }
 
-export function isPositionSettled(trade: IPosition): boolean {
-  return trade.settledTimestamp > 0
-}
+// export function isPositionSettled(trade: IPosition): boolean {
+//   return trade.settledTimestamp > 0
+// }
 
-export function isPositionOpen(trade: IPosition): trade is IPosition {
-  return trade.settledTimestamp === 0
-}
+// export function isPositionOpen(trade: IPosition): trade is IPosition {
+//   return trade.settledTimestamp === 0
+// }
 
-export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Address): bigint {
-  const position = puppetList.find((p) => p.account === puppet)
+// export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Address): bigint {
+//   const position = puppetList.find((p) => p.account === puppet)
 
-  if (!position) throw new Error('Puppet not found')
+//   if (!position) throw new Error('Puppet not found')
 
-  return position.collateral
-}
+//   return position.collateral
+// }
 
-export function getParticiapntCollateral(mp: IPosition, puppet?: viem.Address): bigint {
-  return puppet ? getPuppetShare(mp.puppetList, puppet) : mp.maxCollateralInUsd
-}
+// export function getParticiapntCollateral(mp: IPosition, puppet?: viem.Address): bigint {
+//   return puppet ? getPuppetShare(mp.puppetList, puppet) : mp.maxCollateralInUsd
+// }
 
-export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: viem.Address): bigint {
-  const share = getParticiapntCollateral(mp, puppet)
+// export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: viem.Address): bigint {
+//   const share = getParticiapntCollateral(mp, puppet)
 
-  return getPortion(mp.maxCollateralInUsd, share, totalAmount)
-}
+//   return getPortion(mp.maxCollateralInUsd, share, totalAmount)
+// }
 
-export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
-  const realisedPnl = getParticiapntPortion(mp, mp.realisedPnlUsd, puppet)
+// export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
+//   const realisedPnl = getParticiapntPortion(mp, mp.realisedPnlUsd, puppet)
 
-  return realisedPnl
-}
+//   return realisedPnl
+// }
 
-export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
-  if (supply === 0n || amount === 0n) return amount
+// export function getPortion(supply: bigint, share: bigint, amount: bigint): bigint {
+//   if (supply === 0n || amount === 0n) return amount
 
-  if (share === 0n) {
-    return amount
-  }
-  return (amount * share) / supply
-}
+//   if (share === 0n) {
+//     return amount
+//   }
+//   return (amount * share) / supply
+// }
 
-export function getVestingCursor(vested: IVested): IVested {
-  const now = BigInt(unixTimestampNow())
-  const timeElapsed = now - vested.lastAccruedTime
-  const accruedDelta =
-    timeElapsed >= vested.remainingDuration ? vested.amount : (timeElapsed * vested.amount) / vested.remainingDuration
+// export function getVestingCursor(vested: IVested): IVested {
+//   const now = BigInt(unixTimestampNow())
+//   const timeElapsed = now - vested.lastAccruedTime
+//   const accruedDelta =
+//     timeElapsed >= vested.remainingDuration ? vested.amount : (timeElapsed * vested.amount) / vested.remainingDuration
 
-  vested.remainingDuration =
-    timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
-  vested.amount -= accruedDelta
-  vested.accrued += accruedDelta
+//   vested.remainingDuration =
+//     timeElapsed >= vested.remainingDuration ? 0n : vested.remainingDuration - BigInt(timeElapsed)
+//   vested.amount -= accruedDelta
+//   vested.accrued += accruedDelta
 
-  vested.lastAccruedTime = now
+//   vested.lastAccruedTime = now
 
-  return vested
-}
+//   return vested
+// }
 
 export function getMatchKey(collateralToken: viem.Address, trader: viem.Address) {
   return viem.keccak256(

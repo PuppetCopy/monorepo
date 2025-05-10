@@ -1,7 +1,7 @@
 import { empty, map, skipRepeats } from '@most/core'
 import type { Stream } from '@most/types'
 import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet/middleware/const'
-import { type IPosition, isPositionSettled, latestPriceMap } from '@puppet/middleware/core'
+import { latestPriceMap } from '@puppet/middleware/core'
 import {
   getMarketIndexToken,
   getPositionPnlUsd,
@@ -29,7 +29,7 @@ import {
   readableLeverage,
   readablePercentage,
   readablePnl,
-  readableUsd,
+  readableUsd
 } from '@puppet/middleware/utils'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
 import { $node, $text, component, type INode, nodeEvent, O, style, styleInline, toStream } from 'aelea/core'
@@ -304,7 +304,7 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 
     $row(style({ placeContent: 'space-between' }))(
       $node(style({ color: pallete.foreground, flex: 1 }))($text('Collateral')),
-      $text(readableUsd(latestUpdate.collateralAmount * latestUpdate.collateralTokenPriceMax))
+      $text(readableUsd(latestUpdate.collateralInTokens * latestUpdate.collateralTokenPriceMax))
     ),
     $row(style({ placeContent: 'space-between' }))(
       $node(style({ color: pallete.foreground, flex: 1 }))($text('Open Pnl')),

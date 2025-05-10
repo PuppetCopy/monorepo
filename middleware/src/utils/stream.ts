@@ -31,7 +31,6 @@ export type StateStream<T> = {
 
 type IStreamOrPromise<T> = Stream<T> | Promise<T>
 
-
 export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
   let last: T
 
@@ -44,8 +43,6 @@ export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
     }, s)
   )
 }
-
-
 
 export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>): Stream<A> {
   const entries = Object.entries(state) as [keyof A, Stream<A[K]>][]
@@ -62,7 +59,6 @@ export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>):
 
   return zipped
 }
-
 
 export interface IPeriodRun<T> {
   actionOp: IOps<number, Promise<T>>

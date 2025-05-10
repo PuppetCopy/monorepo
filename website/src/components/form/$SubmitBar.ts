@@ -100,11 +100,13 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 }
 
                 return $alertTooltip(
-                  $text(
-                    String(
-                      message ||
-                        getSafeMappedValue(err, 'shortMessage', 'message') ||
-                        'Transaction failed with an unknown error'
+                  $node(
+                    $text(
+                      String(
+                        message ||
+                          getSafeMappedValue(err, 'shortMessage', 'message') ||
+                          'Transaction failed with an unknown error'
+                      )
                     )
                   )
                 )
@@ -128,7 +130,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     overflow: 'hidden'
                   })
                 ),
-                disabled: combineArray((params) => {
+                disabled: map((params) => {
                   return params.alert !== null || params.disabled || params.isRequestPending
                 }, combineState({ disabled, isRequestPending, alert })),
                 $content: $row(style({ position: 'relative' })($submitContent))

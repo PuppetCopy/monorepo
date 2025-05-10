@@ -6,10 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "bun run build:clean && bun run build:esm",
-    "build:esm": "tsc -b",
+    "build:esm": "bunx tsc -b",
     "build:clean": "rm -rf dist",
     "clean:tsc": "rm -fr dist/*",
-    "dev:generate-abi": "wagmi generate",
+    "dev:generate-abi": "bunx wagmi generate",
     "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
   },
   "files": [
@@ -64,7 +64,7 @@
     "aelea": "1.8.1",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.6",
-    "viem": "2.29.0"
+    "viem": "2.29.2"
   },
   "devDependencies": {
     "@wagmi/cli": "2.3.0"

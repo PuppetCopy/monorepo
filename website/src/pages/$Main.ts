@@ -91,11 +91,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
 
       const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
-      const selectedCollateralTokenList = uiStorage.replayWrite(
-        localStore.global,
-        selectMarketTokenList,
-        'collateralTokenList'
-      )
+      const collateralTokenList = uiStorage.replayWrite(localStore.global, selectMarketTokenList, 'collateralTokenList')
 
       const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
 
@@ -113,9 +109,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         wallet.blockChange
       ])
 
-      const matchingRuleQuery = queryUserMatchingRuleList({
-        account: wallet.account
-      })
+      const matchingRuleQuery = multicast(
+        queryUserMatchingRuleList({
+          account: wallet.account
+        })
+      )
 
       const matchRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
       const depositTokenList = replayLatest(changeDepositTokenList, [] as IDepositEditorChange[])
@@ -182,10 +180,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                         $Leaderboard({
                           route: leaderboardRoute,
                           activityTimeframe,
-                          selectedCollateralTokenList,
-                          matchingRuleQuery,
-                          depositTokenList,
-                          pricefeedMapQuery
+                          collateralTokenList,
+                          user: {
+                            depositTokenList,
+                            matchingRuleQuery
+                          }
                         })({
                           changeActivityTimeframe: changeActivityTimeframeTether(),
                           selectMarketTokenList: selectMarketTokenListTether(),

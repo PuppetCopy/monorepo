@@ -70,7 +70,7 @@ export default defineConfig({
       filename: 'service-worker.ts',
       pwaAssets: {
         config: true,
-        overrideManifestIcons: true,
+        overrideManifestIcons: true
       },
       manifest: {
         name: SITE_CONFIG.__APP_NAME__,

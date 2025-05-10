@@ -34,7 +34,7 @@ import {
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel,
-  readableUnitAmount,
+  readableUnitAmount
 } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'

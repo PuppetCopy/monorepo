@@ -1,11 +1,5 @@
 import { map, skipRepeats } from '@most/core'
-import {
-  getParticiapntPortion,
-  getSettledMpPnL,
-  type IPosition,
-  isPositionSettled,
-  latestPriceMap
-} from '@puppet/middleware/core'
+import { latestPriceMap } from '@puppet/middleware/core'
 import { getMarketIndexToken, getPositionPnlUsd } from '@puppet/middleware/gmx'
 import { $infoTooltip, type TableColumn } from '@puppet/middleware/ui-components'
 import {
@@ -13,7 +7,7 @@ import {
   getMappedValue,
   getTimeSince,
   readableDate,
-  readablePercentage,
+  readablePercentage
 } from '@puppet/middleware/utils'
 import { $node, $text, type IComposeBehavior, type INode, O, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
@@ -28,16 +22,16 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
     $node(style({ fontSize: '.85rem' }))($text(secondaryLabel))
   )
 
-export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
-  $head: $tableHeader('Size', 'Leverage'),
-  columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
-  $bodyCallback: map((mp) => {
-    const size = getParticiapntPortion(mp, mp.maxSizeInUsd, puppet)
-    const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
+// export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
+//   $head: $tableHeader('Size', 'Leverage'),
+//   columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
+//   $bodyCallback: map((mp) => {
+//     const size = getParticiapntPortion(mp, mp.maxSizeInUsd, puppet)
+//     const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
 
-    return $size(size, collateral)
-  })
-})
+//     return $size(size, collateral)
+//   })
+// })
 
 export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),

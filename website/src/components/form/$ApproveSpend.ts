@@ -10,6 +10,7 @@ import {
 import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
 import { erc20Abi } from 'abitype/abis'
 import {
+  $node,
   $text,
   combineState,
   component,
@@ -17,11 +18,10 @@ import {
   type I$Slottable,
   type IBehavior,
   type INodeCompose,
-  isStream,
   style,
   switchMap
 } from 'aelea/core'
-import { $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $row, spacing } from 'aelea/ui-components'
 import * as viem from 'viem'
 import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
 import { $defaultButtonPrimary } from './$Button'
@@ -31,7 +31,7 @@ export interface ISpend {
   spender: viem.Address
   token: viem.Address
   amount?: Stream<bigint>
-  $label?: I$Slottable | string
+  $label?: I$Slottable
 }
 
 interface IApproveSpend extends ISpend {
@@ -78,7 +78,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                   }
 
                   if (status.state === PromiseStatus.PENDING) {
-                    return $intermediateTooltip($text('Awaiting confirmation'))
+                    return $intermediateTooltip($node($text('Awaiting confirmation')))
                   }
                   if (status.state === PromiseStatus.ERROR) {
                     const err = status.error
@@ -88,7 +88,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                       message = err.shortMessage || err.message
                     }
 
-                    return $alertTooltip($text(message || 'Transaction failed'))
+                    return $alertTooltip($node($text(message || 'Transaction failed')))
                   }
 
                   return $alertPositiveTooltip(
@@ -107,7 +107,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                     overflow: 'hidden'
                   })
                 ),
-                $content: $label ? (isStream($label) ? $label : $text($label)) : $text('Approve spend')
+                $content: $label ?? $text('Approve spend')
               })({
                 click: approveTokenSpendTether(
                   map(async () => {
