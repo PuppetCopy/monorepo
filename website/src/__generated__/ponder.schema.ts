@@ -1,182 +1,46 @@
 import { onchainTable, relations } from 'ponder'
 
-export const traderRouteMetric = onchainTable('TraderRouteMetric', (t) => ({
-  id: t.text().primaryKey(),
-  matchingKey: t.hex().notNull(),
-  account: t.hex().notNull(),
-  collateralToken: t.hex().notNull(),
-  cumulativeCollateralUsd: t.bigint().notNull(),
-  cumulativeSizeUsd: t.bigint().notNull(),
-  maxSizeInUsd: t.bigint().notNull(),
-  maxCollateralInUsd: t.bigint().notNull(),
-  openPnl: t.bigint().notNull(),
-  realisedPnl: t.bigint().notNull(),
-  pnl: t.bigint().notNull(),
-  roi: t.bigint().notNull(),
-  interval: t.integer().notNull(),
-  winCount: t.integer().notNull(),
-  lossCount: t.integer().notNull(),
-  matchedPuppetCount: t.integer().notNull(),
-  lastUpdatedTimestamp: t.integer().notNull(),
-  marketList: t.hex().array().notNull(),
-  pnlList: t.bigint().array().notNull(),
-  pnlTimestampList: t.integer().array().notNull(),
-  matchedPuppetList: t.hex().array().notNull()
+export const market = onchainTable('Market', (t) => ({
+  indexToken: t.hex().notNull(),
+  longToken: t.hex().notNull(),
+  shortToken: t.hex().notNull(),
+  marketType: t.hex(),
+
+  marketToken: t.hex().primaryKey()
 }))
 
-export const puppetSettle = onchainTable('PuppetSettle', (t) => ({
-  id: t.hex().primaryKey(),
-  puppet: t.hex().notNull(),
-  amount: t.bigint().notNull(),
-  settleId: t.hex().notNull()
+export const oraclePrice = onchainTable('OraclePrice', (t) => ({
+  price: t.bigint().notNull(),
+  updateTimestamp: t.integer().notNull(),
+
+  token: t.hex().primaryKey()
 }))
 
-export const puppetSettleRelations = relations(puppetSettle, ({ one }) => ({
-  settle: one(settle, { fields: [puppetSettle.settleId], references: [settle.id] })
-}))
-
-export const settle = onchainTable('Settle', (t) => ({
-  id: t.hex().primaryKey(),
-  matchingKey: t.hex().notNull(),
-  allocationKey: t.hex().notNull(),
-
-  allocationAddress: t.hex().notNull(),
-  keeperFeeReceiver: t.hex().notNull(),
-  collateralToken: t.hex().notNull(),
-  distributionToken: t.hex().notNull(),
-  puppet: t.hex().notNull(),
-
-  keeperExecutionFee: t.bigint().notNull(),
-  settledBalance: t.bigint().notNull(),
-  platformFeeAmount: t.bigint().notNull(),
-
-  blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
-}))
-
-export const settleRelations = relations(settle, ({ one }) => ({
-  puppetSettle: one(puppetSettle, { fields: [settle.id], references: [puppetSettle.settleId] }),
-  allocation: one(allocation, { fields: [settle.allocationKey], references: [allocation.allocationKey] })
-}))
-
-export const adjust = onchainTable('Adjust', (t) => ({
-  requestKey: t.hex().primaryKey(),
-  allocationKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
-
-  allocationAddress: t.hex().notNull(),
-  keeperFeeReceiver: t.hex().notNull(),
-
-  keeperExecutionFee: t.bigint().notNull(),
-  puppetKeeperExecutionFeeInsolvency: t.bigint().notNull(),
-  allocation: t.bigint().notNull(),
-  sizeDelta: t.bigint().notNull(),
-  traderTargetLeverage: t.bigint().notNull(),
-
-  blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
-}))
-
-export const mirror = onchainTable('Mirror', (t) => ({
-  matchingKey: t.hex().notNull(),
-  allocationKey: t.hex().notNull(),
-  requestKey: t.hex().notNull(),
-
-  allocationAddress: t.hex().primaryKey(),
-  keeperFeeReceiver: t.hex().notNull(),
-
-  keeperExecutionFee: t.bigint().notNull(),
-  allocation: t.bigint().notNull(),
-  sizeDelta: t.bigint().notNull(),
-  traderTargetLeverage: t.bigint().notNull(),
-
-  blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
-}))
-
-export const puppetAllocate = onchainTable('PuppetAllocate', (t) => ({
-  id: t.hex().primaryKey(),
-  trader: t.hex().notNull(),
-  puppet: t.hex().notNull(),
+export const priceCandle = onchainTable('PriceCandle', (t) => ({
   token: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
-  amount: t.bigint().notNull(),
+  interval: t.integer().notNull(),
+  slotTime: t.integer().notNull(),
+  o: t.bigint().notNull(),
+  h: t.bigint().notNull(),
+  l: t.bigint().notNull(),
+  c: t.bigint().notNull(),
 
-  mirrorPositionId: t.hex().notNull(),
-  allocationKey: t.hex().notNull()
+  id: t.text().primaryKey()
 }))
 
-export const puppetAllocationRelations = relations(puppetAllocate, ({ one }) => ({
-  allocation: one(allocation, { fields: [puppetAllocate.allocationKey], references: [allocation.allocationKey] })
-}))
-
-export const allocation = onchainTable('Allocation', (t) => ({
-  matchingKey: t.hex().notNull(),
-  allocationKey: t.hex().notNull(),
-  allocationAddress: t.hex().primaryKey(),
-
-  puppet: t.hex().notNull(),
-  allocationToken: t.hex().notNull(),
-
-  allocation: t.bigint().notNull(),
-  size: t.bigint().notNull(),
-  cumulativeKeeperFee: t.bigint().notNull()
-}))
-
-export const allocationRelations = relations(allocation, ({ many, one }) => ({
-  mirror: one(mirror, { fields: [allocation.allocationAddress], references: [mirror.allocationAddress] }),
-  settleList: many(settle)
-}))
-
-export const puppetMatchingRule = onchainTable('PuppetMatchingRule', (t) => ({
-  id: t.hex().primaryKey(),
-  matchingKey: t.hex().notNull(),
-
-  collateralToken: t.hex().notNull(),
-  puppet: t.hex().notNull(),
-  trader: t.hex().notNull(),
-
-  allowanceRate: t.bigint().notNull(),
-  throttleActivity: t.bigint().notNull(),
-  expiry: t.bigint().notNull()
-}))
-
-export const deposit = onchainTable('Deposit', (t) => ({
-  id: t.text().primaryKey(),
-  collateralToken: t.hex().notNull(),
-  user: t.hex().notNull(),
-  balance: t.bigint().notNull(),
-  amount: t.bigint().notNull(),
-
-  blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
-}))
-
-export const withdraw = onchainTable('Withdraw', (t) => ({
-  id: t.text().primaryKey(),
-  collateralToken: t.hex().notNull(),
-  user: t.hex().notNull(),
-  receiver: t.hex().notNull(),
-  balance: t.bigint().notNull(),
-  amount: t.bigint().notNull(),
-
-  blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
-}))
-
-// ---- GMX derived data ----
-
-export const traderOpenPnl = onchainTable('TraderOpenPnl', (t) => ({
-  positionKey: t.hex().primaryKey(),
+export const position = onchainTable('Position', (t) => ({
   pnl: t.bigint().notNull(),
-  account: t.hex().notNull()
+  account: t.hex().notNull(),
+  collateralInTokens: t.bigint().notNull(),
+  collateralInUsd: t.bigint().notNull(),
+  lastUpdatedTimestamp: t.integer().notNull(),
+
+  matchingKey: t.hex().notNull(),
+
+  positionKey: t.hex().primaryKey()
 }))
 
 export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
-  orderKey: t.hex().primaryKey(),
-  positionKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
-
   market: t.hex().notNull(),
   account: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
@@ -184,7 +48,7 @@ export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
 
   sizeInTokens: t.bigint().notNull(),
   sizeInUsd: t.bigint().notNull(),
-  collateralAmount: t.bigint().notNull(),
+  collateralInTokens: t.bigint().notNull(),
   borrowingFactor: t.bigint().notNull(),
   fundingFeeAmountPerSize: t.bigint().notNull(),
   longTokenClaimableFundingAmountPerSize: t.bigint().notNull(),
@@ -207,7 +71,12 @@ export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 
-  feeCollectedId: t.hex().notNull()
+  feeCollectedId: t.hex().notNull(),
+
+  positionKey: t.hex().notNull(),
+  matchingKey: t.hex().notNull(),
+
+  orderKey: t.hex().primaryKey()
 }))
 
 export const positionIncreaseRelations = relations(positionIncrease, ({ one }) => ({
@@ -218,10 +87,6 @@ export const positionIncreaseRelations = relations(positionIncrease, ({ one }) =
 }))
 
 export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
-  orderKey: t.hex().primaryKey(),
-  positionKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
-
   market: t.hex().notNull(),
   account: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
@@ -229,7 +94,7 @@ export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
 
   sizeInUsd: t.bigint().notNull(),
   sizeInTokens: t.bigint().notNull(),
-  collateralAmount: t.bigint().notNull(),
+  collateralInTokens: t.bigint().notNull(),
   borrowingFactor: t.bigint().notNull(),
   fundingFeeAmountPerSize: t.bigint().notNull(),
   longTokenClaimableFundingAmountPerSize: t.bigint().notNull(),
@@ -242,7 +107,7 @@ export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
   sizeDeltaUsd: t.bigint().notNull(),
   sizeDeltaInTokens: t.bigint().notNull(),
   collateralDeltaAmount: t.bigint().notNull(),
-  valuesPriceImpactDiffUsd: t.bigint().notNull(),
+  priceImpactDiffUsd: t.bigint().notNull(),
   orderType: t.bigint().notNull(),
 
   priceImpactUsd: t.bigint().notNull(),
@@ -254,7 +119,12 @@ export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 
-  feeCollectedId: t.hex().notNull()
+  feeCollectedId: t.hex().notNull(),
+
+  positionKey: t.hex().notNull(),
+  matchingKey: t.hex().notNull(),
+
+  orderKey: t.hex().primaryKey()
 }))
 
 export const positionDecreaseRelations = relations(positionDecrease, ({ one }) => ({
@@ -265,8 +135,6 @@ export const positionDecreaseRelations = relations(positionDecrease, ({ one }) =
 }))
 
 export const positionFeesCollected = onchainTable('PositionFeesCollected', (t) => ({
-  id: t.hex().primaryKey(),
-  positionKey: t.hex().notNull(),
   referralCode: t.hex().notNull(),
   affiliate: t.hex().notNull(),
 
@@ -295,30 +163,210 @@ export const positionFeesCollected = onchainTable('PositionFeesCollected', (t) =
   uiFeeAmount: t.bigint().notNull(),
 
   blockTimestamp: t.integer().notNull(),
-  transactionHash: t.hex().notNull()
+  transactionHash: t.hex().notNull(),
+
+  positionKey: t.hex().notNull(),
+
+  id: t.hex().primaryKey()
 }))
 
-export const oraclePrice = onchainTable('OraclePrice', (t) => ({
-  token: t.hex().primaryKey(),
-  price: t.bigint().notNull(),
-  updateTimestamp: t.integer().notNull()
+export const traderRouteMetric = onchainTable('TraderRouteMetric', (t) => ({
+  account: t.hex().notNull(),
+  collateralToken: t.hex().notNull(),
+
+  sizeInUsd: t.bigint().notNull(),
+  collateralInUsd: t.bigint().notNull(),
+
+  cumulativeCollateralUsd: t.bigint().notNull(),
+  cumulativeSizeUsd: t.bigint().notNull(),
+  cumulativeLongUsd: t.bigint().notNull(),
+  cumulativeShortUsd: t.bigint().notNull(),
+
+  longShortRatio: t.bigint().notNull(),
+  openPnl: t.bigint().notNull(),
+  realisedPnl: t.bigint().notNull(),
+  pnl: t.bigint().notNull(),
+
+  lastUpdatedTimestamp: t.integer().notNull(),
+  marketList: t.hex().array().notNull(),
+
+  matchingKey: t.hex().primaryKey()
 }))
 
-export const priceCandle = onchainTable('PriceCandle', (t) => ({
-  id: t.text().primaryKey(),
-  token: t.hex().notNull(),
+export const traderRouteLatestMetric = onchainTable('TraderRouteLatestMetric', (t) => ({
+  account: t.hex().notNull(),
+  collateralToken: t.hex().notNull(),
+
+  cumulativeLongUsd: t.bigint().notNull(),
+  cumulativeShortUsd: t.bigint().notNull(),
+  cumulativeCollateralUsd: t.bigint().notNull(),
+  cumulativeSizeUsd: t.bigint().notNull(),
+  settledSizeInUsd: t.bigint().notNull(),
+  settledCollateralInUsd: t.bigint().notNull(),
+
+  longShortRatio: t.bigint().notNull(),
+  realisedPnl: t.bigint().notNull(),
+  pnl: t.bigint().notNull(),
+  realisedRoi: t.bigint().notNull(),
+  roi: t.bigint().notNull(),
+
   interval: t.integer().notNull(),
-  slotTime: t.integer().notNull(),
-  o: t.bigint().notNull(),
-  h: t.bigint().notNull(),
-  l: t.bigint().notNull(),
-  c: t.bigint().notNull()
+  lastUpdatedTimestamp: t.integer().notNull(),
+  marketList: t.hex().array().notNull(),
+  pnlList: t.bigint().array().notNull(),
+  pnlTimestampList: t.integer().array().notNull(),
+  matchedPuppetList: t.hex().array().notNull(),
+
+  matchingKey: t.hex().notNull(),
+
+  id: t.text().primaryKey()
 }))
 
-export const market = onchainTable('Market', (t) => ({
-  id: t.hex().primaryKey(),
-  indexToken: t.hex().notNull(),
-  longToken: t.hex().notNull(),
-  shortToken: t.hex().notNull(),
-  marketType: t.hex()
+export const puppetSettle = onchainTable('PuppetSettle', (t) => ({
+  puppet: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  settleId: t.hex().notNull(),
+
+  id: t.hex().primaryKey()
+}))
+
+export const puppetSettleRelations = relations(puppetSettle, ({ one }) => ({
+  settle: one(settle, { fields: [puppetSettle.settleId], references: [settle.id] })
+}))
+
+export const settle = onchainTable('Settle', (t) => ({
+  allocationAddress: t.hex().notNull(),
+  keeperFeeReceiver: t.hex().notNull(),
+  collateralToken: t.hex().notNull(),
+  distributionToken: t.hex().notNull(),
+  puppet: t.hex().notNull(),
+
+  keeperExecutionFee: t.bigint().notNull(),
+  settledBalance: t.bigint().notNull(),
+  platformFeeAmount: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+
+  matchingKey: t.hex().notNull(),
+  allocationKey: t.hex().notNull(),
+
+  id: t.hex().primaryKey()
+}))
+
+export const settleRelations = relations(settle, ({ one }) => ({
+  puppetSettle: one(puppetSettle, { fields: [settle.id], references: [puppetSettle.settleId] }),
+  allocation: one(allocation, { fields: [settle.allocationKey], references: [allocation.allocationKey] })
+}))
+
+export const adjust = onchainTable('Adjust', (t) => ({
+  allocationAddress: t.hex().notNull(),
+  keeperFeeReceiver: t.hex().notNull(),
+
+  keeperExecutionFee: t.bigint().notNull(),
+  puppetKeeperExecutionFeeInsolvency: t.bigint().notNull(),
+  allocation: t.bigint().notNull(),
+  sizeDelta: t.bigint().notNull(),
+  traderTargetLeverage: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+
+  allocationKey: t.hex().notNull(),
+  matchingKey: t.hex().notNull(),
+
+  requestKey: t.hex().primaryKey()
+}))
+
+export const mirror = onchainTable('Mirror', (t) => ({
+  keeperFeeReceiver: t.hex().notNull(),
+
+  keeperExecutionFee: t.bigint().notNull(),
+  allocation: t.bigint().notNull(),
+  sizeDelta: t.bigint().notNull(),
+  traderTargetLeverage: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+
+  matchingKey: t.hex().notNull(),
+  allocationKey: t.hex().notNull(),
+  requestKey: t.hex().notNull(),
+
+  allocationAddress: t.hex().primaryKey()
+}))
+
+export const puppetAllocate = onchainTable('PuppetAllocate', (t) => ({
+  trader: t.hex().notNull(),
+  puppet: t.hex().notNull(),
+  token: t.hex().notNull(),
+  matchingKey: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+
+  mirrorPositionId: t.hex().notNull(),
+  allocationKey: t.hex().notNull(),
+
+  id: t.hex().primaryKey()
+}))
+
+export const puppetAllocationRelations = relations(puppetAllocate, ({ one }) => ({
+  allocation: one(allocation, { fields: [puppetAllocate.allocationKey], references: [allocation.allocationKey] })
+}))
+
+export const allocation = onchainTable('Allocation', (t) => ({
+  puppet: t.hex().notNull(),
+  allocationToken: t.hex().notNull(),
+
+  allocation: t.bigint().notNull(),
+  size: t.bigint().notNull(),
+  cumulativeKeeperFee: t.bigint().notNull(),
+
+  matchingKey: t.hex().notNull(),
+  allocationKey: t.hex().notNull(),
+
+  allocationAddress: t.hex().primaryKey()
+}))
+
+export const allocationRelations = relations(allocation, ({ many, one }) => ({
+  mirror: one(mirror, { fields: [allocation.allocationAddress], references: [mirror.allocationAddress] }),
+  settleList: many(settle)
+}))
+
+export const puppetMatchingRule = onchainTable('PuppetMatchingRule', (t) => ({
+  collateralToken: t.hex().notNull(),
+  puppet: t.hex().notNull(),
+  trader: t.hex().notNull(),
+
+  allowanceRate: t.bigint().notNull(),
+  throttleActivity: t.bigint().notNull(),
+  expiry: t.bigint().notNull(),
+
+  matchingKey: t.hex().notNull(),
+
+  id: t.hex().primaryKey()
+}))
+
+export const deposit = onchainTable('Deposit', (t) => ({
+  collateralToken: t.hex().notNull(),
+  user: t.hex().notNull(),
+  balance: t.bigint().notNull(),
+  amount: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+
+  id: t.text().primaryKey()
+}))
+
+export const withdraw = onchainTable('Withdraw', (t) => ({
+  collateralToken: t.hex().notNull(),
+  user: t.hex().notNull(),
+  receiver: t.hex().notNull(),
+  balance: t.bigint().notNull(),
+  amount: t.bigint().notNull(),
+
+  blockTimestamp: t.integer().notNull(),
+  transactionHash: t.hex().notNull(),
+
+  id: t.text().primaryKey()
 }))

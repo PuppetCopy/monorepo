@@ -20,9 +20,9 @@ import {
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
+import type { IMatchingRule } from '../../ponder.types.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 

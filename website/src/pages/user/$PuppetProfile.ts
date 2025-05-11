@@ -5,7 +5,7 @@ import { $column, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-compone
 import type * as viem from 'viem'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { $ProfilePeformanceTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
-import type { IMatchRuleEditorChange } from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IUserActivityPageParams } from '../type.js'
 
 export interface IPuppetProfile extends IUserActivityPageParams {
@@ -16,7 +16,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
   component(
     (
       [changeRoute, changeRouteTether]: IBehavior<string, string>,
-      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchRuleEditorChange>,
+      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchingRuleEditorChange>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>

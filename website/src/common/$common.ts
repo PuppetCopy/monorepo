@@ -113,14 +113,14 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
-export const $tokenTryLabeled = (token: viem.Address) => {
+export const $tokenTryLabeled = (token: viem.Address, size = '18px') => {
   const description = getSafeMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token, ADDRESS_ZERO)
 
   return $row(
     spacing.small,
     style({ alignItems: 'center' })
   )(
-    style({ width: '18px', height: '18px' })($tokenIcon(description))
+    style({ width: size, height: size })($tokenIcon(description))
     // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  shortenAddress(indexToken)}`),
   )
 }

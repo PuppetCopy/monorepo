@@ -17,8 +17,8 @@ import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from 
 import { $seperator2 } from '../../pages/common.js'
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
-  $column(style({ textAlign: 'right' }))(
-    $text(primaryLabel),
+  $column(style({ textAlign: 'right', whiteSpace: 'nowrap' }))(
+    $node(style({ fontSize: '.85rem', fontWeight: 'bold' }))($text(primaryLabel)),
     $node(style({ fontSize: '.85rem' }))($text(secondaryLabel))
   )
 

@@ -2,8 +2,8 @@ import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import type * as router from 'aelea/router'
 import type * as viem from 'viem'
-import type { IMatchingRule } from '../__generated__/ponder.types'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
+import type { IMatchingRule } from '../ponder.types'
 
 export interface IComponentPageParams {}
 
