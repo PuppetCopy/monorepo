@@ -1,4 +1,4 @@
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from '../const/index.js'
 import { applyFactor } from '../utils/mathUtils.js'
 import { getDenominator, getMappedValue, getTokenUsd } from '../utils/utils.js'
@@ -134,8 +134,8 @@ export function getPositionNetValue(
 export function getLiquidationPrice(
   marketInfo: IMarketInfo,
   isLong: boolean,
-  collateralToken: viem.Address,
-  indexToken: viem.Address,
+  collateralToken: Address,
+  indexToken: Address,
 
   sizeInTokens: bigint,
   sizeInUsd: bigint,

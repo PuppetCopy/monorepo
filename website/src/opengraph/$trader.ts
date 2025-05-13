@@ -5,7 +5,7 @@
 // import { IntervalTime } from "@puppet/middleware/utils"
 // import { IPriceTickListMap } from "@puppet/middleware/gmx"
 // import { ISetRouteType, queryPosition } from "@puppet/middleware/core"
-// import * as viem from 'viem'
+//
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 // import { $TraderSummary } from "../components/participant/$Summary.js"
 // import { subgraphClient } from "../common/graphClient"
@@ -18,7 +18,7 @@
 // export const $trader = (config: ITrader) => {
 //   const url = new URL(document.location.href)
 
-//   const account = viem.getAddress(String(url.searchParams.get('address'))) as viem.Address
+//   const account = getAddress(String(url.searchParams.get('address'))) as Address
 //   const activityTimeframe = now(Number(url.searchParams.get('activityTimeframe')!) as IntervalTime)
 //   const collateralTokenList = now([])
 //   const positionListQuery = queryPosition(subgraphClient, { account, activityTimeframe, collateralTokenList })

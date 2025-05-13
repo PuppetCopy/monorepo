@@ -16,15 +16,15 @@ import { periodicRun } from '../utils/stream.js'
 // import { aggregatePositionList } from './utils.js'
 
 // export interface IQueryPositionParams {
-//   account?: viem.Address
-//   selectedCollateralTokenList?: viem.Address[]
+//   account?: Address
+//   selectedCollateralTokenList?: Address[]
 //   isLong?: boolean
 //   activityTimeframe?: IntervalTime
 // }
 
 // export interface IQueryMatchRouteParams {
-//   account?: viem.Address
-//   selectedCollateralTokenList?: viem.Address[]
+//   account?: Address
+//   selectedCollateralTokenList?: Address[]
 //   activityTimeframe?: IntervalTime
 // }
 
@@ -156,10 +156,10 @@ import { periodicRun } from '../utils/stream.js'
 // export function queryMatchRouteStats(
 //   subgraphClient: Client,
 //   queryParams: StateParams<{
-//     account?: viem.Address
+//     account?: Address
 //     activityTimeframe?: IntervalTime
 //     sortBy?: IRequestSortApi
-//     collateralTokenList?: viem.Address[]
+//     collateralTokenList?: Address[]
 //   }>
 // ) {
 //   return map(async filterParams => {
@@ -228,7 +228,7 @@ import { periodicRun } from '../utils/stream.js'
 // export function queryPricefeed(
 //   subgraphClient: Client,
 //   queryParams: StateParams<{
-//     tokenList?: viem.Address[]
+//     tokenList?: Address[]
 //     activityTimeframe: IntervalTime
 //   }>,
 //   estTickAmout = 10
@@ -260,7 +260,7 @@ import { periodicRun } from '../utils/stream.js'
 //       },
 //     })
 
-//     const mapped: IPricefeedMap = groupArrayMany(await candleListQuery, x => viem.getAddress(x.token))
+//     const mapped: IPricefeedMap = groupArrayMany(await candleListQuery, x => getAddress(x.token))
 
 //     return mapped
 //   }, combineState(queryParams))

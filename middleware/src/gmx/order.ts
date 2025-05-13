@@ -1,9 +1,10 @@
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
+import type { Chain } from 'viem/chains'
 import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/index.js'
 import { getDenominator, getSafeMappedValue } from '../utils/utils.js'
 import { getNativeTokenAddress } from './gmxUtils.js'
 
-export function resolveAddress<TChain extends viem.Chain>(chain: TChain, indexToken: viem.Address): viem.Address {
+export function resolveAddress<TChain extends Chain>(chain: TChain, indexToken: Address): Address {
   if (indexToken === ADDRESS_ZERO) {
     return getNativeTokenAddress(chain)
   }
@@ -22,9 +23,9 @@ export function adjustForDecimals(amount: bigint, divDecimals: number, mulDecima
 }
 
 // export function getAmountByRatio(
-//   chain: viem.Chain,
-//   fromToken: viem.Address,
-//   toToken: viem.Address,
+//   chain: Chain,
+//   fromToken: Address,
+//   toToken: Address,
 //   fromTokenAmount: bigint,
 //   ratio: bigint,
 //   shouldInvertRatio?: boolean,

@@ -198,7 +198,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     // const _tokenList = [
                     //   ...new Set([
                     //     ...pos.increaseList.map((x) => x.indexToken),
-                    //     ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
+                    //     ...pos.decreaseList.map((x) => getAddress(x.indexToken))
                     //   ])
                     // ]
 
@@ -241,7 +241,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           // const _tokenList = [
                           //   ...new Set([
                           //     ...pos.increaseList.map((x) => x.indexToken),
-                          //     ...pos.decreaseList.map((x) => viem.getAddress(x.indexToken))
+                          //     ...pos.decreaseList.map((x) => getAddress(x.indexToken))
                           //   ])
                           // ]
 

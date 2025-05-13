@@ -1,54 +1,34 @@
-import {
-  awaitPromises,
-  debounce,
-  empty,
-  map,
-  multicast,
-  now,
-  skipRepeatsWith,
-  startWith,
-  switchLatest
-} from '@most/core'
-import type { IntervalTime } from '@puppet/middleware/const'
-import { $Baseline, $IntermediatePromise, $infoTooltipLabel, type IMarker } from '@puppet/middleware/ui-components'
-import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, motion, style } from 'aelea/core'
-import { $column, $NumberTicker, $row, layoutSheet, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { BaselineData, MouseEventParams, Time } from 'lightweight-charts'
-import type * as viem from 'viem'
-import type { IPageFilterParams, IUserActivityPageParams } from '../../pages/type.js'
+import { map, skipRepeatsWith } from '@most/core'
+import type { Stream } from '@most/types'
+import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
+import { $Baseline, $intermediatePromise, type ISeriesTime } from '@puppet/middleware/ui-components'
+import { fillTimeline, formatFixed, unixTimestampNow } from '@puppet/middleware/utils'
+import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $column, $row, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
+import type { BaselineData, MouseEventParams } from 'lightweight-charts'
+import type { Address } from 'viem/accounts'
+import type { IPageFilterParams, ITraderRouteMetricSummary, IUserActivityPageParams } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
-import { getPositionListTimelinePerformance } from '../trade/$ProfilePerformanceGraph.js'
 
-interface IProfilePeformanceTimeline extends IUserActivityPageParams, IPageFilterParams {}
+interface IProfilePeformanceTimeline extends IUserActivityPageParams, IPageFilterParams {
+  metricsQuery: Stream<Promise<ITraderRouteMetricSummary>>
+}
 
-export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =>
+export const $TradeRouteTimeline = ({
+  activityTimeframe,
+  collateralTokenList,
+  depositTokenList,
+  matchingRuleQuery,
+  metricsQuery
+}: IProfilePeformanceTimeline) =>
   component(
     (
       [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const { activityTimeframe, collateralTokenList, depositTokenList, matchingRuleQuery } = config
-
-      const debouncedState = debounce(40, combineState({ collateralTokenList, activityTimeframe }))
-      const positionParams = multicast(
-        map(async (params) => {
-          const list = await params.positionListQuery
-          const timeline = getPositionListTimelinePerformance({
-            ...params,
-            list: list.flatMap((pos) => [...pos.decreaseList, ...pos.increaseList]),
-            tickCount: 100,
-            activityTimeframe: params.activityTimeframe,
-            pricefeedMap: await params.pricefeedMapQuery
-          })
-
-          return { timeline, list }
-        }, debouncedState)
-      )
-
       return [
         $column(style({ width: '100%', padding: 0, height: '200px', placeContent: 'center' }))(
           $row(
@@ -69,104 +49,124 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                 selectMarketTokenList: selectMarketTokenListTether()
               })
             ),
-            switchLatest(
-              awaitPromises(
-                map(async (paramsQuery) => {
-                  const params = await paramsQuery
-                  const positionCount = params.list.length
+            // switchLatest(
+            //   switchMap(async (paramsQuery) => {
+            //     const params = await paramsQuery
+            //     const positionCount = params.pnlList.length
 
-                  if (positionCount === 0) {
-                    return empty()
-                  }
+            //     if (positionCount === 0) {
+            //       return empty()
+            //     }
 
-                  const pnlCrossHairTimeChange = startWith(
-                    null,
-                    skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove)
-                  )
-                  const hoverChartPnl = filterNull(
-                    map((cross) => {
-                      if (cross?.point) {
-                        const value = cross.seriesData.values().next().value?.value || 0
-                        return value
-                      }
+            //     const pnlCrossHairTimeChange = startWith(
+            //       null,
+            //       skipRepeatsWith((xsx, xsy) => xsx.time === xsy.time, crosshairMove)
+            //     )
+            //     const hoverChartPnl = filterNull(
+            //       map((cross) => {
+            //         if (cross?.point) {
+            //           const value = cross.seriesData.values().next().value?.value || 0
+            //           return value
+            //         }
 
-                      const data = params.timeline
-                      const value = data[data.length - 1]?.value
-                      return value || null
-                    }, pnlCrossHairTimeChange)
-                  )
+            //         const data = params.timeline
+            //         const value = data[data.length - 1]?.value
+            //         return value || null
+            //       }, pnlCrossHairTimeChange)
+            //     )
 
-                  return $column(style({ flex: 1, alignItems: 'center' }))(
-                    $NumberTicker({
-                      textStyle: {
-                        fontSize: '1.85rem',
-                        fontWeight: '900'
-                      },
-                      // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
-                      value$: map(
-                        (hoverValue) => {
-                          const newLocal2 = readableUnitAmount(hoverValue)
-                          const newLocal = parseReadableNumber(newLocal2)
-                          return newLocal
-                        },
-                        motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
-                      ),
-                      incrementColor: pallete.positive,
-                      decrementColor: pallete.negative
-                    }),
-                    $infoTooltipLabel('The total combined settled and open trades', $text('PnL'))
-                  )
-                }, positionParams)
-              )
-            ),
+            //     return $column(style({ flex: 1, alignItems: 'center' }))(
+            //       $NumberTicker({
+            //         textStyle: {
+            //           fontSize: '1.85rem',
+            //           fontWeight: '900'
+            //         },
+            //         // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
+            //         value$: map(
+            //           (hoverValue) => {
+            //             const newLocal2 = readableUnitAmount(hoverValue)
+            //             const newLocal = parseReadableNumber(newLocal2)
+            //             return newLocal
+            //           },
+            //           motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
+            //         ),
+            //         incrementColor: pallete.positive,
+            //         decrementColor: pallete.negative
+            //       }),
+            //       $infoTooltipLabel('The total combined settled and open trades', $text('PnL'))
+            //     )
+            //   }, metricsQuery)
+            // ),
             $row(style({ flex: 1 }))(
               $node(style({ flex: 1 }))(),
-              $LastAtivity(config.activityTimeframe)({
+
+              $LastAtivity(activityTimeframe)({
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
             )
           ),
-          $IntermediatePromise({
-            query: positionParams,
-            $$done: map((params) => {
-              const positionCount = params.list.length
+          $intermediatePromise({
+            $$display: map(async (params) => {
+              const pos = await params.metricsQuery
 
-              if (positionCount === 0) {
+              if (pos.pnlList.length === 0) {
                 return $row(
                   spacing.tiny,
                   style({ color: pallete.foreground, textAlign: 'center', placeSelf: 'center' })
                 )($text('No activity found'))
               }
 
-              const openMarkerList = params.list.filter(isPositionOpen).map((pos): IMarker => {
-                const pnl = params.timeline[params.timeline.length - 1].value
-                return {
-                  position: 'inBar',
-                  color: pnl < 0n ? pallete.negative : pallete.positive,
-                  time: unixTimestampNow() as Time,
-                  size: 1.5,
-                  shape: 'circle'
+              const endTime = unixTimestampNow()
+              const startTime = endTime - params.activityTimeframe
+              const sourceList = [
+                { value: 0n, time: startTime },
+                ...pos.pnlList
+                  .map((pnl, index) => ({
+                    value: pnl,
+                    time: pos.pnlTimestampList[index]
+                  }))
+                  .filter((item) => item.time > startTime),
+                { value: pos.pnlList[pos.pnlList.length - 1], time: endTime }
+              ]
+
+              const timeline = fillTimeline({
+                sourceList,
+                ticks: 260,
+                getTime: (item) => item.time,
+                sourceMap: (next) => {
+                  return formatFixed(USD_DECIMALS, next.value)
                 }
               })
-              const settledMarkerList = params.list
-                .filter(isPositionSettled)
-                .flatMap((pos) => pos.decreaseList)
-                .map((pos): IMarker => {
-                  return {
-                    position: 'inBar',
-                    color: colorAlpha(pallete.message, 0.5),
-                    time: Number(pos.blockTimestamp) as Time,
-                    size: 0.1,
-                    shape: 'circle'
-                  }
-                })
 
-              const allMarkerList = [...settledMarkerList, ...openMarkerList].sort(
-                (a, b) => Number(a.time) - Number(b.time)
-              )
+              // const openMarkerList = pos.list.filter(isPositionOpen).map((pos): IMarker => {
+              //   const pnl = params.timeline[params.timeline.length - 1].value
+              //   return {
+              //     position: 'inBar',
+              //     color: pnl < 0n ? pallete.negative : pallete.positive,
+              //     time: unixTimestampNow() as Time,
+              //     size: 1.5,
+              //     shape: 'circle'
+              //   }
+              // })
+              // const settledMarkerList = pos.list
+              //   .filter(isPositionSettled)
+              //   .flatMap((pos) => pos.decreaseList)
+              //   .map((pos): IMarker => {
+              //     return {
+              //       position: 'inBar',
+              //       color: colorAlpha(pallete.message, 0.5),
+              //       time: Number(pos.blockTimestamp) as Time,
+              //       size: 0.1,
+              //       shape: 'circle'
+              //     }
+              //   })
+
+              // const allMarkerList = [...settledMarkerList, ...openMarkerList].sort(
+              //   (a, b) => Number(a.time) - Number(b.time)
+              // )
 
               return $Baseline({
-                markers: now(allMarkerList),
+                // markers: now(allMarkerList),
                 chartConfig: {
                   leftPriceScale: {
                     autoScale: true,
@@ -200,12 +200,12 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                 //     time
                 //   }
                 // }, data[data.length - 1], config.processData),
-                data: params.timeline as any as BaselineData[]
+                data: timeline as any as BaselineData<ISeriesTime>[]
               })({
                 crosshairMove: crosshairMoveTether(skipRepeatsWith((a, b) => a.point?.x === b.point?.x))
               })
-            })
-          })({})
+            }, combineState({ metricsQuery, activityTimeframe, depositTokenList, collateralTokenList }))
+          })
         ),
 
         { selectMarketTokenList, changeActivityTimeframe }

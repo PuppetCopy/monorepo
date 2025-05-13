@@ -5,15 +5,15 @@ import { readableLeverage, readableUsd } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+
 import { $heading2 } from '../../common/$text.js'
-import { $profileDisplay } from '../$AccountProfile.js'
 import { accountSettledPositionListSummary } from '../../pages/common.js'
+import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
   positionListQuery: Stream<Promise<IPosition[]>>
-  account: viem.Address
-  puppet?: viem.Address
+  account: Address
+  puppet?: Address
 }
 
 export const $PuppetSummary = (config: IAccountSummary) =>

@@ -27,7 +27,7 @@ import {
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import type * as viem from 'viem'
+
 import { readBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { type IWriteContractReturn, wallet } from '../../wallet/wallet.js'
@@ -45,7 +45,7 @@ export interface IDepositEditorValue {
 }
 
 export interface IDepositEditorChange {
-  token: viem.Address
+  token: Address
   action: DepositEditorAction
   value: IDepositEditorValue
 }
@@ -146,7 +146,7 @@ export const $DepositEditor = (config: IDepositEditor) =>
               $$display: map((wallet) => {
                 const isSpendPending = startWith(
                   false,
-                  map((s) => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend))
+                  map((s) => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({

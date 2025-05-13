@@ -3,7 +3,6 @@ import type { Stream } from '@most/types'
 import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet/middleware/const'
 import { latestPriceMap } from '@puppet/middleware/core'
 import {
-  getMarketIndexToken,
   getPositionPnlUsd,
   getRoughLiquidationPrice,
   getTokenDescription,
@@ -32,14 +31,15 @@ import {
   readableUsd
 } from '@puppet/middleware/utils'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
-import { $node, $text, component, type INode, nodeEvent, O, style, styleInline, toStream } from 'aelea/core'
+import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
 import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
 import { $seperator2 } from '../pages/common.js'
-import { IWalletTab } from '../pages/type.js'
+import { type IPosition, IWalletTab } from '../pages/type.js'
+import { isPositionSettled } from '../utils/utils.js'
 
 export const $midContainer = $column(
   style({
@@ -60,8 +60,7 @@ export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) 
 }
 
 export const $entry = (pos: IPosition) => {
-  const indexToken = getMarketIndexToken(pos.market)
-  const indexDescription = getTokenDescription(indexToken)
+  const indexDescription = getTokenDescription(pos.indexToken)
   const collateralTokenDescription = getTokenDescription(pos.collateralToken)
 
   const $label = $node(style({ width: '125px' }))
@@ -113,7 +112,7 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
-export const $tokenTryLabeled = (token: viem.Address, size = '18px') => {
+export const $tokenTryLabeled = (token: Address, size = '18px') => {
   const description = getSafeMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token, ADDRESS_ZERO)
 
   return $row(
@@ -141,7 +140,7 @@ export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
   })
 }
 
-export const $puppetList = (puppets?: viem.Address[], click?: IComposeBehavior<INode, string>) => {
+export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode, string>) => {
   // const positionMarkPrice = tradeReader.getLatestPrice(now(pos.indexToken))
   // const cumulativeFee = tradeReader.vault.read('cumulativeFundingRates', pos.collateralToken)
 
@@ -213,8 +212,8 @@ export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
   return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
-export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
-  const indexToken = getMarketIndexToken(pos.market)
+export const $positionRoi = (pos: IPosition, puppet?: Address) => {
+  const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, pos.maxCollateralInUsd)
   const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
@@ -282,7 +281,7 @@ export const $marketSmallLabel = (market: IMarket) => {
 }
 
 export const $openPositionBreakdown = (pos: IPosition) => {
-  const indexToken = getMarketIndexToken(pos.market)
+  const indexToken = pos.indexToken
   const latestPrice = map((pm) => pm[indexToken].max, latestPriceMap)
 
   const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
@@ -339,14 +338,14 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 }
 
 interface ITraderDisplay {
-  trader: viem.Address
+  trader: Address
   route: router.Route
-  puppetList: viem.Address[]
+  puppetList: Address[]
   labelSize?: number
   profileSize?: number
 }
 export const $TraderDisplay = (config: ITraderDisplay) =>
-  component(([click, clickTether]: IBehavior<any, viem.Address>) => {
+  component(([click, clickTether]: IBehavior<any, Address>) => {
     const { route, trader, puppetList, labelSize, profileSize } = config
 
     return [

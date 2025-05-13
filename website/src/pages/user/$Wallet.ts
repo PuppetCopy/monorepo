@@ -40,7 +40,7 @@ import { $node, $text, combineState, component, type IBehavior, replayLatest, st
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import * as viem from 'viem'
+
 import { $heading3 } from '../../common/$text.js'
 import { $card, $labeledDivider, $responsiveFlex } from '../../common/elements/$common.js'
 import { $IntermediateConnectButton } from '../../components/$ConnectWallet.js'
@@ -80,7 +80,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
       [selectProfileMode, selectProfileModeTether]: IBehavior<IWalletTab>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, PUPPET.IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
 
       [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
 
@@ -837,13 +837,13 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       submit: requestTxTether(
                         snapshot(async (paramsQuery, wallet) => {
                           const params = await paramsQuery
-                          const callStack: viem.Hex[] = []
+                          const callStack: Hex[] = []
 
                           const contractDefs = getMappedValue(PUPPET.CONTRACT, wallet.chain.id).TokenomicsRouter
 
                           if (params.claimableContributionReward > 0) {
                             callStack.push(
-                              viem.encodeFunctionData({
+                              encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'claimContribution',
                                 args: [
@@ -857,7 +857,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                           if (params.claimableLockReward > 0) {
                             callStack.push(
-                              viem.encodeFunctionData({
+                              encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'claimEmission',
                                 args: [wallet.account.address, params.claimableLockReward]
@@ -867,7 +867,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                           if (params.claimableVestedReward > 0) {
                             callStack.push(
-                              viem.encodeFunctionData({
+                              encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'claimVested',
                                 args: [wallet.account.address, params.claimableVestedReward]
@@ -877,7 +877,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                           if (params.lockDurationDelta > 0) {
                             callStack.push(
-                              viem.encodeFunctionData({
+                              encodeFunctionData({
                                 ...contractDefs,
                                 functionName: 'lock',
                                 args: [params.lockAmountDelta, params.lockDurationDelta]

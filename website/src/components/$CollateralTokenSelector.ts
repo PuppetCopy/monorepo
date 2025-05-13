@@ -6,17 +6,17 @@ import { $labelDisplay } from '@puppet/middleware/ui-components'
 import type { IBehavior } from 'aelea/core'
 import { $element, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { pallete } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+
 import { $tokenIcon, $tokenLabeled } from '../common/$common'
 import { $DropMultiSelect } from './form/$Dropdown'
 
 interface ISelectCollateralToken {
-  selectedList: Stream<viem.Address[]>
+  selectedList: Stream<Address[]>
   $container?: INodeCompose
 }
 
 export const $SelectCollateralToken = (config: ISelectCollateralToken) =>
-  component(([selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>) => {
+  component(([selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>) => {
     return [
       $DropMultiSelect({
         $container: config.$container,

@@ -1,5 +1,5 @@
-import type { ExtractAbiEvent } from 'abitype'
-import type * as viem from 'viem'
+import type { Abi, Address, ExtractAbiEvent } from 'abitype'
+import type { GetEventArgs, Hex, Log } from 'viem'
 import type * as CONST from '../const/index.js'
 import type { IntervalTime } from '../const/index.js'
 
@@ -32,12 +32,12 @@ export type ILogTxType<T extends string> = ILogTypeId<T> & {
   transactionHash: string
 }
 
-export type ILogArgs<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.GetEventArgs<
+export type ILogArgs<TAbi extends Abi = Abi, TEventName extends string = string> = GetEventArgs<
   TAbi,
   TEventName,
   { Required: true }
 >
-export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = viem.Log<
+export type ILogEvent<TAbi extends Abi = Abi, TEventName extends string = string> = Log<
   bigint,
   number,
   false,
@@ -45,14 +45,14 @@ export type ILogEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends strin
   true,
   TAbi,
   TEventName
-> // ILogIndex & ILogOrdered & viem.GetEventArgs<TAbi, TEventName, { Required: true }>
-export type ILogOrderedEvent<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogOrdered &
+> // ILogIndex & ILogOrdered & GetEventArgs<TAbi, TEventName, { Required: true }>
+export type ILogOrderedEvent<TAbi extends Abi = Abi, TEventName extends string = string> = ILogOrdered &
   Omit<ILogEvent<TAbi, TEventName>, 'data'>
-export type ILog<TAbi extends viem.Abi = viem.Abi, TEventName extends string = string> = ILogTxType<TEventName> &
+export type ILog<TAbi extends Abi = Abi, TEventName extends string = string> = ILogTxType<TEventName> &
   ILogArgs<TAbi, TEventName>
 
 export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
-  token: viem.Address
+  token: Address
   interval: IntervalTime
   slotTime: number
   o: bigint // open
@@ -66,11 +66,11 @@ export interface IPricetick {
   timestamp: number
 }
 
-export type IPriceTickListMap = Record<viem.Address, IPricetick[]>
-export type IPricefeedMap = Record<viem.Address, IPriceCandle[]>
-export type IPriceOracleMap = Record<viem.Address, IOraclePrice>
+export type IPriceTickListMap = Record<Address, IPricetick[]>
+export type IPricefeedMap = Record<Address, IPriceCandle[]>
+export type IPriceOracleMap = Record<Address, IOraclePrice>
 
-export type ILatestPriceMap = Record<viem.Address, IPricetick>
+export type ILatestPriceMap = Record<Address, IPricetick>
 
 export interface IChainParamApi {
   chain: number
@@ -81,12 +81,12 @@ export interface IRequestTimerangeApi {
   to: number
 }
 
-export type IRequestAccountApi = IChainParamApi & { account: viem.Address }
+export type IRequestAccountApi = IChainParamApi & { account: Address }
 
-export type IRequestPriceTimelineApi = IChainParamApi & IRequestTimerangeApi & { tokenAddress: viem.Address }
+export type IRequestPriceTimelineApi = IChainParamApi & IRequestTimerangeApi & { tokenAddress: Address }
 export type IRequestAccountHistoricalDataApi = IChainParamApi & IRequestAccountApi & IRequestTimerangeApi
 export type IRequestPricefeedApi = IChainParamApi &
-  IRequestTimerangeApi & { interval: IntervalTime; tokenAddress: viem.Address }
+  IRequestTimerangeApi & { interval: IntervalTime; tokenAddress: Address }
 
 export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity {}
 
@@ -122,9 +122,9 @@ export const OrderType = {
 } as const
 
 export interface PositionReferralFees {
-  referralCode: viem.Hex
-  affiliate: viem.Address
-  trader: viem.Address
+  referralCode: Hex
+  affiliate: Address
+  trader: Address
 
   totalRebateFactor: bigint
   traderDiscountFactor: bigint
@@ -150,7 +150,7 @@ export interface PositionBorrowingFees {
 }
 
 export interface IPositionUiFees {
-  uiFeeReceiver: viem.Address
+  uiFeeReceiver: Address
   uiFeeReceiverFactor: bigint
   uiFeeAmount: bigint
 }
@@ -187,11 +187,11 @@ export interface IExecutionPriceResult {
 export type IOraclePrice = IPriceMinMax & {
   priceSourceType: bigint
   timestamp: number
-  token: viem.Address
+  token: Address
 }
 
 export type IInsolventClose = {
-  orderKey: viem.Hex
+  orderKey: Hex
   positionCollateralAmount: bigint
   remainingCostUsd: bigint
   basePnlUsd: bigint
@@ -204,10 +204,10 @@ export interface IMarketPrice {
 }
 
 export type IMarket = {
-  indexToken: viem.Address
-  longToken: viem.Address
-  shortToken: viem.Address
-  marketToken: viem.Address
+  indexToken: Address
+  longToken: Address
+  shortToken: Address
+  marketToken: Address
 }
 
 export interface IMarketPool {

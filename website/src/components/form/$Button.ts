@@ -31,7 +31,8 @@ export const $defaultButtonPrimary = $defaultButtonCore(
     fill: 'white',
     borderRadius: '30px',
     alignSelf: 'flex-end',
-    fontSize: '1rem',
+    fontSize: '1.6rem',
+
     height: '48px',
     padding: '0 24px',
     fontWeight: 'bold',
@@ -49,8 +50,8 @@ const secondaryButtonStyle = style({
   borderStyle: 'solid',
   alignSelf: 'flex-start',
   height: '48px',
+  fontSize: '1.6rem',
   backgroundColor: pallete.background,
-  fontSize: '1rem',
   padding: '0 24px',
   fontWeight: 'bold',
   border: '1px solid',
@@ -110,7 +111,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
 
       const isTxPending = recoverWith(
         () => now(false),
-        map((s) => s.state === PromiseStatus.PENDING, promiseState(txQuery))
+        map((s) => s.status === PromiseStatus.PENDING, promiseState(txQuery))
       )
       const isRequestPending = startWith(false, isTxPending)
 

@@ -180,9 +180,9 @@ export enum PromiseStatus {
   ERROR
 }
 
-export type PromiseStateDone<T> = { state: PromiseStatus.DONE; value: T }
-export type PromiseStatePending = { state: PromiseStatus.PENDING }
-export type PromiseStateError = { state: PromiseStatus.ERROR; error: Error }
+export type PromiseStateDone<T> = { status: PromiseStatus.DONE; value: T }
+export type PromiseStatePending = { status: PromiseStatus.PENDING }
+export type PromiseStateError = { status: PromiseStatus.ERROR; error: Error }
 export type PromiseState<T> = PromiseStateDone<T> | PromiseStatePending | PromiseStateError
 
 export const promiseState = <T>(querySrc: Stream<Promise<T>>): Stream<PromiseState<T>> => {
@@ -206,7 +206,7 @@ class PromiseStateSink<T> implements Sink<Promise<T>> {
   }
 
   event(_t: Time, promise: Promise<T>): void {
-    this.eventBound({ state: PromiseStatus.PENDING })
+    this.eventBound({ status: PromiseStatus.PENDING })
 
     this.queue = this.queue.then(() => this.handlePromise(promise)).catch(this.errorBound)
   }
@@ -222,13 +222,13 @@ class PromiseStateSink<T> implements Sink<Promise<T>> {
 
   private async handlePromise(promise: Promise<T>): Promise<void> {
     const x = await promise
-    return this.eventBound({ state: PromiseStatus.DONE, value: x })
+    return this.eventBound({ status: PromiseStatus.DONE, value: x })
   }
 
   // Pre-create closures, to avoid creating them per event
   private eventBound = (x: PromiseState<T>): void => this.sink.event(currentTime(this.scheduler), x)
   private endBound = (): void => this.sink.end(currentTime(this.scheduler))
-  private errorBound = (error: Error): void => this.eventBound({ state: PromiseStatus.ERROR, error })
+  private errorBound = (error: Error): void => this.eventBound({ status: PromiseStatus.ERROR, error })
 }
 
 function fatalError(e: unknown): void {

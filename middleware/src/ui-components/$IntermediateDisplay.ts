@@ -12,10 +12,22 @@ import {
   switchLatest
 } from '@most/core'
 import type { Stream } from '@most/types'
-import { $node, $text, component, type I$Node, type IOps, replayLatest, style } from 'aelea/core'
+import {
+  $node,
+  $text,
+  component,
+  type Fn,
+  type I$Node,
+  type IOp,
+  type IOps,
+  replayLatest,
+  style,
+  switchMap
+} from 'aelea/core'
 import { $row, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
+import { type PromiseStateError, PromiseStatus, promiseState } from '../utils/stream.js'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
 
 export const $spinner = $node(
@@ -26,79 +38,46 @@ export const $spinner = $node(
   })
 )($text('Loading...'))
 
-export interface IIntermediatPromise<T> {
-  query: Stream<Promise<T>>
+export interface I$IntermediatPromise<T> {
   clean?: Stream<any>
 
-  $$done: IOps<T, I$Node>
-  $$fail?: IOps<Error, I$Node>
+  $$display: Stream<Promise<I$Node>>
+  $$fail?: Fn<Error, I$Node>
 
   $loader?: I$Node
 }
 
-export enum IIntermediateStatus {
-  LOADING,
-  DONE,
-  ERROR
-}
-
-export interface IIntermediateState<T> {
-  status: IIntermediateStatus.DONE | IIntermediateStatus.LOADING | IIntermediateStatus.ERROR
-  data: T
-}
-
-export const $IntermediatePromise = <T>({
+export const $intermediatePromise = <T>({
   $loader = $spinner,
-  query,
-  $$fail = map((res) => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message))))),
-  $$done,
-  clean = empty()
-}: IIntermediatPromise<T>) =>
-  component(() => {
-    const state: Stream<IIntermediateState<T | I$Node | Error>> = multicast(
-      switchLatest(
-        map((prom) => {
-          const doneData: Stream<IIntermediateState<T>> = map(
-            (data) => ({ status: IIntermediateStatus.DONE, data }),
-            fromPromise(prom)
-          )
-          const loading: Stream<IIntermediateState<I$Node>> = now({
-            status: IIntermediateStatus.LOADING,
-            data: $loader
-          })
-          const settledOrError = recoverWith(
-            (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
-            doneData
-          )
+  $$fail = (res) => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message)))),
+  $$display
+}: I$IntermediatPromise<T>) =>
+  switchMap((state) => {
+    if (state.status === PromiseStatus.PENDING) {
+      return $loader
+    }
 
-          return merge(settledOrError, loading)
-        }, query)
-      )
-    )
+    if (state.status === PromiseStatus.ERROR) {
+      return $$fail(state.error)
+    }
 
-    return [
-      switchLatest(
-        mergeArray([
-          switchLatest(
-            map((state) => {
-              if (state.status === IIntermediateStatus.LOADING) {
-                return now($loader)
-              }
+    return state.value
 
-              if (state.status === IIntermediateStatus.ERROR) {
-                return $$fail(now(state.data))
-              }
+    // const doneData: Stream<IIntermediateState<T>> = map(
+    //   (data) => ({ status: IIntermediateStatus.DONE, data }),
+    //   fromPromise(prom)
+    // )
+    // const loading: Stream<IIntermediateState<I$Node>> = now({
+    //   status: IIntermediateStatus.LOADING,
+    //   data: $loader
+    // })
+    // const settledOrError = recoverWith(
+    //   (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
+    //   doneData
+    // )
 
-              return $$done(now(state.data))
-            }, state)
-          ),
-          constant(empty(), clean)
-        ])
-      ),
-
-      { state }
-    ]
-  })
+    // return merge(settledOrError, loading)
+  }, promiseState($$display))
 
 type IIntermediateTx<TSuccess extends TransactionReceipt> = {
   $$success?: IOps<TSuccess, I$Node>
@@ -117,17 +96,16 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
 }: IIntermediateTx<TSuccess>) => {
   const multicastQuery = replayLatest(multicast(query))
 
-  return $IntermediatePromise<TSuccess>({
+  return $intermediatePromise<TSuccess>({
     clean,
-    query: map(async (x) => {
-      return x
-    }, multicastQuery),
-    $$done: map((res) => {
+    $$display: map(async (query) => {
+      const res = await query
+
       return $row(spacing.small, style({ color: pallete.positive }))(
         switchLatest($$success(now(res))),
         $txHashRef(res.transactionHash, chain)
       )
-    }),
+    }, multicastQuery),
     $loader: switchLatest(
       map((c) => {
         return $row(spacing.small, style({ alignItems: 'center', fontSize: '1.2rem' }))(
@@ -143,10 +121,10 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
         )
       }, multicastQuery)
     ),
-    $$fail: map((res) => {
+    $$fail: (res) => {
       const error = String(res)
 
       return showTooltip ? $alertTooltip($node($text(error))) : $alert($node($text(error)))
-    })
+    }
   })
 }

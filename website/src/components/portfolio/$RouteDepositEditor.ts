@@ -7,7 +7,7 @@ import { $text, combineState, component, type IBehavior, style, switchMap } from
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import type * as viem from 'viem'
+
 import { $route } from '../../common/$common.js'
 import puppetReader from '../../logic/puppetReader.js'
 import type { IComponentPageParams } from '../../pages/type.js'
@@ -17,7 +17,7 @@ import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.j
 import { $DepositEditor, DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
 
 interface IRouteDepositEditor extends IComponentPageParams {
-  collateralToken: viem.Address
+  collateralToken: Address
   depositTokenList: Stream<IDepositEditorChange[]>
 }
 

@@ -1,4 +1,4 @@
-import * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/index.js'
 import {
   abs,
@@ -305,7 +305,7 @@ export async function querySignedPrices(): Promise<IPriceOracleMap> {
   const res = (await x.json()) as { signedPrices: ISignedPrice[] }
   return groupArrayByKeyMap(
     res.signedPrices,
-    (price) => viem.getAddress(price.tokenAddress),
+    (price) => price.tokenAddress.toLowerCase() as Address,
     (price, token) => {
       const priceMin = BigInt(price.minPriceFull)
       const priceMax = BigInt(price.maxPriceFull)

@@ -8,6 +8,7 @@ import type {
   positionDecrease,
   positionFeesCollected,
   positionIncrease,
+  positionIncreaseRelations,
   priceCandle,
   puppetAllocate,
   puppetMatchingRule,

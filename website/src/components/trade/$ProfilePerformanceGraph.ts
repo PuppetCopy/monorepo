@@ -14,11 +14,10 @@ import {
   type MouseEventParams,
   type Time
 } from 'lightweight-charts'
-import type * as viem from 'viem'
 
 type IOpenPnl = {
   update: { sizeInUsd: bigint; sizeInTokens: bigint; isLong: boolean }
-  indexToken: viem.Address
+  indexToken: Address
   pnl: bigint
 }
 
@@ -29,12 +28,12 @@ export type IPerformanceTimelineTick = {
   pnl: bigint
   roi: bigint
   time: number
-  openPnlMap: Map<viem.Hex, IOpenPnl>
+  openPnlMap: Map<Hex, IOpenPnl>
 }
 
 export type IAbstractUpdate = {
-  indexToken: viem.Address
-  positionKey: viem.Hex
+  indexToken: Address
+  positionKey: Hex
   sizeInUsd: bigint
   sizeInTokens: bigint
   indexTokenPriceMax: bigint
@@ -44,7 +43,7 @@ export type IAbstractUpdate = {
 }
 
 export interface IPerformanceTimeline {
-  pricefeedMap: Record<viem.Address, { token: viem.Address; c: bigint; slotTime: number }[]>
+  pricefeedMap: Record<Address, { token: Address; c: bigint; slotTime: number }[]>
   activityTimeframe: IntervalTime
   list: IAbstractUpdate[]
   tickCount: number
@@ -147,7 +146,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   return data
 }
 
-type IPricetickWithIndexToken = IPricetick & { indexToken: viem.Address }
+type IPricetickWithIndexToken = IPricetick & { indexToken: Address }
 
 export const $ProfilePerformanceGraph = (config: IPerformanceTimeline & { $container: INodeCompose }) =>
   component(([crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>) => {

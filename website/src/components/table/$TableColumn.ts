@@ -12,9 +12,11 @@ import {
 import { $node, $text, type IComposeBehavior, type INode, O, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
 import { $seperator2 } from '../../pages/common.js'
+import type { IPosition } from '../../pages/type.js'
+import { isPositionSettled } from '../../utils/utils.js'
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
   $column(style({ textAlign: 'right', whiteSpace: 'nowrap' }))(
@@ -22,16 +24,13 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
     $node(style({ fontSize: '1.2rem' }))($text(secondaryLabel))
   )
 
-// export const sizeColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
-//   $head: $tableHeader('Size', 'Leverage'),
-//   columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
-//   $bodyCallback: map((mp) => {
-//     const size = getParticiapntPortion(mp, mp.maxSizeInUsd, puppet)
-//     const collateral = getParticiapntPortion(mp, mp.maxCollateralInUsd, puppet)
-
-//     return $size(size, collateral)
-//   })
-// })
+export const sizeColumn = (puppet?: Address): TableColumn<IPosition> => ({
+  $head: $tableHeader('Size', 'Leverage'),
+  columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
+  $bodyCallback: map((mp) => {
+    return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
+  })
+})
 
 export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),
@@ -44,17 +43,16 @@ export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColu
   $head: $text('Puppets'),
   gridTemplate: '90px',
   $bodyCallback: map((pos) => {
-    return $puppetList(pos.puppetList?.map((m) => m.account) || [], click)
+    return $puppetList(pos.puppetList, click)
   })
 })
 
-export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
+export const pnlColumn = (puppet?: Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '90px',
   columnOp: style({ placeContent: 'flex-start' }),
   $bodyCallback: map((pos) => {
-    const indexToken = getMarketIndexToken(pos.market)
-    const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
+    const latestPrice = map((pm) => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
 
     const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
@@ -74,7 +72,7 @@ export const pnlColumn = (puppet?: viem.Address): TableColumn<IPosition> => ({
     const totalFeesUsd = totalPositionFeeAmount + totalBorrowingFeeAmount + totalFundingFeeAmount
 
     const pnl = isSettled
-      ? getSettledMpPnL(pos, puppet)
+      ? pos.realisedPnlUsd
       : map((price) => {
           return (
             pos.realisedPnlUsd +

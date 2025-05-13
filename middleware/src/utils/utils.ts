@@ -1,5 +1,6 @@
 import { curry2 } from '@most/prelude'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
+import type { Chain } from 'viem/chains'
 import { BASIS_POINTS_DIVISOR, IntervalTime } from '../const/common.js'
 import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi, ITokenDescription } from './types.js'
 
@@ -21,7 +22,7 @@ while (zeros.length < 256) {
   zeros += zeros
 }
 
-export function isAddress(address: any): address is viem.Address {
+export function isAddress(address: any): address is Address {
   return ETH_ADDRESS_REGEXP.test(address)
 }
 
@@ -252,18 +253,18 @@ export function pagingQuery<T, TParams extends IPagingQueryParams>(
 
 export const unixTimestampNow = () => Math.floor(Date.now() / 1000)
 
-export const getExplorerUrl = (chain: viem.Chain) => {
+export const getExplorerUrl = (chain: Chain) => {
   return chain.blockExplorers?.default.url || chain.blockExplorers?.etherscan?.url
 }
-export const getTxExplorerUrl = (chain: viem.Chain, hash: string) => {
+export const getTxExplorerUrl = (chain: Chain, hash: string) => {
   return `${getExplorerUrl(chain)}/tx/${hash}`
 }
 
-export function getAccountExplorerUrl(chain: viem.Chain, account: viem.Address) {
+export function getAccountExplorerUrl(chain: Chain, account: Address) {
   return `${getExplorerUrl(chain)}/address/${account}`
 }
 
-export function getDebankProfileUrl(account: viem.Address) {
+export function getDebankProfileUrl(account: Address) {
   return `https://debank.com/profile/${account}`
 }
 

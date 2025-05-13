@@ -10,6 +10,7 @@ import { ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, unixTimestampNow } f
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import type { Address } from 'viem/accounts'
 import { $TraderDisplay } from '../../common/$common'
 import { $heading2 } from '../../common/$text'
 import { queryDb } from '../../common/sqlClient.js'
@@ -17,7 +18,6 @@ import { $metricLabel, $metricRow } from '../../components/participant/$Summary.
 import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
 import { $TraderPage } from './$Trader.js'
-import type { Address } from 'viem/accounts'
 
 export interface IProfile extends IPageParams, IPageFilterParams, IUserActivityPageParams {}
 

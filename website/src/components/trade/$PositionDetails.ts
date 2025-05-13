@@ -14,7 +14,7 @@
 // import { IRequestTrade } from "./$PositionAdjustmentDetails"
 
 // interface IPositionAdjustmentHistory extends IWalletPageParams {
-//   chain: viem.Chain
+//   chain: Chain
 //   pricefeed: Stream<IPriceCandle[]>
 //   tradeConfig: StateStream<ITradeConfig> // ITradeParams
 //   tradeState: StateStream<ITradeParams>

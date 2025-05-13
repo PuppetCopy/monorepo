@@ -4,7 +4,8 @@ import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet
 import { $node, $text, attr, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
+import type { Chain } from 'viem/chains'
 import { $trash } from './$icons.js'
 
 export const $TrashBtn = $ButtonIcon($trash)
@@ -136,16 +137,16 @@ export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') 
   })
 }
 
-export const $accountRef = (id: viem.Address, chain: viem.Chain) =>
+export const $accountRef = (id: Address, chain: Chain) =>
   $anchor(attr({ href: getAccountExplorerUrl(chain, id) }))($text(`${shortenAddress(id)}`))
 
-export const $accountIconLink = (address: viem.Address, chain: viem.Chain) =>
+export const $accountIconLink = (address: Address, chain: Chain) =>
   $anchor(attr({ href: getAccountExplorerUrl(chain, address) }))(
     $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24', svgOps: style({ margin: '3px 4px 0 0' }) }),
     $text(`${shortenAddress(address)} `)
   )
 
-export const $txnIconLink = (hash: string, chain: viem.Chain) => {
+export const $txnIconLink = (hash: string, chain: Chain) => {
   return $anchor(attr({ href: getTxExplorerUrl(chain, hash) }))(
     $icon({ $content: $ethScan, width: '16px', viewBox: '0 0 24 24' })
   )

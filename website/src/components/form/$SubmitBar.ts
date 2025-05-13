@@ -26,7 +26,7 @@ import {
 } from 'aelea/core'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
-import * as viem from 'viem'
+import { BaseError, ContractFunctionRevertedError } from 'viem'
 import { $iconCircular } from '../../common/elements/$common.js'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
 import type { IWalletConnected, IWriteContractReturn } from '../../wallet/wallet.js'
@@ -66,11 +66,11 @@ export const $SubmitBar = (config: ISubmitBar) =>
       const multicastTxQuery = multicast(promiseState(txQuery))
       const requestStatus = mergeArray([
         multicastTxQuery,
-        map((a) => (a ? ({ state: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
+        map((a) => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
       ])
       const isRequestPending = startWith(
         false,
-        map((s) => s.state === PromiseStatus.PENDING, multicastTxQuery)
+        map((s) => s.status === PromiseStatus.PENDING, multicastTxQuery)
       )
 
       return [
@@ -81,16 +81,16 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 return empty()
               }
 
-              if (status.state === PromiseStatus.PENDING) {
+              if (status.status === PromiseStatus.PENDING) {
                 return $intermediateTooltip($node($text('Awaiting confirmation')))
               }
-              if (status.state === PromiseStatus.ERROR) {
+              if (status.status === PromiseStatus.ERROR) {
                 const err = status.error
                 let message: string | undefined
 
-                if (err instanceof viem.BaseError) {
-                  const revertError = err.walk((err) => err instanceof viem.ContractFunctionRevertedError)
-                  if (revertError instanceof viem.ContractFunctionRevertedError) {
+                if (err instanceof BaseError) {
+                  const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError)
+                  if (revertError instanceof ContractFunctionRevertedError) {
                     if (revertError.data) {
                       message = getContractErrorMessage(revertError.data)
                     } else {
@@ -141,7 +141,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               if (spend) {
                 const isSpendPending = startWith(
                   false,
-                  map((s) => s.state === PromiseStatus.PENDING, promiseState(approveTokenSpend))
+                  map((s) => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({

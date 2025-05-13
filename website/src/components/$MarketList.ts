@@ -9,7 +9,7 @@
 // import { IMarket, IMarketFees, IMarketPrice, IMarketUsageInfo, TEMP_MARKET_LIST, getBorrowingFactorPerInterval, getFundingFactorPerInterval } from '@puppet/middleware/gmx'
 // import { latestPriceMap } from 'puppet-middleware'
 // import { $Table, $defaultTableRowContainer } from '@puppet/middleware/ui-components'
-// import * as viem from 'viem'
+//
 // import { $marketSmallLabel } from '../common/$common'
 // import { readMarketPoolUsage } from '../logic/tradeRead'
 // import * as walletLink from "@puppet/middleware/wallet"
@@ -18,7 +18,7 @@
 
 // interface IMarketList extends IComponentPageParams {
 //   $container?: INodeCompose
-//   chain: viem.Chain
+//   chain: Chain
 //   $rowCallback?: IOps<{ market: IMarket, price: IMarketPrice }, INodeCompose>
 // }
 

@@ -3,7 +3,7 @@ import { $element, $svg, attr } from 'aelea/core'
 import Color from 'color'
 // @ts-ignore
 import MersenneTwister from 'mersenne-twister'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 
 const DEFAULT_SHAPE_COUNT = 3
 const DEFAULT_WOBBLE = 30
@@ -64,7 +64,7 @@ function jazzicon(
   return shapes.join('')
 }
 
-export function $jazzicon(address: viem.Address) {
+export function $jazzicon(address: Address) {
   return $svg('svg')(attr({ xmlns: 'http://www.w3.org/2000/svg', x: 0, y: 0, viewBox: '0 0 100 100' }))(
     tap((node) => {
       node.element.innerHTML = jazzicon(address)

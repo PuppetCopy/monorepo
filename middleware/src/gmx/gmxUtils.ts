@@ -1,4 +1,6 @@
-import * as viem from 'viem'
+import type { Address } from 'viem/accounts'
+import type { Chain } from 'viem/chains'
+import { encodeAbiParameters, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
 import {
   BASIS_POINTS_DIVISOR,
   CHAIN_ADDRESS_MAP,
@@ -62,19 +64,19 @@ export function validateIdentityName(name: string) {
   }
 }
 
-export function getMarketIndexToken(market: viem.Address) {
+export function getMarketIndexToken(market: Address) {
   return getMappedValue(MARKET_TOKEN_MAP, market)
 }
 
-export function getTokenDescription(token: viem.Address): ITokenDescription {
+export function getTokenDescription(token: Address): ITokenDescription {
   return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token)
 }
 
-export function getNativeTokenDescription(chain: viem.Chain): ITokenDescription {
+export function getNativeTokenDescription(chain: Chain): ITokenDescription {
   return getMappedValue(CHAIN_NATIVE_DESCRIPTION, chain.id)
 }
 
-export function getNativeTokenAddress(chain: viem.Chain): viem.Address {
+export function getNativeTokenAddress(chain: Chain): Address {
   return getMappedValue(CHAIN_ADDRESS_MAP, chain.id).NATIVE_TOKEN
 }
 
@@ -105,23 +107,18 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
   return Number(blockNumber * 1000000n)
 }
 
-export function getPositionKey(
-  account: viem.Address,
-  market: viem.Address,
-  collateralToken: viem.Address,
-  isLong: boolean
-) {
+export function getPositionKey(account: Address, market: Address, collateralToken: Address, isLong: boolean) {
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
 }
 
-export function getRuleKey(collateralToken: viem.Address, puppet: viem.Address, trader: viem.Address) {
+export function getRuleKey(collateralToken: Address, puppet: Address, trader: Address) {
   return hashData(['address', 'address', 'address'], [collateralToken, puppet, trader])
 }
 
 export function hashData(types: string[], values: any) {
-  const params = viem.parseAbiParameters(types)
-  const hex = viem.encodeAbiParameters(params as any, values)
-  const bytes = viem.toBytes(hex)
-  const hash = viem.keccak256(bytes)
+  const params = parseAbiParameters(types)
+  const hex = encodeAbiParameters(params as any, values)
+  const bytes = toBytes(hex)
+  const hash = keccak256(bytes)
   return hash
 }

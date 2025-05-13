@@ -13,7 +13,7 @@
 // import { wagmiConfig } from '@puppet/middleware/wallet'
 // import { erc20Abi } from 'abitype/abis'
 // import { fromWebsocket } from 'aelea/ui-components'
-// import type * as viem from 'viem'
+//
 // import { getBalance } from 'viem/actions'
 
 // export interface ITokenPoolInfo {
@@ -149,8 +149,8 @@
 // }
 
 // export async function readAddressTokenBalance(
-//   token: viem.Address | typeof PUPPET.ADDRESS_ZERO,
-//   address: viem.Address
+//   token: Address | typeof PUPPET.ADDRESS_ZERO,
+//   address: Address
 // ): Promise<bigint> {
 //   if (token === PUPPET.ADDRESS_ZERO) {
 //     return getBalance(provider, { address })
@@ -176,7 +176,7 @@
 //   return erc20
 // }
 
-// export const exchangesWebsocketPriceSource = (token: viem.Address) => {
+// export const exchangesWebsocketPriceSource = (token: Address) => {
 //   const existingToken = getMappedValue(PUPPET.TOKEN_ADDRESS_DESCRIPTION_MAP, token)
 
 //   return latestPriceFromExchanges(existingToken)
@@ -193,16 +193,16 @@
 //   // }, source)
 // }
 
-// export async function getGmxIOPriceMap(url: string): Promise<{ [key in viem.Address]: bigint }> {
+// export async function getGmxIOPriceMap(url: string): Promise<{ [key in Address]: bigint }> {
 //   const res = await fetch(url)
 //   const json = await res.json()
 
 //   return Object.keys(json).reduce(
 //     (seed, key) => {
-//       seed[key as viem.Address] = BigInt(json[key])
+//       seed[key as Address] = BigInt(json[key])
 //       return seed
 //     },
-//     {} as { [key in viem.Address]: bigint }
+//     {} as { [key in Address]: bigint }
 //   )
 // }
 

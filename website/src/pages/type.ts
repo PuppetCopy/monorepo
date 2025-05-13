@@ -51,6 +51,7 @@ export type IPosition = {
   account: Hex
   market: Hex
   collateralToken: Hex
+  indexToken: Hex
 
   sizeInUsd: bigint
   sizeInTokens: bigint
@@ -75,7 +76,7 @@ export type IPosition = {
   openTimestamp: number
   settledTimestamp: number
 
-  puppetList: string[]
+  puppetList: Address[]
   increaseList: IPositionIncrease[]
   decreaseList: IPositionDecrease[]
 

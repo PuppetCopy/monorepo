@@ -1,4 +1,5 @@
-import * as viem from 'viem'
+import { type Address, parseAbiParameters } from 'abitype'
+import { encodeAbiParameters, type Hex, keccak256 } from 'viem'
 import { getMarketIndexToken, getTokenDescription } from '../gmx/gmxUtils.js'
 import { type IPriceCandle, type IPricefeedMap, OrderType } from '../gmx/types.js'
 import { factor } from '../utils/mathUtils.js'
@@ -36,7 +37,7 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 //   return update.sizeInTokens === 0n
 // }
 
-// export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: viem.Address): IPriceCandle {
+// export function getLatestPriceFeedPrice(priceFeed: IPricefeedMap, token: Address): IPriceCandle {
 //   const feed = getMappedValue(priceFeed, token)
 
 //   if (feed.length === 0) {
@@ -51,15 +52,7 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 //   return 'mirror' in mp && mp.mirror !== null
 // }
 
-// export function isPositionSettled(trade: IPosition): boolean {
-//   return trade.settledTimestamp > 0
-// }
-
-// export function isPositionOpen(trade: IPosition): trade is IPosition {
-//   return trade.settledTimestamp === 0
-// }
-
-// export function getPuppetShare(puppetList: IPuppetPosition[], puppet: viem.Address): bigint {
+// export function getPuppetShare(puppetList: IPuppetPosition[], puppet: Address): bigint {
 //   const position = puppetList.find((p) => p.account === puppet)
 
 //   if (!position) throw new Error('Puppet not found')
@@ -67,17 +60,17 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 //   return position.collateral
 // }
 
-// export function getParticiapntCollateral(mp: IPosition, puppet?: viem.Address): bigint {
+// export function getParticiapntCollateral(mp: IPosition, puppet?: Address): bigint {
 //   return puppet ? getPuppetShare(mp.puppetList, puppet) : mp.maxCollateralInUsd
 // }
 
-// export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: viem.Address): bigint {
+// export function getParticiapntPortion(mp: IPosition, totalAmount: bigint, puppet?: Address): bigint {
 //   const share = getParticiapntCollateral(mp, puppet)
 
 //   return getPortion(mp.maxCollateralInUsd, share, totalAmount)
 // }
 
-// export function getSettledMpPnL(mp: IPosition, puppet?: viem.Address): bigint {
+// export function getSettledMpPnL(mp: IPosition, puppet?: Address): bigint {
 //   const realisedPnl = getParticiapntPortion(mp, mp.realisedPnlUsd, puppet)
 
 //   return realisedPnl
@@ -108,18 +101,12 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 //   return vested
 // }
 
-export function getMatchKey(collateralToken: viem.Address, trader: viem.Address) {
-  return viem.keccak256(
-    viem.encodeAbiParameters(viem.parseAbiParameters('address, address'), [collateralToken, trader])
-  )
+export function getMatchKey(collateralToken: Address, trader: Address) {
+  return keccak256(encodeAbiParameters(parseAbiParameters('address, address'), [collateralToken, trader]))
 }
 
-export function getAllocationKey(puppetList: viem.Address[], matchingKey: viem.Hex, allocationId: bigint) {
-  return viem.keccak256(
-    viem.encodeAbiParameters(viem.parseAbiParameters('address[], bytes32, uint256'), [
-      puppetList,
-      matchingKey,
-      allocationId
-    ])
+export function getAllocationKey(puppetList: Address[], matchingKey: Hex, allocationId: bigint) {
+  return keccak256(
+    encodeAbiParameters(parseAbiParameters('address[], bytes32, uint256'), [puppetList, matchingKey, allocationId])
   )
 }

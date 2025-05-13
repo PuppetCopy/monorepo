@@ -1,4 +1,4 @@
-// import type * as viem from 'viem'
+//
 // import type { ILogTxType, ILogTypeId } from '../gmx/types.js'
 
 // // type PositionFeesCollected {
@@ -35,9 +35,9 @@
 // // }
 
 // export interface IPositionFeesCollected extends ILogTxType<'PositionFeesCollected'> {
-//   affiliate: viem.Address
-//   referralCode: viem.Address
-//   positionKey: viem.Address
+//   affiliate: Address
+//   referralCode: Address
+//   positionKey: Address
 
 //   collateralTokenPriceMin: bigint
 //   collateralTokenPriceMax: bigint
@@ -72,16 +72,16 @@
 // }
 
 // export interface IOrderCreated extends ILogTypeId<'OrderCreated'> {
-//   key: viem.Hex
+//   key: Hex
 
-//   account: viem.Address
-//   receiver: viem.Address
-//   callbackContract: viem.Address
-//   uiFeeReceiver: viem.Address
-//   market: viem.Address
-//   initialCollateralToken: viem.Address
+//   account: Address
+//   receiver: Address
+//   callbackContract: Address
+//   uiFeeReceiver: Address
+//   market: Address
+//   initialCollateralToken: Address
 
-//   swapPath: viem.Address[]
+//   swapPath: Address[]
 
 //   orderType: bigint
 //   decreasePositionSwapType: bigint
@@ -108,11 +108,11 @@
 
 // export interface IPositionIncrease extends ILogTxType<'PositionIncrease'> {
 //   order: IOrderStatus
-//   positionKey: viem.Hex
-//   account: viem.Address
+//   positionKey: Hex
+//   account: Address
 
-//   market: viem.Address
-//   collateralToken: viem.Address
+//   market: Address
+//   collateralToken: Address
 
 //   sizeInUsd: bigint
 //   sizeInTokens: bigint
@@ -142,12 +142,12 @@
 // }
 
 // export interface IPositionDecrease extends ILogTxType<'PositionDecrease'> {
-//   collateralToken: viem.Address
-//   market: viem.Address
-//   account: viem.Address
+//   collateralToken: Address
+//   market: Address
+//   account: Address
 
 //   order: IOrderStatus
-//   positionKey: viem.Hex
+//   positionKey: Hex
 
 //   sizeInUsd: bigint
 //   sizeInTokens: bigint
@@ -179,21 +179,21 @@
 // }
 
 // export interface IMirrorRequest {
-//   puppets: readonly viem.Address[]
-//   trader: viem.Address
-//   subaccount: viem.Address
-//   positionKey: viem.Hex
+//   puppets: readonly Address[]
+//   trader: Address
+//   subaccount: Address
+//   positionKey: Hex
 //   isIncrease: boolean
-//   requestKey: viem.Hex
+//   requestKey: Hex
 // }
 
 // export interface IPuppetPosition extends ILogTxType<'PuppetPosition'> {
-//   key: viem.Hex
-//   positionKey: viem.Hex
+//   key: Hex
+//   positionKey: Hex
 
-//   account: viem.Address
-//   market: viem.Address
-//   collateralToken: viem.Address
+//   account: Address
+//   market: Address
+//   collateralToken: Address
 
 //   collateral: bigint
 
@@ -201,10 +201,10 @@
 // }
 
 // export interface IPosition {
-//   key: viem.Hex
-//   account: viem.Address
-//   market: viem.Address
-//   collateralToken: viem.Address
+//   key: Hex
+//   account: Address
+//   market: Address
+//   collateralToken: Address
 
 //   sizeInUsd: bigint
 //   sizeInTokens: bigint
@@ -239,12 +239,12 @@
 // }
 
 // export interface IGbcToken extends ILogTypeId<'GbcToken'> {
-//   id: viem.Address
+//   id: Address
 //   profile: IProfile
 // }
 
 // export interface IProfile extends ILogTypeId<'Profile'> {
-//   id: viem.Address
+//   id: Address
 //   gbcTokenList: number[]
 // }
 
@@ -257,37 +257,37 @@
 // // }
 
 // export interface IDepositBalance extends ILogTypeId<'DepositBalance'> {
-//   id: viem.Address
-//   token: viem.Address
+//   id: Address
+//   token: Address
 //   value: bigint
 
-//   account: viem.Address
+//   account: Address
 // }
 
 // export interface IAccountBalance extends ILogTypeId<'AccountBalance'> {
-//   id: viem.Address
-//   account: viem.Address
-//   token: viem.Address
+//   id: Address
+//   account: Address
+//   token: Address
 //   value: bigint
 // }
 
 // export interface IPuppetAllocation extends ILogTypeId<'PuppetAllocation'> {
-//   id: viem.Address
-//   puppet: viem.Address
-//   collateralToken: viem.Address
-//   matchKey: viem.Address
-//   originRequestKey: viem.Address
+//   id: Address
+//   puppet: Address
+//   collateralToken: Address
+//   matchKey: Address
+//   originRequestKey: Address
 
 //   activityThrottle: bigint
 //   amount: bigint
 // }
 
 // export interface IAllocation extends ILogTypeId<'Allocation'> {
-//   id: viem.Address
-//   collateralToken: viem.Address
-//   originRequestKey: viem.Address
-//   matchKey: viem.Address
-//   puppetListHash: viem.Address
+//   id: Address
+//   collateralToken: Address
+//   originRequestKey: Address
+//   matchKey: Address
+//   puppetListHash: Address
 
 //   matchSequenceId: bigint
 //   transactionCost: bigint
@@ -298,20 +298,20 @@
 // }
 
 // export interface IPuppetSettlement extends ILogTypeId<'PuppetSettlement'> {
-//   id: viem.Address
-//   puppet: viem.Address
-//   collateralToken: viem.Address
-//   matchKey: viem.Address
+//   id: Address
+//   puppet: Address
+//   collateralToken: Address
+//   matchKey: Address
 
 //   contribution: bigint
 //   amount: bigint
 // }
 
 // export interface ISettlement extends ILogTypeId<'Settlement'> {
-//   id: viem.Address
-//   puppet: viem.Address
-//   collateralToken: viem.Address
-//   matchKey: viem.Address
+//   id: Address
+//   puppet: Address
+//   collateralToken: Address
+//   matchKey: Address
 
 //   allocated: bigint
 //   settled: bigint
@@ -326,13 +326,13 @@
 
 //   blockNumber: number
 //   blockTimestamp: number
-//   transactionHash: viem.Address
+//   transactionHash: Address
 // }
 
 // export interface IMatchRule extends ILogTypeId<'MatchRule'> {
-//   id: viem.Address
-//   puppet: viem.Address
-//   matchKey: viem.Address
+//   id: Address
+//   puppet: Address
+//   matchKey: Address
 
 //   allowanceRate: bigint
 //   throttleActivity: bigint
@@ -342,8 +342,8 @@
 // }
 
 // export interface IMatchRoute extends ILogTypeId<'MatchRoute'> {
-//   id: viem.Address
-//   collateralToken: viem.Address
+//   id: Address
+//   collateralToken: Address
 
 //   profile: IProfile
 
@@ -351,8 +351,8 @@
 //   decreaseList: IPositionDecrease[]
 
 //   // increaseList: {
-//   //   market: viem.Address
-//   //   positionKey: viem.Hex
+//   //   market: Address
+//   //   positionKey: Hex
 //   //   collateralAmount: bigint
 //   //   collateralInUsd: bigint
 //   //   sizeInTokens: bigint
@@ -363,8 +363,8 @@
 //   //   __typename: 'PositionIncrease'
 //   // },
 //   // decreaseList: {
-//   //   market: viem.Address
-//   //   positionKey: viem.Hex
+//   //   market: Address
+//   //   positionKey: Hex
 //   //   collateralAmount: bigint
 //   //   collateralInUsd: bigint
 //   //   sizeInTokens: bigint
@@ -384,9 +384,9 @@
 // }
 
 // export interface ISettle extends ILogTypeId<'Settle'> {
-//   id: viem.Address
-//   collateralToken: viem.Address
-//   matchKey: viem.Address
+//   id: Address
+//   collateralToken: Address
+//   matchKey: Address
 
 //   allocated: bigint
 //   settled: bigint
@@ -395,17 +395,17 @@
 //   transactionCost: bigint
 //   profit: bigint
 
-//   puppet: viem.Address
+//   puppet: Address
 //   allocate: IAllocation
 
 //   blockNumber: number
 //   blockTimestamp: number
-//   transactionHash: viem.Address
+//   transactionHash: Address
 // }
 
 // export interface IMatchRouteStats extends ILogTypeId<'MatchRouteStats'> {
-//   account: viem.Address
-//   collateralToken: viem.Address
+//   account: Address
+//   collateralToken: Address
 
 //   cumulativeCollateralToken: bigint
 //   cumulativeCollateralUsd: bigint

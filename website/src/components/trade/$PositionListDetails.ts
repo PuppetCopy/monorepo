@@ -16,7 +16,7 @@
 // import { ITradeParams } from "./$PositionEditor.js"
 
 // interface IPositionListDetails {
-//   chain: viem.Chain
+//   chain: Chain
 //   positionListQuery: Stream<Promise<IMirrorPosition[]>>
 //   tradeState: StateStream<ITradeParams>
 //   $container: INodeCompose

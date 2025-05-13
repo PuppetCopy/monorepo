@@ -8,7 +8,7 @@ import {
   unixTimestampNow
 } from '@puppet/middleware/utils'
 import { combineState, replayLatest } from 'aelea/core'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import type { IWalletClient } from '../wallet/wallet'
 import { getStatus, queryDb } from './sqlClient'
 
@@ -24,7 +24,7 @@ export const subgraphStatus = replayLatest(
 
 export function queryPricefeed(
   queryParams: StateParams<{
-    tokenList?: viem.Address[]
+    tokenList?: Address[]
     activityTimeframe: IntervalTime
   }>,
   estTickAmout = 10

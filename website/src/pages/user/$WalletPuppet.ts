@@ -2,13 +2,13 @@ import { map } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $IntermediatePromise, $infoLabel } from '@puppet/middleware/ui-components'
+import { $infoLabel, $intermediatePromise } from '@puppet/middleware/ui-components'
 import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
-import { $column, $row, layoutSheet } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
-import type * as viem from 'viem'
+
 import { $card, $card2 } from '../../common/elements/$common.js'
-import { $ProfilePeformanceTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
+import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
 import type { IDepositEditorChange } from '../../components/portfolio/$DepositEditor.js'
 import { $RouteDepositEditor } from '../../components/portfolio/$RouteDepositEditor.js'
 import type { IMatchRuleEditorChange } from '../../components/portfolio/$TraderMatchRouteEditor.js'
@@ -28,7 +28,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
@@ -53,15 +53,16 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
               margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
             })
           )(
-            $ProfilePeformanceTimeline({ ...config })({
+            $TradeRouteTimeline({ ...config })({
               selectMarketTokenList: selectMarketTokenListTether(),
               changeActivityTimeframe: changeActivityTimeframeTether()
             })
           ),
 
-          $IntermediatePromise({
-            query: tableParams,
-            $$done: map((params) => {
+          $intermediatePromise({
+            $$display: map(async (paramsQuery) => {
+              const params = await paramsQuery
+
               if (params.collateralTokenList.length === 0) {
                 return $column(spacing.small)(
                   $text('No active collateral tokens selected'),
@@ -126,7 +127,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                   )
                 })
               )
-            })
+            }, tableParams)
           })({})
         ),
 

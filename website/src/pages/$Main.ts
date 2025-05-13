@@ -1,9 +1,14 @@
-import { map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
+import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
-import { $alertNegativeContainer, $infoLabeledValue, $Tooltip } from '@puppet/middleware/ui-components'
+import {
+  $alertNegativeContainer,
+  $alertPositiveContainer,
+  $infoLabeledValue,
+  $Tooltip
+} from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
+import { filterNull, getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
 import {
   $element,
   $node,
@@ -20,14 +25,16 @@ import * as router from 'aelea/router'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
+import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
 import type { IMatchingRuleEditorChange } from '../components/portfolio/$MatchRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
+import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wallet } from '../wallet/wallet.js'
 import { $rootContainer } from './common.js'
@@ -52,7 +59,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [clickUpdateVersion, clickUpdateVersionTether]: IBehavior<any, bigint>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
-      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<viem.Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
@@ -125,21 +132,21 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       return [
         $column(
-          // switchMap((cb) => {
-          //   return fadeIn(
-          //     $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-          //       filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
+          switchMap((cb) => {
+            return fadeIn(
+              $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
+                filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
 
-          //       $text('New version Available'),
-          //       $ButtonSecondary({
-          //         $container: $defaultMiniButtonSecondary,
-          //         $content: $text('Update')
-          //       })({
-          //         click: clickUpdateVersionTether(tap(cb))
-          //       })
-          //     )
-          //   )
-          // }, pwaUpgradeNotification),
+                $text('New version Available'),
+                $ButtonSecondary({
+                  $container: $defaultMiniButtonSecondary,
+                  $content: $text('Update')
+                })({
+                  click: clickUpdateVersionTether(tap(cb))
+                })
+              )
+            )
+          }, pwaUpgradeNotification),
           router.contains(rootRoute)(
             $rootContainer(
               $column(style({ flex: 1, position: 'relative' }))(

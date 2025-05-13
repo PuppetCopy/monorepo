@@ -8,6 +8,7 @@ import {
   $txHashRef
 } from '@puppet/middleware/ui-components'
 import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
+import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import {
   $node,
@@ -22,14 +23,14 @@ import {
   switchMap
 } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
-import * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
 import { $defaultButtonPrimary } from './$Button'
 import { $ButtonCore } from './$ButtonCore'
 
 export interface ISpend {
-  spender: viem.Address
-  token: viem.Address
+  spender: Address
+  token: Address
   amount?: Stream<bigint>
   $label?: I$Slottable
 }
@@ -77,14 +78,14 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                     return empty()
                   }
 
-                  if (status.state === PromiseStatus.PENDING) {
+                  if (status.status === PromiseStatus.PENDING) {
                     return $intermediateTooltip($node($text('Awaiting confirmation')))
                   }
-                  if (status.state === PromiseStatus.ERROR) {
+                  if (status.status === PromiseStatus.ERROR) {
                     const err = status.error
                     let message: string | undefined
 
-                    if (err instanceof viem.BaseError) {
+                    if (err instanceof BaseError) {
                       message = err.shortMessage || err.message
                     }
 

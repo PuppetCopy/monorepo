@@ -2,9 +2,9 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import type { IBehavior } from 'aelea/core'
 import { component, style } from 'aelea/core'
 import { $column, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
-import type * as viem from 'viem'
+
 import { $card, $card2 } from '../../common/elements/$common.js'
-import { $ProfilePeformanceTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
+import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
 import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IUserActivityPageParams } from '../type.js'
 
@@ -19,7 +19,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
       [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchingRuleEditorChange>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>
     ) => {
       const {
         activityTimeframe,
@@ -44,7 +44,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
                 margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
               })
             )(
-              $ProfilePeformanceTimeline({ ...config })({
+              $TradeRouteTimeline({ ...config })({
                 selectMarketTokenList: selectMarketTokenListTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
@@ -62,7 +62,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
             //       return $text('No activity found')
             //     }
 
-            //     const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [viem.Address, IPuppetTradeRoute[]][]
+            //     const tradeRouteList = Object.entries(groupArrayMany(puppetTradeRouteList, x => x.routeTypeKey)) as [Address, IPuppetTradeRoute[]][]
 
             //     return $column(spacing.big, style({ width: '100%' }))(
             //       // ...tradeRouteList.map(([routeTypeKey, traderPuppetTradeRouteList]) => {

@@ -50,6 +50,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
         account: next.account,
         market: next.market,
         collateralToken: next.collateralToken,
+        indexToken: next.indexToken,
 
         sizeInUsd: 0n,
         sizeInTokens: 0n,
@@ -137,15 +138,15 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       }
     }
 
-    if (position.maxSizeInTokens > 0n) {
-      position.avgEntryPrice =
-        (position.maxSizeInUsd / position.maxSizeInTokens) *
-        getTokenDescription(getMarketIndexToken(next.market)).denominator
-    }
+    // if (position.maxSizeInTokens > 0n) {
+    //   position.avgEntryPrice =
+    //     (position.maxSizeInUsd / position.maxSizeInTokens) *
+    //     getTokenDescription(getMarketIndexToken(next.market)).denominator
+    // }
   }
 
   positionList.push(...openPositionMap.values())
-  return positionList
+  return positionList.reverse()
 }
 
 export function accountSettledPositionListSummary(

@@ -1,30 +1,30 @@
-import { awaitPromises, fromPromise, map, multicast, now, startWith } from '@most/core'
+import { awaitPromises, map, multicast, now, startWith } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $intermediateText, $Table, type IQuantumScrollPage, type ISortBy } from '@puppet/middleware/ui-components'
 import { pagingQuery, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
-import { traderRouteLatestMetric } from 'schema'
-import type * as viem from 'viem'
-import { $TraderDisplay } from '../../common/$common.js'
+import { asc } from 'ponder'
+import { positionIncrease } from 'schema'
+import type { Address } from 'viem/accounts'
 import { $heading2 } from '../../common/$text.js'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { queryDb } from '../../common/sqlClient.js'
-import { $ProfilePeformanceTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
+import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
+import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import {
   $defaultTraderMatchRouteEditorContainer,
   $TraderMatchingRouteEditor
 } from '../../components/portfolio/$TraderMatchRouteEditor'
-import { entryColumn, pnlColumn, puppetsColumn, timeColumn } from '../../components/table/$TableColumn.js'
+import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
-import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 
 interface ITraderPage extends IPageParams, IUserActivityPageParams, IPageFilterParams {
-  account: viem.Address
+  account: Address
   //   matchRouteStatsQuery: Stream<Promise<IMatchingRuleEditorChange[]>>
 }
 
@@ -35,7 +35,7 @@ export const $TraderPage = (config: ITraderPage) =>
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
       [sortByChange, sortByChangeTether]: IBehavior<ISortBy>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
     ) => {
       const { account, activityTimeframe, collateralTokenList, depositTokenList, matchingRuleQuery, route } = config
@@ -82,7 +82,12 @@ export const $TraderPage = (config: ITraderPage) =>
                 ? f.inArray(t.collateralToken, params.collateralTokenList)
                 : undefined,
               f.gt(t.blockTimestamp, startActivityTimeframe)
-            )
+            ),
+
+          orderBy: asc(positionIncrease.blockTimestamp),
+          with: {
+            feeCollected: true
+          }
         })
 
         const decreaseList = await queryDb.query.positionDecrease.findMany({
@@ -93,7 +98,10 @@ export const $TraderPage = (config: ITraderPage) =>
                 ? f.inArray(t.collateralToken, params.collateralTokenList)
                 : undefined,
               f.gt(t.blockTimestamp, startActivityTimeframe)
-            )
+            ),
+          with: {
+            feeCollected: true
+          }
         })
 
         const positionList = aggregatePositionList([...increaseList, ...decreaseList])
@@ -182,11 +190,12 @@ export const $TraderPage = (config: ITraderPage) =>
                 margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
               })
             )(
-              $ProfilePeformanceTimeline({
+              $TradeRouteTimeline({
                 activityTimeframe,
                 collateralTokenList,
                 depositTokenList,
-                matchingRuleQuery
+                matchingRuleQuery,
+                metricsQuery
               })({
                 selectMarketTokenList: selectMarketTokenListTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether()
@@ -238,7 +247,7 @@ export const $TraderPage = (config: ITraderPage) =>
                           ...(isDesktopScreen ? [timeColumn] : []),
                           entryColumn,
                           puppetsColumn(changeRouteTether),
-                          //   sizeColumn(),
+                          sizeColumn(),
                           pnlColumn()
                         ]
                       })({

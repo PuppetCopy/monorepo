@@ -41,8 +41,8 @@
 // import { $defaultSelectContainer, $Dropdown } from "../form/$Dropdown.js"
 
 // export interface ITradeParams {
-//   tradeRoute: viem.Address | null
-//   routeTypeKey: viem.Hex
+//   tradeRoute: Address | null
+//   routeTypeKey: Hex
 
 //   mirrorPosition: IMirrorPosition | null
 //   netPositionValueUsd: bigint
@@ -77,10 +77,10 @@
 //   focusPrice: number | null
 //   market: IMarket
 //   isLong: boolean
-//   indexToken: viem.Address
-//   primaryToken: viem.Address
+//   indexToken: Address
+//   primaryToken: Address
 //   isUsdCollateralToken: boolean
-//   collateralToken: viem.Address
+//   collateralToken: Address
 //   isIncrease: boolean
 //   focusMode: ITradeFocusMode
 //   leverage: bigint
@@ -91,10 +91,10 @@
 // }
 
 // export interface IPositionEditorAbstractParams extends IComponentPageParams {
-//   referralCode: viem.Hex
+//   referralCode: Hex
 //   routeTypeListQuery: Stream<Promise<ISetRouteType[]>>
 //   parentRoute: Route
-//   chain: viem.Chain
+//   chain: Chain
 // }
 
 // interface IPositionEditorConfig extends IPositionEditorAbstractParams {
@@ -117,8 +117,8 @@
 //   [inputPrimaryAmount, inputPrimaryAmountTether]: IBehavior<INode, bigint>,
 //   [inputSizeDeltaUsd, inputSizeDeltaTetherUsd]: IBehavior<INode, bigint>,
 
-//   [changePrimaryToken, changePrimaryTokenTether]: IBehavior<viem.Address, viem.Address>,
-//   [changeMarketToken, changeMarketTokenTether]: IBehavior<any, viem.Address>,
+//   [changePrimaryToken, changePrimaryTokenTether]: IBehavior<Address, Address>,
+//   [changeMarketToken, changeMarketTokenTether]: IBehavior<any, Address>,
 //   [clickChooseMarketPopover, clickChooseMarketPopoverTether]: IBehavior<any>,
 //   // [changeIsUsdCollateralToken, changeIsUsdCollateralTokenTether]: IBehavior<boolean>,
 
