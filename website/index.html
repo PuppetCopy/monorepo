@@ -19,6 +19,11 @@
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 10px;
+            text-rendering: geometricPrecision;
+        }
+
         body {
             overflow: hidden;
             margin: 0;
@@ -39,8 +44,6 @@
         button,
         input {
             font-family: var(--font);
-            text-rendering: geometricPrecision;
-            font-size: 100%;
             font-feature-settings: "tnum" on, "lnum" on;
         }
 

@@ -136,7 +136,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                         $seperator2,
                         $column(style({ flex: 1, padding: '12px 0' }))(
                           ...route.matchRuleList.map((modSubsc) => {
-                            const iconColorParams = modSubsc
+                            const iconColorParams = modSubsc?.id
                               ? modSubsc.expiry === 0n
                                 ? {
                                     fill: pallete.negative,
@@ -177,7 +177,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
 
                               $profileDisplay({
-                                account: modSubsc.trader
+                                address: modSubsc.trader
                                 // $profileContainer: $defaultBerry(style({ width: '50px' }))
                               }),
 

@@ -15,7 +15,7 @@ import type {
   traderRouteLatestMetric,
   traderRouteMetric,
   withdraw
-} from './__generated__/ponder.schema'
+} from './ponder.schema'
 
 export type ITraderRouteMetric = typeof traderRouteMetric.$inferInsert
 export type ITraderRouteLatestMetric = typeof traderRouteLatestMetric.$inferInsert

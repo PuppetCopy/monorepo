@@ -187,7 +187,7 @@ export const $MainMenu = (config: MainMenu) =>
             //     $text(style({ fontSize: '1.15rem' }))('Leaderboard')
             //   ),
             //   route: route.create({ fragment: 'leaderboard' }),
-            //   url: '/app/leaderboard',
+            //   url: '/leaderboard',
             // })({
             //   click: routeChangeTether()
             // }),
@@ -197,7 +197,7 @@ export const $MainMenu = (config: MainMenu) =>
             //     $text(style({ fontSize: '1.15rem' }))('Trade')
             //   ),
             //   route: route.create({ fragment: 'trade' }),
-            //   url: '/app/trade',
+            //   url: '/trade',
             // })({
             //   click: routeChangeTether()
             // }),
@@ -266,15 +266,15 @@ export const $MainMenuMobile = (config: MainMenu) =>
           $column(spacing.big)(
             $Link({
               $content: $popoverPageLink($gmxLogo, 'Trade'),
-              url: '/app/trade',
+              url: '/trade',
               route: route.create({ fragment: 'feefwefwe' })
             })({
-              // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/app/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
+              // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
               click: routeChangeTether()
             }),
             $Link({
               $content: $popoverPageLink($stackedCoins, 'Leaderboard'),
-              url: '/app/leaderboard',
+              url: '/leaderboard',
               route: route.create({ fragment: 'feefwefwe' })
             })({
               click: routeChangeTether()
@@ -428,7 +428,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
               $pageLink({
                 route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
                 // anchorOp: style({  }),
-                url: '/app/wallet',
+                url: '/wallet',
                 $content: $walletProfileDisplay()
               })({
                 click: routeChangeTether()

@@ -42,7 +42,7 @@ export const $defaultSliderThumb = $row(
     cursor: 'grab',
     lineHeight: 0.9,
     userSelect: 'none',
-    fontSize: '.75rem',
+    fontSize: '1.1rem',
     alignItems: 'center',
     pointerEvents: 'all',
     placeContent: 'center',

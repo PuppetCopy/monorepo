@@ -1,40 +1,40 @@
 // import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
-import { awaitPromises, empty, now } from '@most/core'
-import { $node, $text, type I$Node, type INodeCompose, style } from 'aelea/core'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { empty } from '@most/core'
+import { $node, $text, type INodeCompose, style } from 'aelea/core'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import type * as viem from 'viem'
+import type { Address } from 'viem/accounts'
 import { $jazzicon } from '../common/$avatar.js'
 
-export interface IAccountPreview {
-  account: viem.Address
-  labelSize?: string
-  profileSize?: number
-}
-
-export interface IProfilePreview extends IAccountPreview {
+export const $profileDisplay = ({
+  $container = $row,
+  address,
+  showAddress = true,
+  profileSize = 45,
+  $labelContainer
+}: {
   $container?: INodeCompose
+  address: Address
   showAddress?: boolean
+  profileSize?: number
   $labelContainer?: INodeCompose
-}
-
-export const $profileDisplay = (config: IProfilePreview) => {
-  const { $container = $row, account, showAddress = true, profileSize = 45, $labelContainer } = config
-
+}) => {
   return $container(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
-    $profileAvatar({ ...config, profileSize }),
-    showAddress ? $AccountLabel(account, $labelContainer) : empty()
+    $profileAvatar({ size: profileSize, address }),
+    showAddress
+      ? $AccountLabel({
+          address,
+          $container: $labelContainer
+        })
+      : empty()
   )
 }
 
-export const $profileAvatar = (config: IAccountPreview) => {
-  const { account, profileSize = 50 } = config
+export const $profileAvatar = ({ address, size = 50 }: { address: Address; size?: number }) => {
   // const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: account.toLowerCase() })))
 
-  return $row(
-    style({ width: `${profileSize}px`, borderRadius: '50%', overflow: 'hidden', height: `${profileSize}px` })
-  )(
-    $jazzicon(account)
+  return $row(style({ width: `${size}px`, borderRadius: '50%', overflow: 'hidden', height: `${size}px` }))(
+    $jazzicon(address)
     // switchMap(profile => {
     //   return profile && profile.profile
     //     ? $berryByToken(profile.profile) as any
@@ -55,16 +55,26 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
         alignItems: 'center'
       })
     )($node(style({ fontWeight: 800, color: pallete.foreground }))($text('?'))),
-    $column(style({ whiteSpace: 'nowrap', fontSize: '.85rem', alignItems: 'center' }))(
+    $column(style({ whiteSpace: 'nowrap', fontSize: '1.2rem', alignItems: 'center' }))(
       $node(style({}))($text('0x----')),
       $node(style({ fontSize: '1.55em', lineHeight: 1 }))($text('----'))
     )
   )
 }
 
-export const $AccountLabel = (address: string, $container = $column) => {
-  return $container(style({ alignItems: 'flex-end', flexDirection: 'row' }))(
-    $node(style({ fontSize: '.85em', color: pallete.foreground }))($text(`${address.slice(0, 6)}..`)),
-    $node(style({}))($text(address.slice(-4)))
+export const $AccountLabel = ({
+  address,
+  $container = $column,
+  primarySize = 1.6,
+  secondarySize = primarySize * 0.85
+}: {
+  address: string
+  $container?: INodeCompose
+  primarySize?: number
+  secondarySize?: number
+}) => {
+  return $container(style({ alignItems: 'baseline', flexDirection: 'row' }))(
+    $node(style({ fontSize: `${secondarySize}rem`, color: pallete.foreground }))($text(`${address.slice(0, 6)}..`)),
+    $node(style({ fontSize: `${primarySize}rem` }))($text(address.slice(-4)))
   )
 }

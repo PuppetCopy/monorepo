@@ -10,7 +10,6 @@ import {
   switchLatest
 } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
-import { isPositionOpen, isPositionSettled } from '@puppet/middleware/core'
 import { $Baseline, $IntermediatePromise, $infoTooltipLabel, type IMarker } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, motion, style } from 'aelea/core'
@@ -18,12 +17,12 @@ import { $column, $NumberTicker, $row, layoutSheet, spacing } from 'aelea/ui-com
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams, Time } from 'lightweight-charts'
 import type * as viem from 'viem'
-import type { IUserActivityPageParams } from '../../pages/type.js'
+import type { IPageFilterParams, IUserActivityPageParams } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 import { getPositionListTimelinePerformance } from '../trade/$ProfilePerformanceGraph.js'
 
-interface IProfilePeformanceTimeline extends IUserActivityPageParams {}
+interface IProfilePeformanceTimeline extends IUserActivityPageParams, IPageFilterParams {}
 
 export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =>
   component(
@@ -32,12 +31,9 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const { activityTimeframe, selectedCollateralTokenList, pricefeedMapQuery, matchingRuleList } = config
+      const { activityTimeframe, collateralTokenList, depositTokenList, matchingRuleQuery } = config
 
-      const debouncedState = debounce(
-        40,
-        combineState({ selectedCollateralTokenList, pricefeedMapQuery, activityTimeframe, matchRuleList })
-      )
+      const debouncedState = debounce(40, combineState({ collateralTokenList, activityTimeframe }))
       const positionParams = multicast(
         map(async (params) => {
           const list = await params.positionListQuery
@@ -68,7 +64,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
           )(
             $row(style({ flex: 1 }))(
               $SelectCollateralToken({
-                selectedList: selectedCollateralTokenList
+                selectedList: collateralTokenList
               })({
                 selectMarketTokenList: selectMarketTokenListTether()
               })
@@ -118,10 +114,7 @@ export const $ProfilePeformanceTimeline = (config: IProfilePeformanceTimeline) =
                       incrementColor: pallete.positive,
                       decrementColor: pallete.negative
                     }),
-                    $infoTooltipLabel(
-                      'The total combined settled and open trades',
-                      $text(style({ fontSize: '.85rem' }))('PnL')
-                    )
+                    $infoTooltipLabel('The total combined settled and open trades', $text('PnL'))
                   )
                 }, positionParams)
               )

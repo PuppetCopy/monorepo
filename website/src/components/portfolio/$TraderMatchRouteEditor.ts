@@ -1,6 +1,6 @@
 import { empty, map, mergeArray, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
-import { getMatchKey, type IMatchRule } from '@puppet/middleware/core'
+import { getMatchKey } from '@puppet/middleware/core'
 import { $caretDown, $icon } from '@puppet/middleware/ui-components'
 import { unixTimestampNow } from '@puppet/middleware/utils'
 import { $text, combineState, component, type IBehavior, type INodeCompose, style } from 'aelea/core'
@@ -8,20 +8,20 @@ import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-compone
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
+import type { IMatchingRule, ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $tokenTryLabeled } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
-import type { IMatchingRule } from '../../ponder.types.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $MatchRuleEditor, type IMatchingRuleEditorChange } from './$MatchRuleEditor.js'
 
 interface ITraderMatchingRouteEditor {
   trader: Address
-  matchedPuppetList: Address[]
-  collateralToken: Address
   userMatchingRuleList: IMatchingRule[]
+  matchedPuppetList: Hex[]
   $container?: INodeCompose
+  collateralToken: Address
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
@@ -29,7 +29,7 @@ export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style
 export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =>
   component(
     (
-      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchRule | undefined>,
+      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchingRule | undefined>,
       [discardDraft, discardDraftTether]: IBehavior<IMatchingRuleEditorChange>,
       [saveDraft, saveDraftTether]: IBehavior<IMatchingRuleEditorChange>
     ) => {
@@ -38,9 +38,9 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
         trader,
-        userMatchingRuleList,
         collateralToken,
-        matchedPuppetList
+        matchedPuppetList,
+        userMatchingRuleList
       } = config
 
       const matchingRule = userMatchingRuleList.length

@@ -50,7 +50,7 @@ export const $alertNegativeContainer = $row(
     maxWidth: '100%',
     borderRadius: '100px',
     alignItems: 'center',
-    fontSize: '.85rem',
+    fontSize: '1.2rem',
     border: `1px dashed ${pallete.negative}`,
     padding: '8px 12px'
   })
@@ -63,7 +63,7 @@ export const $alertPositiveContainer = $row(
     maxWidth: '100%',
     borderRadius: '100px',
     alignItems: 'center',
-    fontSize: '.85rem',
+    fontSize: '1.2rem',
     border: `1px dashed ${pallete.positive}`,
     padding: '8px 12px'
   })
@@ -77,7 +77,7 @@ export const $alertIntermediateContainer = (...$content: I$Node[]) =>
       maxWidth: '100%',
       borderRadius: '100px',
       alignItems: 'center',
-      fontSize: '.85rem',
+      fontSize: '1.2rem',
       padding: '9px 12px',
       position: 'relative',
       overflow: 'hidden'
@@ -184,7 +184,7 @@ export const $labeledDivider = (label: string | I$Slottable) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
     $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
-      $node(style({ fontSize: '.85rem' }))($toText(label)),
+      $node(style({ fontSize: '1.2rem' }))($toText(label)),
       $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))()
@@ -196,7 +196,7 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
     $icon({ $content: $iconPath, width: '34px', viewBox: '0 0 32 32' }),
     $column(layoutSheet.flex)(
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
-      $node(style({ fontSize: '.85rem', color: pallete.foreground }))($text(token.symbol))
+      $node(style({ fontSize: '1.2rem', color: pallete.foreground }))($text(token.symbol))
     ),
     $label ? $elipsisTextWrapper($label) : empty()
   )
@@ -279,8 +279,8 @@ interface Icon {
 export const $icon = ({ $content, width = '24px', viewBox = '0 0 32 32', fill = 'inherit', svgOps = O() }: Icon) =>
   $svg('svg')(attr({ viewBox, fill }), style({ width, aspectRatio: '1 /1' }), svgOps)($content)
 
-export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): I$Node => {
-  return $node($text(intermediateText(querySrc, hint)))
+export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): I$Slottable => {
+  return $text(intermediateText(querySrc, hint))
 }
 
 export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): Stream<string> => {

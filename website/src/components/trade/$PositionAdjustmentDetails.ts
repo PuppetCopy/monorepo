@@ -241,7 +241,7 @@
 //           $infoLabeledValue(
 //             'Price Impact',
 //             $row(spacing.small, style({ alignItems: 'center' }))(
-//               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(map(params => {
+//               $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(map(params => {
 //                 return `(${readablePercentage(getBasisPoints(params.priceImpactUsd, params.sizeDeltaUsd))} size)`
 //               }, combineState({ priceImpactUsd, sizeDeltaUsd }))),
 //               $pnlDisplay(priceImpactUsd, false)
@@ -253,7 +253,7 @@
 //           $infoLabeledValue(
 //             'Est Reward',
 //             $row(spacing.small, style({ alignItems: 'center' }))(
-//               $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(map(factor => {
+//               $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(map(factor => {
 //                 return `(${readableFactorPercentage(factor)} size)`
 //               }, positionFeeFactor)),
 //               $text('WIP')
@@ -269,7 +269,7 @@
 //                 $infoLabeledValue(
 //                   'Network cost',
 //                   $row(spacing.small, style({ alignItems: 'center' }))(
-//                     $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(map(params => {
+//                     $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(map(params => {
 //                       return `${readableTokenAmountLabel(getNativeTokenDescription(config.chain), params.executionFeeAfterBuffer)}`
 //                     }, combineState({ executionFeeAfterBuffer }))),
 //                     $text(style({ color: pallete.negative, alignSelf: 'flex-end', }))(map(params => {
@@ -283,7 +283,7 @@
 //                 $infoLabeledValue(
 //                   'Margin',
 //                   $row(spacing.small, style({ alignItems: 'center' }))(
-//                     $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(map(factor => {
+//                     $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(map(factor => {
 //                       return `(${readableFactorPercentage(factor)} Position size)`
 //                     }, positionFeeFactor)),
 //                     $pnlDisplay(marginFeeUsd, false)
@@ -387,7 +387,7 @@
 //               $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
 //                 $node(
 //                   $text('By using Puppet, i agree to the '),
-//                   $anchor(attr({ href: '/app/terms-and-conditions' }))($text('Terms & Conditions'))
+//                   $anchor(attr({ href: '/terms-and-conditions' }))($text('Terms & Conditions'))
 //                 ),
 //                 $ButtonPrimary({
 //                   $content: $text('Agree'),

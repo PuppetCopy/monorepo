@@ -61,6 +61,7 @@ export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
   sizeDeltaUsd: t.bigint().notNull(),
   sizeDeltaInTokens: t.bigint().notNull(),
   orderType: t.bigint().notNull(),
+  increasedAtTime: t.bigint().notNull(),
 
   collateralDeltaAmount: t.bigint().notNull(),
   priceImpactUsd: t.bigint().notNull(),
@@ -109,6 +110,7 @@ export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
   collateralDeltaAmount: t.bigint().notNull(),
   priceImpactDiffUsd: t.bigint().notNull(),
   orderType: t.bigint().notNull(),
+  decreasedAtTime: t.bigint().notNull(),
 
   priceImpactUsd: t.bigint().notNull(),
   basePnlUsd: t.bigint().notNull(),
@@ -180,7 +182,6 @@ export const traderRouteMetric = onchainTable('TraderRouteMetric', (t) => ({
   cumulativeCollateralUsd: t.bigint().notNull(),
   cumulativeSizeUsd: t.bigint().notNull(),
   cumulativeLongUsd: t.bigint().notNull(),
-  cumulativeShortUsd: t.bigint().notNull(),
 
   longShortRatio: t.bigint().notNull(),
   openPnl: t.bigint().notNull(),
@@ -198,7 +199,6 @@ export const traderRouteLatestMetric = onchainTable('TraderRouteLatestMetric', (
   collateralToken: t.hex().notNull(),
 
   cumulativeLongUsd: t.bigint().notNull(),
-  cumulativeShortUsd: t.bigint().notNull(),
   cumulativeCollateralUsd: t.bigint().notNull(),
   cumulativeSizeUsd: t.bigint().notNull(),
   settledSizeInUsd: t.bigint().notNull(),
@@ -214,6 +214,7 @@ export const traderRouteLatestMetric = onchainTable('TraderRouteLatestMetric', (
   lastUpdatedTimestamp: t.integer().notNull(),
   marketList: t.hex().array().notNull(),
   pnlList: t.bigint().array().notNull(),
+  openPositionList: t.hex().array().notNull(),
   pnlTimestampList: t.integer().array().notNull(),
   matchedPuppetList: t.hex().array().notNull(),
 

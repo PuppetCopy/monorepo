@@ -180,7 +180,7 @@ export const $Home = (config: ITreasury) =>
                   //       )
                   //     })({})
                   //   ),
-                  //   url: '/app/leaderboard', route: config.parentRoute.create({ fragment: 'fefe' })
+                  //   url: '/leaderboard', route: config.parentRoute.create({ fragment: 'fefe' })
                   // })({
                   //   click: linkClickTether()
                   // }),
@@ -218,7 +218,7 @@ export const $Home = (config: ITreasury) =>
                   //       )
                   //     })({})
                   //   ),
-                  //   url: '/app/trade', route: config.parentRoute.create({ fragment: 'fefe' })
+                  //   url: '/trade', route: config.parentRoute.create({ fragment: 'fefe' })
                   // })({
                   //   click: linkClickTether()
                   // }),

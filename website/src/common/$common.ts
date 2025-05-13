@@ -75,7 +75,7 @@ export const $entry = (pos: IPosition) => {
         isPositionSettled(pos)
           ? $infoLabeledValue(
               $label($text('Close Time')),
-              $node(style({ fontSize: '.85rem' }))($text(readableDate(pos.settledTimestamp)))
+              $node(style({ fontSize: '1.2rem' }))($text(readableDate(pos.settledTimestamp)))
             )
           : empty()
       ),
@@ -83,7 +83,7 @@ export const $entry = (pos: IPosition) => {
     })({}),
     $column(spacing.tiny)(
       $infoLabel($node(style({ fontSize: '.65rem', fontWeight: 'bold' }))($text(pos.isLong ? 'LONG' : 'SHORT'))),
-      $node(style({ fontSize: '.85rem' }))($text(readableUsd(pos.avgEntryPrice)))
+      $node(style({ fontSize: '1.2rem' }))($text(readableUsd(pos.avgEntryPrice)))
     )
   )
 }
@@ -146,31 +146,33 @@ export const $puppetList = (puppets?: viem.Address[], click?: IComposeBehavior<I
   // const cumulativeFee = tradeReader.vault.read('cumulativeFundingRates', pos.collateralToken)
 
   if (!puppets || puppets.length === 0) {
-    return $node(style({ fontSize: '0.85rem', color: pallete.foreground }))($text('-'))
+    return $node(style({ fontSize: '1.2rem', color: pallete.foreground }))($text('-'))
   }
 
   return $row(style({ cursor: 'pointer' }))(
     ...puppets.map((account) => {
       if (!click) {
-        return style({ marginRight: '-12px', border: '2px solid black' })($profileAvatar({ account, profileSize: 25 }))
+        return style({ marginRight: '-12px', border: '2px solid black' })(
+          $profileAvatar({ address: account, size: 25 })
+        )
       }
 
       return click(
         nodeEvent('click'),
         map(() => {
-          const url = `/app/profile/position/${account}`
+          const url = `/profile/position/${account}`
 
           history.pushState({}, '', url)
           return url
         })
-      )(style({ marginRight: '-12px', border: '2px solid black' })($profileAvatar({ account, profileSize: 25 })))
+      )(style({ marginRight: '-12px', border: '2px solid black' })($profileAvatar({ address: account, size: 25 })))
     })
     // $content
   )
 }
 
 export const $leverage = (size: bigint, collateral: bigint) => {
-  return $node(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '0.85rem' }))(
+  return $node(style({ fontWeight: 'bold', letterSpacing: '0.05em', fontSize: '1.2rem' }))(
     $text(readableLeverage(size, collateral))
   )
 }
@@ -223,7 +225,7 @@ export const $positionRoi = (pos: IPosition, puppet?: viem.Address) => {
         const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
         return readablePercentage(getBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
       }, latestPrice)
-  return $node(style({ fontSize: '.85rem' }))($text(roi))
+  return $node(style({ fontSize: '1.2rem' }))($text(roi))
 }
 
 export function $liquidationSeparator(
@@ -261,7 +263,7 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
     showLabel
       ? $column(layoutSheet.flex)(
           $node(style({ fontWeight: 'bold' }))($text(indexTokenDescription.symbol)),
-          $node(style({ fontSize: '.75rem', color: pallete.foreground }))(
+          $node(style({ fontSize: '1.1rem', color: pallete.foreground }))(
             $text(`${longTokenDescription.symbol}/${shortTokenDescription.symbol}`)
           )
         )
@@ -340,24 +342,27 @@ interface ITraderDisplay {
   trader: viem.Address
   route: router.Route
   puppetList: viem.Address[]
-  labelSize?: string
+  labelSize?: number
   profileSize?: number
 }
 export const $TraderDisplay = (config: ITraderDisplay) =>
   component(([click, clickTether]: IBehavior<any, viem.Address>) => {
-    const { route, trader, puppetList } = config
+    const { route, trader, puppetList, labelSize, profileSize } = config
 
     return [
       $Link({
         $content: $row(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
-          $profileAvatar({ ...config, account: trader }),
+          $profileAvatar({ ...config, address: trader }),
           $column(style({ gap: '3px' }))(
-            $AccountLabel(trader),
+            $AccountLabel({
+              address: trader,
+              primarySize: labelSize
+            }),
             puppetList.length > 0
               ? $row(style({ alignItems: 'center' }))(
                   ...puppetList.map((puppet) => {
                     return style({ marginRight: '-12px', border: '2px solid black' })(
-                      $profileAvatar({ account: puppet, profileSize: 25 })
+                      $profileAvatar({ address: puppet, size: 25 })
                     )
                   }),
                   $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))($text(`${puppetList.length}`))
@@ -368,7 +373,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
           )
         ),
         route: route.create({ fragment: 'baseRoute' }),
-        url: `/app/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`
+        url: `/profile/${IWalletTab.TRADER.toLowerCase()}/${trader}`
       })({ click: clickTether() }),
 
       { click }

@@ -1,7 +1,7 @@
 import { empty, map, mergeArray, now, sample, snapshot, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet/middleware/const'
-import { $Checkbox, $FieldLabeled } from '@puppet/middleware/ui-components'
+import { $Checkbox, $FieldLabeled, Optional } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet/middleware/utils'
 import {
@@ -19,17 +19,15 @@ import {
 } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
-import type { Address, Hex } from 'viem'
+import type { Address, Hex, Prettify } from 'viem'
+import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
-import type { IMatchingRule } from '../../ponder.types.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 
 export interface IMatchingRuleEditorChange {
-  allowanceRate: bigint
-  throttleActivity: bigint
-  expiry: bigint
+  model: Prettify<Partial<IMatchingRule>>
   matchingKey: Hex
   collateralToken: Address
   trader: Address
@@ -175,9 +173,18 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
         ),
 
         {
-          save: snapshot((draft) => ({ ...draft, collateralToken, trader, matchingKey }), change, saveMatchRule),
+          save: snapshot(
+            (draft): IMatchingRuleEditorChange => ({ collateralToken, trader, matchingKey, model: draft }),
+            change,
+            saveMatchRule
+          ),
           remove: snapshot(
-            (draft): IMatchingRuleEditorChange => ({ ...draft, matchingKey, collateralToken, trader, expiry: 0n }),
+            (draft): IMatchingRuleEditorChange => ({
+              matchingKey,
+              collateralToken,
+              trader,
+              model: { ...draft, expiry: 0n }
+            }),
             change,
             clickRemove
           )

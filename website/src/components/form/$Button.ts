@@ -63,7 +63,7 @@ export const $defaultButtonSecondary = $defaultButtonCore(
 )
 
 export const $defaultMiniButtonSecondary = $defaultButtonSecondary(
-  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.85rem' })
+  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '1.2rem' })
 )
 
 export const $buttonAnchor = $element('a')(

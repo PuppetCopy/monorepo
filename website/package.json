@@ -29,7 +29,7 @@
     "drizzle-orm": "0.43.1",
     "lightweight-charts": "5.0.6",
     "mersenne-twister": "1.1.0",
-    "ponder": "0.10.24",
+    "ponder": "0.10.26",
     "viem": "2.29.2"
   },
   "devDependencies": {

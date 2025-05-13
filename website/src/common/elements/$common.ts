@@ -53,7 +53,7 @@ export const $labeledDivider = (label: string | I$Node, displayIcon = true) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))(),
     $row(spacing.small, style({ alignItems: 'center' }))(
-      isStream(label) ? label : $node(style({ fontSize: '.85rem' }))($text(label)),
+      isStream(label) ? label : $node(style({ fontSize: '1.2rem' }))($text(label)),
       displayIcon
         ? $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
         : empty()

@@ -1,6 +1,5 @@
-import { empty, map, now, startWith } from '@most/core'
-import type { Time } from '@most/types'
-import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
+import { awaitPromises, empty, map, now, startWith } from '@most/core'
+import { ADDRESS_ZERO, type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import {
   $Baseline,
   $ButtonToggle,
@@ -15,6 +14,7 @@ import {
   $Table,
   type IMarker,
   type IQuantumScrollPage,
+  type ISeriesTime,
   type ISortBy,
   type TableColumn
 } from '@puppet/middleware/ui-components'
@@ -30,24 +30,28 @@ import {
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type BaselineData, LineType } from 'lightweight-charts'
-import { asc, desc } from 'ponder'
+import { arrayContains } from 'drizzle-orm'
+import { type BaselineData, LineType, type Time } from 'lightweight-charts'
+import { asc, desc, inArray } from 'ponder'
 import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
+import type { ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
 import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
 import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
-import { $TraderMatchingRouteEditor } from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import {
+  $defaultTraderMatchRouteEditorContainer,
+  $TraderMatchingRouteEditor
+} from '../../components/portfolio/$TraderMatchRouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
-import type { ITraderRouteLatestMetric } from '../../ponder.types.js'
 import { $seperator2 } from '../common.js'
-import type { IPageFilterParams, IUserActivityPageParams } from '../type.js'
+import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
 
-interface ILeaderboard extends IPageFilterParams {
+interface ILeaderboard extends IPageFilterParams, IPageParams {
   user: IUserActivityPageParams
 }
 
@@ -58,7 +62,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       [sortByChange, sortByChangeTether]: IBehavior<ISortBy<ITraderRouteLatestMetric>>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
       [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
@@ -91,7 +95,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' })
             )(
               $SelectCollateralToken({ selectedList: collateralTokenList })({
-                selectMarketTokenList: selectMarketTokenListTether()
+                selectMarketTokenList: selectCollateralTokenListTether()
               }),
               $ButtonToggle({
                 selected: isLong,
@@ -129,6 +133,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             : f.lte(t.longShortRatio, 5000n)
                           : undefined,
                         // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                        params.collateralTokenList.length > 0
+                          ? f.inArray(t.collateralToken, params.collateralTokenList)
+                          : undefined,
                         f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
                       ),
                     limit: filterParams.paging.pageSize,
@@ -146,6 +153,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       cumulativeCollateralUsd: true,
                       cumulativeSizeUsd: true,
                       longShortRatio: true,
+                      openPositionList: true,
                       roi: true,
                       pnl: true,
                       pnlList: true,
@@ -154,16 +162,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     }
                   })
 
-                  const userMatchingRuleList = await params.matchingRuleQuery
-
                   const page = metrictList.map((metric) => {
-                    return { metric, userMatchingRuleList }
+                    return { metric }
                   })
                   return { ...filterParams.paging, page }
                 },
                 combineState({
-                  paging,
-                  collateralTokenList
+                  paging
                 })
               )
 
@@ -187,9 +192,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   })
                 },
                 {
-                  $head: $text('Routes'),
-                  gridTemplate: isDesktopScreen ? '210px' : undefined,
-                  $bodyCallback: map((pos) => {
+                  $head: $text('Route'),
+                  gridTemplate: isDesktopScreen ? '122px' : undefined,
+                  $bodyCallback: map((routeMetric) => {
                     // const _tokenList = [
                     //   ...new Set([
                     //     ...pos.increaseList.map((x) => x.indexToken),
@@ -204,14 +209,16 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     //     )
                     //   )
                     // )
-                    return $TraderMatchingRouteEditor({
-                      matchedPuppetList: pos.metric.matchedPuppetList,
-                      collateralToken: pos.metric.collateralToken,
-                      userMatchingRuleList: pos.userMatchingRuleList,
-                      trader: pos.metric.account
-                    })({
-                      changeMatchRuleList: changeMatchRuleListTether()
-                    })
+                    return switchMap((list) => {
+                      return $TraderMatchingRouteEditor({
+                        collateralToken: routeMetric.metric.collateralToken,
+                        matchedPuppetList: routeMetric.metric.matchedPuppetList,
+                        userMatchingRuleList: list,
+                        trader: routeMetric.metric.account
+                      })({
+                        changeMatchRuleList: changeMatchRuleListTether()
+                      })
+                    }, awaitPromises(matchingRuleQuery))
                   })
                 },
                 ...(isDesktopScreen
@@ -285,21 +292,38 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       }
                     })
 
-                    const markerList = pos.metric.pnlTimestampList
-                      .map((timestmap) => ({
-                        position: 'inBar',
-                        color: colorAlpha(pallete.message, 0.15),
-                        time: timestmap as Time,
-                        size: 0.1,
-                        shape: 'circle'
-                      }))
+                    const markerList: IMarker[] = pos.metric.pnlTimestampList
+                      .map(
+                        (timestmap): IMarker => ({
+                          position: 'inBar',
+                          color: colorAlpha(pallete.message, 0.15),
+                          time: timestmap as Time,
+                          shape: 'circle'
+                        })
+                      )
                       .sort((a, b) => Number(a.time) - Number(b.time))
+
+                    if (pos.metric.openPositionList.length > 0) {
+                      markerList.push({
+                        position: 'inBar',
+                        color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
+                        time: unixTimestampNow() as Time,
+                        shape: 'circle'
+                      })
+                      markerList.push({
+                        position: 'inBar',
+                        color: colorAlpha(pos.metric.pnl > 0 ? pallete.positive : pallete.negative, 0.25),
+                        time: unixTimestampNow() as Time,
+                        size: 2.25,
+                        shape: 'circle'
+                      })
+                    }
 
                     return $row(style({ position: 'relative', flex: 1, height: '100%' }))(
                       $row(style({ position: 'relative', pointerEvents: 'none', width: '100%' }))(
                         $Baseline({
                           containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
-                          markers: now(markerList as IMarker[]),
+                          markers: now(markerList),
                           chartConfig: {
                             width: 100,
                             leftPriceScale: {
@@ -325,7 +349,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             }
                             // ...config.chartConfig
                           },
-                          data: timeline as any as BaselineData[],
+                          data: timeline as any as BaselineData<ISeriesTime>[],
                           // containerOp: style({  inset: '0px 0px 0px 0px' }),
                           baselineOptions: {
                             baseValue: {
@@ -349,7 +373,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         $column(spacing.tiny)(
                           $roiDisplay(pos.metric.roi),
                           $seperator2,
-                          $node(style({ fontSize: '.85rem' }))($text(readablePnl(pos.metric.pnl)))
+                          $node(style({ fontSize: '1.2rem' }))($text(readablePnl(pos.metric.pnl)))
                         )
                       )
                     )
@@ -392,14 +416,14 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ sortBy, activityTimeframe, isLong, matchingRuleQuery, account }))
+            }, combineState({ sortBy, activityTimeframe, isLong, account, collateralTokenList }))
           )
         ),
 
         {
           routeChange,
           changeActivityTimeframe,
-          selectMarketTokenList,
+          selectCollateralTokenList,
           changeMatchRuleList
         }
       ]

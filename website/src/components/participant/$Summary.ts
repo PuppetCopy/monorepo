@@ -1,6 +1,5 @@
 import { map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
-import { accountSettledPositionListSummary, type IPosition } from '@puppet/middleware/core'
 import { intermediateText } from '@puppet/middleware/ui-components'
 import { readableLeverage, readableUsd } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, style } from 'aelea/core'
@@ -9,6 +8,7 @@ import { pallete } from 'aelea/ui-components-theme'
 import type * as viem from 'viem'
 import { $heading2 } from '../../common/$text.js'
 import { $profileDisplay } from '../$AccountProfile.js'
+import { accountSettledPositionListSummary } from '../../pages/common.js'
 
 export interface IAccountSummary {
   positionListQuery: Stream<Promise<IPosition[]>>
@@ -48,7 +48,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
             $profileDisplay({
               account,
               labelSize: '22px',
-              profileSize: isDesktopScreen ? 90 : 90
+              size: isDesktopScreen ? 90 : 90
             })
           ),
           $row(spacing.big, style({ alignItems: 'flex-end' }))(
@@ -107,7 +107,7 @@ export const $metricLabel = $row(
   style({
     color: pallete.foreground,
     letterSpacing: '1px',
-    fontSize: isDesktopScreen ? '.85rem' : '.85rem'
+    fontSize: isDesktopScreen ? '1.2rem' : '1.2rem'
   })
 )
 export const $metricValue = $row(style({ fontWeight: 900, letterSpacing: '1px', fontSize: '1.85rem' }))

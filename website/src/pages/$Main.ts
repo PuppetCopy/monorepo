@@ -32,6 +32,7 @@ import { fadeIn } from '../transitions/enter.js'
 import { wallet } from '../wallet/wallet.js'
 import { $rootContainer } from './common.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
+import { $PublicUserPage } from './user/$PublicUser.js'
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -51,7 +52,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [clickUpdateVersion, clickUpdateVersionTether]: IBehavior<any, bigint>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<viem.Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<viem.Address[]>,
 
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
@@ -74,24 +75,28 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const rootRoute = router.create({ fragment: baseRoute, title: 'Puppet', fragmentsChange })
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
-      const _profileRoute = rootRoute.create({ fragment: 'profile' })
+      const profileRoute = rootRoute.create({ fragment: 'profile' })
       const walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
-      const _tradeRoute = rootRoute.create({ fragment: 'trade' })
-      const _tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
+      const tradeRoute = rootRoute.create({ fragment: 'trade' })
+      const tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
 
       const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
-      const _adminRoute = rootRoute.create({ fragment: 'admin' })
+      const adminRoute = rootRoute.create({ fragment: 'admin' })
 
-      const _opengraph = rootRoute.create({ fragment: 'og' })
+      const opengraph = rootRoute.create({ fragment: 'og' })
 
-      const _$liItem = $element('li')(style({ marginBottom: '14px' }))
+      const $liItem = $element('li')(style({ marginBottom: '14px' }))
 
       const isDesktopScreen = skipRepeats(
         map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window)))
       )
 
       const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
-      const collateralTokenList = uiStorage.replayWrite(localStore.global, selectMarketTokenList, 'collateralTokenList')
+      const collateralTokenList = uiStorage.replayWrite(
+        localStore.global,
+        selectCollateralTokenList,
+        'collateralTokenList'
+      )
 
       const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
 
@@ -187,22 +192,30 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                           }
                         })({
                           changeActivityTimeframe: changeActivityTimeframeTether(),
-                          selectMarketTokenList: selectMarketTokenListTether(),
+                          selectCollateralTokenList: selectCollateralTokenListTether(),
                           routeChange: changeRouteTether(),
                           changeMatchRuleList: changeMatchRuleListTether()
                         })
                       )
                     )
                   ),
-                  // // router.contains(profileRoute)(
-                  // //   $midContainer(
-                  // //     fadeIn($PublicUserPage({ route: profileRoute,  pricefeedMapQuery, activityTimeframe, selectedCollateralTokenList, providerClientQuery, matchRuleList, depositTokenList })({
-                  // //       changeActivityTimeframe: changeActivityTimeframeTether(),
-                  // //       changeMatchRuleList: changeMatchRuleListTether(),
-                  // //       changeRoute: changeRouteTether(),
-                  // //     }))
-                  // //   )
-                  // // ),
+                  router.contains(profileRoute)(
+                    $midContainer(
+                      fadeIn(
+                        $PublicUserPage({
+                          route: profileRoute,
+                          collateralTokenList,
+                          matchingRuleQuery,
+                          activityTimeframe,
+                          depositTokenList
+                        })({
+                          changeActivityTimeframe: changeActivityTimeframeTether(),
+                          changeMatchRuleList: changeMatchRuleListTether(),
+                          changeRoute: changeRouteTether()
+                        })
+                      )
+                    )
+                  ),
                   // router.contains(adminRoute)(
                   //   $Admin({  providerClientQuery })({
                   //     changeWallet: changeWalletTether(),

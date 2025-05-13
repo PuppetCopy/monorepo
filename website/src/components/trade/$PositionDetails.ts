@@ -54,7 +54,7 @@
 //               const isKeeperReq = 'slippage' in req
 //               const timestamp = isKeeperReq ? unixTimestampNow() : Number(req.blockTimestamp)
 
-//               return $column(spacing.tiny, style({ fontSize: '.85rem' }))(
+//               return $column(spacing.tiny, style({ fontSize: '1.2rem' }))(
 //                 $text(getTimeSince(timestamp)),
 //                 $text(readableDate(timestamp)),
 //               )

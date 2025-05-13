@@ -267,7 +267,7 @@
 //           return empty()
 //         }
 
-//         return $text(style({ color: pallete.negative, fontSize: '.85rem', minHeight: '17px' }))(msg)
+//         return $text(style({ color: pallete.negative, fontSize: '1.2rem', minHeight: '17px' }))(msg)
 //       }, alert))
 
 //     ),

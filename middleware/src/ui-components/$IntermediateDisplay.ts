@@ -130,7 +130,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
     }),
     $loader: switchLatest(
       map((c) => {
-        return $row(spacing.small, style({ alignItems: 'center', fontSize: '.85rem' }))(
+        return $row(spacing.small, style({ alignItems: 'center', fontSize: '1.2rem' }))(
           $spinner,
           $text(
             startWith(

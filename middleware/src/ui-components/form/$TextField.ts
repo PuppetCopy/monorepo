@@ -83,7 +83,7 @@ export const $FieldLabeled = ({
           )
         ),
         $row(
-          style({ fontSize: '.85rem', minHeight: '1rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' })
+          style({ fontSize: '1.2rem', minHeight: '1rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' })
         )(hint ? $text(hint) : empty())
       ),
 

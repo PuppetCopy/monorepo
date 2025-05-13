@@ -920,7 +920,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                   //     $infoLabeledValue(
                   //       $infoTooltipLabel(`Protocol revenue from Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Bought-back'),
                   //       $row(spacing.small, style({ alignItems: 'center' }))(
-                  //         // $text(style({ color: pallete.foreground, fontSize: '.75rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
+                  //         // $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
                   //         $text(readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
                   //       ),
                   //     )

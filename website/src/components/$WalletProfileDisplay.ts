@@ -28,8 +28,8 @@ export const $walletProfileDisplay = () => {
           $disconnectedWalletDisplay(),
           $seperator2,
           $column(
-            style({ fontSize: '.75rem' })($node($text('Click to'))),
-            style({ fontSize: '.75rem', fontWeight: 'bold' })($node($text('Connect')))
+            style({ fontSize: '1.1rem' })($node($text('Click to'))),
+            style({ fontSize: '1.1rem', fontWeight: 'bold' })($node($text('Connect')))
           )
         )
       }
@@ -39,7 +39,7 @@ export const $walletProfileDisplay = () => {
         style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' })
       )(
         accountInfo.address
-          ? $profileDisplay({ account: accountInfo.address })
+          ? $profileDisplay({ address: accountInfo.address })
           : style({ cursor: 'pointer' }, $disconnectedWalletDisplay())
 
         // $seperator2,
