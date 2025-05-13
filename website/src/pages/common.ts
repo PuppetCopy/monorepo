@@ -36,7 +36,7 @@ export const $rootContainer = $column(
 )
 
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
-  const sortedUpdateList = list.sort((a, b) => b.blockTimestamp - a.blockTimestamp)
+  const sortedUpdateList = list.sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const openPositionMap = new Map<Hex, IPosition>()
   const positionList: IPosition[] = []
 

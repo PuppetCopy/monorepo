@@ -42,7 +42,7 @@ export const $TraderPage = (config: ITraderPage) =>
 
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 
-      const routeMetricListQuery = map(async (params) => {
+      const routeMetricListQuery = multicast(map(async (params) => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
         const routeMetricList = await queryDb.query.traderRouteLatestMetric.findMany({
@@ -60,7 +60,7 @@ export const $TraderPage = (config: ITraderPage) =>
         })
 
         return routeMetricList
-      }, combineState({ activityTimeframe, collateralTokenList }))
+      }, combineState({ activityTimeframe, collateralTokenList })))
 
       const metricsQuery = multicast(
         map(async (metricList) => {
