@@ -1,14 +1,14 @@
 import { getMarketIndexToken, getTokenDescription } from '@puppet/middleware/gmx'
 import { factor } from '@puppet/middleware/utils'
-import { $node, $text, style } from 'aelea/core'
-import { $column, $row, $seperator, isMobileScreen } from 'aelea/ui-components'
+import { $node, $text, O, style } from 'aelea/core'
+import { $column, $row, $seperator, isDesktopScreen, isMobileScreen } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
 import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } from '../__generated__/ponder.types'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
 
 export const $metricEntry = (label: string, value: string) =>
-  $row(style({ fontSize: '1.2rem', alignItems: 'center' }))(
+  $row(style({ fontSize: '.8rem', alignItems: 'center' }))(
     $node(style({ color: pallete.foreground, flex: 1 }))($text(label)),
     $node(style({ fontWeight: 'bold' }))($text(value))
   )
@@ -16,23 +16,6 @@ export const $metricEntry = (label: string, value: string) =>
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
   $seperator
-)
-
-export const $rootContainer = $column(
-  style({
-    color: pallete.message,
-    fill: pallete.message,
-    // position: 'relative',
-    // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
-    backgroundColor: pallete.horizon,
-    fontSize: '1.6rem',
-    // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
-    minHeight: '100vh',
-    fontWeight: 400
-    // flexDirection: 'row',
-  }),
-
-  isMobileScreen ? style({ userSelect: 'none' }) : style({})
 )
 
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {

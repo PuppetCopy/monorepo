@@ -9,8 +9,8 @@ export const $ThemePicker = (theme: Stream<Theme>) =>
   component(([changeTheme, changeThemeTether]: any) => {
     return [
       $row(
-        spacing.default,
-        style({ cursor: 'pointer' }),
+        spacing.small,
+        style({ cursor: 'pointer', alignItems: 'center' }),
         stylePseudo(':hover', { fill: pallete.primary, color: pallete.primary }),
         changeThemeTether(
           nodeEvent('click'),

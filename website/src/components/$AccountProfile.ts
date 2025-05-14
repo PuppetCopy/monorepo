@@ -1,7 +1,7 @@
 // import { blueberrySubgraph } from "@gambitdao/gbc-middleware"
 import { empty } from '@most/core'
 import { $node, $text, type INodeCompose, style } from 'aelea/core'
-import { $column, $row, spacing } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $jazzicon } from '../common/$avatar.js'
@@ -30,7 +30,7 @@ export const $profileDisplay = ({
   )
 }
 
-export const $profileAvatar = ({ address, size = 50 }: { address: Address; size?: number }) => {
+export const $profileAvatar = ({ address, size = isDesktopScreen ? 50 : 36 }: { address: Address; size?: number }) => {
   // const profileEv = awaitPromises(blueberrySubgraph.owner(now({ id: account.toLowerCase() })))
 
   return $row(style({ width: `${size}px`, borderRadius: '50%', overflow: 'hidden', height: `${size}px` }))(
@@ -55,7 +55,7 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
         alignItems: 'center'
       })
     )($node(style({ fontWeight: 800, color: pallete.foreground }))($text('?'))),
-    $column(style({ whiteSpace: 'nowrap', fontSize: '1.2rem', alignItems: 'center' }))(
+    $column(style({ whiteSpace: 'nowrap', fontSize: '.8rem', alignItems: 'center' }))(
       $node(style({}))($text('0x----')),
       $node(style({ fontSize: '1.55em', lineHeight: 1 }))($text('----'))
     )
@@ -65,7 +65,7 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
 export const $AccountLabel = ({
   address,
   $container = $column,
-  primarySize = 1.6,
+  primarySize = 1,
   secondarySize = primarySize * 0.85
 }: {
   address: string

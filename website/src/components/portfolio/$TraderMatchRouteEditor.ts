@@ -63,7 +63,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           }, popRouteSubscriptionEditor),
           dismiss: mergeArray([saveDraft, discardDraft]),
           $target: $ButtonSecondary({
-            $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '12px' : '4px' }))(
+            $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '8px' : '4px' }))(
               $row(style({ alignItems: 'center' }))(
                 $tokenTryLabeled(collateralToken),
                 isMobileScreen

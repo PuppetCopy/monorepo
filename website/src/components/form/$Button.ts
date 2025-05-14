@@ -31,7 +31,7 @@ export const $defaultButtonPrimary = $defaultButtonCore(
     fill: 'white',
     borderRadius: '30px',
     alignSelf: 'flex-end',
-    fontSize: '1.6rem',
+    fontSize: '1rem',
 
     height: '48px',
     padding: '0 24px',
@@ -50,7 +50,7 @@ const secondaryButtonStyle = style({
   borderStyle: 'solid',
   alignSelf: 'flex-start',
   height: '48px',
-  fontSize: '1.6rem',
+  fontSize: '1rem',
   backgroundColor: pallete.background,
   padding: '0 24px',
   fontWeight: 'bold',
@@ -64,7 +64,7 @@ export const $defaultButtonSecondary = $defaultButtonCore(
 )
 
 export const $defaultMiniButtonSecondary = $defaultButtonSecondary(
-  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '1.2rem' })
+  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.8rem' })
 )
 
 export const $buttonAnchor = $element('a')(

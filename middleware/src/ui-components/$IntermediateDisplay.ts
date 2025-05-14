@@ -108,7 +108,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
     }, multicastQuery),
     $loader: switchLatest(
       map((c) => {
-        return $row(spacing.small, style({ alignItems: 'center', fontSize: '1.2rem' }))(
+        return $row(spacing.small, style({ alignItems: 'center', fontSize: '.8rem' }))(
           $spinner,
           $text(
             startWith(

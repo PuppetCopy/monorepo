@@ -21,7 +21,7 @@ import { isPositionSettled } from '../../utils/utils.js'
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
   $column(style({ textAlign: 'right', whiteSpace: 'nowrap' }))(
     $node(style({ fontWeight: 'bold' }))($text(primaryLabel)),
-    $node(style({ fontSize: '1.2rem' }))($text(secondaryLabel))
+    $node(style({ fontSize: '.8rem' }))($text(secondaryLabel))
   )
 
 export const sizeColumn = (puppet?: Address): TableColumn<IPosition> => ({
@@ -100,7 +100,7 @@ export const pnlColumn = (puppet?: Address): TableColumn<IPosition> => ({
           ),
           $seperator2,
           // $liquidationSeparator(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, pos.lastUpdate.collateralAmount, latestPrice),
-          $node(style({ fontSize: '1.2rem' }))(
+          $node(style({ fontSize: '.8rem' }))(
             $text(
               map((value) => {
                 return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
@@ -118,7 +118,7 @@ export const timeColumn: TableColumn<IPosition> = {
   $bodyCallback: map((pos) => {
     return $column(spacing.tiny)(
       $text(getTimeSince(pos.openTimestamp)),
-      $row(spacing.small)($node(style({ fontSize: '1.2rem' }))($text(readableDate(pos.openTimestamp))))
+      $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.openTimestamp))))
     )
   })
 }

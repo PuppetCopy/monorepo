@@ -178,12 +178,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
               const columns: TableColumn<ILeaderboardCellData>[] = [
                 {
                   $head: $text('Trader'),
-                  gridTemplate: '149px',
+                  gridTemplate: isDesktopScreen ? '149px' : '136px',
                   // columnOp: style({ placeContent: 'flex-end' }),
                   $bodyCallback: map((pos) => {
                     return $TraderDisplay({
                       route: config.route,
-                      trader: pos.metric.account,
+                      address: pos.metric.account,
                       puppetList: []
                       // puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
                     })({
@@ -269,7 +269,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     )
                   ),
                   sortBy: 'roi',
-                  gridTemplate: isDesktopScreen ? '200px' : '140px',
+                  gridTemplate: isDesktopScreen ? '200px' : '110px',
                   $bodyCallback: map((pos) => {
                     const endTime = unixTimestampNow()
                     const startTime = endTime - params.activityTimeframe
@@ -373,7 +373,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         $column(spacing.tiny)(
                           $roiDisplay(pos.metric.roi),
                           $seperator2,
-                          $node(style({ fontSize: '1.2rem' }))($text(readablePnl(pos.metric.pnl)))
+                          $node(style({  }))($text(readablePnl(pos.metric.pnl)))
                         )
                       )
                     )

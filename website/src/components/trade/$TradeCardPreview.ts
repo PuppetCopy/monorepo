@@ -114,7 +114,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                       // }),
                       // $text(readableFixedUSD30(config.position.averagePrice))
                     )
-                    // $row(spacing.small, style({ color: isSettled ? '' : pallete.indeterminate, fontSize: '1.2rem' }))(
+                    // $row(spacing.small, style({ color: isSettled ? '' : pallete.indeterminate, fontSize: '.8rem' }))(
                     //   $text(tradeTitle(mirroredPosition)),
                     //   $row(style({ gap: '3px', alignItems: 'baseline' }))(
                     //     $icon({
@@ -144,7 +144,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
               //   : $column(spacing.tiny, style({ textAlign: 'center' }))(
               //     $text(readableUSD(mirroredPosition.size)),
               //     $seperator,
-              //     style({ textAlign: 'center', fontSize: '1.2rem' }, $text(style({ fontWeight: 'bold' }))(`${readableNumber(bnDiv(mirroredPosition.size, mirroredPosition.collateral))}x`)),
+              //     style({ textAlign: 'center', fontSize: '.8rem' }, $text(style({ fontWeight: 'bold' }))(`${readableNumber(bnDiv(mirroredPosition.size, mirroredPosition.collateral))}x`)),
               //   ),
 
               // $row(style({ flex: 1 }))(),
@@ -171,7 +171,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                 !config.mp
                   ? $node(
                       style({
-                        fontSize: '1.2rem',
+                        fontSize: '.8rem',
                         color: pallete.foreground,
                         textAlign: 'center'
                       })
@@ -197,7 +197,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                   }),
                   $infoTooltipLabel(
                     'The total combined settled and open trades',
-                    $textNode(style({ fontSize: '1.2rem' }))('PnL')
+                    $textNode(style({ fontSize: '.8rem' }))('PnL')
                   )
                 )
               ),
@@ -257,7 +257,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
             //         })
             //       )
             //       : $text(tickerStyle, styleBehavior(map(pnl => ({ color: pnl > 0 ? pallete.positive : pallete.negative }), chartRealisedPnl)))(map(O(Math.floor, x => `${x > 0 ? '+' : ''}` + x.toLocaleString()), chartRealisedPnl)),
-            //     $text(style({ fontSize: '1.2rem', color: pallete.foreground }))('$'),
+            //     $text(style({ fontSize: '.8rem', color: pallete.foreground }))('$'),
             //   ),
             //   // $liquidationSeparator(liqPercentage),
             //   $row(style({ fontSize: '1.85rem', alignItems: 'baseline' }))(

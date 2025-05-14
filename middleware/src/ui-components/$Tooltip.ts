@@ -100,7 +100,7 @@ export const $Tooltip = ({
                     ([contentRect], [targetRect]) => {
                       const { bottom, top, left, right, height } = targetRect.intersectionRect
                       const { width } = contentRect.boundingClientRect
-                      const rootBounds = contentRect.rootBounds!
+                      const rootBounds = contentRect.rootBounds ?? document.body.getBoundingClientRect()
 
                       const bottomSpcace = rootBounds.height - bottom
                       const goDown = bottomSpcace > bottom

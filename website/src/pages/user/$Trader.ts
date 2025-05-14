@@ -42,25 +42,27 @@ export const $TraderPage = (config: ITraderPage) =>
 
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 
-      const routeMetricListQuery = multicast(map(async (params) => {
-        const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+      const routeMetricListQuery = multicast(
+        map(async (params) => {
+          const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
-        const routeMetricList = await queryDb.query.traderRouteLatestMetric.findMany({
-          where: (t, f) =>
-            f.and(
-              f.eq(t.account, account),
-              f.eq(t.interval, params.activityTimeframe),
+          const routeMetricList = await queryDb.query.traderRouteLatestMetric.findMany({
+            where: (t, f) =>
+              f.and(
+                f.eq(t.account, account),
+                f.eq(t.interval, params.activityTimeframe),
 
-              // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-              params.collateralTokenList.length > 0
-                ? f.inArray(t.collateralToken, params.collateralTokenList)
-                : undefined,
-              f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
-            )
-        })
+                // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                params.collateralTokenList.length > 0
+                  ? f.inArray(t.collateralToken, params.collateralTokenList)
+                  : undefined,
+                f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
+              )
+          })
 
-        return routeMetricList
-      }, combineState({ activityTimeframe, collateralTokenList })))
+          return routeMetricList
+        }, combineState({ activityTimeframe, collateralTokenList }))
+      )
 
       const metricsQuery = multicast(
         map(async (metricList) => {
@@ -137,10 +139,10 @@ export const $TraderPage = (config: ITraderPage) =>
               })
             )(
               $row(spacing.small, style({ textDecoration: 'none', alignItems: 'center' }))(
-                $profileAvatar({ address: account, size: isDesktopScreen ? 80 : 50 }),
+                $profileAvatar({ address: account, size: isDesktopScreen ? 65 : 50 }),
                 $AccountLabel({
                   address: account,
-                  primarySize: 2.25
+                  primarySize: 1.65
                 })
               ),
               $row(spacing.big, style({ alignItems: 'flex-end' }))(

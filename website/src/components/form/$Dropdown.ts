@@ -439,7 +439,7 @@ export const $DropMultiSelect = <T>({
                 return empty()
               }
 
-              return $node(style({ color: pallete.negative, fontSize: '1.2rem', minHeight: '17px' }))($text(msg))
+              return $node(style({ color: pallete.negative, fontSize: '.8rem', minHeight: '17px' }))($text(msg))
             }, alert)
           )
         ),

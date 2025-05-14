@@ -107,7 +107,7 @@ export const $metricLabel = $row(
   style({
     color: pallete.foreground,
     letterSpacing: '1px',
-    fontSize: isDesktopScreen ? '1.2rem' : '1.2rem'
+    fontSize: isDesktopScreen ? '.8rem' : '.8rem'
   })
 )
-export const $metricValue = $row(style({ fontWeight: 900, letterSpacing: '1px', fontSize: '1.85rem' }))
+export const $metricValue = $row(style({ fontWeight: 900, letterSpacing: '1px' }))
