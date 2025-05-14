@@ -54,7 +54,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
 
           const data = timeline
           const value = data[data.length - 1]?.value
-          return value || null
+          return value ?? null
         }, combineState({ pnlCrossHairTimeChange }))
       )
 

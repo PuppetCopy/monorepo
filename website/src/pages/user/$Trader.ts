@@ -1,7 +1,13 @@
 import { awaitPromises, map, multicast, now, startWith } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $intermediateText, $Table, type IQuantumScrollPage, type ISortBy } from '@puppet/middleware/ui-components'
+import {
+  $defaultTableContainer,
+  $intermediateText,
+  $Table,
+  type IQuantumScrollPage,
+  type ISortBy
+} from '@puppet/middleware/ui-components'
 import { pagingQuery, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -22,6 +28,7 @@ import {
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
+import { $route } from '../../common/$common.js'
 
 interface ITraderPage extends IPageParams, IUserActivityPageParams, IPageFilterParams {
   account: Address
@@ -220,7 +227,10 @@ export const $TraderPage = (config: ITraderPage) =>
               return $column(spacing.default)(
                 ...params.routeMetricList.map((routeMetric) => {
                   const dataSource = map((pageParams) => {
-                    return pagingQuery({ ...pageParams.paging, ...pageParams.sortBy }, positionList)
+                    return pagingQuery(
+                      { ...pageParams.paging, ...pageParams.sortBy },
+                      positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
+                    )
                   }, combineState({ sortBy, paging }))
                   const collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(
@@ -228,6 +238,7 @@ export const $TraderPage = (config: ITraderPage) =>
 
                     switchMap((list) => {
                       return $TraderMatchingRouteEditor({
+                        displayCollateralTokenSymbol: true,
                         collateralToken: routeMetric.collateralToken,
                         matchedPuppetList: routeMetric.matchedPuppetList,
                         userMatchingRuleList: list,
@@ -242,8 +253,7 @@ export const $TraderPage = (config: ITraderPage) =>
                     $row(
                       style({ marginRight: '26px' })($seperator2),
                       $Table({
-                        $container: $column(style({ flex: 1 })),
-                        dataSource: now(positionList),
+                        dataSource,
                         sortBy: params.sortBy,
                         columns: [
                           ...(isDesktopScreen ? [timeColumn] : []),

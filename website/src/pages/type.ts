@@ -5,6 +5,7 @@ import type { Address, Hex } from 'viem'
 import type {
   IMatchingRule,
   IPositionDecrease,
+  IPositionFeesCollected,
   IPositionIncrease,
   ITraderRouteLatestMetric
 } from '../__generated__/ponder.types'
@@ -90,7 +91,8 @@ export type IRoute = {
 }
 
 export interface ITraderRouteMetricSummary
-  extends Omit<ITraderRouteLatestMetric, 'collateralToken' | 'matchingKey' | 'id'> {
+  extends Omit<ITraderRouteLatestMetric, 'collateralToken' | 'matchingKey' | 'id' | 'pnlList' | 'pnlTimestampList'> {
   winCount: number
   lossCount: number
+  pnlTimeline: { time: number; value: bigint; matchingKey: Hex }[]
 }

@@ -93,8 +93,6 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       // position.cumulativeCollateralToken += next.collateralAmount
       // position.cumulativeCollateralUsd += position.collateralInUsd
 
-      position.increaseList
-
       position.increaseList.push(next)
     } else {
       // case where indexing ahead of prior position updates
@@ -154,8 +152,7 @@ export function accountSettledPositionListSummary(
     lossCount: 0,
     winCount: 0,
 
-    pnlList: [],
-    pnlTimestampList: [],
+    pnlTimeline: [],
 
     openPositionList: [],
     marketList: [],
@@ -176,13 +173,16 @@ export function accountSettledPositionListSummary(
     seed.settledCollateralInUsd += next.settledCollateralInUsd
     seed.settledSizeInUsd += next.settledSizeInUsd
 
-    next.pnlList.forEach((pnl) => {
+    next.pnlList.forEach((pnl, idx) => {
       seed.lossCount += pnl < 0n ? 1 : 0
       seed.winCount += pnl > 0n ? 1 : 0
-    })
 
-    seed.pnlList.push(...next.pnlList)
-    seed.pnlTimestampList.push(...next.pnlTimestampList)
+      seed.pnlTimeline.push({
+        time: next.pnlTimestampList[idx],
+        value: pnl,
+        matchingKey: next.matchingKey
+      })
+    })
 
     seed.openPositionList.push(...next.openPositionList)
 
@@ -191,6 +191,9 @@ export function accountSettledPositionListSummary(
 
     return seed
   }, seedAccountSummary)
+
+
+  summary.pnlTimeline = summary.pnlTimeline.sort((a, b) => a.time - b.time)
 
   return summary
 }

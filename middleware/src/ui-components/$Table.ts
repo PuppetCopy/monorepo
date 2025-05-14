@@ -77,7 +77,7 @@ export const $defaultTableCell = $row(
 )
 export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground }))
 export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
-export const $defaultTableContainer = $column(spacing.default)
+export const $defaultTableContainer = $column(spacing.default, style({ flex: 1 }))
 
 export const $Table = <T>({
   dataSource,
@@ -114,7 +114,7 @@ export const $Table = <T>({
             const IBehavior = sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
 
             return $headerCell(col.columnOp || O(), IBehavior)(
-              style({ cursor: 'pointer' }, col.$head),
+              $node(style({ cursor: 'pointer' }))(col.$head),
               sortBy
                 ? $column(
                     $icon({

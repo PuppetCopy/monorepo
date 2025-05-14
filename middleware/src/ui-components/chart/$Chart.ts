@@ -141,7 +141,9 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
       seriesApi.setData(config.data)
 
       const crosshairMove = fromCallback<MouseEventParams>((cb) => {
-        chartApi.subscribeCrosshairMove(cb)
+        chartApi.subscribeCrosshairMove(xx => {
+          return cb(xx)
+        })
         return disposeWith((handler) => chartApi.unsubscribeCrosshairMove(handler), cb)
       })
 
@@ -251,31 +253,31 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
         ),
 
         {
-          yAxisCoords: config.yAxisState
-            ? mergeArray([
-                map(
-                  (coords) => {
-                    if (coords.isFocused) {
-                      return null
-                    }
+          // yAxisCoords: config.yAxisState
+          //   ? mergeArray([
+          //       map(
+          //         (coords) => {
+          //           if (coords.isFocused) {
+          //             return null
+          //           }
 
-                    return coords.crosshairMove?.point?.y || null
-                  },
-                  combineState({ crosshairMove, isFocused: config.yAxisState.isFocused })
-                ),
-                snapshot(
-                  (params) => {
-                    if (params.isFocused && params.price) {
-                      return seriesApi.priceToCoordinate(params.price)
-                    }
+          //           return coords.crosshairMove?.point?.y || null
+          //         },
+          //         combineState({ crosshairMove, isFocused: config.yAxisState.isFocused })
+          //       ),
+          //       snapshot(
+          //         (params) => {
+          //           if (params.isFocused && params.price) {
+          //             return seriesApi.priceToCoordinate(params.price)
+          //           }
 
-                    return null
-                  },
-                  combineState(config.yAxisState),
-                  visibleLogicalRangeChange
-                )
-              ])
-            : empty(),
+          //           return null
+          //         },
+          //         combineState(config.yAxisState),
+          //         visibleLogicalRangeChange
+          //       )
+          //     ])
+          //   : empty(),
           focusPrice: config.yAxisState
             ? filterNull(
                 mergeArray([

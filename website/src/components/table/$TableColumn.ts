@@ -114,7 +114,7 @@ export const pnlColumn = (puppet?: Address): TableColumn<IPosition> => ({
 export const timeColumn: TableColumn<IPosition> = {
   $head: $text('Settle Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
-  sortBy: 'openTimestamp',
+  // sortBy: 'openTimestamp',
   $bodyCallback: map((pos) => {
     return $column(spacing.tiny)(
       $text(getTimeSince(pos.openTimestamp)),

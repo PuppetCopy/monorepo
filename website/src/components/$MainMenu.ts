@@ -319,7 +319,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
                   height: '42px',
                   width: '42px'
                 }),
-                attr({ href: 'https://twitter.com/PuppetFinance' })
+                attr({ href: 'https://twitter.com/PuppetCopy' })
               )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
               $anchor(
                 layoutSheet.displayFlex,

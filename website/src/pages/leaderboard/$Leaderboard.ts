@@ -373,7 +373,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         $column(spacing.tiny)(
                           $roiDisplay(pos.metric.roi),
                           $seperator2,
-                          $node(style({  }))($text(readablePnl(pos.metric.pnl)))
+                          $node(style({}))($text(readablePnl(pos.metric.pnl)))
                         )
                       )
                     )

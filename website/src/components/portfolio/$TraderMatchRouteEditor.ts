@@ -22,6 +22,7 @@ interface ITraderMatchingRouteEditor {
   matchedPuppetList: Hex[]
   $container?: INodeCompose
   collateralToken: Address
+  displayCollateralTokenSymbol?: boolean
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
@@ -40,7 +41,8 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
         trader,
         collateralToken,
         matchedPuppetList,
-        userMatchingRuleList
+        userMatchingRuleList,
+        displayCollateralTokenSymbol = false
       } = config
 
       const matchingRule = userMatchingRuleList.length
@@ -65,7 +67,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           $target: $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '8px' : '4px' }))(
               $row(style({ alignItems: 'center' }))(
-                $tokenTryLabeled(collateralToken),
+                $tokenTryLabeled(collateralToken, displayCollateralTokenSymbol),
                 isMobileScreen
                   ? $icon({
                       $content: $caretDown,
