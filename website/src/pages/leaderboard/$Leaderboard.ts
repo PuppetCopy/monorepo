@@ -178,7 +178,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               const columns: TableColumn<ILeaderboardCellData>[] = [
                 {
                   $head: $text('Trader'),
-                  gridTemplate: isDesktopScreen ? '149px' : '136px',
+                  gridTemplate: isDesktopScreen ? '149px' : '126px',
                   // columnOp: style({ placeContent: 'flex-end' }),
                   $bodyCallback: map((pos) => {
                     return $TraderDisplay({
@@ -193,7 +193,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 },
                 {
                   $head: $text('Route'),
-                  gridTemplate: isDesktopScreen ? '122px' : undefined,
+                  gridTemplate: isDesktopScreen ? '122px' : '52px',
                   $bodyCallback: map((routeMetric) => {
                     // const _tokenList = [
                     //   ...new Set([
@@ -269,7 +269,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     )
                   ),
                   sortBy: 'roi',
-                  gridTemplate: isDesktopScreen ? '200px' : '110px',
+                  gridTemplate: isDesktopScreen ? '200px' : undefined,
                   $bodyCallback: map((pos) => {
                     const endTime = unixTimestampNow()
                     const startTime = endTime - params.activityTimeframe

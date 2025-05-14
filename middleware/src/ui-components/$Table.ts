@@ -76,7 +76,7 @@ export const $defaultTableCell = $row(
   style({ padding: '6px 0', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
 )
 export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground }))
-export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.small)
+export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
 export const $defaultTableContainer = $column(spacing.default)
 
 export const $Table = <T>({

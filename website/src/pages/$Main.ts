@@ -120,10 +120,12 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         wallet.blockChange
       ])
 
-      const matchingRuleQuery = multicast(
-        queryUserMatchingRuleList({
-          account: wallet.account
-        })
+      const matchingRuleQuery = replayLatest(
+        multicast(
+          queryUserMatchingRuleList({
+            account: wallet.account
+          })
+        )
       )
 
       const matchRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
