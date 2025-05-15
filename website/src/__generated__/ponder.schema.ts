@@ -28,18 +28,6 @@ export const priceCandle = onchainTable('PriceCandle', (t) => ({
   id: t.text().primaryKey()
 }))
 
-export const position = onchainTable('Position', (t) => ({
-  pnl: t.bigint().notNull(),
-  account: t.hex().notNull(),
-  collateralInTokens: t.bigint().notNull(),
-  collateralInUsd: t.bigint().notNull(),
-  lastUpdatedTimestamp: t.integer().notNull(),
-
-  matchingKey: t.hex().notNull(),
-
-  positionKey: t.hex().primaryKey()
-}))
-
 export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
   market: t.hex().notNull(),
   account: t.hex().notNull(),
@@ -75,7 +63,7 @@ export const positionIncrease = onchainTable('PositionIncrease', (t) => ({
   feeCollectedId: t.hex().notNull(),
 
   positionKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
 
   orderKey: t.hex().primaryKey()
 }))
@@ -124,7 +112,7 @@ export const positionDecrease = onchainTable('PositionDecrease', (t) => ({
   feeCollectedId: t.hex().notNull(),
 
   positionKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
 
   orderKey: t.hex().primaryKey()
 }))
@@ -172,55 +160,75 @@ export const positionFeesCollected = onchainTable('PositionFeesCollected', (t) =
   id: t.hex().primaryKey()
 }))
 
+export const openPosition = onchainTable('OpenPosition', (t) => ({
+  pnl: t.bigint().notNull(),
+  account: t.hex().notNull(),
+  collateralInTokens: t.bigint().notNull(),
+  collateralInUsd: t.bigint().notNull(),
+  lastUpdatedTimestamp: t.integer().notNull(),
+
+  traderMatchingKey: t.hex().notNull(),
+
+  positionKey: t.hex().primaryKey()
+}))
+
 export const traderRouteMetric = onchainTable('TraderRouteMetric', (t) => ({
   account: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
 
-  sizeInUsd: t.bigint().notNull(),
-  collateralInUsd: t.bigint().notNull(),
-
   cumulativeCollateralUsd: t.bigint().notNull(),
   cumulativeSizeUsd: t.bigint().notNull(),
-  cumulativeLongUsd: t.bigint().notNull(),
+  cumulativeSizeLongUsd: t.bigint().notNull(),
+  cumulativeRealisedPnl: t.bigint().notNull(),
 
-  longShortRatio: t.bigint().notNull(),
-  openPnl: t.bigint().notNull(),
-  realisedPnl: t.bigint().notNull(),
-  pnl: t.bigint().notNull(),
+  crossOpenSizeInUsd: t.bigint().notNull(),
+  crossOpenLongSizeInUsd: t.bigint().notNull(),
+  crossOpenCollateralInUsd: t.bigint().notNull(),
+  crossOpenPnl: t.bigint().notNull(),
+
+  marketList: t.hex().array().notNull(),
+  positionList: t.hex().array().notNull(),
 
   lastUpdatedTimestamp: t.integer().notNull(),
-  marketList: t.hex().array().notNull(),
 
-  matchingKey: t.hex().primaryKey()
+  traderMatchingKey: t.hex().primaryKey()
 }))
 
 export const traderRouteLatestMetric = onchainTable('TraderRouteLatestMetric', (t) => ({
   account: t.hex().notNull(),
   collateralToken: t.hex().notNull(),
 
-  cumulativeLongUsd: t.bigint().notNull(),
-  cumulativeCollateralUsd: t.bigint().notNull(),
-  cumulativeSizeUsd: t.bigint().notNull(),
   settledSizeInUsd: t.bigint().notNull(),
+  settledSizeLongInUsd: t.bigint().notNull(),
   settledCollateralInUsd: t.bigint().notNull(),
 
+  sizeUsd: t.bigint().notNull(),
+  collateralUsd: t.bigint().notNull(),
+  longUsd: t.bigint().notNull(),
   longShortRatio: t.bigint().notNull(),
+
   realisedPnl: t.bigint().notNull(),
   pnl: t.bigint().notNull(),
   realisedRoi: t.bigint().notNull(),
   roi: t.bigint().notNull(),
 
-  interval: t.integer().notNull(),
-  lastUpdatedTimestamp: t.integer().notNull(),
-  marketList: t.hex().array().notNull(),
   pnlList: t.bigint().array().notNull(),
-  openPositionList: t.hex().array().notNull(),
   pnlTimestampList: t.integer().array().notNull(),
   matchedPuppetList: t.hex().array().notNull(),
 
-  matchingKey: t.hex().notNull(),
+  interval: t.integer().notNull(),
+  lastUpdatedTimestamp: t.integer().notNull(),
+
+  traderMatchingKey: t.hex().notNull(),
 
   id: t.text().primaryKey()
+}))
+
+export const traderRouteLatestMetricRelations = relations(traderRouteLatestMetric, ({ one }) => ({
+  traderRouteMetric: one(traderRouteMetric, {
+    fields: [traderRouteLatestMetric.traderMatchingKey],
+    references: [traderRouteMetric.traderMatchingKey]
+  })
 }))
 
 export const puppetSettle = onchainTable('PuppetSettle', (t) => ({
@@ -249,7 +257,7 @@ export const settle = onchainTable('Settle', (t) => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
   allocationKey: t.hex().notNull(),
 
   id: t.hex().primaryKey()
@@ -274,7 +282,7 @@ export const adjust = onchainTable('Adjust', (t) => ({
   transactionHash: t.hex().notNull(),
 
   allocationKey: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
 
   requestKey: t.hex().primaryKey()
 }))
@@ -290,7 +298,7 @@ export const mirror = onchainTable('Mirror', (t) => ({
   blockTimestamp: t.integer().notNull(),
   transactionHash: t.hex().notNull(),
 
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
   allocationKey: t.hex().notNull(),
   requestKey: t.hex().notNull(),
 
@@ -301,7 +309,7 @@ export const puppetAllocate = onchainTable('PuppetAllocate', (t) => ({
   trader: t.hex().notNull(),
   puppet: t.hex().notNull(),
   token: t.hex().notNull(),
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
   amount: t.bigint().notNull(),
 
   mirrorPositionId: t.hex().notNull(),
@@ -322,7 +330,7 @@ export const allocation = onchainTable('Allocation', (t) => ({
   size: t.bigint().notNull(),
   cumulativeKeeperFee: t.bigint().notNull(),
 
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
   allocationKey: t.hex().notNull(),
 
   allocationAddress: t.hex().primaryKey()
@@ -342,7 +350,7 @@ export const puppetMatchingRule = onchainTable('PuppetMatchingRule', (t) => ({
   throttleActivity: t.bigint().notNull(),
   expiry: t.bigint().notNull(),
 
-  matchingKey: t.hex().notNull(),
+  traderMatchingKey: t.hex().notNull(),
 
   id: t.hex().primaryKey()
 }))

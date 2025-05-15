@@ -28,14 +28,14 @@ import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 
 export interface IMatchingRuleEditorChange {
   model: Prettify<Partial<IMatchingRule>>
-  matchingKey: Hex
+  traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
 }
 
 export type IMatchRuleEditor = {
   matchingRule?: IMatchingRule
-  matchingKey: Hex
+  traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
 }
@@ -56,7 +56,7 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
         'advancedRouteEditorEnabled'
       )
 
-      const { matchingRule, matchingKey, collateralToken, trader } = config
+      const { matchingRule, traderMatchingKey, collateralToken, trader } = config
 
       const placeholderForm = {
         allowanceRate: BigInt(1000),
@@ -65,7 +65,7 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
       }
 
       const change = combineState({
-        matchingKey: now(matchingKey),
+        traderMatchingKey: now(traderMatchingKey),
         allowanceRate: startWith(matchingRule?.allowanceRate || placeholderForm.allowanceRate, inputAllowance),
         throttleActivity: startWith(
           matchingRule?.throttleActivity || placeholderForm.throttleActivity,
@@ -174,13 +174,13 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
 
         {
           save: snapshot(
-            (draft): IMatchingRuleEditorChange => ({ collateralToken, trader, matchingKey, model: draft }),
+            (draft): IMatchingRuleEditorChange => ({ collateralToken, trader, traderMatchingKey, model: draft }),
             change,
             saveMatchRule
           ),
           remove: snapshot(
             (draft): IMatchingRuleEditorChange => ({
-              matchingKey,
+              traderMatchingKey,
               collateralToken,
               trader,
               model: { ...draft, expiry: 0n }

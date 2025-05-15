@@ -105,8 +105,12 @@ export function getMatchKey(collateralToken: Address, trader: Address) {
   return keccak256(encodeAbiParameters(parseAbiParameters('address, address'), [collateralToken, trader]))
 }
 
-export function getAllocationKey(puppetList: Address[], matchingKey: Hex, allocationId: bigint) {
+export function getAllocationKey(puppetList: Address[], traderMatchingKey: Hex, allocationId: bigint) {
   return keccak256(
-    encodeAbiParameters(parseAbiParameters('address[], bytes32, uint256'), [puppetList, matchingKey, allocationId])
+    encodeAbiParameters(parseAbiParameters('address[], bytes32, uint256'), [
+      puppetList,
+      traderMatchingKey,
+      allocationId
+    ])
   )
 }

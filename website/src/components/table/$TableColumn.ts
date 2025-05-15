@@ -1,6 +1,6 @@
 import { map, skipRepeats } from '@most/core'
 import { latestPriceMap } from '@puppet/middleware/core'
-import { getMarketIndexToken, getPositionPnlUsd } from '@puppet/middleware/gmx'
+import { getPositionPnlUsd } from '@puppet/middleware/gmx'
 import { $infoTooltip, type TableColumn } from '@puppet/middleware/ui-components'
 import {
   getBasisPoints,
@@ -12,7 +12,7 @@ import {
 import { $node, $text, type IComposeBehavior, type INode, O, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-
+import type { Address } from 'viem/accounts'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IPosition } from '../../pages/type.js'
@@ -24,9 +24,9 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
     $node(style({ fontSize: '.8rem' }))($text(secondaryLabel))
   )
 
-export const sizeColumn = (puppet?: Address): TableColumn<IPosition> => ({
-  $head: $tableHeader('Size', 'Leverage'),
-  columnOp: O(spacing.tiny, style({ flex: 1.2, placeContent: 'flex-end' })),
+export const sizeColumn = (): TableColumn<IPosition> => ({
+  $head: $tableHeader('Max Size', 'Leverage'),
+  columnOp: O(spacing.tiny, style({ placeContent: 'flex-end' })),
   $bodyCallback: map((mp) => {
     return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
   })
@@ -117,8 +117,8 @@ export const timeColumn: TableColumn<IPosition> = {
   // sortBy: 'openTimestamp',
   $bodyCallback: map((pos) => {
     return $column(spacing.tiny)(
-      $text(getTimeSince(pos.openTimestamp)),
-      $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.openTimestamp))))
+      $text(getTimeSince(pos.lastUpdateTimestamp)),
+      $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
     )
   })
 }

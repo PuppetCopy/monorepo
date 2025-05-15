@@ -1,6 +1,5 @@
 import { empty, map, multicast, skipRepeatsWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import type { IPosition } from '@puppet/middleware/core'
 import { $Baseline, $bear, $bull, $infoTooltipLabel } from '@puppet/middleware/ui-components'
 import { filterNull, parseReadableNumber, readableUnitAmount } from '@puppet/middleware/utils'
 import {
@@ -18,6 +17,7 @@ import {
 import { $column, $icon, $NumberTicker, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from 'lightweight-charts'
+import type { IPosition } from '../../pages/type.js'
 import { getPositionListTimelinePerformance, type IPerformanceTimeline } from './$ProfilePerformanceGraph.js'
 
 export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionList'> {

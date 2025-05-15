@@ -5,5 +5,5 @@ export function isPositionSettled(trade: IPosition): boolean {
 }
 
 export function isPositionOpen(trade: IPosition): trade is IPosition {
-  return trade.settledTimestamp === 0
+  return trade.lastUpdateTimestamp === 0
 }

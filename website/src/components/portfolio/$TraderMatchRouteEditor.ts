@@ -34,7 +34,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
       [discardDraft, discardDraftTether]: IBehavior<IMatchingRuleEditorChange>,
       [saveDraft, saveDraftTether]: IBehavior<IMatchingRuleEditorChange>
     ) => {
-      const matchingKey = getMatchKey(config.collateralToken, config.trader)
+      const traderMatchingKey = getMatchKey(config.collateralToken, config.trader)
 
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
@@ -46,7 +46,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
       } = config
 
       const matchingRule = userMatchingRuleList.length
-        ? userMatchingRuleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === matchingKey)
+        ? userMatchingRuleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === traderMatchingKey)
         : undefined
 
       return [
@@ -55,7 +55,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           open: map(() => {
             return $MatchRuleEditor({
               matchingRule,
-              matchingKey,
+              traderMatchingKey,
               collateralToken,
               trader
             })({

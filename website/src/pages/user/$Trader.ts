@@ -1,13 +1,7 @@
-import { awaitPromises, map, multicast, now, startWith } from '@most/core'
+import { awaitPromises, map, multicast, startWith } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import {
-  $defaultTableContainer,
-  $intermediateText,
-  $Table,
-  type IQuantumScrollPage,
-  type ISortBy
-} from '@puppet/middleware/ui-components'
+import { $intermediateText, $Table, type IQuantumScrollPage, type ISortBy } from '@puppet/middleware/ui-components'
 import { pagingQuery, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -28,7 +22,6 @@ import {
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
-import { $route } from '../../common/$common.js'
 
 interface ITraderPage extends IPageParams, IUserActivityPageParams, IPageFilterParams {
   account: Address
@@ -63,8 +56,16 @@ export const $TraderPage = (config: ITraderPage) =>
                 params.collateralTokenList.length > 0
                   ? f.inArray(t.collateralToken, params.collateralTokenList)
                   : undefined,
-                f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
-              )
+                f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
+              ),
+            with: {
+              traderRouteMetric: {
+                columns: {
+                  marketList: true,
+                  positionList: true
+                }
+              }
+            }
           })
 
           return routeMetricList
@@ -115,9 +116,6 @@ export const $TraderPage = (config: ITraderPage) =>
 
         const positionList = aggregatePositionList([...increaseList, ...decreaseList])
 
-        for (const position of positionList) {
-        }
-
         //   if (list.length === 0) {
         //     return $column(spacing.small)(
         //       $text('No active positions found'),
@@ -132,60 +130,57 @@ export const $TraderPage = (config: ITraderPage) =>
         $column(spacing.big)(
           $column(
             spacing.default,
-            style({ minHeight: '90px' })
+            style({
+              minHeight: '90px',
+              display: 'flex',
+              flexDirection: isDesktopScreen ? 'row' : 'column',
+              gap: isDesktopScreen ? '56px' : '26px',
+              zIndex: 10,
+              placeContent: 'center',
+              alignItems: 'center',
+              padding: '0 8px'
+            })
           )(
-            $node(
-              style({
-                display: 'flex',
-                flexDirection: isDesktopScreen ? 'row' : 'column',
-                gap: isDesktopScreen ? '56px' : '26px',
-                zIndex: 10,
-                placeContent: 'center',
-                alignItems: 'center',
-                padding: '0 8px'
+            $row(spacing.small, style({ textDecoration: 'none', alignItems: 'center' }))(
+              $profileAvatar({ address: account, size: isDesktopScreen ? 65 : 50 }),
+              $AccountLabel({
+                address: account,
+                primarySize: 1.65
               })
-            )(
-              $row(spacing.small, style({ textDecoration: 'none', alignItems: 'center' }))(
-                $profileAvatar({ address: account, size: isDesktopScreen ? 65 : 50 }),
-                $AccountLabel({
-                  address: account,
-                  primarySize: 1.65
-                })
+            ),
+            $row(spacing.big, style({ alignItems: 'flex-end' }))(
+              $metricRow(
+                $heading2(
+                  $intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
+                      return `${summary.winCount} / ${summary.lossCount}`
+                    }, metricsQuery)
+                  )
+                ),
+                $metricLabel($text('Win / Loss'))
               ),
-              $row(spacing.big, style({ alignItems: 'flex-end' }))(
-                $metricRow(
-                  $heading2(
-                    $intermediateText(
-                      map(async (summaryQuery) => {
-                        const summary = await summaryQuery
-                        return `${summary.winCount} / ${summary.lossCount}`
-                      }, metricsQuery)
-                    )
-                  ),
-                  $metricLabel($text('Win / Loss'))
+              $metricRow(
+                $heading2(
+                  $intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
+                      return readableUsd(summary.sizeUsd)
+                    }, metricsQuery)
+                  )
                 ),
-                $metricRow(
-                  $heading2(
-                    $intermediateText(
-                      map(async (summaryQuery) => {
-                        const summary = await summaryQuery
-                        return readableUsd(summary.cumulativeSizeUsd)
-                      }, metricsQuery)
-                    )
-                  ),
-                  $metricLabel($text('Avg Size'))
+                $metricLabel($text('Volume'))
+              ),
+              $metricRow(
+                $heading2(
+                  $intermediateText(
+                    map(async (summaryQuery) => {
+                      const summary = await summaryQuery
+                      return readableLeverage(summary.sizeUsd, summary.collateralUsd)
+                    }, metricsQuery)
+                  )
                 ),
-                $metricRow(
-                  $heading2(
-                    $intermediateText(
-                      map(async (summaryQuery) => {
-                        const summary = await summaryQuery
-                        return readableLeverage(summary.cumulativeSizeUsd, summary.cumulativeCollateralUsd)
-                      }, metricsQuery)
-                    )
-                  ),
-                  $metricLabel($text('Avg Leverage'))
-                )
+                $metricLabel($text('Avg Leverage'))
               )
             )
           ),
@@ -215,8 +210,6 @@ export const $TraderPage = (config: ITraderPage) =>
               const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-              const positionList = aggregatePositionList([...params.increaseList, ...params.decreaseList])
-
               //   if (list.length === 0) {
               //     return $column(spacing.small)(
               //       $text('No active positions found'),
@@ -224,12 +217,12 @@ export const $TraderPage = (config: ITraderPage) =>
               //     )
               //   }
 
-              return $column(spacing.default)(
+              return $column(spacing.big)(
                 ...params.routeMetricList.map((routeMetric) => {
                   const dataSource = map((pageParams) => {
                     return pagingQuery(
                       { ...pageParams.paging, ...pageParams.sortBy },
-                      positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
+                      params.positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
                     )
                   }, combineState({ sortBy, paging }))
                   const collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
@@ -244,7 +237,7 @@ export const $TraderPage = (config: ITraderPage) =>
                         userMatchingRuleList: list,
                         trader: routeMetric.account,
                         $container: $defaultTraderMatchRouteEditorContainer(
-                          style({ marginLeft: '-16px', paddingBottom: '16px' })
+                          style({ marginLeft: '-12px', paddingBottom: '12px' })
                         )
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()

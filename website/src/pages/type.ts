@@ -7,7 +7,8 @@ import type {
   IPositionDecrease,
   IPositionFeesCollected,
   IPositionIncrease,
-  ITraderRouteLatestMetric
+  ITraderRouteLatestMetric,
+  ITraderRouteMetric
 } from '../__generated__/ponder.types'
 import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
 
@@ -60,11 +61,6 @@ export type IPosition = {
   collateralInUsd: bigint
   realisedPnlUsd: bigint
 
-  // cumulativeSizeUsd: bigint
-  // cumulativeSizeToken: bigint
-  // cumulativeCollateralUsd: bigint
-  // cumulativeCollateralToken: bigint
-
   maxSizeInUsd: bigint
   maxSizeInTokens: bigint
   maxCollateralInTokens: bigint
@@ -74,7 +70,7 @@ export type IPosition = {
 
   isLong: boolean
 
-  openTimestamp: number
+  lastUpdateTimestamp: number
   settledTimestamp: number
 
   puppetList: Address[]
@@ -91,8 +87,19 @@ export type IRoute = {
 }
 
 export interface ITraderRouteMetricSummary
-  extends Omit<ITraderRouteLatestMetric, 'collateralToken' | 'matchingKey' | 'id' | 'pnlList' | 'pnlTimestampList'> {
+  extends Omit<
+    ITraderRouteLatestMetric & Pick<ITraderRouteMetric, 'marketList'>,
+    | 'collateralToken'
+    | 'traderMatchingKey'
+    | 'id'
+    | 'pnlList'
+    | 'pnlTimestampList'
+    | 'traderRouteMetric'
+    | 'lastUpdatedTimestamp'
+    | 'interval'
+  > {
   winCount: number
   lossCount: number
-  pnlTimeline: { time: number; value: bigint; matchingKey: Hex }[]
+  pnlTimeline: { time: number; value: bigint; traderMatchingKey: Hex }[]
+  marketList: Address[]
 }

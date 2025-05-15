@@ -75,7 +75,7 @@ export const $entry = (pos: IPosition) => {
         isPositionSettled(pos)
           ? $infoLabeledValue(
               $label($text('Close Time')),
-              $node(style({ fontSize: '.8rem' }))($text(readableDate(pos.settledTimestamp)))
+              $node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp)))
             )
           : empty()
       ),

@@ -14,11 +14,11 @@ import { $node, $text, combineState, component, type IBehavior, motion, style, s
 import { $column, $NumberTicker, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
+import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import type { IPageFilterParams, ITraderRouteMetricSummary, IUserActivityPageParams } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
-import type { Hex } from 'viem'
 
 interface IProfilePeformanceTimeline extends IUserActivityPageParams, IPageFilterParams {
   metricsQuery: Stream<Promise<ITraderRouteMetricSummary>>
@@ -47,24 +47,27 @@ export const $TradeRouteTimeline = ({
         const endTime = unixTimestampNow()
         const startTime = endTime - params.activityTimeframe
         const sourceList = [
-          { value: 0n, time: startTime, matchingKey: pos.pnlTimeline[0].matchingKey },
-          ...pos.pnlTimeline.filter((item) => item.time > startTime)
+          { value: 0n, time: startTime, traderMatchingKey: pos.pnlTimeline[0].traderMatchingKey },
+          ...pos.pnlTimeline.filter((item) => item.time > startTime),
+          { value: 0n, time: endTime, traderMatchingKey: '0xdead' as Hex }
         ]
 
         const sumMap = new Map<Hex, bigint>()
 
-        return fillTimeline({
+        const timelinbe = fillTimeline({
           sourceList,
           ticks: 280,
           getTime: (item) => item.time,
           sourceMap: (next) => {
-            sumMap.set(next.matchingKey, next.value)
+            sumMap.set(next.traderMatchingKey, next.value)
 
             const sum = [...sumMap.values()].reduce((acc, curr) => acc + curr, 0n)
 
             return formatFixed(USD_DECIMALS, sum)
           }
         })
+
+        return timelinbe
       }, combineState({ metricsQuery, activityTimeframe }))
 
       return [

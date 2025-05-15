@@ -1,10 +1,14 @@
-import { getMarketIndexToken, getTokenDescription } from '@puppet/middleware/gmx'
-import { factor } from '@puppet/middleware/utils'
-import { $node, $text, O, style } from 'aelea/core'
-import { $column, $row, $seperator, isDesktopScreen, isMobileScreen } from 'aelea/ui-components'
+import { unixTimestampNow } from '@puppet/middleware/utils'
+import { $node, $text, style } from 'aelea/core'
+import { $row, $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } from '../__generated__/ponder.types'
+import type {
+  IPositionDecrease,
+  IPositionIncrease,
+  ITraderRouteLatestMetric,
+  ITraderRouteMetric
+} from '../__generated__/ponder.types'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
 
 export const $metricEntry = (label: string, value: string) =>
@@ -20,12 +24,12 @@ export const $seperator2 = style(
 
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
   const sortedUpdateList = list.sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-  const openPositionMap = new Map<Hex, IPosition>()
+  const positionMap = new Map<Hex, IPosition>()
   const positionList: IPosition[] = []
 
   for (let index = 0; index < sortedUpdateList.length; index++) {
     const next = sortedUpdateList[index]
-    let position = openPositionMap.get(next.positionKey)
+    let position = positionMap.get(next.positionKey)
 
     if (!position) {
       position = {
@@ -41,11 +45,6 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
         collateralInUsd: 0n,
         realisedPnlUsd: 0n,
 
-        // cumulativeSizeUsd: 0n,
-        // cumulativeSizeToken: 0n,
-        // cumulativeCollateralUsd: 0n,
-        // cumulativeCollateralToken: 0n,
-
         maxSizeInUsd: 0n,
         maxSizeInTokens: 0n,
         maxCollateralInTokens: 0n,
@@ -55,7 +54,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
         isLong: next.isLong,
 
-        openTimestamp: next.blockTimestamp,
+        lastUpdateTimestamp: 0,
         settledTimestamp: 0,
 
         puppetList: [],
@@ -67,7 +66,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
         lastUpdate: next
       }
 
-      openPositionMap.set(next.positionKey, position)
+      positionMap.set(next.positionKey, position)
     }
 
     position.lastUpdate = next
@@ -88,90 +87,77 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       position.maxCollateralInUsd =
         position.collateralInUsd > position.maxCollateralInUsd ? position.collateralInUsd : position.maxCollateralInUsd
 
-      // position.cumulativeSizeToken += next.sizeInTokens
-      // position.cumulativeSizeUsd += next.sizeInUsd
-      // position.cumulativeCollateralToken += next.collateralAmount
-      // position.cumulativeCollateralUsd += position.collateralInUsd
-
       position.increaseList.push(next)
     } else {
-      // case where indexing ahead of prior position updates
-      // if (position.cumulativeCollateralUsd === 0n) {
-      //   position.maxCollateralInTokens = next.collateralAmount + next.collateralDeltaAmount
-      //   position.maxCollateralInUsd = position.maxCollateralInTokens * next.collateralTokenPriceMax
-      //   position.maxSizeInTokens = next.sizeInTokens > position.maxSizeInTokens ? next.sizeInTokens : position.maxSizeInTokens
-      //   position.maxSizeInUsd = next.sizeInUsd > position.maxSizeInUsd ? next.sizeInUsd : position.maxSizeInUsd
-
-      //   position.cumulativeCollateralToken = position.maxCollateralInTokens
-      //   position.cumulativeCollateralUsd = position.maxCollateralInUsd
-      //   position.cumulativeSizeToken = position.maxSizeInTokens
-      //   position.cumulativeSizeUsd = position.maxSizeInUsd
-      // }
-
       position.decreaseList.push(next)
       position.realisedPnlUsd += next.basePnlUsd
 
       if (next.sizeInTokens === 0n) {
-        position.settledTimestamp = next.blockTimestamp
+        position.lastUpdateTimestamp = next.blockTimestamp
 
         positionList.push(position)
-        openPositionMap.delete(next.positionKey)
+        positionMap.delete(next.positionKey)
       }
     }
 
-    // if (position.maxSizeInTokens > 0n) {
-    //   position.avgEntryPrice =
-    //     (position.maxSizeInUsd / position.maxSizeInTokens) *
-    //     getTokenDescription(getMarketIndexToken(next.market)).denominator
-    // }
+    if (next.sizeInUsd === 0n) {
+      position.settledTimestamp = next.blockTimestamp
+    }
+
+    position.lastUpdateTimestamp = next.blockTimestamp
   }
 
-  positionList.push(...openPositionMap.values())
-  return positionList.reverse()
+  positionList.push(...positionMap.values())
+  return positionList.sort((a, b) => {
+    return b.lastUpdateTimestamp - a.lastUpdateTimestamp
+  })
 }
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: ITraderRouteLatestMetric[]
+  metricList: (ITraderRouteLatestMetric & { traderRouteMetric: Pick<ITraderRouteMetric, 'marketList'> })[]
 ): ITraderRouteMetricSummary {
   const seedAccountSummary: ITraderRouteMetricSummary = {
     account,
-    cumulativeCollateralUsd: 0n,
-    cumulativeLongUsd: 0n,
-    cumulativeSizeUsd: 0n,
-    interval: 0,
-    lastUpdatedTimestamp: 0,
+
+    settledSizeInUsd: 0n,
+    settledSizeLongInUsd: 0n,
+    settledCollateralInUsd: 0n,
+
+    sizeUsd: 0n,
+    collateralUsd: 0n,
+    longUsd: 0n,
     longShortRatio: 0n,
     pnl: 0n,
     realisedPnl: 0n,
     realisedRoi: 0n,
     roi: 0n,
-    settledCollateralInUsd: 0n,
-    settledSizeInUsd: 0n,
 
     lossCount: 0,
     winCount: 0,
 
     pnlTimeline: [],
 
-    openPositionList: [],
-    marketList: [],
-    matchedPuppetList: []
+    // positionList: [],
+    matchedPuppetList: [],
+
+    marketList: []
   }
 
   const summary = metricList.reduce((seed, next, idx): ITraderRouteMetricSummary => {
-    seed.cumulativeCollateralUsd += next.cumulativeCollateralUsd
-    seed.cumulativeLongUsd += next.cumulativeLongUsd
-    seed.cumulativeSizeUsd += next.cumulativeSizeUsd
-    seed.interval += next.interval
-    seed.lastUpdatedTimestamp += next.lastUpdatedTimestamp
+    seed.settledSizeInUsd += next.settledSizeInUsd
+    seed.settledSizeLongInUsd += next.settledSizeLongInUsd
+    seed.settledCollateralInUsd += next.settledCollateralInUsd
+
+    seed.sizeUsd += next.sizeUsd
+    seed.collateralUsd += next.collateralUsd
+    seed.longUsd += next.longUsd
     seed.longShortRatio += next.longShortRatio
+
     seed.pnl += next.pnl
     seed.realisedPnl += next.realisedPnl
     seed.realisedRoi += next.realisedRoi
     seed.roi += next.roi
-    seed.settledCollateralInUsd += next.settledCollateralInUsd
-    seed.settledSizeInUsd += next.settledSizeInUsd
 
     next.pnlList.forEach((pnl, idx) => {
       seed.lossCount += pnl < 0n ? 1 : 0
@@ -180,18 +166,15 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        matchingKey: next.matchingKey
+        traderMatchingKey: next.traderMatchingKey
       })
     })
 
-    seed.openPositionList.push(...next.openPositionList)
-
-    seed.marketList = [...new Set([...seed.marketList, ...next.marketList])]
+    seed.marketList = [...new Set([...seed.marketList, ...next.traderRouteMetric.marketList])]
     seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
 
     return seed
   }, seedAccountSummary)
-
 
   summary.pnlTimeline = summary.pnlTimeline.sort((a, b) => a.time - b.time)
 

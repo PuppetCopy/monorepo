@@ -59,7 +59,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<ITraderRouteLatestMetric>>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
@@ -136,7 +136,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         params.collateralTokenList.length > 0
                           ? f.inArray(t.collateralToken, params.collateralTokenList)
                           : undefined,
-                        f.gt(t.lastUpdatedTimestamp, startActivityTimeframe)
+                        f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
                       ),
                     limit: filterParams.paging.pageSize,
                     offset: filterParams.paging.offset,
@@ -148,17 +148,26 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     columns: {
                       account: true,
                       collateralToken: true,
-                      matchingKey: true,
-                      marketList: true,
-                      cumulativeCollateralUsd: true,
-                      cumulativeSizeUsd: true,
+
+                      sizeUsd: true,
+                      collateralUsd: true,
                       longShortRatio: true,
-                      openPositionList: true,
-                      roi: true,
                       pnl: true,
+                      roi: true,
+
                       pnlList: true,
                       pnlTimestampList: true,
-                      matchedPuppetList: true
+                      matchedPuppetList: true,
+
+                      traderMatchingKey: true
+                    },
+                    with: {
+                      traderRouteMetric: {
+                        columns: {
+                          crossOpenSizeInUsd: true,
+                          marketList: true
+                        }
+                      }
                     }
                   })
 
@@ -193,7 +202,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 },
                 {
                   $head: $text('Route'),
-                  gridTemplate: isDesktopScreen ? '122px' : '52px',
+                  gridTemplate: isDesktopScreen ? '104px' : '52px',
                   $bodyCallback: map((routeMetric) => {
                     // const _tokenList = [
                     //   ...new Set([
@@ -246,16 +255,18 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           // ]
 
                           return $row(spacing.small)(
-                            ...pos.metric.marketList.map((token) => $tokenTryLabeled(token, '32px'))
+                            ...pos.metric.traderRouteMetric.marketList.map((token) =>
+                              $tokenTryLabeled(token, false, '32px')
+                            )
                           )
                         })
                       },
                       {
-                        $head: $tableHeader('Size', 'Leverage'),
-                        sortBy: 'cumulativeSizeUsd',
+                        $head: $tableHeader('Volume', 'Leverage'),
+                        sortBy: 'sizeUsd',
                         columnOp: style({ placeContent: 'flex-end' }),
                         $bodyCallback: map((pos: ILeaderboardCellData) => {
-                          return $size(pos.metric.cumulativeSizeUsd, pos.metric.cumulativeCollateralUsd)
+                          return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
                         })
                       }
                     ]
@@ -292,18 +303,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       }
                     })
 
-                    const markerList: IMarker[] = pos.metric.pnlTimestampList
-                      .map(
-                        (timestmap): IMarker => ({
-                          position: 'inBar',
-                          color: colorAlpha(pallete.message, 0.15),
-                          time: timestmap as Time,
-                          shape: 'circle'
-                        })
-                      )
-                      .sort((a, b) => Number(a.time) - Number(b.time))
+                    const markerList: IMarker[] = []
 
-                    if (pos.metric.openPositionList.length > 0) {
+                    if (pos.metric.traderRouteMetric.crossOpenSizeInUsd > 0n) {
                       markerList.push({
                         position: 'inBar',
                         color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
@@ -373,7 +375,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         $column(spacing.tiny)(
                           $roiDisplay(pos.metric.roi),
                           $seperator2,
-                          $node(style({}))($text(readablePnl(pos.metric.pnl)))
+                          $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
                         )
                       )
                     )

@@ -73,7 +73,7 @@ const $caretDown = $svg('path')(
 
 export const $defaultTableCell = $row(
   spacing.small,
-  style({ padding: '6px 0', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
+  style({ padding: '6px 0', display: 'flex', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
 )
 export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground }))
 export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
@@ -113,8 +113,8 @@ export const $Table = <T>({
           if (col.sortBy) {
             const IBehavior = sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
 
-            return $headerCell(col.columnOp || O(), IBehavior)(
-              $node(style({ cursor: 'pointer' }))(col.$head),
+            return $headerCell(style({ cursor: 'pointer' }))(col.columnOp || O(), IBehavior)(
+              col.$head,
               sortBy
                 ? $column(
                     $icon({

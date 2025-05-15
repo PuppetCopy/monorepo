@@ -141,7 +141,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
       seriesApi.setData(config.data)
 
       const crosshairMove = fromCallback<MouseEventParams>((cb) => {
-        chartApi.subscribeCrosshairMove(xx => {
+        chartApi.subscribeCrosshairMove((xx) => {
           return cb(xx)
         })
         return disposeWith((handler) => chartApi.unsubscribeCrosshairMove(handler), cb)

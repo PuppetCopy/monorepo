@@ -1,20 +1,11 @@
-import { map, mergeArray, multicast, now } from '@most/core'
+import { map, mergeArray, now } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
-import {
-  $ButtonToggle,
-  $defaulButtonToggleContainer,
-  $intermediateText,
-  intermediateText
-} from '@puppet/middleware/ui-components'
-import { ETH_ADDRESS_REGEXP, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
+import { $ButtonToggle, $defaulButtonToggleContainer } from '@puppet/middleware/ui-components'
+import { ETH_ADDRESS_REGEXP } from '@puppet/middleware/utils'
+import { $node, $text, component, type IBehavior, style } from 'aelea/core'
 import * as router from 'aelea/router'
-import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import { $column, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
-import { $TraderDisplay } from '../../common/$common'
-import { $heading2 } from '../../common/$text'
-import { queryDb } from '../../common/sqlClient.js'
-import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
 import { $TraderPage } from './$Trader.js'
