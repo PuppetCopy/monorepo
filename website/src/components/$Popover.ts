@@ -20,7 +20,7 @@ export const $defaultPopoverContentContainer = $column(
     backgroundColor: pallete.middleground,
     padding: '36px',
     borderRadius: '24px',
-    border: `1px solid ${pallete.background}`,
+    border: `1px solid ${colorAlpha(pallete.foreground, .15)}`,
     boxShadow: `0 0 10px 0 ${colorAlpha(pallete.background, 0.5)}`
   })
 )
@@ -123,7 +123,7 @@ export const $Popover = ({
 
       const $content = switchLatest(
         map((content) => {
-          return until(dismissEvent, mergeArray([style({ zIndex: 3456 })(contentOps(content)), $overlay()]))
+          return until(dismissEvent, mergeArray([style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()]))
         }, openMulticast)
       )
 

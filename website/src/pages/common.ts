@@ -2,7 +2,7 @@ import { unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, style } from 'aelea/core'
 import { $row, $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { Address, Hex } from 'viem'
+import type { Address, Hex, Prettify } from 'viem'
 import type {
   IPositionDecrease,
   IPositionIncrease,
@@ -115,7 +115,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: (ITraderRouteLatestMetric & { traderRouteMetric: Pick<ITraderRouteMetric, 'marketList'> })[]
+  metricList: (ITraderRouteLatestMetric & { traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'marketList' | 'positionList'>> })[]
 ): ITraderRouteMetricSummary {
   const seedAccountSummary: ITraderRouteMetricSummary = {
     account,

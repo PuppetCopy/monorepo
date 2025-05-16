@@ -116,21 +116,21 @@ export const $Table = <T>({
             return $headerCell(style({ cursor: 'pointer' }))(col.columnOp || O(), IBehavior)(
               col.$head,
               sortBy
-                ? $column(
+                ? $column(style({borderRadius: '50%', padding: '6px', border: `1px solid ${colorAlpha(pallete.message, sortBy.selector === col.sortBy ? .25 : .075)}`}))(
                     $icon({
                       $content: $sortArrowDown,
                       svgOps: style({ transform: 'rotate(180deg)' }),
                       width: '8px',
                       viewBox: '0 0 32 19.43',
                       fill:
-                        sortBy.selector === col.sortBy && sortBy.direction === 'desc'
+                        sortBy.selector === col.sortBy && sortBy.direction === 'asc'
                           ? ''
                           : colorAlpha(pallete.message, 0.3)
                     }),
                     $icon({
                       $content: $sortArrowDown,
                       fill:
-                        sortBy.selector === col.sortBy && sortBy.direction === 'asc'
+                        sortBy.selector === col.sortBy && sortBy.direction === 'desc'
                           ? ''
                           : colorAlpha(pallete.message, 0.3),
                       width: '8px',

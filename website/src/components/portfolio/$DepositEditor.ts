@@ -34,6 +34,7 @@ import { type IWriteContractReturn, wallet } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $ApproveSpend } from '../form/$ApproveSpend.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
+import type { Address } from 'viem/accounts'
 
 export enum DepositEditorAction {
   DEPOSIT,

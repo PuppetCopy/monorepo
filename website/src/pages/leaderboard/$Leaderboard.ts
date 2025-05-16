@@ -50,9 +50,11 @@ import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
 import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
+import type { Stream } from '@most/types'
 
 interface ILeaderboard extends IPageFilterParams, IPageParams {
   user: IUserActivityPageParams
+  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
 }
 
 export const $Leaderboard = (config: ILeaderboard) =>
@@ -73,6 +75,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       const {
         activityTimeframe,
         collateralTokenList,
+        draftMatchingRuleList,
         user: { depositTokenList, matchingRuleQuery },
         route
       } = config
@@ -220,6 +223,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     // )
                     return switchMap((list) => {
                       return $TraderMatchingRouteEditor({
+                        draftMatchingRuleList,
                         collateralToken: routeMetric.metric.collateralToken,
                         matchedPuppetList: routeMetric.metric.matchedPuppetList,
                         userMatchingRuleList: list,

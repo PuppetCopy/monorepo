@@ -1,5 +1,4 @@
 import { constant, multicast, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $anchor,
   $discord,
@@ -7,13 +6,11 @@ import {
   $github,
   $icon,
   $instagram,
-  $Link,
   $moreDots,
   $twitter
 } from '@puppet/middleware/ui-components'
 import {
   $element,
-  $text,
   attr,
   combineArray,
   component,
@@ -28,10 +25,9 @@ import {
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
 import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete, type Theme, theme, themeList } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
-import { $stackedCoins, $trophy } from '../common/elements/$icons.js'
+import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/type.js'
 import { $Popover } from './$Popover.js'
 import { $ThemePicker } from './$ThemePicker.js'
@@ -70,50 +66,11 @@ export const $MainMenu = (config: MainMenu) =>
       const $extraMenuPopover = $Popover({
         open: constant(
           $column(spacing.big)(
-            // ...isMobileScreen ? $menuItemList : [],
-            // $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
-            //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://docs.blueberry.club/' }))(
-            //     $icon({ $content: $gitbook, width: '22px', viewBox: `0 0 32 32` })
-            //   ),
-            //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' }))(
-            //     $icon({ $content: $discord, width: '22px', viewBox: `0 0 32 32` })
-            //   ),
-            //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://twitter.com/PuppetFinance' }))(
-            //     $icon({ $content: $twitter, width: '22px', viewBox: `0 0 24 24` })
-            //   ),
-            //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://www.instagram.com/blueberryclub.eth' }))(
-            //     $icon({ $content: $instagram, width: '18px', viewBox: `0 0 32 32` })
-            //   ),
-            //   $anchor(layoutSheet.displayFlex, style({ padding: '0 4px', border: `2px solid ${pallete.horizon}`, borderRadius: '50%', alignItems: 'center', placeContent: 'center', height: '42px', width: '42px' }), attr({ href: 'https://github.com/nissoh/blueberry-club' }))(
-            //     $icon({ $content: $github, width: '22px', viewBox: `0 0 32 32` })
-            //   ),
-            // ),
-
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
                 changeTheme: changeThemeTether()
               })
             })({})
-
-            // switchLatest(snapshot((_, walletQuery) => {
-            //   if (walletQuery === null) {
-            //     return empty()
-            //   }
-
-            //   return $ButtonSecondary({
-            //     $content: $text('Disconnect Wallet')
-            //   })({
-            //     click: changeWalletTether(
-            //       map(async xx => {
-
-            //         // Check if connection is already established
-            //         await disconnect(wagmiConfig)
-
-            //       }),
-            //       awaitPromises
-            //     )
-            //   })
-            // }, changeWallet, walletClientQuery)),
           ),
           clickPopoverClaim
         ),
@@ -134,13 +91,10 @@ export const $MainMenu = (config: MainMenu) =>
             viewBox: '0 0 32 32'
           })
         )
-      })({
-        // overlayClick: clickPopoverClaimTether()
-      })
+      })({})
 
       return [
         $row(
-          // styleBehavior(map(isOpen => ({ width: isOpen ? '210px' : '78px' }), isMenuOpen)),
           spacing.big,
           style({
             transition: 'width .3s ease-in-out',
@@ -181,26 +135,6 @@ export const $MainMenu = (config: MainMenu) =>
                 click: routeChangeTether()
               })
             )
-            // $pageLink({
-            //   $content: $row(spacing.default, style({ alignItems: 'center', cursor: 'pointer', borderRadius: '50px', pointerEvents: 'none' }))(
-            //     $icon({ $content: $trophy, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
-            //     $text(style({ fontSize: '1.15rem' }))('Leaderboard')
-            //   ),
-            //   route: route.create({ fragment: 'leaderboard' }),
-            //   url: '/leaderboard',
-            // })({
-            //   click: routeChangeTether()
-            // }),
-            // $pageLink({
-            //   $content: $row(spacing.default, style({ alignItems: 'center', cursor: 'pointer',  borderRadius: '50px', pointerEvents: 'none' }))(
-            //     $icon({ $content: $gmxLogo, svgOps: style({ width: '28px', aspectRatio: `1 / 1` }), viewBox: '0 0 32 32' }),
-            //     $text(style({ fontSize: '1.15rem' }))('Trade')
-            //   ),
-            //   route: route.create({ fragment: 'trade' }),
-            //   url: '/trade',
-            // })({
-            //   click: routeChangeTether()
-            // }),
           ),
 
           $row(spacing.big, style({ flex: 1, placeContent: 'flex-end', alignItems: 'center' }))(
@@ -236,18 +170,6 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const { route, showAccount = true } = config
       const routeChangeMulticast = multicast(routeChange)
 
-      const $popoverPageLink = ($iconPath: I$Node<SVGPathElement>, text: string | Stream<string>) =>
-        $row(style({ alignItems: 'center', cursor: 'pointer' }))(
-          $icon({
-            $content: $iconPath,
-            width: '16px',
-            fill: pallete.foreground,
-            svgOps: style({ minWidth: '36px' }),
-            viewBox: '0 0 32 32'
-          }),
-          $text(text)
-        )
-
       const $circleButtonAnchor = $anchor(
         style({
           padding: '0 4px',
@@ -264,23 +186,6 @@ export const $MainMenuMobile = (config: MainMenu) =>
       const $extraMenuPopover = $Popover({
         open: constant(
           $column(spacing.big)(
-            $Link({
-              $content: $popoverPageLink($gmxLogo, 'Trade'),
-              url: '/trade',
-              route: route.create({ fragment: 'feefwefwe' })
-            })({
-              // $Link({ $content: $pageLink($gmxLogo, 'Trade'), url: '/trade', disabled: now(false), route: parentRoute.create({ fragment: 'feefwefwe' }) })({
-              click: routeChangeTether()
-            }),
-            $Link({
-              $content: $popoverPageLink($stackedCoins, 'Leaderboard'),
-              url: '/leaderboard',
-              route: route.create({ fragment: 'feefwefwe' })
-            })({
-              click: routeChangeTether()
-            }),
-
-            // ...isMobileScreen ? $menuItemList : [],
             $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
               $anchor(
                 layoutSheet.displayFlex,
@@ -350,28 +255,10 @@ export const $MainMenuMobile = (config: MainMenu) =>
             ),
 
             $ButtonSecondary({
-              $content: $ThemePicker(startWith(theme, changeTheme))({})
+              $content: $ThemePicker(startWith(theme, changeTheme))({
+                changeTheme: changeThemeTether()
+              })
             })({})
-
-            // switchLatest(snapshot((_, wallet) => {
-            //   if (wallet === null) {
-            //     return empty()
-            //   }
-
-            //   return $ButtonSecondary({
-            //     $content: $text('Disconnect Wallet')
-            //   })({
-            //     click: walletChangeTether(
-            //       map(async xx => {
-
-            //         // Check if connection is already established
-            //         // await disconnect(wagmiConfig)
-
-            //       }),
-            //       awaitPromises
-            //     )
-            //   })
-            // }, walletChange, walletClientQuery)),
           ),
           clickPopoverClaim
         ),

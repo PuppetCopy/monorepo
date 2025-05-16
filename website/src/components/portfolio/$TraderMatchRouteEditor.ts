@@ -23,6 +23,7 @@ interface ITraderMatchingRouteEditor {
   $container?: INodeCompose
   collateralToken: Address
   displayCollateralTokenSymbol?: boolean
+  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
 }
 
 export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
@@ -31,13 +32,13 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
   component(
     (
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchingRule | undefined>,
-      [discardDraft, discardDraftTether]: IBehavior<IMatchingRuleEditorChange>,
-      [saveDraft, saveDraftTether]: IBehavior<IMatchingRuleEditorChange>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
     ) => {
       const traderMatchingKey = getMatchKey(config.collateralToken, config.trader)
 
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
+        draftMatchingRuleList,
         trader,
         collateralToken,
         matchedPuppetList,
@@ -54,16 +55,16 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           $container,
           open: map(() => {
             return $MatchRuleEditor({
-              matchingRule,
+              draftMatchingRuleList,
+              model: matchingRule,
               traderMatchingKey,
               collateralToken,
               trader
             })({
-              remove: discardDraftTether(),
-              save: saveDraftTether()
+              changeMatchRuleList: changeMatchRuleListTether()
             })
           }, popRouteSubscriptionEditor),
-          dismiss: mergeArray([saveDraft, discardDraft]),
+          dismiss: changeMatchRuleList,
           $target: $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '8px' : '4px' }))(
               $row(style({ alignItems: 'center' }))(
@@ -109,36 +110,7 @@ export const $TraderMatchingRouteEditor = (config: ITraderMatchingRouteEditor) =
           })
         })({}),
         {
-          changeMatchRuleList: mergeArray([
-            map((params) => {
-              const index = userMatchingRuleList.findIndex(
-                (x) => x.trader === trader && x.collateralToken === collateralToken
-              )
-              const newList: IMatchingRuleEditorChange[] = [...userMatchingRuleList]
-              const change = {
-                ...matchingRule,
-                ...params.saveDraft
-              }
-              if (index === -1) {
-                newList.push(change)
-                return newList
-              }
-
-              newList[index] = change
-              return newList
-            }, combineState({ saveDraft })),
-            map((draft) => {
-              const index = userMatchingRuleList.findIndex((x) => x.trader === trader)
-              const newList = [...userMatchingRuleList]
-
-              if (index === -1) {
-                return userMatchingRuleList
-              }
-
-              newList.splice(index, 1)
-              return newList
-            }, discardDraft)
-          ])
+          changeMatchRuleList
         }
       ]
     }

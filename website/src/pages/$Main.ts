@@ -128,7 +128,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         )
       )
 
-      const matchRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
+      const draftMatchingRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
       const depositTokenList = replayLatest(changeDepositTokenList, [] as IDepositEditorChange[])
 
       return [
@@ -169,6 +169,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $Leaderboard({
+                  draftMatchingRuleList,
                   route: leaderboardRoute,
                   activityTimeframe,
                   collateralTokenList,
@@ -307,7 +308,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
               $PortfolioEditorDrawer({
                 depositTokenList,
-                matchRuleList
+                draftMatchingRuleList,
               })({
                 changeWallet: changeWalletTether(),
                 changeMatchRuleList: changeMatchRuleListTether(),

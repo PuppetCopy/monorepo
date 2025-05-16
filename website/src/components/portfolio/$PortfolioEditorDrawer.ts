@@ -23,13 +23,13 @@ import { $RouteDepositEditor } from './$RouteDepositEditor.js'
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   depositTokenList: Stream<IDepositEditorChange[]>
-  matchRuleList: Stream<IMatchingRuleEditorChange[]>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
 }
 
 interface IPortfolioRoute {
   collateralToken: Address
   deposit: IDepositEditorChange | null
-  matchRuleList: IMatchingRuleEditorChange[]
+  matchingRuleList: IMatchingRuleEditorChange[]
 }
 
 export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
@@ -41,28 +41,28 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
     ) => {
-      const { matchRuleList, depositTokenList } = config
+      const { draftMatchingRuleList, depositTokenList } = config
 
       const openDrawerState = skipRepeatsWith((prev, next) => {
-        const prevCount = prev.matchRuleList.length + prev.depositTokenList.length
-        const nextCount = next.matchRuleList.length + next.depositTokenList.length
+        const prevCount = prev.draftMatchingRuleList.length + prev.depositTokenList.length
+        const nextCount = next.draftMatchingRuleList.length + next.depositTokenList.length
         return prevCount > 0 && nextCount > 0
-      }, combineState({ matchRuleList, depositTokenList }))
+      }, combineState({ draftMatchingRuleList, depositTokenList }))
 
       return [
         switchMap((params) => {
-          if (params.matchRuleList.length === 0 && params.depositTokenList.length === 0) {
+          if (params.draftMatchingRuleList.length === 0 && params.depositTokenList.length === 0) {
             return empty()
           }
 
-          const updateList = [...params.matchRuleList, ...params.depositTokenList]
+          const updateList = [...params.draftMatchingRuleList, ...params.depositTokenList]
           const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
             const collateralToken = 'token' in item ? item.token : item.collateralToken
             const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
 
             if (existingRoute) {
               if ('throttleActivity' in item) {
-                existingRoute.matchRuleList.push(item)
+                existingRoute.matchingRuleList.push(item)
               } else if ('token' in item) {
                 existingRoute.deposit = item
               }
@@ -70,11 +70,11 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
               const newDraft: IPortfolioRoute = {
                 collateralToken,
                 deposit: null,
-                matchRuleList: []
+                matchingRuleList: []
               }
 
               if ('throttleActivity' in item) {
-                newDraft.matchRuleList.push(item)
+                newDraft.matchingRuleList.push(item)
               } else if ('token' in item) {
                 newDraft.deposit = item
               }
@@ -135,8 +135,8 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                       $row(spacing.default)(
                         $seperator2,
                         $column(style({ flex: 1, padding: '12px 0' }))(
-                          ...route.matchRuleList.map((modSubsc) => {
-                            const iconColorParams = modSubsc?.id
+                          ...route.matchingRuleList.map((modSubsc) => {
+                            const iconColorParams = modSubsc?.model
                               ? modSubsc.expiry === 0n
                                 ? {
                                     fill: pallete.negative,
@@ -214,9 +214,9 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                         const callStack: Hex[] = []
                         const contractDefs = CONTRACT[42161].RouterProxy
 
-                        if (params.matchRuleList.length > 0) {
+                        if (params.draftMatchingRuleList.length > 0) {
                           callStack.push(
-                            ...params.matchRuleList.map((matchRule) => {
+                            ...params.draftMatchingRuleList.map((matchRule) => {
                               const ruleParams = {
                                 allowanceRate: matchRule.allowanceRate,
                                 throttleActivity: matchRule.throttleActivity,
@@ -279,7 +279,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
 
                 return list
               },
-              matchRuleList,
+              draftMatchingRuleList,
               clickRemoveSubsc
             ),
             constant([], clickClose)
