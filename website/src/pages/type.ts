@@ -5,12 +5,12 @@ import type { Address, Hex } from 'viem'
 import type {
   IMatchingRule,
   IPositionDecrease,
-  IPositionFeesCollected,
   IPositionIncrease,
   ITraderRouteLatestMetric,
   ITraderRouteMetric
 } from '../__generated__/ponder.types'
-import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor'
+import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchRuleEditor'
+import type { IDepositEditorDraft } from '../components/portfolio/$RouteDepositEditor'
 
 export interface IComponentPageParams {}
 
@@ -23,9 +23,10 @@ export interface IPageFilterParams {
   collateralTokenList: Stream<Address[]>
 }
 
-export interface IUserActivityPageParams {
-  depositTokenList: Stream<IDepositEditorChange[]>
+export interface IUserPageParams {
+  draftDepositTokenList: Stream<IDepositEditorDraft[]>
   matchingRuleQuery: Stream<Promise<IMatchingRule[]>>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
 export interface IEarningsPlan {

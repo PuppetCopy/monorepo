@@ -1,35 +1,44 @@
-import { constant, empty, map, mergeArray, skipRepeatsWith, snapshot } from '@most/core'
+import { constant, empty, fromPromise, map, mergeArray, skipRepeatsWith, snapshot, switchLatest } from '@most/core'
+import { remove } from '@most/prelude'
 import type { Stream } from '@most/types'
 import { CONTRACT } from '@puppet/middleware/const'
-import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@puppet/middleware/ui-components'
+import {
+  $alert,
+  $alertTooltip,
+  $check,
+  $infoLabeledValue,
+  $infoTooltip,
+  $target,
+  $xCross
+} from '@puppet/middleware/ui-components'
 import { getDuration, readableDate, readablePercentage } from '@puppet/middleware/utils'
+import { getWalletClient } from '@wagmi/core'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { type Address, encodeFunctionData, type Hex } from 'viem'
+import { type Address, encodeFunctionData, erc20Abi, MethodNotFoundRpcError } from 'viem'
 import { $heading3 } from '../../common/$text.js'
 import { $card2, $iconCircular, $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { fadeIn } from '../../transitions/enter.js'
-import { type IWalletConnected, wallet } from '../../wallet/wallet.js'
+import { type IBatchCall, type IWalletConnected, wallet } from '../../wallet/wallet.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 import { $ButtonCircular } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
-import { DepositEditorAction, type IDepositEditorChange } from './$DepositEditor.js'
-import type { IMatchingRuleEditorChange } from './$MatchRuleEditor.js'
-import { $RouteDepositEditor } from './$RouteDepositEditor.js'
+import type { IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
+import { $RouteDepositEditor, DepositEditorAction, type IDepositEditorDraft } from './$RouteDepositEditor.js'
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
-  depositTokenList: Stream<IDepositEditorChange[]>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
+  depositTokenList: Stream<IDepositEditorDraft[]>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
 interface IPortfolioRoute {
   collateralToken: Address
-  deposit: IDepositEditorChange | null
-  matchingRuleList: IMatchingRuleEditorChange[]
+  deposit: IDepositEditorDraft | null
+  matchingRuleList: IMatchingRuleEditorDraft[]
 }
 
 export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
@@ -37,56 +46,56 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
     (
       [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletConnected, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
-      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchingRuleEditorChange>,
+      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchingRuleEditorDraft>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
     ) => {
       const { draftMatchingRuleList, depositTokenList } = config
 
       const openDrawerState = skipRepeatsWith((prev, next) => {
         const prevCount = prev.draftMatchingRuleList.length + prev.depositTokenList.length
         const nextCount = next.draftMatchingRuleList.length + next.depositTokenList.length
-        return prevCount > 0 && nextCount > 0
+        return prevCount > 0 && nextCount > 0 && prevCount === nextCount
       }, combineState({ draftMatchingRuleList, depositTokenList }))
 
       return [
-        switchMap((params) => {
-          if (params.draftMatchingRuleList.length === 0 && params.depositTokenList.length === 0) {
-            return empty()
-          }
-
-          const updateList = [...params.draftMatchingRuleList, ...params.depositTokenList]
-          const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
-            const collateralToken = 'token' in item ? item.token : item.collateralToken
-            const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
-
-            if (existingRoute) {
-              if ('throttleActivity' in item) {
-                existingRoute.matchingRuleList.push(item)
-              } else if ('token' in item) {
-                existingRoute.deposit = item
-              }
-            } else {
-              const newDraft: IPortfolioRoute = {
-                collateralToken,
-                deposit: null,
-                matchingRuleList: []
-              }
-
-              if ('throttleActivity' in item) {
-                newDraft.matchingRuleList.push(item)
-              } else if ('token' in item) {
-                newDraft.deposit = item
-              }
-
-              acc.push(newDraft)
+        fadeIn(
+          switchMap((params) => {
+            if (params.draftMatchingRuleList.length === 0 && params.depositTokenList.length === 0) {
+              return empty()
             }
 
-            return acc
-          }, [])
+            const updateList = [...params.draftMatchingRuleList, ...params.depositTokenList]
+            const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
+              const collateralToken = 'action' in item ? item.token : item.collateralToken
+              const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
 
-          return fadeIn(
-            $card2(
+              if (existingRoute) {
+                if ('throttleActivity' in item) {
+                  existingRoute.matchingRuleList.push(item)
+                } else if ('token' in item) {
+                  existingRoute.deposit = item
+                }
+              } else {
+                const newDraft: IPortfolioRoute = {
+                  collateralToken,
+                  deposit: null,
+                  matchingRuleList: []
+                }
+
+                if ('throttleActivity' in item) {
+                  newDraft.matchingRuleList.push(item)
+                } else if ('token' in item) {
+                  newDraft.deposit = item
+                }
+
+                acc.push(newDraft)
+              }
+
+              return acc
+            }, [])
+
+            return $card2(
               style({
                 border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
                 padding: '18px 0',
@@ -98,7 +107,10 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
                   $heading3($text('Portfolio Changes')),
                   $infoTooltip(
-                    'The following rules will apply to these traders in your portfolio. visit Profile to view your portfolio'
+                    $text(
+                      'The following rules will apply to these traders in your portfolio.',
+                      'visit Profile to view your portfolio'
+                    )
                   ),
 
                   $node(style({ flex: 1 }))(),
@@ -126,10 +138,9 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                       )(
                         $RouteDepositEditor({
                           collateralToken: route.collateralToken,
-                          depositTokenList
+                          draftDepositTokenList: depositTokenList
                         })({
-                          changeDepositTokenList: changeDepositTokenListTether(),
-                          changeWallet: changeWalletTether()
+                          changeDepositTokenList: changeDepositTokenListTether()
                         })
                       ),
                       $row(spacing.default)(
@@ -201,68 +212,109 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                   })
                 ),
 
-                $row(spacing.small, style({ placeContent: 'space-between', padding: '0 24px' }))(
-                  $node(),
+                $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
+                  $node(style({ flex: 1, minWidth: 0 }))(
+                    switchLatest(
+                      switchMap(
+                        async (getWalelt) => {
+                          try {
+                            const capabilities = await getWalelt.getCapabilities()
+                            if (capabilities) {
+                              return $text(
+                                ...Object.values(capabilities)
+                                  .map((cap) => cap.name)
+                                  .join(', ')
+                              )
+                            }
+                          } catch (error) {
+                            if (error instanceof MethodNotFoundRpcError) {
+                              return $alertTooltip(
+                                $text(
+                                  'Connected Wallet does not support batch calls (EIP 5792). Falling back to multiple transactions.'
+                                )
+                              )
+                            }
+
+                            return $row($alert($text('Wallet does not support capabilities')))
+                          }
+                        },
+                        fromPromise(getWalletClient(wallet.wagmiAdapter.wagmiConfig))
+                      )
+                    )
+                  ),
                   $SubmitBar({
                     $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
                     txQuery: requestChangeSubscription
-                    // alert: validationError
                   })({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async (account) => {
-                        const callStack: Hex[] = []
-                        const contractDefs = CONTRACT[42161].RouterProxy
+                        const routerContractaParams = CONTRACT[42161].RouterProxy
+                        const tokenRouteContractParams = CONTRACT[42161].TokenRouter
 
-                        if (params.draftMatchingRuleList.length > 0) {
-                          callStack.push(
-                            ...params.draftMatchingRuleList.map((matchRule) => {
-                              const ruleParams = {
-                                allowanceRate: matchRule.allowanceRate,
-                                throttleActivity: matchRule.throttleActivity,
-                                expiry: matchRule.expiry
+                        const calls: IBatchCall[] = []
+
+                        for (const deposit of params.depositTokenList) {
+                          if (deposit.action === DepositEditorAction.DEPOSIT) {
+                            calls.push(
+                              {
+                                to: deposit.token,
+                                data: encodeFunctionData({
+                                  abi: erc20Abi,
+                                  functionName: 'approve',
+                                  args: [tokenRouteContractParams.address, deposit.amount]
+                                })
+                              },
+                              {
+                                to: routerContractaParams.address,
+                                data: encodeFunctionData({
+                                  ...routerContractaParams,
+                                  functionName: 'deposit',
+                                  args: [deposit.token, deposit.amount]
+                                })
                               }
-
-                              return encodeFunctionData({
-                                ...contractDefs,
-                                functionName: 'setMatchingRule',
-                                args: [matchRule.collateralToken, matchRule.trader, ruleParams]
+                            )
+                          } else {
+                            calls.push({
+                              to: routerContractaParams.address,
+                              data: encodeFunctionData({
+                                ...routerContractaParams,
+                                functionName: 'withdraw',
+                                args: [deposit.token, account.address, deposit.amount]
                               })
                             })
-                          )
+                          }
                         }
 
-                        if (params.depositTokenList.length > 0) {
-                          callStack.push(
-                            ...params.depositTokenList.map((deposit) =>
-                              deposit.action === DepositEditorAction.DEPOSIT
-                                ? encodeFunctionData({
-                                    ...contractDefs,
-                                    functionName: 'deposit',
-                                    args: [deposit.token, deposit.value.amount]
-                                  })
-                                : encodeFunctionData({
-                                    ...contractDefs,
-                                    functionName: 'withdraw',
-                                    args: [deposit.token, account.address, deposit.value.amount]
-                                  })
-                            )
-                          )
-                        }
-
-                        return wallet.write({
-                          ...contractDefs,
-                          functionName: 'multicall',
-                          args: [callStack]
-                        })
+                        return wallet.writeMany([
+                          ...calls,
+                          ...params.draftMatchingRuleList.map((matchRule) => {
+                            return {
+                              to: routerContractaParams.address,
+                              data: encodeFunctionData({
+                                ...routerContractaParams,
+                                functionName: 'setMatchingRule',
+                                args: [
+                                  matchRule.collateralToken,
+                                  matchRule.trader,
+                                  {
+                                    allowanceRate: matchRule.allowanceRate,
+                                    throttleActivity: matchRule.throttleActivity,
+                                    expiry: matchRule.expiry
+                                  }
+                                ]
+                              })
+                            }
+                          })
+                        ])
                       })
                     )
                   })
                 )
               )
             )
-          )
-        }, openDrawerState),
+          }, openDrawerState)
+        ),
 
         {
           changeWallet,
@@ -272,12 +324,10 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 const idx = list.indexOf(subsc)
 
                 if (idx === -1) {
-                  return list
+                  return [list]
                 }
 
-                list.splice(idx, 1)
-
-                return list
+                return remove(idx, list)
               },
               draftMatchingRuleList,
               clickRemoveSubsc

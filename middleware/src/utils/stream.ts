@@ -8,6 +8,7 @@ import {
   fromPromise,
   map,
   merge,
+  multicast,
   now,
   periodic,
   recoverWith,
@@ -16,10 +17,9 @@ import {
   zipArray
 } from '@most/core'
 import { disposeNone } from '@most/disposable'
-import { curry2 } from '@most/prelude'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
-import { combineArray, type IOps, isStream, O } from 'aelea/core'
+import { type IOps, O, replayLatest } from 'aelea/core'
 import { countdownFn, unixTimestampNow } from './utils.js'
 
 export type StateParams<T> = {
@@ -237,4 +237,8 @@ function fatalError(e: unknown): void {
 
 function rethrow(e: unknown): never {
   throw e
+}
+
+export function replayState<T>(s: Stream<T>, initialState?: T): Stream<T> {
+  return replayLatest(multicast(s), initialState)
 }

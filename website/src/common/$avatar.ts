@@ -1,5 +1,5 @@
 import { tap } from '@most/core'
-import { $element, $svg, attr } from 'aelea/core'
+import { $svg, attr } from 'aelea/core'
 import Color from 'color'
 // @ts-ignore
 import MersenneTwister from 'mersenne-twister'

@@ -4,36 +4,35 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $intermediatePromise } from '@puppet/middleware/ui-components'
 import { $text, combineState, component, type IBehavior, style } from 'aelea/core'
-import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
-
+import type { Address } from 'viem/accounts'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
-import type { IDepositEditorChange } from '../../components/portfolio/$DepositEditor.js'
-import { $RouteDepositEditor } from '../../components/portfolio/$RouteDepositEditor.js'
-import type { IMatchRuleEditorChange } from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import { $RouteDepositEditor, type IDepositEditorDraft } from '../../components/portfolio/$RouteDepositEditor.js'
 import { $seperator2 } from '../common.js'
-import type { IUserActivityPageParams } from '../type.js'
+import type { IUserPageParams } from '../type.js'
 
-interface IWalletPuppet extends IUserActivityPageParams {
-  depositTokenList: Stream<IDepositEditorChange[]>
-  matchingRuleList: Stream<IMatchRuleEditorChange[]>
+interface IWalletPuppet extends IUserPageParams {
+  draftDepositTokenList: Stream<IDepositEditorDraft[]>
+  matchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
 export const $WalletPuppet = (config: IWalletPuppet) =>
   component(
     (
-      [changeRoute, changeRouteTether]: IBehavior<string, string>,
-      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchRuleEditorChange>,
-      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
+      [changeRoute, _changeRouteTether]: IBehavior<string, string>,
+      [modifySubscriber, _modifySubscriberTether]: IBehavior<IMatchingRuleEditorDraft>,
+      [changeWallet, _changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
+      [changeMatchRuleList, _changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
     ) => {
-      const { activityTimeframe, depositTokenList, selectedCollateralTokenList } = config
+      const { activityTimeframe, draftDepositTokenList: depositTokenList, selectedCollateralTokenList } = config
 
       const tableParams = map(async (params) => {
         const activityTimeframe = params.activityTimeframe
@@ -53,14 +52,20 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
               margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
             })
           )(
-            $TradeRouteTimeline({ ...config })({
+            $TradeRouteTimeline({
+              activityTimeframe,
+              collateralTokenList,
+              draftDepositTokenList: depositTokenList,
+              matchingRuleQuery,
+              metricsQuery
+            })({
               selectMarketTokenList: selectMarketTokenListTether(),
               changeActivityTimeframe: changeActivityTimeframeTether()
             })
           ),
 
           $intermediatePromise({
-            $$display: map(async (paramsQuery) => {
+            $display: map(async (paramsQuery) => {
               const params = await paramsQuery
 
               if (params.collateralTokenList.length === 0) {
@@ -80,12 +85,11 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
                       style({ padding: '6px 0' })
                     )(
                       $RouteDepositEditor({
-                        depositTokenList,
+                        draftDepositTokenList: depositTokenList,
                         collateralToken,
                         providerClientQuery,
                         walletClientQuery
                       })({
-                        changeWallet: changeWalletTether(),
                         changeDepositTokenList: changeDepositTokenListTether()
                       })
                     ),

@@ -3,9 +3,6 @@
   "[svg]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[solidity]": {
-    
-  },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

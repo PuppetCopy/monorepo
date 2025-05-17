@@ -93,7 +93,7 @@ export function $Dropdown<T>({
     ) => {
       const openTrigger = constant(true, mergeArray([openMenu]))
       const windowClick = switchLatest(
-        map((open) => take(1, skip(1, eventElementTarget('click', window))), openTrigger)
+        map((_open) => take(1, skip(1, eventElementTarget('click', window))), openTrigger)
       )
 
       const closeTrigger = constant(false, mergeArray([windowClick]))
@@ -239,7 +239,7 @@ export const $DropMultiSelect = <T>({
       [blur, blurTether]: IBehavior<INode, false>,
 
       [focusField, focusFieldTether]: IBehavior<INode, FocusEvent>,
-      [inputSearch, inputSearchTether]: IBehavior<INode<HTMLInputElement>, string>,
+      [_inputSearch, inputSearchTether]: IBehavior<INode<HTMLInputElement>, string>,
       [clickOptionRemove, clickOptionRemoveTether]: IBehavior<INode, T>
     ) => {
       const openTrigger = mergeArray([focusField, constant(true, openMenu)])

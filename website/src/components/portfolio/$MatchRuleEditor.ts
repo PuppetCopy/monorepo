@@ -26,7 +26,7 @@ import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
 
-export interface IMatchingRuleEditorChange {
+export interface IMatchingRuleEditorDraft {
   allowanceRate: bigint
   throttleActivity: bigint
   expiry: bigint
@@ -41,18 +41,19 @@ export type IMatchRuleEditor = {
   traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
-  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
+// TODO: decouple list handling from editor
 export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
   component(
     (
       [inputEndDate, inputEndDateTether]: IBehavior<any, bigint>,
       [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
-      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorChange>,
+      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorDraft>,
       [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
       [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
-      [save, saveTether]: IBehavior<PointerEvent, IMatchingRuleEditorChange>
+      [save, saveTether]: IBehavior<PointerEvent, IMatchingRuleEditorDraft>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
         localStore.ruleEditor,
@@ -189,16 +190,19 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
                     ...model,
                     ...params
                   }
-                } else {
-                  params.draftMatchingRuleList.push({
+
+                  return [...params.draftMatchingRuleList]
+                }
+
+                return [
+                  ...params.draftMatchingRuleList,
+                  {
                     traderMatchingKey,
                     trader,
                     collateralToken,
                     ...params.draft
-                  })
-                }
-
-                return params.draftMatchingRuleList
+                  }
+                ]
               },
               combineState({ draftMatchingRuleList, draft }),
               save

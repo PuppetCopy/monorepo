@@ -12,10 +12,9 @@ import {
   type INodeCompose,
   type IOps,
   nodeEvent,
-  O,
   style
 } from 'aelea/core'
-import { $column, $icon, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
 
@@ -35,7 +34,7 @@ export interface TableOption<T> {
 
   $container?: INodeCompose
   $rowContainer?: INodeCompose
-  $headerContainer?: INodeCompose
+  $headerRowContainer?: INodeCompose
 
   $cell?: INodeCompose
   $bodyCell?: INodeCompose
@@ -52,7 +51,8 @@ export interface TableColumn<T> {
 
   gridTemplate?: string
 
-  columnOp?: IOps<INode, INode>
+  $bodyCellContainer?: INodeCompose
+  $headerCellContainer?: INodeCompose
 }
 
 export interface IPageRequest {
@@ -85,7 +85,7 @@ export const $Table = <T>({
   scrollConfig,
 
   $container = $defaultTableContainer,
-  $headerContainer = $defaultTableRowContainer,
+  $headerRowContainer = $defaultTableRowContainer,
   $cell = $defaultTableCell,
   $bodyCell = $cell,
   $headerCell = $defaultTableHeaderCell,
@@ -108,15 +108,22 @@ export const $Table = <T>({
         gridTemplateColumns: columns.map((col) => col.gridTemplate || '1fr').join(' ')
       })
 
-      const $header = $headerContainer(gridTemplateColumns)(
+      const $header = $headerRowContainer(gridTemplateColumns)(
         ...columns.map((col) => {
+          const $headerCellContainer = col.$headerCellContainer || $headerCell
           if (col.sortBy) {
-            const IBehavior = sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
-
-            return $headerCell(style({ cursor: 'pointer' }))(col.columnOp || O(), IBehavior)(
+            return $headerCellContainer(style({ cursor: 'pointer' }))(
+              sortByChangeTether(nodeEvent('click'), constant(col.sortBy))
+            )(
               col.$head,
               sortBy
-                ? $column(style({borderRadius: '50%', padding: '6px', border: `1px solid ${colorAlpha(pallete.message, sortBy.selector === col.sortBy ? .25 : .075)}`}))(
+                ? $column(
+                    style({
+                      borderRadius: '50%',
+                      padding: '6px',
+                      border: `1px solid ${colorAlpha(pallete.message, sortBy.selector === col.sortBy ? 0.25 : 0.075)}`
+                    })
+                  )(
                     $icon({
                       $content: $sortArrowDown,
                       svgOps: style({ transform: 'rotate(180deg)' }),
@@ -141,9 +148,7 @@ export const $Table = <T>({
             )
           }
 
-          const $headCell = $headerCell(col.columnOp || O())(col.$head)
-
-          return $headCell
+          return $headerCellContainer(col.$head)
         })
       )
 
@@ -157,7 +162,8 @@ export const $Table = <T>({
                     ($rowContainer) => {
                       return $rowContainer(gridTemplateColumns)(
                         ...columns.map((col) => {
-                          return $bodyCell(col.columnOp || O())(switchLatest(col.$bodyCallback(now(rowData))))
+                          const $body = col.$bodyCellContainer ?? $bodyCell
+                          return $body(switchLatest(col.$bodyCallback(now(rowData))))
                         })
                       )
                     },
@@ -166,7 +172,8 @@ export const $Table = <T>({
                 )
               : $rowContainer(gridTemplateColumns)(
                   ...columns.map((col) => {
-                    return $bodyCell(col.columnOp || O())(switchLatest(col.$bodyCallback(now(rowData))))
+                    const $body = col.$bodyCellContainer ?? $bodyCell
+                    return $body(switchLatest(col.$bodyCallback(now(rowData))))
                   })
                 )
           })

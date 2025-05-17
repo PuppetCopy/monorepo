@@ -18,7 +18,7 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
-import { $row, type Control, layoutSheet, spacing } from 'aelea/ui-components'
+import { $row, type Control, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $iconCircular } from '../../common/elements/$common.js'
@@ -105,7 +105,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
   component(
     (
       [click, clickTether]: IBehavior<PointerEvent, PointerEvent>,
-      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>
+      [_changeWallet, _changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 

@@ -66,6 +66,7 @@ export const $FieldLabeled = ({
   placeholder,
   hint,
   labelWidth,
+  value,
   $container = $defaultTextFieldContainer
 }: ITextField) =>
   component(([change, sampleValue]: IBehavior<string, string>) => {
@@ -77,7 +78,9 @@ export const $FieldLabeled = ({
             attrBehavior(map((placeholder) => ({ placeholder }), toStream(placeholder))),
             overideInputStyle
           )(
-            $Field({})({
+            $Field({
+              value
+            })({
               change: sampleValue()
             })
           )

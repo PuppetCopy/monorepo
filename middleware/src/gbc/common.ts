@@ -1,4 +1,3 @@
-import { unixTimestampNow } from '../utils/utils.js'
 import { svgParts } from './mappings/svgParts.js'
 import {
   AttributeBackground,

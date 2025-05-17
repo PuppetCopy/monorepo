@@ -23,6 +23,7 @@
             "syntax": "shorthand"
           }
         },
+        "useLiteralEnumMembers": "off",
         "noCommaOperator": "error",
         "useNodejsImportProtocol": "error",
         "useAsConstAssertion": "error",
@@ -53,6 +54,10 @@
       },
       "performance": {
         "noAccumulatingSpread": "off"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "off",
+        "noUnusedVariables": "off"
       }
     }
   },

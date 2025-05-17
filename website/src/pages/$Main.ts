@@ -30,9 +30,9 @@ import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu, $MainMenuMobile } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
-import type { IDepositEditorChange } from '../components/portfolio/$DepositEditor.js'
-import type { IMatchingRuleEditorChange } from '../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
+import type { IDepositEditorDraft } from '../components/portfolio/$RouteDepositEditor.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
@@ -60,10 +60,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
-      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
+      [_changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
     ) => {
       // walletConnectAppkit.getIsConnectedState()
 
@@ -82,16 +82,16 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
       const profileRoute = rootRoute.create({ fragment: 'profile' })
-      const walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
-      const tradeRoute = rootRoute.create({ fragment: 'trade' })
-      const tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
+      const _walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
+      const _tradeRoute = rootRoute.create({ fragment: 'trade' })
+      const _tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
 
       const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
-      const adminRoute = rootRoute.create({ fragment: 'admin' })
+      const _adminRoute = rootRoute.create({ fragment: 'admin' })
 
-      const opengraph = rootRoute.create({ fragment: 'og' })
+      const _opengraph = rootRoute.create({ fragment: 'og' })
 
-      const $liItem = $element('li')(style({ marginBottom: '14px' }))
+      const _$liItem = $element('li')(style({ marginBottom: '14px' }))
 
       const isDesktopScreen = skipRepeats(
         map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window)))
@@ -104,7 +104,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         'collateralTokenList'
       )
 
-      const pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
+      const _pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
 
       const subgraphBeaconStatusColor = map((status) => {
         const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
@@ -123,13 +123,13 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const matchingRuleQuery = replayLatest(
         multicast(
           queryUserMatchingRuleList({
-            account: wallet.account
+            address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
           })
         )
       )
 
-      const draftMatchingRuleList = multicast(replayLatest(changeMatchRuleList, [] as IMatchingRuleEditorChange[]))
-      const depositTokenList = replayLatest(changeDepositTokenList, [] as IDepositEditorChange[])
+      const draftMatchingRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchingRuleEditorDraft[])
+      const draftDepositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorDraft[])
 
       return [
         $column(
@@ -145,38 +145,17 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               routeChange: changeRouteTether()
             })
           }, isDesktopScreen),
-          // router.contains(walletRoute)(
-          //   $midContainer(
-          //     $WalletPage({
-          //       route: walletRoute,
-          //       depositTokenList,
-          //       matchRuleList,
-          //       activityTimeframe,
-          //       selectedCollateralTokenList,
-          //       pricefeedMapQuery
-          //     })({
-          //       changeWallet: changeWalletTether(),
-          //       changeRoute: changeRouteTether(),
-          //       changeActivityTimeframe: changeActivityTimeframeTether(),
-          //       selectMarketTokenList: selectMarketTokenListTether(),
 
-          //       changeMatchRuleList: changeMatchRuleListTether(),
-          //       changeDepositTokenList: changeDepositTokenListTether()
-          //     })
-          //   )
-          // ),
           router.match(rootRoute)(
             $midContainer(
               fadeIn(
                 $Leaderboard({
-                  draftMatchingRuleList,
                   route: leaderboardRoute,
+                  draftMatchingRuleList,
                   activityTimeframe,
                   collateralTokenList,
-                  user: {
-                    depositTokenList,
-                    matchingRuleQuery
-                  }
+                  draftDepositTokenList,
+                  matchingRuleQuery
                 })({
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
@@ -191,10 +170,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               fadeIn(
                 $PublicUserPage({
                   route: profileRoute,
-                  collateralTokenList,
-                  matchingRuleQuery,
                   activityTimeframe,
-                  depositTokenList
+                  collateralTokenList,
+                  draftDepositTokenList,
+                  draftMatchingRuleList,
+                  matchingRuleQuery
                 })({
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   changeMatchRuleList: changeMatchRuleListTether(),
@@ -305,10 +285,21 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             })({})
           ),
           router.contains(rootRoute)(
-            $column(style({ maxWidth: '1000px', margin: '0 auto', width: '100%', zIndex: 10 }))(
+            $column(
+              style({
+                maxWidth: '1000px',
+                position: 'fixed',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                margin: '0 auto',
+                width: '100%',
+                zIndex: 10
+              })
+            )(
               $PortfolioEditorDrawer({
-                depositTokenList,
-                draftMatchingRuleList,
+                depositTokenList: draftDepositTokenList,
+                draftMatchingRuleList
               })({
                 changeWallet: changeWalletTether(),
                 changeMatchRuleList: changeMatchRuleListTether(),

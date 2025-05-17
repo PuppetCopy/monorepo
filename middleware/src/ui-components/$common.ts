@@ -12,7 +12,6 @@ import {
   type I$Text,
   type INode,
   type IOps,
-  type ISlottable,
   isStream,
   O,
   style,
@@ -101,13 +100,13 @@ export const $alertIntermediateContainer = (...$content: I$Node[]) =>
     ...$content
   )
 
-export const $alert = ($content: I$Node) =>
+export const $alert = ($content: I$Slottable) =>
   $alertNegativeContainer(style({ alignSelf: 'flex-start' }))(
     $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
     $content
   )
 
-export const $alertTooltip = ($content: I$Node) => {
+export const $alertTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
@@ -118,7 +117,7 @@ export const $alertTooltip = ($content: I$Node) => {
   })({})
 }
 
-export const $alertPositiveTooltip = ($content: I$Node) => {
+export const $alertPositiveTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
@@ -129,7 +128,7 @@ export const $alertPositiveTooltip = ($content: I$Node) => {
   })({})
 }
 
-export const $intermediateTooltip = ($content: I$Node) => {
+export const $intermediateTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,

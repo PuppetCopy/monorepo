@@ -18,8 +18,6 @@ export interface TooltipConfig {
   $content: I$Node
   $container?: INodeCompose
   $dropContainer?: INodeCompose
-
-  offset?: number
 }
 
 export const $defaultDropContainer = $column(
@@ -41,7 +39,6 @@ export const $defaultTooltipAnchorContainer = $row(style({ position: 'relative',
 export const $Tooltip = ({
   $anchor,
   $content,
-  offset = 5,
   $container = $defaultTooltipAnchorContainer,
   $dropContainer = $defaultDropContainer
 }: TooltipConfig) =>
@@ -91,38 +88,40 @@ export const $Tooltip = ({
                 style({
                   zIndex: 5160,
                   whiteSpace: 'pre-wrap',
-                  position: 'absolute',
+                  position: 'fixed',
                   visibility: 'hidden',
                   padding: '8px'
                 }),
                 styleInline(
                   zip(
                     ([contentRect], [targetRect]) => {
-                      const { bottom, top, left, right, height } = targetRect.intersectionRect
-                      const { width } = contentRect.boundingClientRect
-                      const rootBounds = contentRect.rootBounds ?? document.body.getBoundingClientRect()
+                      const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
+                      const targetBound = targetRect.intersectionRect
+                      const bottomSpace = window.innerHeight - targetBound.bottom
+                      const goDown = bottomSpace > targetBound.bottom
 
-                      const bottomSpcace = rootBounds.height - bottom
-                      const goDown = bottomSpcace > bottom
+                      // clamp width to screen minus both side‑spacings
+                      const maxWidth = screenWidth
 
-                      const targetSlice = targetRect.intersectionRect.width / 2
+                      const measured = contentRect.target.clientWidth
+                      const width = Math.min(measured, maxWidth)
 
-                      const leftSpace = left + targetSlice
-                      const rightSpace = rootBounds.width - leftSpace
+                      // center on target, then clamp left within [spacing, screenWidth - width - spacing]
+                      const centerX = targetBound.x + targetBound.width / 2
+                      const rawLeft = centerX - width / 2
+                      const maxLeft = screenWidth - width
+                      const left = `${Math.min(rawLeft, maxLeft)}px`
 
-                      const isLeft = leftSpace < rightSpace
-                      const boundingOffset = isLeft
-                        ? leftSpace - width / 2 - targetSlice - offset
-                        : rightSpace - width / 2 - targetSlice
-
-                      const leftPx =
-                        boundingOffset < 0 ? (isLeft ? Math.abs(boundingOffset) : boundingOffset) : targetSlice
+                      const top = `${goDown ? targetBound.bottom : targetBound.y}px`
 
                       return {
-                        [goDown ? 'top' : 'bottom']: `calc(100% + ${0}px)`,
-                        left: `${leftPx}px`,
+                        top,
+                        left,
+                        width: `${width}px`,
+                        maxWidth: `${maxWidth}px`,
+                        transition: 'opacity .2s ease-in-out',
                         visibility: 'visible',
-                        transform: 'translate(-50%, 0)'
+                        transform: `translate(0, ${goDown ? '0' : '-100%'})`
                       }
                     },
                     contentIntersection,

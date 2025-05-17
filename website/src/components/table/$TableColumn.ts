@@ -1,7 +1,7 @@
-import { map, skipRepeats } from '@most/core'
+import { empty, map, skipRepeats } from '@most/core'
 import { latestPriceMap } from '@puppet/middleware/core'
 import { getPositionPnlUsd } from '@puppet/middleware/gmx'
-import { $infoTooltip, type TableColumn } from '@puppet/middleware/ui-components'
+import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet/middleware/ui-components'
 import {
   getBasisPoints,
   getMappedValue,
@@ -9,7 +9,7 @@ import {
   readableDate,
   readablePercentage
 } from '@puppet/middleware/utils'
-import { $node, $text, type IComposeBehavior, type INode, O, style, switchMap, toStream } from 'aelea/core'
+import { $node, $text, type IComposeBehavior, type INode, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -26,7 +26,7 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
 
 export const sizeColumn = (): TableColumn<IPosition> => ({
   $head: $tableHeader('Max Size', 'Leverage'),
-  columnOp: O(spacing.tiny, style({ placeContent: 'flex-end' })),
+  $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
   $bodyCallback: map((mp) => {
     return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
   })
@@ -47,10 +47,10 @@ export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColu
   })
 })
 
-export const pnlColumn = (puppet?: Address): TableColumn<IPosition> => ({
+export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '90px',
-  columnOp: style({ placeContent: 'flex-start' }),
+  $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-start' })),
   $bodyCallback: map((pos) => {
     const latestPrice = map((pm) => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
@@ -116,9 +116,11 @@ export const timeColumn: TableColumn<IPosition> = {
   gridTemplate: 'minmax(110px, 120px)',
   // sortBy: 'openTimestamp',
   $bodyCallback: map((pos) => {
-    return $column(spacing.tiny)(
-      $text(getTimeSince(pos.lastUpdateTimestamp)),
-      $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
-    )
+    return pos.lastUpdate.sizeInUsd === 0n
+      ? $column(spacing.tiny)(
+          $text(getTimeSince(pos.lastUpdateTimestamp)),
+          $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
+        )
+      : empty()
   })
 }

@@ -1,22 +1,22 @@
 import type { IntervalTime } from '@puppet/middleware/const'
 import type { IBehavior } from 'aelea/core'
 import { component, style } from 'aelea/core'
-import { $column, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, isDesktopScreen, spacing } from 'aelea/ui-components'
 
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
-import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
-import type { IUserActivityPageParams } from '../type.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IUserPageParams } from '../type.js'
 
-export interface IPuppetProfile extends IUserActivityPageParams {
+export interface IPuppetProfile extends IUserPageParams {
   // puppetTradeRouteListQuery: Stream<Promise<IPuppetTradeRoute[]>>
 }
 
 export const $PuppetProfile = (config: IPuppetProfile) =>
   component(
     (
-      [changeRoute, changeRouteTether]: IBehavior<string, string>,
-      [modifySubscriber, modifySubscriberTether]: IBehavior<IMatchingRuleEditorChange>,
+      [changeRoute, _changeRouteTether]: IBehavior<string, string>,
+      [modifySubscriber, _modifySubscriberTether]: IBehavior<IMatchingRuleEditorDraft>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>

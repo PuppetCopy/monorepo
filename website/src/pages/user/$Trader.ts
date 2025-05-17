@@ -1,9 +1,15 @@
 import { awaitPromises, map, multicast, startWith } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $intermediateText, $Table, type IQuantumScrollPage, type ISortBy } from '@puppet/middleware/ui-components'
+import {
+  $infoLabel,
+  $intermediateText,
+  $Table,
+  type IQuantumScrollPage,
+  type ISortBy
+} from '@puppet/middleware/ui-components'
 import { pagingQuery, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
+import { $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { asc } from 'ponder'
 import { positionIncrease } from 'schema'
@@ -14,16 +20,16 @@ import { queryDb } from '../../common/sqlClient.js'
 import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
-import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import {
   $defaultTraderMatchRouteEditorContainer,
   $TraderMatchingRouteEditor
 } from '../../components/portfolio/$TraderMatchRouteEditor'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
-import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
+import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
 
-interface ITraderPage extends IPageParams, IUserActivityPageParams, IPageFilterParams {
+interface ITraderPage extends IPageParams, IUserPageParams, IPageFilterParams {
   account: Address
   //   matchRouteStatsQuery: Stream<Promise<IMatchingRuleEditorChange[]>>
 }
@@ -33,12 +39,20 @@ export const $TraderPage = (config: ITraderPage) =>
     (
       [changeRoute, changeRouteTether]: IBehavior<any, string>,
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortBy>,
+      [sortByChange, _sortByChangeTether]: IBehavior<ISortBy>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const { account, activityTimeframe, collateralTokenList, depositTokenList, matchingRuleQuery, route } = config
+      const {
+        account,
+        activityTimeframe,
+        collateralTokenList,
+        draftMatchingRuleList,
+        draftDepositTokenList,
+        matchingRuleQuery,
+        route
+      } = config
 
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 
@@ -80,7 +94,7 @@ export const $TraderPage = (config: ITraderPage) =>
 
       const pageParams = switchMap(async (params) => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-        const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+        const _paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
         const routeMetricList = await params.routeMetricListQuery
 
@@ -197,7 +211,8 @@ export const $TraderPage = (config: ITraderPage) =>
               $TradeRouteTimeline({
                 activityTimeframe,
                 collateralTokenList,
-                depositTokenList,
+                draftMatchingRuleList,
+                draftDepositTokenList,
                 matchingRuleQuery,
                 metricsQuery
               })({
@@ -207,15 +222,15 @@ export const $TraderPage = (config: ITraderPage) =>
             ),
 
             switchMap((params) => {
-              const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+              const _startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-              //   if (list.length === 0) {
-              //     return $column(spacing.small)(
-              //       $text('No active positions found'),
-              //       $infoLabel('Try changing the timeframe or selecting a different trade route')
-              //     )
-              //   }
+              if (params.routeMetricList.length === 0) {
+                return $column(spacing.small)(
+                  $text('No activity to display'),
+                  $infoLabel('Try adjusting filters like Activity timeframe or collateral tokens')
+                )
+              }
 
               return $column(spacing.big)(
                 ...params.routeMetricList.map((routeMetric) => {
@@ -225,7 +240,7 @@ export const $TraderPage = (config: ITraderPage) =>
                       params.positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
                     )
                   }, combineState({ sortBy, paging }))
-                  const collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
+                  const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
@@ -233,8 +248,9 @@ export const $TraderPage = (config: ITraderPage) =>
                       return $TraderMatchingRouteEditor({
                         displayCollateralTokenSymbol: true,
                         collateralToken: routeMetric.collateralToken,
-                        matchedPuppetList: routeMetric.matchedPuppetList,
+                        traderMatchedPuppetList: routeMetric.matchedPuppetList,
                         userMatchingRuleList: list,
+                        draftMatchingRuleList,
                         trader: routeMetric.account,
                         $container: $defaultTraderMatchRouteEditorContainer(
                           style({ marginLeft: '-12px', paddingBottom: '12px' })

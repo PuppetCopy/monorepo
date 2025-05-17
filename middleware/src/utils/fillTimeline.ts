@@ -23,7 +23,7 @@ export function fillTimeline<TSource, TMap, TResult extends TimelineItem<TMap>>(
     sourceList,
     sourceMap,
     gapMap = (prev) => prev,
-    squashMap = (prev, next, timeslot) => sourceMap(next, timeslot),
+    squashMap = (_prev, next, timeslot) => sourceMap(next, timeslot),
     getTime
   } = config
 

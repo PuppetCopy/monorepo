@@ -16,6 +16,7 @@ import {
   component,
   type I$Node,
   type IBehavior,
+  type INodeCompose,
   type ISlottable,
   type IStyleCSS,
   nodeEvent,
@@ -44,7 +45,7 @@ export const $MainMenu = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
+      [changeWallet, _changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
       [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
     ) => {
       const { route, showAccount } = config
@@ -64,7 +65,7 @@ export const $MainMenu = (config: MainMenu) =>
 
       const themeState = startWith(theme, changeTheme)
       const $extraMenuPopover = $Popover({
-        open: constant(
+        $open: constant(
           $column(spacing.big)(
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
@@ -121,20 +122,16 @@ export const $MainMenu = (config: MainMenu) =>
             })
           ),
 
-          $row(
-            spacing.big,
-            style({ flex: 1, alignItems: 'center', placeContent: 'center' })
-          )(
-            style({ padding: 0 })(
-              $pageLink({
-                route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-                // anchorOp: style({  }),
-                url: '/wallet',
-                $content: $walletProfileDisplay()
-              })({
-                click: routeChangeTether()
-              })
-            )
+          $row(style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
+            $pageLink({
+              $container: $anchor(spacing.big, style({ padding: 0 })),
+              route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+              // anchorOp: style({  }),
+              url: '/wallet',
+              $content: $walletProfileDisplay()
+            })({
+              click: routeChangeTether()
+            })
           ),
 
           $row(spacing.big, style({ flex: 1, placeContent: 'flex-end', alignItems: 'center' }))(
@@ -184,7 +181,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
       )
 
       const $extraMenuPopover = $Popover({
-        open: constant(
+        $open: constant(
           $column(spacing.big)(
             $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
               $anchor(
@@ -307,20 +304,15 @@ export const $MainMenuMobile = (config: MainMenu) =>
             })
           ),
 
-          $row(
-            spacing.default,
-            style({ flex: 1, alignItems: 'center', placeContent: 'center' })
-          )(
-            style({ padding: 0 })(
-              $pageLink({
-                route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-                // anchorOp: style({  }),
-                url: '/wallet',
-                $content: $walletProfileDisplay()
-              })({
-                click: routeChangeTether()
-              })
-            )
+          $row(style({ flex: 1, padding: 0, alignItems: 'center', placeContent: 'center' }))(
+            $pageLink({
+              $container: $anchor(spacing.default),
+              route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+              url: '/wallet',
+              $content: $walletProfileDisplay()
+            })({
+              click: routeChangeTether()
+            })
           ),
 
           $row(spacing.big, style({ placeContent: 'flex-end', flex: 1 }))($extraMenuPopover)
@@ -333,17 +325,23 @@ export const $MainMenuMobile = (config: MainMenu) =>
     }
   )
 
-const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $content: I$Node }) => {
+const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompose; $content: I$Node }) => {
   return component(
     (
       [click, clickTether]: IBehavior<string, string>,
       [active, containsTether]: IBehavior<boolean, boolean>,
       [focus, focusTether]: IBehavior<boolean, boolean>
     ) => {
-      const $anchorEl = $anchor(
+      const $anchorEl = (
+        config.$container ??
+        $anchor(
+          style({
+            padding: '11px 22px'
+          })
+        )
+      )(
         style({
           borderRadius: '50px',
-          padding: '11px 22px',
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
         styleBehavior(

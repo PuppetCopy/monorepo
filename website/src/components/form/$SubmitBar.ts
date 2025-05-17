@@ -123,7 +123,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
           $barContent ?? empty(),
           $IntermediateConnectButton({
             $$display: map((wallet) => {
-              const $btn = $ButtonCore({
+              const $primaryActionButton = $ButtonCore({
                 $container: $defaultButtonPrimary(
                   style({
                     position: 'relative',
@@ -133,7 +133,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 disabled: map((params) => {
                   return params.alert !== null || params.disabled || params.isRequestPending
                 }, combineState({ disabled, isRequestPending, alert })),
-                $content: $row(style({ position: 'relative' })($submitContent))
+                $content: $submitContent
               })({
                 click: submitTether()
               })
@@ -149,13 +149,13 @@ export const $SubmitBar = (config: ISubmitBar) =>
                   wallet,
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
-                  $content: $btn,
+                  $content: $primaryActionButton,
                   disabled: combineArray((params) => params.isSpendPending, combineState({ isSpendPending }))
                 })({
                   approveTokenSpend: approveTokenSpendTether()
                 })
               }
-              return $btn
+              return $primaryActionButton
             })
           })({
             changeWallet: changeWalletTether()

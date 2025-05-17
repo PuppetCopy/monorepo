@@ -1,14 +1,14 @@
 import * as PUPPET from '@puppet/middleware/const'
-
 import type { Hex } from 'viem'
+import type { Address } from 'viem/accounts'
 import { wallet } from '../wallet/wallet'
 
 export default {
-  getUserBalance: (token: Address, puppet: Address, contractDefs = PUPPET.CONTRACT[42161]) =>
+  getUserBalance: (token: Address, user: Address, contractDefs = PUPPET.CONTRACT[42161]) =>
     wallet.read({
       ...contractDefs.AllocationStore,
       functionName: 'userBalanceMap',
-      args: [token, puppet]
+      args: [token, user]
     }),
   getUserAllocationList: (key: Hex, puppetList: Address[], contractDefs = PUPPET.CONTRACT[42161]) =>
     wallet.read({

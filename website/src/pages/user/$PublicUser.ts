@@ -6,11 +6,11 @@ import { $node, $text, component, type IBehavior, style } from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
-import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
-import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
 import { $TraderPage } from './$Trader.js'
 
-export interface IProfile extends IPageParams, IPageFilterParams, IUserActivityPageParams {}
+export interface IProfile extends IPageParams, IPageFilterParams, IUserPageParams {}
 
 type IRouteOption = {
   label: string
@@ -23,11 +23,9 @@ export const $PublicUserPage = (config: IProfile) =>
       [changeRoute, changeRouteTether]: IBehavior<string, string>,
       [selectProfileMode, selectProfileModeTether]: IBehavior<IRouteOption, IRouteOption>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
+      [_selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const { depositTokenList, matchingRuleQuery, activityTimeframe, collateralTokenList, route } = config
-
       const profileAddressRoute = config.route
       const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({
         title: 'Trader',

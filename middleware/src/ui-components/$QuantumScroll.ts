@@ -2,7 +2,7 @@ import { constant, filter, join, map, mergeArray, now, recoverWith, until } from
 import type { Stream } from '@most/types'
 import type { IBehavior } from 'aelea/core'
 import { $custom, $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
-import { $column, layoutSheet, observer, spacing } from 'aelea/ui-components'
+import { $column, observer, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $alertNegativeContainer } from './$common.js'
 

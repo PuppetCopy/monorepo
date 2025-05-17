@@ -1,11 +1,13 @@
-import { empty, map, mergeArray, now } from '@most/core'
+import { skipRepeatsWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { type Connector, createAppKit } from '@reown/appkit'
+import { replayState } from '@puppet/middleware/utils'
+import { createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-
 import {
   type GetAccountReturnType,
   getAccount,
+  getCapabilities,
+  getConnectorClient,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
@@ -16,35 +18,32 @@ import {
 import { fromCallback } from 'aelea/core'
 import {
   type Abi,
-  type Address,
+  type Call,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
   fallback,
+  type Hex,
   http,
   type ParseEventLogsReturnType,
+  type Prettify,
   parseEventLogs,
   type ReadContractParameters,
   type ReadContractReturnType,
+  type SendCallsReturnType,
   type TransactionReceipt,
   type WriteContractParameters,
   webSocket
 } from 'viem'
+import type { Address } from 'viem/accounts'
+import { sendCalls, sendTransaction } from 'viem/actions'
 import { arbitrum } from 'viem/chains'
 
-type IWalletClient = GetAccountReturnType
 type IWalletConnected = {
   address: Address
-  addresses: readonly [Address, ...Address[]]
-  chain: number
-  chainId: number
-  connector: Connector
-  isConnected: true
-  isConnecting: false
-  isDisconnected: false
-  isReconnecting: false
-  status: 'connected'
 }
+
+type IGetWalletStatus = Prettify<GetAccountReturnType>
 
 const projectId = import.meta.env.VITE__WC_PROJECT_ID
 
@@ -65,7 +64,7 @@ const wagmiAdapter = new WagmiAdapter({
   networks
 })
 
-const connectAppkit = createAppKit({
+const appkit = createAppKit({
   adapters: [wagmiAdapter],
   networks: [arbitrum],
   showWallets: false,
@@ -94,14 +93,19 @@ const blockChange: Stream<bigint> = fromCallback((cb) => {
   return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: (res) => cb(res) })
 })
 
-const accountChange = fromCallback((cb) => {
-  return watchAccount(wagmiAdapter.wagmiConfig, { onChange: (res) => cb(res) })
-})
+const appkitAccountEvent: Stream<GetAccountReturnType> = skipRepeatsWith(
+  (prev, next) => prev.isConnected === next.isConnected && prev.address === next.address,
+  fromCallback((cb) => {
+    watchAccount(wagmiAdapter.wagmiConfig, {
+      onChange(account, _prevAccount) {
+        cb(account)
+      }
+    })
 
-const account: Stream<GetAccountReturnType> = mergeArray([
-  map(() => getAccount(wagmiAdapter.wagmiConfig), now(null)),
-  accountChange
-])
+    cb(getAccount(wagmiAdapter.wagmiConfig))
+  }) as Stream<GetAccountReturnType>
+)
+const account: Stream<IGetWalletStatus> = replayState(appkitAccountEvent)
 
 async function read<
   TAbi extends Abi,
@@ -151,26 +155,66 @@ async function write<
   }
 }
 
-// connectAppkit.subscribeWalletInfo((aaa) => {
-//   if (aaa) {
-//     console.log('Wallet info:', aaa)
-//   }
-// })
+type IBatchCall = {
+  to: Address
+  data: Hex
+  value?: bigint | undefined
+}
 
-// connectAppkit.subscribeAccount((account) => {
-//   if (account) {
-//     console.log('Account info:', account)
-//   }
-// })
+async function writeMany<calls extends readonly Call[]>(callList: IBatchCall[]): Promise<SendCallsReturnType> {
+  const client = await getConnectorClient(wagmiAdapter.wagmiConfig)
+  const address = client.account.address
+
+  if (!address) {
+    throw new Error('No connected account found')
+  }
+
+  // /  const callList = dataList.filter((data) => data !== undefined).map((data): Call => ({ to: address, data }))
+
+  if (callList.length === 0) {
+    throw new Error('No valid calls to send')
+  }
+
+  const capabilities = await getCapabilities(wagmiAdapter.wagmiConfig).catch((error) => {
+    console.error('Error getting capabilities:', error)
+    return null
+  })
+
+  if (capabilities === null) {
+    for (const call of callList) {
+      if (!call) {
+        throw new Error('Invalid call: "to" and "data" are required')
+      }
+
+      await sendTransaction(client, {
+        account: client.account,
+        chain: client.chain,
+        data: call.data,
+        to: call.to,
+        value: call.value
+      })
+
+      return { id: '' } as SendCallsReturnType
+    }
+  }
+
+  const call = await sendCalls(client, {
+    account: client.account,
+    calls: callList,
+    forceAtomic: true
+  })
+  return call
+}
 
 export const wallet = {
   read,
   write,
-  connectAppkit,
+  writeMany,
+  wagmiAdapter,
+  appkit,
   blockChange,
   account,
-  accountChange,
   transport
 }
 
-export type { IWalletClient, IWalletConnected, IWriteContractReturn }
+export type { IGetWalletStatus, IWalletConnected, IWriteContractReturn, IBatchCall }

@@ -1,6 +1,3 @@
-import type { IPriceCandle } from '../gmx/types.js'
-import type { IResponsePageApi } from '../utils/types.js'
-
 export enum AttributeMappings {
   'Afro Green' = 78,
   'Afro Multicolor' = 42,

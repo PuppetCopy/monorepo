@@ -28,7 +28,7 @@ export interface ITreasury {
 const styleEl = document.createElement('style')
 document.getElementsByTagName('head')[0].appendChild(styleEl)
 
-function createAnimationKeyframe(keyframes: string) {
+function _createAnimationKeyframe(keyframes: string) {
   const animationId = `anim${(Math.random() + 1).toString(36).substring(7)}`
 
   const kframes = `@keyframes ${animationId} {${keyframes}}`
@@ -41,10 +41,10 @@ const installUserChoice: Stream<any> = fromCallback((cb) => {
   return window.addEventListener('beforeinstallprompt', cb)
 })
 
-export const $Home = (config: ITreasury) =>
+export const $Home = (_config: ITreasury) =>
   component(
     (
-      [routeChanges, linkClickTether]: IBehavior<any, any>,
+      [routeChanges, _linkClickTether]: IBehavior<any, any>,
       [clickDownloadBtn, clickDownloadBtnTether]: IBehavior<any, any>
     ) => {
       const $snapSection = $column(
@@ -228,7 +228,7 @@ export const $Home = (config: ITreasury) =>
                   ? switchMap((deferredPrompt) => {
                       return $column(spacing.default)(
                         filterNull(
-                          map((req) => {
+                          map((_req) => {
                             return null
                           }, clickDownloadBtn)
                         ) as any,

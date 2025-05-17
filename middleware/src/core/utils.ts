@@ -1,9 +1,5 @@
 import { type Address, parseAbiParameters } from 'abitype'
 import { encodeAbiParameters, type Hex, keccak256 } from 'viem'
-import { getMarketIndexToken, getTokenDescription } from '../gmx/gmxUtils.js'
-import { type IPriceCandle, type IPricefeedMap, OrderType } from '../gmx/types.js'
-import { factor } from '../utils/mathUtils.js'
-import { getMappedValue, unixTimestampNow } from '../utils/utils.js'
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(
   list: readonly A[],

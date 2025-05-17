@@ -1,33 +1,10 @@
-import {
-  constant,
-  empty,
-  fromPromise,
-  map,
-  merge,
-  mergeArray,
-  multicast,
-  now,
-  recoverWith,
-  startWith,
-  switchLatest
-} from '@most/core'
+import { constant, empty, fromPromise, map, multicast, now, startWith, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
-import {
-  $node,
-  $text,
-  component,
-  type Fn,
-  type I$Node,
-  type IOp,
-  type IOps,
-  replayLatest,
-  style,
-  switchMap
-} from 'aelea/core'
-import { $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $node, $text, type Fn, type I$Node, type IOps, replayLatest, style, switchMap } from 'aelea/core'
+import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
-import { type PromiseStateError, PromiseStatus, promiseState } from '../utils/stream.js'
+import { PromiseStatus, promiseState } from '../utils/stream.js'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
 
 export const $spinner = $node(
@@ -38,10 +15,9 @@ export const $spinner = $node(
   })
 )($text('Loading...'))
 
-export interface I$IntermediatPromise<T> {
+export interface I$IntermediatPromise<_T> {
   clean?: Stream<any>
-
-  $$display: Stream<Promise<I$Node>>
+  $display: Stream<Promise<I$Node>>
   $$fail?: Fn<Error, I$Node>
 
   $loader?: I$Node
@@ -50,7 +26,7 @@ export interface I$IntermediatPromise<T> {
 export const $intermediatePromise = <T>({
   $loader = $spinner,
   $$fail = (res) => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message)))),
-  $$display
+  $display
 }: I$IntermediatPromise<T>) =>
   switchMap((state) => {
     if (state.status === PromiseStatus.PENDING) {
@@ -62,22 +38,7 @@ export const $intermediatePromise = <T>({
     }
 
     return state.value
-
-    // const doneData: Stream<IIntermediateState<T>> = map(
-    //   (data) => ({ status: IIntermediateStatus.DONE, data }),
-    //   fromPromise(prom)
-    // )
-    // const loading: Stream<IIntermediateState<I$Node>> = now({
-    //   status: IIntermediateStatus.LOADING,
-    //   data: $loader
-    // })
-    // const settledOrError = recoverWith(
-    //   (error) => now({ status: IIntermediateStatus.ERROR, data: error } as IIntermediateState<Error>),
-    //   doneData
-    // )
-
-    // return merge(settledOrError, loading)
-  }, promiseState($$display))
+  }, promiseState($display))
 
 type IIntermediateTx<TSuccess extends TransactionReceipt> = {
   $$success?: IOps<TSuccess, I$Node>
@@ -98,7 +59,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
 
   return $intermediatePromise<TSuccess>({
     clean,
-    $$display: map(async (query) => {
+    $display: map(async (query) => {
       const res = await query
 
       return $row(spacing.small, style({ color: pallete.positive }))(

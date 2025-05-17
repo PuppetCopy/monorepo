@@ -9,7 +9,6 @@ import {
 } from '@puppet/middleware/utils'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
-import type { IWalletClient } from '../wallet/wallet'
 import { getStatus, queryDb } from './sqlClient'
 
 export const subgraphStatus = replayLatest(
@@ -51,11 +50,11 @@ export function queryPricefeed(
 
 export function queryUserMatchingRuleList(
   queryParams: StateParams<{
-    account: IWalletClient
+    address: Address | undefined
   }>
 ) {
   return map(async (params) => {
-    const address = params.account.address
+    const address = params.address
     if (address === undefined) {
       return []
     }

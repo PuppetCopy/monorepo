@@ -37,10 +37,10 @@ import {
   readableUnitAmount
 } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-
+import type { Address } from 'viem/accounts'
 import { $heading3 } from '../../common/$text.js'
 import { $card, $labeledDivider, $responsiveFlex } from '../../common/elements/$common.js'
 import { $IntermediateConnectButton } from '../../components/$ConnectWallet.js'
@@ -48,12 +48,11 @@ import { $Popover } from '../../components/$Popover.js'
 import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from '../../components/$Slider.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../../components/form/$Button.js'
 import { $SubmitBar } from '../../components/form/$SubmitBar.js'
-import type { IDepositEditorChange } from '../../components/portfolio/$DepositEditor.js'
-import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IDepositEditorDraft } from '../../components/portfolio/$RouteDepositEditor.js'
 import { localStore } from '../../const/localStore.js'
 import tokenomicsReader from '../../logic/tokenomicsReader.js'
-import type { IWalletClient } from '../../wallet/wallet.js'
-import { type IUserActivityPageParams, IWalletTab } from '../type.js'
+import { type IUserPageParams, IWalletTab } from '../type.js'
 import { $WalletPuppet } from './$WalletPuppet.js'
 
 const optionDisplay = {
@@ -71,7 +70,7 @@ const optionDisplay = {
   }
 }
 
-interface IWalletPageParams extends IUserActivityPageParams {}
+interface IWalletPageParams extends IUserPageParams {}
 
 export const $WalletPage = (config: IWalletPageParams) =>
   component(
@@ -84,8 +83,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
       [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorChange[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
 
       [requestTx, requestTxTether]: IBehavior<IWalletClient, any>,
       [checkCashoutMode, checkCashoutModeTether]: IBehavior<boolean>,
@@ -102,7 +101,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
         activityTimeframe,
         selectedCollateralTokenList,
         pricefeedMapQuery,
-        depositTokenList,
+        draftDepositTokenList: depositTokenList,
         matchingRuleList
       } = config
 
@@ -311,7 +310,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
           $row(style({ flex: 1, placeContent: 'center' }))(
             $IntermediateConnectButton({
-              $$display: map((wallet) => {
+              $$display: map((_wallet) => {
                 // return empty()
                 return $ButtonSecondary({
                   $content: $text('Disconnect')
@@ -353,7 +352,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 selectedCollateralTokenList,
                 providerClientQuery,
                 matchingRuleList,
-                depositTokenList
+                draftDepositTokenList: depositTokenList
               })({
                 changeWallet: changeWalletTether(),
                 changeRoute: changeRouteTether(),
@@ -481,7 +480,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                       ),
                       $node(style({ flex: 1 }))(),
                       $Popover({
-                        open: map(() => {
+                        $open: map(() => {
                           const maxBalance = sample(lockedAmount, popoverClickMaxDeposit)
                           const withdrawAmount = mergeArray([popoverInputAmount, maxBalance])
 
@@ -695,7 +694,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
                             $row(spacing.default, style({ alignItems: 'center' }))(
                               $Popover({
-                                open: map(() => {
+                                $open: map(() => {
                                   const maxBalance = sample(walletBalance, popoverClickMaxDeposit)
 
                                   return $column(spacing.default)(

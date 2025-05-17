@@ -37,7 +37,7 @@ export const $CardTable = <T>(config: TableOption<T>) => {
         padding: '16px 0'
       })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
     },
-    $headerContainer: $defaultTableRowContainer(
+    $headerRowContainer: $defaultTableRowContainer(
       style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
     ),
     $rowContainer: $defaultTableRowContainer(

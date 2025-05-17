@@ -145,16 +145,16 @@ export function parseQueryResults(json: any, schema: any) {
   return entity
 }
 
-function parseFilterObject(query: any) {
+function _parseFilterObject(query: any) {
   if (query === undefined) return ''
 
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       if (value.length === 0) return
-      fields.push(`${key}: [${value.map((arrVal) => `{${parseFilterObject(arrVal)}}`).join(' ')}]`)
+      fields.push(`${key}: [${value.map((arrVal) => `{${_parseFilterObject(arrVal)}}`).join(' ')}]`)
     } else if (value instanceof Object) {
-      fields.push(`${key}: { ${parseFilterObject(value)} }`)
+      fields.push(`${key}: { ${_parseFilterObject(value)} }`)
     } else if (value !== undefined) {
       fields.push(`${key}: ${value}`)
     }
@@ -162,11 +162,11 @@ function parseFilterObject(query: any) {
   return fields.join(' ')
 }
 
-function parseQueryObject(query: any) {
+function _parseQueryObject(query: any) {
   const fields: string[] = []
   Object.entries(query).forEach(([key, value]) => {
     if (value instanceof Object) {
-      fields.push(`${key} { ${parseQueryObject(value)} }`)
+      fields.push(`${key} { ${_parseQueryObject(value)} }`)
     } else {
       fields.push(key)
     }
@@ -174,10 +174,10 @@ function parseQueryObject(query: any) {
   return fields.join(' ')
 }
 
-function fillQuery(obj: any) {
+function _fillQuery(obj: any) {
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key]
-    acc[key] = value instanceof Object ? fillQuery(value) : null
+    acc[key] = value instanceof Object ? _fillQuery(value) : null
     return acc
   }, {} as any)
 }

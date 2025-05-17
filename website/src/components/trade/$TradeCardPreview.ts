@@ -7,14 +7,13 @@ import {
   $text,
   combineState,
   component,
-  type I$Node,
   type IBehavior,
   type INodeCompose,
   motion,
   replayLatest,
   style
 } from 'aelea/core'
-import { $column, $icon, $NumberTicker, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $icon, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, ChartOptions, DeepPartial, MouseEventParams } from 'lightweight-charts'
 import type { IPosition } from '../../pages/type.js'
@@ -31,7 +30,7 @@ export interface ITradeCardPreview extends Omit<IPerformanceTimeline, 'positionL
 export const $TradeCardPreview = (config: ITradeCardPreview) =>
   component(
     (
-      [accountPreviewClick, accountPreviewClickTether]: IBehavior<string, string>,
+      [accountPreviewClick, _accountPreviewClickTether]: IBehavior<string, string>,
       [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams, MouseEventParams>
     ) => {
       const $container = config.$container || $column(style({ height: '80px', minWidth: '100px' }))

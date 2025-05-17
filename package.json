@@ -31,7 +31,7 @@
     "build": "bun run contracts:build && bun run middleware:build && bun run docs:build && bun run website:build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.0-beta.2",
+    "@biomejs/biome": "2.0.0-beta.4",
     "@changesets/cli": "2.29.2",
     "sherif": "1.5.0",
     "typescript": "5.8.3"

@@ -10,7 +10,6 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
-  type IOp,
   type IOps,
   O,
   style,

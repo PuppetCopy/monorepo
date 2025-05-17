@@ -56,7 +56,7 @@ export function getPositionListTimelinePerformance(config: IPerformanceTimeline)
   }
 
   const timeNow = unixTimestampNow()
-  const startTime = timeNow - config.activityTimeframe
+  const _startTime = timeNow - config.activityTimeframe
   const initialPositionTime = config.list
     .map((pos) => pos.blockTimestamp)
     .reduce((a, b) => Math.min(a, b), config.list[0].blockTimestamp)

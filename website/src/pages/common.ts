@@ -22,6 +22,10 @@ export const $seperator2 = style(
   $seperator
 )
 
+function positionLatestTimestamp(position: IPosition): number {
+  return position.lastUpdate.sizeInUsd === 0n ? unixTimestampNow() : position.lastUpdateTimestamp
+}
+
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
   const sortedUpdateList = list.sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const positionMap = new Map<Hex, IPosition>()
@@ -109,13 +113,15 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
   positionList.push(...positionMap.values())
   return positionList.sort((a, b) => {
-    return b.lastUpdateTimestamp - a.lastUpdateTimestamp
+    return positionLatestTimestamp(a) - positionLatestTimestamp(b)
   })
 }
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: (ITraderRouteLatestMetric & { traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'marketList' | 'positionList'>> })[]
+  metricList: (ITraderRouteLatestMetric & {
+    traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'marketList' | 'positionList'>>
+  })[]
 ): ITraderRouteMetricSummary {
   const seedAccountSummary: ITraderRouteMetricSummary = {
     account,
@@ -144,7 +150,7 @@ export function accountSettledPositionListSummary(
     marketList: []
   }
 
-  const summary = metricList.reduce((seed, next, idx): ITraderRouteMetricSummary => {
+  const summary = metricList.reduce((seed, next, _idx): ITraderRouteMetricSummary => {
     seed.settledSizeInUsd += next.settledSizeInUsd
     seed.settledSizeLongInUsd += next.settledSizeLongInUsd
     seed.settledCollateralInUsd += next.settledCollateralInUsd

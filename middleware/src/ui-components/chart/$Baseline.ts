@@ -49,7 +49,6 @@ export const $Baseline = (config: IBaselineChart) => {
       fontSize: 10
     },
     leftPriceScale: {
-      autoScale: true,
       ticksVisible: true,
       scaleMargins: {
         top: 0.1,
@@ -65,6 +64,7 @@ export const $Baseline = (config: IBaselineChart) => {
     //     bottom: 0,
     //   }
     // },
+    autoSize: true,
     handleScale: false,
     handleScroll: false,
     timeScale: {
@@ -85,9 +85,9 @@ export const $Baseline = (config: IBaselineChart) => {
     chartConfig,
     getSeriesApi: (api) => {
       const series = api.addSeries(BaselineSeries, baselineOptions)
-      setTimeout(() => {
-        api.timeScale().fitContent()
-      }, 55)
+      // setTimeout(() => {
+      //   api.timeScale().fitContent()
+      // }, 55)
 
       return series
     }

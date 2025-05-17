@@ -20,29 +20,29 @@ export const $defaultPopoverContentContainer = $column(
     backgroundColor: pallete.middleground,
     padding: '36px',
     borderRadius: '24px',
-    border: `1px solid ${colorAlpha(pallete.foreground, .15)}`,
+    border: `1px solid ${colorAlpha(pallete.foreground, 0.15)}`,
     boxShadow: `0 0 10px 0 ${colorAlpha(pallete.background, 0.5)}`
   })
 )
 
 interface IPocus {
-  open: Stream<I$Node>
-  dismiss?: Stream<any>
-
+  $open: Stream<I$Node>
   $target: I$Node
 
+  dismiss?: Stream<any>
+  spacing?: number
   $contentContainer?: INodeCompose
   $container?: INodeCompose
-  spacing?: number
 }
 
 export const $Popover = ({
-  open,
-  dismiss = empty(),
-  spacing = 10,
+  $open: open,
+  $target,
+
   $contentContainer = $defaultPopoverContentContainer,
   $container = $node,
-  $target
+  dismiss = empty(),
+  spacing = 10
 }: IPocus) =>
   component(
     (
@@ -97,7 +97,7 @@ export const $Popover = ({
         style({
           position: 'fixed',
           zIndex: 2321,
-          backgroundColor: colorAlpha(pallete.background, 0.8),
+          backgroundColor: colorAlpha(pallete.horizon, 0.85),
           top: 0,
           left: 0,
           right: 0,

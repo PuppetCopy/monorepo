@@ -1,5 +1,5 @@
 import { awaitPromises, empty, map, now, startWith } from '@most/core'
-import { ADDRESS_ZERO, type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
+import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import {
   $Baseline,
   $ButtonToggle,
@@ -30,9 +30,8 @@ import {
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { arrayContains } from 'drizzle-orm'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
-import { asc, desc, inArray } from 'ponder'
+import { asc, desc } from 'ponder'
 import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
 import type { ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
@@ -41,21 +40,14 @@ import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
-import type { IMatchingRuleEditorChange } from '../../components/portfolio/$MatchRuleEditor.js'
-import {
-  $defaultTraderMatchRouteEditorContainer,
-  $TraderMatchingRouteEditor
-} from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import { $TraderMatchingRouteEditor } from '../../components/portfolio/$TraderMatchRouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
-import type { IPageFilterParams, IPageParams, IUserActivityPageParams } from '../type.js'
-import type { Stream } from '@most/types'
+import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
 
-interface ILeaderboard extends IPageFilterParams, IPageParams {
-  user: IUserActivityPageParams
-  draftMatchingRuleList: Stream<IMatchingRuleEditorChange[]>
-}
+interface ILeaderboard extends IPageFilterParams, IUserPageParams, IPageParams {}
 
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
@@ -68,15 +60,16 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
       [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
-      [filterAccount, filterAccountTether]: IBehavior<string | undefined>,
+      [filterAccount, _filterAccountTether]: IBehavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorChange[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
       const {
         activityTimeframe,
         collateralTokenList,
         draftMatchingRuleList,
-        user: { depositTokenList, matchingRuleQuery },
+        draftDepositTokenList,
+        matchingRuleQuery,
         route
       } = config
 
@@ -187,213 +180,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
               type ILeaderboardDatasource = InferStream<typeof dataSource>['page']
               type ILeaderboardCellData = ILeaderboardDatasource[number]
 
-              const columns: TableColumn<ILeaderboardCellData>[] = [
-                {
-                  $head: $text('Trader'),
-                  gridTemplate: isDesktopScreen ? '149px' : '126px',
-                  // columnOp: style({ placeContent: 'flex-end' }),
-                  $bodyCallback: map((pos) => {
-                    return $TraderDisplay({
-                      route: config.route,
-                      address: pos.metric.account,
-                      puppetList: []
-                      // puppetList: pos.matchRoute.matchRuleList.map(mr => mr.puppet),
-                    })({
-                      click: routeChangeTether()
-                    })
-                  })
-                },
-                {
-                  $head: $text('Route'),
-                  gridTemplate: isDesktopScreen ? '104px' : '52px',
-                  $bodyCallback: map((routeMetric) => {
-                    // const _tokenList = [
-                    //   ...new Set([
-                    //     ...pos.increaseList.map((x) => x.indexToken),
-                    //     ...pos.decreaseList.map((x) => getAddress(x.indexToken))
-                    //   ])
-                    // ]
-
-                    // return $row(
-                    //   ...tokenList.map(token =>
-                    //     $column(spacing.tiny)(
-                    //       $tokenTryLabeled(token)
-                    //     )
-                    //   )
-                    // )
-                    return switchMap((list) => {
-                      return $TraderMatchingRouteEditor({
-                        draftMatchingRuleList,
-                        collateralToken: routeMetric.metric.collateralToken,
-                        matchedPuppetList: routeMetric.metric.matchedPuppetList,
-                        userMatchingRuleList: list,
-                        trader: routeMetric.metric.account
-                      })({
-                        changeMatchRuleList: changeMatchRuleListTether()
-                      })
-                    }, awaitPromises(matchingRuleQuery))
-                  })
-                },
-                ...(isDesktopScreen
-                  ? [
-                      // {
-                      //   $head: $text('Win/Loss'),
-                      //   gridTemplate: '70px',
-                      //   columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                      //   $bodyCallback: map((pos: ILeaderboardCellData) => {
-                      //     const totalCount = pos.metric.winCount + pos.metric.lossCount
-                      //     return $row(spacing.small)(
-                      //       $text(`${pos.metric.winCount} / ${totalCount - pos.metric.lossCount}`)
-                      //     )
-                      //   })
-                      // },
-                      {
-                        $head: $text('Markets'),
-                        gridTemplate: isDesktopScreen ? '210px' : undefined,
-                        $bodyCallback: map((pos: ILeaderboardCellData) => {
-                          // const _tokenList = [
-                          //   ...new Set([
-                          //     ...pos.increaseList.map((x) => x.indexToken),
-                          //     ...pos.decreaseList.map((x) => getAddress(x.indexToken))
-                          //   ])
-                          // ]
-
-                          return $row(spacing.small)(
-                            ...pos.metric.traderRouteMetric.marketList.map((token) =>
-                              $tokenTryLabeled(token, false, '32px')
-                            )
-                          )
-                        })
-                      },
-                      {
-                        $head: $tableHeader('Volume', 'Leverage'),
-                        sortBy: 'sizeUsd',
-                        columnOp: style({ placeContent: 'flex-end' }),
-                        $bodyCallback: map((pos: ILeaderboardCellData) => {
-                          return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
-                        })
-                      }
-                    ]
-                  : []),
-                {
-                  // columnOp: style({ placeContent: 'flex-start' }),
-                  $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
-                    $tableHeader('ROI %', 'PNL $'),
-                    $node(style({ textAlign: 'right', alignSelf: 'center' }))(
-                      $text(`${getMappedValue(LAST_ACTIVITY_LABEL_MAP, params.activityTimeframe)} Activtiy`)
-                    )
-                  ),
-                  sortBy: 'roi',
-                  gridTemplate: isDesktopScreen ? '200px' : undefined,
-                  $bodyCallback: map((pos) => {
-                    const endTime = unixTimestampNow()
-                    const startTime = endTime - params.activityTimeframe
-                    const sourceList = [
-                      { value: 0n, time: startTime },
-                      ...pos.metric.pnlList
-                        .map((pnl, index) => ({
-                          value: pnl,
-                          time: pos.metric.pnlTimestampList[index]
-                        }))
-                        .filter((item) => item.time > startTime),
-                      { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
-                    ]
-
-                    const timeline = fillTimeline({
-                      sourceList,
-                      getTime: (item) => item.time,
-                      sourceMap: (next) => {
-                        return formatFixed(USD_DECIMALS, next.value)
-                      }
-                    })
-
-                    const markerList: IMarker[] = []
-
-                    if (pos.metric.traderRouteMetric.crossOpenSizeInUsd > 0n) {
-                      markerList.push({
-                        position: 'inBar',
-                        color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
-                        time: unixTimestampNow() as Time,
-                        shape: 'circle'
-                      })
-                      markerList.push({
-                        position: 'inBar',
-                        color: colorAlpha(pos.metric.pnl > 0 ? pallete.positive : pallete.negative, 0.25),
-                        time: unixTimestampNow() as Time,
-                        size: 2.25,
-                        shape: 'circle'
-                      })
-                    }
-
-                    return $row(style({ position: 'relative', flex: 1, height: '100%' }))(
-                      $row(style({ position: 'relative', pointerEvents: 'none', width: '100%' }))(
-                        $Baseline({
-                          containerOp: style({ inset: '0px 0px 0px 0px', position: 'absolute' }),
-                          markers: now(markerList),
-                          chartConfig: {
-                            width: 100,
-                            leftPriceScale: {
-                              // autoScale: true,
-                              ticksVisible: true,
-                              scaleMargins: {
-                                top: 0,
-                                bottom: 0
-                              }
-                            },
-                            crosshair: {
-                              horzLine: {
-                                visible: false
-                              },
-                              vertLine: {
-                                visible: false
-                              }
-                            },
-                            // height: 150,
-                            // width: 100,
-                            timeScale: {
-                              visible: false
-                            }
-                            // ...config.chartConfig
-                          },
-                          data: timeline as any as BaselineData<ISeriesTime>[],
-                          // containerOp: style({  inset: '0px 0px 0px 0px' }),
-                          baselineOptions: {
-                            baseValue: {
-                              price: 0,
-                              type: 'price'
-                            },
-                            lineWidth: 1,
-                            lineType: LineType.Curved
-                          }
-                        })({})
-                      ),
-                      $row(
-                        style({
-                          position: 'absolute',
-                          background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`,
-                          inset: 0,
-                          zIndex: 1,
-                          alignItems: 'center'
-                        })
-                      )(
-                        $column(spacing.tiny)(
-                          $roiDisplay(pos.metric.roi),
-                          $seperator2,
-                          $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
-                        )
-                      )
-                    )
-                  })
-                }
-              ]
-
               return $Table({
-                $headerContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),
+                $headerRowContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),
                 $container: $defaultTableContainer(
                   style({
                     backgroundColor: pallete.background,
                     borderTop: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                    padding: isDesktopScreen ? '36px' : '14px 8px'
+                    padding: isDesktopScreen ? '36px' : '14px'
                   })
                 ),
                 $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
@@ -417,7 +210,182 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 // ),
                 sortBy: params.sortBy,
                 dataSource,
-                columns
+                columns: [
+                  {
+                    $head: $text('Trader'),
+                    gridTemplate: isDesktopScreen ? '149px' : '126px',
+                    $bodyCallback: map((pos) => {
+                      return $TraderDisplay({
+                        route: config.route,
+                        address: pos.metric.account,
+                        puppetList: []
+                      })({
+                        click: routeChangeTether()
+                      })
+                    })
+                  },
+                  {
+                    $head: $text('Route'),
+                    gridTemplate: isDesktopScreen ? '104px' : '52px',
+                    $bodyCallback: map((routeMetric) => {
+                      return switchMap((list) => {
+                        return $TraderMatchingRouteEditor({
+                          draftMatchingRuleList,
+                          collateralToken: routeMetric.metric.collateralToken,
+                          traderMatchedPuppetList: routeMetric.metric.matchedPuppetList,
+                          userMatchingRuleList: list,
+                          trader: routeMetric.metric.account
+                        })({
+                          changeMatchRuleList: changeMatchRuleListTether()
+                        })
+                      }, awaitPromises(matchingRuleQuery))
+                    })
+                  },
+                  ...((isDesktopScreen
+                    ? [
+                        // {
+                        //   $head: $text('Win/Loss'),
+                        //   gridTemplate: '70px',
+                        //   columnOp: style({ alignItems: 'center', placeContent: 'center' }),
+                        //   $bodyCallback: map((pos: ILeaderboardCellData) => {
+                        //     const totalCount = pos.metric.winCount + pos.metric.lossCount
+                        //     return $row(spacing.small)(
+                        //       $text(`${pos.metric.winCount} / ${totalCount - pos.metric.lossCount}`)
+                        //     )
+                        //   })
+                        // },
+                        {
+                          $head: $text('Markets'),
+                          gridTemplate: isDesktopScreen ? '210px' : undefined,
+                          $bodyCallback: map((pos) => {
+                            return $row(spacing.small)(
+                              ...pos.metric.traderRouteMetric.marketList.map((token) =>
+                                $tokenTryLabeled(token, false, '32px')
+                              )
+                            )
+                          })
+                        },
+                        {
+                          $head: $tableHeader('Volume', 'Leverage'),
+                          sortBy: 'sizeUsd',
+                          $bodyCellContainer: $defaultTableCell,
+                          $bodyCallback: map((pos) => {
+                            return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
+                          })
+                        }
+                      ]
+                    : []) as TableColumn<ILeaderboardCellData>[]),
+                  {
+                    // columnOp: style({ placeContent: 'flex-start' }),
+                    $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
+                      $tableHeader('ROI %', 'PNL $'),
+                      $node(style({ textAlign: 'right', alignSelf: 'center' }))(
+                        $text(`${getMappedValue(LAST_ACTIVITY_LABEL_MAP, params.activityTimeframe)} Activtiy`)
+                      )
+                    ),
+                    sortBy: 'roi',
+                    gridTemplate: isDesktopScreen ? '200px' : undefined,
+                    $bodyCallback: map((pos) => {
+                      const endTime = unixTimestampNow()
+                      const startTime = endTime - params.activityTimeframe
+                      const sourceList = [
+                        { value: 0n, time: startTime },
+                        ...pos.metric.pnlList
+                          .map((pnl, index) => ({
+                            value: pnl,
+                            time: pos.metric.pnlTimestampList[index]
+                          }))
+                          .filter((item) => item.time > startTime),
+                        { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
+                      ]
+
+                      const timeline = fillTimeline({
+                        sourceList,
+                        getTime: (item) => item.time,
+                        sourceMap: (next) => {
+                          return formatFixed(USD_DECIMALS, next.value)
+                        }
+                      })
+
+                      const markerList: IMarker[] = []
+
+                      if (pos.metric.traderRouteMetric.crossOpenSizeInUsd > 0n) {
+                        markerList.push({
+                          position: 'inBar',
+                          color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
+                          time: unixTimestampNow() as Time,
+                          shape: 'circle'
+                        })
+                        markerList.push({
+                          position: 'inBar',
+                          color: colorAlpha(pos.metric.pnl > 0 ? pallete.positive : pallete.negative, 0.25),
+                          time: unixTimestampNow() as Time,
+                          size: 2.25,
+                          shape: 'circle'
+                        })
+                      }
+
+                      return $row(style({ position: 'relative', height: '100%', flex: 1 }))(
+                        $Baseline({
+                          containerOp: style({
+                            flex: 1,
+                            inset: '0px 0px 0px 0px',
+                            position: 'absolute',
+                            pointerEvents: 'none',
+                            width: '100%'
+                          }),
+                          markers: now(markerList),
+                          chartConfig: {
+                            leftPriceScale: {
+                              // autoScale: true,
+                              ticksVisible: true,
+                              scaleMargins: {
+                                top: 0.1,
+                                bottom: 0.1
+                              }
+                            },
+                            crosshair: {
+                              horzLine: {
+                                visible: false
+                              },
+                              vertLine: {
+                                visible: false
+                              }
+                            },
+                            timeScale: {
+                              visible: false
+                            }
+                          },
+                          data: timeline as any as BaselineData<ISeriesTime>[],
+                          // containerOp: style({  inset: '0px 0px 0px 0px' }),
+                          baselineOptions: {
+                            baseValue: {
+                              price: 0,
+                              type: 'price'
+                            },
+                            lineWidth: 1,
+                            lineType: LineType.Curved
+                          }
+                        })({}),
+                        $row(
+                          style({
+                            position: 'absolute',
+                            background: `linear-gradient(to right, ${pallete.background} 0%, ${pallete.background} 23%, transparent 100%)`,
+                            inset: 0,
+                            zIndex: 1,
+                            alignItems: 'center'
+                          })
+                        )(
+                          $column(spacing.tiny)(
+                            $roiDisplay(pos.metric.roi),
+                            $seperator2,
+                            $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
+                          )
+                        )
+                      )
+                    })
+                  }
+                ] as TableColumn<ILeaderboardCellData>[]
               })({
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()

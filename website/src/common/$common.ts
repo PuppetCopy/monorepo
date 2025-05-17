@@ -36,7 +36,6 @@ import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
-import { IPositionFeesCollected } from '../__generated__/ponder.types.js'
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
 import { $seperator2 } from '../pages/common.js'
 import { type IPosition, IWalletTab } from '../pages/type.js'
@@ -211,7 +210,7 @@ export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
   return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
-export const $positionRoi = (pos: IPosition, puppet?: Address) => {
+export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, pos.maxCollateralInUsd)
