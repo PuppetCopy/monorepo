@@ -21,10 +21,7 @@ import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
-import {
-  $defaultTraderMatchRouteEditorContainer,
-  $TraderMatchingRouteEditor
-} from '../../components/portfolio/$TraderMatchRouteEditor'
+import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
@@ -245,7 +242,7 @@ export const $TraderPage = (config: ITraderPage) =>
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
                     switchMap((list) => {
-                      return $TraderMatchingRouteEditor({
+                      return $RouteEditor({
                         displayCollateralTokenSymbol: true,
                         collateralToken: routeMetric.collateralToken,
                         traderMatchedPuppetList: routeMetric.matchedPuppetList,

@@ -52,11 +52,7 @@ export const $midContainer = $column(
 )
 
 export const $size = (size: bigint, collateral: bigint, $divider = $seperator2) => {
-  return $column(spacing.tiny, style({ textAlign: 'right' }))(
-    $text(readableUsd(size)),
-    $divider,
-    $leverage(size, collateral)
-  )
+  return $column(spacing.tiny)($text(readableUsd(size)), $divider, $leverage(size, collateral))
 }
 
 export const $entry = (pos: IPosition) => {

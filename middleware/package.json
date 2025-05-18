@@ -63,11 +63,11 @@
     "abitype": "1.0.8",
     "aelea": "1.9.0",
     "jazzicon": "1.5.0",
-    "lightweight-charts": "5.0.6",
+    "lightweight-charts": "5.0.7",
     "viem": "2.29.4"
   },
   "devDependencies": {
-    "@wagmi/cli": "2.3.0"
+    "@wagmi/cli": "2.3.1"
   },
   "homepage": "https://puppet.tech",
   "repository": "PuppetCopy/monorepo",

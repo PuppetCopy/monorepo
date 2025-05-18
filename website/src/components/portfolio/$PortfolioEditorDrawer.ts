@@ -243,7 +243,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                     )
                   ),
                   $SubmitBar({
-                    $submitContent: $text(isDesktopScreen ? 'Save Changes' : 'Save'),
+                    $submitContent: $text('Submit'),
                     txQuery: requestChangeSubscription
                   })({
                     changeWallet: changeWalletTether(),

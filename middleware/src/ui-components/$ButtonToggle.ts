@@ -31,7 +31,7 @@ export const $defaulButtonToggleBtn = $row(
     fontWeight: 'bold',
     flex: 1,
     borderRadius: '20px',
-    padding: '10px 16px',
+    padding: '12px 18px',
     alignItems: 'center',
     border: '1px solid transparent',
     cursor: 'pointer',
@@ -69,7 +69,7 @@ export const $ButtonToggle = <T>({
             styleBehavior(
               map((selectedOpt) => {
                 return selectedOpt === opt
-                  ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, cursor: 'default' }
+                  ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, pointerEvents: 'none' }
                   : { color: pallete.foreground }
               }, selected)
             )

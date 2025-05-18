@@ -1,10 +1,8 @@
-import { awaitPromises, empty, map, now, startWith } from '@most/core'
+import { awaitPromises, empty, map, mergeArray, now, startWith } from '@most/core'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import {
   $Baseline,
   $ButtonToggle,
-  $bear,
-  $bull,
   $defaultTableCell,
   $defaultTableContainer,
   $defaultTableRowContainer,
@@ -35,13 +33,14 @@ import { asc, desc } from 'ponder'
 import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
 import type { ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
-import { $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
+import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
 import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
+import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
-import { $TraderMatchingRouteEditor } from '../../components/portfolio/$TraderMatchRouteEditor.js'
+import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
@@ -49,11 +48,14 @@ import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js
 
 interface ILeaderboard extends IPageFilterParams, IUserPageParams, IPageParams {}
 
+type ISortLeaderboardBy = ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>
+
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortLeaderboardBy>,
+      [changeScreenerFocus, changeScreenerFocusTether]: IBehavior<'roi' | 'pnl'>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
@@ -75,7 +77,17 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
-      const sortBy = uiStorage.replayWrite(localStore.leaderboard, sortByChange, 'sortBy')
+      const screenerFocus = uiStorage.replayWrite(localStore.leaderboard, changeScreenerFocus, 'focus')
+      const sortBy = uiStorage.replayWrite(
+        localStore.leaderboard,
+        mergeArray([
+          sortByChange,
+          map((selector) => {
+            return { direction: 'desc', selector } as const
+          }, changeScreenerFocus)
+        ]),
+        'sortBy'
+      )
       const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
       const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
       const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
@@ -93,20 +105,57 @@ export const $Leaderboard = (config: ILeaderboard) =>
               $SelectCollateralToken({ selectedList: collateralTokenList })({
                 selectMarketTokenList: selectCollateralTokenListTether()
               }),
+              // $Dropdown({
+              //   $selection: $row(style({ whiteSpace: 'pre' }))(
+              //     $infoLabel('Focus: '),
+              //     switchMap((sortBy) => $text(sortBy ? `${sortBy.selector}` : 'None'), sortBy)
+              //   ),
+              //   selector: {
+              //     value: sortBy,
+              //     $container: $defaultSelectContainer(style({ right: '0' })),
+              //     $$option: map((option) => {
+              //       return $node($text(option.selector))
+              //     }),
+              //     list: [
+              //       { direction: 'desc', selector: 'roi' },
+              //       { direction: 'desc', selector: 'pnl' }
+              //     ]
+              //   }
+              // })({
+              //   select: sortByChangeTether()
+              // }),
               $ButtonToggle({
-                selected: isLong,
-                options: [undefined, true, false],
-                $$option: map((il) => {
-                  return $row(spacing.tiny, style({ alignItems: 'center' }))(
-                    il === undefined
+                selected: screenerFocus,
+                options: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
+                $$option: map((option) => {
+                  return $row(spacing.small, style({ alignItems: 'center' }))(
+                    option === undefined
                       ? empty()
-                      : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
-                    $text(il === undefined ? 'Both' : il ? 'Long' : 'Short')
+                      : $icon({
+                          $content: option === 'pnl' ? $bagOfCoins : $trophy,
+                          width: '18px',
+                          viewBox: '0 0 32 32'
+                        }),
+                    $text(option === 'roi' ? 'Performance' : 'Profit & Loss')
                   )
                 })
               })({
-                select: switchIsLongTether()
+                select: changeScreenerFocusTether()
               }),
+              // $ButtonToggle({
+              //   selected: isLong,
+              //   options: [undefined, true, false],
+              //   $$option: map((il) => {
+              //     return $row(spacing.tiny, style({ alignItems: 'center' }))(
+              //       il === undefined
+              //         ? empty()
+              //         : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
+              //       $text(il === undefined ? 'Both' : il ? 'Long' : 'Short')
+              //     )
+              //   })
+              // })({
+              //   select: switchIsLongTether()
+              // }),
               $LastAtivity(activityTimeframe)({
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
@@ -229,7 +278,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     gridTemplate: isDesktopScreen ? '104px' : '52px',
                     $bodyCallback: map((routeMetric) => {
                       return switchMap((list) => {
-                        return $TraderMatchingRouteEditor({
+                        return $RouteEditor({
                           draftMatchingRuleList,
                           collateralToken: routeMetric.metric.collateralToken,
                           traderMatchedPuppetList: routeMetric.metric.matchedPuppetList,
@@ -278,12 +327,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   {
                     // columnOp: style({ placeContent: 'flex-start' }),
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
-                      $tableHeader('ROI %', 'PNL $'),
+                      params.screenerFocus === 'roi' ? $tableHeader('ROI %', 'PNL $') : $tableHeader('PNL $', 'ROI %'),
                       $node(style({ textAlign: 'right', alignSelf: 'center' }))(
                         $text(`${getMappedValue(LAST_ACTIVITY_LABEL_MAP, params.activityTimeframe)} Activtiy`)
                       )
                     ),
-                    sortBy: 'roi',
+                    sortBy: params.screenerFocus,
                     gridTemplate: isDesktopScreen ? '200px' : undefined,
                     $bodyCallback: map((pos) => {
                       const endTime = unixTimestampNow()
@@ -376,11 +425,17 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             alignItems: 'center'
                           })
                         )(
-                          $column(spacing.tiny)(
-                            $roiDisplay(pos.metric.roi),
-                            $seperator2,
-                            $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
-                          )
+                          params.screenerFocus === 'roi'
+                            ? $column(spacing.tiny)(
+                                $roiDisplay(pos.metric.roi),
+                                $seperator2,
+                                $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
+                              )
+                            : $column(spacing.tiny)(
+                                $pnlDisplay(pos.metric.pnl),
+                                $seperator2,
+                                $node(style({ fontSize: '.8rem' }))($text(`${formatFixed(2, pos.metric.roi)}%`))
+                              )
                         )
                       )
                     })
@@ -390,7 +445,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ sortBy, activityTimeframe, isLong, account, collateralTokenList }))
+            }, combineState({ screenerFocus, sortBy, activityTimeframe, isLong, account, collateralTokenList }))
           )
         ),
 

@@ -21,6 +21,7 @@ export const localStore = uiStorage.createStoreDefinition('root', 8, {
   leaderboard: {
     initialState: {
       sortBy: { direction: 'desc', selector: 'roi' } as ISortBy,
+      focus: 'pnl',
       isLong: undefined as boolean | undefined,
       account: undefined as string | undefined
     }

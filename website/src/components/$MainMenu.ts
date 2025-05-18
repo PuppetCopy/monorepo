@@ -127,7 +127,7 @@ export const $MainMenu = (config: MainMenu) =>
               $container: $anchor(spacing.big, style({ padding: 0 })),
               route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
               // anchorOp: style({  }),
-              url: '/wallet',
+              url: '/portfolio',
               $content: $walletProfileDisplay()
             })({
               click: routeChangeTether()
@@ -308,7 +308,7 @@ export const $MainMenuMobile = (config: MainMenu) =>
             $pageLink({
               $container: $anchor(spacing.default),
               route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-              url: '/wallet',
+              url: '/portfolio',
               $content: $walletProfileDisplay()
             })({
               click: routeChangeTether()

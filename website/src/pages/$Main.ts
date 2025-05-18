@@ -82,7 +82,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
       const profileRoute = rootRoute.create({ fragment: 'profile' })
-      const _walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Portfolio' })
+      const _walletRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
       const _tradeRoute = rootRoute.create({ fragment: 'trade' })
       const _tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
 
