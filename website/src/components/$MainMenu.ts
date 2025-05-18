@@ -66,7 +66,48 @@ export const $MainMenu = (config: MainMenu) =>
       const themeState = startWith(theme, changeTheme)
       const $extraMenuPopover = $Popover({
         $open: constant(
-          $column(spacing.big)(
+          $column(spacing.default)(
+            $row(spacing.big, style({ flexWrap: 'wrap', placeContent: 'center' }))(
+              $anchor(
+                layoutSheet.displayFlex,
+                style({
+                  padding: '0 4px',
+                  border: `2px solid ${pallete.horizon}`,
+                  borderRadius: '50%',
+                  alignItems: 'center',
+                  placeContent: 'center',
+                  height: '42px',
+                  width: '42px'
+                }),
+                attr({ href: 'https://docs.puppet.tech' })
+              )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
+              $anchor(
+                layoutSheet.displayFlex,
+                style({
+                  padding: '0 4px',
+                  border: `2px solid ${pallete.horizon}`,
+                  borderRadius: '50%',
+                  alignItems: 'center',
+                  placeContent: 'center',
+                  height: '42px',
+                  width: '42px'
+                }),
+                attr({ href: 'https://twitter.com/PuppetCopy' })
+              )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
+              $anchor(
+                layoutSheet.displayFlex,
+                style({
+                  padding: '0 4px',
+                  border: `2px solid ${pallete.horizon}`,
+                  borderRadius: '50%',
+                  alignItems: 'center',
+                  placeContent: 'center',
+                  height: '42px',
+                  width: '42px'
+                }),
+                attr({ href: 'https://github.com/PuppetCopy/monorepo' })
+              )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
+            ),
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
                 changeTheme: changeThemeTether()
@@ -152,174 +193,6 @@ export const $MainMenu = (config: MainMenu) =>
         {
           routeChange,
           changeWallet
-        }
-      ]
-    }
-  )
-
-export const $MainMenuMobile = (config: MainMenu) =>
-  component(
-    (
-      [routeChange, routeChangeTether]: IBehavior<string, string>,
-      [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
-    ) => {
-      const { route, showAccount = true } = config
-      const routeChangeMulticast = multicast(routeChange)
-
-      const $circleButtonAnchor = $anchor(
-        style({
-          padding: '0 4px',
-          border: `2px solid ${colorAlpha(pallete.foreground, 0.25)}`,
-          display: 'flex',
-          borderRadius: '50%',
-          alignItems: 'center',
-          placeContent: 'center',
-          height: '42px',
-          width: '42px'
-        })
-      )
-
-      const $extraMenuPopover = $Popover({
-        $open: constant(
-          $column(spacing.big)(
-            $row(spacing.big, style({ flexWrap: 'wrap', width: '210px' }))(
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://docs.blueberry.club/' })
-              )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' })
-              )($icon({ $content: $discord, width: '22px', viewBox: '0 0 32 32' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://twitter.com/PuppetCopy' })
-              )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://www.instagram.com/blueberryclub.eth' })
-              )($icon({ $content: $instagram, width: '18px', viewBox: '0 0 32 32' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://github.com/nissoh/blueberry-club' })
-              )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
-            ),
-
-            $ButtonSecondary({
-              $content: $ThemePicker(startWith(theme, changeTheme))({
-                changeTheme: changeThemeTether()
-              })
-            })({})
-          ),
-          clickPopoverClaim
-        ),
-        dismiss: routeChangeMulticast,
-        $target: $circleButtonAnchor(
-          $icon({
-            svgOps: O(
-              clickPopoverClaimTether(nodeEvent('click')),
-              style({
-                padding: '6px',
-                cursor: 'pointer',
-                alignSelf: 'center',
-                transform: 'rotate(90deg)'
-              })
-            ),
-            width: '32px',
-            $content: $moreDots,
-            viewBox: '0 0 32 32'
-          })
-        )
-      })({
-        // overlayClick: clickPopoverClaimTether()
-      })
-
-      return [
-        $row(
-          spacing.big,
-          style({
-            padding: '14px',
-            flexShrink: 0,
-            alignItems: 'flex-end',
-            borderRadius: '30px',
-            placeContent: 'space-between'
-          })
-        )(
-          $row(
-            spacing.big,
-            style({ alignItems: 'center', flex: 1 })
-          )(
-            $RouterAnchor({
-              url: '/',
-              route: route,
-              $anchor: $element('a')($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
-            })({
-              click: routeChangeTether()
-            })
-          ),
-
-          $row(style({ flex: 1, padding: 0, alignItems: 'center', placeContent: 'center' }))(
-            $pageLink({
-              $container: $anchor(spacing.default),
-              route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-              url: '/portfolio',
-              $content: $walletProfileDisplay()
-            })({
-              click: routeChangeTether()
-            })
-          ),
-
-          $row(spacing.big, style({ placeContent: 'flex-end', flex: 1 }))($extraMenuPopover)
-        ),
-
-        {
-          routeChange: routeChangeMulticast
         }
       ]
     }

@@ -21,7 +21,7 @@ import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
-import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
+import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'

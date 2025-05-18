@@ -133,18 +133,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       return [
         $column(
-          switchMap((isDesktop) => {
-            if (isDesktop) {
-              return $MainMenu({ route: rootRoute })({
-                routeChange: changeRouteTether(),
-                changeWallet: changeWalletTether()
-              })
-            }
-
-            return $MainMenuMobile({ route: rootRoute })({
-              routeChange: changeRouteTether()
-            })
-          }, isDesktopScreen),
+          $MainMenu({ route: rootRoute })({
+            routeChange: changeRouteTether(),
+            changeWallet: changeWalletTether()
+          }),
 
           router.match(rootRoute)(
             $midContainer(

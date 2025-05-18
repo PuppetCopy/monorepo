@@ -98,18 +98,17 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
             return $card2(
               style({
                 border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                padding: '18px 0',
+                padding: '12px 0',
                 borderBottom: 'none',
                 borderRadius: '20px 20px 0 0'
               })
             )(
-              $column(spacing.default)(
+              $column(isDesktopScreen ? spacing.default : spacing.small)(
                 $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
                   $heading3($text('Portfolio Changes')),
                   $infoTooltip(
                     $text(
-                      'The following rules will apply to these traders in your portfolio.',
-                      'visit Profile to view your portfolio'
+                      'The following rules will apply to these traders in your portfolio. \nvisit Profile to view your portfolio'
                     )
                   ),
 
@@ -132,20 +131,18 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 )(
                   ...portfolioRouteList.map((route) => {
                     return $column(style({ paddingLeft: '16px' }))(
-                      $row(
-                        spacing.big,
-                        style({ padding: '6px 0' })
-                      )(
-                        $RouteDepositEditor({
-                          collateralToken: route.collateralToken,
-                          draftDepositTokenList: depositTokenList
-                        })({
-                          changeDepositTokenList: changeDepositTokenListTether()
-                        })
-                      ),
+                      $RouteDepositEditor({
+                        collateralToken: route.collateralToken,
+                        draftDepositTokenList: depositTokenList
+                      })({
+                        changeDepositTokenList: changeDepositTokenListTether()
+                      }),
                       $row(spacing.default)(
                         $seperator2,
-                        $column(style({ flex: 1, padding: '12px 0' }))(
+                        $column(
+                          spacing.small,
+                          style({ flex: 1 })
+                        )(
                           ...route.matchingRuleList.map((modSubsc) => {
                             const iconColorParams = modSubsc?.model
                               ? modSubsc.expiry === 0n
@@ -165,10 +162,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                   label: isDesktopScreen ? 'Add' : '+'
                                 }
 
-                            return $row(
-                              isDesktopScreen ? spacing.big : spacing.default,
-                              style({ alignItems: 'center', padding: '14px 0' })
-                            )(
+                            return $row(spacing.default, style({ alignItems: 'center', flex: 1 }))(
                               O(
                                 style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
                                 clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
@@ -176,33 +170,23 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               $row(
                                 style({
                                   backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
-                                  marginLeft: '-42px',
+                                  marginLeft: '-33px',
                                   borderRadius: '6px',
                                   padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
                                   color: iconColorParams.fill
                                 })
                               )($text(iconColorParams.label)),
 
-                              // switchMap(amount => {
-                              //   return $text(tokenAmountLabel(routeType.indexToken, amount))
-                              // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
-
                               $profileDisplay({
                                 address: modSubsc.trader
-                                // $profileContainer: $defaultBerry(style({ width: '50px' }))
                               }),
 
-                              $responsiveFlex(spacing.default, style({ flex: 1 }))(
-                                $infoLabeledValue(
-                                  'Allowance Rate',
-                                  $text(`${readablePercentage(modSubsc.allowanceRate)}`)
-                                ),
-                                $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry))),
-                                $infoLabeledValue(
-                                  'Throttle Duration',
-                                  $text(`${getDuration(modSubsc.throttleActivity)}`)
-                                )
-                              )
+                              $infoLabeledValue(
+                                'Allowance Rate',
+                                $text(`${readablePercentage(modSubsc.allowanceRate)}`)
+                              ),
+                              $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry))),
+                              $infoLabeledValue('Throttle Duration', $text(`${getDuration(modSubsc.throttleActivity)}`))
                             )
                           })
                         )

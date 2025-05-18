@@ -91,12 +91,12 @@
 //                               $profileAvatar({ address: puppet, size: 25 })
 //                             )
 //                           }),
-//                           $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.85em' }))(
+//                           $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.8rem' }))(
 //                             $text(`${traderMatchedPuppetList.length}`)
 //                           )
 //                         )
 //                       : $row(style({ alignItems: 'center' }))(
-//                           $node(style({ color: pallete.foreground, fontSize: '.85em' }))($text('0 puppets'))
+//                           $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
 //                         )
 //                   )
 //                 ),

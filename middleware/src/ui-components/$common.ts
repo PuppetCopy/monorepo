@@ -19,7 +19,7 @@ import {
   stylePseudo,
   switchMap
 } from 'aelea/core'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
 import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress } from '../utils/index.js'
@@ -144,19 +144,26 @@ export const $intermediateTooltip = ($content: I$Slottable) => {
   })({})
 }
 
-export const $toText = (text: string | I$Text): I$Text => {
+export const $fromText = (text: string | I$Text): I$Text => {
   return isStream(text) ? text : $text(text)
 }
 
+const $infoLabelNode = $node(style({ color: pallete.foreground }))
+
 export const $infoLabel = (label: string | I$Text) => {
   // const $msg = isStream(label) ? label : $toText(label)
-  return $node(style({ color: pallete.foreground }))($toText(label))
+  return $infoLabelNode($fromText(label))
 }
 
-export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable, collapseMobile = false) => {
-  const $container = collapseMobile ? $column : $row(style({ alignItems: 'center' }))
+const $infoLabeledValueNode = isDesktopScreen
+  ? $row(spacing.default, style({ alignItems: 'center' })) //
+  : $column(spacing.small, style({ flex: 1, placeContent: 'space-between' }))
 
-  return $container(spacing.small)($infoLabel(label), isStream(value) ? value : $text(value))
+export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable) => {
+  return $infoLabeledValueNode(
+    $infoLabel(label), //
+    isStream(value) ? value : $text(value)
+  )
 }
 
 export const $infoTooltipLabel = (text: string | I$Slottable, label?: string | I$Slottable) => {
@@ -180,7 +187,7 @@ export const $labeledDivider = (label: string | I$Slottable) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))(),
     $row(spacing.small, style({ color: pallete.foreground, alignItems: 'center' }))(
-      $node(style({ fontSize: '.8rem' }))($toText(label)),
+      $node(style({ fontSize: '.8rem' }))($fromText(label)),
       $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${pallete.horizon}` }))()

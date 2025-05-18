@@ -7,6 +7,7 @@ import {
   $defaultTableContainer,
   $defaultTableRowContainer,
   $icon,
+  $infoLabel,
   $infoLabeledValue,
   $spinner,
   $Table,
@@ -307,17 +308,20 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           $head: $text('Markets'),
                           gridTemplate: isDesktopScreen ? '210px' : undefined,
                           $bodyCallback: map((pos) => {
+                            const marketList = pos.metric.traderRouteMetric.marketList
+                            const marketListLength = marketList.length
                             return $row(spacing.small)(
-                              ...pos.metric.traderRouteMetric.marketList.map((token) =>
-                                $tokenTryLabeled(token, false, '32px')
-                              )
+                              ...marketList.slice(0, 4).map((token) => $tokenTryLabeled(token, false, '32px')),
+                              marketListLength > 4
+                                ? style({ fontSize: '.8rem' })($infoLabel($text(`+${marketListLength - 4} more`)))
+                                : empty()
                             )
                           })
                         },
                         {
                           $head: $tableHeader('Volume', 'Leverage'),
                           sortBy: 'sizeUsd',
-                          $bodyCellContainer: $defaultTableCell,
+                          $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
                           $bodyCallback: map((pos) => {
                             return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
                           })
