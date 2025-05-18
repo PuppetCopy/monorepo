@@ -19,7 +19,7 @@ import type { IPosition } from '../../pages/type.js'
 import { isPositionSettled } from '../../utils/utils.js'
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
-  $column(style({ textAlign: 'right', whiteSpace: 'nowrap' }))(
+  $column(style({ whiteSpace: 'nowrap' }))(
     $node(style({ fontWeight: 'bold' }))($text(primaryLabel)),
     $node(style({ fontSize: '.8rem' }))($text(secondaryLabel))
   )

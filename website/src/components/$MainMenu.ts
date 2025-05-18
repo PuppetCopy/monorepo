@@ -1,14 +1,5 @@
-import { constant, multicast, startWith } from '@most/core'
-import {
-  $anchor,
-  $discord,
-  $gitbook,
-  $github,
-  $icon,
-  $instagram,
-  $moreDots,
-  $twitter
-} from '@puppet/middleware/ui-components'
+import { constant, empty, startWith } from '@most/core'
+import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet/middleware/ui-components'
 import {
   $element,
   attr,
@@ -25,7 +16,7 @@ import {
   styleBehavior
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
-import { $column, $row, layoutSheet, spacing } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $puppetLogo } from '../common/$icons.js'
@@ -37,7 +28,6 @@ import { $ButtonSecondary } from './form/$Button.js'
 
 interface MainMenu extends IPageParams {
   route: Route
-  showAccount?: boolean
 }
 
 export const $MainMenu = (config: MainMenu) =>
@@ -48,7 +38,7 @@ export const $MainMenu = (config: MainMenu) =>
       [changeWallet, _changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
       [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
     ) => {
-      const { route, showAccount } = config
+      const { route } = config
 
       const $circleButtonAnchor = $anchor(
         style({
@@ -63,51 +53,55 @@ export const $MainMenu = (config: MainMenu) =>
         })
       )
 
+      const $socialLinkList = [
+        $anchor(
+          layoutSheet.displayFlex,
+          style({
+            padding: '0 4px',
+            border: `2px solid ${pallete.horizon}`,
+            borderRadius: '50%',
+            alignItems: 'center',
+            placeContent: 'center',
+            height: '42px',
+            width: '42px'
+          }),
+          attr({ href: 'https://docs.puppet.tech' })
+        )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
+        $anchor(
+          layoutSheet.displayFlex,
+          style({
+            padding: '0 4px',
+            border: `2px solid ${pallete.horizon}`,
+            borderRadius: '50%',
+            alignItems: 'center',
+            placeContent: 'center',
+            height: '42px',
+            width: '42px'
+          }),
+          attr({ href: 'https://twitter.com/PuppetCopy' })
+        )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
+        $anchor(
+          layoutSheet.displayFlex,
+          style({
+            padding: '0 4px',
+            border: `2px solid ${pallete.horizon}`,
+            borderRadius: '50%',
+            alignItems: 'center',
+            placeContent: 'center',
+            height: '42px',
+            width: '42px'
+          }),
+          attr({ href: 'https://github.com/PuppetCopy/monorepo' })
+        )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
+      ]
+
       const themeState = startWith(theme, changeTheme)
       const $extraMenuPopover = $Popover({
         $open: constant(
           $column(spacing.default)(
-            $row(spacing.big, style({ flexWrap: 'wrap', placeContent: 'center' }))(
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://docs.puppet.tech' })
-              )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://twitter.com/PuppetCopy' })
-              )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
-              $anchor(
-                layoutSheet.displayFlex,
-                style({
-                  padding: '0 4px',
-                  border: `2px solid ${pallete.horizon}`,
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  placeContent: 'center',
-                  height: '42px',
-                  width: '42px'
-                }),
-                attr({ href: 'https://github.com/PuppetCopy/monorepo' })
-              )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
-            ),
+            isMobileScreen
+              ? $row(spacing.big, style({ flexWrap: 'wrap', placeContent: 'center' }))(...$socialLinkList)
+              : empty(),
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
                 changeTheme: changeThemeTether()
@@ -137,7 +131,7 @@ export const $MainMenu = (config: MainMenu) =>
 
       return [
         $row(
-          spacing.big,
+          spacing.default,
           style({
             transition: 'width .3s ease-in-out',
             overflow: 'hidden',
@@ -155,9 +149,7 @@ export const $MainMenu = (config: MainMenu) =>
             $RouterAnchor({
               url: '/',
               route: route,
-              $anchor: $element('a')(style({ padding: '8px', margin: '8px' }))(
-                $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' })
-              )
+              $anchor: $element('a')($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
             })({
               click: routeChangeTether()
             })
@@ -176,17 +168,8 @@ export const $MainMenu = (config: MainMenu) =>
           ),
 
           $row(spacing.big, style({ flex: 1, placeContent: 'flex-end', alignItems: 'center' }))(
-            // $SwitchNetworkDropdown()({}),
             $extraMenuPopover,
-            // $circleButtonAnchor(attr({ href: 'https://docs.blueberry.club/' }))(
-            //   $icon({ $content: $gitbook, fill: pallete.middleground, width: '22px', viewBox: `0 0 32 32` })
-            // ),
-            // $circleButtonAnchor(attr({ href: 'https://discord.com/invite/7ZMmeU3z9j' }))(
-            //   $icon({ $content: $discord, fill: pallete.middleground, width: '22px', viewBox: `0 0 32 32` })
-            // ),
-            $circleButtonAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))(
-              $icon({ $content: $twitter, fill: pallete.foreground, width: '22px', viewBox: '0 0 24 24' })
-            )
+            ...(isDesktopScreen ? $socialLinkList : [])
           )
         ),
 

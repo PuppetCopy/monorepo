@@ -321,7 +321,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         {
                           $head: $tableHeader('Volume', 'Leverage'),
                           sortBy: 'sizeUsd',
-                          $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
+                          // $headerCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
+                          // $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
                           $bodyCallback: map((pos) => {
                             return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
                           })
