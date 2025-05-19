@@ -27,7 +27,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
       [changeWallet, _changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
       [changeMatchRuleList, _changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
@@ -59,7 +59,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
               matchingRuleQuery,
               metricsQuery
             })({
-              selectMarketTokenList: selectMarketTokenListTether(),
+              selectCollateralTokenList: selectCollateralTokenListTether(),
               changeActivityTimeframe: changeActivityTimeframeTether()
             })
           ),
@@ -140,7 +140,7 @@ export const $WalletPuppet = (config: IWalletPuppet) =>
           changeRoute,
           modifySubscriber,
           changeActivityTimeframe,
-          selectMarketTokenList,
+          selectCollateralTokenList,
           changeDepositTokenList,
           changeMatchRuleList
         }

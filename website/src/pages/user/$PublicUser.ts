@@ -4,11 +4,12 @@ import { $ButtonToggle, $defaulButtonToggleContainer } from '@puppet/middleware/
 import { ETH_ADDRESS_REGEXP } from '@puppet/middleware/utils'
 import { $node, $text, component, type IBehavior, style } from 'aelea/core'
 import * as router from 'aelea/router'
-import { $column, spacing } from 'aelea/ui-components'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
 import { $TraderPage } from './$Trader.js'
+import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 
 export interface IProfile extends IPageParams, IPageFilterParams, IUserPageParams {}
 
@@ -17,16 +18,23 @@ type IRouteOption = {
   fragment: string
 }
 
-export const $PublicUserPage = (config: IProfile) =>
+export const $PublicUserPage = ({
+  activityTimeframe,
+  collateralTokenList,
+  draftDepositTokenList,
+  draftMatchingRuleList,
+  matchingRuleQuery,
+  route
+}: IProfile) =>
   component(
     (
       [changeRoute, changeRouteTether]: IBehavior<string, string>,
       [selectProfileMode, selectProfileModeTether]: IBehavior<IRouteOption, IRouteOption>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [_selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const profileAddressRoute = config.route
+      const profileAddressRoute = route
       const traderRoute = profileAddressRoute.create({ fragment: 'trader' }).create({
         title: 'Trader',
         fragment: ETH_ADDRESS_REGEXP
@@ -46,14 +54,21 @@ export const $PublicUserPage = (config: IProfile) =>
         }
       ]
 
+      const urlFragments = document.location.pathname.split('/')
+      const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address
+
       return [
         $column(spacing.big)(
           $node(),
 
-          $column(
-            spacing.big,
-            style({ alignItems: 'center', placeContent: 'center' })
-          )(
+          $row(spacing.big, style({ alignItems: 'center', placeContent: 'space-between' }))(
+            $row(spacing.small, style({ flex: 1, textDecoration: 'none', alignItems: 'center' }))(
+              $profileAvatar({ address: account, size: isDesktopScreen ? 50 : 50 }),
+              $AccountLabel({
+                address: account,
+                primarySize: 1.25
+              })
+            ),
             $ButtonToggle({
               $container: $defaulButtonToggleContainer(style({ alignSelf: 'center' })),
               value: mergeArray([
@@ -64,30 +79,29 @@ export const $PublicUserPage = (config: IProfile) =>
               $$option: map((option) => {
                 return $node($text(option.label))
               })
-            })({ select: selectProfileModeTether() })
+            })({ select: selectProfileModeTether() }),
+            $node(style({ flex: 1 }))()
           ),
 
           $column(
-            router.match(traderRoute)({
-              run(sink, scheduler) {
-                const urlFragments = document.location.pathname.split('/')
-                const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address
-                // const matchRouteStatsQuery = queryMatchRouteStats(client, {
-                //   account,
-                //   activityTimeframe,
-                //   collateralTokenList: collateralTokenList
-                // })
-
-                return $column(spacing.big)(
-                  $TraderPage({ ...config, account })({
-                    selectMarketTokenList: selectMarketTokenListTether(),
-                    changeRoute: changeRouteTether(),
-                    changeActivityTimeframe: changeActivityTimeframeTether(),
-                    changeMatchRuleList: changeMatchRuleListTether()
-                  })
-                ).run(sink, scheduler)
-              }
-            })
+            router.match(traderRoute)(
+              $column(spacing.big)(
+                $TraderPage({
+                  account,
+                  activityTimeframe,
+                  collateralTokenList,
+                  draftDepositTokenList,
+                  draftMatchingRuleList,
+                  matchingRuleQuery,
+                  route
+                })({
+                  selectCollateralTokenList: selectCollateralTokenListTether(),
+                  changeRoute: changeRouteTether(),
+                  changeActivityTimeframe: changeActivityTimeframeTether(),
+                  changeMatchRuleList: changeMatchRuleListTether()
+                })
+              )
+            )
             // router.match(puppetRoute)(
             //   {
             //     run(sink, scheduler) {
@@ -117,7 +131,7 @@ export const $PublicUserPage = (config: IProfile) =>
             //           })({
             //             changeRoute: changeRouteTether(),
             //             changeActivityTimeframe: changeActivityTimeframeTether(),
-            //             selectMarketTokenList: selectMarketTokenListTether(),
+            //             selectCollateralTokenList: selectCollateralTokenListTether(),
             //             modifySubscriber: modifySubscriberTether()
             //           }),
             //         ),
@@ -133,6 +147,7 @@ export const $PublicUserPage = (config: IProfile) =>
         ),
 
         {
+          selectCollateralTokenList,
           changeMatchRuleList,
           changeActivityTimeframe,
           changeRoute: mergeArray([

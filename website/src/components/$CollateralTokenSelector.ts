@@ -2,46 +2,36 @@ import { map } from '@most/core'
 import type { Stream } from '@most/types'
 import { PUPPET_COLLATERAL_LIST } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $labelDisplay } from '@puppet/middleware/ui-components'
 import type { IBehavior } from 'aelea/core'
-import { $element, $text, component, type INodeCompose, style } from 'aelea/core'
-import { pallete } from 'aelea/ui-components-theme'
+import { $text, component } from 'aelea/core'
+import { isDesktopScreen } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
 import { $tokenIcon, $tokenLabeled } from '../common/$common'
-import { $DropMultiSelect } from './form/$Dropdown'
+import { $DropMultiSelect, $defaultNoneSelected } from './form/$DropMultiselect'
 
 interface ISelectCollateralToken {
   selectedList: Stream<Address[]>
-  $container?: INodeCompose
 }
 
-export const $SelectCollateralToken = (config: ISelectCollateralToken) =>
-  component(([selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>) => {
+export const $SelectCollateralToken = ({ selectedList }: ISelectCollateralToken) =>
+  component(([changeCollateralTokenList, changeCollateralTokenListTether]: IBehavior<Address[]>) => {
     return [
       $DropMultiSelect({
-        $container: config.$container,
-        $input: $element('input'),
-        $label: $labelDisplay(style({ color: pallete.foreground }))($text('Collateral')),
-        placeholder: 'All Tokens',
-        $$chip: map((tr) => $tokenIcon(getTokenDescription(tr))),
-        selector: {
-          list: PUPPET_COLLATERAL_LIST,
-          $$option: map((tr) => {
-            return style(
-              {
-                padding: '8px'
-              },
-              $tokenLabeled(getTokenDescription(tr))
-            )
-          })
-        },
-        value: config.selectedList
+        $noneSelected: $defaultNoneSelected($text(isDesktopScreen ? 'All Collateral' : 'All')),
+        $$option: map((tr) => {
+          return $tokenLabeled(getTokenDescription(tr))
+        }),
+        $$selectedOption: map((tr) => {
+          return $tokenIcon(getTokenDescription(tr))
+        }),
+        value: selectedList,
+        optionList: map((list) => PUPPET_COLLATERAL_LIST.filter((item) => list.indexOf(item) === -1), selectedList)
       })({
-        select: selectMarketTokenListTether()
+        select: changeCollateralTokenListTether()
       }),
 
       {
-        selectMarketTokenList
+        changeCollateralTokenList
       }
     ]
   })

@@ -11,7 +11,7 @@ import {
   unixTimestampNow
 } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, motion, style, switchMap } from 'aelea/core'
-import { $column, $NumberTicker, $row, spacing } from 'aelea/ui-components'
+import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
@@ -34,7 +34,7 @@ export const $TradeRouteTimeline = ({
   component(
     (
       [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
       const timelineQuery = map(async (params) => {
@@ -76,8 +76,8 @@ export const $TradeRouteTimeline = ({
             style({
               position: 'absolute',
               top: '14px',
-              left: '20px',
-              right: '20px',
+              left: isDesktopScreen ? '20px' : '12px',
+              right: isDesktopScreen ? '20px' : '12px',
               alignSelf: 'center',
               zIndex: 11,
               alignItems: 'flex-start'
@@ -87,7 +87,7 @@ export const $TradeRouteTimeline = ({
               $SelectCollateralToken({
                 selectedList: collateralTokenList
               })({
-                selectMarketTokenList: selectMarketTokenListTether()
+                changeCollateralTokenList: selectCollateralTokenListTether()
               })
             ),
             switchLatest(
@@ -235,7 +235,7 @@ export const $TradeRouteTimeline = ({
           })
         ),
 
-        { selectMarketTokenList, changeActivityTimeframe }
+        { selectCollateralTokenList, changeActivityTimeframe }
       ]
     }
   )

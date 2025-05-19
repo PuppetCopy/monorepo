@@ -31,26 +31,24 @@ interface ITraderPage extends IPageParams, IUserPageParams, IPageFilterParams {
   //   matchRouteStatsQuery: Stream<Promise<IMatchingRuleEditorChange[]>>
 }
 
-export const $TraderPage = (config: ITraderPage) =>
+export const $TraderPage = ({
+  account,
+  activityTimeframe,
+  collateralTokenList,
+  draftMatchingRuleList,
+  draftDepositTokenList,
+  matchingRuleQuery,
+  route
+}: ITraderPage) =>
   component(
     (
       [changeRoute, changeRouteTether]: IBehavior<any, string>,
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
       [sortByChange, _sortByChangeTether]: IBehavior<ISortBy>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const {
-        account,
-        activityTimeframe,
-        collateralTokenList,
-        draftMatchingRuleList,
-        draftDepositTokenList,
-        matchingRuleQuery,
-        route
-      } = config
-
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 
       const routeMetricListQuery = multicast(
@@ -139,63 +137,6 @@ export const $TraderPage = (config: ITraderPage) =>
 
       return [
         $column(spacing.big)(
-          $column(
-            spacing.default,
-            style({
-              minHeight: '90px',
-              display: 'flex',
-              flexDirection: isDesktopScreen ? 'row' : 'column',
-              gap: isDesktopScreen ? '56px' : '26px',
-              zIndex: 10,
-              placeContent: 'center',
-              alignItems: 'center',
-              padding: '0 8px'
-            })
-          )(
-            $row(spacing.small, style({ textDecoration: 'none', alignItems: 'center' }))(
-              $profileAvatar({ address: account, size: isDesktopScreen ? 50 : 50 }),
-              $AccountLabel({
-                address: account,
-                primarySize: 1.25
-              })
-            ),
-            $row(spacing.big, style({ alignItems: 'flex-end' }))(
-              $metricRow(
-                $heading2(
-                  $intermediateText(
-                    map(async (summaryQuery) => {
-                      const summary = await summaryQuery
-                      return `${summary.winCount} / ${summary.lossCount}`
-                    }, metricsQuery)
-                  )
-                ),
-                $metricLabel($text('Win / Loss'))
-              ),
-              $metricRow(
-                $heading2(
-                  $intermediateText(
-                    map(async (summaryQuery) => {
-                      const summary = await summaryQuery
-                      return readableUsd(summary.sizeUsd)
-                    }, metricsQuery)
-                  )
-                ),
-                $metricLabel($text('Volume'))
-              ),
-              $metricRow(
-                $heading2(
-                  $intermediateText(
-                    map(async (summaryQuery) => {
-                      const summary = await summaryQuery
-                      return readableLeverage(summary.sizeUsd, summary.collateralUsd)
-                    }, metricsQuery)
-                  )
-                ),
-                $metricLabel($text('Avg Leverage'))
-              )
-            )
-          ),
-
           $card(spacing.big, style({ flex: 1, width: '100%' }))(
             $card2(
               style({
@@ -213,9 +154,58 @@ export const $TraderPage = (config: ITraderPage) =>
                 matchingRuleQuery,
                 metricsQuery
               })({
-                selectMarketTokenList: selectMarketTokenListTether(),
+                selectCollateralTokenList: selectCollateralTokenListTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
+            ),
+
+            $column(
+              spacing.default,
+              style({
+                display: 'flex',
+                flexDirection: isDesktopScreen ? 'row' : 'column',
+                gap: isDesktopScreen ? '56px' : '26px',
+                zIndex: 10,
+                placeContent: 'center',
+                alignItems: 'center',
+                padding: '0 8px'
+              })
+            )(
+              $row(spacing.big, style({ alignItems: 'flex-end' }))(
+                $metricRow(
+                  $heading2(
+                    $intermediateText(
+                      map(async (summaryQuery) => {
+                        const summary = await summaryQuery
+                        return `${summary.winCount} / ${summary.lossCount}`
+                      }, metricsQuery)
+                    )
+                  ),
+                  $metricLabel($text('Win / Loss'))
+                ),
+                $metricRow(
+                  $heading2(
+                    $intermediateText(
+                      map(async (summaryQuery) => {
+                        const summary = await summaryQuery
+                        return readableUsd(summary.sizeUsd)
+                      }, metricsQuery)
+                    )
+                  ),
+                  $metricLabel($text('Volume'))
+                ),
+                $metricRow(
+                  $heading2(
+                    $intermediateText(
+                      map(async (summaryQuery) => {
+                        const summary = await summaryQuery
+                        return readableLeverage(summary.sizeUsd, summary.collateralUsd)
+                      }, metricsQuery)
+                    )
+                  ),
+                  $metricLabel($text('Avg Leverage'))
+                )
+              )
             ),
 
             switchMap((params) => {
@@ -279,7 +269,7 @@ export const $TraderPage = (config: ITraderPage) =>
             }, pageParams)
           )
         ),
-        { changeRoute, changeActivityTimeframe, selectMarketTokenList, changeMatchRuleList }
+        { changeRoute, changeActivityTimeframe, selectCollateralTokenList, changeMatchRuleList }
       ]
     }
   )

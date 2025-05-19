@@ -28,7 +28,7 @@ import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
 import type { ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
-import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
+import { $card2 } from '../../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
@@ -92,10 +92,20 @@ export const $Leaderboard = (config: ILeaderboard) =>
           style({ paddingTop: '36px' })
         )(
           $card2(style({ padding: '0', gap: 0 }))(
-            $responsiveFlex(
-              spacing.big,
-              style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' })
-            )(
+            // display: flex
+            // flex-direction: row;
+            // gap: 26px;
+            // flex: 1 1 0%;
+            // padding: 26px;
+            // place-content: center;
+            // flex-wrap: wrap;
+            // align-items: flex-start;
+            (isDesktopScreen
+              ? $row(spacing.big, style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }))
+              : $row(
+                  spacing.big,
+                  style({ padding: '12px', placeContent: 'center', flexWrap: 'wrap', alignItems: 'flex-start' })
+                ))(
               $ButtonToggle({
                 value: screenerFocus,
                 optionList: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
@@ -115,7 +125,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 select: changeScreenerFocusTether()
               }),
               $SelectCollateralToken({ selectedList: collateralTokenList })({
-                selectMarketTokenList: selectCollateralTokenListTether()
+                changeCollateralTokenList: selectCollateralTokenListTether()
               }),
 
               $LastAtivity(activityTimeframe)({

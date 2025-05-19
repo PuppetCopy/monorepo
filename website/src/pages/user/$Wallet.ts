@@ -79,7 +79,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
       [selectProfileMode, selectProfileModeTether]: IBehavior<IWalletTab>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, PUPPET.IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>,
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
       [changeWallet, changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
 
@@ -357,7 +357,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                 changeWallet: changeWalletTether(),
                 changeRoute: changeRouteTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether(),
-                selectMarketTokenList: selectMarketTokenListTether(),
+                selectCollateralTokenList: selectCollateralTokenListTether(),
                 changeDepositTokenList: changeDepositTokenListTether(),
                 changeMatchRuleList: changeMatchRuleListTether()
               })
@@ -971,7 +971,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
 
         {
           changeActivityTimeframe,
-          selectMarketTokenList,
+          selectCollateralTokenList,
           changeRoute,
           changeWallet,
           changeMatchRuleList,

@@ -19,7 +19,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
       [modifySubscriber, _modifySubscriberTether]: IBehavior<IMatchingRuleEditorDraft>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
-      [selectMarketTokenList, selectMarketTokenListTether]: IBehavior<Address[]>
+      [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>
     ) => {
       const {
         activityTimeframe,
@@ -45,7 +45,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
               })
             )(
               $TradeRouteTimeline({ ...config })({
-                selectMarketTokenList: selectMarketTokenListTether(),
+                selectCollateralTokenList: selectCollateralTokenListTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
             )
@@ -97,7 +97,7 @@ export const $PuppetProfile = (config: IPuppetProfile) =>
           changeRoute,
           modifySubscriber,
           changeActivityTimeframe,
-          selectMarketTokenList
+          selectCollateralTokenList
         }
       ]
     }

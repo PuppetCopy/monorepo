@@ -118,21 +118,18 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
 
             return $column(spacing.default)(
               $Dropdown({
-                $selection: $FieldLabeled({
+                $anchor: $FieldLabeled({
                   label: 'Activity throttle',
                   value: map(O(Number, getDuration), changeActivityThrottle),
                   placeholder: getDuration(Number(model?.throttleActivity || placeholderForm.throttleActivity)),
                   labelWidth: 150,
                   hint: 'Ignore positions that are too close to each other in time'
                 })({}),
-                selector: {
-                  value: now(3600),
-                  $container: $defaultSelectContainer(style({ right: '0' })),
-                  $option: map((option) => {
-                    return $node($text(getDuration(Number(option))))
-                  }),
-                  list: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
-                }
+                $container: $defaultSelectContainer(style({ right: '0' })),
+                $$option: map((tf) => {
+                  return $node($text(getDuration(Number(tf))))
+                }),
+                optionList: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
               })({
                 select: changeActivityThrottleTether(map(BigInt))
               }),

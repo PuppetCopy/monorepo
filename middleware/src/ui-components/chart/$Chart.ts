@@ -3,7 +3,6 @@ import { disposeWith } from '@most/disposable'
 import type { Stream } from '@most/types'
 import {
   $wrapNativeElement,
-  combineArray,
   combineState,
   component,
   fromCallback,
@@ -238,15 +237,15 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
               }),
               tap((next) => {
                 seriesMarkers.setMarkers(next)
-              }, markers),
-              combineArray(([containerDimension]) => {
-                const { width, height } = containerDimension.contentRect
-                chartApi.resize(width, height)
-                // timeScale.fitContent()
-                timeScale.resetTimeScale()
+              }, markers)
+              // combineArray(([containerDimension]) => {
+              //   const { width, height } = containerDimension.contentRect
+              //   chartApi.resize(width, height)
+              //   // timeScale.fitContent()
+              //   timeScale.resetTimeScale()
 
-                return empty()
-              }, containerDimension)
+              //   return empty()
+              // }, containerDimension)
             ])
           )
         ),

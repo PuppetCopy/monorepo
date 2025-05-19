@@ -148,12 +148,11 @@ export const $fromText = (text: string | I$Text): I$Text => {
   return isStream(text) ? text : $text(text)
 }
 
-const $infoLabelNode = $node(style({ color: pallete.foreground }))
+export const $infoLabel = $node(style({ color: pallete.foreground }))
 
-export const $infoLabel = (label: string | I$Text) => {
-  // const $msg = isStream(label) ? label : $toText(label)
-  return $infoLabelNode($fromText(label))
-}
+// export const $infoLabel = (label: string | I$Text) => {
+//   return $infoLabelNode($fromText(label))
+// }
 
 const $infoLabeledValueNode = isDesktopScreen
   ? $row(spacing.default, style({ alignItems: 'center' })) //
@@ -161,13 +160,13 @@ const $infoLabeledValueNode = isDesktopScreen
 
 export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable) => {
   return $infoLabeledValueNode(
-    $infoLabel(label), //
+    $infoLabel($fromText(label)), //
     isStream(value) ? value : $text(value)
   )
 }
 
 export const $infoTooltipLabel = (text: string | I$Slottable, label?: string | I$Slottable) => {
-  return $row(style({ alignItems: 'center' }))(label ? $infoLabel(label) : empty(), $infoTooltip(text))
+  return $row(style({ alignItems: 'center' }))(label ? $infoLabel($fromText(label)) : empty(), $infoTooltip(text))
 }
 
 export const $infoTooltip = (text: string | I$Slottable, color = pallete.foreground, size = '24px') => {
@@ -262,7 +261,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
 
 export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: ILabeledHintAdjustment) => {
   return $row(spacing.small, style({ alignItems: 'center' }))(
-    tooltip ? $infoTooltipLabel(tooltip, label) : label ? $infoLabel(label) : empty(),
+    tooltip ? $infoTooltipLabel(tooltip, label) : label ? $infoLabel($fromText(label)) : empty(),
 
     $hintAdjustment({ change, color, $val })
   )

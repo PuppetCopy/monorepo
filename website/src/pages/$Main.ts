@@ -168,6 +168,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   draftMatchingRuleList,
                   matchingRuleQuery
                 })({
+                  selectCollateralTokenList: selectCollateralTokenListTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   changeMatchRuleList: changeMatchRuleListTether(),
                   changeRoute: changeRouteTether()

@@ -1,3 +1,4 @@
+import type { Address } from 'viem/accounts'
 import { arbitrum, avalanche } from 'viem/chains'
 import { ARBITRUM_ADDRESS } from './chain/arbitrum.js'
 import { AVALANCHE_ADDRESS } from './chain/avalanche.js'
@@ -32,7 +33,7 @@ export const MAX_UINT256 = 2n ** 256n - 1n
 export const INITIAL_SUPPLY = 10n ** 100_000n
 export const MAX_LOCK_SCHEDULE = IntervalTime.WEEK * 105
 
-export const PUPPET_COLLATERAL_LIST = [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN] as const
+export const PUPPET_COLLATERAL_LIST = [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN] as Address[]
 
 export const MAX_LEVERAGE_FACTOR = 100n * BASIS_POINTS_DIVISOR
 export const MIN_LEVERAGE_FACTOR = 11000n
