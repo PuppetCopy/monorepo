@@ -196,7 +196,7 @@ export const $TradeCardPreview = (config: ITradeCardPreview) =>
                   }),
                   $infoTooltipLabel(
                     'The total combined settled and open trades',
-                    $textNode(style({ fontSize: '.8rem' }))('PnL')
+                    $node(style({ fontSize: '.8rem' }))($text('PnL'))
                   )
                 )
               ),

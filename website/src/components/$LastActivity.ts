@@ -6,7 +6,6 @@ import type { IBehavior } from 'aelea/core'
 import { $node, $text, component, style } from 'aelea/core'
 import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { $Dropdown } from './form/$Dropdown'
-import { $defaultNoneSelected } from './form/$DropMultiselect'
 
 export const lastActivityOptionList = [
   {

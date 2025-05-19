@@ -38,8 +38,8 @@
         "@most/scheduler": "1.3.0",
         "@most/types": "1.1.0",
         "@puppet/middleware": "workspace:*",
-        "@reown/appkit": "1.7.5",
-        "@reown/appkit-adapter-wagmi": "1.7.5",
+        "@reown/appkit": "1.7.6",
+        "@reown/appkit-adapter-wagmi": "1.7.6",
         "@wagmi/core": "2.17.2",
         "abitype": "1.0.8",
         "aelea": "1.9.0",
@@ -47,7 +47,7 @@
         "drizzle-orm": "0.43.1",
         "lightweight-charts": "5.0.7",
         "mersenne-twister": "1.1.0",
-        "ponder": "0.11.2",
+        "ponder": "0.11.3",
         "viem": "2.29.4",
       },
       "devDependencies": {
@@ -525,25 +525,25 @@
 
     "@quansync/fs": ["@quansync/fs@0.1.3", "", { "dependencies": { "quansync": "^0.2.10" } }, "sha512-G0OnZbMWEs5LhDyqy2UL17vGhSVHkQIfVojMtEWVenvj0V5S84VBgy86kJIuNsGDp2p7sTKlpSIpBUWdC35OKg=="],
 
-    "@reown/appkit": ["@reown/appkit@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-pay": "1.7.5", "@reown/appkit-polyfills": "1.7.5", "@reown/appkit-scaffold-ui": "1.7.5", "@reown/appkit-ui": "1.7.5", "@reown/appkit-utils": "1.7.5", "@reown/appkit-wallet": "1.7.5", "@walletconnect/types": "2.20.2", "@walletconnect/universal-provider": "2.20.2", "bs58": "6.0.0", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-CFJIhUuloBcu+neJBmeRIqXuPzdlCV9KN6/eovc6UIEf6KgXFrAagPKb+aDoQ1YMvW0dE5Q/vEuOrKZmjWHiCw=="],
+    "@reown/appkit": ["@reown/appkit@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-pay": "1.7.6", "@reown/appkit-polyfills": "1.7.6", "@reown/appkit-scaffold-ui": "1.7.6", "@reown/appkit-ui": "1.7.6", "@reown/appkit-utils": "1.7.6", "@reown/appkit-wallet": "1.7.6", "@walletconnect/types": "2.20.2", "@walletconnect/universal-provider": "2.20.2", "bs58": "6.0.0", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-9E9b4w245AMr8+YhCYB/c5O3Fl6XbA2adeypvWuNNUMnoolNRIWyQ45+QTKJiXJaAVknPC6G4P7ym0NYIgc8ww=="],
 
-    "@reown/appkit-adapter-wagmi": ["@reown/appkit-adapter-wagmi@1.7.5", "", { "dependencies": { "@reown/appkit": "1.7.5", "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-polyfills": "1.7.5", "@reown/appkit-scaffold-ui": "1.7.5", "@reown/appkit-utils": "1.7.5", "@reown/appkit-wallet": "1.7.5", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2" }, "optionalDependencies": { "@wagmi/connectors": ">=5.7.11" }, "peerDependencies": { "@wagmi/core": ">=2.16.7", "viem": ">=2.29.0", "wagmi": ">=2.15.2" } }, "sha512-QGnsiUuo144icHzJnJDtDjokJGngSvYPKR34HtYA/zIiXmSpVd0YapQsJhYU41oMZwikld4gUjcUT2rplJ7V1A=="],
+    "@reown/appkit-adapter-wagmi": ["@reown/appkit-adapter-wagmi@1.7.6", "", { "dependencies": { "@reown/appkit": "1.7.6", "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-polyfills": "1.7.6", "@reown/appkit-scaffold-ui": "1.7.6", "@reown/appkit-utils": "1.7.6", "@reown/appkit-wallet": "1.7.6", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2" }, "optionalDependencies": { "@wagmi/connectors": ">=5.7.11" }, "peerDependencies": { "@wagmi/core": ">=2.16.7", "viem": ">=2.29.0", "wagmi": ">=2.15.2" } }, "sha512-IQd9AacNSh54viOzdQlq/7ToSgXIU9kQ6Xw05k/mDHLRo3VLvE3sLIafLl0LzlbWgzgSZK9+Pt0HXtnyvVzGjQ=="],
 
-    "@reown/appkit-common": ["@reown/appkit-common@1.7.5", "", { "dependencies": { "big.js": "6.2.2", "dayjs": "1.11.13", "viem": ">=2.29.0" } }, "sha512-TyjOKRyRqNzTGwEikjkyDp2l3k0obgTuXKM0/VCF1FlZN48hMPOnd9gBnsI9TB7mK/wmJRHMs29JlolThlTOTw=="],
+    "@reown/appkit-common": ["@reown/appkit-common@1.7.6", "", { "dependencies": { "big.js": "6.2.2", "dayjs": "1.11.13", "viem": ">=2.29.0" } }, "sha512-Rs7eM1jQtimZwwG03dQMmHR8RG26jl5b4Qqn3GSIofRktKLYgZyb5mI5kjfQRkwfoRbjgI7oKnljT95hIk2yxg=="],
 
-    "@reown/appkit-controllers": ["@reown/appkit-controllers@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-wallet": "1.7.5", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-MGEQpjMjobkFZIOy+Ti4BV9DZ90WAjJ4dbR91ZshrqvtytTxuUf3Tf65ALMpsUhGgnfwTeuXm2oHQ26S+NIx4g=="],
+    "@reown/appkit-controllers": ["@reown/appkit-controllers@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-wallet": "1.7.6", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-jKJaHwQpAPhJMBizeRaySQfClvqOMh0tzM+p2DWLYdBFTLyKTtBe4Ey38hjP1yIDiEL3WbzbgLWxezSX4Py8Yg=="],
 
-    "@reown/appkit-pay": ["@reown/appkit-pay@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-ui": "1.7.5", "@reown/appkit-utils": "1.7.5", "lit": "3.3.0", "valtio": "1.13.2" } }, "sha512-CR0EISQl6Q3bl5FQIaZRyN5DEHU0TEsDgoPuU0X1u9LB97tUedNIaCqrOXRPQatw0w/EsG29mDX5DRl1N4Yszg=="],
+    "@reown/appkit-pay": ["@reown/appkit-pay@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-ui": "1.7.6", "@reown/appkit-utils": "1.7.6", "lit": "3.3.0", "valtio": "1.13.2" } }, "sha512-ccaIBsboyr1E+rbZRcedvy5UsPnIVkyuW/H7OV3FXHVsbkzdP24crf4riFRvI6AYeiaM4JmhF8f4iBAxNlAcWA=="],
 
-    "@reown/appkit-polyfills": ["@reown/appkit-polyfills@1.7.5", "", { "dependencies": { "buffer": "6.0.3" } }, "sha512-AoyVgfx30gLi9Lo+/UZ95BFwEL6zS0y9AsXrZylnBfvFIlSf8MvhJR8a8aH5BfQ0/7hYYbNKnJsWGbOCgAY5jg=="],
+    "@reown/appkit-polyfills": ["@reown/appkit-polyfills@1.7.6", "", { "dependencies": { "buffer": "6.0.3" } }, "sha512-WP19ZiBQs/TXogpDBPujJqtLwBenjHzCIVIBzjfdrXTBW/mdW6jtAJAUVBs4c+r/mRuAx57h1vHoajjk837orQ=="],
 
-    "@reown/appkit-scaffold-ui": ["@reown/appkit-scaffold-ui@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-ui": "1.7.5", "@reown/appkit-utils": "1.7.5", "@reown/appkit-wallet": "1.7.5", "lit": "3.3.0" } }, "sha512-WsB0mev3N95iKSlX9Bd9WYesvy2Svywk7nDmC37AmNwqXlpX62Xkf5i4CeJotv/ElzyDWWznRzP4MfDavyBadw=="],
+    "@reown/appkit-scaffold-ui": ["@reown/appkit-scaffold-ui@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-ui": "1.7.6", "@reown/appkit-utils": "1.7.6", "@reown/appkit-wallet": "1.7.6", "lit": "3.3.0" } }, "sha512-Z95fqK+h64Gf2Ky9M8Sw81hhw23KW1K89Qa7/rtY5Vt1wAXtBCDQWhMA62PEFXPskYDYWEt/Nv64swDYjoN2EA=="],
 
-    "@reown/appkit-ui": ["@reown/appkit-ui@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-wallet": "1.7.5", "lit": "3.3.0", "qrcode": "1.5.3" } }, "sha512-nuK6f2vgde9ySKvAGrrsWVgg0pECtjpADp/t0iVCgxGsDgT8903cEUkOXKFsJuK18OHqwGsldwnTcoOG3oBs1A=="],
+    "@reown/appkit-ui": ["@reown/appkit-ui@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-wallet": "1.7.6", "lit": "3.3.0", "qrcode": "1.5.3" } }, "sha512-U8agGJnGcXeIasR+oY6Yj9yRJ+UOntspoAsz43R3D0ak+Gz5Vq1uCBfwfCZF17ri2o1yhAbaMKnLJbmdP3CMDA=="],
 
-    "@reown/appkit-utils": ["@reown/appkit-utils@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-controllers": "1.7.5", "@reown/appkit-polyfills": "1.7.5", "@reown/appkit-wallet": "1.7.5", "@walletconnect/logger": "2.1.2", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-OjOpN0ulAAnf32nbIKUDb/MbMcK2lkXRtXJo8EX56bvp2BKvtG8Jcl7+uiWJxdb6yuUOSUMcP+5r0Yj/EKzM9g=="],
+    "@reown/appkit-utils": ["@reown/appkit-utils@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-controllers": "1.7.6", "@reown/appkit-polyfills": "1.7.6", "@reown/appkit-wallet": "1.7.6", "@walletconnect/logger": "2.1.2", "@walletconnect/universal-provider": "2.20.2", "valtio": "1.13.2", "viem": ">=2.29.0" } }, "sha512-N0IVNk4HboH3Ydk68uG8au+wp+zLUHgqatuJ6twYMhQzZHoqkMAkuYa4jFB0s1Lvp78V857dD5PkXLFuez9+Ig=="],
 
-    "@reown/appkit-wallet": ["@reown/appkit-wallet@1.7.5", "", { "dependencies": { "@reown/appkit-common": "1.7.5", "@reown/appkit-polyfills": "1.7.5", "@walletconnect/logger": "2.1.2", "zod": "3.22.4" } }, "sha512-46124X/0muD0RaNi+myF5OLWiCvJfq2+SqaopLRWKlCJLVjt5iBYwA/WsBZ5d8gy6izwzuhTMyHgP2oJc20SRg=="],
+    "@reown/appkit-wallet": ["@reown/appkit-wallet@1.7.6", "", { "dependencies": { "@reown/appkit-common": "1.7.6", "@reown/appkit-polyfills": "1.7.6", "@walletconnect/logger": "2.1.2", "zod": "3.22.4" } }, "sha512-W0qe186B0IEkcHPvx2c/FDwW6Y4XTndEboB7cxjezeIcFx/gUHaUcuYN+9dvNJm2sB75DbGHlegeY4QzPv5owQ=="],
 
     "@repeaterjs/repeater": ["@repeaterjs/repeater@3.0.6", "", {}, "sha512-Javneu5lsuhwNCryN+pXH93VPQ8g0dBX7wItHFgYiwQmzE1sVdg5tWHiOgHywzL2W21XQopa7IwIEnNbmeUJYA=="],
 
@@ -1393,7 +1393,7 @@
 
     "pngjs": ["pngjs@5.0.0", "", {}, "sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw=="],
 
-    "ponder": ["ponder@0.11.2", "", { "dependencies": { "@babel/code-frame": "^7.23.4", "@commander-js/extra-typings": "^12.0.1", "@electric-sql/pglite": "0.2.13", "@escape.tech/graphql-armor-max-aliases": "^2.3.0", "@escape.tech/graphql-armor-max-depth": "^2.2.0", "@escape.tech/graphql-armor-max-tokens": "^2.3.0", "@hono/node-server": "1.13.3", "@ponder/utils": "0.2.7", "abitype": "^0.10.2", "ansi-escapes": "^7.0.0", "commander": "^12.0.0", "conf": "^12.0.0", "dataloader": "^2.2.2", "detect-package-manager": "^3.0.2", "dotenv": "^16.3.1", "drizzle-orm": "0.41.0", "glob": "^10.3.10", "graphql": "^16.8.1", "graphql-yoga": "^5.3.0", "http-terminator": "^3.2.0", "kysely": "^0.26.3", "pg": "^8.11.3", "pg-connection-string": "^2.6.2", "pg-copy-streams": "^6.0.6", "pg-query-emscripten": "5.1.0", "picocolors": "^1.1.1", "pino": "^8.16.2", "prom-client": "^15.0.0", "semver": "^7.7.1", "stacktrace-parser": "^0.1.10", "superjson": "^2.2.2", "terminal-size": "^4.0.0", "vite": "5.0.7", "vite-node": "1.0.2", "vite-tsconfig-paths": "4.3.1" }, "peerDependencies": { "hono": ">=4.5", "typescript": ">=5.0.4", "viem": ">=2" }, "optionalPeers": ["typescript"], "bin": { "ponder": "dist/esm/bin/ponder.js" } }, "sha512-ZFaZfeXCRWTsJtZ76ZBNDGrKc93wb4ZAHyUjhDa/YrhoJOI2boo/n51hD8w/5OULccwR4Rat4L0NL3ayzR1g0g=="],
+    "ponder": ["ponder@0.11.3", "", { "dependencies": { "@babel/code-frame": "^7.23.4", "@commander-js/extra-typings": "^12.0.1", "@electric-sql/pglite": "0.2.13", "@escape.tech/graphql-armor-max-aliases": "^2.3.0", "@escape.tech/graphql-armor-max-depth": "^2.2.0", "@escape.tech/graphql-armor-max-tokens": "^2.3.0", "@hono/node-server": "1.13.3", "@ponder/utils": "0.2.7", "abitype": "^0.10.2", "ansi-escapes": "^7.0.0", "commander": "^12.0.0", "conf": "^12.0.0", "dataloader": "^2.2.2", "detect-package-manager": "^3.0.2", "dotenv": "^16.3.1", "drizzle-orm": "0.41.0", "glob": "^10.3.10", "graphql": "^16.8.1", "graphql-yoga": "^5.3.0", "http-terminator": "^3.2.0", "kysely": "^0.26.3", "pg": "^8.11.3", "pg-connection-string": "^2.6.2", "pg-copy-streams": "^6.0.6", "pg-query-emscripten": "5.1.0", "picocolors": "^1.1.1", "pino": "^8.16.2", "prom-client": "^15.0.0", "semver": "^7.7.1", "stacktrace-parser": "^0.1.10", "superjson": "^2.2.2", "terminal-size": "^4.0.0", "vite": "5.0.7", "vite-node": "1.0.2", "vite-tsconfig-paths": "4.3.1" }, "peerDependencies": { "hono": ">=4.5", "typescript": ">=5.0.4", "viem": ">=2" }, "optionalPeers": ["typescript"], "bin": { "ponder": "dist/esm/bin/ponder.js" } }, "sha512-DA+Tv5BUVCVxocM+3z2wStI1v1Z9SUe/TlRKS9qVcwaPavX5P/gjrCc6OGIH2SRyOvCQtO/hvdUtOzyrIRYYXA=="],
 
     "pony-cause": ["pony-cause@2.1.11", "", {}, "sha512-M7LhCsdNbNgiLYiP4WjsfLUuFmCfnjdF6jKe2R9NKl4WFN+HZPGHJZ9lnLP7f9ZnKe3U9nuWD0szirmj+migUg=="],
 

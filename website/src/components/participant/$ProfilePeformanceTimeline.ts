@@ -193,10 +193,12 @@ export const $TradeRouteTimeline = ({
                       ticksVisible: true,
                       scaleMargins: {
                         top: 0.4,
-                        bottom: 0
+                        bottom: 0.1
                       }
+                    },
+                    timeScale: {
+                      visible: false
                     }
-                    // timeScale: {}
                   },
                   baselineOptions: {
                     baseLineColor: pallete.message,

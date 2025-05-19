@@ -1,21 +1,59 @@
+import type { Stream } from '@most/types'
 import { pallete } from 'aelea/ui-components-theme'
 import {
   type BarPrice,
   BaselineSeries,
   type BaselineSeriesPartialOptions,
   type ChartOptions,
+  createChart,
   type DeepPartial,
   LineStyle
 } from 'lightweight-charts'
 import { readableUnitAmount } from '../../utils/index.js'
-import { $Chart, type IChartConfig } from './$Chart.js'
+import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
 
-export interface IBaselineChart extends IChartConfig<'Baseline'> {
+export interface IBaselineChart {
   baselineOptions?: BaselineSeriesPartialOptions
+  data: ISeriesType['Baseline'][]
+
+  chartConfig?: DeepPartial<ChartOptions>
+  markers?: Stream<IMarker[]>
 }
 
-export const $Baseline = (config: IBaselineChart) => {
-  const baselineOptions: BaselineSeriesPartialOptions = {
+export const $Baseline = ({ data, baselineOptions, chartConfig, markers }: IBaselineChart) => {
+  const chartElement = document.createElement('chart')
+  const chartApi = createChart(chartElement, {
+    ...defaultChartConfig,
+    layout: {
+      attributionLogo: false,
+      background: {
+        color: 'transparent'
+      },
+      textColor: pallete.foreground,
+      fontSize: 10
+    },
+    leftPriceScale: {
+      ticksVisible: true,
+      scaleMargins: {
+        top: 0.1,
+        bottom: 0.1
+      }
+    },
+    handleScale: false,
+    handleScroll: false,
+    timeScale: {
+      secondsVisible: false,
+      timeVisible: true,
+      shiftVisibleRangeOnNewBar: true,
+      rightBarStaysOnScroll: true,
+      fixRightEdge: true,
+      fixLeftEdge: true,
+      borderVisible: false,
+      rightOffset: 0
+    },
+    ...chartConfig
+  })
+  const series = chartApi.addSeries(BaselineSeries, {
     priceFormat: {
       type: 'custom',
       formatter: (priceValue: BarPrice) => readableUnitAmount(priceValue.valueOf())
@@ -36,60 +74,16 @@ export const $Baseline = (config: IBaselineChart) => {
     baseLineVisible: true,
     // lastValueVisible: false,
     priceLineVisible: false,
-    ...config.baselineOptions
-  }
+    ...baselineOptions
+  })
 
-  const chartConfig: DeepPartial<ChartOptions> = {
-    layout: {
-      attributionLogo: false,
-      background: {
-        color: 'transparent'
-      },
-      textColor: pallete.foreground,
-      fontSize: 10
-    },
-    leftPriceScale: {
-      ticksVisible: true,
-      scaleMargins: {
-        top: 0.1,
-        bottom: 0.1
-      }
-    },
-    // rightPriceScale: {
-    //   // mode: PriceScaleMode.Logarithmic,
-    //   autoScale: true,
-    //   visible: true,
-    //   scaleMargins: {
-    //     top: 0.4,
-    //     bottom: 0,
-    //   }
-    // },
-    autoSize: true,
-    handleScale: false,
-    handleScroll: false,
-    timeScale: {
-      secondsVisible: false,
-      timeVisible: true,
-      shiftVisibleRangeOnNewBar: true,
-      rightBarStaysOnScroll: true,
-      fixRightEdge: true,
-      fixLeftEdge: true,
-      borderVisible: false,
-      rightOffset: 0
-    },
-    ...(config.chartConfig || {})
-  }
+  // setTimeout(() => {
+  series.setData(data)
+  // }, 100)
 
   return $Chart({
-    ...config,
-    chartConfig,
-    getSeriesApi: (api) => {
-      const series = api.addSeries(BaselineSeries, baselineOptions)
-      setTimeout(() => {
-        api.timeScale().fitContent()
-      }, 55)
-
-      return series
-    }
+    chartApi,
+    series,
+    markers
   })
 }

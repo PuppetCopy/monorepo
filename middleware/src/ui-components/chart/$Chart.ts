@@ -9,10 +9,9 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
-  type IOps,
-  O,
   style,
-  styleInline
+  styleInline,
+  switchMap
 } from 'aelea/core'
 import { $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -20,7 +19,6 @@ import {
   type ChartOptions,
   type Coordinate,
   CrosshairMode,
-  createChart,
   createSeriesMarkers, // Import createSeriesMarkers
   type DeepPartial,
   type IChartApi,
@@ -33,7 +31,6 @@ import {
   type PriceLineOptions,
   type SeriesDataItemTypeMap,
   type SeriesMarker,
-  type SeriesPartialOptionsMap,
   type Time
 } from 'lightweight-charts'
 import { filterNull } from '../../utils/index.js'
@@ -48,13 +45,11 @@ export interface ICHartAxisChange {
   price: Stream<number | null>
 }
 
-export interface IChartConfig<TType extends keyof ISeriesType> {
-  chartConfig?: DeepPartial<ChartOptions>
-  containerOp?: IOps<INode, INode>
-  seriesConfig?: SeriesPartialOptionsMap[TType]
+export interface IChart<TSeriesType extends keyof ISeriesType> {
+  chartApi: IChartApi
+  series: ISeriesApi<TSeriesType>
 
-  data: ISeriesType[TType][]
-  appendData?: Stream<ISeriesType[TType]>
+  appendData?: Stream<ISeriesType[TSeriesType]>
   priceLines?: Stream<(Partial<PriceLineOptions> & Pick<PriceLineOptions, 'price'>) | null>[]
   markers?: Stream<IMarker[]>
 
@@ -63,80 +58,21 @@ export interface IChartConfig<TType extends keyof ISeriesType> {
   yAxisState?: ICHartAxisChange
 }
 
-export interface IChart<TSeriesType extends keyof ISeriesType> extends IChartConfig<TSeriesType> {
-  getSeriesApi: (api: IChartApi) => ISeriesApi<TSeriesType> // Note: The implementation of this function where it's passed *into* $Chart needs to be updated to use chart.addSeries(Type, options)
-}
-
-export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSeriesType>) =>
+export const $Chart = <TSeriesType extends keyof ISeriesType>({
+  chartApi,
+  series,
+  $content,
+  appendData,
+  priceLines,
+  markers,
+  yAxisState
+}: IChart<TSeriesType>) =>
   component(
     (
       // [sampleCrosshairMove, crosshairMove]: IBehavior<MouseEventParams, MouseEventParams>,
       [containerDimension, sampleContainerDimension]: IBehavior<INode, ResizeObserverEntry[]>
     ) => {
-      const containerEl = document.createElement('chart')
-
-      const chartApi = createChart(containerEl, {
-        rightPriceScale: {
-          visible: false
-        },
-        grid: {
-          horzLines: {
-            visible: false
-          },
-          vertLines: {
-            visible: false
-          }
-        },
-        overlayPriceScales: {
-          borderVisible: false
-        },
-        // leftPriceScale: {
-        //   autoScale: true,
-        //   visible: false,
-        //   scaleMargins: {
-        //     bottom: 0,
-        //     top: 0,
-        //   }
-        // },
-        layout: {
-          attributionLogo: false,
-          textColor: pallete.message,
-          background: {
-            color: 'transparent'
-          },
-          fontFamily: '-apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif',
-          fontSize: 12
-        },
-        timeScale: {
-          rightOffset: 0,
-          secondsVisible: true,
-          timeVisible: true,
-          lockVisibleTimeRangeOnResize: true
-        },
-        crosshair: {
-          mode: CrosshairMode.Magnet,
-          horzLine: {
-            // visible: false,
-            labelBackgroundColor: pallete.background,
-            // labelVisible: false,
-            color: pallete.indeterminate,
-            width: 1,
-            style: LineStyle.Dotted
-          },
-          vertLine: {
-            color: pallete.indeterminate,
-            labelBackgroundColor: pallete.background,
-            width: 1,
-            style: LineStyle.Dotted
-          }
-        },
-        ...config.chartConfig
-      })
-
-      const seriesApi: ISeriesApi<TSeriesType> = config.getSeriesApi(chartApi)
-      const seriesMarkers = createSeriesMarkers(seriesApi) // Create the marker primitive
-
-      seriesApi.setData(config.data)
+      const containerEl = chartApi.chartElement()
 
       const crosshairMove = fromCallback<MouseEventParams>((cb) => {
         chartApi.subscribeCrosshairMove((xx) => {
@@ -169,16 +105,15 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
       )
 
       const ignoreAll = filter(() => false)
-      const priceLineConfigList = config.priceLines || []
-      const markers = config.markers || empty()
+      const priceLineConfigList = priceLines || []
+      const seriesMarkers = createSeriesMarkers(series) // Create the marker primitive
 
       return [
         $wrapNativeElement(containerEl)(
           style({ position: 'relative', minHeight: '30px', flex: 1, width: '100%' }),
-          sampleContainerDimension(observer.resize()),
-          config.containerOp || O()
+          sampleContainerDimension(observer.resize())
         )(
-          config.yAxisState
+          yAxisState
             ? $row(
                 style({
                   placeContent: 'flex-end',
@@ -200,25 +135,30 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                       top: `${params.coords}px`,
                       display: 'flex'
                     }
-                  }, combineState(config.yAxisState))
+                  }, combineState(yAxisState))
                 )
-              )(config.$content || empty())
+              )($content || empty())
             : empty(),
 
           ignoreAll(
             mergeArray([
-              config.appendData
+              switchMap(([containerObserver]) => {
+                chartApi.resize(containerObserver.contentRect.width, containerObserver.contentRect.height)
+                timeScale.fitContent()
+                return empty()
+              }, containerDimension),
+              appendData
                 ? tap((next) => {
                     if (next?.time) {
-                      seriesApi.update(next)
+                      series.update(next)
                     }
-                  }, config.appendData)
+                  }, appendData)
                 : empty(),
               ...priceLineConfigList.map((lineStreamConfig) => {
                 return scan(
                   (prev, params) => {
                     if (prev && params === null) {
-                      seriesApi.removePriceLine(prev)
+                      series.removePriceLine(prev)
                     }
 
                     if (params) {
@@ -226,7 +166,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                         prev.applyOptions(params)
                         return prev
                       }
-                      return seriesApi.createPriceLine(params)
+                      return series.createPriceLine(params)
                     }
 
                     return null
@@ -237,21 +177,13 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
               }),
               tap((next) => {
                 seriesMarkers.setMarkers(next)
-              }, markers)
-              // combineArray(([containerDimension]) => {
-              //   const { width, height } = containerDimension.contentRect
-              //   chartApi.resize(width, height)
-              //   // timeScale.fitContent()
-              //   timeScale.resetTimeScale()
-
-              //   return empty()
-              // }, containerDimension)
+              }, markers || empty())
             ])
           )
         ),
 
         {
-          // yAxisCoords: config.yAxisState
+          // yAxisCoords: yAxisState
           //   ? mergeArray([
           //       map(
           //         (coords) => {
@@ -261,7 +193,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
 
           //           return coords.crosshairMove?.point?.y || null
           //         },
-          //         combineState({ crosshairMove, isFocused: config.yAxisState.isFocused })
+          //         combineState({ crosshairMove, isFocused: yAxisState.isFocused })
           //       ),
           //       snapshot(
           //         (params) => {
@@ -271,12 +203,12 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
 
           //           return null
           //         },
-          //         combineState(config.yAxisState),
+          //         combineState(yAxisState),
           //         visibleLogicalRangeChange
           //       )
           //     ])
           //   : empty(),
-          focusPrice: config.yAxisState
+          focusPrice: yAxisState
             ? filterNull(
                 mergeArray([
                   snapshot(
@@ -285,9 +217,9 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                         return null
                       }
 
-                      return ev.point ? seriesApi.coordinateToPrice(ev.point.y) : null
+                      return ev.point ? series.coordinateToPrice(ev.point.y) : null
                     },
-                    combineState(config.yAxisState),
+                    combineState(yAxisState),
                     click
                   ),
                   snapshot(
@@ -296,15 +228,15 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
                         return null
                       }
 
-                      return coords ? seriesApi.coordinateToPrice(coords) : null
+                      return coords ? series.coordinateToPrice(coords) : null
                     },
-                    combineState(config.yAxisState),
-                    config.yAxisState.coords
+                    combineState(yAxisState),
+                    yAxisState.coords
                   )
                 ])
               )
             : empty(),
-          isFocused: config.yAxisState ? snapshot((focused) => !focused, config.yAxisState.isFocused, click) : empty(),
+          isFocused: yAxisState ? snapshot((focused) => !focused, yAxisState.isFocused, click) : empty(),
           crosshairMove,
           click,
           visibleLogicalRangeChange,
@@ -314,3 +246,52 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>(config: IChart<TSe
       ]
     }
   )
+
+export const defaultChartConfig: DeepPartial<ChartOptions> = {
+  rightPriceScale: {
+    visible: false
+  },
+  grid: {
+    horzLines: {
+      visible: false
+    },
+    vertLines: {
+      visible: false
+    }
+  },
+  overlayPriceScales: {
+    borderVisible: false
+  },
+  layout: {
+    attributionLogo: false,
+    textColor: pallete.message,
+    background: {
+      color: 'transparent'
+    },
+    fontFamily: '-apple-system,BlinkMacSystemFont,Trebuchet MS,Roboto,Ubuntu,sans-serif',
+    fontSize: 12
+  },
+  timeScale: {
+    rightOffset: 0,
+    secondsVisible: true,
+    timeVisible: true,
+    lockVisibleTimeRangeOnResize: true
+  },
+  crosshair: {
+    mode: CrosshairMode.Magnet,
+    horzLine: {
+      // visible: false,
+      labelBackgroundColor: pallete.background,
+      // labelVisible: false,
+      color: pallete.indeterminate,
+      width: 1,
+      style: LineStyle.Dotted
+    },
+    vertLine: {
+      color: pallete.indeterminate,
+      labelBackgroundColor: pallete.background,
+      width: 1,
+      style: LineStyle.Dotted
+    }
+  }
+}

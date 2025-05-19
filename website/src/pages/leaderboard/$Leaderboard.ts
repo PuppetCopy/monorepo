@@ -367,47 +367,48 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       }
 
                       return $row(style({ position: 'relative', height: '100%', flex: 1 }))(
-                        $Baseline({
-                          containerOp: style({
-                            flex: 1,
-                            inset: '0px 0px 0px 0px',
-                            position: 'absolute',
-                            pointerEvents: 'none',
-                            width: '100%'
-                          }),
-                          markers: now(markerList),
-                          chartConfig: {
-                            leftPriceScale: {
-                              // autoScale: true,
-                              ticksVisible: true,
-                              scaleMargins: {
-                                top: 0.1,
-                                bottom: 0.1
-                              }
-                            },
-                            crosshair: {
-                              horzLine: {
-                                visible: false
+                        style({
+                          flex: 1,
+                          inset: '0px 0px 0px 0px',
+                          position: 'absolute',
+                          pointerEvents: 'none',
+                          width: '100%'
+                        })(
+                          $Baseline({
+                            markers: now(markerList),
+                            chartConfig: {
+                              leftPriceScale: {
+                                // autoScale: true,
+                                ticksVisible: true,
+                                scaleMargins: {
+                                  top: 0.1,
+                                  bottom: 0.1
+                                }
                               },
-                              vertLine: {
+                              crosshair: {
+                                horzLine: {
+                                  visible: false
+                                },
+                                vertLine: {
+                                  visible: false
+                                }
+                              },
+                              timeScale: {
                                 visible: false
                               }
                             },
-                            timeScale: {
-                              visible: false
+                            data: timeline as any as BaselineData<ISeriesTime>[],
+                            // containerOp: style({  inset: '0px 0px 0px 0px' }),
+                            baselineOptions: {
+                              baseValue: {
+                                price: 0,
+                                type: 'price'
+                              },
+                              lineWidth: 1,
+                              lineType: LineType.Curved
                             }
-                          },
-                          data: timeline as any as BaselineData<ISeriesTime>[],
-                          // containerOp: style({  inset: '0px 0px 0px 0px' }),
-                          baselineOptions: {
-                            baseValue: {
-                              price: 0,
-                              type: 'price'
-                            },
-                            lineWidth: 1,
-                            lineType: LineType.Curved
-                          }
-                        })({}),
+                          })({})
+                        ),
                         $row(
                           style({
                             position: 'absolute',

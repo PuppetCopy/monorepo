@@ -17,7 +17,6 @@ import type { Address } from 'viem/accounts'
 import { $heading2 } from '../../common/$text.js'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { queryDb } from '../../common/sqlClient.js'
-import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
@@ -215,7 +214,7 @@ export const $TraderPage = ({
               if (params.routeMetricList.length === 0) {
                 return $column(spacing.small)(
                   $text('No activity to display'),
-                  $infoLabel('Try adjusting filters like Activity timeframe or collateral tokens')
+                  $infoLabel($text('Try adjusting filters like Activity timeframe or collateral tokens'))
                 )
               }
 

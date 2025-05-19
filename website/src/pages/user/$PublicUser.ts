@@ -6,10 +6,10 @@ import { $node, $text, component, type IBehavior, style } from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
+import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
 import { $TraderPage } from './$Trader.js'
-import { $AccountLabel, $profileAvatar } from '../../components/$AccountProfile.js'
 
 export interface IProfile extends IPageParams, IPageFilterParams, IUserPageParams {}
 
