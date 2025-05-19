@@ -1,5 +1,5 @@
 import { empty, map, periodic } from '@most/core'
-import { $alertIcon, $defaultDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
+import { $alertIcon, $defaultTooltipDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
 import { readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
 import { $element, $node, $text, attr, type I$Node, style } from 'aelea/core'
 import { $column, $icon, $row } from 'aelea/ui-components'
@@ -9,7 +9,7 @@ import { $pnlDisplay } from '../../common/$common.js'
 export const $alertTooltip = ($content: I$Node) => {
   return $Tooltip({
     $content,
-    $dropContainer: $defaultDropContainer(style({})),
+    $dropContainer: $defaultTooltipDropContainer(style({})),
     $anchor: $icon({
       $content: $alertIcon,
       viewBox: '0 0 24 24',

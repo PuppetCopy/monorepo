@@ -18,14 +18,7 @@ import {
   type TableColumn
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import {
-  fillTimeline,
-  formatFixed,
-  getMappedValue,
-  type InferStream,
-  readablePnl,
-  unixTimestampNow
-} from '@puppet/middleware/utils'
+import { fillTimeline, formatFixed, type InferStream, readablePnl, unixTimestampNow } from '@puppet/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -39,7 +32,7 @@ import { $card2, $responsiveFlex } from '../../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
 import { queryDb } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
-import { $LastAtivity, LAST_ACTIVITY_LABEL_MAP } from '../../components/$LastActivity.js'
+import { $LastAtivity, lastActivityOptionList } from '../../components/$LastActivity.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
@@ -103,31 +96,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
               spacing.big,
               style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' })
             )(
-              $SelectCollateralToken({ selectedList: collateralTokenList })({
-                selectMarketTokenList: selectCollateralTokenListTether()
-              }),
-              // $Dropdown({
-              //   $selection: $row(style({ whiteSpace: 'pre' }))(
-              //     $infoLabel('Focus: '),
-              //     switchMap((sortBy) => $text(sortBy ? `${sortBy.selector}` : 'None'), sortBy)
-              //   ),
-              //   selector: {
-              //     value: sortBy,
-              //     $container: $defaultSelectContainer(style({ right: '0' })),
-              //     $$option: map((option) => {
-              //       return $node($text(option.selector))
-              //     }),
-              //     list: [
-              //       { direction: 'desc', selector: 'roi' },
-              //       { direction: 'desc', selector: 'pnl' }
-              //     ]
-              //   }
-              // })({
-              //   select: sortByChangeTether()
-              // }),
               $ButtonToggle({
-                selected: screenerFocus,
-                options: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
+                value: screenerFocus,
+                optionList: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
                 $$option: map((option) => {
                   return $row(spacing.small, style({ alignItems: 'center' }))(
                     option === undefined
@@ -143,6 +114,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
               })({
                 select: changeScreenerFocusTether()
               }),
+              $SelectCollateralToken({ selectedList: collateralTokenList })({
+                selectMarketTokenList: selectCollateralTokenListTether()
+              }),
+
+              $LastAtivity(activityTimeframe)({
+                changeActivityTimeframe: changeActivityTimeframeTether()
+              })
               // $ButtonToggle({
               //   selected: isLong,
               //   options: [undefined, true, false],
@@ -157,9 +135,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
               // })({
               //   select: switchIsLongTether()
               // }),
-              $LastAtivity(activityTimeframe)({
-                changeActivityTimeframe: changeActivityTimeframeTether()
-              })
             ),
             switchMap((params) => {
               // const interval = IntervalTime.MIN
@@ -275,7 +250,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     })
                   },
                   {
-                    $head: $text('Route'),
+                    $head: $text('Collateral'),
                     gridTemplate: isDesktopScreen ? '104px' : '52px',
                     $bodyCallback: map((routeMetric) => {
                       return switchMap((list) => {
@@ -334,7 +309,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
                       params.screenerFocus === 'roi' ? $tableHeader('ROI %', 'PNL $') : $tableHeader('PNL $', 'ROI %'),
                       $node(style({ textAlign: 'right', alignSelf: 'center' }))(
-                        $text(`${getMappedValue(LAST_ACTIVITY_LABEL_MAP, params.activityTimeframe)} Activtiy`)
+                        $text(
+                          `${lastActivityOptionList.find((option) => option.value === params.activityTimeframe)?.label} Activtiy`
+                        )
                       )
                     ),
                     sortBy: params.screenerFocus,

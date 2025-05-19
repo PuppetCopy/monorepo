@@ -6,7 +6,7 @@ import { $labelDisplay } from '@puppet/middleware/ui-components'
 import type { IBehavior } from 'aelea/core'
 import { $element, $text, component, type INodeCompose, style } from 'aelea/core'
 import { pallete } from 'aelea/ui-components-theme'
-
+import type { Address } from 'viem/accounts'
 import { $tokenIcon, $tokenLabeled } from '../common/$common'
 import { $DropMultiSelect } from './form/$Dropdown'
 

@@ -16,12 +16,11 @@ import { $row } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
 export interface IButtonToggle<T> {
-  options: T[]
-  selected: Stream<T>
+  optionList: T[]
+  value: Stream<T>
 
   $container?: INodeCompose
   $button?: INodeCompose
-
   $$option?: IOps<T, I$Node>
 }
 
@@ -51,19 +50,17 @@ export const $defaulButtonToggleContainer = $node(
   })
 )
 
-const defaultOption = map(<T>(o: T) => $node($text(String(o))))
-
 export const $ButtonToggle = <T>({
-  options,
-  selected,
-  $$option = defaultOption,
+  optionList,
+  value,
+  $$option = map(<T>(o: T) => $node($text(String(o)))),
   $button = $defaulButtonToggleBtn,
   $container = $defaulButtonToggleContainer
 }: IButtonToggle<T>) =>
   component(([select, sampleSelect]: IBehavior<INode, T>) => {
     return [
       $container(
-        ...options.map((opt) =>
+        ...optionList.map((opt) =>
           $button(
             sampleSelect(nodeEvent('click'), constant(opt)),
             styleBehavior(
@@ -71,7 +68,7 @@ export const $ButtonToggle = <T>({
                 return selectedOpt === opt
                   ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, pointerEvents: 'none' }
                   : { color: pallete.foreground }
-              }, selected)
+              }, value)
             )
           )(switchLatest($$option(now(opt))))
         )

@@ -346,24 +346,26 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
       $Link({
         $content: $row(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
           $profileAvatar({ address, size: profileSize }),
-          $column(style({ gap: '3px' }))(
-            $AccountLabel({
-              address,
-              primarySize: labelSize
-            }),
-            puppetList.length > 0
-              ? $row(style({ alignItems: 'center' }))(
-                  ...puppetList.map((puppet) => {
-                    return style({ marginRight: '-12px', border: '2px solid black' })(
-                      $profileAvatar({ address: puppet, size: 25 })
+          labelSize === undefined || labelSize > 0
+            ? $column(style({ gap: '3px' }))(
+                $AccountLabel({
+                  address,
+                  primarySize: labelSize
+                }),
+                puppetList.length > 0
+                  ? $row(style({ alignItems: 'center' }))(
+                      ...puppetList.map((puppet) => {
+                        return style({ marginRight: '-12px', border: '2px solid black' })(
+                          $profileAvatar({ address: puppet, size: 25 })
+                        )
+                      }),
+                      $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.8rem' }))($text(`${puppetList.length}`))
                     )
-                  }),
-                  $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.8rem' }))($text(`${puppetList.length}`))
-                )
-              : $row(style({ alignItems: 'center' }))(
-                  $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
-                )
-          )
+                  : $row(style({ alignItems: 'center' }))(
+                      $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
+                    )
+              )
+            : empty()
         ),
         route: route.create({ fragment: 'baseRoute' }),
         url: `/profile/${IWalletTab.TRADER.toLowerCase()}/${address}`

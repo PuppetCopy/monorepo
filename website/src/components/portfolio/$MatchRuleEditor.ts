@@ -128,7 +128,7 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
                 selector: {
                   value: now(3600),
                   $container: $defaultSelectContainer(style({ right: '0' })),
-                  $$option: map((option) => {
+                  $option: map((option) => {
                     return $node($text(getDuration(Number(option))))
                   }),
                   list: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]

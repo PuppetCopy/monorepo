@@ -26,7 +26,7 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
 
 export const sizeColumn = (): TableColumn<IPosition> => ({
   $head: $tableHeader('Max Size', 'Leverage'),
-  $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
+  gridTemplate: '78px',
   $bodyCallback: map((mp) => {
     return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
   })
@@ -49,7 +49,7 @@ export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColu
 
 export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
-  gridTemplate: '90px',
+  gridTemplate: '100px',
   $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-start' })),
   $bodyCallback: map((pos) => {
     const latestPrice = map((pm) => getMappedValue(pm, pos.indexToken).max, latestPriceMap)

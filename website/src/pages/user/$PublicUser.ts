@@ -56,11 +56,11 @@ export const $PublicUserPage = (config: IProfile) =>
           )(
             $ButtonToggle({
               $container: $defaulButtonToggleContainer(style({ alignSelf: 'center' })),
-              selected: mergeArray([
+              value: mergeArray([
                 router.match<IRouteOption>(puppetRoute)(now(options[0])),
                 router.match<IRouteOption>(traderRoute)(now(options[1]))
               ]),
-              options,
+              optionList: options,
               $$option: map((option) => {
                 return $node($text(option.label))
               })

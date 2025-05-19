@@ -24,7 +24,7 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
 import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress } from '../utils/index.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
-import { $defaultDropContainer, $Tooltip } from './$Tooltip.js'
+import { $defaultTooltipDropContainer, $Tooltip } from './$Tooltip.js'
 
 const $elipsisTextWrapper = $node(
   style({ overflow: 'hidden', minHeight: 0, whiteSpace: 'nowrap', textOverflow: 'ellipsis' })
@@ -172,7 +172,7 @@ export const $infoTooltipLabel = (text: string | I$Slottable, label?: string | I
 
 export const $infoTooltip = (text: string | I$Slottable, color = pallete.foreground, size = '24px') => {
   return $Tooltip({
-    $dropContainer: $defaultDropContainer,
+    $dropContainer: $defaultTooltipDropContainer,
     $content: isStream(text) ? text : $node($text(text)),
     $anchor: $icon({
       $content: $info,

@@ -8,7 +8,8 @@ import {
   type INodeCompose,
   nodeEvent,
   style,
-  styleInline
+  styleInline,
+  switchMap
 } from 'aelea/core'
 import { $column, $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -20,7 +21,7 @@ export interface TooltipConfig {
   $dropContainer?: INodeCompose
 }
 
-export const $defaultDropContainer = $column(
+export const $defaultTooltipDropContainer = $column(
   style({
     whiteSpace: 'pre-wrap',
     maxWidth: '600px',
@@ -40,7 +41,7 @@ export const $Tooltip = ({
   $anchor,
   $content,
   $container = $defaultTooltipAnchorContainer,
-  $dropContainer = $defaultDropContainer
+  $dropContainer = $defaultTooltipDropContainer
 }: TooltipConfig) =>
   component(
     (
@@ -77,60 +78,58 @@ export const $Tooltip = ({
           targetIntersectionTether(observer.intersection())
         )(
           style({ cursor: 'help' })($anchor),
-          switchLatest(
-            map((show) => {
-              if (!show) {
-                return empty()
-              }
+          switchMap((show) => {
+            if (!show) {
+              return empty()
+            }
 
-              return $row(
-                contentIntersectionTether(observer.intersection()),
-                style({
-                  zIndex: 5160,
-                  whiteSpace: 'pre-wrap',
-                  position: 'fixed',
-                  visibility: 'hidden',
-                  padding: '8px'
-                }),
-                styleInline(
-                  zip(
-                    ([contentRect], [targetRect]) => {
-                      const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
-                      const targetBound = targetRect.intersectionRect
-                      const bottomSpace = window.innerHeight - targetBound.bottom
-                      const goDown = bottomSpace > targetBound.bottom
+            return $row(
+              contentIntersectionTether(observer.intersection()),
+              style({
+                zIndex: 5160,
+                whiteSpace: 'pre-wrap',
+                position: 'fixed',
+                visibility: 'hidden',
+                padding: '8px'
+              }),
+              styleInline(
+                zip(
+                  ([contentRect], [targetRect]) => {
+                    const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
+                    const targetBound = targetRect.intersectionRect
+                    const bottomSpace = window.innerHeight - targetBound.bottom
+                    const goDown = bottomSpace > targetBound.bottom
 
-                      // clamp width to screen minus both side‑spacings
-                      const maxWidth = screenWidth
+                    // clamp width to screen minus both side‑spacings
+                    const maxWidth = screenWidth
 
-                      const measured = contentRect.target.clientWidth
-                      const width = Math.min(measured, maxWidth)
+                    const measured = contentRect.target.clientWidth
+                    const width = Math.min(measured, maxWidth)
 
-                      // center on target, then clamp left within [spacing, screenWidth - width - spacing]
-                      const centerX = targetBound.x + targetBound.width / 2
-                      const rawLeft = centerX - width / 2
-                      const maxLeft = screenWidth - width
-                      const left = `${Math.min(rawLeft, maxLeft)}px`
+                    // center on target, then clamp left within [spacing, screenWidth - width - spacing]
+                    const centerX = targetBound.x + targetBound.width / 2
+                    const rawLeft = Math.max(centerX - width / 2, 0)
+                    const maxLeft = screenWidth - width
+                    const left = `${Math.min(rawLeft, maxLeft)}px`
 
-                      const top = `${goDown ? targetBound.bottom : targetBound.y}px`
+                    const top = `${goDown ? targetBound.bottom : targetBound.y}px`
 
-                      return {
-                        top,
-                        left,
-                        width: `${width}px`,
-                        maxWidth: `${maxWidth}px`,
-                        transition: 'opacity .2s ease-in-out',
-                        visibility: 'visible',
-                        transform: `translate(0, ${goDown ? '0' : '-100%'})`
-                      }
-                    },
-                    contentIntersection,
-                    targetIntersection
-                  )
+                    return {
+                      top,
+                      left,
+                      width: `${width}px`,
+                      maxWidth: `${maxWidth}px`,
+                      transition: 'opacity .2s ease-in-out',
+                      visibility: 'visible',
+                      transform: `translate(0, ${goDown ? '0' : '-100%'})`
+                    }
+                  },
+                  contentIntersection,
+                  targetIntersection
                 )
-              )($dropContainer($content))
-            }, hover)
-          )
+              )
+            )($dropContainer($content))
+          }, hover)
         ),
         {
           hover

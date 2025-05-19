@@ -153,10 +153,10 @@ export const $TraderPage = (config: ITraderPage) =>
             })
           )(
             $row(spacing.small, style({ textDecoration: 'none', alignItems: 'center' }))(
-              $profileAvatar({ address: account, size: isDesktopScreen ? 65 : 50 }),
+              $profileAvatar({ address: account, size: isDesktopScreen ? 50 : 50 }),
               $AccountLabel({
                 address: account,
-                primarySize: 1.65
+                primarySize: 1.25
               })
             ),
             $row(spacing.big, style({ alignItems: 'flex-end' }))(
@@ -264,7 +264,7 @@ export const $TraderPage = (config: ITraderPage) =>
                         columns: [
                           ...(isDesktopScreen ? [timeColumn] : []),
                           entryColumn,
-                          puppetsColumn(changeRouteTether),
+                          ...(isDesktopScreen ? [puppetsColumn(changeRouteTether)] : []),
                           sizeColumn(),
                           pnlColumn()
                         ]

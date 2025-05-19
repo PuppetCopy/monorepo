@@ -14,31 +14,33 @@ import {
 import { getDuration, readableDate, readablePercentage } from '@puppet/middleware/utils'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style, switchMap } from 'aelea/core'
-import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import type { Route } from 'aelea/router'
+import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Address, encodeFunctionData, erc20Abi, MethodNotFoundRpcError } from 'viem'
+import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2, $iconCircular } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/type.js'
 import { fadeIn } from '../../transitions/enter.js'
 import { type IBatchCall, type IWalletConnected, wallet } from '../../wallet/wallet.js'
-import { $profileDisplay } from '../$AccountProfile.js'
 import { $ButtonCircular } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
 import { $RouteDepositEditor, DepositEditorAction, type IDepositEditorDraft } from './$RouteDepositEditor.js'
 
-interface IPortfolioEditorDrawer extends IComponentPageParams {
-  depositTokenList: Stream<IDepositEditorDraft[]>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
-}
-
 interface IPortfolioRoute {
   collateralToken: Address
   deposit: IDepositEditorDraft | null
   matchingRuleList: IMatchingRuleEditorDraft[]
+}
+
+interface IPortfolioEditorDrawer extends IComponentPageParams {
+  route: Route
+  depositTokenList: Stream<IDepositEditorDraft[]>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
 export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
@@ -48,7 +50,8 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchingRuleEditorDraft>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
+      [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
       const { draftMatchingRuleList, depositTokenList } = config
 
@@ -123,6 +126,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
 
                 $column(
                   spacing.default,
+                  designSheet.customScroll,
                   style({
                     overflow: 'auto',
                     maxHeight: '35vh',
@@ -138,10 +142,10 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                         changeDepositTokenList: changeDepositTokenListTether()
                       }),
                       $row(spacing.default)(
-                        $seperator2,
+                        style({ marginBottom: '30px' })($seperator2),
                         $column(
-                          spacing.small,
-                          style({ flex: 1 })
+                          spacing.default,
+                          style({ flex: 1, padding: '8px 0 18px' })
                         )(
                           ...route.matchingRuleList.map((modSubsc) => {
                             const iconColorParams = modSubsc?.model
@@ -162,7 +166,10 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                                   label: isDesktopScreen ? 'Add' : '+'
                                 }
 
-                            return $row(spacing.default, style({ alignItems: 'center', flex: 1 }))(
+                            return $row(
+                              isDesktopScreen ? spacing.default : spacing.small,
+                              style({ alignItems: 'center', flex: 1 })
+                            )(
                               O(
                                 style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
                                 clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
@@ -170,17 +177,21 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               $row(
                                 style({
                                   backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
-                                  marginLeft: '-33px',
+                                  marginLeft: '-32px',
                                   borderRadius: '6px',
                                   padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
                                   color: iconColorParams.fill
                                 })
                               )($text(iconColorParams.label)),
 
-                              $profileDisplay({
-                                address: modSubsc.trader
+                              $TraderDisplay({
+                                labelSize: isDesktopScreen ? 1 : 0,
+                                route: config.route,
+                                address: modSubsc.trader,
+                                puppetList: []
+                              })({
+                                click: routeChangeTether()
                               }),
-
                               $infoLabeledValue(
                                 'Allowance Rate',
                                 $text(`${readablePercentage(modSubsc.allowanceRate)}`)
@@ -190,8 +201,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                             )
                           })
                         )
-                      ),
-                      $seperator2
+                      )
                     )
                   })
                 ),
@@ -301,6 +311,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
         ),
 
         {
+          routeChange,
           changeWallet,
           changeMatchRuleList: mergeArray([
             snapshot(

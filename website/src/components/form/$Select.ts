@@ -15,7 +15,6 @@ import { $defaultSelectContainer } from './$Dropdown.js'
 
 export interface ISelect<T> {
   list: readonly T[] | Stream<readonly T[]>
-  value: Stream<T>
 
   $container?: INodeCompose
   $$option: IOps<T, I$Node>

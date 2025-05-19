@@ -27,7 +27,7 @@ interface IProfilePeformanceTimeline extends IUserPageParams, IPageFilterParams 
 export const $TradeRouteTimeline = ({
   activityTimeframe,
   collateralTokenList,
-  draftDepositTokenList: depositTokenList,
+  draftDepositTokenList,
   matchingRuleQuery,
   metricsQuery
 }: IProfilePeformanceTimeline) =>
@@ -119,7 +119,7 @@ export const $TradeRouteTimeline = ({
                 return $column(style({ flex: 1, alignItems: 'center' }))(
                   $NumberTicker({
                     textStyle: {
-                      fontSize: '1.85rem',
+                      fontSize: '1.45rem',
                       fontWeight: '900'
                     },
                     // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
@@ -147,83 +147,91 @@ export const $TradeRouteTimeline = ({
             )
           ),
           $intermediatePromise({
-            $display: map(async (params) => {
-              const timeline = await params.timelineQuery
+            $display: map(
+              async (params) => {
+                const timeline = await params.timelineQuery
 
-              if (timeline.length === 0) {
-                return $row(
-                  spacing.tiny,
-                  style({ color: pallete.foreground, textAlign: 'center', placeSelf: 'center' })
-                )($text('No activity found'))
-              }
+                if (timeline.length === 0) {
+                  return $row(
+                    spacing.tiny,
+                    style({ color: pallete.foreground, textAlign: 'center', placeSelf: 'center' })
+                  )($text('No activity found'))
+                }
 
-              // const openMarkerList = pos.list.filter(isPositionOpen).map((pos): IMarker => {
-              //   const pnl = params.timeline[params.timeline.length - 1].value
-              //   return {
-              //     position: 'inBar',
-              //     color: pnl < 0n ? pallete.negative : pallete.positive,
-              //     time: unixTimestampNow() as Time,
-              //     size: 1.5,
-              //     shape: 'circle'
-              //   }
-              // })
-              // const settledMarkerList = pos.list
-              //   .filter(isPositionSettled)
-              //   .flatMap((pos) => pos.decreaseList)
-              //   .map((pos): IMarker => {
-              //     return {
-              //       position: 'inBar',
-              //       color: colorAlpha(pallete.message, 0.5),
-              //       time: Number(pos.blockTimestamp) as Time,
-              //       size: 0.1,
-              //       shape: 'circle'
-              //     }
-              //   })
-
-              // const allMarkerList = [...settledMarkerList, ...openMarkerList].sort(
-              //   (a, b) => Number(a.time) - Number(b.time)
-              // )
-
-              return $Baseline({
-                // markers: now(allMarkerList),
-                chartConfig: {
-                  leftPriceScale: {
-                    autoScale: true,
-                    ticksVisible: true,
-                    scaleMargins: {
-                      top: 0.4,
-                      bottom: 0
-                    }
-                  }
-                  // timeScale: {}
-                },
-                baselineOptions: {
-                  baseLineColor: pallete.message,
-                  baseLineVisible: true,
-                  lineWidth: 2,
-                  baseValue: {
-                    price: 0,
-                    type: 'price'
-                  }
-                },
-                // appendData: scan((prev, next) => {
-                //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
-                //   const timeNow = unixTimestampNow()
-                //   const prevTimeSlot = Math.floor(prev.time as number / tf)
-                //   const nextTimeSlot = Math.floor(timeNow / tf)
-                //   const time = nextTimeSlot * tf as Time
-                //   const isNext = nextTimeSlot > prevTimeSlot
-
+                // const openMarkerList = pos.list.filter(isPositionOpen).map((pos): IMarker => {
+                //   const pnl = params.timeline[params.timeline.length - 1].value
                 //   return {
-                //     value: marketPrice,
-                //     time
+                //     position: 'inBar',
+                //     color: pnl < 0n ? pallete.negative : pallete.positive,
+                //     time: unixTimestampNow() as Time,
+                //     size: 1.5,
+                //     shape: 'circle'
                 //   }
-                // }, data[data.length - 1], config.processData),
-                data: timeline as any as BaselineData<ISeriesTime>[]
-              })({
-                crosshairMove: crosshairMoveTether()
+                // })
+                // const settledMarkerList = pos.list
+                //   .filter(isPositionSettled)
+                //   .flatMap((pos) => pos.decreaseList)
+                //   .map((pos): IMarker => {
+                //     return {
+                //       position: 'inBar',
+                //       color: colorAlpha(pallete.message, 0.5),
+                //       time: Number(pos.blockTimestamp) as Time,
+                //       size: 0.1,
+                //       shape: 'circle'
+                //     }
+                //   })
+
+                // const allMarkerList = [...settledMarkerList, ...openMarkerList].sort(
+                //   (a, b) => Number(a.time) - Number(b.time)
+                // )
+
+                return $Baseline({
+                  // markers: now(allMarkerList),
+                  chartConfig: {
+                    leftPriceScale: {
+                      autoScale: true,
+                      ticksVisible: true,
+                      scaleMargins: {
+                        top: 0.4,
+                        bottom: 0
+                      }
+                    }
+                    // timeScale: {}
+                  },
+                  baselineOptions: {
+                    baseLineColor: pallete.message,
+                    baseLineVisible: true,
+                    lineWidth: 2,
+                    baseValue: {
+                      price: 0,
+                      type: 'price'
+                    }
+                  },
+                  // appendData: scan((prev, next) => {
+                  //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
+                  //   const timeNow = unixTimestampNow()
+                  //   const prevTimeSlot = Math.floor(prev.time as number / tf)
+                  //   const nextTimeSlot = Math.floor(timeNow / tf)
+                  //   const time = nextTimeSlot * tf as Time
+                  //   const isNext = nextTimeSlot > prevTimeSlot
+
+                  //   return {
+                  //     value: marketPrice,
+                  //     time
+                  //   }
+                  // }, data[data.length - 1], config.processData),
+                  data: timeline as any as BaselineData<ISeriesTime>[]
+                })({
+                  crosshairMove: crosshairMoveTether()
+                })
+              },
+              combineState({
+                timelineQuery,
+                activityTimeframe,
+                depositTokenList: draftDepositTokenList,
+                collateralTokenList
               })
-            }, combineState({ timelineQuery, activityTimeframe, depositTokenList, collateralTokenList }))
+            )
           })
         ),
 

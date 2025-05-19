@@ -26,7 +26,7 @@ export const $DepositEditor = (config: { walletBalance: Stream<bigint>; amount: 
       const draft = mergeArray([sample(config.walletBalance, clickMax), inputAmount])
 
       return [
-        $column(spacing.default, style({ width: '330px' }))(
+        $column(spacing.default, style({ minWidth: '230px' }))(
           $node($text('Token: '), $infoLabel(`${tokenDescription.symbol} (${tokenDescription.name})`)),
 
           $row(spacing.small, style({ position: 'relative' }))(

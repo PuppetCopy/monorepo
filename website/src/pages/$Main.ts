@@ -290,9 +290,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               })
             )(
               $PortfolioEditorDrawer({
+                route: rootRoute,
                 depositTokenList: draftDepositTokenList,
                 draftMatchingRuleList
               })({
+                routeChange: changeRouteTether(),
                 changeWallet: changeWalletTether(),
                 changeMatchRuleList: changeMatchRuleListTether(),
                 changeDepositTokenList: changeDepositTokenListTether()

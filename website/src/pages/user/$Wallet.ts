@@ -327,8 +327,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
             $node(style({ flex: 1 }))(),
             $ButtonToggle({
               $container: $defaulButtonToggleContainer(style({ alignSelf: 'center' })),
-              selected: profileMode,
-              options: [IWalletTab.PUPPET, IWalletTab.TRADER],
+              value: profileMode,
+              optionList: [IWalletTab.PUPPET, IWalletTab.TRADER],
               $$option: map((option) => {
                 return $text(optionDisplay[option].label)
               })
@@ -634,8 +634,8 @@ export const $WalletPage = (config: IWalletPageParams) =>
                         ),
                         $ButtonToggle({
                           $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
-                          options: [false, true],
-                          selected: cashout,
+                          optionList: [false, true],
+                          value: cashout,
                           $$option: map((isCashout) => {
                             if (isCashout) {
                               return $text('Cash-Out')
