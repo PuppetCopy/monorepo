@@ -59,7 +59,8 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+
       strategies: 'injectManifest',
       injectManifest: {
         maximumFileSizeToCacheInBytes: 3000000,
@@ -99,7 +100,7 @@ export default defineConfig({
       },
       mode: 'development',
       devOptions: {
-        enabled: true,
+        enabled: false,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module'

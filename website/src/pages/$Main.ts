@@ -302,7 +302,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               })
             )
           ),
-
           switchMap((cb) => {
             return fadeIn(
               $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
