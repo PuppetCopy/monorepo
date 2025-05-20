@@ -2,6 +2,7 @@ import { constant, empty, startWith } from '@most/core'
 import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet/middleware/ui-components'
 import {
   $element,
+  $node,
   attr,
   combineArray,
   component,
@@ -40,63 +41,45 @@ export const $MainMenu = (config: MainMenu) =>
     ) => {
       const { route } = config
 
-      const $circleButtonAnchor = $anchor(
+
+
+      const $iconAnchor = $anchor(
+        layoutSheet.displayFlex,
         style({
           padding: '0 4px',
-          border: `2px solid ${pallete.horizon}`,
-          display: 'flex',
+          border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
           borderRadius: '50%',
           alignItems: 'center',
           placeContent: 'center',
           height: '42px',
           width: '42px'
-        })
+        }),
+        attr({ href: 'https://docs.puppet.tech' })
       )
 
+      const $iconCircular = $node(
+        layoutSheet.displayFlex,
+        style({
+          padding: '0 4px',
+          border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
+          borderRadius: '50%',
+          alignItems: 'center',
+          placeContent: 'center',
+          height: '42px',
+          width: '42px'
+        }),
+      )
+
+
       const $socialLinkList = [
-        $anchor(
-          layoutSheet.displayFlex,
-          style({
-            padding: '0 4px',
-            border: `2px solid ${pallete.horizon}`,
-            borderRadius: '50%',
-            alignItems: 'center',
-            placeContent: 'center',
-            height: '42px',
-            width: '42px'
-          }),
-          attr({ href: 'https://docs.puppet.tech' })
-        )($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
-        $anchor(
-          layoutSheet.displayFlex,
-          style({
-            padding: '0 4px',
-            border: `2px solid ${pallete.horizon}`,
-            borderRadius: '50%',
-            alignItems: 'center',
-            placeContent: 'center',
-            height: '42px',
-            width: '42px'
-          }),
-          attr({ href: 'https://twitter.com/PuppetCopy' })
-        )($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
-        $anchor(
-          layoutSheet.displayFlex,
-          style({
-            padding: '0 4px',
-            border: `2px solid ${pallete.horizon}`,
-            borderRadius: '50%',
-            alignItems: 'center',
-            placeContent: 'center',
-            height: '42px',
-            width: '42px'
-          }),
-          attr({ href: 'https://github.com/PuppetCopy/monorepo' })
-        )($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
+        $iconAnchor(attr({ href: 'https://docs.puppet.tech' }))($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
+        $iconAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
+        $iconAnchor(attr({ href: 'https://github.com/PuppetCopy/monorepo' }))($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
       ]
 
       const themeState = startWith(theme, changeTheme)
       const $extraMenuPopover = $Popover({
+        $container: $iconCircular,
         $open: constant(
           $column(spacing.default)(
             isMobileScreen
@@ -111,8 +94,7 @@ export const $MainMenu = (config: MainMenu) =>
           clickPopoverClaim
         ),
         dismiss: routeChange,
-        $target: $circleButtonAnchor(
-          $icon({
+        $target: $icon({
             svgOps: O(
               clickPopoverClaimTether(nodeEvent('click')),
               style({
@@ -126,7 +108,6 @@ export const $MainMenu = (config: MainMenu) =>
             $content: $moreDots,
             viewBox: '0 0 32 32'
           })
-        )
       })({})
 
       return [

@@ -13,7 +13,6 @@ import {
   startWith
 } from '@most/core'
 import * as PUPPET from '@puppet/middleware/const'
-import { getVestingCursor } from '@puppet/middleware/core'
 import {
   $ButtonToggle,
   $defaulButtonToggleContainer,
@@ -54,6 +53,7 @@ import { localStore } from '../../const/localStore.js'
 import tokenomicsReader from '../../logic/tokenomicsReader.js'
 import { type IUserPageParams, IWalletTab } from '../type.js'
 import { $WalletPuppet } from './$WalletPuppet.js'
+import { encodeFunctionData } from 'viem/utils'
 
 const optionDisplay = {
   [IWalletTab.EARN]: {
@@ -72,7 +72,11 @@ const optionDisplay = {
 
 interface IWalletPageParams extends IUserPageParams {}
 
-export const $WalletPage = (config: IWalletPageParams) =>
+export const $PortfolioPage = ({
+  draftDepositTokenList,
+  draftMatchingRuleList,
+  matchingRuleQuery
+}: IWalletPageParams) =>
   component(
     (
       [changeRoute, changeRouteTether]: IBehavior<string, string>,
@@ -96,15 +100,6 @@ export const $WalletPage = (config: IWalletPageParams) =>
       [popoverRequestWithdraw, popoverRequestWithdrawTether]: IBehavior<IWalletClient, any>,
       [popoverSaveDepositAmount, popoverSaveDepositAmountTether]: IBehavior<any, bigint>
     ) => {
-      const {
-        route,
-        activityTimeframe,
-        selectedCollateralTokenList,
-        pricefeedMapQuery,
-        draftDepositTokenList: depositTokenList,
-        matchingRuleList
-      } = config
-
       const profileMode = uiStorage.replayWrite(localStore.wallet, selectProfileMode, 'selectedTab')
 
       const puppetTokenPriceInUsd = switchMap(async (providerQuery) => {
@@ -473,7 +468,7 @@ export const $WalletPage = (config: IWalletPageParams) =>
                   $column(spacing.default, style({ flex: 1 }))(
                     $row(spacing.default, style({ placeContent: 'space-between' }))(
                       $row(style({ alignItems: 'center' }))(
-                        $heading3('Voting Power'),
+                        $heading3($text('Voting Power')),
                         $infoTooltip(
                           'The amount of PUPPET tokens locked. Granting protocol revenue share and governance voting power.'
                         )

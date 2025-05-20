@@ -8,7 +8,7 @@ import {
   $Tooltip
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { filterNull, getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
+import { ETH_ADDRESS_REGEXP, filterNull, getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
 import {
   $element,
   $node,
@@ -38,7 +38,7 @@ import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wallet } from '../wallet/wallet.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
-import { $PublicUserPage } from './user/$PublicUser.js'
+import { $TraderPage } from './user/$Trader.js'
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -80,6 +80,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const rootRoute = router.create({ fragment: baseRoute, title: 'Puppet', fragmentsChange })
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
+
+      const traderRoute = rootRoute.create({ fragment: 'trader' }).create({
+        title: 'Trader',
+        fragment: ETH_ADDRESS_REGEXP
+      })
 
       const profileRoute = rootRoute.create({ fragment: 'profile' })
       const _walletRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
@@ -157,11 +162,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             )
           ),
-          router.contains(profileRoute)(
+          router.contains(traderRoute)(
             $midContainer(
               fadeIn(
-                $PublicUserPage({
-                  route: profileRoute,
+                $TraderPage({
                   activityTimeframe,
                   collateralTokenList,
                   draftDepositTokenList,

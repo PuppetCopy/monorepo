@@ -13,7 +13,7 @@ import {
   styleBehavior
 } from 'aelea/core'
 import { $row } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
 export interface IButtonToggle<T> {
   optionList: T[]
@@ -45,7 +45,7 @@ export const $defaulButtonToggleContainer = $node(
     gridAutoFlow: 'column',
     gridAutoColumns: 'minmax(50px, 1fr)',
     borderRadius: '20px',
-    border: `1px solid ${pallete.horizon}`,
+    border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
     backgroundColor: pallete.background
   })
 )

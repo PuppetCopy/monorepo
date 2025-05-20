@@ -153,7 +153,7 @@ export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode,
       return click(
         nodeEvent('click'),
         map(() => {
-          const url = `/profile/position/${account}`
+          const url = `/position/${account}`
 
           history.pushState({}, '', url)
           return url
@@ -368,7 +368,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
             : empty()
         ),
         route: route.create({ fragment: 'baseRoute' }),
-        url: `/profile/${IWalletTab.TRADER.toLowerCase()}/${address}`
+        url: `/${IWalletTab.TRADER.toLowerCase()}/${address}`
       })({ click: clickTether() }),
 
       { click }

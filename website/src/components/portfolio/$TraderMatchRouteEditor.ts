@@ -101,7 +101,7 @@
 //                   )
 //                 ),
 //                 route: route.create({ fragment: 'baseRoute' }),
-//                 url: `/profile/trader/${address}`
+//                 url: `/trader/${address}`
 //               })({ click: clickTether() }),
 //               $row(style({ alignItems: 'center' }))(
 //                 $tokenTryLabeled(collateralToken, displayCollateralTokenSymbol),

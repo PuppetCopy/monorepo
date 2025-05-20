@@ -2,14 +2,27 @@ import { awaitPromises, map, multicast, startWith } from '@most/core'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import {
+  $anchor,
+  $AnchorLink,
+  $arrowRight,
+  $external,
+  $icon,
   $infoLabel,
   $intermediateText,
   $Table,
   type IQuantumScrollPage,
   type ISortBy
 } from '@puppet/middleware/ui-components'
-import { pagingQuery, readableLeverage, readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
-import { $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
+import {
+  getDebankProfileUrl,
+  pagingQuery,
+  readableLeverage,
+  readableUsd,
+  shortenAddress,
+  shortPostAdress,
+  unixTimestampNow
+} from '@puppet/middleware/utils'
+import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { asc } from 'ponder'
 import { positionIncrease } from 'schema'
@@ -24,20 +37,16 @@ import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../../com
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
 import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
+import { pallete } from 'aelea/ui-components-theme'
 
-interface ITraderPage extends IPageParams, IUserPageParams, IPageFilterParams {
-  account: Address
-  //   matchRouteStatsQuery: Stream<Promise<IMatchingRuleEditorChange[]>>
-}
+interface ITraderPage extends IUserPageParams, IPageFilterParams {}
 
 export const $TraderPage = ({
-  account,
   activityTimeframe,
   collateralTokenList,
   draftMatchingRuleList,
   draftDepositTokenList,
-  matchingRuleQuery,
-  route
+  matchingRuleQuery
 }: ITraderPage) =>
   component(
     (
@@ -49,6 +58,9 @@ export const $TraderPage = ({
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
+
+      const urlFragments = document.location.pathname.split('/')
+      const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address
 
       const routeMetricListQuery = multicast(
         map(async (params) => {
@@ -135,7 +147,39 @@ export const $TraderPage = ({
       }, combineState({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
 
       return [
-        $column(spacing.big)(
+        $column(spacing.small)(
+          $node(),
+          $row(spacing.tiny, style({ alignItems: 'center', paddingLeft: '20px', fontSize: '.8rem' }))(
+            $node(style({ color: pallete.foreground }))($text('Leaderboard')),
+            $node(
+              $icon({
+                $content: $arrowRight,
+                fill: pallete.foreground,
+                width: '8px'
+              })
+            ),
+            $node(style({ color: pallete.foreground }))($text('Trader')),
+            $node(
+              $icon({
+                $content: $arrowRight,
+                fill: pallete.foreground,
+                width: '8px'
+              })
+            ),
+            $anchor(
+              attr({
+                href: getDebankProfileUrl(account),
+                target: '_blank'
+              })
+            )(
+              $text(shortenAddress(account)),
+              $icon({
+                $content: $external,
+                width: '12px'
+              })
+            )
+          ),
+
           $card(spacing.big, style({ flex: 1, width: '100%' }))(
             $card2(
               style({

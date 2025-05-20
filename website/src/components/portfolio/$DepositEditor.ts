@@ -45,6 +45,10 @@ export const $DepositEditor = (config: {
               return 'Amount cannot be 0'
             }
 
+            if (params.draft < 0n) {
+              return 'Amount cannot be negative'
+            }
+
             return null
           },
           combineState({ walletBalance: config.walletBalance, draft })

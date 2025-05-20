@@ -79,11 +79,14 @@ export interface IDropdown<T> {
 }
 
 export function $Dropdown<T>({
+  $anchor,
   optionList,
+
+  closeOnSelect = true,
+
   $container = $defaulMultiselectDropContainer,
   $dropListContainer = $defaultDropListContainer,
   $$option = map(<T>(o: T) => $node($text(String(o)))),
-  $anchor,
   $optionContainer = $defaultOptionContainer
 }: IDropdown<T>) {
   return component(
@@ -98,7 +101,7 @@ export function $Dropdown<T>({
         map((_open) => take(1, skip(1, eventElementTarget('click', window))), openTrigger)
       )
 
-      const closeTrigger = constant(false, mergeArray([windowClick]))
+      const closeTrigger = constant(false, mergeArray([windowClick, closeOnSelect ? select : empty()]))
 
       const isOpen = skipRepeats(merge(closeTrigger, openTrigger))
 
