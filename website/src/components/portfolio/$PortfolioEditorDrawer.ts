@@ -135,12 +135,14 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                 )(
                   ...portfolioRouteList.map((route) => {
                     return $column(style({ paddingLeft: '16px' }))(
-                      $RouteDepositEditor({
-                        collateralToken: route.collateralToken,
-                        draftDepositTokenList: depositTokenList
-                      })({
-                        changeDepositTokenList: changeDepositTokenListTether()
-                      }),
+                      $row(
+                        $RouteDepositEditor({
+                          collateralToken: route.collateralToken,
+                          draftDepositTokenList: depositTokenList
+                        })({
+                          changeDepositTokenList: changeDepositTokenListTether()
+                        })
+                      ),
                       $row(spacing.default)(
                         style({ marginBottom: '30px' })($seperator2),
                         $column(
@@ -192,6 +194,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                               })({
                                 click: routeChangeTether()
                               }),
+                              isDesktopScreen ? $node(style({ flex: 1 }))() : empty(),
                               $infoLabeledValue(
                                 'Allowance Rate',
                                 $text(`${readablePercentage(modSubsc.allowanceRate)}`)

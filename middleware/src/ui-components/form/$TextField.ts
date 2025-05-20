@@ -1,16 +1,18 @@
-import { empty, map } from '@most/core'
+import { empty, map, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $element,
   $node,
   $text,
   attrBehavior,
+  combineState,
   component,
   type IBehavior,
   type INodeCompose,
   O,
   style,
   stylePseudo,
+  switchMap,
   toStream
 } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
@@ -67,9 +69,21 @@ export const $FieldLabeled = ({
   hint,
   labelWidth,
   value,
+  validation = empty(),
   $container = $defaultTextFieldContainer
 }: ITextField) =>
   component(([change, sampleValue]: IBehavior<string, string>) => {
+    const $message = switchMap(
+      (params) => {
+        if (params.validation) {
+          return $node(style({ color: pallete.negative }))($text(params.validation))
+        }
+
+        return params.hint ? $node($text(params.hint)) : empty()
+      },
+      combineState({ validation: startWith(null, validation), hint: toStream(hint) })
+    )
+
     return [
       $container(
         $row(spacing.small, style({ width: '100%' }))(
@@ -79,7 +93,8 @@ export const $FieldLabeled = ({
             overideInputStyle
           )(
             $Field({
-              value
+              value,
+              validation
             })({
               change: sampleValue()
             })
@@ -87,7 +102,7 @@ export const $FieldLabeled = ({
         ),
         $row(
           style({ fontSize: '.8rem', minHeight: '1rem', width: '100%', whiteSpace: 'pre-wrap', position: 'relative' })
-        )(hint ? $text(hint) : empty())
+        )($message)
       ),
 
       { change }

@@ -1,4 +1,5 @@
-import { empty, filter, map, merge, mergeArray, multicast, never, now, startWith, switchLatest, tap } from '@most/core'
+import { empty, filter, map, merge, mergeArray, now, startWith, switchLatest, tap } from '@most/core'
+import type { Stream } from '@most/types'
 import {
   $element,
   combineState,
@@ -11,17 +12,38 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import { designSheet, type Input } from 'aelea/ui-components'
+import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { dismissOp, interactionOp } from './common.js'
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
+export declare enum InputType {
+  TEXT = 'text',
+  NUMBER = 'number',
+  SEARCH = 'search',
+  PASSWORD = 'password',
+  BUTTON = 'button',
+  CHECKBOX = 'checkbox',
+  COLOR = 'color',
+  DATE = 'date',
+  TEL = 'tel',
+  URL = 'url',
+  HIDDEN = 'hidden'
+}
+export interface Control {
+  disabled?: Stream<boolean>
+}
+export interface Input<T> extends Control {
+  value: Stream<T>
+  validation?: Stream<string | null>
+}
+
 export interface Field extends Optional<Input<string>, 'value'> {
   $input?: INodeCompose<HTMLInputElement>
 }
 
-export const $Field = ({ value = empty(), disabled, validation = never, $input = $element('input') }: Field) =>
+export const $Field = ({ value = empty(), disabled, validation = empty(), $input = $element('input') }: Field) =>
   component(
     (
       [focusStyle, interactionTether]: IBehavior<INode, true>,
@@ -29,12 +51,8 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
       [blur, blurTether]: IBehavior<INode, FocusEvent>,
       [change, changeTether]: IBehavior<INode<HTMLInputElement>, string>
     ) => {
-      const multicastValidation = O(validation, startWith(''), multicast)
-
-      const alert = multicastValidation(change)
-
       const focus = merge(focusStyle, dismissstyle)
-      const state = combineState({ focus, alert })
+      const state = combineState({ focus, validation })
 
       return [
         $input(
@@ -57,12 +75,12 @@ export const $Field = ({ value = empty(), disabled, validation = never, $input =
                 { opacity: '.5' },
                 map(() => ({ opacity: '' }), value)
               ),
-              map(({ focus, alert }) => {
-                if (alert) {
+              map((params) => {
+                if (params.validation) {
                   return { borderBottom: `2px solid ${pallete.negative}` }
                 }
 
-                return focus ? { borderBottom: `2px solid ${pallete.primary}` } : null
+                return params.focus ? { borderBottom: `2px solid ${pallete.primary}` } : null
               }, state)
             ])
           ),

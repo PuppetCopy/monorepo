@@ -1,20 +1,25 @@
-import { map, mergeArray, sample } from '@most/core'
+import { empty, map, mergeArray, sample, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $FieldLabeled, $infoLabel } from '@puppet/middleware/ui-components'
+import { $FieldLabeled } from '@puppet/middleware/ui-components'
 import {
   parseFixed,
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel
 } from '@puppet/middleware/utils'
-import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, type IOps, style } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
-export const $DepositEditor = (config: { walletBalance: Stream<bigint>; amount: Stream<bigint>; token: Address }) =>
+export const $DepositEditor = (config: {
+  walletBalance: Stream<bigint> //
+  initialAmount: bigint
+  token: Address
+  validation?: IOps<bigint, string | null>
+}) =>
   component(
     (
       [clickMax, clickMaxTether]: IBehavior<PointerEvent>,
@@ -22,19 +27,43 @@ export const $DepositEditor = (config: { walletBalance: Stream<bigint>; amount: 
       [clickSave, clickSaveTether]: IBehavior<PointerEvent>
     ) => {
       const tokenDescription = getTokenDescription(config.token)
+      const inputMaxAmount = sample(config.walletBalance, clickMax)
+      const draft = mergeArray([inputMaxAmount, inputAmount])
 
-      const draft = mergeArray([sample(config.walletBalance, clickMax), inputAmount])
+      const alert = mergeArray([
+        map(
+          (params) => {
+            if (params.walletBalance === 0n) {
+              return 'Wallet balance is 0'
+            }
+
+            if (params.draft > params.walletBalance) {
+              return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.walletBalance)}`
+            }
+
+            if (params.draft === 0n) {
+              return 'Amount cannot be 0'
+            }
+
+            return null
+          },
+          combineState({ walletBalance: config.walletBalance, draft })
+        ),
+        config.validation ? config.validation(draft) : empty()
+      ])
 
       return [
         $column(spacing.default, style({ minWidth: '230px' }))(
-          $node($text('Token: '), $infoLabel(`${tokenDescription.symbol} (${tokenDescription.name})`)),
-
           $row(spacing.small, style({ position: 'relative' }))(
             $FieldLabeled({
               label: 'Amount',
-              value: map((value) => {
-                return value ? readableTokenAmount(tokenDescription, value) : ''
-              }, draft),
+              validation: alert,
+              value: startWith(
+                readableTokenAmount(tokenDescription, config.initialAmount),
+                map((value) => {
+                  return value ? readableTokenAmount(tokenDescription, value) : ''
+                }, inputMaxAmount)
+              ),
               placeholder: 'Enter amount',
               hint: map((balance) => {
                 return `Wallet Balance: ${readableTokenAmountLabel(tokenDescription, balance)}`
@@ -66,8 +95,8 @@ export const $DepositEditor = (config: { walletBalance: Stream<bigint>; amount: 
 
             $ButtonSecondary({
               disabled: map(
-                (params) => params.max === 0n || params.amount === params.draft,
-                combineState({ max: config.walletBalance, draft, amount: config.amount })
+                (params) => params.alert !== null || config.initialAmount === params.draft,
+                combineState({ alert, draft })
               ),
               $content: $text('Save')
             })({

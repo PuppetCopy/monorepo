@@ -1,4 +1,4 @@
-import { map, now, snapshot } from '@most/core'
+import { map, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet/middleware/ui-components'
@@ -70,7 +70,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
             (change) => {
               return $DepositEditor({
                 walletBalance,
-                amount: now(change?.amount ?? 0n),
+                initialAmount: change?.amount ?? 0n,
                 token: collateralToken
               })({
                 changeAmount: draftTether(
@@ -85,7 +85,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
             $route(collateralTokenDescription),
             $row(spacing.default)(
               $row(spacing.small, style({ alignItems: 'center' }))(
-                $infoLabel('Balance'),
+                $infoLabel($text('Balance')),
                 $labeledhintAdjustment({
                   color: map(
                     (c) =>
