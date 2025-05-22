@@ -70,7 +70,6 @@
     "@wagmi/cli": "2.3.1"
   },
   "homepage": "https://puppet.tech",
-  "repository": "PuppetCopy/monorepo",
   "keywords": [
     "puppet",
     "puppetCopy",
@@ -80,5 +79,8 @@
     "ethereum",
     "dapp",
     "wallet"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
