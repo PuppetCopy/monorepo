@@ -1,4 +1,5 @@
 import { map, multicast } from '@most/core'
+import type { Stream } from '@most/types'
 import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet/middleware/const'
 import {
   getClosestNumber,
@@ -9,6 +10,7 @@ import {
 } from '@puppet/middleware/utils'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
+import type { IMatchingRule } from '../__generated__/ponder.types'
 import { getStatus, queryDb } from './sqlClient'
 
 export const subgraphStatus = replayLatest(
@@ -52,7 +54,7 @@ export function queryUserMatchingRuleList(
   queryParams: StateParams<{
     address: Address | undefined
   }>
-) {
+): Stream<Promise<IMatchingRule[]>> {
   return map(async (params) => {
     const address = params.address
     if (address === undefined) {

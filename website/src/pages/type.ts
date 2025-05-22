@@ -3,14 +3,11 @@ import type { IntervalTime } from '@puppet/middleware/const'
 import type * as router from 'aelea/router'
 import type { Address, Hex } from 'viem'
 import type {
-  IMatchingRule,
   IPositionDecrease,
   IPositionIncrease,
   ITraderRouteLatestMetric,
   ITraderRouteMetric
 } from '../__generated__/ponder.types'
-import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchRuleEditor'
-import type { IDepositEditorDraft } from '../components/portfolio/$RouteDepositEditor'
 
 export interface IComponentPageParams {}
 
@@ -21,12 +18,6 @@ export interface IPageParams extends IComponentPageParams {
 export interface IPageFilterParams {
   activityTimeframe: Stream<IntervalTime>
   collateralTokenList: Stream<Address[]>
-}
-
-export interface IUserPageParams {
-  draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  matchingRuleQuery: Stream<Promise<IMatchingRule[]>>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
 export interface IEarningsPlan {

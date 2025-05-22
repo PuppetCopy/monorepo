@@ -1,4 +1,5 @@
 import { awaitPromises, empty, map, mergeArray, now, startWith } from '@most/core'
+import type { Stream } from '@most/types'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
 import {
   $Baseline,
@@ -26,7 +27,7 @@ import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
 import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
-import type { ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
+import type { IMatchingRule, ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
@@ -38,9 +39,12 @@ import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
 import { localStore } from '../../const/localStore.js'
 import { $seperator2 } from '../common.js'
-import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
+import type { IPageFilterParams, IPageParams } from '../type.js'
 
-interface ILeaderboard extends IPageFilterParams, IUserPageParams, IPageParams {}
+interface ILeaderboard extends IPageFilterParams, IPageParams {
+  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+}
 
 type ISortLeaderboardBy = ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>
 
@@ -55,19 +59,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
-      [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
+      // [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
       [filterAccount, _filterAccountTether]: IBehavior<string | undefined>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const {
-        activityTimeframe,
-        collateralTokenList,
-        draftMatchingRuleList,
-        draftDepositTokenList,
-        matchingRuleQuery,
-        route
-      } = config
+      const { activityTimeframe, collateralTokenList, draftMatchingRuleList, userMatchingRuleQuery, route } = config
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
@@ -82,7 +79,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
         ]),
         'sortBy'
       )
-      const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
+      // const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
       const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
       const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -158,11 +155,11 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       f.and(
                         f.eq(t.interval, params.activityTimeframe),
                         params.account ? f.ilike(t.account, params.account) : undefined,
-                        params.isLong !== undefined
-                          ? params.isLong
-                            ? f.gte(t.longShortRatio, 5000n)
-                            : f.lte(t.longShortRatio, 5000n)
-                          : undefined,
+                        // params.isLong !== undefined
+                        //   ? params.isLong
+                        //     ? f.gte(t.longShortRatio, 5000n)
+                        //     : f.lte(t.longShortRatio, 5000n)
+                        //   : undefined,
                         // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
                         params.collateralTokenList.length > 0
                           ? f.inArray(t.collateralToken, params.collateralTokenList)
@@ -248,7 +245,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 columns: [
                   {
                     $head: $text('Trader'),
-                    gridTemplate: isDesktopScreen ? '149px' : '126px',
+                    gridTemplate: isDesktopScreen ? '149px' : '136px',
                     $bodyCallback: map((pos) => {
                       return $TraderDisplay({
                         route: config.route,
@@ -273,7 +270,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         })({
                           changeMatchRuleList: changeMatchRuleListTether()
                         })
-                      }, awaitPromises(matchingRuleQuery))
+                      }, awaitPromises(userMatchingRuleQuery))
                     })
                   },
                   ...((isDesktopScreen
@@ -438,7 +435,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ screenerFocus, sortBy, activityTimeframe, isLong, account, collateralTokenList }))
+            }, combineState({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList }))
           )
         ),
 

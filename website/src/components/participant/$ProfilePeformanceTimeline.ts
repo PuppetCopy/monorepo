@@ -16,19 +16,17 @@ import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
-import type { IPageFilterParams, ITraderRouteMetricSummary, IUserPageParams } from '../../pages/type.js'
+import type { IPageFilterParams, ITraderRouteMetricSummary } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 
-interface IProfilePeformanceTimeline extends IUserPageParams, IPageFilterParams {
+interface IProfilePeformanceTimeline extends IPageFilterParams {
   metricsQuery: Stream<Promise<ITraderRouteMetricSummary>>
 }
 
 export const $TradeRouteTimeline = ({
   activityTimeframe,
   collateralTokenList,
-  draftDepositTokenList,
-  matchingRuleQuery,
   metricsQuery
 }: IProfilePeformanceTimeline) =>
   component(
@@ -230,7 +228,6 @@ export const $TradeRouteTimeline = ({
               combineState({
                 timelineQuery,
                 activityTimeframe,
-                depositTokenList: draftDepositTokenList,
                 collateralTokenList
               })
             )

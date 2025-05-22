@@ -10,8 +10,8 @@ const SITE_CONFIG = {
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
   __OG_IMAGE__: '/.netlify/functions/og-middlware',
-  __THEME_PRIMARY__: '#0085FF',
-  __THEME_BACKGROUND__: '#870B38'
+  __THEME_PRIMARY__: '#870B38',
+  __THEME_BACKGROUND__: '#292c37'
 }
 
 // https://vitejs.dev/config/

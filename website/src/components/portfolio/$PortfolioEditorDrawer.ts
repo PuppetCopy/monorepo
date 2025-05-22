@@ -39,7 +39,7 @@ interface IPortfolioRoute {
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   route: Route
-  depositTokenList: Stream<IDepositEditorDraft[]>
+  draftDepositTokenList: Stream<IDepositEditorDraft[]>
   draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
@@ -53,22 +53,22 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
       [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
-      const { draftMatchingRuleList, depositTokenList } = config
+      const { draftMatchingRuleList, draftDepositTokenList } = config
 
       const openDrawerState = skipRepeatsWith((prev, next) => {
-        const prevCount = prev.draftMatchingRuleList.length + prev.depositTokenList.length
-        const nextCount = next.draftMatchingRuleList.length + next.depositTokenList.length
+        const prevCount = prev.draftMatchingRuleList.length + prev.draftDepositTokenList.length
+        const nextCount = next.draftMatchingRuleList.length + next.draftDepositTokenList.length
         return prevCount > 0 && nextCount > 0 && prevCount === nextCount
-      }, combineState({ draftMatchingRuleList, depositTokenList }))
+      }, combineState({ draftMatchingRuleList, draftDepositTokenList }))
 
       return [
         fadeIn(
           switchMap((params) => {
-            if (params.draftMatchingRuleList.length === 0 && params.depositTokenList.length === 0) {
+            if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
               return empty()
             }
 
-            const updateList = [...params.draftMatchingRuleList, ...params.depositTokenList]
+            const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
             const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
               const collateralToken = 'action' in item ? item.token : item.collateralToken
               const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
@@ -138,7 +138,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
                       $row(
                         $RouteDepositEditor({
                           collateralToken: route.collateralToken,
-                          draftDepositTokenList: depositTokenList
+                          draftDepositTokenList: draftDepositTokenList
                         })({
                           changeDepositTokenList: changeDepositTokenListTether()
                         })
@@ -251,7 +251,7 @@ export const $PortfolioEditorDrawer = (config: IPortfolioEditorDrawer) =>
 
                         const calls: IBatchCall[] = []
 
-                        for (const deposit of params.depositTokenList) {
+                        for (const deposit of params.draftDepositTokenList) {
                           if (deposit.action === DepositEditorAction.DEPOSIT) {
                             calls.push(
                               {

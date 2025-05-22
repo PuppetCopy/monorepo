@@ -54,6 +54,7 @@ export const $defaultDropListContainer = $column(
 
 export const $defaulMultiselectDropContainer = $node(
   style({
+    cursor: 'pointer',
     position: 'relative',
     alignItems: 'center',
     height: '44px',

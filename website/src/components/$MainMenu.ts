@@ -41,13 +41,11 @@ export const $MainMenu = (config: MainMenu) =>
     ) => {
       const { route } = config
 
-
-
       const $iconAnchor = $anchor(
         layoutSheet.displayFlex,
         style({
           padding: '0 4px',
-          border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
+          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
           borderRadius: '50%',
           alignItems: 'center',
           placeContent: 'center',
@@ -61,20 +59,25 @@ export const $MainMenu = (config: MainMenu) =>
         layoutSheet.displayFlex,
         style({
           padding: '0 4px',
-          border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
+          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
           borderRadius: '50%',
           alignItems: 'center',
           placeContent: 'center',
           height: '42px',
           width: '42px'
-        }),
+        })
       )
 
-
       const $socialLinkList = [
-        $iconAnchor(attr({ href: 'https://docs.puppet.tech' }))($icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })),
-        $iconAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))($icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })),
-        $iconAnchor(attr({ href: 'https://github.com/PuppetCopy/monorepo' }))($icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' }))
+        $iconAnchor(attr({ href: 'https://docs.puppet.tech' }))(
+          $icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })
+        ),
+        $iconAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))(
+          $icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })
+        ),
+        $iconAnchor(attr({ href: 'https://github.com/PuppetCopy/monorepo' }))(
+          $icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' })
+        )
       ]
 
       const themeState = startWith(theme, changeTheme)
@@ -95,19 +98,19 @@ export const $MainMenu = (config: MainMenu) =>
         ),
         dismiss: routeChange,
         $target: $icon({
-            svgOps: O(
-              clickPopoverClaimTether(nodeEvent('click')),
-              style({
-                padding: '6px',
-                cursor: 'pointer',
-                alignSelf: 'center',
-                transform: 'rotate(90deg)'
-              })
-            ),
-            width: '32px',
-            $content: $moreDots,
-            viewBox: '0 0 32 32'
-          })
+          svgOps: O(
+            clickPopoverClaimTether(nodeEvent('click')),
+            style({
+              padding: '6px',
+              cursor: 'pointer',
+              alignSelf: 'center',
+              transform: 'rotate(90deg)'
+            })
+          ),
+          width: '32px',
+          $content: $moreDots,
+          viewBox: '0 0 32 32'
+        })
       })({})
 
       return [

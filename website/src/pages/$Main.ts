@@ -1,4 +1,4 @@
-import { constant, map, merge, mergeArray, multicast, now, skipRepeats, startWith, take, tap } from '@most/core'
+import { constant, map, merge, mergeArray, multicast, now, take, tap } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import {
@@ -8,9 +8,15 @@ import {
   $Tooltip
 } from '@puppet/middleware/ui-components'
 import { uiStorage } from '@puppet/middleware/ui-storage'
-import { ETH_ADDRESS_REGEXP, filterNull, getTimeSince, readableUnitAmount, unixTimestampNow, zipState } from '@puppet/middleware/utils'
 import {
-  $element,
+  ETH_ADDRESS_REGEXP,
+  filterNull,
+  getTimeSince,
+  readableUnitAmount,
+  unixTimestampNow,
+  zipState
+} from '@puppet/middleware/utils'
+import {
   $node,
   $text,
   component,
@@ -38,6 +44,7 @@ import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wallet } from '../wallet/wallet.js'
 import { $Leaderboard } from './leaderboard/$Leaderboard.js'
+import { $PortfolioPage } from './user/$PortfolioPuppet.js'
 import { $TraderPage } from './user/$Trader.js'
 
 const popStateEvent = eventElementTarget('popstate', window)
@@ -81,26 +88,12 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const rootRoute = router.create({ fragment: baseRoute, title: 'Puppet', fragmentsChange })
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
+      const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
       const traderRoute = rootRoute.create({ fragment: 'trader' }).create({
         title: 'Trader',
         fragment: ETH_ADDRESS_REGEXP
       })
-
-      const profileRoute = rootRoute.create({ fragment: 'profile' })
-      const _walletRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
-      const _tradeRoute = rootRoute.create({ fragment: 'trade' })
-      const _tradeTermsAndConditions = rootRoute.create({ fragment: 'terms-and-conditions' })
-
-      const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
-      const _adminRoute = rootRoute.create({ fragment: 'admin' })
-
-      const _opengraph = rootRoute.create({ fragment: 'og' })
-
-      const _$liItem = $element('li')(style({ marginBottom: '14px' }))
-
-      const isDesktopScreen = skipRepeats(
-        map(() => document.body.clientWidth > 1040 + 280, startWith(null, eventElementTarget('resize', window)))
-      )
+      const portfolioRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
 
       const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
       const collateralTokenList = uiStorage.replayWrite(
@@ -125,7 +118,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         wallet.blockChange
       ])
 
-      const matchingRuleQuery = replayLatest(
+      const userMatchingRuleQuery = replayLatest(
         multicast(
           queryUserMatchingRuleList({
             address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
@@ -151,8 +144,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   draftMatchingRuleList,
                   activityTimeframe,
                   collateralTokenList,
-                  draftDepositTokenList,
-                  matchingRuleQuery
+                  userMatchingRuleQuery
                 })({
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
@@ -166,16 +158,30 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $TraderPage({
+                  userMatchingRuleQuery,
                   activityTimeframe,
                   collateralTokenList,
-                  draftDepositTokenList,
-                  draftMatchingRuleList,
-                  matchingRuleQuery
+                  draftMatchingRuleList
                 })({
                   selectCollateralTokenList: selectCollateralTokenListTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   changeMatchRuleList: changeMatchRuleListTether(),
                   changeRoute: changeRouteTether()
+                })
+              )
+            )
+          ),
+          router.contains(portfolioRoute)(
+            $midContainer(
+              fadeIn(
+                $PortfolioPage({
+                  draftDepositTokenList,
+                  userMatchingRuleQuery,
+                  activityTimeframe,
+                  collateralTokenList
+                })({
+                  selectCollateralTokenList: selectCollateralTokenListTether(),
+                  changeActivityTimeframe: changeActivityTimeframeTether()
                 })
               )
             )
@@ -296,7 +302,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             )(
               $PortfolioEditorDrawer({
                 route: rootRoute,
-                depositTokenList: draftDepositTokenList,
+                draftDepositTokenList,
                 draftMatchingRuleList
               })({
                 routeChange: changeRouteTether(),

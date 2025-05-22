@@ -1,9 +1,9 @@
 import { awaitPromises, map, multicast, startWith } from '@most/core'
+import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet/middleware/const'
 import { getTokenDescription } from '@puppet/middleware/gmx'
 import {
   $anchor,
-  $AnchorLink,
   $arrowRight,
   $external,
   $icon,
@@ -19,34 +19,36 @@ import {
   readableLeverage,
   readableUsd,
   shortenAddress,
-  shortPostAdress,
   unixTimestampNow
 } from '@puppet/middleware/utils'
 import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
 import { positionIncrease } from 'schema'
 import type { Address } from 'viem/accounts'
+import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $heading2 } from '../../common/$text.js'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { queryDb } from '../../common/sqlClient.js'
-import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline'
+import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
-import type { IPageFilterParams, IPageParams, IUserPageParams } from '../type.js'
-import { pallete } from 'aelea/ui-components-theme'
+import type { IPageFilterParams } from '../type.js'
 
-interface ITraderPage extends IUserPageParams, IPageFilterParams {}
+interface ITraderPage extends IPageFilterParams {
+  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+}
 
 export const $TraderPage = ({
   activityTimeframe,
   collateralTokenList,
-  draftMatchingRuleList,
-  draftDepositTokenList,
-  matchingRuleQuery
+  userMatchingRuleQuery,
+  draftMatchingRuleList
 }: ITraderPage) =>
   component(
     (
@@ -192,9 +194,6 @@ export const $TraderPage = ({
               $TradeRouteTimeline({
                 activityTimeframe,
                 collateralTokenList,
-                draftMatchingRuleList,
-                draftDepositTokenList,
-                matchingRuleQuery,
                 metricsQuery
               })({
                 selectCollateralTokenList: selectCollateralTokenListTether(),
@@ -279,7 +278,7 @@ export const $TraderPage = ({
                         displayCollateralTokenSymbol: true,
                         collateralToken: routeMetric.collateralToken,
                         traderMatchedPuppetList: routeMetric.matchedPuppetList,
-                        userMatchingRuleList: list,
+                        userMatchingRuleList: [],
                         draftMatchingRuleList,
                         trader: routeMetric.account,
                         $container: $defaultTraderMatchRouteEditorContainer(
@@ -288,7 +287,7 @@ export const $TraderPage = ({
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()
                       })
-                    }, awaitPromises(matchingRuleQuery)),
+                    }, awaitPromises(userMatchingRuleQuery)),
                     $row(
                       style({ marginRight: '26px' })($seperator2),
                       $Table({
