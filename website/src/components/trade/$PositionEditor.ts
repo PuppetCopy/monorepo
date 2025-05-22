@@ -12,10 +12,10 @@
 //   switchLatest
 // } from "@most/core"
 // import { Stream } from "@most/types"
-// import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream } from "@puppet/middleware/utils"
-// import * as GMX "@puppet/middleware/gmx"
-// import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress } from "@puppet/middleware/gmx"
-// import { IMirrorPosition, ISetRouteType, latestPriceMap } from "@puppet/middleware/core"
+// import { ADDRESS_ZERO, BASIS_POINTS_DIVISOR, delta, div, filterNull, formatDiv, formatFixed, getBasisPoints, getTokenAmount, getTokenUsd, ITokenDescription, parseBps, parseFixed, parseReadableNumber, readableNumber, readableTokenAmountFromUsdAmount, readableTokenAmountLabel, readableTokenUsd, readableUnitAmount, readableUsd, StateStream } from "@puppet-copy/middleware/utils"
+// import * as GMX "@puppet-copy/middleware/gmx"
+// import { getNativeTokenAddress, getNativeTokenDescription, getTokenDescription, IMarket, IMarketInfo, IMarketPrice, resolveAddress } from "@puppet-copy/middleware/gmx"
+// import { IMirrorPosition, ISetRouteType, latestPriceMap } from "@puppet-copy/middleware/core"
 // import {
 //   $bear, $bull,
 //   $ButtonToggle,
@@ -25,14 +25,14 @@
 //   $intermediateText,
 //   $moreDots,
 //   $tokenIconMap, $tokenLabelFromSummary
-// } from "@puppet/middleware/ui-components"
+// } from "@puppet-copy/middleware/ui-components"
 // import * as viem from "viem"
 // // import { $MarketInfoList } from "../$MarketList"
 // import { $Popover } from "../$Popover"
 // import { $defaultSliderThumb, $Slider } from "../$Slider.js"
 // import { $gmxLogo } from "../../common/$icons"
 // import { $heading2 } from "../../common/$text.js"
-// import { $FieldLabeled } from "@puppet/middleware/ui-components"
+// import { $FieldLabeled } from "@puppet-copy/middleware/ui-components"
 // import { boxShadow } from "../../common/elements/$common"
 // import { $caretDown } from "../../common/elements/$icons.js"
 // import * as trade from "../../logic/traderRead.js"

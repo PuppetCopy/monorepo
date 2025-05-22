@@ -5,8 +5,8 @@ import {
   $alertTooltip,
   $intermediateTooltip,
   $txHashRef
-} from '@puppet/middleware/ui-components'
-import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/ui-components'
+import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
   $node,
   $text,

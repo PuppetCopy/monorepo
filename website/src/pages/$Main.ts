@@ -1,13 +1,13 @@
 import { constant, map, merge, mergeArray, multicast, now, take, tap } from '@most/core'
 import type { Stream } from '@most/types'
-import type { IntervalTime } from '@puppet/middleware/const'
+import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   $alertNegativeContainer,
   $alertPositiveContainer,
   $infoLabeledValue,
   $Tooltip
-} from '@puppet/middleware/ui-components'
-import { uiStorage } from '@puppet/middleware/ui-storage'
+} from '@puppet-copy/middleware/ui-components'
+import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import {
   ETH_ADDRESS_REGEXP,
   filterNull,
@@ -15,7 +15,7 @@ import {
   readableUnitAmount,
   unixTimestampNow,
   zipState
-} from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/utils'
 import {
   $node,
   $text,

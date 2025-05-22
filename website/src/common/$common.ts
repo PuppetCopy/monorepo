@@ -1,14 +1,14 @@
 import { empty, map, skipRepeats } from '@most/core'
 import type { Stream } from '@most/types'
-import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet/middleware/const'
-import { latestPriceMap } from '@puppet/middleware/core'
+import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet-copy/middleware/const'
+import { latestPriceMap } from '@puppet-copy/middleware/core'
 import {
   getPositionPnlUsd,
   getRoughLiquidationPrice,
   getTokenDescription,
   type IMarket,
   liquidationWeight
-} from '@puppet/middleware/gmx'
+} from '@puppet-copy/middleware/gmx'
 import {
   $infoLabel,
   $infoLabeledValue,
@@ -16,7 +16,7 @@ import {
   $labeledDivider,
   $Tooltip,
   $tokenIconMap
-} from '@puppet/middleware/ui-components'
+} from '@puppet-copy/middleware/ui-components'
 import {
   getBasisPoints,
   getMappedValue,
@@ -29,7 +29,7 @@ import {
   readablePercentage,
   readablePnl,
   readableUsd
-} from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/utils'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
 import type * as router from 'aelea/router'

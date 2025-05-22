@@ -12,7 +12,7 @@ import {
   snapshot,
   startWith
 } from '@most/core'
-import * as PUPPET from '@puppet/middleware/const'
+import * as PUPPET from '@puppet-copy/middleware/const'
 import {
   $ButtonToggle,
   $defaulButtonToggleContainer,
@@ -22,8 +22,8 @@ import {
   $infoTooltipLabel,
   $labeledhintAdjustment,
   intermediateText
-} from '@puppet/middleware/ui-components'
-import { uiStorage } from '@puppet/middleware/ui-storage'
+} from '@puppet-copy/middleware/ui-components'
+import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import {
   applyFactor,
   formatFixed,
@@ -34,7 +34,7 @@ import {
   readableTokenAmount,
   readableTokenAmountLabel,
   readableUnitAmount
-} from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

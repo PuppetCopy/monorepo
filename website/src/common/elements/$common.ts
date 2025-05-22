@@ -1,6 +1,6 @@
 import { empty } from '@most/core'
-import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet/middleware/ui-components'
-import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet/middleware/utils'
+import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet-copy/middleware/ui-components'
+import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet-copy/middleware/utils'
 import { $node, $text, attr, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'

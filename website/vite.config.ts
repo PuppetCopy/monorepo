@@ -29,14 +29,14 @@ export default defineConfig({
             'aelea/ui-components-theme-browser'
           ],
           middleware: [
-            '@puppet/middleware/const',
-            '@puppet/middleware/core',
-            '@puppet/middleware/utils',
-            '@puppet/middleware/gmx',
-            '@puppet/middleware/gbc',
-            '@puppet/middleware/ui-components',
-            '@puppet/middleware/ui-router',
-            '@puppet/middleware/ui-storage'
+            '@puppet-copy/middleware/const',
+            '@puppet-copy/middleware/core',
+            '@puppet-copy/middleware/utils',
+            '@puppet-copy/middleware/gmx',
+            '@puppet-copy/middleware/gbc',
+            '@puppet-copy/middleware/ui-components',
+            '@puppet-copy/middleware/ui-router',
+            '@puppet-copy/middleware/ui-storage'
           ],
           vendor: [
             '@most/core',

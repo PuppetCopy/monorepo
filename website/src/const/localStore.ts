@@ -1,6 +1,6 @@
-import { IntervalTime } from '@puppet/middleware/const'
-import type { ISortBy } from '@puppet/middleware/ui-components'
-import { uiStorage } from '@puppet/middleware/ui-storage'
+import { IntervalTime } from '@puppet-copy/middleware/const'
+import type { ISortBy } from '@puppet-copy/middleware/ui-components'
+import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import { arbitrum } from 'viem/chains'
 import { IWalletTab } from '../pages/type.js'
 

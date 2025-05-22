@@ -1,6 +1,6 @@
 import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
+import { PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
   $element,
   $node,

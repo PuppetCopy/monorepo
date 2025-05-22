@@ -1,6 +1,6 @@
 import { awaitPromises, empty, map, mergeArray, now, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IntervalTime, USD_DECIMALS } from '@puppet/middleware/const'
+import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   $Baseline,
   $ButtonToggle,
@@ -17,9 +17,9 @@ import {
   type ISeriesTime,
   type ISortBy,
   type TableColumn
-} from '@puppet/middleware/ui-components'
-import { uiStorage } from '@puppet/middleware/ui-storage'
-import { fillTimeline, formatFixed, type InferStream, readablePnl, unixTimestampNow } from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/ui-components'
+import { uiStorage } from '@puppet-copy/middleware/ui-storage'
+import { fillTimeline, formatFixed, type InferStream, readablePnl, unixTimestampNow } from '@puppet-copy/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

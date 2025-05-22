@@ -1,4 +1,4 @@
-import { unixTimestampNow } from '@puppet/middleware/utils'
+import { unixTimestampNow } from '@puppet-copy/middleware/utils'
 import { $node, $text, style } from 'aelea/core'
 import { $row, $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

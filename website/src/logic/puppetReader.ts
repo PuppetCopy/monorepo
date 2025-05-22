@@ -1,4 +1,4 @@
-import * as PUPPET from '@puppet/middleware/const'
+import * as PUPPET from '@puppet-copy/middleware/const'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { wallet } from '../wallet/wallet'

@@ -1,4 +1,4 @@
-import { CONTRACT } from '@puppet/middleware/const'
+import { CONTRACT } from '@puppet-copy/middleware/const'
 import type { Address } from 'viem/accounts'
 import { wallet } from '../wallet/wallet'
 

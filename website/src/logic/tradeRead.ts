@@ -1,4 +1,4 @@
-import { CONTRACT } from '@puppet/middleware/const'
+import { CONTRACT } from '@puppet-copy/middleware/const'
 import {
   hashData,
   type IMarket,
@@ -8,9 +8,9 @@ import {
   type IMarketPool,
   type IMarketPrice,
   type IMarketUsageInfo
-} from '@puppet/middleware/gmx'
-import { getMappedValue } from '@puppet/middleware/utils'
-import type * as walletLink from '@puppet/middleware/wallet'
+} from '@puppet-copy/middleware/gmx'
+import { getMappedValue } from '@puppet-copy/middleware/utils'
+import type * as walletLink from '@puppet-copy/middleware/wallet'
 import { readContract } from 'viem/actions'
 
 export function hashKey(key: string) {

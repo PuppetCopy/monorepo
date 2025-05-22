@@ -1,16 +1,16 @@
 // import { empty, map, mergeArray, now, scan, skip } from '@most/core'
 // import type { Stream } from '@most/types'
-// import * as PUPPET from '@puppet/middleware/const'
-// import { hashData, resolveAddress } from '@puppet/middleware/gmx'
+// import * as PUPPET from '@puppet-copy/middleware/const'
+// import { hashData, resolveAddress } from '@puppet-copy/middleware/gmx'
 // import {
 //   filterNull,
 //   getDenominator,
 //   getMappedValue,
 //   type ITokenDescription,
 //   parseFixed
-// } from '@puppet/middleware/utils'
-// import * as walletLink from '@puppet/middleware/wallet'
-// import { wagmiConfig } from '@puppet/middleware/wallet'
+// } from '@puppet-copy/middleware/utils'
+// import * as walletLink from '@puppet-copy/middleware/wallet'
+// import { wagmiConfig } from '@puppet-copy/middleware/wallet'
 // import { erc20Abi } from 'abitype/abis'
 // import { fromWebsocket } from 'aelea/ui-components'
 //

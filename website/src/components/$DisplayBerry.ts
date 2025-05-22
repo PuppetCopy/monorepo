@@ -1,5 +1,5 @@
 import { tap } from '@most/core'
-import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet/middleware/gbc'
+import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet-copy/middleware/gbc'
 import { $svg, $wrapNativeElement, attr, type I$Node } from 'aelea/core'
 
 export function $svgContent(content: string): I$Node[] {

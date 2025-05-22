@@ -1,6 +1,6 @@
 import type { Stream } from '@most/types'
-import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet/middleware/const'
-import { getTokenDescription } from '@puppet/middleware/gmx'
+import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $node, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'

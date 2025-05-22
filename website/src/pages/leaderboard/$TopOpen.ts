@@ -5,11 +5,11 @@
 // import { pallete } from "aelea/ui-components-theme"
 // import { map, startWith } from "@most/core"
 // import { Stream } from "@most/types"
-// import * as GMX from '@puppet/middleware/gmx'
-// import { $Table, ISortBy, ScrollRequest } from "@puppet/middleware/ui-components"
-// import { IAbstractPositionParams, pagingQuery } from "@puppet/middleware/gmx"
-// import { ROUTE_DESCRIPTION } from "@puppet/middleware/const"
-// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "@puppet/middleware/core"
+// import * as GMX from '@puppet-copy/middleware/gmx'
+// import { $Table, ISortBy, ScrollRequest } from "@puppet-copy/middleware/ui-components"
+// import { IAbstractPositionParams, pagingQuery } from "@puppet-copy/middleware/gmx"
+// import { ROUTE_DESCRIPTION } from "@puppet-copy/middleware/const"
+// import { IPositionMirrorOpen, IPuppetSubscritpion, getMpSlotPnL, getRouteTypeKey } from "@puppet-copy/middleware/core"
 // import { $labelDisplay } from "../../common/$TextField.js"
 // import { $TraderDisplay, $route } from "../../common/$common.js"
 // import { $DropMultiSelect } from "../../components/form/$Dropdown.js"

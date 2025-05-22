@@ -6,7 +6,7 @@ import {
   getLabItemTupleIndex,
   type IBerryDisplayTupleMap,
   tokenIdAttributeTuple
-} from '@puppet/middleware/gbc'
+} from '@puppet-copy/middleware/gbc'
 import {
   $defaultTableCell,
   $defaultTableRowContainer,
@@ -15,7 +15,7 @@ import {
   $spinner,
   $Table,
   type TableOption
-} from '@puppet/middleware/ui-components'
+} from '@puppet-copy/middleware/ui-components'
 import { style, stylePseudo } from 'aelea/core'
 import { $column, isDesktopScreen } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

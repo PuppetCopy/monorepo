@@ -1,7 +1,7 @@
 import { constant, map, mergeArray, never, now, snapshot, switchLatest, tap } from '@most/core'
 import { append, remove } from '@most/prelude'
 import type { Stream } from '@most/types'
-import { $caretDown, $infoLabel, $xCross } from '@puppet/middleware/ui-components'
+import { $caretDown, $infoLabel, $xCross } from '@puppet-copy/middleware/ui-components'
 import {
   $text,
   component,

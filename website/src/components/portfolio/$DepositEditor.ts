@@ -1,13 +1,13 @@
 import { empty, map, mergeArray, sample, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { getTokenDescription } from '@puppet/middleware/gmx'
-import { $FieldLabeled } from '@puppet/middleware/ui-components'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import {
   parseFixed,
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel
-} from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, type IOps, style } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

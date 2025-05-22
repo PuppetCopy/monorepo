@@ -1,7 +1,7 @@
 import { constant, empty, fromPromise, map, mergeArray, skipRepeatsWith, snapshot, switchLatest } from '@most/core'
 import { remove } from '@most/prelude'
 import type { Stream } from '@most/types'
-import { CONTRACT } from '@puppet/middleware/const'
+import { CONTRACT } from '@puppet-copy/middleware/const'
 import {
   $alert,
   $alertTooltip,
@@ -10,8 +10,8 @@ import {
   $infoTooltip,
   $target,
   $xCross
-} from '@puppet/middleware/ui-components'
-import { getDuration, readableDate, readablePercentage } from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/ui-components'
+import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, combineState, component, type IBehavior, nodeEvent, O, style, switchMap } from 'aelea/core'
 import type { Route } from 'aelea/router'

@@ -1,5 +1,5 @@
 import { tap } from '@most/core'
-import { ignoreAll } from '@puppet/middleware/utils'
+import { ignoreAll } from '@puppet-copy/middleware/utils'
 import { $node, $text, behavior, nodeEvent, style, switchMap } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'

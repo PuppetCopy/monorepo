@@ -1,6 +1,6 @@
 import { empty, map, periodic } from '@most/core'
-import { $alertIcon, $defaultTooltipDropContainer, $Tooltip } from '@puppet/middleware/ui-components'
-import { readableUsd, unixTimestampNow } from '@puppet/middleware/utils'
+import { $alertIcon, $defaultTooltipDropContainer, $Tooltip } from '@puppet-copy/middleware/ui-components'
+import { readableUsd, unixTimestampNow } from '@puppet-copy/middleware/utils'
 import { $element, $node, $text, attr, type I$Node, style } from 'aelea/core'
 import { $column, $icon, $row } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

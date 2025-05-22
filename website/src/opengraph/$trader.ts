@@ -2,9 +2,9 @@
 // import { $column, layoutSheet } from "aelea/ui-components"
 // import { now } from "@most/core"
 // import { Stream } from "@most/types"
-// import { IntervalTime } from "@puppet/middleware/utils"
-// import { IPriceTickListMap } from "@puppet/middleware/gmx"
-// import { ISetRouteType, queryPosition } from "@puppet/middleware/core"
+// import { IntervalTime } from "@puppet-copy/middleware/utils"
+// import { IPriceTickListMap } from "@puppet-copy/middleware/gmx"
+// import { ISetRouteType, queryPosition } from "@puppet-copy/middleware/core"
 //
 // import { $ProfilePeformanceTimeline } from "../components/participant/$ProfilePeformanceTimeline.js"
 // import { $TraderSummary } from "../components/participant/$Summary.js"

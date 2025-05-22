@@ -1,4 +1,4 @@
-import { getMappedValue } from '@puppet/middleware/utils'
+import { getMappedValue } from '@puppet-copy/middleware/utils'
 import type { DecodeErrorResultReturnType } from 'viem'
 
 const errorMessages = {

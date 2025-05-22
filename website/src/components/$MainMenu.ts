@@ -1,5 +1,5 @@
 import { constant, empty, startWith } from '@most/core'
-import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet/middleware/ui-components'
+import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet-copy/middleware/ui-components'
 import {
   $element,
   $node,

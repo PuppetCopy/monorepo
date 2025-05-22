@@ -1,13 +1,13 @@
 import { empty, fromPromise, map, mergeArray, now, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
-import { MAX_UINT256 } from '@puppet/middleware/const'
+import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import {
   $alertPositiveTooltip,
   $alertTooltip,
   $intermediateTooltip,
   $txHashRef
-} from '@puppet/middleware/ui-components'
-import { PromiseStatus, promiseState } from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/ui-components'
+import { PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import {

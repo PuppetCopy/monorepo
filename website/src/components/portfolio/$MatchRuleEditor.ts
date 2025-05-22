@@ -1,9 +1,9 @@
 import { empty, map, mergeArray, now, snapshot, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { IntervalTime } from '@puppet/middleware/const'
-import { $Checkbox, $FieldLabeled } from '@puppet/middleware/ui-components'
-import { uiStorage } from '@puppet/middleware/ui-storage'
-import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet/middleware/utils'
+import { IntervalTime } from '@puppet-copy/middleware/const'
+import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
+import { uiStorage } from '@puppet-copy/middleware/ui-storage'
+import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/utils'
 import {
   $element,
   $node,

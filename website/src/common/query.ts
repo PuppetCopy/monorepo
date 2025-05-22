@@ -1,13 +1,13 @@
 import { map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet/middleware/const'
+import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet-copy/middleware/const'
 import {
   getClosestNumber,
   groupArrayMany,
   periodicRun,
   type StateParams,
   unixTimestampNow
-} from '@puppet/middleware/utils'
+} from '@puppet-copy/middleware/utils'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
 import type { IMatchingRule } from '../__generated__/ponder.types'

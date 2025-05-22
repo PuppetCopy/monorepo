@@ -1,5 +1,5 @@
-import { $anchor } from '@puppet/middleware/ui-components'
-import { getExplorerUrl, shortenTxAddress } from '@puppet/middleware/utils'
+import { $anchor } from '@puppet-copy/middleware/ui-components'
+import { getExplorerUrl, shortenTxAddress } from '@puppet-copy/middleware/utils'
 import { $text, attr, type I$Node } from 'aelea/core'
 import type { Chain } from 'viem/chains'
 

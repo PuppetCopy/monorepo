@@ -1,5 +1,5 @@
 import type { Stream } from '@most/types'
-import type { IntervalTime } from '@puppet/middleware/const'
+import type { IntervalTime } from '@puppet-copy/middleware/const'
 import type * as router from 'aelea/router'
 import type { Address, Hex } from 'viem'
 import type {

@@ -1,7 +1,7 @@
 import { empty, map, multicast, skipRepeatsWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { $Baseline, $bear, $bull, $infoTooltipLabel } from '@puppet/middleware/ui-components'
-import { filterNull, parseReadableNumber, readableUnitAmount } from '@puppet/middleware/utils'
+import { $Baseline, $bear, $bull, $infoTooltipLabel } from '@puppet-copy/middleware/ui-components'
+import { filterNull, parseReadableNumber, readableUnitAmount } from '@puppet-copy/middleware/utils'
 import {
   $node,
   $text,
