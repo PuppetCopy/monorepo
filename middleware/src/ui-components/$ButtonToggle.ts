@@ -27,7 +27,7 @@ export interface IButtonToggle<T> {
 export const $defaulButtonToggleBtn = $row(
   style({
     placeContent: 'center',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     flex: 1,
     borderRadius: '20px',
     padding: '12px 18px',
@@ -45,7 +45,7 @@ export const $defaulButtonToggleContainer = $node(
     gridAutoFlow: 'column',
     gridAutoColumns: 'minmax(50px, 1fr)',
     borderRadius: '20px',
-    border: `1px solid ${colorAlpha(pallete.foreground, .2)}`,
+    border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
     backgroundColor: pallete.background
   })
 )

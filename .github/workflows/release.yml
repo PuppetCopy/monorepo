@@ -1,0 +1,39 @@
+name: CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          # https://yarnpkg.com/features/release-workflow/#ensuring-that-versions-are-bumped-ci
+          fetch-depth: 0
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run biome:check
+
+      - name: Build
+        run: cd middleware && bun run build
+
+      - name: Release via Changesets
+        uses: changesets/action@v1
+        with:
+          publish: bun run changeset:publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_AUTH }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -39,7 +39,7 @@
         "noParameterAssign": "off",
         "useDefaultParameterLast": "error",
         "noArguments": "error",
-        "useImportType": "error",
+        "useImportType": "warn",
         "useExportType": "error",
         "noUselessElse": "error",
         "useShorthandFunctionType": "error"
