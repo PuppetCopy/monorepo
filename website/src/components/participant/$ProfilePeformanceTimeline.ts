@@ -1,7 +1,12 @@
 import { empty, map, skipRepeatsWith, startWith, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
-import { $Baseline, $infoTooltipLabel, $intermediatePromise, type ISeriesTime } from '@puppet-copy/middleware/ui-components'
+import {
+  $Baseline,
+  $infoTooltipLabel,
+  $intermediatePromise,
+  type ISeriesTime
+} from '@puppet-copy/middleware/ui-components'
 import {
   fillTimeline,
   filterNull,

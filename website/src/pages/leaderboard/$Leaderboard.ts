@@ -19,7 +19,13 @@ import {
   type TableColumn
 } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import { fillTimeline, formatFixed, type InferStream, readablePnl, unixTimestampNow } from '@puppet-copy/middleware/utils'
+import {
+  fillTimeline,
+  formatFixed,
+  type InferStream,
+  readablePnl,
+  unixTimestampNow
+} from '@puppet-copy/middleware/utils'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
