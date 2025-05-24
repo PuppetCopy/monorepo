@@ -4,3 +4,6 @@
 [submodule "subgraph"]
 	path = subgraph
 	url = https://github.com/PuppetCopy/subgraph.git
+[submodule "keeper"]
+	path = keeper
+	url = https://github.com/PuppetCopy/keeper.git
