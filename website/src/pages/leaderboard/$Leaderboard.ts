@@ -26,18 +26,18 @@ import {
   readablePnl,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
+import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
-import * as schema from 'schema'
 import type { Address } from 'viem/accounts'
 import type { IMatchingRule, ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
-import { queryDb } from '../../common/sqlClient.js'
+import { sqlClient } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity, lastActivityOptionList } from '../../components/$LastActivity.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
@@ -156,7 +156,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
               const dataSource = switchMap(
                 async (filterParams) => {
-                  const metrictList = await queryDb.query.traderRouteLatestMetric.findMany({
+                  const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
                     where: (t, f) =>
                       f.and(
                         f.eq(t.interval, params.activityTimeframe),

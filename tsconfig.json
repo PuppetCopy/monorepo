@@ -3,5 +3,5 @@
   "extends": "./tsconfig.base.json",
   "include": [
     "**/src"
-, "keeper/keeper/abis", "keeper/keeper/utils", "keeper/keeper/const.ts", "keeper/keeper/dto.ts", "keeper/keeper/index.ts", "keeper/keeper/query.ts", "keeper/keeper/source.ts", "keeper/keeper/type.ts"  ]
+, "keeper/keeper/abis", "keeper/keeper/utils", "keeper/keeper/const.ts", "keeper/keeper/dto.ts", "keeper/keeper/index.ts", "keeper/keeper/query.ts", "keeper/keeper/source.ts", "keeper/keeper/type.ts", "subgraph/public/schema", "subgraph/public/sql"  ]
 }

@@ -2,7 +2,7 @@
   "name": "@puppet-copy/middleware",
   "license": "BSL-1.1 and MIT",
   "description": "Copytrading middleware",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "build": "bun run build:clean && bun run build:esm",
@@ -10,7 +10,6 @@
     "build:clean": "rm -rf dist",
     "clean:tsc": "rm -fr dist/*",
     "dev:generate-abi": "bunx wagmi generate",
-    "dev:schemaFiles": "mkdir -p ./src/sql/__generated__ && cp ../subgraph/ponder.schema.ts ../subgraph/ponder.types.ts ./src/sql/__generated__/",
     "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
   },
   "files": [
@@ -52,10 +51,6 @@
     "./ui-storage": {
       "types": "./dist/types/ui-storage/index.d.ts",
       "import": "./dist/esm/ui-storage/index.js"
-    },
-    "./sql": {
-      "types": "./dist/types/sql/index.d.ts",
-      "import": "./dist/esm/sql/index.js"
     },
     "./package.json": "./package.json"
   },

@@ -11,7 +11,7 @@ import {
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
 import type { IMatchingRule } from '../__generated__/ponder.types'
-import { getStatus, queryDb } from './sqlClient'
+import { getStatus, sqlClient } from './sqlClient'
 
 export const subgraphStatus = replayLatest(
   multicast(
@@ -31,7 +31,7 @@ export function queryPricefeed(
   estTickAmout = 10
 ) {
   return map(async (params) => {
-    const priceList = await queryDb.query.priceCandle.findMany({
+    const priceList = await sqlClient.query.priceCandle.findMany({
       columns: {
         c: true,
         slotTime: true,
@@ -61,7 +61,7 @@ export function queryUserMatchingRuleList(
       return []
     }
 
-    const metrictList = await queryDb.query.puppetMatchingRule.findMany({
+    const metrictList = await sqlClient.query.puppetMatchingRule.findMany({
       where: (t, f) =>
         f.and(
           f.eq(t.puppet, address)

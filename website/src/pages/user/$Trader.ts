@@ -21,16 +21,16 @@ import {
   shortenAddress,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
+import { positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
-import { positionIncrease } from 'schema'
 import type { Address } from 'viem/accounts'
 import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $heading2 } from '../../common/$text.js'
 import { $card, $card2 } from '../../common/elements/$common.js'
-import { queryDb } from '../../common/sqlClient.js'
+import { sqlClient } from '../../common/sqlClient.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
@@ -68,7 +68,7 @@ export const $TraderPage = ({
         map(async (params) => {
           const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
-          const routeMetricList = await queryDb.query.traderRouteLatestMetric.findMany({
+          const routeMetricList = await sqlClient.query.traderRouteLatestMetric.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.account, account),
@@ -106,7 +106,7 @@ export const $TraderPage = ({
 
         const routeMetricList = await params.routeMetricListQuery
 
-        const increaseList = await queryDb.query.positionIncrease.findMany({
+        const increaseList = await sqlClient.query.positionIncrease.findMany({
           where: (t, f) =>
             f.and(
               f.eq(t.account, account),
@@ -122,7 +122,7 @@ export const $TraderPage = ({
           }
         })
 
-        const decreaseList = await queryDb.query.positionDecrease.findMany({
+        const decreaseList = await sqlClient.query.positionDecrease.findMany({
           where: (t, f) =>
             f.and(
               f.eq(t.account, account),
