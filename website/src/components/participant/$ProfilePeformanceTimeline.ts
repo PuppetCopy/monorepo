@@ -78,9 +78,10 @@ export const $TradeRouteTimeline = ({
           $row(
             style({
               position: 'absolute',
-              top: '14px',
-              left: isDesktopScreen ? '20px' : '12px',
-              right: isDesktopScreen ? '20px' : '12px',
+              top: 0,
+              left: 0,
+              right: 0,
+              padding: isDesktopScreen ? '12px 20px 0' : '12px 12px 0',
               alignSelf: 'center',
               zIndex: 11,
               alignItems: 'flex-start'

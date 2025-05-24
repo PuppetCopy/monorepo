@@ -59,22 +59,22 @@ export const CONTRACT = {
     },
 
     // V2
-    ReaderV2: {
+    GmxReaderV2: {
       address: '0x38d91ED96283d62182Fc6d990C24097A918a4d9b',
       abi: reader
     },
-    ExchangeRouter: {
+    GmxExchangeRouter: {
       address: '0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8',
       abi: exchangeRouter
     },
-    OrderVault: {
+    GmxOrderVault: {
       address: '0x31eF83a530Fde1B38EE9A18093A333D8Bbbc40D5'
     },
-    Datastore: {
+    GmxDatastore: {
       address: '0xFD70de6b91282D8017aA4E741e9Ae325CAb992d8',
       abi: datastore
     },
-    EventEmitter: {
+    GmxEventEmitter: {
       address: '0xC8ee91A54287DB53897056e12D9819156D3822Fb',
       abi: gmxEventEmitter
     },

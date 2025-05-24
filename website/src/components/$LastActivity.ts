@@ -1,10 +1,10 @@
-import { map } from '@most/core'
+import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet-copy/middleware/const'
 import { $caretDown, $icon, $infoLabel } from '@puppet-copy/middleware/ui-components'
 import type { IBehavior } from 'aelea/core'
 import { $node, $text, component, style } from 'aelea/core'
-import { $row, spacing } from 'aelea/ui-components'
+import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { $Dropdown } from './form/$Dropdown'
 
 export const lastActivityOptionList = [
@@ -53,7 +53,7 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
           $anchor: $row(
             $node(style({ whiteSpace: 'nowrap', padding: '12px 0px 12px 18px' }))(
               $row(spacing.tiny)(
-                $infoLabel($text('Last Activity:')),
+                isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty(),
                 $text(
                   map((tf) => {
                     const selectedOption = lastActivityOptionList.find((option) => option.value === tf)

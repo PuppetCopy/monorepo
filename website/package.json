@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "bunx --bun vite",
-    "dev:schemaFiles": "mkdir -p ./src/__generated__ && cp ../subgraph/ponder.schema.ts ../subgraph/ponder.types.ts ./src/__generated__/",
     "dev:generate-pwa-assets": "pwa-assets-generator",
     "build": "bunx --bun vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
@@ -26,11 +25,11 @@
     "abitype": "1.0.8",
     "aelea": "1.9.0",
     "color": "5.0.0",
-    "drizzle-orm": "0.43.1",
+    "drizzle-orm": "0.41.0",
     "lightweight-charts": "5.0.7",
     "mersenne-twister": "1.1.0",
-    "ponder": "0.11.5",
-    "viem": "2.30.0"
+    "ponder": "0.11.6",
+    "viem": "2.30.1"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.2",
