@@ -1,13 +1,13 @@
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import type * as router from 'aelea/router'
-import type { Address, Hex } from 'viem'
 import type {
   IPositionDecrease,
   IPositionIncrease,
   ITraderRouteLatestMetric,
   ITraderRouteMetric
-} from '../__generated__/ponder.types'
+} from '@puppet-copy/sql/schema'
+import type * as router from 'aelea/router'
+import type { Address, Hex } from 'viem'
 
 export interface IComponentPageParams {}
 

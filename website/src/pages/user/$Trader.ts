@@ -21,13 +21,12 @@ import {
   shortenAddress,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
-import { positionIncrease } from '@puppet-copy/sql/schema'
+import { type IMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
 import type { Address } from 'viem/accounts'
-import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $heading2 } from '../../common/$text.js'
 import { $card, $card2 } from '../../common/elements/$common.js'
 import { sqlClient } from '../../common/sqlClient.js'

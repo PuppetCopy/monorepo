@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/performance/noBarrelFile: entrypoint module file */
+export * from './const.js'
 export * from './gmxUtils.js'
 export * from './market.js'
 export * from './marketMap.js'

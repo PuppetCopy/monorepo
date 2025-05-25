@@ -1,33 +1,23 @@
 import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
-import { IntervalTime } from '@puppet-copy/middleware/const'
+import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet-copy/middleware/const'
 import { $caretDown, $icon, $infoLabel } from '@puppet-copy/middleware/ui-components'
+import { getMappedValue } from '@puppet-copy/middleware/utils'
 import type { IBehavior } from 'aelea/core'
 import { $node, $text, component, style } from 'aelea/core'
 import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { $Dropdown } from './form/$Dropdown'
 
-export const lastActivityOptionList = [
-  {
-    value: IntervalTime.DAY,
-    label: '24 Hours'
-  },
-  {
-    value: IntervalTime.WEEK,
-    label: '7 Days'
-  },
-  {
-    value: IntervalTime.MONTH,
-    label: '30 Days'
-  },
-  {
-    value: IntervalTime.YEAR,
-    label: '1 Year'
-  }
-]
+export const activityOptionLabelMap = {
+  [IntervalTime.DAY]: '24 Hours',
+  [IntervalTime.WEEK]: '7 Days',
+  [IntervalTime.MONTH]: '30 Days',
+  [IntervalTime.QUARTER]: '90 Days',
+  [IntervalTime.YEAR]: '1 Year'
+} as const
 
 export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
-  component(([changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>) => {
+  component(([changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>) => {
     return [
       $row(
         spacing.default,
@@ -54,12 +44,7 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
             $node(style({ whiteSpace: 'nowrap', padding: '12px 0px 12px 18px' }))(
               $row(spacing.tiny)(
                 isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty(),
-                $text(
-                  map((tf) => {
-                    const selectedOption = lastActivityOptionList.find((option) => option.value === tf)
-                    return selectedOption?.label!
-                  }, activityTimeframe)
-                )
+                $text(map((tf) => getMappedValue(activityOptionLabelMap, tf), activityTimeframe))
               )
             ),
             $row(style({ alignItems: 'center', cursor: 'pointer', padding: '12px 18px', flex: '1' }))(
@@ -71,12 +56,12 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
               })
             )
           ),
-          optionList: lastActivityOptionList,
+          optionList: PLATFORM_STAT_INTERVAL,
           $$option: map((option) => {
-            return $node($text(String(option.label)))
+            return $node($text(activityOptionLabelMap[option]))
           })
         })({
-          select: changeActivityTimeframeTether(map((option) => option.value))
+          select: changeActivityTimeframeTether()
         })
       ),
       { changeActivityTimeframe }

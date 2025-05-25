@@ -4,6 +4,7 @@ import { IntervalTime } from '@puppet-copy/middleware/const'
 import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/utils'
+import type { IMatchingRule } from '@puppet-copy/sql/schema'
 import {
   $element,
   $node,
@@ -20,7 +21,6 @@ import {
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'

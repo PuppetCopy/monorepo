@@ -1,6 +1,6 @@
 import { map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
-import { type IntervalTime, PRICEFEED_INTERVAL } from '@puppet-copy/middleware/const'
+import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import {
   getClosestNumber,
   groupArrayMany,
@@ -8,9 +8,9 @@ import {
   type StateParams,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
+import type { IMatchingRule } from '@puppet-copy/sql/schema'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
-import type { IMatchingRule } from '../__generated__/ponder.types'
 import { getStatus, sqlClient } from './sqlClient'
 
 export const subgraphStatus = replayLatest(
@@ -39,7 +39,7 @@ export function queryPricefeed(
       },
       where: (t, f) =>
         f.and(
-          f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL, params.activityTimeframe / estTickAmout)),
+          f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL_LIST, params.activityTimeframe / estTickAmout)),
           f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
           params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
         )

@@ -22,10 +22,12 @@ import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import {
   fillTimeline,
   formatFixed,
+  getMappedValue,
   type InferStream,
   readablePnl,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
+import type { IMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -33,13 +35,12 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
 import type { Address } from 'viem/accounts'
-import type { IMatchingRule, ITraderRouteLatestMetric } from '../../__generated__/ponder.types.js'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
 import { sqlClient } from '../../common/sqlClient.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
-import { $LastAtivity, lastActivityOptionList } from '../../components/$LastActivity.js'
+import { $LastAtivity, activityOptionLabelMap } from '../../components/$LastActivity.js'
 import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
 import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../../components/table/$TableColumn.js'
@@ -322,9 +323,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
                       params.screenerFocus === 'roi' ? $tableHeader('ROI %', 'PNL $') : $tableHeader('PNL $', 'ROI %'),
                       $node(style({ textAlign: 'right', alignSelf: 'center' }))(
-                        $text(
-                          `${lastActivityOptionList.find((option) => option.value === params.activityTimeframe)?.label} Activtiy`
-                        )
+                        $text(`${getMappedValue(activityOptionLabelMap, params.activityTimeframe)} Activtiy`)
                       )
                     ),
                     sortBy: params.screenerFocus,

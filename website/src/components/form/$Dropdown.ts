@@ -68,7 +68,7 @@ export const $defaulMultiselectDropContainer = $node(
 )
 
 export interface IDropdown<T> {
-  optionList: Stream<T[]> | T[]
+  optionList: Stream<readonly T[]> | readonly T[]
   $anchor: I$Node
 
   closeOnSelect?: boolean

@@ -50,7 +50,7 @@ export const MARGIN_FEE_BASIS_POINTS = 10n
 
 export const FUNDING_RATE_PRECISION = 1000000n
 
-export const PRICEFEED_INTERVAL = [
+export const PRICEFEED_INTERVAL_LIST = [
   IntervalTime.MIN5,
   IntervalTime.MIN15,
   IntervalTime.HR,
@@ -58,6 +58,14 @@ export const PRICEFEED_INTERVAL = [
   IntervalTime.DAY,
   IntervalTime.WEEK,
   IntervalTime.MONTH
+] as const
+
+export const PLATFORM_STAT_INTERVAL = [
+  IntervalTime.DAY,
+  IntervalTime.WEEK,
+  IntervalTime.MONTH,
+  IntervalTime.QUARTER,
+  IntervalTime.YEAR
 ] as const
 
 export const TRADE_CONTRACT_MAPPING = {

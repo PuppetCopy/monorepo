@@ -1,14 +1,14 @@
 import { unixTimestampNow } from '@puppet-copy/middleware/utils'
-import { $node, $text, style } from 'aelea/core'
-import { $row, $seperator } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { Address, Hex, Prettify } from 'viem'
 import type {
   IPositionDecrease,
   IPositionIncrease,
   ITraderRouteLatestMetric,
   ITraderRouteMetric
-} from '../__generated__/ponder.types'
+} from '@puppet-copy/sql/schema'
+import { $node, $text, style } from 'aelea/core'
+import { $row, $seperator } from 'aelea/ui-components'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import type { Address, Hex, Prettify } from 'viem'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
 
 export const $metricEntry = (label: string, value: string) =>

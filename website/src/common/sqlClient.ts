@@ -1,4 +1,4 @@
-import { createClient } from '@puppet-copy/middleware/sql'
+import { createClient, getStatus as getSqlStatus } from '@puppet-copy/sql/client'
 
 const baseUrl = import.meta.env.VITE__INDEXR_ENDPOINT
 
@@ -9,9 +9,5 @@ if (!baseUrl || typeof baseUrl !== 'string') {
 export const sqlClient = createClient(baseUrl)
 
 export async function getStatus() {
-  const response = await fetch(`${baseUrl}/status`, {
-    method: 'POST'
-  })
-
-  return response.json()
+  return getSqlStatus(baseUrl)
 }

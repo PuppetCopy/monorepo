@@ -8,7 +8,6 @@
 // import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 // import type { Hex } from 'viem'
 // import type { Address } from 'viem/accounts'
-// import type { IMatchingRule } from '../../__generated__/ponder.types.js'
 // import { $tokenTryLabeled } from '../../common/$common.js'
 // import { $responsiveFlex } from '../../common/elements/$common.js'
 // import { $seperator2 } from '../../pages/common.js'
@@ -17,6 +16,7 @@
 // import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
 // import { $AccountLabel, $profileAvatar } from '../$AccountProfile.js'
 // import type { Route } from 'aelea/router'
+// import { IMatchingRule } from '@puppet-copy/sql/schema'
 
 // interface ITraderMatchingRouteEditor {
 //   address: Address
