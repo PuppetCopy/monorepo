@@ -12,7 +12,7 @@ export const CONTRACT = {
   42161: {
     RouterProxy: {
       address: addresses[42161].RouterProxy as Address,
-      abi: [...abi.errorAbi, ...abi.routerAbi, ...abi.routerProxyAbi]
+      abi: [...abi.routerAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
     },
 
     Dictatorship: {

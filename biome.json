@@ -25,7 +25,7 @@
         },
         "useLiteralEnumMembers": "off",
         "noCommaOperator": "error",
-        "useNodejsImportProtocol": "error",
+        "useNodejsImportProtocol": "off",
         "useAsConstAssertion": "error",
         "useNumericLiterals": "error",
         "useSelfClosingElements": "error",

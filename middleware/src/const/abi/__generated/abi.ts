@@ -65,7 +65,25 @@ export const allocationAccountAbi = [
     ],
     stateMutability: 'payable'
   },
-  { type: 'error', inputs: [], name: 'Subaccount__UnauthorizedOperator' }
+  {
+    type: 'function',
+    inputs: [
+      { name: '_to', internalType: 'address payable', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'recoverETH',
+    outputs: [
+      { name: '_success', internalType: 'bool', type: 'bool' },
+      { name: '_returnData', internalType: 'bytes', type: 'bytes' }
+    ],
+    stateMutability: 'nonpayable'
+  },
+  { type: 'error', inputs: [], name: 'AllocationAccount__InsufficientBalance' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'AllocationAccount__UnauthorizedOperator'
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -708,6 +726,64 @@ export const erc165Abi = [
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC1967UpgradeUpgradeable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc1967UpgradeUpgradeableAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      },
+      {
+        name: 'newAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      }
+    ],
+    name: 'AdminChanged'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'beacon',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'BeaconUpgraded'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    name: 'Initialized'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'implementation',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'Upgraded'
   }
 ] as const
 
@@ -1482,6 +1558,12 @@ export const errorAbi = [
   },
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
+  { type: 'error', inputs: [], name: 'AllocationAccount__InsufficientBalance' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'AllocationAccount__UnauthorizedOperator'
+  },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
   {
     type: 'error',
@@ -1680,10 +1762,6 @@ export const errorAbi = [
   },
   { type: 'error', inputs: [], name: 'RewardDistributor__InvalidAmount' },
   { type: 'error', inputs: [], name: 'Store__InvalidLength' },
-  { type: 'error', inputs: [], name: 'Subaccount__AlreadyInitialized' },
-  { type: 'error', inputs: [], name: 'Subaccount__OnlyFactory' },
-  { type: 'error', inputs: [], name: 'Subaccount__UnauthorizedCreator' },
-  { type: 'error', inputs: [], name: 'Subaccount__UnauthorizedOperator' },
   { type: 'error', inputs: [], name: 'TransferUtils__EmptyHoldingAddress' },
   {
     type: 'error',
@@ -1742,11 +1820,6 @@ export const feeMarketplaceAbi = [
       {
         name: '_authority',
         internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      {
-        name: '_tokenRouter',
-        internalType: 'contract TokenRouter',
         type: 'address'
       },
       {
@@ -1902,13 +1975,6 @@ export const feeMarketplaceAbi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'tokenRouter',
-    outputs: [{ name: '', internalType: 'contract TokenRouter', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -2491,6 +2557,27 @@ export const gmxExecutionCallbackAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GmxPositionUtils
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const gmxPositionUtilsAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'COLLATERAL_AMOUNT_KEY',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'SIZE_IN_USD_KEY',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IAuthentication
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2668,6 +2755,20 @@ export const iBasePoolAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const iBeaconAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'implementation',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IBeaconUpgradeable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iBeaconUpgradeableAbi = [
   {
     type: 'function',
     inputs: [],
@@ -2905,10 +3006,76 @@ export const ierc1363Abi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC1822ProxiableUpgradeable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc1822ProxiableUpgradeableAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC1967
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const ierc1967Abi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      },
+      {
+        name: 'newAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      }
+    ],
+    name: 'AdminChanged'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'beacon',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'BeaconUpgraded'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'implementation',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'Upgraded'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC1967Upgradeable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc1967UpgradeableAbi = [
   {
     type: 'event',
     anonymous: false,
@@ -7015,6 +7182,19 @@ export const iWeightedPoolFactoryAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Initializable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const initializableAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    name: 'Initialized'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MatchingRule
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -7095,7 +7275,7 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
       { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'getRuleList',
@@ -7120,7 +7300,7 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
       { name: 'puppet', internalType: 'address', type: 'address' }
     ],
     name: 'matchingRuleMap',
@@ -7184,6 +7364,31 @@ export const matchingRuleAbi = [
     name: 'setRule',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_tokenAllowanceList',
+        internalType: 'contract IERC20[]',
+        type: 'address[]'
+      },
+      {
+        name: '_tokenDustThresholdCapList',
+        internalType: 'uint256[]',
+        type: 'uint256[]'
+      }
+    ],
+    name: 'setTokenAllowanceList',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'tokenAllowanceList',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7275,47 +7480,6 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      {
-        name: '_callParams',
-        internalType: 'struct MirrorPosition.CallPosition',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
-          {
-            name: 'keeperExecutionFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
-          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
-          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
-          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperExecutionFee',
-            internalType: 'uint256',
-            type: 'uint256'
-          }
-        ]
-      },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
-      { name: '_allocationId', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'adjust',
-    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'allocationMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -7324,7 +7488,7 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'allocationKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
       { name: 'puppet', internalType: 'address', type: 'address' }
     ],
     name: 'allocationPuppetMap',
@@ -7434,7 +7598,7 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'feeMarket',
+    name: 'feeMarketplace',
     outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
     stateMutability: 'view'
   },
@@ -7564,7 +7728,7 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
       { name: '_puppet', internalType: 'address', type: 'address' }
     ],
     name: 'initializeTraderActivityThrottle',
@@ -7574,7 +7738,7 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'matchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
       { name: 'puppet', internalType: 'address', type: 'address' }
     ],
     name: 'lastActivityThrottleMap',
@@ -7593,6 +7757,87 @@ export const mirrorPositionAbi = [
     inputs: [],
     name: 'matchingRule',
     outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'nextAllocationId',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'positionMap',
+    outputs: [
+      { name: 'size', internalType: 'uint256', type: 'uint256' },
+      { name: 'traderSize', internalType: 'uint256', type: 'uint256' },
+      { name: 'traderCollateral', internalType: 'uint256', type: 'uint256' }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_callParams',
+        internalType: 'struct MirrorPosition.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
+          {
+            name: 'keeperExecutionFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
+          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
+          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperExecutionFee',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
+      { name: '_allocationId', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'requestAdjust',
+    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'requestAdjustmentMap',
+    outputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
+      {
+        name: 'traderTargetLeverage',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'traderCollateralDelta',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      { name: 'traderSizeDelta', internalType: 'uint256', type: 'uint256' },
+      { name: 'sizeDelta', internalType: 'uint256', type: 'uint256' }
+    ],
     stateMutability: 'view'
   },
   {
@@ -7631,53 +7876,13 @@ export const mirrorPositionAbi = [
       },
       { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
-    name: 'mirror',
+    name: 'requestMirror',
     outputs: [
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
       { name: '_nextAllocationId', internalType: 'uint256', type: 'uint256' },
       { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
     ],
     stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'nextAllocationId',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'positionMap',
-    outputs: [
-      { name: 'size', internalType: 'uint256', type: 'uint256' },
-      { name: 'traderSize', internalType: 'uint256', type: 'uint256' },
-      { name: 'traderCollateral', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'requestAdjustmentMap',
-    outputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-      { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
-      {
-        name: 'traderTargetLeverage',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'traderCollateralDelta',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'traderSizeDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'sizeDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7711,7 +7916,7 @@ export const mirrorPositionAbi = [
         type: 'uint256[]'
       }
     ],
-    name: 'setTokenDustThreshold',
+    name: 'setTokenDustThresholdList',
     outputs: [],
     stateMutability: 'nonpayable'
   },
@@ -7758,6 +7963,13 @@ export const mirrorPositionAbi = [
     inputs: [{ name: 'token', internalType: 'contract IERC20', type: 'address' }],
     name: 'tokenDustThresholdAmountMap',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'tokenDustThresholdList',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -11113,6 +11325,88 @@ export const tokenRouterAbi = [
     type: 'error',
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
     name: 'CallUtils__SafeERC20FailedOperation'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UUPSUpgradeable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const uupsUpgradeableAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
+    name: 'upgradeTo',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'newImplementation', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' }
+    ],
+    name: 'upgradeToAndCall',
+    outputs: [],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      },
+      {
+        name: 'newAdmin',
+        internalType: 'address',
+        type: 'address',
+        indexed: false
+      }
+    ],
+    name: 'AdminChanged'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'beacon',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'BeaconUpgraded'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    name: 'Initialized'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'implementation',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      }
+    ],
+    name: 'Upgraded'
   }
 ] as const
 
