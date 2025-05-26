@@ -9,6 +9,8 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
   "search.exclude": {

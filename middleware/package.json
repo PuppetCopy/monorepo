@@ -10,7 +10,7 @@
     "build:clean": "rm -rf dist",
     "clean:tsc": "rm -fr dist/*",
     "dev:generate-abi": "bunx wagmi generate",
-    "dev:copy-deployments": "cp ../contracts/deployments/addresses.json ./src/const/"
+    "dev:copy-deployments": "cp ../contracts/deployments.json ./src/const/"
   },
   "files": [
     "dist"

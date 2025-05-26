@@ -6,7 +6,7 @@ import exchangeRouter from './abi/exchangeRouter.js'
 import gmxEventEmitter from './abi/gmxEventEmitter.js'
 import reader from './abi/reader.js'
 import referralStorage from './abi/referralStorage.js'
-import addresses from './addresses.json' with { type: 'json' }
+import addresses from './deployments.json' with { type: 'json' }
 
 export const CONTRACT = {
   42161: {
@@ -24,7 +24,7 @@ export const CONTRACT = {
       abi: abi.puppetTokenAbi
     },
     PuppetVoteToken: {
-      address: '', // Address not found in addresses.json
+      address: '', // Address not found in deployments.json
       abi: abi.puppetVoteTokenAbi
     },
     TokenRouter: {
