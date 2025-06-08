@@ -116,27 +116,6 @@ ${config.location ? `&location=${config.location}` : ''}
   )($icon({ $content: $calendar, width: '22px', viewBox: '0 0 32 32' }))
 }
 
-export const $iconCircular = ($iconPath: I$Node<SVGPathElement>, size = '32px') => {
-  return $icon({
-    $content: $iconPath,
-    svgOps: style({
-      padding: '6px',
-      zIndex: 10,
-      borderRadius: '50%',
-      border: `1px solid ${colorAlpha(pallete.foreground, 0.25)}`,
-      width: size,
-      aspectRatio: '1 / 1',
-      height: 'auto',
-      fontSize: '11px',
-      textAlign: 'center',
-      lineHeight: '15px',
-      fontWeight: 'bold',
-      color: pallete.message
-    }),
-    viewBox: '0 0 32 32'
-  })
-}
-
 export const $accountRef = (id: Address, chain: Chain) =>
   $anchor(attr({ href: getAccountExplorerUrl(chain, id) }))($text(`${shortenAddress(id)}`))
 

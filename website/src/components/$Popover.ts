@@ -12,13 +12,13 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import { $column, observer } from 'aelea/ui-components'
+import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
 export const $defaultPopoverContentContainer = $column(
   style({
     backgroundColor: pallete.middleground,
-    padding: '36px',
+    padding: isDesktopScreen ? '36px' : '16px',
     borderRadius: '24px',
     border: `1px solid ${colorAlpha(pallete.foreground, 0.15)}`,
     boxShadow: `0 0 10px 0 ${colorAlpha(pallete.background, 0.5)}`
@@ -38,7 +38,6 @@ interface IPocus {
 export const $Popover = ({
   $open: open,
   $target,
-
   $contentContainer = $defaultPopoverContentContainer,
   $container = $node,
   dismiss = empty(),

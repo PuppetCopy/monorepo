@@ -91,10 +91,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
       return [
-        $column(
-          spacing.default,
-          style({ paddingTop: '36px' })
-        )(
+        $column(spacing.default)(
           $card2(style({ padding: '0', gap: 0 }))(
             // display: flex
             // flex-direction: row;

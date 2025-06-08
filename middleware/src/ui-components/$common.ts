@@ -66,7 +66,19 @@ export const $alertPositiveContainer = $row(
   })
 )
 
-export const $alertIntermediateContainer = (...$content: I$Node[]) =>
+export const $alertIntermediateContainer = $row(
+  spacing.small,
+  style({
+    minWidth: 0,
+    maxWidth: '100%',
+    borderRadius: '100px',
+    alignItems: 'center',
+    border: `1px dashed ${pallete.indeterminate}`,
+    padding: '8px 12px'
+  })
+)
+
+export const $alertIntermediateSpinnerContainer = (...$content: I$Node[]) =>
   $row(
     spacing.small,
     style({
@@ -106,9 +118,9 @@ export const $alert = ($content: I$Slottable) =>
     $content
   )
 
-export const $alertTooltip = ($content: I$Slottable) => {
+export const $alertTooltip = ($tooltip: I$Slottable, $content: I$Slottable = $tooltip) => {
   return $Tooltip({
-    $content: $content,
+    $content,
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertNegativeContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
@@ -117,9 +129,9 @@ export const $alertTooltip = ($content: I$Slottable) => {
   })({})
 }
 
-export const $alertPositiveTooltip = ($content: I$Slottable) => {
+export const $alertPositiveTooltip = ($tooltip: I$Slottable, $content: I$Slottable = $tooltip) => {
   return $Tooltip({
-    $content: $content,
+    $content,
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertPositiveContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
@@ -128,11 +140,22 @@ export const $alertPositiveTooltip = ($content: I$Slottable) => {
   })({})
 }
 
-export const $intermediateTooltip = ($content: I$Slottable) => {
+export const $alertIntermediateTooltip = ($tooltip: I$Slottable, $content: I$Slottable = $tooltip) => {
+  return $Tooltip({
+    $content,
+    // $dropContainer: $defaultDropContainer,
+    $anchor: $alertIntermediateContainer(
+      $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),
+      $elipsisTextWrapper($tooltip)
+    )
+  })({})
+}
+
+export const $spinnerTooltip = ($content: I$Slottable) => {
   return $Tooltip({
     $content: $content,
     // $dropContainer: $defaultDropContainer,
-    $anchor: $alertIntermediateContainer(
+    $anchor: $alertIntermediateSpinnerContainer(
       $icon({
         $content: $alertIcon,
         viewBox: '0 0 24 24',

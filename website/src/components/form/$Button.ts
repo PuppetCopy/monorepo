@@ -1,5 +1,6 @@
 import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
 import type { Stream } from '@most/types'
+import { $icon } from '@puppet-copy/middleware/ui-components'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
   $element,
@@ -11,8 +12,8 @@ import {
   type I$Node,
   type IBehavior,
   type INode,
+  type INodeCompose,
   nodeEvent,
-  O,
   style,
   styleBehavior,
   styleInline,
@@ -21,7 +22,6 @@ import {
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { $iconCircular } from '../../common/elements/$common.js'
 import { $ButtonCore, $defaultButtonCore, type IButtonCore } from './$ButtonCore.js'
 
 export const $defaultButtonPrimary = $defaultButtonCore(
@@ -163,23 +163,48 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
 
 interface IButtonCircular extends Control {
   $iconPath: I$Node<SVGPathElement>
+  $container?: INodeCompose
 }
 
-export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>
+export const $defaultButtonCircularContainer = $row(
+  style({
+    cursor: 'pointer',
+    padding: '6px',
+    margin: '-6px',
+    borderRadius: '50%',
+    border: `1px solid ${colorAlpha(pallete.foreground, 0.25)}`,
+    width: '32px',
+    aspectRatio: '1 / 1',
+    height: 'auto',
+    fontSize: '11px',
+    textAlign: 'center',
+    lineHeight: '15px',
+    fontWeight: 'bold',
+    color: pallete.message
+  })
+)
+
+export const $ButtonCircular = ({
+  $iconPath,
+  disabled = empty(),
+  $container = $defaultButtonCircularContainer
+}: IButtonCircular) =>
   component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {
-    const ops = O(
-      clickTether(nodeEvent('pointerup')),
-      styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
-      attrBehavior(
-        map((d) => {
-          return { disabled: d ? 'true' : null }
-        }, disabled)
-      )
-    )
-
     return [
-      ops($row(style({ cursor: 'pointer', padding: '6px', margin: '-6px' }))($iconCircular($iconPath))),
-
+      $container(
+        clickTether(nodeEvent('pointerup')),
+        styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
+        attrBehavior(
+          map((d) => {
+            return { disabled: d ? 'true' : null }
+          }, disabled)
+        )
+      )(
+        $icon({
+          $content: $iconPath,
+          viewBox: '0 0 32 32'
+        })
+      ),
       {
         click
       }

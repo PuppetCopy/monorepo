@@ -63,20 +63,21 @@ export const allocationAccountAbi = [
       { name: '_success', internalType: 'bool', type: 'bool' },
       { name: '_returnData', internalType: 'bytes', type: 'bytes' }
     ],
-    stateMutability: 'payable'
+    stateMutability: 'nonpayable'
   },
   {
     type: 'function',
     inputs: [
-      { name: '_to', internalType: 'address payable', type: 'address' },
-      { name: '_amount', internalType: 'uint256', type: 'uint256' }
+      { name: '_contract', internalType: 'address', type: 'address' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' },
+      { name: '_ethAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'recoverETH',
+    name: 'execute',
     outputs: [
       { name: '_success', internalType: 'bool', type: 'bool' },
       { name: '_returnData', internalType: 'bytes', type: 'bytes' }
     ],
-    stateMutability: 'nonpayable'
+    stateMutability: 'payable'
   },
   { type: 'error', inputs: [], name: 'AllocationAccount__InsufficientBalance' },
   {
@@ -364,7 +365,7 @@ export const coreContractAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -380,6 +381,13 @@ export const coreContractAbi = [
     outputs: [],
     stateMutability: 'nonpayable'
   },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' }
 ] as const
 
@@ -390,7 +398,7 @@ export const coreContractAbi = [
 export const dictatorshipAbi = [
   {
     type: 'constructor',
-    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
+    inputs: [{ name: '_initialOwner', internalType: 'address', type: 'address' }],
     stateMutability: 'nonpayable'
   },
   {
@@ -403,8 +411,8 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Access', type: 'address' },
-      { name: 'user', internalType: 'address', type: 'address' }
+      { name: '_target', internalType: 'contract Access', type: 'address' },
+      { name: '_user', internalType: 'address', type: 'address' }
     ],
     name: 'hasAccess',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -413,8 +421,8 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Permission', type: 'address' },
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: '_target', internalType: 'contract Permission', type: 'address' },
+      { name: '_functionSig', internalType: 'bytes4', type: 'bytes4' },
       { name: 'user', internalType: 'address', type: 'address' }
     ],
     name: 'hasPermission',
@@ -425,11 +433,10 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: 'target',
+        name: '_target',
         internalType: 'contract CoreContract',
         type: 'address'
-      },
-      { name: 'config', internalType: 'bytes', type: 'bytes' }
+      }
     ],
     name: 'initContract',
     outputs: [],
@@ -438,8 +445,8 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'method', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
+      { name: '_method', internalType: 'string', type: 'string' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' }
     ],
     name: 'logEvent',
     outputs: [],
@@ -455,8 +462,8 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Access', type: 'address' },
-      { name: 'user', internalType: 'address', type: 'address' }
+      { name: '_target', internalType: 'contract Access', type: 'address' },
+      { name: '_user', internalType: 'address', type: 'address' }
     ],
     name: 'removeAccess',
     outputs: [],
@@ -466,7 +473,7 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: 'target',
+        name: '_target',
         internalType: 'contract CoreContract',
         type: 'address'
       }
@@ -478,9 +485,9 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Permission', type: 'address' },
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' }
+      { name: '_target', internalType: 'contract Permission', type: 'address' },
+      { name: '_functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: '_user', internalType: 'address', type: 'address' }
     ],
     name: 'removePermission',
     outputs: [],
@@ -496,8 +503,8 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Access', type: 'address' },
-      { name: 'user', internalType: 'address', type: 'address' }
+      { name: '_target', internalType: 'contract Access', type: 'address' },
+      { name: '_user', internalType: 'address', type: 'address' }
     ],
     name: 'setAccess',
     outputs: [],
@@ -507,11 +514,11 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: 'target',
+        name: '_target',
         internalType: 'contract CoreContract',
         type: 'address'
       },
-      { name: 'config', internalType: 'bytes', type: 'bytes' }
+      { name: '_config', internalType: 'bytes', type: 'bytes' }
     ],
     name: 'setConfig',
     outputs: [],
@@ -520,9 +527,9 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'target', internalType: 'contract Permission', type: 'address' },
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' }
+      { name: '_target', internalType: 'contract Permission', type: 'address' },
+      { name: '_functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: '_user', internalType: 'address', type: 'address' }
     ],
     name: 'setPermission',
     outputs: [],
@@ -655,7 +662,21 @@ export const dictatorshipAbi = [
     inputs: [],
     name: 'Dictatorship__ContractAlreadyInitialized'
   },
-  { type: 'error', inputs: [], name: 'Dictatorship__ContractNotInitialized' },
+  { type: 'error', inputs: [], name: 'Dictatorship__ContractNotRegistered' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Dictatorship__CoreContractConfigCallFailed'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Dictatorship__CoreContractInitConfigNotSet'
+  },
+  { type: 'error', inputs: [], name: 'Dictatorship__EmptyConfiguration' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidCoreContract' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidTargetAddress' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidUserAddress' },
   {
     type: 'error',
     inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
@@ -665,7 +686,8 @@ export const dictatorshipAbi = [
     type: 'error',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'OwnableUnauthorizedAccount'
-  }
+  },
+  { type: 'error', inputs: [], name: 'Permission__InvalidFunctionSignature' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1577,6 +1599,7 @@ export const errorAbi = [
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
     name: 'CallUtils__SafeERC20FailedOperation'
   },
+  { type: 'error', inputs: [], name: 'CoreContract__ConfigurationNotSet' },
   {
     type: 'error',
     inputs: [
@@ -1595,7 +1618,21 @@ export const errorAbi = [
     inputs: [],
     name: 'Dictatorship__ContractAlreadyInitialized'
   },
-  { type: 'error', inputs: [], name: 'Dictatorship__ContractNotInitialized' },
+  { type: 'error', inputs: [], name: 'Dictatorship__ContractNotRegistered' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Dictatorship__CoreContractConfigCallFailed'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Dictatorship__CoreContractInitConfigNotSet'
+  },
+  { type: 'error', inputs: [], name: 'Dictatorship__EmptyConfiguration' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidCoreContract' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidTargetAddress' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidUserAddress' },
   {
     type: 'error',
     inputs: [{ name: 'accruedReward', internalType: 'uint256', type: 'uint256' }],
@@ -1716,7 +1753,10 @@ export const errorAbi = [
   },
   {
     type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
     name: 'MirrorPosition__KeeperFeeExceedsCostFactor'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
@@ -1743,6 +1783,7 @@ export const errorAbi = [
     name: 'MirrorPosition__ZeroCollateralOnIncrease'
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__InvalidFunctionSignature' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
   { type: 'error', inputs: [], name: 'PuppetStore__OverwriteAllocation' },
   { type: 'error', inputs: [], name: 'PuppetToken__CoreShareExceedsMining' },
@@ -1755,13 +1796,14 @@ export const errorAbi = [
     name: 'PuppetToken__ExceededRateLimit'
   },
   { type: 'error', inputs: [], name: 'PuppetToken__InvalidRate' },
+  { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
   {
     type: 'error',
     inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
     name: 'RewardDistributor__InsufficientRewards'
   },
   { type: 'error', inputs: [], name: 'RewardDistributor__InvalidAmount' },
-  { type: 'error', inputs: [], name: 'Store__InvalidLength' },
+  { type: 'error', inputs: [], name: 'TokenRouter__EmptyTokenTranferGasLimit' },
   { type: 'error', inputs: [], name: 'TransferUtils__EmptyHoldingAddress' },
   {
     type: 'error',
@@ -1777,14 +1819,13 @@ export const errorAbi = [
     ],
     name: 'TransferUtils__TokenTransferError'
   },
-  { type: 'error', inputs: [], name: 'VotingEscrowLogic__ExceedMaxTime' },
+  { type: 'error', inputs: [], name: 'VotingEscrow__ExceedMaxTime' },
   {
     type: 'error',
     inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
-    name: 'VotingEscrowLogic__ExceedingAccruedAmount'
+    name: 'VotingEscrow__ExceedingAccruedAmount'
   },
-  { type: 'error', inputs: [], name: 'VotingEscrowLogic__ZeroAmount' },
-  { type: 'error', inputs: [], name: 'VotingEscrow__Unsupported' }
+  { type: 'error', inputs: [], name: 'VotingEscrow__ZeroAmount' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1823,14 +1864,32 @@ export const feeMarketplaceAbi = [
         type: 'address'
       },
       {
+        name: '_protocolToken',
+        internalType: 'contract PuppetToken',
+        type: 'address'
+      },
+      {
         name: '_store',
         internalType: 'contract FeeMarketplaceStore',
         type: 'address'
       },
       {
-        name: '_protocolToken',
-        internalType: 'contract PuppetToken',
-        type: 'address'
+        name: '_config',
+        internalType: 'struct FeeMarketplace.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'feeDistributor',
+            internalType: 'contract BankStore',
+            type: 'address'
+          },
+          {
+            name: 'distributionTimeframe',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'burnBasisPoints', internalType: 'uint256', type: 'uint256' }
+        ]
       }
     ],
     stateMutability: 'nonpayable'
@@ -1948,7 +2007,7 @@ export const feeMarketplaceAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -1975,6 +2034,13 @@ export const feeMarketplaceAbi = [
         type: 'address'
       }
     ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
   },
   {
@@ -2132,9 +2198,16 @@ export const gmxExecutionCallbackAbi = [
         type: 'address'
       },
       {
-        name: '_position',
-        internalType: 'contract MirrorPosition',
-        type: 'address'
+        name: '_config',
+        internalType: 'struct GmxExecutionCallback.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'mirrorPosition',
+            internalType: 'contract MirrorPosition',
+            type: 'address'
+          }
+        ]
       }
     ],
     stateMutability: 'nonpayable'
@@ -2512,7 +2585,20 @@ export const gmxExecutionCallbackAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [],
+    name: 'config',
+    outputs: [
+      {
+        name: 'mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -2527,6 +2613,13 @@ export const gmxExecutionCallbackAbi = [
     name: 'setPermission',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7213,19 +7306,39 @@ export const matchingRuleAbi = [
         type: 'address'
       },
       {
-        name: '_mirrorPosition',
-        internalType: 'contract MirrorPosition',
-        type: 'address'
+        name: '_config',
+        internalType: 'struct MatchingRule.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'minExpiryDuration',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
       }
     ],
     stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7265,6 +7378,7 @@ export const matchingRuleAbi = [
         internalType: 'contract IERC20',
         type: 'address'
       },
+      { name: '_depositor', internalType: 'address', type: 'address' },
       { name: '_user', internalType: 'address', type: 'address' },
       { name: '_amount', internalType: 'uint256', type: 'uint256' }
     ],
@@ -7313,14 +7427,7 @@ export const matchingRuleAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'mirrorPosition',
-    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -7339,6 +7446,11 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
+      {
+        name: 'mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      },
       {
         name: '_collateralToken',
         internalType: 'contract IERC20',
@@ -7382,6 +7494,20 @@ export const matchingRuleAbi = [
     name: 'setTokenAllowanceList',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'store',
+    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7461,19 +7587,55 @@ export const mirrorPositionAbi = [
         type: 'address'
       },
       {
-        name: '_puppetStore',
+        name: '_allocationStore',
         internalType: 'contract AllocationStore',
         type: 'address'
       },
       {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
-        type: 'address'
-      },
-      {
-        name: '_feeMarket',
-        internalType: 'contract FeeMarketplace',
-        type: 'address'
+        name: '_config',
+        internalType: 'struct MirrorPosition.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'gmxExchangeRouter',
+            internalType: 'contract IGmxExchangeRouter',
+            type: 'address'
+          },
+          { name: 'callbackHandler', internalType: 'address', type: 'address' },
+          { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
+          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
+          {
+            name: 'increaseCallbackGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'decreaseCallbackGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'platformSettleFeeFactor',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'maxKeeperFeeToAllocationRatio',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxKeeperFeeToAdjustmentRatio',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxKeeperFeeToCollectDustRatio',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
       }
     ],
     stateMutability: 'nonpayable'
@@ -7594,13 +7756,6 @@ export const mirrorPositionAbi = [
     name: 'execute',
     outputs: [],
     stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeMarketplace',
-    outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
-    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -7755,13 +7910,6 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'matchingRule',
-    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'nextAllocationId',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
@@ -7844,6 +7992,11 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [
       {
+        name: '_matchingRule',
+        internalType: 'contract MatchingRule',
+        type: 'address'
+      },
+      {
         name: '_callParams',
         internalType: 'struct MirrorPosition.CallPosition',
         type: 'tuple',
@@ -7886,7 +8039,7 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -7924,6 +8077,11 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [
       {
+        name: '_feeMarketpalce',
+        internalType: 'contract FeeMarketplace',
+        type: 'address'
+      },
+      {
         name: '_callParams',
         internalType: 'struct MirrorPosition.CallSettle',
         type: 'tuple',
@@ -7957,6 +8115,13 @@ export const mirrorPositionAbi = [
     name: 'settle',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -8027,7 +8192,10 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
     name: 'MirrorPosition__KeeperFeeExceedsCostFactor'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
@@ -10661,6 +10829,7 @@ export const puppetVoteTokenAbi = [
   { type: 'error', inputs: [], name: 'InvalidShortString' },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
   {
     type: 'error',
     inputs: [
@@ -10678,8 +10847,7 @@ export const puppetVoteTokenAbi = [
     type: 'error',
     inputs: [{ name: 'expiry', internalType: 'uint256', type: 'uint256' }],
     name: 'VotesExpiredSignature'
-  },
-  { type: 'error', inputs: [], name: 'VotingEscrow__Unsupported' }
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10795,7 +10963,7 @@ export const rewardDistributorAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -10816,6 +10984,13 @@ export const rewardDistributorAbi = [
     inputs: [],
     name: 'store',
     outputs: [{ name: '', internalType: 'contract RewardStore', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
   },
   {
@@ -10991,6 +11166,11 @@ export const routerAbi = [
     type: 'constructor',
     inputs: [
       {
+        name: '_mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      },
+      {
         name: '_matchingRule',
         internalType: 'contract MatchingRule',
         type: 'address'
@@ -11036,6 +11216,13 @@ export const routerAbi = [
     inputs: [],
     name: 'matchingRule',
     outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'mirrorPosition',
+    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -11263,9 +11450,16 @@ export const tokenRouterAbi = [
         type: 'address'
       },
       {
-        name: '_initialTransferGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
+        name: '_config',
+        internalType: 'struct TokenRouter.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'transferGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
       }
     ],
     stateMutability: 'nonpayable'
@@ -11279,27 +11473,45 @@ export const tokenRouterAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    inputs: [
+      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' }
+    ],
     name: 'canCall',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'user', internalType: 'address', type: 'address' },
-      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setAccess',
+    inputs: [],
+    name: 'config',
+    outputs: [{ name: 'transferGasLimit', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
+    name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
-    inputs: [{ name: '_trasnferGasLimit', internalType: 'uint256', type: 'uint256' }],
-    name: 'setTransferGasLimit',
+    inputs: [
+      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' },
+      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
+    ],
+    name: 'setPermission',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -11313,8 +11525,6 @@ export const tokenRouterAbi = [
     outputs: [],
     stateMutability: 'nonpayable'
   },
-  { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Access__Unauthorized' },
   {
     type: 'error',
     inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
@@ -11325,7 +11535,10 @@ export const tokenRouterAbi = [
     type: 'error',
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
     name: 'CallUtils__SafeERC20FailedOperation'
-  }
+  },
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'TokenRouter__EmptyTokenTranferGasLimit' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11741,7 +11954,7 @@ export const votingEscrowAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
     name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
@@ -11762,6 +11975,13 @@ export const votingEscrowAbi = [
     inputs: [],
     name: 'store',
     outputs: [{ name: '', internalType: 'contract VotingEscrowStore', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
   },
   {
@@ -11803,13 +12023,13 @@ export const votingEscrowAbi = [
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
-  { type: 'error', inputs: [], name: 'VotingEscrowLogic__ExceedMaxTime' },
+  { type: 'error', inputs: [], name: 'VotingEscrow__ExceedMaxTime' },
   {
     type: 'error',
     inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
-    name: 'VotingEscrowLogic__ExceedingAccruedAmount'
+    name: 'VotingEscrow__ExceedingAccruedAmount'
   },
-  { type: 'error', inputs: [], name: 'VotingEscrowLogic__ZeroAmount' }
+  { type: 'error', inputs: [], name: 'VotingEscrow__ZeroAmount' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

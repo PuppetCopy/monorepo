@@ -36,9 +36,9 @@ import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
+import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
 import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
-import type { IDepositEditorDraft } from '../components/portfolio/$RouteDepositEditor.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
@@ -130,7 +130,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const draftDepositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorDraft[])
 
       return [
-        $column(
+        $column(spacing.big)(
           $MainMenu({ route: rootRoute })({
             routeChange: changeRouteTether(),
             changeWallet: changeWalletTether()
@@ -175,13 +175,16 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $PortfolioPage({
+                  draftMatchingRuleList,
                   draftDepositTokenList,
                   userMatchingRuleQuery,
                   activityTimeframe,
                   collateralTokenList
                 })({
+                  changeDepositTokenList: changeDepositTokenListTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
-                  changeActivityTimeframe: changeActivityTimeframeTether()
+                  changeActivityTimeframe: changeActivityTimeframeTether(),
+                  changeMatchRuleList: changeMatchRuleListTether()
                 })
               )
             )
@@ -302,6 +305,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             )(
               $PortfolioEditorDrawer({
                 route: rootRoute,
+                userMatchingRuleQuery,
                 draftDepositTokenList,
                 draftMatchingRuleList
               })({

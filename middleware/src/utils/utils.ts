@@ -105,7 +105,8 @@ export function readableFileSize(sizeBytes: number | bigint): string {
   }).format(size)
 }
 
-export const readableDate = (timestamp: number) => new Date(timestamp * 1000).toLocaleDateString(undefined, intlOptions)
+export const readableDate = (timestamp: number, intlOptions: Intl.DateTimeFormatOptions = { dateStyle: 'short' }) =>
+  new Date(timestamp * 1000).toLocaleDateString(undefined, intlOptions)
 
 export function shortenTxAddress(address: string) {
   return shortenAddress(address, 8, 6)

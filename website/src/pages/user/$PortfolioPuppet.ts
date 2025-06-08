@@ -1,18 +1,31 @@
+import { constant, empty, map } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
+import { getMatchKey } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
+import { filterNull, getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
 import type { IMatchingRule } from '@puppet-copy/sql/schema'
-import { $node, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
+import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
-import { $card, $card2 } from '../../common/elements/$common.js'
+import { $card, $card2, $responsiveFlex } from '../../common/elements/$common.js'
+import { sqlClient } from '../../common/sqlClient.js'
+import { $profileDisplay } from '../../components/$AccountProfile.js'
 import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
 import { $LastAtivity } from '../../components/$LastActivity.js'
-import { $RouteDepositEditor, type IDepositEditorDraft } from '../../components/portfolio/$RouteDepositEditor.js'
+import { $Popover } from '../../components/$Popover.js'
+import { $ButtonCircular, $defaultButtonCircularContainer } from '../../components/form/$Button.js'
+import type { IDepositEditorDraft } from '../../components/portfolio/$DepositEditor.js'
+import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import { $RouteDepositEditor } from '../../components/portfolio/$RouteDepositEditor.js'
+import { wallet } from '../../wallet/wallet.js'
 import { $seperator2 } from '../common.js'
 import type { IPageFilterParams } from '../type.js'
 
 interface IWalletPuppet extends IPageFilterParams {
+  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
   draftDepositTokenList: Stream<IDepositEditorDraft[]>
   userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
 }
@@ -21,14 +34,38 @@ export const $PortfolioPage = ({
   activityTimeframe,
   collateralTokenList,
   userMatchingRuleQuery,
-  draftDepositTokenList
+  draftDepositTokenList,
+  draftMatchingRuleList
 }: IWalletPuppet) =>
   component(
     (
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, Address>
     ) => {
+      const settlementListQuery = map(
+        async (params) => {
+          const address = params.wallet.address
+          if (address === undefined) {
+            return []
+          }
+
+          return await sqlClient.query.puppetSettle.findMany({
+            where: (t, f) =>
+              f.and(
+                f.eq(t.puppet, address)
+                // f.inArray(t.collateralToken, params.collateralTokenList)
+              )
+
+            // orderBy: (t, f) => f.expiry.asc(),
+            // limit: 100
+          })
+        },
+        combineState({ collateralTokenList, activityTimeframe, wallet: wallet.account })
+      )
+
       return [
         $card(spacing.big, style({ flex: 1, width: '100%' }))(
           $card2(
@@ -66,74 +103,141 @@ export const $PortfolioPage = ({
                     changeActivityTimeframe: changeActivityTimeframeTether()
                   })
                 )
-              )
+              ),
+
+              $intermediatePromise({
+                $display: map(async (params) => {
+                  const settlementList = await params.settlementListQuery
+                  if (settlementList.length === 0) {
+                    return $column(style({ alignItems: 'center' }), spacing.small)(
+                      // no activity within the selected timeframe
+                      $text(`No activity in the last ${getDuration(params.activityTimeframe)}`),
+                      $infoLabel($text('Try adjusting filters like Activity timeframe or collateral tokens'))
+                    )
+                  }
+
+                  // TODO
+                  return empty()
+                }, combineState({ activityTimeframe, settlementListQuery }))
+              })
             )
           ),
 
-          switchMap((params) => {
-            const activeRouteList =
-              params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
+          $intermediatePromise({
+            $display: map(async (params) => {
+              const activeRouteList =
+                params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
 
-            return $column(spacing.default)(
-              ...activeRouteList.map((collateralToken) => {
-                const _tokenDescription = getTokenDescription(collateralToken)
+              const matchingRuleList = await params.userMatchingRuleQuery
 
-                return $column(style({ paddingLeft: '16px' }))(
-                  $row(
-                    spacing.big,
-                    style({ padding: '6px 0' })
-                  )(
-                    $RouteDepositEditor({
-                      draftDepositTokenList,
-                      collateralToken
-                    })({
-                      changeDepositTokenList: changeDepositTokenListTether()
-                    })
-                  ),
-                  $row(spacing.default)(
-                    $seperator2,
-                    $column(style({ flex: 1, padding: '12px 0' }))(
-                      // ...[].map(modSubsc => {
-                      //   const iconColorParams = modSubsc.matchRule
-                      //     ? modSubsc.expiry === 0n
-                      //       ? { fill: pallete.negative, icon: $xCross, label: isDesktopScreen ? 'Remove' : '-' } : { fill: pallete.message, icon: $target, label: isDesktopScreen ? 'Edit' : '~' }
-                      //     : { fill: pallete.positive, icon: $check, label: isDesktopScreen ? 'Add' : '+' }
-                      //   return $row(isDesktopScreen ? spacing.big : spacing.default, style({ alignItems: 'center', padding: `14px 0` }))(
-                      //     // O(
-                      //     //   style({ marginLeft: '-32px', backgroundColor: pallete.horizon, cursor: 'pointer' }),
-                      //     //   clickRemoveSubscTether(nodeEvent('click'), constant(modSubsc))
-                      //     // )(
-                      //     //   $iconCircular($xCross)
-                      //     // ),
-                      //     $row(
-                      //       $text(style({ backgroundColor: colorAlpha(iconColorParams.fill, .1), marginLeft: `-42px`, borderRadius: '6px', padding: isDesktopScreen ? `6px 12px 6px 22px` : `6px 8px 6px 30px`, color: iconColorParams.fill, }))(iconColorParams.label),
-                      //     ),
-                      //     // switchMap(amount => {
-                      //     //   return $text(tokenAmountLabel(routeType.indexToken, amount))
-                      //     // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
-                      //     $profileDisplay({
-                      //       account: modSubsc.trader,
-                      //       // $profileContainer: $defaultBerry(style({ width: '50px' }))
-                      //     }),
-                      //     $responsiveFlex(spacing.default, style({ flex: 1 }))(
-                      //       $infoLabeledValue('Allowance Rate', $text(`${readablePercentage(modSubsc.allowanceRate)}`)),
-                      //       $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry))),
-                      //       $infoLabeledValue('Throttle Duration', $text(`${getDuration(modSubsc.throttleActivity)}`)),
-                      //     )
-                      //   )
-                      // })
+              return $column(spacing.default)(
+                ...activeRouteList.map((collateralToken) => {
+                  const matchingRuleListForToken = matchingRuleList.filter(
+                    (rule) => rule.collateralToken === collateralToken
+                  )
+
+                  return $column(style({ paddingLeft: '16px' }))(
+                    $row(
+                      spacing.big
+                      // style({ padding: '6px 0' })
+                    )(
+                      $RouteDepositEditor({
+                        draftDepositTokenList,
+                        collateralToken
+                      })({
+                        changeDepositTokenList: changeDepositTokenListTether()
+                      })
+                    ),
+                    $row(spacing.default)(
+                      style({ marginBottom: '30px' })($seperator2),
+                      $column(style({ flex: 1, padding: '12px 0' }))(
+                        $column(spacing.big)(
+                          // user did not set any matching rules for this collateral token
+                          matchingRuleListForToken.length === 0
+                            ? $infoLabel(
+                                $text(`No matching rules set for ${getTokenDescription(collateralToken).name}`)
+                              )
+                            : empty(),
+                          ...matchingRuleListForToken.map((rule) => {
+                            const traderMatchingKey = getMatchKey(collateralToken, rule.trader)
+
+                            return $Popover({
+                              $open: filterNull(
+                                map((trader) => {
+                                  if (trader !== rule.trader) {
+                                    return null
+                                  }
+
+                                  return $MatchRuleEditor({
+                                    draftMatchingRuleList,
+                                    model: rule,
+                                    traderMatchingKey,
+                                    collateralToken,
+                                    trader: rule.trader
+                                  })({
+                                    changeMatchRuleList: changeMatchRuleListTether()
+                                  })
+                                }, popRouteSubscriptionEditor)
+                              ),
+                              dismiss: changeMatchRuleList,
+                              $target: $row(
+                                isDesktopScreen ? spacing.big : spacing.default,
+                                style({ alignItems: 'center' })
+                              )(
+                                $ButtonCircular({
+                                  $iconPath: $caretDown,
+                                  $container: $defaultButtonCircularContainer(
+                                    style({
+                                      marginLeft: '-32px',
+                                      backgroundColor: pallete.background,
+                                      cursor: 'pointer'
+                                    })
+                                  )
+                                })({
+                                  click: popRouteSubscriptionEditorTether(constant(rule.trader))
+                                }),
+                                // switchMap(amount => {
+                                //   return $text(tokenAmountLabel(routeType.indexToken, amount))
+                                // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
+                                $profileDisplay({
+                                  address: rule.trader
+                                  // $profileContainer: $defaultBerry(style({ width: '50px' }))
+                                }),
+                                // $RouteEditor({
+                                //   draftMatchingRuleList,
+                                //   collateralToken: collateralToken,
+                                //   traderMatchedPuppetList: [],
+                                //   userMatchingRuleList: matchingRuleList,
+                                //   trader: modSubsc.trader
+                                // })({
+                                //   changeMatchRuleList: changeMatchRuleListTether()
+                                // }),
+                                $responsiveFlex(spacing.default, style({ flex: 1 }))(
+                                  $infoLabeledValue(
+                                    'Allowance Rate',
+                                    $text(`${readablePercentage(rule.allowanceRate)}`)
+                                  ),
+                                  $infoLabeledValue('Expiry', readableDate(Number(rule.expiry))),
+                                  $infoLabeledValue('Throttle Duration', $text(`${getDuration(rule.throttleActivity)}`))
+                                )
+                              )
+                            })({})
+                          })
+                        )
+                      )
                     )
                   )
-                )
-              })
-            )
-          }, combineState({ activityTimeframe, collateralTokenList }))
+                })
+              )
+            }, combineState({ activityTimeframe, collateralTokenList, settlementListQuery, userMatchingRuleQuery }))
+          })
         ),
 
         {
           changeActivityTimeframe,
           selectCollateralTokenList,
-          changeDepositTokenList
+          changeDepositTokenList,
+          changeMatchRuleList
         }
       ]
     }

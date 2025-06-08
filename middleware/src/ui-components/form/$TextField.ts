@@ -69,6 +69,7 @@ export const $FieldLabeled = ({
   hint,
   labelWidth,
   value,
+  $input,
   validation = empty(),
   $container = $defaultTextFieldContainer
 }: ITextField) =>
@@ -93,6 +94,7 @@ export const $FieldLabeled = ({
             overideInputStyle
           )(
             $Field({
+              $input,
               value,
               validation
             })({

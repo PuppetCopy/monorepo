@@ -6,8 +6,8 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import {
   type GetAccountReturnType,
   getAccount,
-  getCapabilities,
   getConnectorClient,
+  getWalletClient,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
@@ -18,7 +18,6 @@ import {
 import { fromCallback } from 'aelea/core'
 import {
   type Abi,
-  type Call,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
@@ -36,7 +35,7 @@ import {
   webSocket
 } from 'viem'
 import type { Address } from 'viem/accounts'
-import { sendCalls, sendTransaction } from 'viem/actions'
+import { sendCalls } from 'viem/actions'
 import { arbitrum } from 'viem/chains'
 
 type IWalletConnected = {
@@ -161,8 +160,9 @@ type IBatchCall = {
   value?: bigint | undefined
 }
 
-async function writeMany<calls extends readonly Call[]>(callList: IBatchCall[]): Promise<SendCallsReturnType> {
+async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
   const client = await getConnectorClient(wagmiAdapter.wagmiConfig)
+  const wallet = await getWalletClient(wagmiAdapter.wagmiConfig)
   const address = client.account.address
 
   if (!address) {
@@ -175,34 +175,50 @@ async function writeMany<calls extends readonly Call[]>(callList: IBatchCall[]):
     throw new Error('No valid calls to send')
   }
 
-  const capabilities = await getCapabilities(wagmiAdapter.wagmiConfig).catch((error) => {
-    console.error('Error getting capabilities:', error)
-    return null
-  })
+  // const result = await simulateCalls(client, {
+  //   account: client.account,
+  //   calls: callList
+  //   // validation: true,
+  //   // traceTransfers: true,
+  //   // forceAtomic: true
+  // })
 
-  if (capabilities === null) {
-    for (const call of callList) {
-      if (!call) {
-        throw new Error('Invalid call: "to" and "data" are required')
-      }
+  // const capabilities = await getCapabilities(wagmiAdapter.wagmiConfig).catch((error) => {
+  //   console.error('Error getting capabilities:', error)
+  //   return null
+  // })
 
-      await sendTransaction(client, {
-        account: client.account,
-        chain: client.chain,
-        data: call.data,
-        to: call.to,
-        value: call.value
-      })
+  // if (capabilities === null) {
+  //   for (const call of callList) {
+  //     if (!call) {
+  //       throw new Error('Invalid call: "to" and "data" are required')
+  //     }
 
-      return { id: '' } as SendCallsReturnType
-    }
-  }
+  //     await sendTransaction(client, {
+  //       account: client.account,
+  //       chain: client.chain,
+  //       data: call.data,
+  //       to: call.to,
+  //       value: call.value
+  //     })
+
+  //     return { id: '' } as SendCallsReturnType
+  //   }
+  // }
 
   const call = await sendCalls(client, {
     account: client.account,
     calls: callList,
-    forceAtomic: true
+    experimental_fallbackDelay: 1000, // Delay in ms before falling back to legacy transaction
+    version: 'v1',
+    experimental_fallback: true
+    // forceAtomic: true
   })
+
+  const result = await wallet.getCallsStatus({
+    id: '0x1234567890abcdef'
+  })
+
   return call
 }
 

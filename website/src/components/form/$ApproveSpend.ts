@@ -4,7 +4,7 @@ import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import {
   $alertPositiveTooltip,
   $alertTooltip,
-  $intermediateTooltip,
+  $spinnerTooltip,
   $txHashRef
 } from '@puppet-copy/middleware/ui-components'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
@@ -79,7 +79,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                   }
 
                   if (status.status === PromiseStatus.PENDING) {
-                    return $intermediateTooltip($node($text('Awaiting confirmation')))
+                    return $spinnerTooltip($node($text('Awaiting confirmation')))
                   }
                   if (status.status === PromiseStatus.ERROR) {
                     const err = status.error

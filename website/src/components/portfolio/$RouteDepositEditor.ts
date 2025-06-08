@@ -1,4 +1,4 @@
-import { map, snapshot } from '@most/core'
+import { constant, map, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet-copy/middleware/ui-components'
@@ -14,18 +14,7 @@ import type { IComponentPageParams } from '../../pages/type.js'
 import { wallet } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { $DepositEditor } from './$DepositEditor.js'
-
-export enum DepositEditorAction {
-  DEPOSIT,
-  WITHDRAW
-}
-
-export interface IDepositEditorDraft {
-  action: DepositEditorAction
-  token: Address
-  amount: bigint
-}
+import { $DepositEditor, DepositEditorAction, type IDepositEditorDraft } from './$DepositEditor.js'
 
 interface IRouteDepositEditor extends IComponentPageParams {
   collateralToken: Address
@@ -36,13 +25,20 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
   component(
     (
       [popDepositEdtior, popDepositEdtiorTether]: IBehavior<any>,
-      [draft, draftTether]: IBehavior<bigint, IDepositEditorDraft>
+      [changeModel, changeModelTether]: IBehavior<IDepositEditorDraft>
     ) => {
       const { draftDepositTokenList, collateralToken } = config
 
       const model = replayState(
         map((list) => {
-          return list.find((ct) => ct.token === collateralToken)
+          const match = list.find((ct) => ct.token === collateralToken)
+          return (
+            match ?? {
+              action: DepositEditorAction.DEPOSIT,
+              token: collateralToken,
+              amount: 0n
+            }
+          )
         }, draftDepositTokenList)
       )
 
@@ -66,19 +62,15 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
 
       return [
         $Popover({
-          $open: snapshot(
-            (change) => {
-              return $DepositEditor({
-                walletBalance,
-                initialAmount: change?.amount ?? 0n,
-                token: collateralToken
-              })({
-                changeAmount: draftTether(
-                  map((amount) => ({ amount, action: DepositEditorAction.DEPOSIT, token: collateralToken }))
-                )
-              })
-            },
-            model,
+          $open: constant(
+            $DepositEditor({
+              walletBalance,
+              depositBalance,
+              model,
+              token: collateralToken
+            })({
+              changeModel: changeModelTether()
+            }),
             popDepositEdtior
           ),
           $target: $row(spacing.big, style({ padding: '6px 0' }))(
@@ -94,6 +86,10 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                   ),
                   change: map((params) => {
                     if (!params.model) return ''
+
+                    if (params.model.action === DepositEditorAction.DEPOSIT) {
+                      if (params.model.amount === 0n) return ''
+                    }
 
                     return readableTokenAmount(
                       collateralTokenDescription,
@@ -111,13 +107,13 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               ),
               $ButtonSecondary({
                 $container: $defaultMiniButtonSecondary,
-                $content: $text('Add')
+                $content: $text('Change')
               })({
                 click: popDepositEdtiorTether()
               })
             )
           ),
-          dismiss: draft
+          dismiss: changeModel
         })({}),
 
         {
@@ -133,7 +129,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               return [...changeList, draft]
             },
             draftDepositTokenList,
-            draft
+            changeModel
           )
         }
       ]

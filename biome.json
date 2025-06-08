@@ -27,7 +27,6 @@
         "noCommaOperator": "error",
         "useNodejsImportProtocol": "off",
         "useAsConstAssertion": "error",
-        "useNumericLiterals": "error",
         "useSelfClosingElements": "error",
         "useConst": "error",
         "useSingleVarDeclarator": "error",
@@ -70,6 +69,10 @@
   },
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "on" } }
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   }
 }

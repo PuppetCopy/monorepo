@@ -24,17 +24,9 @@ import type { Address, Hex } from 'viem'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
-import { $Dropdown, $defaultSelectContainer } from '../form/$Dropdown.js'
+import { $Dropdown } from '../form/$Dropdown.js'
 
-export interface IMatchingRuleEditorDraft {
-  allowanceRate: bigint
-  throttleActivity: bigint
-  expiry: bigint
-  traderMatchingKey: Hex
-  collateralToken: Address
-  trader: Address
-  model?: IMatchingRule
-}
+export type IMatchingRuleEditorDraft = Omit<IMatchingRule, 'id'>
 
 export type IMatchRuleEditor = {
   model?: IMatchingRule
@@ -44,14 +36,13 @@ export type IMatchRuleEditor = {
   draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
-// TODO: decouple list handling from editor
 export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
   component(
     (
-      [inputEndDate, inputEndDateTether]: IBehavior<any, bigint>,
       [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
-      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorDraft>,
+      [inputEndDate, inputEndDateTether]: IBehavior<string, bigint>,
       [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
+      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorDraft>,
       [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
       [save, saveTether]: IBehavior<PointerEvent, IMatchingRuleEditorDraft>
     ) => {
@@ -63,20 +54,18 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
 
       const { model, traderMatchingKey, draftMatchingRuleList, collateralToken, trader } = config
 
-      const placeholderForm = {
+      const defaultDraft = {
         allowanceRate: BigInt(1000),
         throttleActivity: BigInt(IntervalTime.HR),
         expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
       }
 
-      const draft = combineState({
-        allowanceRate: startWith(model?.allowanceRate || placeholderForm.allowanceRate, inputAllowance),
-        throttleActivity: startWith(
-          model?.throttleActivity || placeholderForm.throttleActivity,
-          changeActivityThrottle
-        ),
-        expiry: startWith(model?.expiry || placeholderForm.expiry, inputEndDate)
-      })
+      const allowanceRate = model ? startWith(model.allowanceRate, inputAllowance) : inputAllowance
+      const throttleActivity = model
+        ? startWith(model.throttleActivity, changeActivityThrottle)
+        : changeActivityThrottle
+      const expiry = model ? startWith(model.expiry, inputEndDate) : inputEndDate
+      const draft = combineState({ allowanceRate, throttleActivity, expiry })
 
       const isSubscribed = model && model.expiry > BigInt(unixTimestampNow())
 
@@ -86,13 +75,8 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
 
           $FieldLabeled({
             label: 'Allocate %',
-            value: mergeArray([
-              model?.allowanceRate && model.allowanceRate !== placeholderForm.allowanceRate
-                ? now(model.allowanceRate)
-                : empty(),
-              map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), inputAllowance)
-            ]),
-            placeholder: `${formatFixed(4, model?.allowanceRate || placeholderForm.allowanceRate) * 100}`,
+            value: map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), allowanceRate),
+            placeholder: `${formatFixed(4, defaultDraft.allowanceRate) * 100}`,
             labelWidth: 150,
             hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
@@ -111,48 +95,57 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
             )
           ),
 
-          switchMap((isEnabled) => {
-            if (!isEnabled) {
-              return empty()
-            }
+          $row(
+            switchMap((isEnabled) => {
+              if (!isEnabled) {
+                return empty()
+              }
 
-            return $column(spacing.default)(
-              $Dropdown({
-                $anchor: $FieldLabeled({
-                  label: 'Activity throttle',
-                  value: map(O(Number, getDuration), changeActivityThrottle),
-                  placeholder: getDuration(Number(model?.throttleActivity || placeholderForm.throttleActivity)),
+              return $column(spacing.default)(
+                $FieldLabeled({
+                  label: 'Expiration',
                   labelWidth: 150,
-                  hint: 'Ignore positions that are too close to each other in time'
-                })({}),
-                $container: $defaultSelectContainer(style({ right: '0' })),
-                $$option: map((tf) => {
-                  return $node($text(getDuration(Number(tf))))
+                  $input: $element('input')(
+                    attr({
+                      type: 'date',
+                      value: new Date(Number(defaultDraft.expiry * 1000n)).toISOString().slice(0, 10)
+                    }),
+                    stylePseudo('::-webkit-calendar-picker-indicator', {
+                      filter: theme.name === 'dark' ? 'invert(1)' : ''
+                    })
+                  ),
+                  hint: 'set a date when this rule will expire, default is 1 year',
+                  value: map((time) => {
+                    return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
+                  }, expiry)
+                })({
+                  change: inputEndDateTether(
+                    map((date) => {
+                      const parsed = Date.parse(date)
+                      return parsed ? BigInt(Math.floor(parsed / 1000)) : BigInt(0)
+                    })
+                  )
                 }),
-                optionList: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
-              })({
-                select: changeActivityThrottleTether(map(BigInt))
-              }),
 
-              $FieldLabeled({
-                label: 'Expiration',
-                labelWidth: 150,
-                $input: $element('input')(
-                  attr({ type: 'date' }),
-                  stylePseudo('::-webkit-calendar-picker-indicator', {
-                    filter: theme.name === 'dark' ? 'invert(1)' : ''
-                  })
-                ),
-                hint: 'set a date when this rule will expire, default is 1 year',
-                placeholder: 'never',
-                value: map((time) => {
-                  return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
-                }, inputEndDate)
-              })({
-                change: inputEndDateTether()
-              })
-            )
-          }, advancedRouteEditorEnabled),
+                $Dropdown({
+                  $anchor: $FieldLabeled({
+                    label: 'Activity throttle',
+                    value: map(O(Number, getDuration), throttleActivity),
+                    placeholder: getDuration(Number(model?.throttleActivity || defaultDraft.throttleActivity)),
+                    labelWidth: 150,
+                    hint: 'Ignore positions that are too close to each other in time'
+                  })({}),
+                  $container: $row(style({ right: '0', position: 'relative' })),
+                  $$option: map((tf) => {
+                    return $node($text(getDuration(Number(tf))))
+                  }),
+                  optionList: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
+                })({
+                  select: changeActivityThrottleTether(map(BigInt))
+                })
+              )
+            }, advancedRouteEditorEnabled)
+          ),
 
           $node(),
 
@@ -184,8 +177,9 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
 
                 if (model) {
                   params.draftMatchingRuleList[modelIndex] = {
+                    ...defaultDraft,
                     ...model,
-                    ...params
+                    ...params.draft
                   }
 
                   return [...params.draftMatchingRuleList]
@@ -195,8 +189,8 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
                   ...params.draftMatchingRuleList,
                   {
                     traderMatchingKey,
-                    trader,
                     collateralToken,
+                    trader,
                     ...params.draft
                   }
                 ]
@@ -206,13 +200,30 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
             ),
             snapshot(
               (params) => {
-                const modelIndex = params.draftMatchingRuleList.findIndex(
-                  (x) => x.traderMatchingKey === traderMatchingKey
-                )
-                if (modelIndex > -1) {
-                  params.draftMatchingRuleList.splice(modelIndex, 1)
+                const match = params.draftMatchingRuleList.find((x) => x.traderMatchingKey === traderMatchingKey)
+
+                if (match) {
+                  const modelIndex = params.draftMatchingRuleList.findIndex(
+                    (x) => x.traderMatchingKey === traderMatchingKey
+                  )
+                  params.draftMatchingRuleList[modelIndex] = {
+                    ...match,
+                    expiry: 0n
+                  }
+
+                  return [...params.draftMatchingRuleList]
                 }
-                return params.draftMatchingRuleList
+
+                return [
+                  ...params.draftMatchingRuleList,
+                  {
+                    traderMatchingKey,
+                    collateralToken,
+                    trader,
+                    ...params.draft,
+                    expiry: 0n
+                  }
+                ]
               },
               combineState({ draftMatchingRuleList, draft }),
               clickRemove

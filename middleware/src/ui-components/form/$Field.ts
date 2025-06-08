@@ -1,4 +1,4 @@
-import { empty, filter, map, merge, mergeArray, now, startWith, switchLatest, tap } from '@most/core'
+import { empty, map, merge, mergeArray, now, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $element,
@@ -10,10 +10,12 @@ import {
   nodeEvent,
   O,
   style,
-  styleBehavior
+  styleBehavior,
+  switchMap
 } from 'aelea/core'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
+import { filterNull } from '../../utils/stream.js'
 import { dismissOp, interactionOp } from './common.js'
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
@@ -100,20 +102,25 @@ export const $Field = ({ value = empty(), disabled, validation = empty(), $input
               )
             : O(),
 
-          O(
-            map((node) =>
-              merge(
-                now(node),
-                filter(
-                  () => false,
-                  tap((val) => {
+          switchMap((node) =>
+            merge(
+              now(node),
+              filterNull(
+                map(
+                  (params) => {
+                    if (params.focus) {
+                      return null
+                    }
+
                     // applying by setting `HTMLInputElement.value` imperatively(only way known to me)
-                    node.element.value = String(val)
-                  }, value)
+                    node.element.value = String(params.value)
+
+                    return null
+                  },
+                  combineState({ value, focus: startWith(null, focus) })
                 )
               )
-            ),
-            switchLatest
+            )
           )
         )(),
 

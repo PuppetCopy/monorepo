@@ -1,33 +1,27 @@
-import { empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
+import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
 import {
   $alertPositiveTooltip,
   $alertTooltip,
-  $intermediateTooltip,
+  $spinnerTooltip,
   $txHashRef
 } from '@puppet-copy/middleware/ui-components'
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
   $node,
   $text,
-  attrBehavior,
   combineArray,
   combineState,
   component,
   type I$Node,
   type I$Slottable,
   type IBehavior,
-  type INode,
   type INodeCompose,
-  nodeEvent,
-  O,
-  style,
-  styleBehavior
+  style
 } from 'aelea/core'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { BaseError, ContractFunctionRevertedError } from 'viem'
-import { $iconCircular } from '../../common/elements/$common.js'
+import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
 import type { IWalletConnected, IWriteContractReturn } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
@@ -36,7 +30,7 @@ import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
 export interface ISubmitBar {
-  txQuery: Stream<IWriteContractReturn>
+  txQuery: Stream<Promise<GetCallsStatusReturnType>>
   alert?: Stream<string | null>
   $container?: INodeCompose
   $submitContent: I$Slottable
@@ -82,7 +76,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               }
 
               if (status.status === PromiseStatus.PENDING) {
-                return $intermediateTooltip($node($text('Awaiting confirmation')))
+                return $spinnerTooltip($node($text('Awaiting confirmation')))
               }
               if (status.status === PromiseStatus.ERROR) {
                 const err = status.error
@@ -112,12 +106,19 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 )
               }
 
-              return $alertPositiveTooltip(
-                $row(spacing.small)(
-                  $text('Transaction confirmed'),
-                  $txHashRef(status.value.transactionReceipt.transactionHash)
-                )
-              )
+              return status.value.status === 'success'
+                ? $alertPositiveTooltip(
+                    $row(spacing.small)(
+                      $text('Transaction confirmed'),
+
+                      ...(status.value.receipts?.map((receipt) =>
+                        $txHashRef(receipt.transactionHash)
+                          ? $node($text(receipt.transactionHash))
+                          : $node($text(receipt.transactionHash || ''))
+                      ) || [])
+                    )
+                  )
+                : $alertTooltip($node($text('Transaction failed')))
             }, requestStatus)
           ),
           $barContent ?? empty(),
@@ -135,7 +136,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 }, combineState({ disabled, isRequestPending, alert })),
                 $content: $submitContent
               })({
-                click: submitTether()
+                click: submitTether(constant(wallet))
               })
 
               if (spend) {
@@ -170,24 +171,3 @@ export const $SubmitBar = (config: ISubmitBar) =>
 interface IButtonCircular extends Control {
   $iconPath: I$Node<SVGPathElement>
 }
-
-export const $ButtonCircular = ({ $iconPath, disabled = empty() }: IButtonCircular) =>
-  component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {
-    const ops = O(
-      clickTether(nodeEvent('pointerup')),
-      styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
-      attrBehavior(
-        map((d) => {
-          return { disabled: d ? 'true' : null }
-        }, disabled)
-      )
-    )
-
-    return [
-      ops($row(style({ cursor: 'pointer', padding: '6px', margin: '-6px' }))($iconCircular($iconPath))),
-
-      {
-        click
-      }
-    ]
-  })
