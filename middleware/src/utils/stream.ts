@@ -60,6 +60,11 @@ export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>):
   return zipped
 }
 
+export const filterNull = <T>(prov: Stream<T | null>) => filter((ev): ev is T => ev !== null, prov)
+
+export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
+
+
 export interface IPeriodRun<T> {
   actionOp: IOps<number, Promise<T>>
 
@@ -67,11 +72,6 @@ export interface IPeriodRun<T> {
   startImmediate?: boolean
   recoverError?: boolean
 }
-
-export const filterNull = <T>(prov: Stream<T | null>) => filter((ev): ev is T => ev !== null, prov)
-
-export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
-
 export const periodicRun = <T>({
   actionOp,
   interval = 1000,
