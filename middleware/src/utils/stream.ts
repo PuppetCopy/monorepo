@@ -64,7 +64,6 @@ export const filterNull = <T>(prov: Stream<T | null>) => filter((ev): ev is T =>
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 
-
 export interface IPeriodRun<T> {
   actionOp: IOps<number, Promise<T>>
 
