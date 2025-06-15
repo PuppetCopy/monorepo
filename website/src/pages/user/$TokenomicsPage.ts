@@ -49,7 +49,7 @@ import { $defaultSliderThumb, $Slider, $sliderDefaultContainer } from '../../com
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../../components/form/$Button.js'
 import { $SubmitBar } from '../../components/form/$SubmitBar.js'
 import type { IDepositEditorDraft } from '../../components/portfolio/$DepositEditor.js'
-import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
 import { localStore } from '../../const/localStore.js'
 import tokenomicsReader from '../../logic/tokenomicsReader.js'
 import { wallet } from '../../wallet/wallet.js'

@@ -41,7 +41,7 @@ import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Butto
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
 import { DepositEditorAction } from './$DepositEditor.js'
-import type { IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteDepositEditor } from './$RouteDepositEditor.js'
 
 interface IPortfolioRoute {
@@ -233,7 +233,10 @@ export const $PortfolioEditorDrawer = ({
                                   'Allowance Rate',
                                   $text(`${readablePercentage(modSubsc.allowanceRate)}`)
                                 ),
-                                $infoLabeledValue('Expiry', readableDate(Number(modSubsc.expiry))),
+                                $infoLabeledValue(
+                                  'Expiry',
+                                  modSubsc.expiry > 0n ? readableDate(Number(modSubsc.expiry)) : $text('Never')
+                                ),
                                 $infoLabeledValue(
                                   'Throttle Duration',
                                   $text(`${getDuration(modSubsc.throttleActivity)}`)
@@ -267,7 +270,7 @@ export const $PortfolioEditorDrawer = ({
                                 $alertIntermediateTooltip(
                                   $text('Connected Wallet does not support EIP-5792 yet'),
                                   $text(
-                                    'Submittion will display multiple transactions for you to sign.\n\nMore about EIP-5792: https://eips.ethereum.org/EIPS/eip-5792'
+                                    'Submittion will require multiple transactions for you to sign.\n\nMore about EIP-5792: https://eips.ethereum.org/EIPS/eip-5792'
                                   )
                                 )
                               )

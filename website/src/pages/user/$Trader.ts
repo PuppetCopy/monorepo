@@ -32,7 +32,7 @@ import { $card, $card2 } from '../../common/elements/$common.js'
 import { sqlClient } from '../../common/sqlClient.js'
 import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
 import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
-import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
 import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
@@ -103,37 +103,37 @@ export const $TraderPage = ({
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
         const _paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
-        const routeMetricList = await params.routeMetricListQuery
+        const [routeMetricList, increaseList, decreaseList] = await Promise.all([
+          params.routeMetricListQuery,
+          sqlClient.query.positionIncrease.findMany({
+            where: (t, f) =>
+              f.and(
+                f.eq(t.account, account),
+                params.collateralTokenList.length > 0
+                  ? f.inArray(t.collateralToken, params.collateralTokenList)
+                  : undefined,
+                f.gt(t.blockTimestamp, startActivityTimeframe)
+              ),
 
-        const increaseList = await sqlClient.query.positionIncrease.findMany({
-          where: (t, f) =>
-            f.and(
-              f.eq(t.account, account),
-              params.collateralTokenList.length > 0
-                ? f.inArray(t.collateralToken, params.collateralTokenList)
-                : undefined,
-              f.gt(t.blockTimestamp, startActivityTimeframe)
-            ),
-
-          orderBy: asc(positionIncrease.blockTimestamp),
-          with: {
-            feeCollected: true
-          }
-        })
-
-        const decreaseList = await sqlClient.query.positionDecrease.findMany({
-          where: (t, f) =>
-            f.and(
-              f.eq(t.account, account),
-              params.collateralTokenList.length > 0
-                ? f.inArray(t.collateralToken, params.collateralTokenList)
-                : undefined,
-              f.gt(t.blockTimestamp, startActivityTimeframe)
-            ),
-          with: {
-            feeCollected: true
-          }
-        })
+            orderBy: asc(positionIncrease.blockTimestamp),
+            with: {
+              feeCollected: true
+            }
+          }),
+          sqlClient.query.positionDecrease.findMany({
+            where: (t, f) =>
+              f.and(
+                f.eq(t.account, account),
+                params.collateralTokenList.length > 0
+                  ? f.inArray(t.collateralToken, params.collateralTokenList)
+                  : undefined,
+                f.gt(t.blockTimestamp, startActivityTimeframe)
+              ),
+            with: {
+              feeCollected: true
+            }
+          })
+        ])
 
         const positionList = aggregatePositionList([...increaseList, ...decreaseList])
 

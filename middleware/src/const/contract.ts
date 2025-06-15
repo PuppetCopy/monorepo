@@ -3,6 +3,7 @@ import * as abi from './abi/__generated/abi.js'
 import datastore from './abi/datastore.js'
 // gmx v2
 import exchangeRouter from './abi/exchangeRouter.js'
+import gmxCustomError from './abi/gmxCustomError.js'
 import gmxEventEmitter from './abi/gmxEventEmitter.js'
 import reader from './abi/reader.js'
 import referralStorage from './abi/referralStorage.js'
@@ -49,6 +50,10 @@ export const CONTRACT = {
       abi: abi.feeMarketplaceAbi
     },
 
+    CustomError: {
+      abi: abi.errorAbi
+    },
+
     GMX: {
       address: '0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a',
       abi: erc20Abi
@@ -78,8 +83,8 @@ export const CONTRACT = {
       address: '0xC8ee91A54287DB53897056e12D9819156D3822Fb',
       abi: gmxEventEmitter
     },
-    CustomError: {
-      abi: abi.errorAbi
+    GmxCustomError: {
+      abi: gmxCustomError
     }
   }
 } as const

@@ -37,7 +37,7 @@ import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../co
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
-import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchRuleEditor.js'
+import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'

@@ -14,7 +14,7 @@ import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
+import { $MatchingRuleEditor, type IMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 
 interface ITraderMatchingRouteEditor {
   trader: Address
@@ -54,7 +54,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         $Popover({
           $container,
           $open: map(() => {
-            return $MatchRuleEditor({
+            return $MatchingRuleEditor({
               draftMatchingRuleList,
               model: matchingRule,
               traderMatchingKey,

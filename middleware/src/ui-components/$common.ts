@@ -178,7 +178,7 @@ export const $infoLabel = $node(style({ color: pallete.foreground }))
 // }
 
 const $infoLabeledValueNode = isDesktopScreen
-  ? $row(spacing.default, style({ alignItems: 'center' })) //
+  ? $row(spacing.small, style({ alignItems: 'center' })) //
   : $column(spacing.small, style({ flex: 1, placeContent: 'space-between' }))
 
 export const $infoLabeledValue = (label: string | I$Slottable, value: string | I$Slottable) => {

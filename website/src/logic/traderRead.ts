@@ -39,15 +39,6 @@
 //   maxGlobalLongSizes: bigint
 // }
 
-// const derievedSymbolMapping = {
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.WETH.symbol]: 'ETH',
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.WBTC.symbol]: 'BTC',
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.BTCB.symbol]: 'BTC',
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: 'BTC',
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: 'AVAX',
-//   [PUPPET.TOKEN_DESCRIPTION_MAP.SOL.symbol]: 'SOL'
-// } as const
-
 // const _gmxIoPricefeedIntervalLabel = {
 //   [PUPPET.IntervalTime.MIN5]: '5m',
 //   [PUPPET.IntervalTime.MIN15]: '15m',
@@ -71,82 +62,6 @@
 // //     actionOp: map(async time => getGmxIOPriceMap(GMX_URL_CHAIN[GMX.CHAIN.AVALANCHE] + '/prices'))
 // //   })))),
 // // }
-
-// export function latestPriceFromExchanges(tokendescription: ITokenDescription): Stream<bigint> {
-//   const symbol = derievedSymbolMapping[tokendescription.symbol]
-
-//   if (symbol === null) {
-//     console.warn(`no symbol ${symbol} found in mapping`)
-//     return empty()
-//   }
-
-//   const binance = fromWebsocket(
-//     'wss://stream.binance.com:9443/ws',
-//     now({ params: [`${symbol}usdt@trade`.toLowerCase()], method: 'SUBSCRIBE', id: 1 })
-//   )
-//   const bitfinex = fromWebsocket(
-//     'wss://api-pub.bitfinex.com/ws/2',
-//     now({ symbol: `${symbol}USD`, event: 'subscribe', channel: 'ticker' })
-//   )
-//   const coinbase = fromWebsocket(
-//     'wss://ws-feed.pro.coinbase.com',
-//     now({ product_ids: [`${symbol}-USD`], type: 'subscribe', channels: ['ticker'] })
-//   )
-//   const kraken = fromWebsocket(
-//     'wss://ws.kraken.com',
-//     now({ event: 'subscribe', pair: [`${symbol.toUpperCase()}/USD`], subscription: { name: 'ticker' } })
-//   )
-
-//   const allSources: Stream<number> = filterNull(
-//     mergeArray([
-//       map((ev: any) => {
-//         if ('p' in ev) {
-//           return Number(ev.p)
-//         }
-//         // console.warn(ev)
-//         return null
-//       }, binance),
-//       map((data: any) => {
-//         if (data[2] && data[2] === 'ticker') {
-//           return Number(data[1].c[0])
-//         }
-//         // console.warn(ev)
-
-//         return null
-//       }, kraken),
-//       map((ev: any) => {
-//         if (Array.isArray(ev) && ev.length === 2 && Array.isArray(ev[1]) && ev[1].length === 10) {
-//           // console.log(Number(ev[1][6]))
-//           return ev[1][6]
-//         }
-//         // console.warn(ev)
-//         return null
-//       }, bitfinex),
-//       map((ev: any) => {
-//         if ('price' in ev) {
-//           // console.log(Number(ev.price))
-
-//           return Number(ev.price)
-//         }
-//         // console.warn(ev)
-//         return null
-//       }, coinbase)
-//     ])
-//   )
-
-//   const avgPrice = skip(
-//     1,
-//     scan(
-//       (prev, next) => {
-//         return prev === 0 ? next : (prev + next) / 2
-//       },
-//       0,
-//       allSources
-//     )
-//   )
-
-//   return map((ev) => parseFixed(PUPPET.USD_DECIMALS, ev) / getDenominator(tokendescription.decimals), avgPrice)
-// }
 
 // export async function readAddressTokenBalance(
 //   token: Address | typeof PUPPET.ADDRESS_ZERO,

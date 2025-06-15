@@ -18,7 +18,7 @@ import { $LastAtivity } from '../../components/$LastActivity.js'
 import { $Popover } from '../../components/$Popover.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../../components/portfolio/$DepositEditor.js'
-import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchRuleEditor.js'
+import { $MatchingRuleEditor, type IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
 import { $RouteDepositEditor } from '../../components/portfolio/$RouteDepositEditor.js'
 import { wallet } from '../../wallet/wallet.js'
 import { $seperator2 } from '../common.js'
@@ -111,7 +111,7 @@ export const $PortfolioPage = ({
                   if (settlementList.length === 0) {
                     return $column(style({ alignItems: 'center' }), spacing.small)(
                       // no activity within the selected timeframe
-                      $text(`No activity in the last ${getDuration(params.activityTimeframe)}`),
+                      $text(`No matching activity in the last ${getDuration(params.activityTimeframe)}`),
                       $infoLabel($text('Try adjusting filters like Activity timeframe or collateral tokens'))
                     )
                   }
@@ -168,7 +168,7 @@ export const $PortfolioPage = ({
                                     return null
                                   }
 
-                                  return $MatchRuleEditor({
+                                  return $MatchingRuleEditor({
                                     draftMatchingRuleList,
                                     model: rule,
                                     traderMatchingKey,

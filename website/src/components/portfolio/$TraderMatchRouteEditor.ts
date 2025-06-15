@@ -13,7 +13,7 @@
 // import { $seperator2 } from '../../pages/common.js'
 // import { $Popover } from '../$Popover.js'
 // import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-// import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from './$MatchRuleEditor.js'
+// import { $MatchRuleEditor, type IMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 // import { $AccountLabel, $profileAvatar } from '../$AccountProfile.js'
 // import type { Route } from 'aelea/router'
 // import { IMatchingRule } from '@puppet-copy/sql/schema'

@@ -36,6 +36,11 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
     let position = positionMap.get(next.positionKey)
 
     if (!position) {
+      if (next.sizeInUsd !== next.sizeDeltaUsd || 'decreasedAtTime' in next) {
+        // Ignore adjustments preceding the creation of the position
+        continue
+      }
+
       position = {
         key: next.positionKey,
         account: next.account,

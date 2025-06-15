@@ -10,13 +10,15 @@ import {
   $node,
   $text,
   attr,
+  combineArray,
   combineState,
   component,
   type IBehavior,
   O,
   style,
   stylePseudo,
-  switchMap
+  switchMap,
+  toStream
 } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
@@ -36,7 +38,41 @@ export type IMatchRuleEditor = {
   draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
 }
 
-export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
+export type InputStateParams<T> = {
+  [P in keyof T]: Stream<T[P]> | T[P]
+}
+
+export type InputArrayParams<T extends any[]> = {
+  [P in keyof T]: Stream<T[P]>
+}
+
+export function combineForm<A, K extends keyof A = keyof A>(state: InputStateParams<A>, defualtState: A): Stream<A> {
+  const entries = Object.entries(state) as [keyof A, Stream<A[K]> | A[K]][]
+
+  if (entries.length === 0) {
+    return now({} as A)
+  }
+
+  const streams = entries.map(([key, stream]) => {
+    return startWith(defualtState[key], toStream(stream))
+  })
+
+  const zipped = combineArray(
+    (...arrgs: A[K][]) => {
+      return arrgs.reduce((seed, val, idx) => {
+        const key = entries[idx][0]
+        seed[key] = val
+
+        return seed
+      }, {} as A)
+    },
+    ...streams
+  )
+
+  return zipped
+}
+
+export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
   component(
     (
       [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
@@ -65,7 +101,7 @@ export const $MatchRuleEditor = (config: IMatchRuleEditor) =>
         ? startWith(model.throttleActivity, changeActivityThrottle)
         : changeActivityThrottle
       const expiry = model ? startWith(model.expiry, inputEndDate) : inputEndDate
-      const draft = combineState({ allowanceRate, throttleActivity, expiry })
+      const draft = combineForm({ allowanceRate, throttleActivity, expiry }, defaultDraft)
 
       const isSubscribed = model && model.expiry > BigInt(unixTimestampNow())
 
