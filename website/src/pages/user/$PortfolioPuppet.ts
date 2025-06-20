@@ -1,7 +1,7 @@
 import { constant, empty, map } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
-import { getMatchKey } from '@puppet-copy/middleware/core'
+import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import { filterNull, getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
@@ -159,7 +159,7 @@ export const $PortfolioPage = ({
                               )
                             : empty(),
                           ...matchingRuleListForToken.map((rule) => {
-                            const traderMatchingKey = getMatchKey(collateralToken, rule.trader)
+                            const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 
                             return $Popover({
                               $open: filterNull(

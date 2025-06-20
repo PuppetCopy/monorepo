@@ -413,7 +413,7 @@
 //               $selection: switchLatest(map(token => {
 //                 const tokenDesc = token === ADDRESS_ZERO
 //                   ? getNativeTokenDescription(config.chain)
-//                   : getTokenDescription(resolveAddress(config.chain, token))
+//                   : TOKEN_ADDRESS_DESCRIPTION_MAP[resolveAddress(config.chain, token))
 
 //                 return $ButtonSecondary({
 //                   $content: $row(spacing.tiny, style({ alignItems: 'center', cursor: 'pointer' }))(
@@ -448,7 +448,7 @@
 
 //                     return trade.readAddressTokenBalance(wallet, option, wallet.account.address)
 //                   }, walletClientQuery)
-//                   const tokenDesc = option === ADDRESS_ZERO ? getNativeTokenDescription(config.chain) : getTokenDescription(option)
+//                   const tokenDesc = option === ADDRESS_ZERO ? getNativeTokenDescription(config.chain) : TOKEN_ADDRESS_DESCRIPTION_MAP[option)
 
 //                   return $row(style({ placeContent: 'space-between', flex: 1 }))(
 //                     $tokenLabelFromSummary(tokenDesc),
@@ -679,7 +679,7 @@
 //                 const nativeToken = getNativeTokenAddress(config.chain)
 //                 const tokenDesc = token === nativeToken
 //                   ? getNativeTokenDescription(config.chain)
-//                   : getTokenDescription(resolveAddress(config.chain, token))
+//                   : TOKEN_ADDRESS_DESCRIPTION_MAP[resolveAddress(config.chain, token))
 
 //                 return $ButtonSecondary({
 //                   $container: $defaultMiniButtonSecondary(style({ borderColor: colorAlpha(pallete.foreground, .2) })),
@@ -754,7 +754,7 @@
 
 //               switchMap(params => {
 //                 const token = params.isUsdCollateralToken ? params.market.shortToken : params.market.longToken
-//                 const tokenDesc = getTokenDescription(token)
+//                 const tokenDesc = TOKEN_ADDRESS_DESCRIPTION_MAP[token)
 
 //                 return $row(spacing.tiny, style({ alignItems: 'center' }))(
 //                   $icon({ $content: $tokenIconMap[tokenDesc.symbol], width: '14px', viewBox: '0 0 32 32' }),
@@ -774,7 +774,7 @@
 //                 //     $container: $defaultSelectContainer(style({ minWidth: '290px', right: 0 })),
 //                 //     $$option: map(option => {
 //                 //       const token = option ? params.market.shortToken : params.market.longToken
-//                 //       const desc = getTokenDescription(token)
+//                 //       const desc = TOKEN_ADDRESS_DESCRIPTION_MAP[token)
 //                 //       // const liquidity = tradeReader.getAvailableLiquidityUsd(now(token), now(option))
 //                 //       // const poolInfo = tradeReader.getTokenPoolInfo(now(token))
 

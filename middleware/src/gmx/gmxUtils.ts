@@ -1,10 +1,7 @@
 import type { Address } from 'viem/accounts'
-import type { Chain } from 'viem/chains'
-import { encodeAbiParameters, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
+import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
 import {
   BASIS_POINTS_DIVISOR,
-  CHAIN_ADDRESS_MAP,
-  CHAIN_NATIVE_DESCRIPTION,
   FUNDING_RATE_PRECISION,
   MARGIN_FEE_BASIS_POINTS,
   TOKEN_ADDRESS_DESCRIPTION_MAP
@@ -12,8 +9,8 @@ import {
 import { factor, getBasisPoints } from '../utils/mathUtils.js'
 import type { ITokenDescription } from '../utils/types.js'
 import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from '../utils/utils.js'
-import { MARKET_TOKEN_MAP } from './marketMap.js'
-import type { ILogEvent } from './types.js'
+import type { ILogEvent, IMarket } from './types.js'
+import { MARKET_ADDRESS_DESCRIPTION_MAP } from './const.js'
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
   if (size === 0n) {
@@ -64,20 +61,12 @@ export function validateIdentityName(name: string) {
   }
 }
 
-export function getMarketIndexToken(market: Address) {
-  return getMappedValue(MARKET_TOKEN_MAP, market)
-}
-
 export function getTokenDescription(token: Address): ITokenDescription {
-  return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token)
+  return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getAddress(token))
 }
 
-export function getNativeTokenDescription(chain: Chain): ITokenDescription {
-  return getMappedValue(CHAIN_NATIVE_DESCRIPTION, chain.id)
-}
-
-export function getNativeTokenAddress(chain: Chain): Address {
-  return getMappedValue(CHAIN_ADDRESS_MAP, chain.id).NATIVE_TOKEN
+export function getMarketDescription(market: Address): IMarket {
+  return getMappedValue(MARKET_ADDRESS_DESCRIPTION_MAP, getAddress(market))
 }
 
 export function orderEvents<T extends ILogEvent>(arr: T[]): T[] {
@@ -109,10 +98,6 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
 
 export function getPositionKey(account: Address, market: Address, collateralToken: Address, isLong: boolean) {
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
-}
-
-export function getRuleKey(collateralToken: Address, puppet: Address, trader: Address) {
-  return hashData(['address', 'address', 'address'], [collateralToken, puppet, trader])
 }
 
 export function hashData(types: string[], values: any) {

@@ -1,9 +1,6 @@
 import type { Abi, Address, ExtractAbiEvent } from 'abitype'
 import type { GetEventArgs, Hex, Log } from 'viem'
-import type * as CONST from '../const/index.js'
 import type { IntervalTime } from '../const/index.js'
-
-export type ITokenSymbol = keyof typeof CONST.TOKEN_DESCRIPTION_MAP
 
 export interface IIdentifiableEntity {
   id: string

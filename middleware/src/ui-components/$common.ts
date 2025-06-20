@@ -228,10 +228,12 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
 }
 
 export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Slottable) => {
-  const $iconG = getMappedValue($tokenIconMap, token.symbol)
-
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
-    $icon({ $content: $iconG, width: '34px', viewBox: '0 0 32 32' }),
+    $icon({
+      $content: getMappedValue($tokenIconMap, token.symbol), //
+      width: '34px',
+      viewBox: '0 0 32 32'
+    }),
     $column(layoutSheet.flex)(
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ color: pallete.foreground }))($text(token.name))

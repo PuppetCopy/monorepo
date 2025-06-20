@@ -4,7 +4,7 @@
 // import { map, now } from "@most/core"
 // import { Stream } from "@most/types"
 // import { StateStream, getMappedValue, getTimeSince, getTokenUsd, readableDate, readableTokenPrice, readableUsd, unixTimestampNow } from "@puppet-copy/middleware/utils"
-// import { IPositionDecrease, IPositionIncrease, IPriceCandle, getMarketIndexToken, getTokenDescription } from "@puppet-copy/middleware/gmx"
+// import { IPositionDecrease, IPositionIncrease, IPriceCandle, getTokenDescription } from "@puppet-copy/middleware/gmx"
 // import { IMirrorPosition } from "@puppet-copy/middleware/core"
 // import { $Table, $infoLabel, $txHashRef } from "@puppet-copy/middleware/ui-components"
 // import * as viem from "viem"
@@ -65,8 +65,8 @@
 //             columnOp: O(style({ flex: 1 })),
 //             $bodyCallback: map((pos) => {
 //               const direction = pos.__typename === 'PositionIncrease' ? '↑' : '↓'
-//               const indexToken = getMarketIndexToken(pos.market)
-//               const tokendescription = getTokenDescription(indexToken)
+//               const indexToken = MARKET_ADDRESS_DESCRIPTION_MAP[pos.market]
+//               const tokendescription = TOKEN_ADDRESS_DESCRIPTION_MAP[indexToken]
 
 //               return $row(spacing.small)(
 //                 $txHashRef(pos.transactionHash, config.chain),

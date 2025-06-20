@@ -1,4 +1,5 @@
 import type { Stream } from '@most/types'
+import type { Address } from 'abitype'
 
 export type InferStream<T> = T extends Stream<infer U> ? U : T
 
@@ -30,4 +31,5 @@ export interface ITokenDescription {
   symbol: string
   decimals: number
   denominator: bigint
+  address: Address
 }

@@ -1,6 +1,5 @@
 import { empty, map, skipRepeats } from '@most/core'
 import type { Stream } from '@most/types'
-import { ADDRESS_ZERO, TOKEN_ADDRESS_DESCRIPTION_MAP } from '@puppet-copy/middleware/const'
 import { latestPriceMap } from '@puppet-copy/middleware/core'
 import {
   getPositionPnlUsd,
@@ -15,12 +14,12 @@ import {
   $Link,
   $labeledDivider,
   $Tooltip,
-  $tokenIconMap
+  $tokenIconMap,
+  $unknown
 } from '@puppet-copy/middleware/ui-components'
 import {
   getBasisPoints,
   getMappedValue,
-  getSafeMappedValue,
   getTokenUsd,
   type ITokenDescription,
   lst,
@@ -109,7 +108,7 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
 }
 
 export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '18px') => {
-  const description = getSafeMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, token, ADDRESS_ZERO)
+  const description = getTokenDescription(token)
 
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: size, height: size })($tokenIcon(description)),
@@ -119,9 +118,7 @@ export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '1
 }
 
 export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
-  const $token = tokenDesc
-    ? $tokenIconMap[tokenDesc.symbol] || $tokenIconMap[ADDRESS_ZERO]
-    : $tokenIconMap[ADDRESS_ZERO]
+  const $token = tokenDesc ? $tokenIconMap[tokenDesc.symbol] || $unknown : $unknown
 
   if (!$token) {
     throw new Error('Unable to find matched token')

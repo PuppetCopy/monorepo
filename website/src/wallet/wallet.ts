@@ -18,6 +18,7 @@ import {
 import { fromCallback } from 'aelea/core'
 import {
   type Abi,
+  type Chain,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
@@ -40,6 +41,14 @@ import { arbitrum } from 'viem/chains'
 
 type IWalletConnected = {
   address: Address
+  addresses: readonly [Address, ...Address[]]
+  chain: Chain
+  chainId: number
+  isConnected: true
+  isConnecting: false
+  isDisconnected: false
+  isReconnecting: false
+  status: 'connected'
 }
 
 type IGetWalletStatus = Prettify<GetAccountReturnType>

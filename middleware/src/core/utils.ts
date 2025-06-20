@@ -1,5 +1,5 @@
 import { type Address, parseAbiParameters } from 'abitype'
-import { encodeAbiParameters, type Hex, keccak256 } from 'viem'
+import { encodeAbiParameters, encodePacked, type Hex, keccak256 } from 'viem'
 
 export function mapArrayBy<A, B extends string | symbol | number, R>(
   list: readonly A[],
@@ -97,8 +97,8 @@ export function mapArrayBy<A, B extends string | symbol | number, R>(
 //   return vested
 // }
 
-export function getMatchKey(collateralToken: Address, trader: Address) {
-  return keccak256(encodeAbiParameters(parseAbiParameters('address, address'), [collateralToken, trader]))
+export function getTraderMatchingKey(collateralToken: Address, trader: Address) {
+  return keccak256(encodePacked(['address', 'address'], [collateralToken, trader]))
 }
 
 export function getAllocationKey(puppetList: Address[], traderMatchingKey: Hex, allocationId: bigint) {

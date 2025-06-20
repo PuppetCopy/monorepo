@@ -19,7 +19,7 @@ import {
 import { disposeNone } from '@most/disposable'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
-import { type IOps, O, replayLatest } from 'aelea/core'
+import { type IOps, O, replayLatest, switchMap } from 'aelea/core'
 import { countdownFn, unixTimestampNow } from './utils.js'
 
 export type StateParams<T> = {
@@ -28,8 +28,6 @@ export type StateParams<T> = {
 export type StateStream<T> = {
   [P in keyof T]: Stream<T[P]>
 }
-
-type IStreamOrPromise<T> = Stream<T> | Promise<T>
 
 export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
   let last: T
@@ -95,6 +93,18 @@ export const periodicRun = <T>({
       return periodicRun({ interval, actionOp, recoverError, startImmediate: false })
     })
   )(tick)
+}
+
+export const runRecover = <T>(source: Stream<Promise<T>>, recoveryDelay = 1000): Stream<T> => {
+  const runAndAwait = awaitPromises(source)
+  const runAndRecover = recoverWith((err) => {
+    console.error(err)
+
+    const startAt = at(recoveryDelay, null)
+    return switchMap(() => runRecover(source, recoveryDelay * 2), startAt)
+  }, runAndAwait)
+
+  return runAndRecover
 }
 
 export interface IPeriodSample {

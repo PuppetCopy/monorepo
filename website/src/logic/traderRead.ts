@@ -1,4 +1,4 @@
-// import { empty, map, mergeArray, now, scan, skip } from '@most/core'
+// import { empty, map, mergeArray, multicast, now, scan, skip } from '@most/core'
 // import type { Stream } from '@most/types'
 // import * as PUPPET from '@puppet-copy/middleware/const'
 // import { hashData, resolveAddress } from '@puppet-copy/middleware/gmx'
@@ -7,13 +7,17 @@
 //   getDenominator,
 //   getMappedValue,
 //   type ITokenDescription,
-//   parseFixed
+//   parseFixed,
+//   periodicRun
 // } from '@puppet-copy/middleware/utils'
 // import * as walletLink from '@puppet-copy/middleware/wallet'
 // import { wagmiConfig } from '@puppet-copy/middleware/wallet'
+// import { readContract } from '@wagmi/core'
 // import { erc20Abi } from 'abitype/abis'
-// import { fromWebsocket } from 'aelea/ui-components'
-//
+// import { replayLatest } from 'aelea/core'
+// import { fromWebsocket, observer } from 'aelea/ui-components'
+// import { Address } from 'viem/accounts'
+
 // import { getBalance } from 'viem/actions'
 
 // export interface ITokenPoolInfo {
@@ -47,21 +51,10 @@
 //   [PUPPET.IntervalTime.DAY]: '1d'
 // }
 
-// // const GMX_URL_CHAIN = {
-// //   [GMX.CHAIN.ARBITRUM]: 'https://gmx-server-mainnet.uw.r.appspot.com',
-// //   [GMX.CHAIN.AVALANCHE]: 'https://gmx-avax-server.uc.r.appspot.com',
-// // }
-
-// // const gmxIOPriceMapSource = {
-// //   [GMX.CHAIN.ARBITRUM]: replayLatest(multicast(observer.duringWindowActivity(periodicRun({
-// //     interval: 2000,
-// //     actionOp: map(async time => getGmxIOPriceMap(GMX_URL_CHAIN[GMX.CHAIN.ARBITRUM] + '/prices'))
-// //   })))),
-// //   [GMX.CHAIN.AVALANCHE]: replayLatest(multicast(observer.duringWindowActivity(periodicRun({
-// //     interval: 2000,
-// //     actionOp: map(async time => getGmxIOPriceMap(GMX_URL_CHAIN[GMX.CHAIN.AVALANCHE] + '/prices'))
-// //   })))),
-// // }
+// const gmxIOPriceMapSource = replayLatest(multicast(observer.duringWindowActivity(periodicRun({
+//     interval: 2000,
+//     actionOp: map(async time => getGmxIOPriceMap(GMX_URL_CHAIN[GMX.CHAIN.ARBITRUM] + '/prices'))
+//   }))))
 
 // export async function readAddressTokenBalance(
 //   token: Address | typeof PUPPET.ADDRESS_ZERO,
@@ -94,8 +87,8 @@
 // export const exchangesWebsocketPriceSource = (token: Address) => {
 //   const existingToken = getMappedValue(PUPPET.TOKEN_ADDRESS_DESCRIPTION_MAP, token)
 
-//   return latestPriceFromExchanges(existingToken)
-//   // const source = gmxIOPriceMapSource[chain.id]
+//   // return latestPriceFromExchanges(existingToken)
+//   const source = gmxIOPriceMapSource[chain.id]
 
 //   // if (!source) {
 //   //   throw new Error(`no price mapping exists for chain ${chain} ${chain}`)
@@ -122,7 +115,7 @@
 // }
 
 // // export const getGmxIoPricefeed = async (queryParams: IRequestPricefeedApi): Promise<IPriceLatest[]> => {
-// //   const tokenDesc = getTokenDescription(queryParams.tokenAddress)
+// //   const tokenDesc = TOKEN_ADDRESS_DESCRIPTION_MAP[queryParams.tokenAddress)
 // //   const intervalLabel = getMappedValue(gmxIoPricefeedIntervalLabel, queryParams.interval)
 // //   const symbol = derievedSymbolMapping[tokenDesc.symbol] || tokenDesc.symbol
 // //   const res = fetch(`https://stats.gmx.io/api/candles/${symbol}?preferableChainId=${queryParams.chain}&period=${intervalLabel}&from=${queryParams.from}&preferableSource=fast`)

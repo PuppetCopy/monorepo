@@ -383,13 +383,13 @@ export const $PortfolioPage = ({
               //           $row(spacing.small, style({ position: 'relative' }))(
               //             $FieldLabeled({
               //               label: 'Amount',
-              //               value: startWith('', map(amount => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
+              //               value: startWith('', map(amount => readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount), maxBalance)),
               //               placeholder: 'Enter amount',
-              //               hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`, lockedAmount),
+              //               hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount)}`, lockedAmount),
               //             })({
               //               change: popoverInputAmountTether(
               //                 map(amount => {
-              //                   return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
+              //                   return parseFixed(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET.decimals, parseReadableNumber(amount))
               //                 })
               //               )
               //             }),
@@ -443,9 +443,9 @@ export const $PortfolioPage = ({
               //         const params = await paramsQuery
               //         if (params.cashout) return ''
 
-              //         return readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
+              //         return readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
               //       }, claimableState),
-              //       $val: $text(switchMap(async amount => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await amount), lockAmountQuery)),
+              //       $val: $text(switchMap(async amount => readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await amount), lockAmountQuery)),
               //     }),
               //     $metricLabel($text('Voting Power'))
               //   ),
@@ -488,21 +488,21 @@ export const $PortfolioPage = ({
                                 value: startWith(
                                   '',
                                   map(
-                                    (amount) => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
+                                    (amount) => readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount),
                                     maxBalance
                                   )
                                 ),
                                 placeholder: 'Enter amount',
                                 hint: map(
                                   (amount) =>
-                                    `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`,
+                                    `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount)}`,
                                   lockedAmount
                                 )
                               })({
                                 change: popoverInputAmountTether(
                                   map((amount) => {
                                     return parseFixed(
-                                      PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals,
+                                      PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET.decimals,
                                       parseReadableNumber(amount)
                                     )
                                   })
@@ -563,11 +563,12 @@ export const $PortfolioPage = ({
                           const params = await paramsQuery
                           if (params.cashout) return ''
 
-                          return readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
+                          return readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, params.nextLockAmount)
                         }, claimableState),
                         $val: $text(
                           switchMap(
-                            async (amount) => readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await amount),
+                            async (amount) =>
+                              readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await amount),
                             lockAmountQuery
                           )
                         )
@@ -603,7 +604,7 @@ export const $PortfolioPage = ({
                           if (params.lockDurationBonusInVest === 0n) return ''
 
                           return readableTokenAmountLabel(
-                            PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET,
+                            PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET,
                             params.vestedAmount + params.lockDurationBonusInVest
                           )
                         }, claimableState),
@@ -613,7 +614,7 @@ export const $PortfolioPage = ({
                             if (vested === null) return '0'
 
                             return readableTokenAmountLabel(
-                              PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET,
+                              PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET,
                               vested.amount - vested.accrued
                             )
                           }, vestedCursorQuery)
@@ -701,21 +702,21 @@ export const $PortfolioPage = ({
                                           '',
                                           map(
                                             (amount) =>
-                                              readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
+                                              readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount),
                                             maxBalance
                                           )
                                         ),
                                         placeholder: 'Enter amount',
                                         hint: map(
                                           (amount) =>
-                                            `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount)}`,
+                                            `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount)}`,
                                           walletBalance
                                         )
                                       })({
                                         change: popoverInputAmountTether(
                                           map((amount) => {
                                             return parseFixed(
-                                              PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET.decimals,
+                                              PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET.decimals,
                                               parseReadableNumber(amount)
                                             )
                                           })
@@ -754,7 +755,8 @@ export const $PortfolioPage = ({
                               })({}),
                               $text(style({ placeContent: 'space-between' }))(
                                 map(
-                                  (amount) => readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, amount),
+                                  (amount) =>
+                                    readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, amount),
                                   walletLockAmount
                                 )
                               )
@@ -772,7 +774,10 @@ export const $PortfolioPage = ({
                               map(async (params) => {
                                 return (
                                   '+' +
-                                  readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, params.totalClaimable)
+                                  readableTokenAmountLabel(
+                                    PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET,
+                                    params.totalClaimable
+                                  )
                                 )
                               }, awaitPromises(claimableState))
                             )
@@ -786,7 +791,7 @@ export const $PortfolioPage = ({
 
                       //     $text(style({ placeContent: 'space-between', color: pallete.positive }))(intermediateText(
                       //       map(async amount => {
-                      //         return '+' + readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, await amount)
+                      //         return '+' + readableTokenAmountLabel(TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await amount)
                       //       }, claimableContributionRewardQuery)
                       //     )),
                       //   )
@@ -797,7 +802,7 @@ export const $PortfolioPage = ({
                       //     $text('Vested releases'),
                       //     $text(style({ placeContent: 'space-between', color: pallete.positive }))(intermediateText(
                       //       map(async amount => {
-                      //         return '+' + readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, await amount)
+                      //         return '+' + readableTokenAmountLabel(TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await amount)
                       //       }, vestedAccruedQuery)
                       //     ))
                       //   )
@@ -809,7 +814,7 @@ export const $PortfolioPage = ({
 
                       //     $text(style({ placeContent: 'space-between', color: pallete.positive }))(intermediateText(
                       //       map(async amount => {
-                      //         return '+' + readableTokenAmountLabel(TOKEN_DESCRIPTION_MAP.PUPPET, await amount)
+                      //         return '+' + readableTokenAmountLabel(TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await amount)
                       //       }, claimableLockRewardQuery)
                       //     )),
                       //   )
@@ -915,8 +920,8 @@ export const $PortfolioPage = ({
                   //     $infoLabeledValue(
                   //       $infoTooltipLabel(`Protocol revenue from Copy-trading is used to buy back PUPPET tokens. This is done through public contract auctions. The bought-back tokens are then distributed to lockers based on proportionally to their Voting Power`, 'Revenue Bought-back'),
                   //       $row(spacing.small, style({ alignItems: 'center' }))(
-                  //         // $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(readableTokenAmount(TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
-                  //         $text(readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
+                  //         // $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(readableTokenAmount(TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, BigInt(1e18))),
+                  //         $text(readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, BigInt(1e18)))
                   //       ),
                   //     )
                   //   ),
@@ -928,7 +933,7 @@ export const $PortfolioPage = ({
                   //           const provider = await providerQuery
                   //           const puppetSupply = tokenomics.PuppetToken.getTotalSupply(provider)
 
-                  //           return readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await puppetSupply - PUPPET.INITIAL_SUPPLY)
+                  //           return readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await puppetSupply - PUPPET.INITIAL_SUPPLY)
                   //         }, providerClientQuery)
                   //       ),
                   //     )
@@ -949,7 +954,7 @@ export const $PortfolioPage = ({
                   //           // const totalSupply = await tokenomics.PuppetToken.totalSupply(provider)
                   //           const vTokenSupply = await tokenomics.PuppetVoteToken.getTotalSupply(provider)
 
-                  //           return `${readableTokenAmount(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, vTokenSupply)}`
+                  //           return `${readableTokenAmount(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, vTokenSupply)}`
                   //         }, providerClientQuery)
                   //       ),
                   //     )
@@ -1027,10 +1032,10 @@ export const $PortfolioPage = ({
 //           $FieldLabeled({
 //             label: 'Amount',
 //             placeholder: 'Enter amount',
-//             hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, walletBalance),
+//             hint: map(amount => `Balance: ${readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.USDC, amount)}`, walletBalance),
 //           })({
 //             change: inputDepositAmountTether(map(value => {
-//               return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, value)
+//               return parseFixed(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.USDC.decimals, value)
 //             }))
 //           })
 //         ),
@@ -1062,13 +1067,13 @@ export const $PortfolioPage = ({
 
 //         $infoLabeledValue(
 //           $text('Accrued USDC for sale'),
-//           $text(map(amount => `${readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.USDC, amount)}`, contributedUsdcQuery))
+//           $text(map(amount => `${readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.USDC, amount)}`, contributedUsdcQuery))
 //         ),
 //         $infoLabeledValue(
 //           $text('Offered Quote'),
 //           $intermediateText(
 //             map(async (durationQuery) => {
-//               return readableTokenAmountLabel(PUPPET.TOKEN_DESCRIPTION_MAP.PUPPET, await durationQuery)
+//               return readableTokenAmountLabel(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.PUPPET, await durationQuery)
 //             }, usdcBuybackQuote)
 //           )
 //         ),
@@ -1079,7 +1084,7 @@ export const $PortfolioPage = ({
 //             placeholder: 'Enter amount'
 //           })({
 //             change: inputBuybackAmountTether(map(value => {
-//               return parseFixed(PUPPET.TOKEN_DESCRIPTION_MAP.USDC.decimals, parseReadableNumber(value))
+//               return parseFixed(PUPPET.TOKEN_SYMBOL_DESCRIPTION_MAP.USDC.decimals, parseReadableNumber(value))
 //             }))
 //           })
 //         ),

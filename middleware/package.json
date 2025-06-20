@@ -2,7 +2,7 @@
   "name": "@puppet-copy/middleware",
   "license": "BSL-1.1 and MIT",
   "description": "Copytrading middleware",
-  "version": "0.0.9",
+  "version": "0.0.13",
   "type": "module",
   "scripts": {
     "build": "bun run build:clean && bun run build:esm",
@@ -68,8 +68,8 @@
     "drizzle-orm": "0.41.0",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.7",
-    "ponder": "0.11.16",
-    "viem": "2.31.2"
+    "ponder": "0.11.17",
+    "viem": "2.31.3"
   },
   "devDependencies": {
     "@wagmi/cli": "2.3.1"

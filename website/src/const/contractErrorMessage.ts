@@ -27,5 +27,5 @@ export function getContractErrorMessage(data: DecodeErrorResultReturnType): stri
     }
   }
 
-  return errorFunc(params)
+  return errorFunc()
 }

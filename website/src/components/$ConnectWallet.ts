@@ -2,12 +2,12 @@ import { map, now, switchLatest } from '@most/core'
 import type { IBehavior, IOps } from 'aelea/core'
 import { $node, $text, component, type I$Node, type INodeCompose, style, switchMap } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
-import { type IWalletConnected, wallet } from '../wallet/wallet.js'
+import { type IGetWalletStatus, wallet } from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
 export interface IConnectWalletPopover {
-  $$display: IOps<IWalletConnected, I$Node>
+  $$display: IOps<IGetWalletStatus, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose
 }
@@ -44,7 +44,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
             })
           }
 
-          return switchLatest(config.$$display(now(getAccountStatus as any as IWalletConnected)))
+          return switchLatest(config.$$display(now(getAccountStatus as any as IGetWalletStatus)))
         }, wallet.account)
       ),
 

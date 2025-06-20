@@ -1,5 +1,4 @@
-import { $svg, attr } from 'aelea/core'
-import { ADDRESS_ZERO, TOKEN_DESCRIPTION_MAP } from '../const/index.js'
+import { $svg, attr, type I$Node } from 'aelea/core'
 
 export const $path = $svg('path')
 
@@ -312,34 +311,29 @@ export const $sol = $svg('g')(
   )()
 )
 
-export const $tokenIconMap = {
-  [ADDRESS_ZERO]: $unknown,
-  [TOKEN_DESCRIPTION_MAP.PUPPET.symbol]: $puppet,
-  [TOKEN_DESCRIPTION_MAP.GMX.symbol]: $gmx,
-
-  [TOKEN_DESCRIPTION_MAP.ARB.symbol]: $arb,
-  [TOKEN_DESCRIPTION_MAP.SOL.symbol]: $sol,
-  [TOKEN_DESCRIPTION_MAP.DOGE.symbol]: $doge,
-  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.tBTC.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.LTC.symbol]: $ltc,
-  [TOKEN_DESCRIPTION_MAP.XRP.symbol]: $xrp,
-
-  // [TOKEN_DESCRIPTION_MAP.BTC.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.WBTC.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.WBTCE.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.BTCB.symbol]: $btc,
-  [TOKEN_DESCRIPTION_MAP.ETH.symbol]: $eth,
-  [TOKEN_DESCRIPTION_MAP.WETH.symbol]: $eth,
-  [TOKEN_DESCRIPTION_MAP.UNI.symbol]: $uni,
-  [TOKEN_DESCRIPTION_MAP.LINK.symbol]: $link,
-  [TOKEN_DESCRIPTION_MAP.AVAX.symbol]: $avax,
-  [TOKEN_DESCRIPTION_MAP.WAVAX.symbol]: $avax,
-
-  [TOKEN_DESCRIPTION_MAP.DAI.symbol]: $dai,
-  [TOKEN_DESCRIPTION_MAP.USDC.symbol]: $usdc,
-  [TOKEN_DESCRIPTION_MAP.USDCE.symbol]: $usdc,
-  [TOKEN_DESCRIPTION_MAP.USDT.symbol]: $usdt,
-  [TOKEN_DESCRIPTION_MAP.FRAX.symbol]: $frax,
-  [TOKEN_DESCRIPTION_MAP.MIM.symbol]: $usd
+export const $tokenIconMap: Record<string, I$Node<SVGPathElement>> = {
+  PUPPET: $puppet,
+  GMX: $gmx,
+  ARB: $arb,
+  SOL: $sol,
+  BTC: $btc,
+  DOGE: $doge,
+  WBTC: $btc,
+  tBTC: $btc,
+  LTC: $ltc,
+  XRP: $xrp,
+  WBTCE: $btc,
+  BTCB: $btc,
+  ETH: $eth,
+  WETH: $eth,
+  UNI: $uni,
+  LINK: $link,
+  AVAX: $avax,
+  WAVAX: $avax,
+  DAI: $dai,
+  USDC: $usdc,
+  USDCE: $usdc,
+  USDT: $usdt,
+  FRAX: $frax,
+  MIM: $usd
 }

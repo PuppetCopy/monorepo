@@ -194,7 +194,7 @@
 //         return `No ${state.indexDescription.symbol} position to reduce`
 //       }
 
-//       const indexPriceUsd = state.indexPrice * getDenominator(getTokenDescription(state.market.indexToken).decimals)
+//       const indexPriceUsd = state.indexPrice * getDenominator(TOKEN_ADDRESS_DESCRIPTION_MAP[state.market.indexToken].decimals)
 
 //       if (state.mirrorPosition && state.liquidationPrice && (state.isLong ? state.liquidationPrice > indexPriceUsd : state.liquidationPrice < indexPriceUsd)) {
 //         return `Exceeding liquidation price`

@@ -4,11 +4,9 @@ import type { Address, PublicClient } from 'viem'
 import { arbitrum, avalanche } from 'viem/chains'
 import { ARBITRUM_ADDRESS } from '../../const/chain/arbitrum.js'
 import { AVALANCHE_ADDRESS } from '../../const/chain/avalanche.js'
-import { FLOAT_PRECISION } from '../../const/common.js'
-import { TOKEN_DESCRIPTION_MAP } from '../../const/token.js'
+import { FLOAT_PRECISION, TOKEN_SYMBOL_DESCRIPTION_MAP } from '../../const/common.js'
 import { zipState } from '../../utils/stream.js'
 import { expandDecimals, getDenominator } from '../../utils/utils.js'
-import { getNativeTokenDescription } from '../gmxUtils.js'
 import univ2Pool from './uniV2.abi.js'
 import univ3Pool from './uniV3.abi.js'
 
@@ -39,10 +37,10 @@ export async function getUniV2PoolPrice(client: PublicClient, decimals: number, 
 
 function getGmxPerNetworkToken(client: PublicClient) {
   if (client.chain?.id === avalanche.id) {
-    return getUniV2PoolPrice(client, TOKEN_DESCRIPTION_MAP.GMX.decimals, AVALANCHE_ADDRESS.TraderJoeUniPool)
+    return getUniV2PoolPrice(client, TOKEN_SYMBOL_DESCRIPTION_MAP.GMX.decimals, AVALANCHE_ADDRESS.TraderJoeUniPool)
   }
 
-  return getUniV3PoolPrice(client, TOKEN_DESCRIPTION_MAP.GMX.decimals, ARBITRUM_ADDRESS.UniswapGmxEthPool)
+  return getUniV3PoolPrice(client, TOKEN_SYMBOL_DESCRIPTION_MAP.GMX.decimals, ARBITRUM_ADDRESS.UniswapGmxEthPool)
 }
 
 export function getGmxPriceUsd(client: Stream<PublicClient>, networkTokenUsd: Stream<bigint>) {
@@ -54,7 +52,7 @@ export function getGmxPriceUsd(client: Stream<PublicClient>, networkTokenUsd: St
       throw new Error('client chain is not defined')
     }
 
-    const networkTokenDescription = getNativeTokenDescription(params.client.chain)
+    const networkTokenDescription = TOKEN_SYMBOL_DESCRIPTION_MAP.GMX
     const price =
       (params.networkTokenUsd * FLOAT_PRECISION) /
       expandDecimals(params.gmxPerNetworkToken, 30 - networkTokenDescription.decimals)
@@ -70,11 +68,11 @@ export async function getAvalancheNetworkTokenUsd(client: PublicClient) {
 
   const price = await getUniV2PoolPrice(
     client,
-    TOKEN_DESCRIPTION_MAP.WAVAX.decimals,
+    TOKEN_SYMBOL_DESCRIPTION_MAP.WAVAX.decimals,
     '0xf4003f4efbe8691b60249e6afbd307abe7758adb'
   )
 
-  const usdPrice = expandDecimals(price, 30 - TOKEN_DESCRIPTION_MAP.USDC.decimals)
+  const usdPrice = expandDecimals(price, 30 - TOKEN_SYMBOL_DESCRIPTION_MAP.USDC.decimals)
 
   return usdPrice
 }
@@ -86,11 +84,11 @@ export async function getArbitrumNetworkTokenUsd(client: PublicClient) {
 
   const price = await getUniV3PoolPrice(
     client,
-    TOKEN_DESCRIPTION_MAP.WETH.decimals,
+    TOKEN_SYMBOL_DESCRIPTION_MAP.WETH.decimals,
     '0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443'
   )
 
-  const usdPrice = expandDecimals(price, 30 - TOKEN_DESCRIPTION_MAP.USDC.decimals)
+  const usdPrice = expandDecimals(price, 30 - TOKEN_SYMBOL_DESCRIPTION_MAP.USDC.decimals)
   return usdPrice
 }
 

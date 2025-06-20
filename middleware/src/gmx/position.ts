@@ -1,7 +1,8 @@
 import type { Address } from 'viem/accounts'
-import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP, WEI_PRECISION } from '../const/index.js'
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION, WEI_PRECISION } from '../const/index.js'
 import { applyFactor } from '../utils/mathUtils.js'
-import { getDenominator, getMappedValue, getTokenUsd } from '../utils/utils.js'
+import { getDenominator, getTokenUsd } from '../utils/utils.js'
+import { getTokenDescription } from './gmxUtils.js'
 import { getPoolUsdWithoutPnl } from './market.js'
 import { getPriceImpactForPosition } from './price.js'
 import type { IMarketInfo, IMarketPrice, IPositionFees, IPositionNumbers, PositionReferralFees } from './types.js'
@@ -180,7 +181,7 @@ export function getLiquidationPrice(
 
   let liquidationPrice = 0n
 
-  const indexTokenDescription = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, indexToken)
+  const indexTokenDescription = getTokenDescription(indexToken)
   const indexTokenDenominator = getDenominator(indexTokenDescription.decimals)
 
   if (collateralToken === indexToken) {

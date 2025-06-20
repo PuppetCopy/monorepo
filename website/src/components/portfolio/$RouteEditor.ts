@@ -1,6 +1,6 @@
 import { empty, map } from '@most/core'
 import type { Stream } from '@most/types'
-import { getMatchKey } from '@puppet-copy/middleware/core'
+import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
 import { $caretDown, $icon } from '@puppet-copy/middleware/ui-components'
 import { unixTimestampNow } from '@puppet-copy/middleware/utils'
 import type { IMatchingRule } from '@puppet-copy/sql/schema'
@@ -34,7 +34,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchingRule | undefined>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
     ) => {
-      const traderMatchingKey = getMatchKey(config.collateralToken, config.trader)
+      const traderMatchingKey = getTraderMatchingKey(config.collateralToken, config.trader)
 
       const {
         $container = $defaultTraderMatchRouteEditorContainer,
@@ -47,7 +47,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       } = config
 
       const matchingRule = userMatchingRuleList.length
-        ? userMatchingRuleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+        ? userMatchingRuleList.find((mr) => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
         : undefined
 
       return [

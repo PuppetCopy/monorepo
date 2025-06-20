@@ -40,7 +40,7 @@
 //       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
 //       [click, clickTether]: IBehavior<any, Address>
 //     ) => {
-//       const traderMatchingKey = getMatchKey(config.collateralToken, config.address)
+//       const traderMatchingKey = getTraderMatchingKey(config.collateralToken, config.address)
 
 //       const {
 //         $container = $defaultTraderMatchRouteEditorContainer(style({ flex: 1 })),
@@ -56,7 +56,7 @@
 //       } = config
 
 //       const matchingRule = userMatchingRuleList.length
-//         ? userMatchingRuleList.find((mr) => getMatchKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+//         ? userMatchingRuleList.find((mr) => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
 //         : undefined
 
 //       return [

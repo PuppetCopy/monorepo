@@ -1,14 +1,7 @@
 import type { Address } from 'viem/accounts'
-import { FLOAT_PRECISION, TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/index.js'
-import {
-  abs,
-  applyFactor,
-  delta,
-  getDenominator,
-  getMappedValue,
-  getTokenUsd,
-  groupArrayByKeyMap
-} from '../utils/index.js'
+import { FLOAT_PRECISION } from '../const/index.js'
+import { abs, applyFactor, delta, getDenominator, getTokenUsd, groupArrayByKeyMap } from '../utils/index.js'
+import { getTokenDescription } from './gmxUtils.js'
 import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from './types.js'
 
 export function getPriceImpactUsd(
@@ -188,14 +181,14 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
 
 export function getOraclePriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
   const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
+  const desc = getTokenDescription(price.token)
 
   return pickedPrice * getDenominator(desc.decimals)
 }
 
 export function getPriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
   const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, price.token)
+  const desc = getTokenDescription(price.token)
 
   return pickedPrice * getDenominator(desc.decimals)
 }
