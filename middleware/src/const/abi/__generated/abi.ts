@@ -1762,7 +1762,6 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoDustToCollect' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoNetFundsAllocated' },
   { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
   {
     type: 'error',
@@ -8201,7 +8200,6 @@ export const mirrorPositionAbi = [
   { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoDustToCollect' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoNetFundsAllocated' },
   { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
   { type: 'error', inputs: [], name: 'MirrorPosition__PositionNotFound' },
   { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
