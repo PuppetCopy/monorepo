@@ -1,12 +1,4 @@
-import { TOKENS } from '@gmx-io/sdk/configs/tokens'
-import type { Token } from '@gmx-io/sdk/types/tokens'
 import type { Address } from 'viem/accounts'
-import { arbitrum, avalanche } from 'viem/chains'
-import type { ITokenDescription } from '../utils/types.js'
-import { getDenominator, groupArrayByKey } from '../utils/utils.js'
-import { ARBITRUM_ADDRESS } from './chain/arbitrum.js'
-import { AVALANCHE_ADDRESS } from './chain/avalanche.js'
-import { CONTRACT } from './contract.js'
 
 export enum IntervalTime {
   SEC = 1,
@@ -25,6 +17,106 @@ export enum IntervalTime {
   QUARTER = 7884000,
   YEAR = 31536000
 }
+
+export const ARBITRUM_ADDRESS = {
+  NATIVE_TOKEN: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+  WBTC: '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f',
+  LINK: '0xf97f4df75117a78c1a5a0dbb814af92458539fb4',
+  UNI: '0xfa7f8980b0f1e64a2062791cc3b0871572f1f7f0',
+  ARB: '0x912ce59144191c1204e64559fe8253a0e49e6548',
+  SOL: '0x2bcc6d6cdbbdc0a4071e48bb3b969b06b3330c07',
+  WAVAX: '0x565609faf65b92f7be02468acf86f8979423e514',
+  NEAR: '0x1ff7f3efbb9481cbd7db4f932cbcd4467144237c',
+  OP: '0xac800fd6159c2a2cb8fc31ef74621eb430287a5a',
+  AAVE: '0xba5ddd1f9d7f570dc94a51479a000e3bce967196',
+  BNB: '0xa9004a5421372e1d83fb1f85b0fc986c912f91f3',
+  PEPE: '0x25d887ce7a35172c62febfd67a1856f20faebb00',
+  ADA: '0x53186c8419beb83fe4da74f7875041a1287337ed',
+  TRON: '0x7a9ba06548d0499f6debf97809cc351c1e85795d',
+  MATIC: '0xd98d28787f5598749331052f952196428f61e3ad',
+  DOT: '0xe958f107b467d5172573f761d26931d658c1b436',
+  WIF: '0xa1b91fe9fd52141ff8cac388ce3f10bfdc1de79d',
+  ORDI: '0x1e15d08f3ca46853b692ee28ae9c7a0b88a9c994',
+  SHIB: '0x3e57d02f9d196873e55727382974b02edeb6bfd',
+  ATOM: '0x7d7f1765acbaf847b9a1f7137fe8ed4931fbfeba',
+  STX: '0xbaf07cf91d413c0acb2b7444b9bf13b4e03c9d71',
+  USDe: '0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34',
+  tBTC: '0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40',
+  wstETH: '0x5979d7b546e38e414f7e9822514be443a4800529',
+  EIGEN: '0x606c3e5075e5555e79aa15f1e9facb776f96c248',
+  SATS: '0x2cd2eb61d17b78239fcd19aaff72981b5d5ef319',
+  POL: '0x9c74772b713a1b032aeb173e28683d937e51921c',
+  APE: '0x7f9fbf9bdd3f4105c478b996b648fe6e828a1e98',
+  SUI: '0x197aa2de1313c7ad50184234490e12409b2a1f95',
+  SEI: '0xb489711b1cb86afda48924730084e23310eb4883',
+  APT: '0x3f8f0dce4dce4d0d1d0871941e79cda82ca50d0b',
+  TIA: '0x38676f62d166f5ce7de8433f51c6b3d6d9d66c19',
+  TRX: '0x0d1495527c255068f2f6fee31c85d326d0a76fe8',
+  TON: '0xb2f7cefaeeb08aa347705ac829a7b8be2fb560f3',
+  BONK: '0x1fd10e767187a92f0ab2abdeef4505e319ca06b2',
+  WLD: '0x75b9add873641b253718810e6c65db6d72311fd0',
+  TAO: '0x938aef36caafbcb37815251b602168087ec14648',
+  BOME: '0x3eea56a1cccdbfb70a26ad381c71ee17e4c8a15f',
+  FLOKI: '0x6792c5b8962ffbdd020c6b6fd0be7b182e0e33a3',
+  MEME: '0xaf770f03518686a365300ab35ad860e99967b2f0',
+  MEW: '0x5503cf72f54b6d692d36bbcd391516a7de068687',
+  PENDLE: '0x0c880f6761f1af8d9aa9c466984b80dab9a8c9e8',
+  BCH: '0xc33d9c096e74aa4f571e9417b69a19c4a1e72ef2',
+  ICP: '0xdaf0a71608938f762e37ec5f72f670cc44703454',
+  XLM: '0xc5dbd52ae5a927cf585b884011d0c7631c9974c6',
+  RENDER: '0x82bb89fcc64c5d4016c5ed1ab016bb0d1c20d6c3',
+  FIL: '0x3aebb98f57081dcbeb0b8ea823cf84900a31e5d8',
+  DYDX: '0x0739ad7aea69ad36edeb91b0e55cac140427c632',
+  INJ: '0xfde73eddbe6c5712a12b72c470f8fe5c77a7ff17',
+
+  DOGE: '0xc4da4c24fd591125c3f47b340b6f4f76111883d8',
+  LTC: '0xb46a094bc4b0adbd801e14b9db95e05e28962764',
+  XRP: '0xc14e065b0067de91534e032868f5ac6ecf2c6868',
+
+  USDCE: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
+  USDC: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+  USDT: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9',
+  DAI: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
+  MIM: '0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a',
+  FRAX: '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
+
+  Vault: '0x489ee077994b6658eafa855c308275ead8097c4a',
+  VaultPriceFeed: '0x2d68011bca022ed0e474264145f46cc4de96a002',
+  Router: '0xabbc5f99639c9b6bcb58544ddf04efa6802f4064',
+  VaultReader: '0xfebb9f4cac4cd523598fe1c5771181440143f24a',
+  Reader: '0xf09ed52638c22cc3f1d7f5583e3699a075e601b2',
+  GlpManager: '0x321f653eed006ad1c29d174e17d96351bde22649',
+  RewardRouter: '0xc73d553473dc65ce56db96c58e6a091c20980fba',
+  RewardReader: '0xe725ad0ce3ecf68a7b93d8d8091e83043ff12e9a',
+
+  GMX: '0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a',
+  ES_GMX: '0xf42ae1d54fd613c9bb14810b0588faaa09a426ca',
+  GLP: '0x4277f8f2c384827b5273592ff7cebd9f2c1ac258',
+  BN_GMX: '0x35247165119b69a40edd5304969560d0ef486921',
+  USDG: '0x45096e7aa921f27590f8f19e457794eb09678141',
+
+  StakedGmxTracker: '0x908c4d94d34924765f1edc22a1dd098397c59dd4',
+  BonusGmxTracker: '0x4d268a7d4c16ceb5a606c173bd974984343fea13',
+  FeeGmxTracker: '0xd2d1162512f927a7e282ef43a362659e4f2a728f',
+  FeeGlpTracker: '0x4e971a87900b931ff39d1aad67697f49835400b6',
+  StakedGlpTracker: '0x1addd80e6039594ee970e5872d247bf0414c8903',
+
+  StakedGmxDistributor: '0x23208b91a98c7c1cd9fe63085bff68311494f193',
+  StakedGlpDistributor: '0x60519b48ec4183a61ca2b8e37869e675fd203b34',
+
+  GmxVester: '0x199070ddfd1cfb69173aa2f7e20906f26b363004',
+  GlpVester: '0xa75287d2f8b217273e7fcd7e86ef07d33972042e',
+
+  OrderBook: '0x09f77e8a13de9a35a7231028187e9fd5db8a2acb',
+  OrderExecutor: '0x7257ac5d0a0aac04aa7ba2ac0a6eb742e332c3fb',
+  OrderBookReader: '0xa27c20a7cf0e1c68c0460706bb674f98f362bc21',
+
+  FastPriceFeed: '0x1a0ad27350cccd6f7f168e052100b4960efdb774',
+  PositionRouter: '0xb87a436b93ffe9d75c5cfa7bacfff96430b09868',
+  PositionManager: '0x87a4088bd721f83b6c2e5102e2fa47022cb1c831',
+
+  UniswapGmxEthPool: '0x80a9ae39310abf666a87c743d6ebbd0e8c42158e'
+} as const
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000' as const
 export const BYTES32_ZERO = '0x0000000000000000000000000000000000000000000000000000000000000000' as const
@@ -72,38 +164,3 @@ export const PLATFORM_STAT_INTERVAL = [
   IntervalTime.QUARTER,
   IntervalTime.YEAR
 ] as const
-
-export const TRADE_CONTRACT_MAPPING = {
-  [arbitrum.id]: ARBITRUM_ADDRESS,
-  [avalanche.id]: AVALANCHE_ADDRESS
-} as const
-
-export type ContractChain = keyof typeof TRADE_CONTRACT_MAPPING
-
-export const TOKEN_DESCRIPTION_LIST: ITokenDescription[] = [
-  ...TOKENS[arbitrum.id].map((token: Token) => ({
-    address: token.address as Address,
-    decimals: token.decimals,
-    denominator: getDenominator(token.decimals),
-    name: token.name,
-    symbol: token.symbol
-  })),
-
-  // Puppet token
-  {
-    address: CONTRACT[42161].PuppetToken.address,
-    decimals: 18,
-    denominator: getDenominator(18),
-    name: 'Puppet',
-    symbol: 'PUPPET'
-  }
-]
-
-export const TOKEN_ADDRESS_DESCRIPTION_MAP: Record<Address, ITokenDescription> = groupArrayByKey(
-  TOKEN_DESCRIPTION_LIST,
-  (token) => token.address
-)
-
-export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupArrayByKey(TOKEN_DESCRIPTION_LIST, (token) =>
-  token.symbol.toUpperCase()
-)
