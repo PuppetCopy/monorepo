@@ -482,7 +482,7 @@
 //                   return true
 //                 }
 
-//                 const primaryCollateralThreshold = getBasisPoints(params.collateralDeltaAmount, params.walletBalance)
+//                 const primaryCollateralThreshold = toBasisPoints(params.collateralDeltaAmount, params.walletBalance)
 
 //                 if (primaryCollateralThreshold > 9000n && primaryCollateralThreshold <= 10000n) {
 //                   return true

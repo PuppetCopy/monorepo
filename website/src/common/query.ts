@@ -61,7 +61,7 @@ export function queryUserMatchingRuleList(
       return []
     }
 
-    const metrictList = await sqlClient.query.puppetMatchingRule.findMany({
+    const metrictList = await sqlClient.query.matchingRule.findMany({
       where: (t, f) =>
         f.and(
           f.eq(t.puppet, address)

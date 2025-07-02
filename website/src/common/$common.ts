@@ -18,7 +18,6 @@ import {
   $unknown
 } from '@puppet-copy/middleware/ui-components'
 import {
-  getBasisPoints,
   getMappedValue,
   getTokenUsd,
   type ITokenDescription,
@@ -27,7 +26,8 @@ import {
   readableLeverage,
   readablePercentage,
   readablePnl,
-  readableUsd
+  readableUsd,
+  toBasisPoints
 } from '@puppet-copy/middleware/utils'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
@@ -210,10 +210,10 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
 
   const roi = isPositionSettled(pos)
-    ? readablePercentage(getBasisPoints(pos.realisedPnlUsd, collateralUsd))
+    ? readablePercentage(toBasisPoints(pos.realisedPnlUsd, collateralUsd))
     : map((markPrice) => {
         const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
-        return readablePercentage(getBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
+        return readablePercentage(toBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
       }, latestPrice)
   return $node(style({ fontSize: '.8rem' }))($text(roi))
 }

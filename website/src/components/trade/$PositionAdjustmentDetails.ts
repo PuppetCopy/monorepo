@@ -242,7 +242,7 @@
 //             'Price Impact',
 //             $row(spacing.small, style({ alignItems: 'center' }))(
 //               $text(style({ color: pallete.foreground, fontSize: '1.1rem' }))(map(params => {
-//                 return `(${readablePercentage(getBasisPoints(params.priceImpactUsd, params.sizeDeltaUsd))} size)`
+//                 return `(${readablePercentage(toBasisPoints(params.priceImpactUsd, params.sizeDeltaUsd))} size)`
 //               }, combineState({ priceImpactUsd, sizeDeltaUsd }))),
 //               $pnlDisplay(priceImpactUsd, false)
 //             )

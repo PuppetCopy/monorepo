@@ -342,6 +342,12 @@ export const bankStoreAbi = [
 export const checkpointsAbi = [{ type: 'error', inputs: [], name: 'CheckpointUnorderedInsertion' }] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Clones
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const clonesAbi = [{ type: 'error', inputs: [], name: 'CloneArgumentsTooLong' }] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreContract
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -390,6 +396,12 @@ export const coreContractAbi = [
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' }
 ] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Create2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const create2Abi = [{ type: 'error', inputs: [], name: 'Create2EmptyBytecode' }] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dictatorship
@@ -1642,6 +1654,11 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'FeeMarketplace__ZeroDeposit' },
   {
     type: 'error',
+    inputs: [],
+    name: 'GmxExecutionCallback__FailedRefundExecutionFee'
+  },
+  {
+    type: 'error',
     inputs: [
       {
         name: 'orderType',
@@ -1722,6 +1739,7 @@ export const errorAbi = [
     name: 'MirrorPosition__InsufficientSettledBalanceForKeeperFee'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocation' },
+  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
   {
     type: 'error',
     inputs: [],
@@ -2205,6 +2223,11 @@ export const gmxExecutionCallbackAbi = [
             name: 'mirrorPosition',
             internalType: 'contract MirrorPosition',
             type: 'address'
+          },
+          {
+            name: 'refundExecutionFeeReceiver',
+            internalType: 'address',
+            type: 'address'
           }
         ]
       }
@@ -2591,9 +2614,24 @@ export const gmxExecutionCallbackAbi = [
         name: 'mirrorPosition',
         internalType: 'contract MirrorPosition',
         type: 'address'
+      },
+      {
+        name: 'refundExecutionFeeReceiver',
+        internalType: 'address',
+        type: 'address'
       }
     ],
     stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
+      { name: '', internalType: 'bytes', type: 'bytes' }
+    ],
+    name: 'refundExecutionFee',
+    outputs: [],
+    stateMutability: 'payable'
   },
   {
     type: 'function',
@@ -2643,6 +2681,11 @@ export const gmxExecutionCallbackAbi = [
       { name: 'error', internalType: 'bytes', type: 'bytes' }
     ],
     stateMutability: 'view'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'GmxExecutionCallback__FailedRefundExecutionFee'
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
@@ -4303,6 +4346,16 @@ export const iGmxOrderCallbackReceiverAbi = [
     name: 'afterOrderFrozen',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'eventData', internalType: 'bytes', type: 'bytes' }
+    ],
+    name: 'refundExecutionFee',
+    outputs: [],
+    stateMutability: 'payable'
   }
 ] as const
 
@@ -7908,13 +7961,6 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'nextAllocationId',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'positionMap',
     outputs: [
@@ -8026,12 +8072,12 @@ export const mirrorPositionAbi = [
           }
         ]
       },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
+      { name: '_allocationId', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'requestMirror',
     outputs: [
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_nextAllocationId', internalType: 'uint256', type: 'uint256' },
       { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
     ],
     stateMutability: 'payable'
@@ -8136,6 +8182,15 @@ export const mirrorPositionAbi = [
     outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
     stateMutability: 'view'
   },
+  { type: 'error', inputs: [], name: 'FailedDeployment' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'InsufficientBalance'
+  },
   {
     type: 'error',
     inputs: [],
@@ -8160,6 +8215,7 @@ export const mirrorPositionAbi = [
     name: 'MirrorPosition__InsufficientGmxExecutionFee'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocation' },
+  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
   {
     type: 'error',
     inputs: [],

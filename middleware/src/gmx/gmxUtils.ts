@@ -2,7 +2,7 @@ import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
 import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS } from '../const/index.js'
 import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
-import { factor, getBasisPoints } from '../utils/mathUtils.js'
+import { factor, toBasisPoints } from '../utils/mathUtils.js'
 import type { ITokenDescription } from '../utils/types.js'
 import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from '../utils/utils.js'
 import { MARKET_ADDRESS_DESCRIPTION_MAP } from './const.js'
@@ -42,7 +42,7 @@ export function getFundingFee(entryFundingRate: bigint, cumulativeFundingRate: b
 }
 
 export function liquidationWeight(isLong: boolean, liquidationPrice: bigint, markPrice: bigint) {
-  const weight = isLong ? getBasisPoints(liquidationPrice, markPrice) : getBasisPoints(markPrice, liquidationPrice)
+  const weight = isLong ? toBasisPoints(liquidationPrice, markPrice) : toBasisPoints(markPrice, liquidationPrice)
   const value = easeInExpo(formatFixed(4, weight))
   return value > 1 ? 1 : value
 }

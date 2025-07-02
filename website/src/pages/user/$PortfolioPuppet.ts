@@ -52,7 +52,7 @@ export const $PortfolioPage = ({
             return []
           }
 
-          return await sqlClient.query.puppetSettle.findMany({
+          return await sqlClient.query.puppetSettlement.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.puppet, address)

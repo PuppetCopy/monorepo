@@ -304,7 +304,7 @@ export const cacheMap =
   }
 
 export function groupArrayManyMap<A, B extends string | symbol | number, R>(
-  list: A[],
+  list: readonly A[],
   getKey: (v: A) => B,
   mapFn: (v: A, key: B) => R
 ): Record<B, R[]> {
@@ -325,16 +325,22 @@ export function groupArrayManyMap<A, B extends string | symbol | number, R>(
   return gmap
 }
 
-export function groupArrayMany<A, B extends string | symbol | number>(list: A[], getKey: (v: A) => B): Record<B, A[]> {
+export function groupArrayMany<A, B extends string | symbol | number>(
+  list: readonly A[],
+  getKey: (v: A) => B
+): Record<B, A[]> {
   return groupArrayManyMap(list, getKey, (x) => x)
 }
 
-export function groupArrayByKey<A, B extends string | symbol | number>(list: A[], getKey: (v: A) => B): Record<B, A> {
+export function groupArrayByKey<A, B extends string | symbol | number>(
+  list: readonly A[],
+  getKey: (v: A) => B
+): Record<B, A> {
   return groupArrayByKeyMap(list, getKey, (x) => x)
 }
 
 export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
-  list: A[],
+  list: readonly A[],
   getKey: (v: A) => B,
   mapFn: (v: A, key: B, seed: number) => R
 ) {

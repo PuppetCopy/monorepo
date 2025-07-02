@@ -3,11 +3,11 @@ import { latestPriceMap } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
 import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
 import {
-  getBasisPoints,
   getMappedValue,
   getTimeSince,
   readableDate,
-  readablePercentage
+  readablePercentage,
+  toBasisPoints
 } from '@puppet-copy/middleware/utils'
 import { $node, $text, type IComposeBehavior, type INode, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
@@ -103,7 +103,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
           $node(style({ fontSize: '.8rem' }))(
             $text(
               map((value) => {
-                return readablePercentage(getBasisPoints(value, pos.maxCollateralInUsd))
+                return readablePercentage(toBasisPoints(value, pos.maxCollateralInUsd))
               }, toStream(pnl))
             )
           )

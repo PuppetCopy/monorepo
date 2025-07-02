@@ -14,12 +14,21 @@ import {
   recoverWith,
   switchLatest,
   takeWhile,
+  tap,
   zipArray
 } from '@most/core'
-import { disposeNone } from '@most/disposable'
+import { disposeBoth, disposeNone, disposeWith } from '@most/disposable'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
-import { type IOps, O, replayLatest, switchMap } from 'aelea/core'
+import { fromCallback, type IOps, nullSink, O, replayLatest, switchMap } from 'aelea/core'
+import type {
+  Abi,
+  ContractEventName,
+  PublicClient,
+  Transport,
+  WatchContractEventOnLogsParameter,
+  WatchContractEventParameters
+} from 'viem'
 import { countdownFn, unixTimestampNow } from './utils.js'
 
 export type StateParams<T> = {
@@ -250,4 +259,177 @@ function rethrow(e: unknown): never {
 
 export function replayState<T>(s: Stream<T>, initialState?: T): Stream<T> {
   return replayLatest(multicast(s), initialState)
+}
+
+export function fromWebsocket<OUTPUT, INPUT>(
+  url: string,
+  input: Stream<INPUT> = empty(),
+  protocols: string | string[] | undefined = undefined
+): Stream<OUTPUT> {
+  return {
+    run(sink, scheduler) {
+      const socket = new WebSocket(url, protocols)
+      const messageBuffer: INPUT[] = []
+
+      const onError = (error: Event) => {
+        const errorMsg = error instanceof ErrorEvent ? error.message : 'WebSocket connection error'
+        sink.error(scheduler.currentTime(), new Error(`WebSocket error: ${errorMsg}`))
+      }
+
+      const onMessage = (msg: MessageEvent) => {
+        try {
+          const data = JSON.parse(msg.data)
+          sink.event(scheduler.currentTime(), data)
+        } catch (parseError) {
+          sink.error(scheduler.currentTime(), new Error(`JSON parse error: ${parseError}`))
+        }
+      }
+
+      const sendMessage = (value: INPUT) => {
+        try {
+          socket.send(JSON.stringify(value))
+        } catch (sendError) {
+          console.warn('Failed to send WebSocket message:', sendError)
+        }
+      }
+
+      const onOpen = () => {
+        // Send any buffered messages
+        while (messageBuffer.length > 0) {
+          const message = messageBuffer.shift()!
+          sendMessage(message)
+        }
+      }
+
+      const onClose = () => {
+        cleanup()
+        sink.end(scheduler.currentTime())
+      }
+
+      const cleanup = () => {
+        socket.removeEventListener('error', onError)
+        socket.removeEventListener('message', onMessage)
+        socket.removeEventListener('open', onOpen)
+        socket.removeEventListener('close', onClose)
+      }
+
+      socket.addEventListener('error', onError)
+      socket.addEventListener('message', onMessage)
+      socket.addEventListener('open', onOpen)
+      socket.addEventListener('close', onClose)
+
+      // Handle input stream
+      const sendInputEffect = tap((value: INPUT) => {
+        if (socket.readyState === WebSocket.OPEN) {
+          sendMessage(value)
+        } else if (socket.readyState === WebSocket.CONNECTING) {
+          messageBuffer.push(value)
+        }
+      }, input).run(nullSink, scheduler)
+
+      const disposeSocket = disposeWith(() => {
+        cleanup()
+        if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+          socket.close()
+        }
+      }, socket)
+
+      return disposeBoth(disposeSocket, sendInputEffect)
+    }
+  }
+}
+
+export function flattenEvents<T>(source: Stream<T[]>): Stream<T> {
+  return {
+    run(sink, scheduler) {
+      return source.run(
+        {
+          event: (time, items) => {
+            if (!Array.isArray(items)) {
+              sink.error(time, new Error(`flattenEvents: expected array but got ${typeof items}`))
+              return
+            }
+
+            for (const item of items) {
+              sink.event(time, item)
+            }
+          },
+          error: (time, error) => sink.error(time, error), // Use original time
+          end: (time) => sink.end(time)
+        },
+        scheduler
+      )
+    }
+  }
+}
+
+export function bufferEvents<T>(source: Stream<T>, period = 1000): Stream<readonly T[]> {
+  if (period <= 0) {
+    throw new Error('Buffer period must be positive')
+  }
+
+  return {
+    run(sink, scheduler) {
+      let buffer: T[] = []
+      let lastEmitTime: number | null = null // Don't initialize until first event
+
+      const onEvent = (time: number, event: T) => {
+        buffer.push(event)
+
+        if (lastEmitTime === null || time - lastEmitTime >= period) {
+          const bufferToEmit = buffer
+          buffer = []
+          lastEmitTime = time
+          sink.event(time, bufferToEmit)
+        }
+      }
+
+      const onError = (time: number, error: Error) => sink.error(time, error)
+
+      const onEnd = (time: number) => {
+        if (buffer.length > 0) {
+          sink.event(time, buffer)
+        }
+        sink.end(time)
+      }
+
+      const disposable = source.run({ event: onEvent, error: onError, end: onEnd }, scheduler)
+
+      return disposeWith(() => {
+        buffer = []
+        disposable.dispose()
+      }, disposable)
+    }
+  }
+}
+
+export const watchContractEvent = <
+  transport extends Transport,
+  const abi extends Abi | readonly unknown[],
+  eventName extends ContractEventName<abi>,
+  strict extends boolean | undefined = undefined
+>(
+  client: PublicClient,
+  params: Omit<
+    WatchContractEventParameters<abi, eventName, strict, transport>,
+    'onLogs' | 'onError' | 'batch' | 'strict'
+  >
+): Stream<WatchContractEventOnLogsParameter<abi, eventName, true>> => {
+  return fromCallback<any>((callEvent) => {
+    const removeListenerFn = client.watchContractEvent({
+      ...params,
+      false: true,
+      strict: true,
+      reconnect: false,
+      onLogs: (logList: any[]) => callEvent(logList),
+      onError: (err: Error) => {
+        console.error(err)
+      }
+    } as any)
+
+    return disposeWith(() => {
+      console.log(`Connection ${client.name} closed`)
+      removeListenerFn()
+    }, null)
+  })
 }

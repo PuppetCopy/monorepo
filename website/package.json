@@ -19,7 +19,7 @@
     "@most/scheduler": "1.3.0",
     "@most/types": "1.1.0",
     "@puppet-copy/middleware": "workspace:*",
-    "@puppet-copy/sql": "0.0.2",
+    "@puppet-copy/sql": "0.0.4",
     "@reown/appkit": "1.7.10",
     "@reown/appkit-adapter-wagmi": "1.7.10",
     "@wagmi/core": "2.17.3",
@@ -29,7 +29,7 @@
     "lightweight-charts": "5.0.7",
     "mersenne-twister": "1.1.0",
     "ponder": "0.11.17",
-    "viem": "2.31.4"
+    "viem": "2.31.6"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.2",

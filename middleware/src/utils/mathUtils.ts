@@ -1,5 +1,4 @@
-const FLOAT_PRECISION = 10n ** 30n
-const BASIS_POINTS_DIVISOR = 10000n
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION } from '../const/common.js'
 
 export function safeDiv(a: bigint, b: bigint): bigint {
   if (b === 0n) {
@@ -17,12 +16,16 @@ export function applyFactor(value: bigint, factorn: bigint): bigint {
   return (value * factorn) / FLOAT_PRECISION
 }
 
-export function getBasisPoints(numerator: bigint, denominator: bigint) {
+export function toBasisPoints(numerator: bigint, denominator: bigint) {
   if (denominator === 0n) {
     return 0n
   }
 
   return (numerator * BASIS_POINTS_DIVISOR) / denominator
+}
+
+export function applyBasisPoints(value: bigint, bps: bigint): bigint {
+  return (value * bps) / BASIS_POINTS_DIVISOR
 }
 
 export function min(a: bigint, b: bigint): bigint {
