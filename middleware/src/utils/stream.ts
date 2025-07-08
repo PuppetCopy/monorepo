@@ -20,7 +20,7 @@ import {
 import { disposeBoth, disposeNone, disposeWith } from '@most/disposable'
 import { currentTime } from '@most/scheduler'
 import type { Scheduler, Sink, Stream, Time } from '@most/types'
-import { fromCallback, type IOps, nullSink, O, replayLatest, switchMap } from 'aelea/core'
+import { type IOps, nullSink, O, replayLatest, switchMap } from 'aelea/core'
 import type {
   Abi,
   ContractEventName,
@@ -77,6 +77,8 @@ export interface IPeriodRun<T> {
   interval?: number
   startImmediate?: boolean
   recoverError?: boolean
+  maxRetries?: number
+  maxInterval?: number
 }
 export const periodicRun = <T>({
   actionOp,
@@ -410,26 +412,29 @@ export const watchContractEvent = <
   strict extends boolean | undefined = undefined
 >(
   client: PublicClient,
-  params: Omit<
-    WatchContractEventParameters<abi, eventName, strict, transport>,
-    'onLogs' | 'onError' | 'batch' | 'strict'
-  >
-): Stream<WatchContractEventOnLogsParameter<abi, eventName, true>> => {
-  return fromCallback<any>((callEvent) => {
-    const removeListenerFn = client.watchContractEvent({
-      ...params,
-      false: true,
-      strict: true,
-      reconnect: false,
-      onLogs: (logList: any[]) => callEvent(logList),
-      onError: (err: Error) => {
-        console.error(err)
-      }
-    } as any)
+  params: Omit<WatchContractEventParameters<abi, eventName, strict, transport>, 'onLogs' | 'onError'>
+): Stream<WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>> => {
+  return {
+    run(sink, scheduler) {
+      const removeListenerFn = client.watchContractEvent({
+        strict: params.strict ?? true,
+        batch: params.batch ?? false,
+        ...params,
+        onLogs: (
+          logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>[]
+        ) => {
+          for (const log of logList) {
+            sink.event(scheduler.currentTime(), log)
+          }
+        },
+        onError: (err: Error) => {
+          sink.error(scheduler.currentTime(), err)
+        }
+      } as any) // Type assertion needed due to complex Viem type constraints
 
-    return disposeWith(() => {
-      console.log(`Connection ${client.name} closed`)
-      removeListenerFn()
-    }, null)
-  })
+      return disposeWith(() => {
+        removeListenerFn()
+      }, null)
+    }
+  }
 }

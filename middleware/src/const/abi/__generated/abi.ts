@@ -1611,7 +1611,6 @@ export const errorAbi = [
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
     name: 'CallUtils__SafeERC20FailedOperation'
   },
-  { type: 'error', inputs: [], name: 'CoreContract__ConfigurationNotSet' },
   {
     type: 'error',
     inputs: [
@@ -1659,17 +1658,6 @@ export const errorAbi = [
   },
   {
     type: 'error',
-    inputs: [
-      {
-        name: 'orderType',
-        internalType: 'enum GmxPositionUtils.OrderType',
-        type: 'uint8'
-      }
-    ],
-    name: 'GmxExecutionCallback__InvalidOrderType'
-  },
-  {
-    type: 'error',
     inputs: [{ name: 'allowanceCap', internalType: 'uint256', type: 'uint256' }],
     name: 'MatchingRule__AllowanceAboveLimit'
   },
@@ -1707,63 +1695,67 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__AllocationAccountNotFound'
-  },
-  {
-    type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'threshold', internalType: 'uint256', type: 'uint256' }
+    ],
     name: 'MirrorPosition__AmountExceedsDustThreshold'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__DustThresholdNotSet' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__DustTransferFailed' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__ExecuteOnZeroCollateralPosition'
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__DustThresholdNotSet'
   },
   {
     type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'MirrorPosition__DustTransferFailed'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
     name: 'MirrorPosition__ExecutionRequestMissing'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InitialMustBeIncrease' },
   {
     type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__InsufficientAllocationForKeeperFee'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'provided', internalType: 'uint256', type: 'uint256' },
+      { name: 'required', internalType: 'uint256', type: 'uint256' }
+    ],
     name: 'MirrorPosition__InsufficientGmxExecutionFee'
   },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InsufficientSettledBalanceForKeeperFee'
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__InvalidAllocation'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocation' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InvalidAllocationOrFullyReduced'
-  },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCollateralDelta' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCurrentLeverage' },
   {
     type: 'error',
     inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExeuctionFeeAmount'
+    name: 'MirrorPosition__InvalidKeeperExecutionFeeAmount'
   },
   {
     type: 'error',
     inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExeuctionFeeReceiver'
+    name: 'MirrorPosition__InvalidKeeperExecutionFeeReceiver'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidReceiver' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidSizeDelta' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__KeeperAdjustmentExecutionFeeExceedsAllocatedAmount'
-  },
   {
     type: 'error',
     inputs: [],
@@ -1777,42 +1769,54 @@ export const errorAbi = [
     ],
     name: 'MirrorPosition__KeeperFeeExceedsCostFactor'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__KeeperFeeExceedsSettledAmount'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoDustToCollect' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'MirrorPosition__NoDustToCollect'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
   {
     type: 'error',
-    inputs: [{ name: 'remaining', internalType: 'uint256', type: 'uint256' }],
-    name: 'MirrorPosition__PaymasterExecutionFeeNotFullyCovered'
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__PositionNotFound'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__PositionNotFound' },
   { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__SettlementTransferFailed'
+    inputs: [
+      { name: 'provided', internalType: 'uint256', type: 'uint256' },
+      { name: 'maximum', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__PuppetListExceedsMaximum'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__TraderCollateralZero' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__ZeroCollateralOnIncrease'
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'MirrorPosition__SettlementTransferFailed'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__TraderCollateralZero'
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__InvalidFunctionSignature' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
-  { type: 'error', inputs: [], name: 'PuppetStore__OverwriteAllocation' },
-  { type: 'error', inputs: [], name: 'PuppetToken__CoreShareExceedsMining' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'rateLimit', internalType: 'uint256', type: 'uint256' },
-      { name: 'emissionRate', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'PuppetToken__ExceededRateLimit'
-  },
-  { type: 'error', inputs: [], name: 'PuppetToken__InvalidRate' },
   { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
   {
     type: 'error',
@@ -7986,7 +7990,7 @@ export const mirrorPositionAbi = [
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
           {
-            name: 'keeperExecutionFeeReceiver',
+            name: 'keeperFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
@@ -8001,11 +8005,11 @@ export const mirrorPositionAbi = [
             name: 'keeperExecutionFee',
             internalType: 'uint256',
             type: 'uint256'
-          }
+          },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
         ]
       },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
-      { name: '_allocationId', internalType: 'uint256', type: 'uint256' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestAdjust',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
@@ -8054,7 +8058,7 @@ export const mirrorPositionAbi = [
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
           {
-            name: 'keeperExecutionFeeReceiver',
+            name: 'keeperFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
@@ -8069,11 +8073,11 @@ export const mirrorPositionAbi = [
             name: 'keeperExecutionFee',
             internalType: 'uint256',
             type: 'uint256'
-          }
+          },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
         ]
       },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
-      { name: '_allocationId', internalType: 'uint256', type: 'uint256' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestMirror',
     outputs: [
@@ -8142,7 +8146,7 @@ export const mirrorPositionAbi = [
             type: 'address'
           },
           {
-            name: 'keeperExecutionFeeReceiver',
+            name: 'keeperFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
@@ -8193,53 +8197,67 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__AllocationAccountNotFound'
-  },
-  {
-    type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'threshold', internalType: 'uint256', type: 'uint256' }
+    ],
     name: 'MirrorPosition__AmountExceedsDustThreshold'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__DustThresholdNotSet' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__DustTransferFailed' },
   {
     type: 'error',
-    inputs: [],
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__DustThresholdNotSet'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'MirrorPosition__DustTransferFailed'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
     name: 'MirrorPosition__ExecutionRequestMissing'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InitialMustBeIncrease' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InsufficientGmxExecutionFee'
+    inputs: [
+      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__InsufficientAllocationForKeeperFee'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocation' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
   {
     type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InvalidAllocationOrFullyReduced'
+    inputs: [
+      { name: 'provided', internalType: 'uint256', type: 'uint256' },
+      { name: 'required', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__InsufficientGmxExecutionFee'
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__InvalidAllocation'
+  },
+  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCollateralDelta' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCurrentLeverage' },
   {
     type: 'error',
     inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExeuctionFeeAmount'
+    name: 'MirrorPosition__InvalidKeeperExecutionFeeAmount'
   },
   {
     type: 'error',
     inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExeuctionFeeReceiver'
+    name: 'MirrorPosition__InvalidKeeperExecutionFeeReceiver'
   },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidReceiver' },
   { type: 'error', inputs: [], name: 'MirrorPosition__InvalidSizeDelta' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__KeeperAdjustmentExecutionFeeExceedsAllocatedAmount'
-  },
   {
     type: 'error',
     inputs: [],
@@ -8253,18 +8271,51 @@ export const mirrorPositionAbi = [
     ],
     name: 'MirrorPosition__KeeperFeeExceedsCostFactor'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__MaxPuppetList' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__KeeperFeeExceedsSettledAmount'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoDustToCollect' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'MirrorPosition__NoDustToCollect'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__PositionNotFound' },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__PositionNotFound'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
   {
     type: 'error',
-    inputs: [],
+    inputs: [
+      { name: 'provided', internalType: 'uint256', type: 'uint256' },
+      { name: 'maximum', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'MirrorPosition__PuppetListExceedsMaximum'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
     name: 'MirrorPosition__SettlementTransferFailed'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__TraderCollateralZero' },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'MirrorPosition__TraderCollateralZero'
+  },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
 ] as const
