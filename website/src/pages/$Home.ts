@@ -11,7 +11,8 @@ import {
   fromCallback,
   type I$Node,
   type IBehavior,
-  style
+  style,
+  switchMap
 } from 'aelea/core'
 import type { Route } from 'aelea/router'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
