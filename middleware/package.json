@@ -2,57 +2,21 @@
   "name": "@puppet-copy/middleware",
   "license": "BSL-1.1 and MIT",
   "description": "Copytrading middleware",
-  "version": "0.0.27",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "build": "bun run build:clean && bun run build:esm",
-    "build:dev": "bun run dev && bun run build:clean && bun run build:esm",
     "build:esm": "bunx tsc -b",
     "build:clean": "rm -rf dist",
-    "clean:tsc": "rm -fr dist/*",
-    "dev": "bun run dev:copy-deployments && bun run dev:generate-abi",
-    "dev:generate-abi": "bunx wagmi generate",
-    "dev:copy-deployments": "cp ../contracts/deployments.json ./src/const/"
+    "dev:sync-contracts": "bun run script/post-deploy-sync.ts"
   },
   "files": [
     "dist"
   ],
   "exports": {
-    "./const": {
-      "types": "./dist/types/const/index.d.ts",
-      "import": "./dist/esm/const/index.js"
-    },
-    "./core": {
-      "types": "./dist/types/core/index.d.ts",
-      "import": "./dist/esm/core/index.js"
-    },
-    "./wallet": {
-      "types": "./dist/types/wallet/index.d.ts",
-      "import": "./dist/esm/wallet/index.js"
-    },
-    "./utils": {
-      "types": "./dist/types/utils/index.d.ts",
-      "import": "./dist/esm/utils/index.js"
-    },
-    "./gmx": {
-      "types": "./dist/types/gmx/index.d.ts",
-      "import": "./dist/esm/gmx/index.js"
-    },
-    "./gbc": {
-      "types": "./dist/types/gbc/index.d.ts",
-      "import": "./dist/esm/gbc/index.js"
-    },
-    "./ui-components": {
-      "types": "./dist/types/ui-components/index.d.ts",
-      "import": "./dist/esm/ui-components/index.js"
-    },
-    "./ui-router": {
-      "types": "./dist/types/ui-router/index.d.ts",
-      "import": "./dist/esm/ui-router/index.js"
-    },
-    "./ui-storage": {
-      "types": "./dist/types/ui-storage/index.d.ts",
-      "import": "./dist/esm/ui-storage/index.js"
+    "./*": {
+      "types": "./dist/types/*/index.d.ts",
+      "import": "./dist/esm/*/index.js"
     },
     "./package.json": "./package.json"
   },

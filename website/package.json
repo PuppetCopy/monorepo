@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "website",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,7 +19,7 @@
     "@most/scheduler": "1.3.0",
     "@most/types": "1.1.0",
     "@puppet-copy/middleware": "workspace:*",
-    "@puppet-copy/sql": "0.0.7",
+    "@puppet-copy/sql": "0.3.0",
     "@reown/appkit": "1.7.12",
     "@reown/appkit-adapter-wagmi": "1.7.12",
     "@wagmi/core": "2.17.3",
