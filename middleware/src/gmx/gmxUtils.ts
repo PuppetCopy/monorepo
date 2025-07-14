@@ -96,10 +96,14 @@ export function getPositionKey(account: Address, market: Address, collateralToke
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
 }
 
-export function hashData(types: string[], values: any) {
+export function hashData(types: string[], values: (string | number | bigint | boolean)[]) {
   const params = parseAbiParameters(types)
   const hex = encodeAbiParameters(params as any, values)
   const bytes = toBytes(hex)
   const hash = keccak256(bytes)
   return hash
+}
+
+export function hashString(string: string) {
+  return hashData(['string'], [string])
 }
