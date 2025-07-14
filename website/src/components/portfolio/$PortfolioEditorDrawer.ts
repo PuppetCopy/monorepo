@@ -290,8 +290,8 @@ export const $PortfolioEditorDrawer = ({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async (account) => {
-                        const routerContractaParams = CONTRACT[42161].RouterProxy
-                        const tokenRouteContractParams = CONTRACT[42161].TokenRouter
+                        const routerContractaParams = CONTRACT.RouterProxy
+                        const tokenRouteContractParams = CONTRACT.TokenRouter
 
                         const callStack: IBatchCall[] = []
 

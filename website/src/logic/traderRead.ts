@@ -127,7 +127,7 @@
 // // }
 
 // export async function readMinExecutionFee(): Promise<bigint> {
-//   const puppetContractMap = PUPPET.CONTRACT[42161]
+//   const puppetContractMap = PUPPET.CONTRACT
 //   const minExecutionFeeKey = hashData(['string'], ['MIN_EXECUTION_FEE'])
 
 //   return readContract(wagmiConfig, {

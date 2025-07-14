@@ -17,7 +17,7 @@ export const TOKEN_DESCRIPTION_LIST: ITokenDescription[] = [
 
   // Puppet token
   {
-    address: CONTRACT[42161].PuppetToken.address,
+    address: CONTRACT.PuppetToken.address,
     decimals: 18,
     denominator: getDenominator(18),
     name: 'Puppet',

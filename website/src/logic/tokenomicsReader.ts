@@ -4,9 +4,9 @@ import { wallet } from '../wallet/wallet'
 
 export default {
   PuppetToken: {
-    getTotalSupply: (contractDefs = CONTRACT[42161]) =>
+    getTotalSupply: (contractDefs = CONTRACT) =>
       wallet.read({ ...contractDefs.PuppetToken, functionName: 'totalSupply', args: [] }),
-    getBalanceOf: (user: Address, contractDefs = CONTRACT[42161]) =>
+    getBalanceOf: (user: Address, contractDefs = CONTRACT) =>
       wallet.read({ ...contractDefs.PuppetToken, functionName: 'balanceOf', args: [user] })
     // getCoreShare: (user: Address, contractDefs = CONTRACT[42161]) =>
     //   readContract({ ...contractDefs.PuppetToken, functionName: 'getCoreShare', args: [] }),
