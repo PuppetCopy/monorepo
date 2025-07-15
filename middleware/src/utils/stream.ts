@@ -407,7 +407,7 @@ export function bufferEvents<T>(source: Stream<T>, period = 1000): Stream<readon
 
 export const watchContractEvent = <
   transport extends Transport,
-  const abi extends Abi | readonly unknown[],
+  const abi extends Abi,
   eventName extends ContractEventName<abi>,
   strict extends boolean | undefined = undefined
 >(
@@ -417,24 +417,18 @@ export const watchContractEvent = <
   return {
     run(sink, scheduler) {
       const removeListenerFn = client.watchContractEvent({
-        strict: params.strict ?? true,
-        batch: params.batch ?? false,
         ...params,
         onLogs: (
-          logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>[]
+          logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>
         ) => {
-          for (const log of logList) {
-            sink.event(scheduler.currentTime(), log)
-          }
+          sink.event(scheduler.currentTime(), logList)
         },
         onError: (err: Error) => {
           sink.error(scheduler.currentTime(), err)
         }
-      } as any) // Type assertion needed due to complex Viem type constraints
+      } as any) // Type assertion needed due to Viem's complex transport constraints
 
-      return disposeWith(() => {
-        removeListenerFn()
-      }, null)
+      return disposeWith(removeListenerFn, null)
     }
   }
 }

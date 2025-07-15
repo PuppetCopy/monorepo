@@ -1,4 +1,4 @@
-import { type Address, erc20Abi } from 'viem'
+import { erc20Abi } from 'viem'
 import * as abi from './abi/__generated/abi.js'
 import datastore from './abi/datastore.js'
 // gmx v2
@@ -7,6 +7,7 @@ import gmxCustomError from './abi/gmxCustomError.js'
 import gmxEventEmitter from './abi/gmxEventEmitter.js'
 import reader from './abi/reader.js'
 import referralStorage from './abi/referralStorage.js'
+
 // Contract addresses for Arbitrum (42161)
 const addresses = {
   Dictatorship: '0x6dB9010e25c1c97c6b78C4eA1d517C93851dFb82',
@@ -21,7 +22,6 @@ const addresses = {
   Allocate: '0x7af02f2c8917617d034117bfe93c98740b6fd050',
   Settle: '0xb5c9e474ff4621f3bad1be816dde38999b21920e',
   KeeperRouter: '0x136bb60b7e1f81dbe11128a2567b059c008b8ad3',
-  GmxExecutionCallback: '0xE45C136247d0F0D1cfaa43781D05Eb756A75F8F0',
   Router: '0x94e58f4eDb5134C8e6885516857536580dacCc18'
 } as const
 
@@ -40,7 +40,7 @@ export const CONTRACT = {
     abi: abi.puppetTokenAbi
   },
   PuppetVoteToken: {
-    address: '', 
+    address: '',
     abi: abi.puppetVoteTokenAbi
   },
   TokenRouter: {

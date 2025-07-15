@@ -44,12 +44,7 @@ export function getAllocationAdderess(allocationStoreImplementationHash: Hex, al
   return getAddress(
     slice(
       keccak256(
-        concat([
-          toBytes('0xff'),
-          CONTRACT.MirrorPosition.address,
-          allocationKey,
-          allocationStoreImplementationHash
-        ])
+        concat([toBytes('0xff'), CONTRACT.MirrorPosition.address, allocationKey, allocationStoreImplementationHash])
       ),
       12
     )

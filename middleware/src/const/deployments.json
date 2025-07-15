@@ -12,7 +12,6 @@
     "Allocate": "0x7af02f2c8917617d034117bfe93c98740b6fd050",
     "Settle": "0xb5c9e474ff4621f3bad1be816dde38999b21920e",
     "KeeperRouter": "0x136bb60b7e1f81dbe11128a2567b059c008b8ad3",
-    "GmxExecutionCallback": "0xE45C136247d0F0D1cfaa43781D05Eb756A75F8F0",
     "Router": "0x94e58f4eDb5134C8e6885516857536580dacCc18"
   }
 }

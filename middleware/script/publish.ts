@@ -16,18 +16,18 @@ try {
   // Update contract.ts with new addresses
   const contractFile = file('./src/const/contract.ts')
   let contractContent = await contractFile.text()
-  
+
   // Format addresses in single-line style
   const formattedAddresses = Object.entries(addresses)
     .map(([key, value]) => `  ${key}: '${value}'`)
     .join(',\n')
-  
+
   // Replace addresses block content
   contractContent = contractContent.replace(
     /const addresses = \{[\s\S]*?\} as const/,
     `const addresses = {\n${formattedAddresses}\n} as const`
   )
-  
+
   await write('./src/const/contract.ts', contractContent)
   console.log('✅ Contract addresses updated')
 
@@ -62,7 +62,7 @@ try {
 
   // Wait for npm registry propagation
   console.log('⏳ Waiting for npm registry propagation...')
-  await new Promise(resolve => setTimeout(resolve, 10000)) // 10 second delay
+  await new Promise((resolve) => setTimeout(resolve, 10000)) // 10 second delay
 
   // Step 4: Update dependencies across monorepo
   console.log('\n🔄 Step 4: Updating dependencies across monorepo...')
