@@ -9,7 +9,7 @@ CoreContract
 ### config
 
 ```solidity
-Config public config;
+Config config;
 ```
 
 

@@ -30,7 +30,7 @@ RewardStore public immutable store;
 ### config
 
 ```solidity
-Config public config;
+Config config;
 ```
 
 

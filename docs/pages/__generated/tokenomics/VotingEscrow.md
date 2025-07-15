@@ -37,7 +37,7 @@ PuppetVoteToken public immutable vToken;
 ### config
 
 ```solidity
-Config public config;
+Config config;
 ```
 
 
