@@ -8,7 +8,8 @@ export default defineConfig({
       project: '../contracts',
       forge: {
         clean: true
-      }
+      },
+      exclude: ['Chain.sol/**']
     })
   ]
 })

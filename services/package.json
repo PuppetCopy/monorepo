@@ -1,0 +1,25 @@
+{
+  "name": "puppet-services",
+  "license": "BSL-1.1",
+  "private": true,
+  "type": "module",
+  "module": "ESNext",
+  "description": "Puppet Services",
+  "scripts": {
+    "og:generate-svg": "node --trace-warnings ./opengraph/index.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "1.2.17",
+    "@types/node": "24.0.3",
+    "typescript": "5.8.3"
+  },
+  "packageManager": "bun@1.2.16",
+  "dependencies": {
+    "@puppet-copy/middleware": "0.4.0",
+    "aelea": "1.9.0",
+    "og-img": "0.2.1",
+    "satori": "0.15.2",
+    "satori-html": "0.3.2"
+  }
+}

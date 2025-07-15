@@ -910,21 +910,6 @@ export const dictatorshipAbi = [
     anonymous: false,
     inputs: [
       {
-        name: 'operator',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      { name: 'method', internalType: 'string', type: 'string', indexed: true },
-      { name: 'data', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'LogEvent'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
         name: 'previousOwner',
         internalType: 'address',
         type: 'address',
@@ -938,6 +923,21 @@ export const dictatorshipAbi = [
       }
     ],
     name: 'OwnershipTransferred'
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'operator',
+        internalType: 'address',
+        type: 'address',
+        indexed: true
+      },
+      { name: 'method', internalType: 'string', type: 'string', indexed: true },
+      { name: 'data', internalType: 'bytes', type: 'bytes', indexed: false }
+    ],
+    name: 'PuppetEventLog'
   },
   {
     type: 'event',
