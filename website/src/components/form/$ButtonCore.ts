@@ -14,10 +14,7 @@ import {
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
-const interactionOp = O(
-  (src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)),
-  constant(true)
-)
+const interactionOp = O((src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)), constant(true))
 
 const dismissOp = O(
   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),

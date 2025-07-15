@@ -1,11 +1,8 @@
 import { empty } from '@most/core'
-import { $anchor, $calendar, $caretDblDown, $ethScan } from '@puppet-copy/middleware/ui-components'
-import { getAccountExplorerUrl, getTxExplorerUrl, shortenAddress } from '@puppet-copy/middleware/utils'
-import { $node, $text, attr, type I$Node, isStream, style } from 'aelea/core'
+import { $caretDblDown } from '@puppet-copy/middleware/ui-components'
+import { $node, $text, type I$Node, isStream, style } from 'aelea/core'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
-import type { Address } from 'viem/accounts'
-import type { Chain } from 'viem/chains'
 import { $trash } from './$icons.js'
 
 export const $TrashBtn = $ButtonIcon($trash)

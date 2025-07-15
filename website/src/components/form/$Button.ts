@@ -3,7 +3,6 @@ import type { Stream } from '@most/types'
 import { $icon } from '@puppet-copy/middleware/ui-components'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
-  $element,
   $node,
   attrBehavior,
   combineArray,
@@ -19,7 +18,7 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
-import { $row, type Control, spacing } from 'aelea/ui-components'
+import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { $ButtonCore, $defaultButtonCore, type IButtonCore } from './$ButtonCore.js'

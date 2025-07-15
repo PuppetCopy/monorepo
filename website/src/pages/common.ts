@@ -5,8 +5,8 @@ import type {
   ITraderRouteLatestMetric,
   ITraderRouteMetric
 } from '@puppet-copy/sql/schema'
-import { $node, $text, style } from 'aelea/core'
-import { $row, $seperator } from 'aelea/ui-components'
+import { style } from 'aelea/core'
+import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex, Prettify } from 'viem'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
