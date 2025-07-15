@@ -67,21 +67,6 @@ export const $defaultMiniButtonSecondary = $defaultButtonSecondary(
   style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.8rem' })
 )
 
-export const $buttonAnchor = $element('a')(
-  spacing.small,
-  secondaryButtonStyle,
-  stylePseudo(':hover', { color: 'inherit', boxShadow: 'none', borderColor: pallete.primary }),
-  style({
-    userSelect: 'none',
-    alignItems: 'center',
-    textDecoration: 'none',
-    // padding: '6px 12px',
-    display: 'flex',
-    cursor: 'pointer',
-    color: pallete.message
-  })
-)
-
 export const $ButtonPrimary = (config: IButtonCore) => {
   return $ButtonCore({
     $container: $defaultButtonPrimary,

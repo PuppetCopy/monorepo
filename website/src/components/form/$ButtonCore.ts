@@ -14,12 +14,12 @@ import {
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
-export const interactionOp = O(
+const interactionOp = O(
   (src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)),
   constant(true)
 )
 
-export const dismissOp = O(
+const dismissOp = O(
   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
   filter((x) => document.activeElement !== x.target), // focused elements cannot be dismissed
   constant(false)

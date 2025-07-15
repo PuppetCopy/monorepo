@@ -11,12 +11,6 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex, Prettify } from 'viem'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
 
-export const $metricEntry = (label: string, value: string) =>
-  $row(style({ fontSize: '.8rem', alignItems: 'center' }))(
-    $node(style({ color: pallete.foreground, flex: 1 }))($text(label)),
-    $node(style({ fontWeight: 'bold' }))($text(value))
-  )
-
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
   $seperator

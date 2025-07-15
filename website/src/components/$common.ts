@@ -1,13 +1,4 @@
 import {
-  type AttributeBackground,
-  type AttributeBadge,
-  type AttributeMappings,
-  getBerryFromItems,
-  getLabItemTupleIndex,
-  type IBerryDisplayTupleMap,
-  tokenIdAttributeTuple
-} from '@puppet-copy/middleware/gbc'
-import {
   $defaultTableCell,
   $defaultTableRowContainer,
   $defaultVScrollContainer,
@@ -19,7 +10,6 @@ import {
 import { style, stylePseudo } from 'aelea/core'
 import { $column, isDesktopScreen } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { $berry } from './$DisplayBerry.js'
 
 export interface ICardTable<T> extends TableOption<T> {}
 
@@ -49,35 +39,4 @@ export const $CardTable = <T>(config: TableOption<T>) => {
     // ),
     ...config
   })
-}
-
-export const $berryByToken = (token: IToken) => {
-  const display = getBerryFromItems(token.labItems.map((li) => Number(li.id)))
-  const tuple: Partial<IBerryDisplayTupleMap> = [...tokenIdAttributeTuple[token.id - 1]]
-
-  return $berryByLabItems(token.id, display.background, display.custom, display.badge, tuple)
-}
-
-export const $berryByLabItems = (
-  berryId: number,
-  backgroundId: AttributeBackground,
-  labItemId: AttributeMappings,
-  badgeId: AttributeBadge,
-  tuple: Partial<IBerryDisplayTupleMap> = [...tokenIdAttributeTuple[berryId - 1]]
-) => {
-  if (labItemId) {
-    const customIdx = getLabItemTupleIndex(labItemId)
-
-    tuple.splice(customIdx, 1, labItemId as any)
-  }
-
-  if (badgeId) {
-    tuple.splice(6, 1, badgeId)
-  }
-
-  if (backgroundId) {
-    tuple.splice(0, 1, backgroundId)
-  }
-
-  return $berry(tuple)
 }

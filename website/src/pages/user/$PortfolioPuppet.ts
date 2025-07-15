@@ -162,67 +162,54 @@ export const $PortfolioPage = ({
                             const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 
                             return $Popover({
-                              $open: filterNull(
-                                map((trader) => {
-                                  if (trader !== rule.trader) {
-                                    return null
-                                  }
+                                $open: filterNull(
+                                  map((trader) => {
+                                    if (trader !== rule.trader) {
+                                      return null
+                                    }
 
-                                  return $MatchingRuleEditor({
-                                    draftMatchingRuleList,
-                                    model: rule,
-                                    traderMatchingKey,
-                                    collateralToken,
-                                    trader: rule.trader
-                                  })({
-                                    changeMatchRuleList: changeMatchRuleListTether()
-                                  })
-                                }, popRouteSubscriptionEditor)
-                              ),
-                              dismiss: changeMatchRuleList,
-                              $target: $row(
-                                isDesktopScreen ? spacing.big : spacing.default,
-                                style({ alignItems: 'center' })
-                              )(
-                                $ButtonCircular({
-                                  $iconPath: $caretDown,
-                                  $container: $defaultButtonCircularContainer(
-                                    style({
-                                      marginLeft: '-32px',
-                                      backgroundColor: pallete.background,
-                                      cursor: 'pointer'
+                                    return $MatchingRuleEditor({
+                                      draftMatchingRuleList,
+                                      model: rule,
+                                      traderMatchingKey,
+                                      collateralToken,
+                                      trader: rule.trader
+                                    })({
+                                      changeMatchRuleList: changeMatchRuleListTether()
                                     })
+                                  }, popRouteSubscriptionEditor)
+                                ),
+                                dismiss: changeMatchRuleList,
+                                $target: $row(
+                                  isDesktopScreen ? spacing.big : spacing.default,
+                                  style({ alignItems: 'center' })
+                                )(
+                                  $ButtonCircular({
+                                    $iconPath: $caretDown,
+                                    $container: $defaultButtonCircularContainer(
+                                      style({
+                                        marginLeft: '-32px',
+                                        backgroundColor: pallete.background,
+                                        cursor: 'pointer'
+                                      })
+                                    )
+                                  })({
+                                    click: popRouteSubscriptionEditorTether(constant(rule.trader))
+                                  }),
+                                  $profileDisplay({
+                                    address: rule.trader
+                                  }),
+                                  $responsiveFlex(spacing.default, style({ flex: 1 }))(
+                                    $infoLabeledValue(
+                                      'Allowance Rate',
+                                      $text(`${readablePercentage(rule.allowanceRate)}`)
+                                    ),
+                                    $infoLabeledValue('Expiry', readableDate(Number(rule.expiry))),
+                                    $infoLabeledValue('Throttle Duration', $text(`${getDuration(rule.throttleActivity)}`))
                                   )
-                                })({
-                                  click: popRouteSubscriptionEditorTether(constant(rule.trader))
-                                }),
-                                // switchMap(amount => {
-                                //   return $text(tokenAmountLabel(routeType.indexToken, amount))
-                                // }, orchestrator.read('puppetAccountBalance', w3p.account.address, routeType.indexToken)),
-                                $profileDisplay({
-                                  address: rule.trader
-                                  // $profileContainer: $defaultBerry(style({ width: '50px' }))
-                                }),
-                                // $RouteEditor({
-                                //   draftMatchingRuleList,
-                                //   collateralToken: collateralToken,
-                                //   traderMatchedPuppetList: [],
-                                //   userMatchingRuleList: matchingRuleList,
-                                //   trader: modSubsc.trader
-                                // })({
-                                //   changeMatchRuleList: changeMatchRuleListTether()
-                                // }),
-                                $responsiveFlex(spacing.default, style({ flex: 1 }))(
-                                  $infoLabeledValue(
-                                    'Allowance Rate',
-                                    $text(`${readablePercentage(rule.allowanceRate)}`)
-                                  ),
-                                  $infoLabeledValue('Expiry', readableDate(Number(rule.expiry))),
-                                  $infoLabeledValue('Throttle Duration', $text(`${getDuration(rule.throttleActivity)}`))
                                 )
-                              )
-                            })({})
-                          })
+                              })({})
+                            })
                         )
                       )
                     )

@@ -1,19 +1,6 @@
 import { tap } from '@most/core'
 import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet-copy/middleware/gbc'
-import { $svg, $wrapNativeElement, attr, type I$Node } from 'aelea/core'
-
-export function $svgContent(content: string): I$Node[] {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(`<g>${content}</g>`, 'image/svg+xml')
-  const childNodes = doc.firstChild?.childNodes
-
-  if (!childNodes) {
-    return []
-  }
-
-  const firstNode = Array.from(childNodes)
-  return firstNode.map((node) => $wrapNativeElement(node as any)())
-}
+import { $svg, attr } from 'aelea/core'
 
 export const $berry = (displayTuple: Partial<IBerryDisplayTupleMap>) => {
   return $svg('svg')(
