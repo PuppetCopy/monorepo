@@ -10,6 +10,7 @@ RUN echo '{"name":"website-build","private":true,"workspaces":["website","middle
 
 # Copy lockfile and package files
 COPY bun.lock ./
+COPY tsconfig.base.json ./
 COPY middleware/package.json middleware/
 COPY website/package.json website/
 COPY indexer/package.json indexer/
@@ -18,6 +19,7 @@ COPY indexer/package.json indexer/
 RUN bun install
 
 # Copy source code
+COPY tsconfig.json ./
 COPY middleware/ middleware/
 COPY website/ website/
 COPY indexer/ indexer/
