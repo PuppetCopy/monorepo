@@ -3,7 +3,7 @@ import type { Stream } from '@most/types'
 import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
 import { $caretDown, $icon } from '@puppet-copy/middleware/ui-components'
 import { unixTimestampNow } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $text, component, type IBehavior, type INodeCompose, style } from 'aelea/core'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -14,15 +14,15 @@ import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { $MatchingRuleEditor, type IMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
+import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 
 interface ITraderMatchingRouteEditor {
   trader: Address
   traderMatchedPuppetList: Hex[]
-  userMatchingRuleList: IMatchingRule[]
+  userMatchingRuleList: ISetMatchingRule[]
   collateralToken: Address
   displayCollateralTokenSymbol?: boolean
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
   $container?: INodeCompose
 }
 
@@ -31,8 +31,8 @@ export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style
 export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
   component(
     (
-      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, IMatchingRule | undefined>,
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
+      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, ISetMatchingRule | undefined>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
       const traderMatchingKey = getTraderMatchingKey(config.collateralToken, config.trader)
 

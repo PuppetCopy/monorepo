@@ -8,7 +8,7 @@ import {
   type StateParams,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
@@ -54,14 +54,14 @@ export function queryUserMatchingRuleList(
   queryParams: StateParams<{
     address: Address | undefined
   }>
-): Stream<Promise<IMatchingRule[]>> {
+): Stream<Promise<ISetMatchingRule[]>> {
   return map(async (params) => {
     const address = params.address
     if (address === undefined) {
       return []
     }
 
-    const metrictList = await sqlClient.query.matchingRule.findMany({
+    const metrictList = await sqlClient.query.setMatchingRule.findMany({
       where: (t, f) =>
         f.and(
           f.eq(t.puppet, address)

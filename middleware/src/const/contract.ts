@@ -13,7 +13,7 @@ const addresses = {
   Dictatorship: '0x583C63CEcb474789331C43da153b1fe5eC0d6CEC',
   PuppetToken: '0x10f7F9e33FaF343F9CfE1c69b177ed86Bc760B4e',
   TokenRouter: '0x796347E2881bE603C4D88ac0103c4A3569BA8b28',
-  RouterProxy: '0x34Df3B8042902492451d4Ae87306904bDF8e702a',
+  RouterProxy: '0x8c194dba375973a75cD0bDe2b4Af795a2b25ff3e',
   AllocationStore: '0xd29389780e53bb915f64d93c8981d2ca168c2ddc',
   FeeMarketplaceStore: '0xAf97414983197b30485828ddb3De60134871dBe2',
   FeeMarketplace: '0x1290fE1CC845D9D564183d3d8C65122DCf908ED5',
@@ -22,7 +22,8 @@ const addresses = {
   Allocate: '0x31b1932248c12029820fd28bde2b49991ed6f178',
   Settle: '0x0c93cb536516bceb4d23ec9464d674c50b417b2d',
   KeeperRouter: '0x3d04f440b4c3c5b56770d7341c1682065bee6593',
-  Router: '0x94e58f4eDb5134C8e6885516857536580dacCc18'
+  Router: '0x94e58f4eDb5134C8e6885516857536580dacCc18',
+  UserRouter: '0x877b074B4E87EeaD27656a11491D86C9081198a7'
 } as const
 
 export const CONTRACT = {

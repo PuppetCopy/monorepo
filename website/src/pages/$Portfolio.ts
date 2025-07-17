@@ -1,33 +1,39 @@
-import { constant, empty, map } from '@most/core'
+import { constant, empty, map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
 import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
-import { filterNull, getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule } from '@puppet-copy/sql/schema'
+import {
+  filterNull,
+  getDuration,
+  readableDate,
+  readablePercentage,
+  unixTimestampNow
+} from '@puppet-copy/middleware/utils'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
-import { $card, $card2, $responsiveFlex } from '../../common/elements/$common.js'
-import { sqlClient } from '../../common/sqlClient.js'
-import { $profileDisplay } from '../../components/$AccountProfile.js'
-import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
-import { $LastAtivity } from '../../components/$LastActivity.js'
-import { $Popover } from '../../components/$Popover.js'
-import { $ButtonCircular, $defaultButtonCircularContainer } from '../../components/form/$Button.js'
-import type { IDepositEditorDraft } from '../../components/portfolio/$DepositEditor.js'
-import { $MatchingRuleEditor, type IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
-import { $RouteDepositEditor } from '../../components/portfolio/$RouteDepositEditor.js'
-import { wallet } from '../../wallet/wallet.js'
-import { $seperator2 } from '../common.js'
-import type { IPageFilterParams } from '../type.js'
+import { $card, $card2, $responsiveFlex } from '../common/elements/$common.js'
+import { sqlClient } from '../common/sqlClient.js'
+import { $profileDisplay } from '../components/$AccountProfile.js'
+import { $SelectCollateralToken } from '../components/$CollateralTokenSelector.js'
+import { $LastAtivity } from '../components/$LastActivity.js'
+import { $Popover } from '../components/$Popover.js'
+import { $ButtonCircular, $defaultButtonCircularContainer } from '../components/form/$Button.js'
+import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
+import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
+import { $RouteDepositEditor } from '../components/portfolio/$RouteDepositEditor.js'
+import { wallet } from '../wallet/wallet.js'
+import { $seperator2 } from './common.js'
+import type { IPageFilterParams } from './type.js'
 
 interface IWalletPuppet extends IPageFilterParams {
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
   draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
+  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
 }
 
 export const $PortfolioPage = ({
@@ -42,29 +48,74 @@ export const $PortfolioPage = ({
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, Address>
     ) => {
-      const settlementListQuery = map(
-        async (params) => {
-          const address = params.wallet.address
-          if (address === undefined) {
-            return []
-          }
+      const positionLinkListQuery = multicast(
+        map(
+          async (params) => {
+            const address = params.wallet.address
 
-          return await sqlClient.query.puppetSettlement.findMany({
-            where: (t, f) =>
-              f.and(
-                f.eq(t.puppet, address)
-                // f.inArray(t.collateralToken, params.collateralTokenList)
-              )
+            if (address === undefined) {
+              return null
+            }
 
-            // orderBy: (t, f) => f.expiry.asc(),
-            // limit: 100
-          })
-        },
-        combineState({ collateralTokenList, activityTimeframe, wallet: wallet.account })
+            const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+
+            const result = await sqlClient.query.puppetLink.findMany({
+              // where: (t, f) =>
+              //   f.and(
+              //     f.eq(t.puppet, address),
+              //     f.gte(t.createdAt, startActivityTimeframe),
+              //     f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
+              //   ),
+              with: {
+                mirrorLink: {
+                  with: {
+                    createAllocation: true,
+                    executeList: true,
+                    // liquidate: true,
+                    // puppetLinkList: true,
+                    // requestAdjustList: true,
+                    requestMirror: true,
+                    settleList: true, 
+                    updateAllocationForKeeperFeeList: true
+                  }
+                }
+              }
+            })
+
+            debugger
+
+
+            return result
+          },
+          combineState({ activityTimeframe, collateralTokenList, wallet: wallet.account })
+        )
       )
+
+      const stateParams = combineState({
+        userMatchingRuleQuery,
+        positionLinkListQuery,
+        activityTimeframe,
+        collateralTokenList
+      })
+
+      // const matchingRuleQuery = map(async (params) => {
+      //   const ruleList = params.collateralTokenList.map((collateralToken) => {
+      //     const address = params.wallet.address
+
+      //     if (address === undefined) return null
+
+      //     return wallet.read({
+      //       ...CONTRACT.MatchingRule,
+      //       functionName: 'getRuleList',
+      //       args: [collateralToken, address]
+      //     })
+      //   })
+
+      //   return Promise.all(ruleList)
+      // }, combineState({ collateralTokenList, wallet: wallet.account }))
 
       return [
         $card(spacing.big, style({ flex: 1, width: '100%' }))(
@@ -107,7 +158,7 @@ export const $PortfolioPage = ({
 
               $intermediatePromise({
                 $display: map(async (params) => {
-                  const settlementList = await params.settlementListQuery
+                  const settlementList = await params.positionLinkListQuery
                   if (settlementList.length === 0) {
                     return $column(style({ alignItems: 'center' }), spacing.small)(
                       // no activity within the selected timeframe
@@ -118,7 +169,7 @@ export const $PortfolioPage = ({
 
                   // TODO
                   return empty()
-                }, combineState({ activityTimeframe, settlementListQuery }))
+                }, stateParams)
               })
             )
           ),
@@ -128,6 +179,7 @@ export const $PortfolioPage = ({
               const activeRouteList =
                 params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
 
+              const positionList = await params.positionListQuery
               const matchingRuleList = await params.userMatchingRuleQuery
 
               return $column(spacing.default)(
@@ -216,7 +268,7 @@ export const $PortfolioPage = ({
                   )
                 })
               )
-            }, combineState({ activityTimeframe, collateralTokenList, settlementListQuery, userMatchingRuleQuery }))
+            }, stateParams)
           })
         ),
 

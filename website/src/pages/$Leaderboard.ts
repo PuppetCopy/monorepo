@@ -27,7 +27,7 @@ import {
   readablePnl,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
+import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -35,22 +35,22 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
 import type { Address } from 'viem/accounts'
-import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../../common/$common.js'
-import { $card2 } from '../../common/elements/$common.js'
-import { $bagOfCoins, $trophy } from '../../common/elements/$icons.js'
-import { sqlClient } from '../../common/sqlClient.js'
-import { $SelectCollateralToken } from '../../components/$CollateralTokenSelector.js'
-import { $LastAtivity, activityOptionLabelMap } from '../../components/$LastActivity.js'
-import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
-import { $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
-import { $tableHeader } from '../../components/table/$TableColumn.js'
-import { localStore } from '../../const/localStore.js'
-import { $seperator2 } from '../common.js'
-import type { IPageFilterParams, IPageParams } from '../type.js'
+import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../common/$common.js'
+import { $card2 } from '../common/elements/$common.js'
+import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
+import { sqlClient } from '../common/sqlClient.js'
+import { $SelectCollateralToken } from '../components/$CollateralTokenSelector.js'
+import { $LastAtivity, activityOptionLabelMap } from '../components/$LastActivity.js'
+import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
+import { $RouteEditor } from '../components/portfolio/$RouteEditor.js'
+import { $tableHeader } from '../components/table/$TableColumn.js'
+import { localStore } from '../const/localStore.js'
+import { $seperator2 } from './common.js'
+import type { IPageFilterParams, IPageParams } from './type.js'
 
 interface ILeaderboard extends IPageFilterParams, IPageParams {
-  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
 }
 
 type ISortLeaderboardBy = ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>
@@ -69,7 +69,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       // [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
       [filterAccount, _filterAccountTether]: IBehavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
       const { activityTimeframe, collateralTokenList, draftMatchingRuleList, userMatchingRuleQuery, route } = config
 
@@ -191,7 +191,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       pnlTimestampList: true,
                       matchedPuppetList: true,
 
-                      traderMatchingKey: true
+                      id: true
                     },
                     with: {
                       traderRouteMetric: {

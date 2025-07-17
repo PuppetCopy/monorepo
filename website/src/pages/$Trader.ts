@@ -21,26 +21,26 @@ import {
   shortenAddress,
   unixTimestampNow
 } from '@puppet-copy/middleware/utils'
-import { type IMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
+import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
 import type { Address } from 'viem/accounts'
-import { $heading2 } from '../../common/$text.js'
-import { $card, $card2 } from '../../common/elements/$common.js'
-import { sqlClient } from '../../common/sqlClient.js'
-import { $TradeRouteTimeline } from '../../components/participant/$ProfilePeformanceTimeline.js'
-import { $metricLabel, $metricRow } from '../../components/participant/$Summary.js'
-import type { IMatchingRuleEditorDraft } from '../../components/portfolio/$MatchingRuleEditor.js'
-import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../../components/portfolio/$RouteEditor.js'
-import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../../components/table/$TableColumn.js'
-import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from '../common'
-import type { IPageFilterParams } from '../type.js'
+import { $heading2 } from '../common/$text.js'
+import { $card, $card2 } from '../common/elements/$common.js'
+import { sqlClient } from '../common/sqlClient.js'
+import { $TradeRouteTimeline } from '../components/participant/$ProfilePeformanceTimeline.js'
+import { $metricLabel, $metricRow } from '../components/participant/$Summary.js'
+import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
+import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../components/portfolio/$RouteEditor.js'
+import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../components/table/$TableColumn.js'
+import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from './common'
+import type { IPageFilterParams } from './type.js'
 
 interface ITraderPage extends IPageFilterParams {
-  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $TraderPage = ({
@@ -56,7 +56,7 @@ export const $TraderPage = ({
       [sortByChange, _sortByChangeTether]: IBehavior<ISortBy>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 

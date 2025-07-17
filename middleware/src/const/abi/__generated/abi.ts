@@ -169,27 +169,6 @@ export const allocateAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'maxKeeperFeeToAllocationRatio',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'maxKeeperFeeToAdjustmentRatio',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'gmxOrderVault', internalType: 'address', type: 'address' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     inputs: [
       {
         name: '_matchingRule',
@@ -753,13 +732,6 @@ export const dictatorshipAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'contractAccessRegistry',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     inputs: [
       { name: '_target', internalType: 'contract Access', type: 'address' },
       { name: '_user', internalType: 'address', type: 'address' }
@@ -782,19 +754,6 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [
-      {
-        name: '_target',
-        internalType: 'contract CoreContract',
-        type: 'address'
-      }
-    ],
-    name: 'initContract',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
       { name: '_method', internalType: 'string', type: 'string' },
       { name: '_data', internalType: 'bytes', type: 'bytes' }
     ],
@@ -807,6 +766,26 @@ export const dictatorshipAbi = [
     inputs: [],
     name: 'owner',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_target',
+        internalType: 'contract CoreContract',
+        type: 'address'
+      }
+    ],
+    name: 'registerContract',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'registeredContract',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view'
   },
   {
@@ -887,23 +866,24 @@ export const dictatorshipAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
+    inputs: [{ name: '_gasLimit', internalType: 'uint256', type: 'uint256' }],
+    name: 'settargetCallGasLimit',
     outputs: [],
     stateMutability: 'nonpayable'
   },
   {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'target',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      }
-    ],
-    name: 'AddContractAccess'
+    type: 'function',
+    inputs: [],
+    name: 'targetCallGasLimit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable'
   },
   {
     type: 'event',
@@ -940,69 +920,6 @@ export const dictatorshipAbi = [
     name: 'PuppetEventLog'
   },
   {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'target',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      }
-    ],
-    name: 'RemoveContractAccess'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'target',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      { name: 'config', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'SetConfig'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'target',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      { name: 'user', internalType: 'address', type: 'address', indexed: true },
-      { name: 'enabled', internalType: 'bool', type: 'bool', indexed: false }
-    ],
-    name: 'UpdateAccess'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'target',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      { name: 'user', internalType: 'address', type: 'address', indexed: true },
-      {
-        name: 'functionSig',
-        internalType: 'bytes4',
-        type: 'bytes4',
-        indexed: true
-      },
-      { name: 'enabled', internalType: 'bool', type: 'bool', indexed: false }
-    ],
-    name: 'UpdatePermission'
-  },
-  {
     type: 'error',
     inputs: [],
     name: 'Dictatorship__ConfigurationUpdateFailed'
@@ -1013,20 +930,7 @@ export const dictatorshipAbi = [
     name: 'Dictatorship__ContractAlreadyInitialized'
   },
   { type: 'error', inputs: [], name: 'Dictatorship__ContractNotRegistered' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Dictatorship__CoreContractConfigCallFailed'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Dictatorship__CoreContractInitConfigNotSet'
-  },
-  { type: 'error', inputs: [], name: 'Dictatorship__EmptyConfiguration' },
-  { type: 'error', inputs: [], name: 'Dictatorship__InvalidCoreContract' },
   { type: 'error', inputs: [], name: 'Dictatorship__InvalidTargetAddress' },
-  { type: 'error', inputs: [], name: 'Dictatorship__InvalidUserAddress' },
   {
     type: 'error',
     inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
@@ -1036,8 +940,7 @@ export const dictatorshipAbi = [
     type: 'error',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'OwnableUnauthorizedAccount'
-  },
-  { type: 'error', inputs: [], name: 'Permission__InvalidFunctionSignature' }
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2390,21 +2293,6 @@ export const feeMarketplaceAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'distributionTimeframe',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'burnBasisPoints', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     inputs: [
       { name: '_feeToken', internalType: 'contract IERC20', type: 'address' },
       { name: '_depositor', internalType: 'address', type: 'address' },
@@ -2419,6 +2307,32 @@ export const feeMarketplaceAbi = [
     inputs: [],
     name: 'distributionBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct FeeMarketplace.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'transferOutGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'distributionTimeframe',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'burnBasisPoints', internalType: 'uint256', type: 'uint256' }
+        ]
+      }
+    ],
     stateMutability: 'view'
   },
   {
@@ -9559,31 +9473,6 @@ export const keeperRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'mirrorBaseGasLimit', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'mirrorPerPuppetGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'adjustBaseGasLimit', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'adjustPerPuppetGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'fallbackRefundExecutionFeeReceiver',
-        internalType: 'address',
-        type: 'address'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'getConfig',
     outputs: [
       {
@@ -9640,7 +9529,7 @@ export const keeperRouterAbi = [
     inputs: [
       { name: 'key', internalType: 'bytes32', type: 'bytes32' },
       {
-        name: 'eventData',
+        name: '',
         internalType: 'struct GmxPositionUtils.EventLogData',
         type: 'tuple',
         components: [
@@ -10100,20 +9989,6 @@ export const matchingRuleAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      { name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' },
-      { name: 'minAllowanceRate', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxAllowanceRate', internalType: 'uint256', type: 'uint256' },
-      { name: 'minActivityThrottle', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxActivityThrottle', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     inputs: [
       {
         name: '_collateralToken',
@@ -10127,6 +10002,51 @@ export const matchingRuleAbi = [
     name: 'deposit',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct MatchingRule.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'transferOutGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minExpiryDuration',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      }
+    ],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -10371,36 +10291,6 @@ export const mirrorPositionAbi = [
     ],
     name: 'canCall',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'config',
-    outputs: [
-      {
-        name: 'gmxExchangeRouter',
-        internalType: 'contract IGmxExchangeRouter',
-        type: 'address'
-      },
-      { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
-      { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: 'increaseCallbackGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'decreaseCallbackGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'fallbackRefundExecutionFeeReceiver',
-        internalType: 'address',
-        type: 'address'
-      }
-    ],
     stateMutability: 'view'
   },
   {
@@ -13404,16 +13294,6 @@ export const rewardDistributorAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      { name: 'distributionWindow', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'cumulativeRewardPerToken',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
@@ -13885,31 +13765,6 @@ export const settleAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'platformSettleFeeFactor',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'maxKeeperFeeToSettleRatio',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'allocationAccountTransferGasLimit',
-        internalType: 'uint256',
-        type: 'uint256'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'getConfig',
     outputs: [
       {
@@ -14211,8 +14066,21 @@ export const tokenRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'config',
-    outputs: [{ name: 'transferGasLimit', internalType: 'uint256', type: 'uint256' }],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct TokenRouter.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'transferGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      }
+    ],
     stateMutability: 'view'
   },
   {
@@ -14638,19 +14506,30 @@ export const votingEscrowAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'config',
-    outputs: [
-      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
-      { name: 'baseMultiplier', internalType: 'uint256', type: 'uint256' }
-    ],
+    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    name: 'getClaimable',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
   },
   {
     type: 'function',
-    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
-    name: 'getClaimable',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    inputs: [],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct VotingEscrow.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'transferOutGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'baseMultiplier', internalType: 'uint256', type: 'uint256' }
+        ]
+      }
+    ],
     stateMutability: 'view'
   },
   {

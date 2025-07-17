@@ -22,7 +22,7 @@ import {
   $xCross
 } from '@puppet-copy/middleware/ui-components'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
 import type { Route } from 'aelea/router'
@@ -41,20 +41,20 @@ import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Butto
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
 import { DepositEditorAction } from './$DepositEditor.js'
-import type { IMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
+import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteDepositEditor } from './$RouteDepositEditor.js'
 
 interface IPortfolioRoute {
   collateralToken: Address
   deposit: IDepositEditorDraft | null
-  matchingRuleList: IMatchingRuleEditorDraft[]
+  matchingRuleList: ISetMatchingRuleEditorDraft[]
 }
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   route: Route
-  userMatchingRuleQuery: Stream<Promise<IMatchingRule[]>>
+  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
   draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $PortfolioEditorDrawer = ({
@@ -67,7 +67,7 @@ export const $PortfolioEditorDrawer = ({
     (
       [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletConnected, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
-      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, IMatchingRuleEditorDraft>,
+      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
       [routeChange, routeChangeTether]: IBehavior<string, string>

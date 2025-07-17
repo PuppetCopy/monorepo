@@ -4,7 +4,7 @@ import { IntervalTime } from '@puppet-copy/middleware/const'
 import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/utils'
-import type { IMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import {
   $element,
   $node,
@@ -28,14 +28,14 @@ import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 import { $Dropdown } from '../form/$Dropdown.js'
 
-export type IMatchingRuleEditorDraft = Omit<IMatchingRule, 'id'>
+export type ISetMatchingRuleEditorDraft = Omit<ISetMatchingRule, 'id'>
 
 export type IMatchRuleEditor = {
-  model?: IMatchingRule
+  model?: ISetMatchingRule
   traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
-  draftMatchingRuleList: Stream<IMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
 }
 
 export type InputStateParams<T> = {
@@ -78,9 +78,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
       [inputEndDate, inputEndDateTether]: IBehavior<string, bigint>,
       [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
-      [clickRemove, clickRemoveTether]: IBehavior<any, IMatchingRuleEditorDraft>,
+      [clickRemove, clickRemoveTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
       [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
-      [save, saveTether]: IBehavior<PointerEvent, IMatchingRuleEditorDraft>
+      [save, saveTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
         localStore.ruleEditor,

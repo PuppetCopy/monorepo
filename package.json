@@ -14,7 +14,8 @@
   ],
   "workspaces": [
     "website",
-    "middleware"
+    "middleware",
+    "indexer"
   ],
   "scripts": {
     "sherif": "sherif",

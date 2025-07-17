@@ -37,15 +37,15 @@ import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../co
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
-import type { IMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
+import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
 import { wallet } from '../wallet/wallet.js'
-import { $Leaderboard } from './leaderboard/$Leaderboard.js'
-import { $PortfolioPage } from './user/$PortfolioPuppet.js'
-import { $TraderPage } from './user/$Trader.js'
+import { $Leaderboard } from './$Leaderboard.js'
+import { $PortfolioPage } from './$Portfolio.js'
+import { $TraderPage } from './$Trader.js'
 
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
@@ -69,7 +69,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       [_changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<IMatchingRuleEditorDraft[]>,
+      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
     ) => {
       // walletConnectAppkit.getIsConnectedState()
@@ -126,7 +126,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         )
       )
 
-      const draftMatchingRuleList = replayLatest(multicast(changeMatchRuleList), [] as IMatchingRuleEditorDraft[])
+      const draftMatchingRuleList = replayLatest(multicast(changeMatchRuleList), [] as ISetMatchingRuleEditorDraft[])
       const draftDepositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorDraft[])
 
       return [
