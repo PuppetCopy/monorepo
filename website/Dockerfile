@@ -5,8 +5,11 @@ ENV NPM_CONFIG_FUND=false
 
 WORKDIR /app
 
-# Copy workspace structure for dependencies
-COPY package.json bun.lock ./
+# Create simplified package.json for website-only build
+RUN echo '{"name":"website-build","private":true,"workspaces":["website","middleware"]}' > package.json
+
+# Copy lockfile and package files
+COPY bun.lock ./
 COPY middleware/package.json middleware/
 COPY website/package.json website/
 
