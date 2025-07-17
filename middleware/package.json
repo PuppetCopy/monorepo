@@ -8,7 +8,7 @@
     "build": "bun run build:clean && bun run build:esm",
     "build:esm": "bunx tsc -b",
     "build:clean": "rm -rf dist",
-    "dev:publish": "bun run script/publish.ts"
+    "build:pre-release": "bun run script/pre-release.ts"
   },
   "files": [
     "dist"

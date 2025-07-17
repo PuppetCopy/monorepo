@@ -4,11 +4,18 @@
     "@changesets/changelog-github",
     {
       "repo": "PuppetCopy/monorepo",
-      "baseBranches": ["main"]
+      "baseBranches": [
+        "main"
+      ]
     }
   ],
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "middleware",
+      "indexer"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "main",

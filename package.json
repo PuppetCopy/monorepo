@@ -15,7 +15,8 @@
   "workspaces": [
     "website",
     "middleware",
-    "indexer"
+    "indexer",
+    "keeper"
   ],
   "scripts": {
     "sherif": "sherif",
@@ -23,9 +24,11 @@
     "biome:check": "biome check",
     "biome:check:fix": "biome check --fix",
     "biome:check:fix:unsafe": "biome check --fix --unsafe",
-    "changeset:publish": "changeset publish --access public",
-    "changeset:version": "changeset version",
-    "publish": "bun run changeset:publish && bun run sherif:fix",
+    "release:patch": "bun run scripts/release.ts patch",
+    "release:minor": "bun run scripts/release.ts minor",
+    "release:major": "bun run scripts/release.ts major",
+    "build:packages": "bun run scripts/build.ts",
+    "build:release": "bun run scripts/build.ts",
     "update-deps": "bun run sherif:fix",
     "contracts:build": "cd contracts && bun run build",
     "middleware:build": "cd middleware && bun run build",
