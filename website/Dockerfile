@@ -1,0 +1,33 @@
+FROM oven/bun:alpine AS build
+
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false
+ENV NPM_CONFIG_FUND=false
+
+WORKDIR /app
+
+# Copy workspace structure for dependencies
+COPY package.json bun.lockb ./
+COPY middleware/package.json middleware/
+COPY website/package.json website/
+
+# Install dependencies
+RUN bun install --frozen-lockfile
+
+# Copy source code
+COPY middleware/ middleware/
+COPY website/ website/
+
+# Build website
+WORKDIR /app/website
+RUN bun run build
+
+FROM caddy:alpine
+
+WORKDIR /app
+
+COPY website/Caddyfile ./
+RUN caddy fmt Caddyfile --overwrite
+
+COPY --from=build /app/website/dist ./dist
+
+CMD ["caddy", "run", "--config", "Caddyfile", "--adapter", "caddyfile"]
