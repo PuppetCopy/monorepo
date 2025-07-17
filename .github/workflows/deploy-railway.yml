@@ -8,28 +8,28 @@ jobs:
   deploy-website:
     name: Deploy Website
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SVC_ID: ${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Deploy Website to Railway
-        uses: railway/cli-action@v3
-        with:
-          token: ${{ secrets.RAILWAY_TOKEN }}
-          command: up --service ${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
+      - name: Deploy to Railway
+        run: railway up --service=${{ env.SVC_ID }}
 
   deploy-indexer:
     name: Deploy Indexer
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SVC_ID: ${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_TOKEN }}
-
-      - name: Deploy Indexer to Railway
-        uses: railway/cli-action@v3
-        with:
-          token: ${{ secrets.RAILWAY_TOKEN }}
-          command: up --service ${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}
+      - name: Deploy to Railway
+        run: railway up --service=${{ env.SVC_ID }}
