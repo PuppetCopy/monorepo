@@ -6,7 +6,7 @@ ENV NPM_CONFIG_FUND=false
 WORKDIR /app
 
 # Copy workspace structure for dependencies
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 COPY middleware/package.json middleware/
 COPY website/package.json website/
 
