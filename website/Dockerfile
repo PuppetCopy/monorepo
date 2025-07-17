@@ -15,7 +15,7 @@ COPY website/package.json website/
 COPY indexer/package.json indexer/
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY middleware/ middleware/
