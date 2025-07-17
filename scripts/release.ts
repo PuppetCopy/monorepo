@@ -54,57 +54,17 @@ ${releaseType.charAt(0).toUpperCase() + releaseType.slice(1)} release
   const newVersion = middlewarePackage.version
   console.log(`✅ New version: ${newVersion}`)
 
-  // 6. Process each package sequentially
-  for (const pkg of packages) {
-    console.log(`\n📦 Processing ${pkg}...`)
-
-    const packagePath = `./${pkg}/package.json`
-    const packageFile = file(packagePath)
-    const packageContent = await packageFile.text()
-
-    // Replace workspace:* references with the new version
-    const regex = /"@puppet-copy\/[^"]+":\s*"workspace:\*"/g
-    const newContent = packageContent.replace(regex, (match) => {
-      return match.replace('"workspace:*"', `"${newVersion}"`)
-    })
-
-    if (newContent !== packageContent) {
-      await write(packagePath, newContent)
-      console.log(`  - Replaced workspace:* references with ${newVersion}`)
-    }
-
-    // Install dependencies to generate lock file (temporarily hide workspace)
-    console.log('  - Installing dependencies...')
-    // Temporarily rename package.json to hide workspace structure
-    await $`mv package.json package.json.tmp`
-    
-    try {
-      await $`cd ${pkg} && bun install`
-    } finally {
-      // Restore root package.json
-      await $`mv package.json.tmp package.json`
-    }
-
-    // Build package if it has a build script
-    const pkgJson = JSON.parse(newContent)
-    if (pkgJson.scripts?.build) {
-      console.log('  - Building package...')
-      try {
-        await $`cd ${pkg} && bun run build`
-      } catch (e) {
-        console.log(`  ⚠️  Build failed: ${e}`)
-      }
-    }
-  }
+  // 6. Build all packages to ensure they work
+  console.log('\n🏗️  Building all packages...')
+  await $`bun run build:packages`
 
   // 7. Commit all changes
   console.log('\n💾 Committing release changes...')
   await $`git add -A`
-  await $`git commit -m "chore: prepare release v${newVersion}
+  await $`git commit -m "chore: release v${newVersion}
 
-- Replace workspace:* with v${newVersion}
-- Generate lock files for all packages
-- Build all packages"`
+- Bump all package versions to v${newVersion}
+- Update CHANGELOG.md files"`
 
   // 8. Create and push tag
   console.log(`🏷️  Creating tag v${newVersion}...`)
