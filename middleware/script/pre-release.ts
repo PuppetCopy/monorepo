@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 import { $, file, write } from 'bun'
-import { join } from 'path'
 
 console.log('🚀 Starting post-deployment synchronization...')
 

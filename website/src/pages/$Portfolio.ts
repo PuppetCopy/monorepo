@@ -78,15 +78,12 @@ export const $PortfolioPage = ({
                     // puppetLinkList: true,
                     // requestAdjustList: true,
                     requestMirror: true,
-                    settleList: true, 
+                    settleList: true,
                     updateAllocationForKeeperFeeList: true
                   }
                 }
               }
             })
-
-            debugger
-
 
             return result
           },

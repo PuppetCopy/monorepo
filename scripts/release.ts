@@ -85,7 +85,6 @@ ${releaseType.charAt(0).toUpperCase() + releaseType.slice(1)} release
 
   console.log(`\n✅ Release v${newVersion} completed successfully!`)
   console.log('Railway will automatically deploy from the release branch.')
-
 } catch (error) {
   console.error('❌ Release failed:', error)
   process.exit(1)
@@ -94,13 +93,13 @@ ${releaseType.charAt(0).toUpperCase() + releaseType.slice(1)} release
 // Get packages from changeset config
 async function getPackagesFromChangeset(): Promise<string[]> {
   const changesetConfig = await file('./.changeset/config.json').json()
-  
+
   // Get packages from the fixed groups (they should all have the same version)
   const fixedGroups = changesetConfig.fixed || []
   if (fixedGroups.length > 0) {
     return fixedGroups[0] // Use the first fixed group
   }
-  
+
   // Fallback to workspace discovery if no fixed groups
   const rootPackage = await file('./package.json').json()
   return rootPackage.workspaces || []
