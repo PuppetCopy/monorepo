@@ -8,21 +8,24 @@ WORKDIR /app
 # Create simplified package.json for website-only build  
 RUN echo '{"name":"website-build","private":true,"workspaces":["website","middleware","indexer"]}' > package.json
 
-# Copy lockfile and package files
+# Copy only package files first for better caching
 COPY bun.lock ./
-COPY tsconfig.base.json ./
 COPY middleware/package.json middleware/
 COPY website/package.json website/
 COPY indexer/package.json indexer/
 
-# Install dependencies
+# Install dependencies (cached if package files don't change)
 RUN bun install
 
-# Copy source code
-COPY tsconfig.json ./
+# Copy all source code
+COPY tsconfig.base.json tsconfig.json ./
 COPY middleware/ middleware/
 COPY website/ website/
 COPY indexer/ indexer/
+
+# Build middleware first (website depends on it)
+WORKDIR /app/middleware
+RUN bun run build
 
 # Build website
 WORKDIR /app/website
