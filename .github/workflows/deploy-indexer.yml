@@ -1,0 +1,70 @@
+name: Deploy Indexer to Railway
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Ensure this doesn't run on PRs from forks
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build all packages
+        run: bun run build:packages
+
+      - name: Get version from tag
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION=$(grep '"version"' middleware/package.json | cut -d'"' -f4)
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create deployment package
+        run: |
+          # Create a clean deployment directory
+          mkdir -p railway-deploy
+          
+          # Copy indexer (excluding node_modules)
+          rsync -av --exclude='node_modules' --exclude='.git' indexer/ railway-deploy/
+          
+          # Bundle middleware inside indexer
+          mkdir -p railway-deploy/bundled
+          cp -r middleware railway-deploy/bundled/
+          
+          # Update package.json to use bundled middleware
+          cd railway-deploy
+          sed -i 's|"@puppet-copy/middleware": "workspace:\*"|"@puppet-copy/middleware": "file:./bundled/middleware"|g' package.json
+          
+          # Install dependencies with the bundled middleware
+          bun install --frozen-lockfile
+          
+          # Create deployment info
+          echo "Deployed version: ${{ steps.version.outputs.version }}" > DEPLOYMENT_INFO.txt
+          echo "Deployed at: $(date)" >> DEPLOYMENT_INFO.txt
+
+      - name: Deploy to Railway
+        uses: bensonibeabuchi/railway-deploy@v1.0.1
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: indexer
+          source: railway-deploy

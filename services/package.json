@@ -16,7 +16,7 @@
   },
   "packageManager": "bun@1.2.16",
   "dependencies": {
-    "@puppet-copy/middleware": "0.4.0",
+    "@puppet-copy/middleware": "workspace:*",
     "aelea": "1.9.0",
     "og-img": "0.2.1",
     "satori": "0.15.2",

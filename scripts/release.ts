@@ -58,7 +58,7 @@ ${releaseType.charAt(0).toUpperCase() + releaseType.slice(1)} release
   console.log('\n🏗️  Building all packages...')
   await $`bun run build:packages`
 
-  // 7. Commit all changes
+  // 7. Commit all changes (keeping workspace:* references)
   console.log('\n💾 Committing release changes...')
   await $`git add -A`
   await $`git commit -m "chore: release v${newVersion}
