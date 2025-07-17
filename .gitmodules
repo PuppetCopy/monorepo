@@ -3,7 +3,7 @@
 	url = https://github.com/GMX-Blueberry-Club/puppet-contracts.git
 [submodule "subgraph"]
 	path = indexer
-	url = https://github.com/PuppetCopy/subgraph.git
+	url = https://github.com/PuppetCopy/indexer.git
 [submodule "keeper"]
 	path = keeper
 	url = https://github.com/PuppetCopy/keeper.git
