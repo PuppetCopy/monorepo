@@ -1,5 +1,5 @@
 import { getAddress } from 'viem'
-import { getMappedValue } from '../../utils/index.js'
+import { getMappedValue } from '../utils.js'
 
 export type GqlType<T extends string> = { __typename: T }
 

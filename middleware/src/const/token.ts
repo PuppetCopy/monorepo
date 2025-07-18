@@ -2,8 +2,8 @@ import { TOKENS } from '@gmx-io/sdk/configs/tokens'
 import type { Token } from '@gmx-io/sdk/types/tokens'
 import type { Address } from 'abitype'
 import { arbitrum } from 'viem/chains'
-import type { ITokenDescription } from '../utils/types.js'
-import { getDenominator, groupArrayByKey } from '../utils/utils.js'
+import type { ITokenDescription } from '../core/types.js'
+import { getDenominator, groupArrayByKey } from '../core/utils.js'
 import { CONTRACT } from './contract.js'
 
 export const TOKEN_DESCRIPTION_LIST: ITokenDescription[] = [

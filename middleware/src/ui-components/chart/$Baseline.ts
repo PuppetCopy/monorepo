@@ -9,7 +9,7 @@ import {
   type DeepPartial,
   LineStyle
 } from 'lightweight-charts'
-import { readableUnitAmount } from '../../utils/index.js'
+import { readableUnitAmount } from '../../core/utils.js'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
 
 export interface IBaselineChart {

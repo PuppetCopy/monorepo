@@ -1,8 +1,9 @@
 import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION } from '../const/index.js'
-import { abs, applyFactor, delta, getDenominator, getTokenUsd, groupArrayByKeyMap } from '../utils/index.js'
+import { abs, delta } from '../core/mathUtils.js'
+import { getDenominator, groupArrayByKeyMap } from '../core/utils.js'
 import { getTokenDescription } from './gmxUtils.js'
-import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from './types.js'
+import type { IOraclePrice, IPriceMinMax } from './types.js'
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,
@@ -62,79 +63,79 @@ export function calculateImpactForCrossoverRebalance(
   return positiveImpact > negativeImpactUsd ? deltaDiffUsd : 0n - deltaDiffUsd
 }
 
-export function getCappedPositionImpactUsd(
-  marketPrice: IMarketPrice,
-  marketPoolInfo: IMarketInfo,
-  sizeDeltaUsd: bigint,
-  isLong: boolean
-) {
-  const priceImpactDeltaUsd = getPriceImpactForPosition(marketPoolInfo, sizeDeltaUsd, isLong)
+// export function getCappedPositionImpactUsd(
+//   marketPrice: IMarketPrice,
+//   marketPoolInfo: IMarketInfo,
+//   sizeDeltaUsd: bigint,
+//   isLong: boolean
+// ) {
+//   const priceImpactDeltaUsd = getPriceImpactForPosition(marketPoolInfo, sizeDeltaUsd, isLong)
 
-  if (priceImpactDeltaUsd < 0n) return priceImpactDeltaUsd
+//   if (priceImpactDeltaUsd < 0n) return priceImpactDeltaUsd
 
-  const impactPoolAmount = marketPoolInfo.usage.positionImpactPoolAmount
+//   const impactPoolAmount = marketPoolInfo.usage.positionImpactPoolAmount
 
-  const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(marketPrice.indexTokenPrice.min, impactPoolAmount)
+//   const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(marketPrice.indexTokenPrice.min, impactPoolAmount)
 
-  let cappedImpactUsd = priceImpactDeltaUsd
+//   let cappedImpactUsd = priceImpactDeltaUsd
 
-  if (cappedImpactUsd > maxPriceImpactUsdBasedOnImpactPool) {
-    cappedImpactUsd = maxPriceImpactUsdBasedOnImpactPool
-  }
+//   if (cappedImpactUsd > maxPriceImpactUsdBasedOnImpactPool) {
+//     cappedImpactUsd = maxPriceImpactUsdBasedOnImpactPool
+//   }
 
-  const maxPriceImpactFactor = marketPoolInfo.config.maxPositionImpactFactorPositive
-  const maxPriceImpactUsdBasedOnMaxPriceImpactFactor = applyFactor(abs(sizeDeltaUsd), maxPriceImpactFactor)
+//   const maxPriceImpactFactor = marketPoolInfo.config.maxPositionImpactFactorPositive
+//   const maxPriceImpactUsdBasedOnMaxPriceImpactFactor = applyFactor(abs(sizeDeltaUsd), maxPriceImpactFactor)
 
-  if (cappedImpactUsd > maxPriceImpactUsdBasedOnMaxPriceImpactFactor) {
-    cappedImpactUsd = maxPriceImpactUsdBasedOnMaxPriceImpactFactor
-  }
+//   if (cappedImpactUsd > maxPriceImpactUsdBasedOnMaxPriceImpactFactor) {
+//     cappedImpactUsd = maxPriceImpactUsdBasedOnMaxPriceImpactFactor
+//   }
 
-  return cappedImpactUsd
-}
+//   return cappedImpactUsd
+// }
 
-export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd: bigint, isLong: boolean) {
-  const longInterestInUsd = marketInfo.usage.longInterestUsd
-  const shortInterestInUsd = marketInfo.usage.shortInterestUsd
+// export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd: bigint, isLong: boolean) {
+//   const longInterestInUsd = marketInfo.usage.longInterestUsd
+//   const shortInterestInUsd = marketInfo.usage.shortInterestUsd
 
-  const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
-  const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
+//   const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
+//   const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
 
-  const priceImpactUsd = getPriceImpactUsd(
-    longInterestInUsd,
-    shortInterestInUsd,
-    nextLongUsd,
-    nextShortUsd,
-    marketInfo.config.positionImpactFactorPositive,
-    marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor
-  )
+//   const priceImpactUsd = getPriceImpactUsd(
+//     longInterestInUsd,
+//     shortInterestInUsd,
+//     nextLongUsd,
+//     nextShortUsd,
+//     marketInfo.config.positionImpactFactorPositive,
+//     marketInfo.config.positionImpactFactorNegative,
+//     marketInfo.config.positionImpactExponentFactor
+//   )
 
-  if (priceImpactUsd > 0n) {
-    return priceImpactUsd
-  }
+//   if (priceImpactUsd > 0n) {
+//     return priceImpactUsd
+//   }
 
-  if (!(abs(marketInfo.fees.virtualInventory.virtualInventoryForPositions) > 0n)) {
-    return priceImpactUsd
-  }
+//   if (!(abs(marketInfo.fees.virtualInventory.virtualInventoryForPositions) > 0n)) {
+//     return priceImpactUsd
+//   }
 
-  const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
-    marketInfo.fees.virtualInventory.virtualInventoryForPositions,
-    sizeDeltaUsd,
-    isLong
-  )
+//   const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
+//     marketInfo.fees.virtualInventory.virtualInventoryForPositions,
+//     sizeDeltaUsd,
+//     isLong
+//   )
 
-  const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
-    longInterestInUsd,
-    shortInterestInUsd,
-    virtualInventoryParams.nextLongUsd,
-    virtualInventoryParams.nextShortUsd,
-    marketInfo.config.positionImpactFactorPositive,
-    marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor
-  )
+//   const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
+//     longInterestInUsd,
+//     shortInterestInUsd,
+//     virtualInventoryParams.nextLongUsd,
+//     virtualInventoryParams.nextShortUsd,
+//     marketInfo.config.positionImpactFactorPositive,
+//     marketInfo.config.positionImpactFactorNegative,
+//     marketInfo.config.positionImpactExponentFactor
+//   )
 
-  return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
-}
+//   return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
+// }
 
 export function getMarkPrice(price: IPriceMinMax, isIncrease: boolean, isLong: boolean) {
   const shouldUseMaxPrice = getShouldUseMaxPrice(isIncrease, isLong)
@@ -292,7 +293,7 @@ interface ISignedPrice {
   blob: string
 }
 
-export async function querySignedPrices(): Promise<IPriceOracleMap> {
+export async function querySignedPrices(): Promise<Record<Address, IOraclePrice>> {
   const x = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
 
   const res = (await x.json()) as { signedPrices: ISignedPrice[] }
