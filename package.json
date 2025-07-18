@@ -28,8 +28,7 @@
     "contracts:build": "cd contracts && bun run build",
     "middleware:build": "cd middleware && bun run build",
     "docs:build": "cd docs && bun vitepress build",
-    "website:build": "cd website && bun run build",
-    "build": "bun run contracts:build && bun run middleware:build && bun run docs:build && bun run website:build"
+    "website:build": "cd website && bun run build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
