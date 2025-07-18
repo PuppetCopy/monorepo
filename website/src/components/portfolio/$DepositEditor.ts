@@ -1,13 +1,13 @@
 import { constant, empty, map, mergeArray, sample, snapshot } from '@most/core'
 import type { Stream } from '@most/types'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import {
   parseFixed,
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, combineState, component, type IBehavior, type IOps, style, switchMap } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

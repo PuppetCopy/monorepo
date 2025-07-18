@@ -1,6 +1,6 @@
 import { empty, map, now } from '@most/core'
 import type { Stream } from '@most/types'
-import { filterNull } from '@puppet-copy/middleware/utils'
+import { filterNull } from '@puppet-copy/middleware/core'
 import {
   $element,
   $node,

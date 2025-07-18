@@ -1,6 +1,14 @@
 import { awaitPromises, map, multicast, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
+import {
+  getDebankProfileUrl,
+  pagingQuery,
+  readableLeverage,
+  readableUsd,
+  shortenAddress,
+  unixTimestampNow
+} from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import {
   $anchor,
@@ -13,14 +21,6 @@ import {
   type IQuantumScrollPage,
   type ISortBy
 } from '@puppet-copy/middleware/ui-components'
-import {
-  getDebankProfileUrl,
-  pagingQuery,
-  readableLeverage,
-  readableUsd,
-  shortenAddress,
-  unixTimestampNow
-} from '@puppet-copy/middleware/utils'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'

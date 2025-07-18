@@ -1,16 +1,16 @@
 import { constant, empty, map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
-import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import {
   filterNull,
   getDuration,
+  getTraderMatchingKey,
   readableDate,
   readablePercentage,
   unixTimestampNow
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'

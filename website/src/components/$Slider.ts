@@ -1,6 +1,6 @@
 import { join, map, mergeArray, now, snapshot, until } from '@most/core'
 import type { Stream } from '@most/types'
-import { invertColor } from '@puppet-copy/middleware/utils'
+import { invertColor } from '@puppet-copy/middleware/core'
 import {
   $node,
   $text,

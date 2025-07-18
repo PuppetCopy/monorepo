@@ -1,11 +1,21 @@
 import { empty, map, skipRepeats } from '@most/core'
 import type { Stream } from '@most/types'
-import { latestPriceMap } from '@puppet-copy/middleware/core'
+import {
+  getMappedValue,
+  type ITokenDescription,
+  latestPriceMap,
+  lst,
+  readableDate,
+  readableLeverage,
+  readablePercentage,
+  readablePnl,
+  readableUsd,
+  toBasisPoints
+} from '@puppet-copy/middleware/core'
 import {
   getPositionPnlUsd,
   getRoughLiquidationPrice,
   getTokenDescription,
-  type IMarket,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
 import {
@@ -17,18 +27,7 @@ import {
   $tokenIconMap,
   $unknown
 } from '@puppet-copy/middleware/ui-components'
-import {
-  getMappedValue,
-  getTokenUsd,
-  type ITokenDescription,
-  lst,
-  readableDate,
-  readableLeverage,
-  readablePercentage,
-  readablePnl,
-  readableUsd,
-  toBasisPoints
-} from '@puppet-copy/middleware/utils'
+import type { IMarket } from '@puppet-copy/sql/schema'
 import type { IBehavior, IComposeBehavior } from 'aelea/core'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
 import type * as router from 'aelea/router'
@@ -206,7 +205,7 @@ export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
 export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
-  const collateralUsd = getTokenUsd(lstIncrease.collateralTokenPriceMin, pos.maxCollateralInUsd)
+  const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
   const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
 
   const roi = isPositionSettled(pos)
@@ -226,7 +225,7 @@ export function $liquidationSeparator(
   markPrice: Stream<bigint>
 ) {
   const liqWeight = map((price) => {
-    const collateralUsd = getTokenUsd(price, collateralAmount)
+    const collateralUsd = price * collateralAmount
     const liquidationPrice = getRoughLiquidationPrice(isLong, sizeUsd, sizeInTokens, collateralUsd, collateralAmount)
 
     return liquidationWeight(isLong, liquidationPrice, price)
