@@ -12,9 +12,9 @@ try {
   const deployments = await deploymentsFile.json()
   const addresses = deployments[42161]
 
-  // Update contract.ts with new addresses
-  const contractFile = file('./src/const/contract.ts')
-  let contractContent = await contractFile.text()
+  // Update address.ts with new addresses
+  const addressFile = file('./src/const/address.ts')
+  let addressContent = await addressFile.text()
 
   // Format addresses in single-line style
   const formattedAddresses = Object.entries(addresses)
@@ -22,17 +22,17 @@ try {
     .join(',\n')
 
   // Replace addresses block content
-  contractContent = contractContent.replace(
+  addressContent = addressContent.replace(
     /const addresses = \{[\s\S]*?\} as const/,
     `const addresses = {\n${formattedAddresses}\n} as const`
   )
 
-  await write('./src/const/contract.ts', contractContent)
-  console.log('✅ Contract addresses updated')
+  await write('./src/const/address.ts', addressContent)
+  console.log('✅ Address updated')
 
   await $`bunx wagmi generate`
   console.log('✅ ABIs generated successfully')
 } catch (error) {
-  console.error('❌ Error updating contract addresses or generating ABIs:', error)
+  console.error('❌ Error updating address or generating ABIs:', error)
   process.exit(1)
 }

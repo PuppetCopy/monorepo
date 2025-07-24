@@ -1,3 +1,4 @@
+import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
 import { FUNDING_RATE_PRECISION } from '../const/index.js'
@@ -66,6 +67,13 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
 
 export function getPositionKey(account: Address, market: Address, collateralToken: Address, isLong: boolean) {
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
+}
+
+export function getPositionSizeInUsdKey(positionKey: Hex) {
+  return keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'string' }], [positionKey, 'SIZE_IN_USD']))
+}
+export function getPositionCollateralAmountKey(positionKey: Hex) {
+  return keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'string' }], [positionKey, 'COLLATERAL_AMOUNT']))
 }
 
 export function hashData(types: string[], values: (string | number | bigint | boolean)[]) {

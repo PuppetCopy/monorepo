@@ -1,35 +1,23 @@
+import { CONTRACTS } from '@gmx-io/sdk/configs/contracts'
 import { erc20Abi } from 'viem'
 import * as abi from './abi/__generated/abi.js'
 import datastore from './abi/datastore.js'
-// gmx v2
 import exchangeRouter from './abi/exchangeRouter.js'
 import gmxCustomError from './abi/gmxCustomError.js'
 import gmxEventEmitter from './abi/gmxEventEmitter.js'
 import reader from './abi/reader.js'
 import referralStorage from './abi/referralStorage.js'
 
-// Contract addresses for Arbitrum (42161)
-const addresses = {
-  Dictatorship: '0x583C63CEcb474789331C43da153b1fe5eC0d6CEC',
-  PuppetToken: '0x10f7F9e33FaF343F9CfE1c69b177ed86Bc760B4e',
-  TokenRouter: '0x796347E2881bE603C4D88ac0103c4A3569BA8b28',
-  RouterProxy: '0x8c194dba375973a75cD0bDe2b4Af795a2b25ff3e',
-  AllocationStore: '0xd29389780e53bb915f64d93c8981d2ca168c2ddc',
-  FeeMarketplaceStore: '0xAf97414983197b30485828ddb3De60134871dBe2',
-  FeeMarketplace: '0x1290fE1CC845D9D564183d3d8C65122DCf908ED5',
-  MatchingRule: '0xaaC31987673082034e06E7066726a6Bc85dbCF80',
-  MirrorPosition: '0xfab9370c2a8f8f69ed7880f5f204e0125c351632',
-  Allocate: '0x31b1932248c12029820fd28bde2b49991ed6f178',
-  Settle: '0x0c93cb536516BcEB4d23ec9464D674C50B417b2D',
-  KeeperRouter: '0x3d04f440b4c3c5b56770d7341c1682065bee6593',
-  Router: '0x94e58f4eDb5134C8e6885516857536580dacCc18',
-  UserRouter: '0x877b074B4E87EeaD27656a11491D86C9081198a7'
-} as const
+import { addresses } from './address.js'
 
 export const CONTRACT = {
-  RouterProxy: {
+  UserRouter: {
     address: addresses.RouterProxy,
-    abi: [...abi.userRouterAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
+    abi: abi.userRouterAbi
+  },
+  KeeperRouter: {
+    address: addresses.KeeperRouter,
+    abi: [...abi.keeperRouterAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
   },
 
   Dictatorship: {
@@ -61,17 +49,9 @@ export const CONTRACT = {
     address: addresses.MirrorPosition,
     abi: abi.mirrorPositionAbi
   },
-  Allocate: {
-    address: addresses.Allocate,
-    abi: abi.allocateAbi
-  },
   Settle: {
     address: addresses.Settle,
     abi: abi.settleAbi
-  },
-  KeeperRouter: {
-    address: addresses.KeeperRouter,
-    abi: abi.keeperRouterAbi
   },
   FeeMarketplace: {
     address: addresses.FeeMarketplace,
@@ -83,32 +63,32 @@ export const CONTRACT = {
   },
 
   GMX: {
-    address: '0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a',
+    address: CONTRACTS[42161].GMX,
     abi: erc20Abi
   },
   ReferralStorage: {
-    address: '0xe6fab3f0c7199b0d34d7fbe83394fc0e0d06e99d',
+    address: CONTRACTS[42161].ReferralStorage,
     abi: referralStorage
   },
 
   // V2
   GmxReaderV2: {
-    address: '0x38d91ED96283d62182Fc6d990C24097A918a4d9b',
+    address: CONTRACTS[42161].Reader,
     abi: reader
   },
   GmxExchangeRouter: {
-    address: '0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8',
+    address: CONTRACTS[42161].Router,
     abi: exchangeRouter
   },
   GmxOrderVault: {
-    address: '0x31eF83a530Fde1B38EE9A18093A333D8Bbbc40D5'
+    address: CONTRACTS[42161].OrderVault
   },
   GmxDatastore: {
-    address: '0xFD70de6b91282D8017aA4E741e9Ae325CAb992d8',
+    address: CONTRACTS[42161].DataStore,
     abi: datastore
   },
   GmxEventEmitter: {
-    address: '0xC8ee91A54287DB53897056e12D9819156D3822Fb',
+    address: CONTRACTS[42161].EventEmitter,
     abi: gmxEventEmitter
   },
   GmxCustomError: {

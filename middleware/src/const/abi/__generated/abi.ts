@@ -43,323 +43,6 @@ export const addressAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Allocate
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const allocateAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      {
-        name: '_authority',
-        internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      {
-        name: '_allocationStore',
-        internalType: 'contract AllocationStore',
-        type: 'address'
-      },
-      {
-        name: '_config',
-        internalType: 'struct Allocate.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'transferOutGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'maxKeeperFeeToAllocationRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxKeeperFeeToAdjustmentRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationAccountImplementation',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'allocationMap',
-    outputs: [{ name: 'totalAmount', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'allocationPuppetList',
-    outputs: [{ name: 'puppetAmounts', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'authority',
-    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' }
-    ],
-    name: 'canCall',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_params',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    name: 'collectKeeperFee',
-    outputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_nextAllocated', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
-        type: 'address'
-      },
-      {
-        name: '_params',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    name: 'createAllocation',
-    outputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocated', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'getAllocation',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getConfig',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct Allocate.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'transferOutGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'maxKeeperFeeToAllocationRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxKeeperFeeToAdjustmentRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'getPuppetAllocationList',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: '_puppet', internalType: 'address', type: 'address' }
-    ],
-    name: 'initializeTraderActivityThrottle',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'puppet', internalType: 'address', type: 'address' }
-    ],
-    name: 'lastActivityThrottleMap',
-    outputs: [{ name: 'lastActivity', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
-    name: 'setConfig',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' },
-      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setPermission',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__InsufficientAllocationForKeeperFee'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'Allocation__InvalidAllocation'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeExceedsAdjustmentRatio'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeExceedsCostFactor'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
-      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeNotFullyCovered'
-  },
-  { type: 'error', inputs: [], name: 'Allocation__PuppetListEmpty' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'expected', internalType: 'uint256', type: 'uint256' },
-      { name: 'provided', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__PuppetListMismatch'
-  },
-  { type: 'error', inputs: [], name: 'FailedDeployment' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'InsufficientBalance'
-  },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AllocationAccount
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2640,6 +2323,14 @@ export const errorAbi = [
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'MirrorPosition__PositionNotFound'
   },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'MirrorPosition__PositionNotStalled'
+  },
   { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
   {
     type: 'error',
@@ -3632,13 +3323,6 @@ export const forkTestBaseAbi = [
     inputs: [],
     name: 'IS_TEST',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -6302,6 +5986,221 @@ export const iGmxOrderCallbackReceiverAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IGmxReadDataStore
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iGmxReadDataStoreAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'address', type: 'address' }
+    ],
+    name: 'addAddress',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'addBytes32',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'addUint',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'address', type: 'address' }
+    ],
+    name: 'containsAddress',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'containsBytes32',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'containsUint',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddressArray',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddressCount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getAddressValuesAt',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBool',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBoolArray',
+    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32Array',
+    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32Count',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getBytes32ValuesAt',
+    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getInt',
+    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getIntArray',
+    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getString',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getStringArray',
+    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUint',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUintArray',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUintCount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getUintValuesAt',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'removeBytes32',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IGmxReferralStorage
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8248,7 +8147,6 @@ export const keeperRouterAbi = [
         internalType: 'contract MatchingRule',
         type: 'address'
       },
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' },
       { name: '_settle', internalType: 'contract Settle', type: 'address' },
       {
         name: '_config',
@@ -8272,6 +8170,16 @@ export const keeperRouterAbi = [
           },
           {
             name: 'adjustPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
             internalType: 'uint256',
             type: 'uint256'
           },
@@ -9254,13 +9162,6 @@ export const keeperRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'authority',
     outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view'
@@ -9313,6 +9214,16 @@ export const keeperRouterAbi = [
           },
           {
             name: 'adjustPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
             internalType: 'uint256',
             type: 'uint256'
           },
@@ -9547,27 +9458,6 @@ export const keeperRouterAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_allocParams',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      },
-      {
         name: '_callParams',
         internalType: 'struct MirrorPosition.CallPosition',
         type: 'tuple',
@@ -9576,6 +9466,11 @@ export const keeperRouterAbi = [
             name: 'collateralToken',
             internalType: 'contract IERC20',
             type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
           },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
@@ -9586,9 +9481,16 @@ export const keeperRouterAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
         ]
-      }
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestAdjust',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
@@ -9598,27 +9500,6 @@ export const keeperRouterAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_allocParams',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      },
-      {
         name: '_callParams',
         internalType: 'struct MirrorPosition.CallPosition',
         type: 'tuple',
@@ -9627,6 +9508,11 @@ export const keeperRouterAbi = [
             name: 'collateralToken',
             internalType: 'contract IERC20',
             type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
           },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
@@ -9637,11 +9523,60 @@ export const keeperRouterAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
         ]
-      }
+      },
+      { name: '_allocationAddress', internalType: 'address', type: 'address' }
     ],
-    name: 'requestMirror',
+    name: 'requestCloseStalledPosition',
+    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_callParams',
+        internalType: 'struct MirrorPosition.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
+          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
+          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestOpen',
     outputs: [
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
       { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
@@ -9924,7 +9859,11 @@ export const matchingRuleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'allocate', internalType: 'contract Allocate', type: 'address' },
+      {
+        name: 'mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      },
       {
         name: '_collateralToken',
         internalType: 'contract IERC20',
@@ -10061,6 +10000,11 @@ export const mirrorPositionAbi = [
         type: 'address'
       },
       {
+        name: '_allocationStore',
+        internalType: 'contract AllocationStore',
+        type: 'address'
+      },
+      {
         name: '_config',
         internalType: 'struct MirrorPosition.Config',
         type: 'tuple',
@@ -10068,6 +10012,11 @@ export const mirrorPositionAbi = [
           {
             name: 'gmxExchangeRouter',
             internalType: 'contract IGmxExchangeRouter',
+            type: 'address'
+          },
+          {
+            name: 'gmxDataStore',
+            internalType: 'contract IGmxReadDataStore',
             type: 'address'
           },
           { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
@@ -10086,11 +10035,58 @@ export const mirrorPositionAbi = [
             name: 'fallbackRefundExecutionFeeReceiver',
             internalType: 'address',
             type: 'address'
+          },
+          {
+            name: 'transferOutGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'maxKeeperFeeToAllocationRatio',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxKeeperFeeToAdjustmentRatio',
+            internalType: 'uint256',
+            type: 'uint256'
           }
         ]
       }
     ],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'allocationAccountImplementation',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'allocationMap',
+    outputs: [{ name: 'totalAmount', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'allocationPuppetList',
+    outputs: [{ name: 'puppetAmounts', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'allocationStore',
+    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -10111,10 +10107,64 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'config',
+    outputs: [
+      {
+        name: 'gmxExchangeRouter',
+        internalType: 'contract IGmxExchangeRouter',
+        type: 'address'
+      },
+      {
+        name: 'gmxDataStore',
+        internalType: 'contract IGmxReadDataStore',
+        type: 'address'
+      },
+      { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
+      { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: 'increaseCallbackGasLimit',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'decreaseCallbackGasLimit',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'fallbackRefundExecutionFeeReceiver',
+        internalType: 'address',
+        type: 'address'
+      },
+      { name: 'transferOutGasLimit', internalType: 'uint256', type: 'uint256' },
+      { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'maxKeeperFeeToAllocationRatio',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'maxKeeperFeeToAdjustmentRatio',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
     inputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
     name: 'execute',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'getAllocation',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -10129,6 +10179,11 @@ export const mirrorPositionAbi = [
           {
             name: 'gmxExchangeRouter',
             internalType: 'contract IGmxExchangeRouter',
+            type: 'address'
+          },
+          {
+            name: 'gmxDataStore',
+            internalType: 'contract IGmxReadDataStore',
             type: 'address'
           },
           { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
@@ -10147,6 +10202,22 @@ export const mirrorPositionAbi = [
             name: 'fallbackRefundExecutionFeeReceiver',
             internalType: 'address',
             type: 'address'
+          },
+          {
+            name: 'transferOutGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'maxKeeperFeeToAllocationRatio',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxKeeperFeeToAdjustmentRatio',
+            internalType: 'uint256',
+            type: 'uint256'
           }
         ]
       }
@@ -10177,35 +10248,29 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'getRequestAdjustment',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct MirrorPosition.RequestAdjustment',
-        type: 'tuple',
-        components: [
-          {
-            name: 'allocationAddress',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
-          {
-            name: 'traderTargetLeverage',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'traderCollateralDelta',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'traderSizeDelta', internalType: 'uint256', type: 'uint256' },
-          { name: 'sizeDelta', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'getPuppetAllocationList',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_puppet', internalType: 'address', type: 'address' }
     ],
+    name: 'initializeTraderActivityThrottle',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'puppet', internalType: 'address', type: 'address' }
+    ],
+    name: 'lastActivityThrottleMap',
+    outputs: [{ name: 'lastActivity', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
   },
   {
@@ -10230,7 +10295,7 @@ export const mirrorPositionAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_params',
+        name: '_callParams',
         internalType: 'struct MirrorPosition.CallPosition',
         type: 'tuple',
         components: [
@@ -10238,6 +10303,11 @@ export const mirrorPositionAbi = [
             name: 'collateralToken',
             internalType: 'contract IERC20',
             type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
           },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
@@ -10248,12 +10318,16 @@ export const mirrorPositionAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
         ]
       },
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocation', internalType: 'uint256', type: 'uint256' },
-      { name: '_callbackContract', internalType: 'address', type: 'address' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestAdjust',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
@@ -10294,6 +10368,11 @@ export const mirrorPositionAbi = [
             internalType: 'contract IERC20',
             type: 'address'
           },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
           { name: 'isIncrease', internalType: 'bool', type: 'bool' },
@@ -10303,15 +10382,70 @@ export const mirrorPositionAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
         ]
       },
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocation', internalType: 'uint256', type: 'uint256' },
       { name: '_callbackContract', internalType: 'address', type: 'address' }
     ],
-    name: 'requestMirror',
+    name: 'requestCloseStalledPosition',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_matchingRule',
+        internalType: 'contract MatchingRule',
+        type: 'address'
+      },
+      {
+        name: '_callParams',
+        internalType: 'struct MirrorPosition.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
+          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
+          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestOpen',
+    outputs: [
+      { name: '_allocationAddress', internalType: 'address', type: 'address' },
+      { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
     stateMutability: 'payable'
   },
   {
@@ -10340,28 +10474,64 @@ export const mirrorPositionAbi = [
     stateMutability: 'view'
   },
   {
-    type: 'function',
-    inputs: [],
-    name: 'unhandledCallbackListId',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
+    type: 'error',
+    inputs: [
+      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Allocation__InsufficientAllocationForKeeperFee'
   },
   {
-    type: 'function',
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'Allocation__InvalidAllocation'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Allocation__InvalidKeeperExecutionFeeAmount'
+  },
+  {
+    type: 'error',
     inputs: [
-      {
-        name: 'unhandledCallbackListSequenceId',
-        internalType: 'uint256',
-        type: 'uint256'
-      }
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'unhandledCallbackMap',
-    outputs: [
-      { name: 'operator', internalType: 'address', type: 'address' },
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'bytes', type: 'bytes' }
+    name: 'Allocation__KeeperFeeExceedsAdjustmentRatio'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    stateMutability: 'view'
+    name: 'Allocation__KeeperFeeExceedsCostFactor'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
+      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Allocation__KeeperFeeNotFullyCovered'
+  },
+  { type: 'error', inputs: [], name: 'Allocation__PuppetListEmpty' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'expected', internalType: 'uint256', type: 'uint256' },
+      { name: 'provided', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Allocation__PuppetListMismatch'
+  },
+  { type: 'error', inputs: [], name: 'FailedDeployment' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'InsufficientBalance'
   },
   {
     type: 'error',
@@ -10391,6 +10561,14 @@ export const mirrorPositionAbi = [
     type: 'error',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'MirrorPosition__PositionNotFound'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'MirrorPosition__PositionNotStalled'
   },
   {
     type: 'error',
@@ -13058,7 +13236,11 @@ export const settleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' },
+      {
+        name: '_mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      },
       {
         name: '_callParams',
         internalType: 'struct Settle.CallSettle',
@@ -14124,13 +14306,6 @@ export const tradingForkTestAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'allocationStore',
     outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
     stateMutability: 'view'
@@ -14880,14 +15055,14 @@ export const tradingTestAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'testRequestMirrorInsufficientFunds',
+    name: 'testRequestOpenInsufficientFunds',
     outputs: [],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
     inputs: [],
-    name: 'testRequestMirrorSuccess',
+    name: 'testRequestOpenSuccess',
     outputs: [],
     stateMutability: 'nonpayable'
   },
@@ -15138,7 +15313,11 @@ export const userRouterAbi = [
         internalType: 'contract FeeMarketplace',
         type: 'address'
       },
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' }
+      {
+        name: '_mirrorPosition',
+        internalType: 'contract MirrorPosition',
+        type: 'address'
+      }
     ],
     stateMutability: 'nonpayable'
   },
@@ -15152,13 +15331,6 @@ export const userRouterAbi = [
     name: 'acceptOffer',
     outputs: [],
     stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -15182,6 +15354,13 @@ export const userRouterAbi = [
     inputs: [],
     name: 'matchingRule',
     outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'mirrorPosition',
+    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
     stateMutability: 'view'
   },
   {
