@@ -43,9 +43,7 @@ export function initCodeHash(implementation: Address): Hex {
 export function getAllocationAdderess(allocationStoreImplementationHash: Hex, allocationKey: Hex): Address {
   return getAddress(
     slice(
-      keccak256(
-        concat([toBytes('0xff'), CONTRACT.MirrorPosition.address, allocationKey, allocationStoreImplementationHash])
-      ),
+      keccak256(concat([toBytes('0xff'), CONTRACT.Mirror.address, allocationKey, allocationStoreImplementationHash])),
       12
     )
   )

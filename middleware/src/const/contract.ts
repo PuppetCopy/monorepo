@@ -36,18 +36,22 @@ export const CONTRACT = {
     address: addresses.TokenRouter,
     abi: abi.tokenRouterAbi
   },
-  AllocationStore: {
-    address: addresses.AllocationStore,
-    abi: abi.allocationStoreAbi
+  AccountStore: {
+    address: addresses.AccountStore,
+    abi: abi.accountStoreAbi
   },
 
-  MatchingRule: {
-    address: addresses.MatchingRule,
-    abi: abi.matchingRuleAbi
+  Account: {
+    address: addresses.Account,
+    abi: abi.accountAbi
   },
-  MirrorPosition: {
-    address: addresses.MirrorPosition,
-    abi: abi.mirrorPositionAbi
+  Rule: {
+    address: addresses.Rule,
+    abi: abi.ruleAbi
+  },
+  Mirror: {
+    address: addresses.Mirror,
+    abi: abi.mirrorAbi
   },
   Settle: {
     address: addresses.Settle,

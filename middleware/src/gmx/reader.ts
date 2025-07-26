@@ -31,9 +31,9 @@ export async function getTraderCollateral(client: PublicClient, positionKey: Hex
 //   allocationAddress: Address
 // ) {
 //   return readContract(client, {
-//     address: CONTRACT.MirrorPosition.address as Address,
-//     abi: CONTRACT.MirrorPosition.abi,
-//     functionName: 'isPositionStalled',
+//     address: CONTRACT.Mirror.address as Address,
+//     abi: CONTRACT.Mirror.abi,
+//     functionName: 'is',
 //     args: [trader, market, collateralToken, isLong, allocationAddress]
 //   })
 // }
