@@ -16,7 +16,7 @@
     "website",
     "middleware",
     "indexer",
-    "keeper"
+    "sequencer"
   ],
   "scripts": {
     "sherif": "sherif",

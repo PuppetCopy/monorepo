@@ -15,9 +15,9 @@ export const CONTRACT = {
     address: addresses.RouterProxy,
     abi: abi.userRouterAbi
   },
-  KeeperRouter: {
-    address: addresses.KeeperRouter,
-    abi: [...abi.keeperRouterAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
+  SequencerRouter: {
+    address: addresses.SequencerRouter,
+    abi: [...abi.sequencerRouterAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
   },
 
   Dictatorship: {

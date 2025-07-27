@@ -23,7 +23,7 @@ export const METHOD_HASHES_MAP = {
   CollectPlatformFees: keccak256(toHex('CollectPlatformFees')),
   SetTokenDustThreshold: keccak256(toHex('SetTokenDustThreshold')),
 
-  // KeeperRouter.sol
+  // SequencerRouter.sol
   RefundExecutionFee: keccak256(toHex('RefundExecutionFee'))
 } as const
 
@@ -57,7 +57,7 @@ export const EVENT_PARAMS_MAP = {
   CollectPlatformFees: parseAbiParameters('address, address, uint256'),
   SetTokenDustThreshold: parseAbiParameters('address[], uint256[]'),
 
-  // KeeperRouter.sol events
+  // SequencerRouter.sol events
   RefundExecutionFee: parseAbiParameters('bytes32, uint256')
 } as const
 
@@ -87,6 +87,6 @@ export const EVENT_DECODER_MAP = {
   [METHOD_HASHES_MAP.SetTokenDustThreshold]: (data: Hex) =>
     decodeAbiParameters(EVENT_PARAMS_MAP.SetTokenDustThreshold, data),
 
-  // KeeperRouter.sol decoders
+  // SequencerRouter.sol decoders
   [METHOD_HASHES_MAP.RefundExecutionFee]: (data: Hex) => decodeAbiParameters(EVENT_PARAMS_MAP.RefundExecutionFee, data)
 } as const
