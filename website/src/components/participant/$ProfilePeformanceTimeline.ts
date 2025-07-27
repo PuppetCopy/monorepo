@@ -2,19 +2,19 @@ import { empty, map, skipRepeatsWith, startWith, switchLatest } from '@most/core
 import type { Stream } from '@most/types'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
-  $Baseline,
-  $infoTooltipLabel,
-  $intermediatePromise,
-  type ISeriesTime
-} from '@puppet-copy/middleware/ui-components'
-import {
   fillTimeline,
   filterNull,
   formatFixed,
   parseReadableNumber,
   readableUnitAmount,
   unixTimestampNow
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
+import {
+  $Baseline,
+  $infoTooltipLabel,
+  $intermediatePromise,
+  type ISeriesTime
+} from '@puppet-copy/middleware/ui-components'
 import { $node, $text, combineState, component, type IBehavior, motion, style, switchMap } from 'aelea/core'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

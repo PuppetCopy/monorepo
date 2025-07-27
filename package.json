@@ -16,7 +16,7 @@
     "website",
     "middleware",
     "indexer",
-    "keeper"
+    "sequencer"
   ],
   "scripts": {
     "sherif": "sherif",
@@ -31,7 +31,7 @@
     "website:build": "cd website && bun run build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.1.1",
+    "@biomejs/biome": "2.1.2",
     "@changesets/changelog-github": "0.5.1",
     "@changesets/cli": "2.29.5",
     "sherif": "1.6.1",

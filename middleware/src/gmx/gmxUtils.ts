@@ -1,12 +1,12 @@
+import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
-import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION, MARGIN_FEE_BASIS_POINTS } from '../const/index.js'
+import { FUNDING_RATE_PRECISION } from '../const/index.js'
 import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
-import { factor, toBasisPoints } from '../utils/mathUtils.js'
-import type { ITokenDescription } from '../utils/types.js'
-import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from '../utils/utils.js'
+import { factor, toBasisPoints } from '../core/mathUtils.js'
+import type { ITokenDescription } from '../core/types.js'
+import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from '../core/utils.js'
 import { MARKET_ADDRESS_DESCRIPTION_MAP } from './const.js'
-import type { ILogEvent, IMarket } from './types.js'
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
   if (size === 0n) {
@@ -26,10 +26,6 @@ export function getNextAveragePrice(islong: boolean, size: bigint, nextPrice: bi
   const divisor = islong ? nextSize + pnl : nextSize + -pnl
 
   return (nextPrice * nextSize) / divisor
-}
-
-export function getMarginFees(size: bigint) {
-  return (size * MARGIN_FEE_BASIS_POINTS) / BASIS_POINTS_DIVISOR
 }
 
 export function getFundingFee(entryFundingRate: bigint, cumulativeFundingRate: bigint, size: bigint) {
@@ -61,31 +57,8 @@ export function getTokenDescription(token: Address): ITokenDescription {
   return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getAddress(token))
 }
 
-export function getMarketDescription(market: Address): IMarket {
+export function getMarketDescription(market: Address) {
   return getMappedValue(MARKET_ADDRESS_DESCRIPTION_MAP, getAddress(market))
-}
-
-export function orderEvents<T extends ILogEvent>(arr: T[]): T[] {
-  return arr.sort((a, b) => {
-    if (typeof b.blockNumber !== 'bigint') throw new Error('blockNumber is not a bigint')
-    if (typeof b.transactionIndex !== 'number') throw new Error('transactionIndex is not a number')
-    if (typeof b.logIndex !== 'number') throw new Error('logIndex is not a number')
-
-    const order =
-      a.blockNumber === b.blockNumber // same block?, compare transaction index
-        ? a.transactionIndex === b.transactionIndex //same transaction?, compare log index
-          ? a.logIndex - b.logIndex
-          : a.transactionIndex - b.transactionIndex
-        : Number(a.blockNumber - b.blockNumber) // compare block number
-
-    return order
-  })
-}
-
-export function getEventOrderIdentifier<T extends ILogEvent>(idxObj: T): number {
-  if (idxObj.blockNumber === null || idxObj.transactionIndex === null || idxObj.logIndex === null)
-    throw new Error('blockNumber is null')
-  return getblockOrderIdentifier(idxObj.blockNumber) + (idxObj.transactionIndex * 1000 + idxObj.logIndex)
 }
 
 export function getblockOrderIdentifier(blockNumber: bigint): number {
@@ -94,6 +67,13 @@ export function getblockOrderIdentifier(blockNumber: bigint): number {
 
 export function getPositionKey(account: Address, market: Address, collateralToken: Address, isLong: boolean) {
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
+}
+
+export function getPositionSizeInUsdKey(positionKey: Hex) {
+  return keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'string' }], [positionKey, 'SIZE_IN_USD']))
+}
+export function getPositionCollateralAmountKey(positionKey: Hex) {
+  return keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'string' }], [positionKey, 'COLLATERAL_AMOUNT']))
 }
 
 export function hashData(types: string[], values: (string | number | bigint | boolean)[]) {

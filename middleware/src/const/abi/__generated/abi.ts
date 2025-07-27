@@ -27,26 +27,15 @@ export const accessAbi = [
     outputs: [],
     stateMutability: 'nonpayable'
   },
-  { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' }
+  { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Address
+// Account
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const addressAbi = [
-  {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Allocate
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const allocateAbi = [
+export const accountAbi = [
   {
     type: 'constructor',
     inputs: [
@@ -56,32 +45,20 @@ export const allocateAbi = [
         type: 'address'
       },
       {
-        name: '_allocationStore',
-        internalType: 'contract AllocationStore',
+        name: '_accountStore',
+        internalType: 'contract AccountStore',
         type: 'address'
       },
       {
         name: '_config',
-        internalType: 'struct Allocate.Config',
+        internalType: 'struct Account.Config',
         type: 'tuple',
         components: [
           {
             name: 'transferOutGasLimit',
             internalType: 'uint256',
             type: 'uint256'
-          },
-          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'maxKeeperFeeToAllocationRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxKeeperFeeToAdjustmentRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' }
+          }
         ]
       }
     ],
@@ -90,32 +67,15 @@ export const allocateAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocationAccountImplementation',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'allocationMap',
-    outputs: [{ name: 'totalAmount', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'allocationAddress', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'allocationPuppetList',
-    outputs: [{ name: 'puppetAmounts', internalType: 'uint256', type: 'uint256' }],
+    name: 'accountStore',
+    outputs: [{ name: '', internalType: 'contract AccountStore', type: 'address' }],
     stateMutability: 'view'
   },
   {
     type: 'function',
     inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
+    name: 'allocationAccountImplementation',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -137,78 +97,64 @@ export const allocateAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      {
-        name: '_params',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    name: 'collectKeeperFee',
-    outputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_nextAllocated', internalType: 'uint256', type: 'uint256' }
-    ],
+    inputs: [{ name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'createAllocationAccount',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
     inputs: [
       {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
+        name: '_collateralToken',
+        internalType: 'contract IERC20',
         type: 'address'
       },
-      {
-        name: '_params',
-        internalType: 'struct Allocate.CallAllocation',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
+      { name: '_depositor', internalType: 'address', type: 'address' },
+      { name: '_user', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'createAllocation',
-    outputs: [
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'depositTokenList',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocated', internalType: 'uint256', type: 'uint256' }
+      { name: '_target', internalType: 'address', type: 'address' },
+      { name: '_callData', internalType: 'bytes', type: 'bytes' },
+      { name: '_gasLimit', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'execute',
+    outputs: [
+      { name: 'success', internalType: 'bool', type: 'bool' },
+      { name: 'returnData', internalType: 'bytes', type: 'bytes' }
     ],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
-    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'getAllocation',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    inputs: [{ name: '_allocationKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAllocationAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'getBalanceList',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
     stateMutability: 'view'
   },
   {
@@ -218,26 +164,14 @@ export const allocateAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct Allocate.Config',
+        internalType: 'struct Account.Config',
         type: 'tuple',
         components: [
           {
             name: 'transferOutGasLimit',
             internalType: 'uint256',
             type: 'uint256'
-          },
-          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'maxKeeperFeeToAllocationRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxKeeperFeeToAdjustmentRatio',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' }
+          }
         ]
       }
     ],
@@ -245,35 +179,33 @@ export const allocateAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'getPuppetAllocationList',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_accountList', internalType: 'address[]', type: 'address[]' },
+      { name: '_balanceList', internalType: 'uint256[]', type: 'uint256[]' }
+    ],
+    name: 'setBalanceList',
+    outputs: [],
+    stateMutability: 'nonpayable'
   },
   {
     type: 'function',
-    inputs: [
-      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: '_puppet', internalType: 'address', type: 'address' }
-    ],
-    name: 'initializeTraderActivityThrottle',
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
+    name: 'setConfig',
     outputs: [],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
     inputs: [
-      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'puppet', internalType: 'address', type: 'address' }
+      {
+        name: '_depositTokenList',
+        internalType: 'contract IERC20[]',
+        type: 'address[]'
+      },
+      { name: '_depositCapList', internalType: 'uint256[]', type: 'uint256[]' }
     ],
-    name: 'lastActivityThrottleMap',
-    outputs: [{ name: 'lastActivity', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
-    name: 'setConfig',
+    name: 'setDepositCapList',
     outputs: [],
     stateMutability: 'nonpayable'
   },
@@ -290,62 +222,102 @@ export const allocateAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_account', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'setUserBalance',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_allocationAddress', internalType: 'address', type: 'address' },
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_gasLimit', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'transferInAllocation',
+    outputs: [{ name: '_recordedAmountIn', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_receiver', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'transferOut',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'unaccountedBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
   },
   {
-    type: 'error',
+    type: 'function',
     inputs: [
-      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      { name: 'user', internalType: 'address', type: 'address' }
     ],
-    name: 'Allocation__InsufficientAllocationForKeeperFee'
+    name: 'userBalanceMap',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
   },
   {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'Allocation__InvalidAllocation'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
+    type: 'function',
     inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+      {
+        name: '_collateralToken',
+        internalType: 'contract IERC20',
+        type: 'address'
+      },
+      { name: '_user', internalType: 'address', type: 'address' },
+      { name: '_receiver', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__KeeperFeeExceedsAdjustmentRatio'
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable'
   },
   {
     type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeExceedsCostFactor'
+    inputs: [{ name: 'depositCap', internalType: 'uint256', type: 'uint256' }],
+    name: 'Account__DepositExceedsLimit'
   },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
-      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeNotFullyCovered'
-  },
-  { type: 'error', inputs: [], name: 'Allocation__PuppetListEmpty' },
+  { type: 'error', inputs: [], name: 'Account__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'Account__InvalidAmount' },
   {
     type: 'error',
     inputs: [
-      { name: 'expected', internalType: 'uint256', type: 'uint256' },
-      { name: 'provided', internalType: 'uint256', type: 'uint256' }
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      { name: 'recordedAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__PuppetListMismatch'
+    name: 'Account__InvalidSettledAmount'
   },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'token', internalType: 'address', type: 'address' }
+    ],
+    name: 'Account__NoFundsToTransfer'
+  },
+  { type: 'error', inputs: [], name: 'Account__TokenNotAllowed' },
   { type: 'error', inputs: [], name: 'FailedDeployment' },
   {
     type: 'error',
@@ -356,7 +328,131 @@ export const allocateAbi = [
     name: 'InsufficientBalance'
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AccountStore
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const accountStoreAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_authority',
+        internalType: 'contract IAuthority',
+        type: 'address'
+      },
+      {
+        name: '_router',
+        internalType: 'contract TokenRouter',
+        type: 'address'
+      }
+    ],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'authority',
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    name: 'canCall',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    name: 'getTokenBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    name: 'recordTransferIn',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'user', internalType: 'address', type: 'address' },
+      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
+    ],
+    name: 'setAccess',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    name: 'syncTokenBalance',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    name: 'tokenBalanceMap',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_depositor', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'transferIn',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'gasLimit', internalType: 'uint256', type: 'uint256' },
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_receiver', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'transferOut',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Access__Unauthorized' },
+  { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      { name: 'receiver', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'TransferUtils__TokenTransferError'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Address
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const addressAbi = [
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode'
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -403,158 +499,6 @@ export const allocationAccountAbi = [
     type: 'error',
     inputs: [],
     name: 'AllocationAccount__UnauthorizedOperator'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// AllocationStore
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const allocationStoreAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      {
-        name: '_authority',
-        internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      {
-        name: '_router',
-        internalType: 'contract TokenRouter',
-        type: 'address'
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'authority',
-    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
-    name: 'canCall',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-      { name: '_userList', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'getBalanceList',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
-    name: 'getTokenBalance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
-    name: 'recordTransferIn',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'user', internalType: 'address', type: 'address' },
-      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setAccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-      { name: '_accountList', internalType: 'address[]', type: 'address[]' },
-      { name: '_balanceList', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'setBalanceList',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-      { name: '_account', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'setUserBalance',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
-    name: 'syncTokenBalance',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
-    name: 'tokenBalanceMap',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-      { name: '_depositor', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'transferIn',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'gasLimit', internalType: 'uint256', type: 'uint256' },
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
-      { name: '_receiver', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'transferOut',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-      { name: 'user', internalType: 'address', type: 'address' }
-    ],
-    name: 'userBalanceMap',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Access__Unauthorized' },
-  { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-      { name: 'receiver', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'TransferUtils__TokenTransferError'
   }
 ] as const
 
@@ -641,6 +585,7 @@ export const bankStoreAbi = [
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
@@ -649,421 +594,6 @@ export const bankStoreAbi = [
       { name: 'amount', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'TransferUtils__TokenTransferError'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// BaseScript
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const baseScriptAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_SCRIPT',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint256', type: 'uint256' }],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// BasicSetup
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const basicSetupAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_TEST',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'setUp',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
   }
 ] as const
 
@@ -1124,9 +654,10 @@ export const coreContractAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' }
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1134,125 +665,6 @@ export const coreContractAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const create2Abi = [{ type: 'error', inputs: [], name: 'Create2EmptyBytecode' }] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DeployBase
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const deployBaseAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_SCRIPT',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint256', type: 'uint256' }],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'run',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DeployPosition
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const deployPositionAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_SCRIPT',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint256', type: 'uint256' }],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'run',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'matchingRule',
-        internalType: 'contract MatchingRule',
-        type: 'address'
-      },
-      { name: 'settle', internalType: 'contract Settle', type: 'address' }
-    ],
-    name: 'setupUpkeepingConfig',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DeployUserRouter
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const deployUserRouterAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_SCRIPT',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint256', type: 'uint256' }],
-    name: 'getNextCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'run',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  }
-] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dictatorship
@@ -1306,7 +718,7 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_target',
+        name: '_contract',
         internalType: 'contract CoreContract',
         type: 'address'
       }
@@ -1336,7 +748,7 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_target',
+        name: '_contract',
         internalType: 'contract CoreContract',
         type: 'address'
       }
@@ -1377,7 +789,7 @@ export const dictatorshipAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_target',
+        name: '_contract',
         internalType: 'contract CoreContract',
         type: 'address'
       },
@@ -1401,7 +813,7 @@ export const dictatorshipAbi = [
   {
     type: 'function',
     inputs: [{ name: '_gasLimit', internalType: 'uint256', type: 'uint256' }],
-    name: 'settargetCallGasLimit',
+    name: 'setTargetCallGasLimit',
     outputs: [],
     stateMutability: 'nonpayable'
   },
@@ -1443,7 +855,7 @@ export const dictatorshipAbi = [
     anonymous: false,
     inputs: [
       {
-        name: 'operator',
+        name: 'coreContract',
         internalType: 'address',
         type: 'address',
         indexed: true
@@ -1464,6 +876,7 @@ export const dictatorshipAbi = [
     name: 'Dictatorship__ContractAlreadyInitialized'
   },
   { type: 'error', inputs: [], name: 'Dictatorship__ContractNotRegistered' },
+  { type: 'error', inputs: [], name: 'Dictatorship__InvalidCoreContract' },
   { type: 'error', inputs: [], name: 'Dictatorship__InvalidTargetAddress' },
   {
     type: 'error',
@@ -2288,87 +1701,15 @@ export const erc20VotesAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const errorAbi = [
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'reason',
-        internalType: 'string',
-        type: 'string',
-        indexed: false
-      },
-      {
-        name: 'returndata',
-        internalType: 'bytes',
-        type: 'bytes',
-        indexed: false
-      }
-    ],
-    name: 'TransferUtils__TokenTransferReverted'
-  },
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
-  { type: 'error', inputs: [], name: 'AllocationAccount__InsufficientBalance' },
   {
     type: 'error',
-    inputs: [],
-    name: 'AllocationAccount__UnauthorizedOperator'
+    inputs: [{ name: 'depositCap', internalType: 'uint256', type: 'uint256' }],
+    name: 'Account__DepositExceedsLimit'
   },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      { name: 'threshold', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__AmountExceedsDustThreshold'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
-    name: 'Allocation__DustThresholdNotSet'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'Allocation__DustTransferFailed'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__InsufficientAllocationForKeeperFee'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'puppetIndex', internalType: 'uint256', type: 'uint256' },
-      { name: 'unpaidAmount', internalType: 'uint256', type: 'uint256' },
-      { name: 'puppetAllocation', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__InsufficientFundsForKeeperFee'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'Allocation__InvalidAllocation'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeReceiver'
-  },
-  { type: 'error', inputs: [], name: 'Allocation__InvalidReceiver' },
+  { type: 'error', inputs: [], name: 'Account__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'Account__InvalidAmount' },
   {
     type: 'error',
     inputs: [
@@ -2376,82 +1717,24 @@ export const errorAbi = [
       { name: 'recordedAmount', internalType: 'uint256', type: 'uint256' },
       { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__InvalidSettledAmount'
+    name: 'Account__InvalidSettledAmount'
   },
   {
     type: 'error',
     inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'token', internalType: 'address', type: 'address' }
     ],
-    name: 'Allocation__KeeperFeeExceedsAdjustmentRatio'
+    name: 'Account__NoFundsToTransfer'
   },
+  { type: 'error', inputs: [], name: 'Account__TokenNotAllowed' },
+  { type: 'error', inputs: [], name: 'AllocationAccount__InsufficientBalance' },
   {
     type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeExceedsCostFactor'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeExceedsSettledAmount'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
-      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__KeeperFeeNotFullyCovered'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'Allocation__NoDustToCollect'
-  },
-  { type: 'error', inputs: [], name: 'Allocation__PuppetListEmpty' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'provided', internalType: 'uint256', type: 'uint256' },
-      { name: 'maximum', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__PuppetListExceedsMaximum'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'expected', internalType: 'uint256', type: 'uint256' },
-      { name: 'provided', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__PuppetListMismatch'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'Allocation__SettlementTransferFailed'
+    inputs: [],
+    name: 'AllocationAccount__UnauthorizedOperator'
   },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'version', internalType: 'string', type: 'string' }
-    ],
-    name: 'CoreContract__Unauthorized'
-  },
   {
     type: 'error',
     inputs: [],
@@ -2463,20 +1746,8 @@ export const errorAbi = [
     name: 'Dictatorship__ContractAlreadyInitialized'
   },
   { type: 'error', inputs: [], name: 'Dictatorship__ContractNotRegistered' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Dictatorship__CoreContractConfigCallFailed'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Dictatorship__CoreContractInitConfigNotSet'
-  },
-  { type: 'error', inputs: [], name: 'Dictatorship__EmptyConfiguration' },
   { type: 'error', inputs: [], name: 'Dictatorship__InvalidCoreContract' },
   { type: 'error', inputs: [], name: 'Dictatorship__InvalidTargetAddress' },
-  { type: 'error', inputs: [], name: 'Dictatorship__InvalidUserAddress' },
   {
     type: 'error',
     inputs: [
@@ -2497,10 +1768,117 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'KeeperRouter__FailedRefundExecutionFee' },
   {
     type: 'error',
-    inputs: [{ name: 'allowanceCap', internalType: 'uint256', type: 'uint256' }],
-    name: 'MatchingRule__AllowanceAboveLimit'
+    inputs: [
+      { name: 'token', internalType: 'address', type: 'address' },
+      { name: 'account', internalType: 'address', type: 'address' }
+    ],
+    name: 'Mirror__DustTransferFailed'
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
+  {
+    type: 'error',
+    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'Mirror__ExecutionRequestMissing'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__InitialMustBeIncrease' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__InsufficientAllocationForKeeperFee'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'provided', internalType: 'uint256', type: 'uint256' },
+      { name: 'required', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__InsufficientGmxExecutionFee'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'Mirror__InvalidAllocation'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidCollateralDelta' },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidCurrentLeverage' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Mirror__InvalidKeeperExecutionFeeAmount'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidSizeDelta' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeExceedsAdjustmentRatio'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeExceedsCostFactor'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
+      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeNotFullyCovered'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__NoAdjustmentRequired' },
+  { type: 'error', inputs: [], name: 'Mirror__OrderCreationFailed' },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'Mirror__PositionNotFound'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'Mirror__PositionNotStalled'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__PuppetListEmpty' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'expected', internalType: 'uint256', type: 'uint256' },
+      { name: 'provided', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__PuppetListMismatch'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'Mirror__TraderCollateralZero'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'trader', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'Mirror__TraderPositionNotFound'
+  },
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
+  {
+    type: 'error',
+    inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
+    name: 'RewardDistributor__InsufficientRewards'
+  },
+  { type: 'error', inputs: [], name: 'RewardDistributor__InvalidAmount' },
   {
     type: 'error',
     inputs: [
@@ -2515,7 +1893,7 @@ export const errorAbi = [
         type: 'uint256'
       }
     ],
-    name: 'MatchingRule__InvalidActivityThrottle'
+    name: 'Rule__InvalidActivityThrottle'
   },
   {
     type: 'error',
@@ -2523,27 +1901,49 @@ export const errorAbi = [
       { name: 'min', internalType: 'uint256', type: 'uint256' },
       { name: 'max', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'MatchingRule__InvalidAllowanceRate'
+    name: 'Rule__InvalidAllowanceRate'
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
   {
     type: 'error',
     inputs: [{ name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' }],
-    name: 'MatchingRule__InvalidExpiryDuration'
+    name: 'Rule__InvalidExpiryDuration'
   },
-  { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
   {
     type: 'error',
     inputs: [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'threshold', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'MirrorPosition__AmountExceedsDustThreshold'
+    name: 'Settle__AmountExceedsDustThreshold'
   },
   {
     type: 'error',
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__DustThresholdNotSet'
+    name: 'Settle__DustThresholdNotSet'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'Settle__InvalidAllocation'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Settle__InvalidKeeperExecutionFeeAmount'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Settle__InvalidKeeperExecutionFeeReceiver'
+  },
+  { type: 'error', inputs: [], name: 'Settle__InvalidReceiver' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Settle__KeeperFeeExceedsSettledAmount'
   },
   {
     type: 'error',
@@ -2551,127 +1951,16 @@ export const errorAbi = [
       { name: 'token', internalType: 'address', type: 'address' },
       { name: 'account', internalType: 'address', type: 'address' }
     ],
-    name: 'MirrorPosition__DustTransferFailed'
+    name: 'Settle__NoDustToCollect'
   },
-  {
-    type: 'error',
-    inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'MirrorPosition__ExecutionRequestMissing'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InitialMustBeIncrease' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MirrorPosition__InsufficientAllocationForKeeperFee'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'provided', internalType: 'uint256', type: 'uint256' },
-      { name: 'required', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MirrorPosition__InsufficientGmxExecutionFee'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__InvalidAllocation'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidAllocationId' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCollateralDelta' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCurrentLeverage' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__InvalidKeeperExecutionFeeReceiver'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidReceiver' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-      { name: 'recordedAmount', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MirrorPosition__InvalidSettledAmount'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidSizeDelta' },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'MirrorPosition__KeeperExecutionFeeNotFullyCovered'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MirrorPosition__KeeperFeeExceedsCostFactor'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MirrorPosition__KeeperFeeExceedsSettledAmount'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'MirrorPosition__NoDustToCollect'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
-  {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__PositionNotFound'
-  },
-  { type: 'error', inputs: [], name: 'MirrorPosition__PuppetListEmpty' },
   {
     type: 'error',
     inputs: [
       { name: 'provided', internalType: 'uint256', type: 'uint256' },
       { name: 'maximum', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'MirrorPosition__PuppetListExceedsMaximum'
+    name: 'Settle__PuppetListExceedsMaximum'
   },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'MirrorPosition__SettlementTransferFailed'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__TraderCollateralZero'
-  },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__InvalidFunctionSignature' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
-  { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
-  {
-    type: 'error',
-    inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
-    name: 'RewardDistributor__InsufficientRewards'
-  },
-  { type: 'error', inputs: [], name: 'RewardDistributor__InvalidAmount' },
   { type: 'error', inputs: [], name: 'TokenRouter__EmptyTokenTranferGasLimit' },
   { type: 'error', inputs: [], name: 'TransferUtils__EmptyHoldingAddress' },
   {
@@ -2950,7 +2239,7 @@ export const feeMarketplaceAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'function',
@@ -2977,7 +2266,8 @@ export const feeMarketplaceAbi = [
   { type: 'error', inputs: [], name: 'FeeMarketplace__NotAuctionableToken' },
   { type: 'error', inputs: [], name: 'FeeMarketplace__ZeroDeposit' },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3098,6 +2388,7 @@ export const feeMarketplaceStoreAbi = [
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
@@ -3110,1038 +2401,6 @@ export const feeMarketplaceStoreAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// FeeMarketplaceTest
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const feeMarketplaceTestAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_TEST',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'setUp',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testBurnAddressReceipt',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testBuyAndBurnSuccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCollectDistribution',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCollectDistributionInsufficientBalance',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCollectDistributionInvalidAmount',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCollectDistributionInvalidReceiver',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testConfigUpdate',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testDepositUpdatesState',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testExactTimeUnlock',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testFullLifecycle',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testMaxPurchase',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testMultipleDeposits',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testPartialBurnWithDistribution',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testPartialUnlock',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testSmallAmountPrecision',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testUnauthorizedAccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testZeroBuybackQuote',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testZeroDepositReverts',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ForkTestBase
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const forkTestBaseAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_TEST',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'dictator',
-    outputs: [{ name: '', internalType: 'contract Dictatorship', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeMarketplace',
-    outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeMarketplaceStore',
-    outputs: [
-      {
-        name: '',
-        internalType: 'contract FeeMarketplaceStore',
-        type: 'address'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'isRPCAvailable',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'isSetupComplete',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'keeper',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'keeperRouter',
-    outputs: [{ name: '', internalType: 'contract KeeperRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'matchingRule',
-    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'mirrorPosition',
-    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppet1',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppet2',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppetToken',
-    outputs: [{ name: '', internalType: 'contract PuppetToken', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'settle',
-    outputs: [{ name: '', internalType: 'contract Settle', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'tokenRouter',
-    outputs: [{ name: '', internalType: 'contract TokenRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'trader',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'userRouter',
-    outputs: [{ name: '', internalType: 'contract UserRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GmxPositionUtils
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4150,6 +2409,27 @@ export const gmxPositionUtilsAbi = [
     type: 'function',
     inputs: [],
     name: 'COLLATERAL_AMOUNT_KEY',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'DECREASED_AT_TIME',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'INCREASED_AT_TIME',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'SIZE_IN_TOKENS_KEY',
     outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     stateMutability: 'view'
   },
@@ -6302,6 +4582,221 @@ export const iGmxOrderCallbackReceiverAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IGmxReadDataStore
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iGmxReadDataStoreAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'address', type: 'address' }
+    ],
+    name: 'addAddress',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'addBytes32',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'addUint',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'address', type: 'address' }
+    ],
+    name: 'containsAddress',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'containsBytes32',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'containsUint',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddressArray',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getAddressCount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getAddressValuesAt',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBool',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBoolArray',
+    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32Array',
+    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getBytes32Count',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getBytes32ValuesAt',
+    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getInt',
+    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getIntArray',
+    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getString',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getStringArray',
+    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUint',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUintArray',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'setKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getUintCount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'start', internalType: 'uint256', type: 'uint256' },
+      { name: 'end', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'getUintValuesAt',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'setKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'removeBytes32',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IGmxReferralStorage
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8226,10 +6721,10 @@ export const iwntAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// KeeperRouter
+// SequencerRouter
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const keeperRouterAbi = [
+export const sequencerRouterAbi = [
   {
     type: 'constructor',
     inputs: [
@@ -8238,17 +6733,9 @@ export const keeperRouterAbi = [
         internalType: 'contract IAuthority',
         type: 'address'
       },
-      {
-        name: '_mirrorPosition',
-        internalType: 'contract MirrorPosition',
-        type: 'address'
-      },
-      {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
-        type: 'address'
-      },
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' },
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_ruleContract', internalType: 'contract Rule', type: 'address' },
+      { name: '_mirror', internalType: 'contract Mirror', type: 'address' },
       { name: '_settle', internalType: 'contract Settle', type: 'address' },
       {
         name: '_config',
@@ -8276,6 +6763,16 @@ export const keeperRouterAbi = [
             type: 'uint256'
           },
           {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
             name: 'fallbackRefundExecutionFeeReceiver',
             internalType: 'address',
             type: 'address'
@@ -8284,6 +6781,13 @@ export const keeperRouterAbi = [
       }
     ],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'account',
+    outputs: [{ name: '', internalType: 'contract Account', type: 'address' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -9254,13 +7758,6 @@ export const keeperRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'authority',
     outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view'
@@ -9282,8 +7779,8 @@ export const keeperRouterAbi = [
       { name: '_dustToken', internalType: 'contract IERC20', type: 'address' },
       { name: '_receiver', internalType: 'address', type: 'address' }
     ],
-    name: 'collectDust',
-    outputs: [{ name: 'dustAmount', internalType: 'uint256', type: 'uint256' }],
+    name: 'collectAllocationAccountDust',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable'
   },
   {
@@ -9317,6 +7814,16 @@ export const keeperRouterAbi = [
             type: 'uint256'
           },
           {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
             name: 'fallbackRefundExecutionFeeReceiver',
             internalType: 'address',
             type: 'address'
@@ -9329,15 +7836,8 @@ export const keeperRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'matchingRule',
-    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'mirrorPosition',
-    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
+    name: 'mirror',
+    outputs: [{ name: '', internalType: 'contract Mirror', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -9547,8 +8047,8 @@ export const keeperRouterAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_allocParams',
-        internalType: 'struct Allocate.CallAllocation',
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
         type: 'tuple',
         components: [
           {
@@ -9556,29 +8056,18 @@ export const keeperRouterAbi = [
             internalType: 'contract IERC20',
             type: 'address'
           },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
           { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'market', internalType: 'address', type: 'address' },
           {
             name: 'keeperFeeReceiver',
             internalType: 'address',
             type: 'address'
-          }
-        ]
-      },
-      {
-        name: '_callParams',
-        internalType: 'struct MirrorPosition.CallPosition',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
           },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
           { name: 'isIncrease', internalType: 'bool', type: 'bool' },
           { name: 'isLong', internalType: 'bool', type: 'bool' },
           { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
@@ -9586,9 +8075,11 @@ export const keeperRouterAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
         ]
-      }
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestAdjust',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
@@ -9598,8 +8089,8 @@ export const keeperRouterAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_allocParams',
-        internalType: 'struct Allocate.CallAllocation',
+        name: '_params',
+        internalType: 'struct Mirror.StalledPositionParams',
         type: 'tuple',
         components: [
           {
@@ -9607,29 +8098,45 @@ export const keeperRouterAbi = [
             internalType: 'contract IERC20',
             type: 'address'
           },
+          { name: 'market', internalType: 'address', type: 'address' },
           { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'puppetList', internalType: 'address[]', type: 'address[]' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestCloseStalledPosition',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
           {
             name: 'keeperFeeReceiver',
             internalType: 'address',
             type: 'address'
-          }
-        ]
-      },
-      {
-        name: '_callParams',
-        internalType: 'struct MirrorPosition.CallPosition',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
           },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
           { name: 'isIncrease', internalType: 'bool', type: 'bool' },
           { name: 'isLong', internalType: 'bool', type: 'bool' },
           { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
@@ -9637,16 +8144,25 @@ export const keeperRouterAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
         ]
-      }
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
-    name: 'requestMirror',
+    name: 'requestOpen',
     outputs: [
       { name: '_allocationAddress', internalType: 'address', type: 'address' },
       { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
     ],
     stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'ruleContract',
+    outputs: [{ name: '', internalType: 'contract Rule', type: 'address' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -9720,7 +8236,7 @@ export const keeperRouterAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   { type: 'error', inputs: [], name: 'KeeperRouter__FailedRefundExecutionFee' },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
@@ -9729,10 +8245,10 @@ export const keeperRouterAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MatchingRule
+// Mirror
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const matchingRuleAbi = [
+export const mirrorAbi = [
   {
     type: 'constructor',
     inputs: [
@@ -9742,42 +8258,40 @@ export const matchingRuleAbi = [
         type: 'address'
       },
       {
-        name: '_store',
-        internalType: 'contract AllocationStore',
-        type: 'address'
-      },
-      {
         name: '_config',
-        internalType: 'struct MatchingRule.Config',
+        internalType: 'struct Mirror.Config',
         type: 'tuple',
         components: [
           {
-            name: 'transferOutGasLimit',
+            name: 'gmxExchangeRouter',
+            internalType: 'contract IGmxExchangeRouter',
+            type: 'address'
+          },
+          {
+            name: 'gmxDataStore',
+            internalType: 'contract IGmxReadDataStore',
+            type: 'address'
+          },
+          { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
+          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
+          {
+            name: 'increaseCallbackGasLimit',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'minExpiryDuration',
+            name: 'decreaseCallbackGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'maxKeeperFeeToAllocationRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'minAllowanceRate',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxAllowanceRate',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'minActivityThrottle',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxActivityThrottle',
+            name: 'maxKeeperFeeToAdjustmentRatio',
             internalType: 'uint256',
             type: 'uint256'
           }
@@ -9785,6 +8299,23 @@ export const matchingRuleAbi = [
       }
     ],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'allocationMap',
+    outputs: [{ name: 'totalAmount', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'allocationPuppetList',
+    outputs: [{ name: 'puppetAmounts', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -9805,19 +8336,65 @@ export const matchingRuleAbi = [
   },
   {
     type: 'function',
-    inputs: [
+    inputs: [],
+    name: 'config',
+    outputs: [
       {
-        name: '_collateralToken',
-        internalType: 'contract IERC20',
+        name: 'gmxExchangeRouter',
+        internalType: 'contract IGmxExchangeRouter',
         type: 'address'
       },
-      { name: '_depositor', internalType: 'address', type: 'address' },
-      { name: '_user', internalType: 'address', type: 'address' },
-      { name: '_amount', internalType: 'uint256', type: 'uint256' }
+      {
+        name: 'gmxDataStore',
+        internalType: 'contract IGmxReadDataStore',
+        type: 'address'
+      },
+      { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
+      { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: 'increaseCallbackGasLimit',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'decreaseCallbackGasLimit',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'maxKeeperFeeToAllocationRatio',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'maxKeeperFeeToAdjustmentRatio',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
     ],
-    name: 'deposit',
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'execute',
     outputs: [],
     stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'getAllocation',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_allocationAddress', internalType: 'address', type: 'address' }],
+    name: 'getAllocationPuppetList',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
+    stateMutability: 'view'
   },
   {
     type: 'function',
@@ -9826,36 +8403,39 @@ export const matchingRuleAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct MatchingRule.Config',
+        internalType: 'struct Mirror.Config',
         type: 'tuple',
         components: [
           {
-            name: 'transferOutGasLimit',
+            name: 'gmxExchangeRouter',
+            internalType: 'contract IGmxExchangeRouter',
+            type: 'address'
+          },
+          {
+            name: 'gmxDataStore',
+            internalType: 'contract IGmxReadDataStore',
+            type: 'address'
+          },
+          { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
+          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
+          {
+            name: 'increaseCallbackGasLimit',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'minExpiryDuration',
+            name: 'decreaseCallbackGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'maxKeeperFeeToAllocationRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'minAllowanceRate',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxAllowanceRate',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'minActivityThrottle',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'maxActivityThrottle',
+            name: 'maxKeeperFeeToAdjustmentRatio',
             internalType: 'uint256',
             type: 'uint256'
           }
@@ -9868,289 +8448,10 @@ export const matchingRuleAbi = [
     type: 'function',
     inputs: [
       { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+      { name: '_puppet', internalType: 'address', type: 'address' }
     ],
-    name: 'getRuleList',
-    outputs: [
-      {
-        name: '_ruleList',
-        internalType: 'struct MatchingRule.Rule[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'throttleActivity',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'expiry', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'puppet', internalType: 'address', type: 'address' }
-    ],
-    name: 'matchingRuleMap',
-    outputs: [
-      { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
-      { name: 'throttleActivity', internalType: 'uint256', type: 'uint256' },
-      { name: 'expiry', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
-    name: 'setConfig',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' },
-      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setPermission',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'allocate', internalType: 'contract Allocate', type: 'address' },
-      {
-        name: '_collateralToken',
-        internalType: 'contract IERC20',
-        type: 'address'
-      },
-      { name: '_user', internalType: 'address', type: 'address' },
-      { name: '_trader', internalType: 'address', type: 'address' },
-      {
-        name: '_ruleParams',
-        internalType: 'struct MatchingRule.Rule',
-        type: 'tuple',
-        components: [
-          { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'throttleActivity',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'expiry', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    name: 'setRule',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_tokenAllowanceList',
-        internalType: 'contract IERC20[]',
-        type: 'address[]'
-      },
-      {
-        name: '_tokenDustThresholdCapList',
-        internalType: 'uint256[]',
-        type: 'uint256[]'
-      }
-    ],
-    name: 'setTokenAllowanceList',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'store',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    name: 'tokenAllowanceList',
-    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_collateralToken',
-        internalType: 'contract IERC20',
-        type: 'address'
-      },
-      { name: '_user', internalType: 'address', type: 'address' },
-      { name: '_receiver', internalType: 'address', type: 'address' },
-      { name: '_amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'withdraw',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'allowanceCap', internalType: 'uint256', type: 'uint256' }],
-    name: 'MatchingRule__AllowanceAboveLimit'
-  },
-  { type: 'error', inputs: [], name: 'MatchingRule__InsufficientBalance' },
-  {
-    type: 'error',
-    inputs: [
-      {
-        name: 'minAllocationActivity',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'maxAllocationActivity',
-        internalType: 'uint256',
-        type: 'uint256'
-      }
-    ],
-    name: 'MatchingRule__InvalidActivityThrottle'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'min', internalType: 'uint256', type: 'uint256' },
-      { name: 'max', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'MatchingRule__InvalidAllowanceRate'
-  },
-  { type: 'error', inputs: [], name: 'MatchingRule__InvalidAmount' },
-  {
-    type: 'error',
-    inputs: [{ name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' }],
-    name: 'MatchingRule__InvalidExpiryDuration'
-  },
-  { type: 'error', inputs: [], name: 'MatchingRule__TokenNotAllowed' },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MirrorPosition
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mirrorPositionAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      {
-        name: '_authority',
-        internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      {
-        name: '_config',
-        internalType: 'struct MirrorPosition.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'gmxExchangeRouter',
-            internalType: 'contract IGmxExchangeRouter',
-            type: 'address'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
-          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'increaseCallbackGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'decreaseCallbackGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'fallbackRefundExecutionFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'authority',
-    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' }
-    ],
-    name: 'canCall',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'execute',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getConfig',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct MirrorPosition.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'gmxExchangeRouter',
-            internalType: 'contract IGmxExchangeRouter',
-            type: 'address'
-          },
-          { name: 'gmxOrderVault', internalType: 'address', type: 'address' },
-          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'increaseCallbackGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'decreaseCallbackGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'fallbackRefundExecutionFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
+    name: 'getLastActivityThrottle',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
   },
   {
@@ -10160,7 +8461,7 @@ export const mirrorPositionAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct MirrorPosition.Position',
+        internalType: 'struct Mirror.Position',
         type: 'tuple',
         components: [
           { name: 'size', internalType: 'uint256', type: 'uint256' },
@@ -10177,35 +8478,36 @@ export const mirrorPositionAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'getRequestAdjustment',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct MirrorPosition.RequestAdjustment',
-        type: 'tuple',
-        components: [
-          {
-            name: 'allocationAddress',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
-          {
-            name: 'traderTargetLeverage',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'traderCollateralDelta',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'traderSizeDelta', internalType: 'uint256', type: 'uint256' },
-          { name: 'sizeDelta', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
+    inputs: [{ name: '_traderPositionKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getTraderPositionCollateralAmount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_traderPositionKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getTraderPositionSizeInUsd',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_puppet', internalType: 'address', type: 'address' }
     ],
+    name: 'initializeTraderActivityThrottle',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'puppet', internalType: 'address', type: 'address' }
+    ],
+    name: 'lastActivityThrottleMap',
+    outputs: [{ name: 'lastActivity', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view'
   },
   {
@@ -10229,9 +8531,11 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_callbackContract', internalType: 'address', type: 'address' },
       {
-        name: '_params',
-        internalType: 'struct MirrorPosition.CallPosition',
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
         type: 'tuple',
         components: [
           {
@@ -10239,8 +8543,18 @@ export const mirrorPositionAbi = [
             internalType: 'contract IERC20',
             type: 'address'
           },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
           { name: 'isIncrease', internalType: 'bool', type: 'bool' },
           { name: 'isLong', internalType: 'bool', type: 'bool' },
           { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
@@ -10248,12 +8562,11 @@ export const mirrorPositionAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
         ]
       },
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocation', internalType: 'uint256', type: 'uint256' },
-      { name: '_callbackContract', internalType: 'address', type: 'address' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
     name: 'requestAdjust',
     outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
@@ -10266,11 +8579,7 @@ export const mirrorPositionAbi = [
     outputs: [
       { name: 'allocationAddress', internalType: 'address', type: 'address' },
       { name: 'traderIsIncrease', internalType: 'bool', type: 'bool' },
-      {
-        name: 'traderTargetLeverage',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
+      { name: 'isIncrease', internalType: 'bool', type: 'bool' },
       {
         name: 'traderCollateralDelta',
         internalType: 'uint256',
@@ -10284,9 +8593,10 @@ export const mirrorPositionAbi = [
   {
     type: 'function',
     inputs: [
+      { name: '_account', internalType: 'contract Account', type: 'address' },
       {
         name: '_params',
-        internalType: 'struct MirrorPosition.CallPosition',
+        internalType: 'struct Mirror.StalledPositionParams',
         type: 'tuple',
         components: [
           {
@@ -10294,8 +8604,49 @@ export const mirrorPositionAbi = [
             internalType: 'contract IERC20',
             type: 'address'
           },
+          { name: 'market', internalType: 'address', type: 'address' },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' },
+      { name: '_callbackContract', internalType: 'address', type: 'address' }
+    ],
+    name: 'requestCloseStalledPosition',
+    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_ruleContract', internalType: 'contract Rule', type: 'address' },
+      { name: '_callbackContract', internalType: 'address', type: 'address' },
+      {
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
+          {
+            name: 'keeperFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
           { name: 'isIncrease', internalType: 'bool', type: 'bool' },
           { name: 'isLong', internalType: 'bool', type: 'bool' },
           { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
@@ -10303,15 +8654,17 @@ export const mirrorPositionAbi = [
           { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
         ]
       },
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_allocation', internalType: 'uint256', type: 'uint256' },
-      { name: '_callbackContract', internalType: 'address', type: 'address' }
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
     ],
-    name: 'requestMirror',
-    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'requestOpen',
+    outputs: [
+      { name: '_allocationAddress', internalType: 'address', type: 'address' },
+      { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
     stateMutability: 'payable'
   },
   {
@@ -10337,1316 +8690,107 @@ export const mirrorPositionAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'unhandledCallbackListId',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'unhandledCallbackListSequenceId',
-        internalType: 'uint256',
-        type: 'uint256'
-      }
-    ],
-    name: 'unhandledCallbackMap',
-    outputs: [
-      { name: 'operator', internalType: 'address', type: 'address' },
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'bytes', type: 'bytes' }
-    ],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'error',
     inputs: [{ name: 'requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'MirrorPosition__ExecutionRequestMissing'
+    name: 'Mirror__ExecutionRequestMissing'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InitialMustBeIncrease' },
+  { type: 'error', inputs: [], name: 'Mirror__InitialMustBeIncrease' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocation', internalType: 'uint256', type: 'uint256' },
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__InsufficientAllocationForKeeperFee'
+  },
   {
     type: 'error',
     inputs: [
       { name: 'provided', internalType: 'uint256', type: 'uint256' },
       { name: 'required', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'MirrorPosition__InsufficientGmxExecutionFee'
+    name: 'Mirror__InsufficientGmxExecutionFee'
   },
   {
     type: 'error',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__InvalidAllocation'
+    name: 'Mirror__InvalidAllocation'
   },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCollateralDelta' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidCurrentLeverage' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__InvalidSizeDelta' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__NoAdjustmentRequired' },
-  { type: 'error', inputs: [], name: 'MirrorPosition__OrderCreationFailed' },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidCollateralDelta' },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidCurrentLeverage' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Mirror__InvalidKeeperExecutionFeeAmount'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__InvalidSizeDelta' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeExceedsAdjustmentRatio'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeExceedsCostFactor'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
+      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__KeeperFeeNotFullyCovered'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__NoAdjustmentRequired' },
+  { type: 'error', inputs: [], name: 'Mirror__OrderCreationFailed' },
   {
     type: 'error',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__PositionNotFound'
+    name: 'Mirror__PositionNotFound'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'allocationAddress', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'Mirror__PositionNotStalled'
+  },
+  { type: 'error', inputs: [], name: 'Mirror__PuppetListEmpty' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'expected', internalType: 'uint256', type: 'uint256' },
+      { name: 'provided', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__PuppetListMismatch'
   },
   {
     type: 'error',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'MirrorPosition__TraderCollateralZero'
+    name: 'Mirror__TraderCollateralZero'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'trader', internalType: 'address', type: 'address' },
+      { name: 'positionKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    name: 'Mirror__TraderPositionNotFound'
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
   { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MockERC20
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mockErc20Abi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'symbol', internalType: 'string', type: 'string' },
-      { name: 'decimals_', internalType: 'uint8', type: 'uint8' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' }
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'mint',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'owner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'spender',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'value',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'Approval'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      {
-        name: 'value',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'Transfer'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'ERC20InsufficientAllowance'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'sender', internalType: 'address', type: 'address' },
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'ERC20InsufficientBalance'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidApprover'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidReceiver'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSender'
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSpender'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MockGmxExchangeRouter
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mockGmxExchangeRouterAbi = [
-  {
-    type: 'function',
-    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'cancelOrder',
-    outputs: [],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address[]', type: 'address[]' },
-      { name: '', internalType: 'address[]', type: 'address[]' },
-      { name: '', internalType: 'address', type: 'address' }
-    ],
-    name: 'claimAffiliateRewards',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address[]', type: 'address[]' },
-      { name: '', internalType: 'address[]', type: 'address[]' },
-      { name: '', internalType: 'address', type: 'address' }
-    ],
-    name: 'claimFundingFees',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'params',
-        internalType: 'struct GmxPositionUtils.CreateOrderParams',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addresses',
-            internalType: 'struct GmxPositionUtils.CreateOrderParamsAddresses',
-            type: 'tuple',
-            components: [
-              { name: 'receiver', internalType: 'address', type: 'address' },
-              {
-                name: 'cancellationReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'callbackContract',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'uiFeeReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              { name: 'market', internalType: 'address', type: 'address' },
-              {
-                name: 'initialCollateralToken',
-                internalType: 'contract IERC20',
-                type: 'address'
-              },
-              {
-                name: 'swapPath',
-                internalType: 'address[]',
-                type: 'address[]'
-              }
-            ]
-          },
-          {
-            name: 'numbers',
-            internalType: 'struct GmxPositionUtils.CreateOrderParamsNumbers',
-            type: 'tuple',
-            components: [
-              {
-                name: 'sizeDeltaUsd',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'initialCollateralDeltaAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'triggerPrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'acceptablePrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'executionFee',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'callbackGasLimit',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'minOutputAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'validFromTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              }
-            ]
-          },
-          {
-            name: 'orderType',
-            internalType: 'enum GmxPositionUtils.OrderType',
-            type: 'uint8'
-          },
-          {
-            name: 'decreasePositionSwapType',
-            internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-            type: 'uint8'
-          },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          {
-            name: 'shouldUnwrapNativeToken',
-            internalType: 'bool',
-            type: 'bool'
-          },
-          { name: 'autoCancel', internalType: 'bool', type: 'bool' },
-          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' }
-        ]
-      }
-    ],
-    name: 'createOrder',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
-    name: 'multicall',
-    outputs: [{ name: 'results', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'orderCount',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'orders',
-    outputs: [
-      {
-        name: 'addresses',
-        internalType: 'struct GmxPositionUtils.CreateOrderParamsAddresses',
-        type: 'tuple',
-        components: [
-          { name: 'receiver', internalType: 'address', type: 'address' },
-          {
-            name: 'cancellationReceiver',
-            internalType: 'address',
-            type: 'address'
-          },
-          {
-            name: 'callbackContract',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'uiFeeReceiver', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
-          {
-            name: 'initialCollateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'swapPath', internalType: 'address[]', type: 'address[]' }
-        ]
-      },
-      {
-        name: 'numbers',
-        internalType: 'struct GmxPositionUtils.CreateOrderParamsNumbers',
-        type: 'tuple',
-        components: [
-          { name: 'sizeDeltaUsd', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'initialCollateralDeltaAmount',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'callbackGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          { name: 'minOutputAmount', internalType: 'uint256', type: 'uint256' },
-          { name: 'validFromTime', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      {
-        name: 'orderType',
-        internalType: 'enum GmxPositionUtils.OrderType',
-        type: 'uint8'
-      },
-      {
-        name: 'decreasePositionSwapType',
-        internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-        type: 'uint8'
-      },
-      { name: 'isLong', internalType: 'bool', type: 'bool' },
-      { name: 'shouldUnwrapNativeToken', internalType: 'bool', type: 'bool' },
-      { name: 'autoCancel', internalType: 'bool', type: 'bool' },
-      { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'receiver', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'sendNativeToken',
-    outputs: [],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'receiver', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'sendTokens',
-    outputs: [],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'receiver', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'sendWnt',
-    outputs: [],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'orderId',
-        internalType: 'bytes32',
-        type: 'bytes32',
-        indexed: true
-      },
-      {
-        name: 'params',
-        internalType: 'struct GmxPositionUtils.CreateOrderParams',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addresses',
-            internalType: 'struct GmxPositionUtils.CreateOrderParamsAddresses',
-            type: 'tuple',
-            components: [
-              { name: 'receiver', internalType: 'address', type: 'address' },
-              {
-                name: 'cancellationReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'callbackContract',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'uiFeeReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              { name: 'market', internalType: 'address', type: 'address' },
-              {
-                name: 'initialCollateralToken',
-                internalType: 'contract IERC20',
-                type: 'address'
-              },
-              {
-                name: 'swapPath',
-                internalType: 'address[]',
-                type: 'address[]'
-              }
-            ]
-          },
-          {
-            name: 'numbers',
-            internalType: 'struct GmxPositionUtils.CreateOrderParamsNumbers',
-            type: 'tuple',
-            components: [
-              {
-                name: 'sizeDeltaUsd',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'initialCollateralDeltaAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'triggerPrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'acceptablePrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'executionFee',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'callbackGasLimit',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'minOutputAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'validFromTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              }
-            ]
-          },
-          {
-            name: 'orderType',
-            internalType: 'enum GmxPositionUtils.OrderType',
-            type: 'uint8'
-          },
-          {
-            name: 'decreasePositionSwapType',
-            internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-            type: 'uint8'
-          },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          {
-            name: 'shouldUnwrapNativeToken',
-            internalType: 'bool',
-            type: 'bool'
-          },
-          { name: 'autoCancel', internalType: 'bool', type: 'bool' },
-          { name: 'referralCode', internalType: 'bytes32', type: 'bytes32' }
-        ],
-        indexed: false
-      }
-    ],
-    name: 'OrderCreated'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MockUniswapV3Pool
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mockUniswapV3PoolAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: 'initialSqrtPriceX96', internalType: 'uint160', type: 'uint160' },
-      { name: '_token0', internalType: 'address', type: 'address' },
-      { name: '_token1', internalType: 'address', type: 'address' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'tickLower', internalType: 'int24', type: 'int24' },
-      { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-      { name: 'amount', internalType: 'uint128', type: 'uint128' }
-    ],
-    name: 'burn',
-    outputs: [
-      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
-      { name: 'amount1', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: 'tickLower', internalType: 'int24', type: 'int24' },
-      { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-      { name: 'amount0Requested', internalType: 'uint128', type: 'uint128' },
-      { name: 'amount1Requested', internalType: 'uint128', type: 'uint128' }
-    ],
-    name: 'collect',
-    outputs: [
-      { name: 'amount0', internalType: 'uint128', type: 'uint128' },
-      { name: 'amount1', internalType: 'uint128', type: 'uint128' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: 'amount0Requested', internalType: 'uint128', type: 'uint128' },
-      { name: 'amount1Requested', internalType: 'uint128', type: 'uint128' }
-    ],
-    name: 'collectProtocol',
-    outputs: [
-      { name: 'amount0', internalType: 'uint128', type: 'uint128' },
-      { name: 'amount1', internalType: 'uint128', type: 'uint128' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'factory',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'fee',
-    outputs: [{ name: '', internalType: 'uint24', type: 'uint24' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeGrowthGlobal0X128',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeGrowthGlobal1X128',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
-      { name: 'amount1', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'flash',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'observationCardinalityNext',
-        internalType: 'uint16',
-        type: 'uint16'
-      }
-    ],
-    name: 'increaseObservationCardinalityNext',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_sqrtPriceX96', internalType: 'uint160', type: 'uint160' }],
-    name: 'initialize',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'liquidity',
-    outputs: [{ name: '', internalType: 'uint128', type: 'uint128' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'maxLiquidityPerTick',
-    outputs: [{ name: '', internalType: 'uint128', type: 'uint128' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: 'tickLower', internalType: 'int24', type: 'int24' },
-      { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-      { name: 'amount', internalType: 'uint128', type: 'uint128' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mint',
-    outputs: [
-      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
-      { name: 'amount1', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
-    name: 'observations',
-    outputs: [
-      { name: 'blockTimestamp', internalType: 'uint32', type: 'uint32' },
-      { name: 'tickCumulative', internalType: 'int56', type: 'int56' },
-      {
-        name: 'secondsPerLiquidityCumulativeX128',
-        internalType: 'uint160',
-        type: 'uint160'
-      },
-      { name: 'initialized', internalType: 'bool', type: 'bool' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'uint32[]', type: 'uint32[]' }],
-    name: 'observe',
-    outputs: [
-      { name: '', internalType: 'int56[]', type: 'int56[]' },
-      { name: '', internalType: 'uint160[]', type: 'uint160[]' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'key', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'positions',
-    outputs: [
-      { name: '_liquidity', internalType: 'uint128', type: 'uint128' },
-      {
-        name: 'feeGrowthInside0LastX128',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'feeGrowthInside1LastX128',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
-      { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'protocolFees',
-    outputs: [
-      { name: '_token0', internalType: 'uint128', type: 'uint128' },
-      { name: '_token1', internalType: 'uint128', type: 'uint128' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'feeProtocol0', internalType: 'uint8', type: 'uint8' },
-      { name: 'feeProtocol1', internalType: 'uint8', type: 'uint8' }
-    ],
-    name: 'setFeeProtocol',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_ratio', internalType: 'uint256', type: 'uint256' }],
-    name: 'setSqrtPriceX96',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'slot0',
-    outputs: [
-      { name: '_sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
-      { name: 'tick', internalType: 'int24', type: 'int24' },
-      { name: 'observationIndex', internalType: 'uint16', type: 'uint16' },
-      {
-        name: 'observationCardinality',
-        internalType: 'uint16',
-        type: 'uint16'
-      },
-      {
-        name: 'observationCardinalityNext',
-        internalType: 'uint16',
-        type: 'uint16'
-      },
-      { name: 'feeProtocol', internalType: 'uint8', type: 'uint8' },
-      { name: '_unlocked', internalType: 'bool', type: 'bool' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'tickLower', internalType: 'int24', type: 'int24' },
-      { name: 'tickUpper', internalType: 'int24', type: 'int24' }
-    ],
-    name: 'snapshotCumulativesInside',
-    outputs: [
-      { name: 'tickCumulativeInside', internalType: 'int56', type: 'int56' },
-      {
-        name: 'secondsPerLiquidityInsideX128',
-        internalType: 'uint160',
-        type: 'uint160'
-      },
-      { name: 'secondsInside', internalType: 'uint32', type: 'uint32' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'sqrtPriceX96',
-    outputs: [{ name: '', internalType: 'uint160', type: 'uint160' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: 'zeroForOne', internalType: 'bool', type: 'bool' },
-      { name: 'amountSpecified', internalType: 'int256', type: 'int256' },
-      { name: 'sqrtPriceLimitX96', internalType: 'uint160', type: 'uint160' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'swap',
-    outputs: [
-      { name: 'amount0', internalType: 'int256', type: 'int256' },
-      { name: 'amount1', internalType: 'int256', type: 'int256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'wordPosition', internalType: 'int16', type: 'int16' }],
-    name: 'tickBitmap',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'tickSpacing',
-    outputs: [{ name: '', internalType: 'int24', type: 'int24' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'tick', internalType: 'int24', type: 'int24' }],
-    name: 'ticks',
-    outputs: [
-      { name: 'liquidityGross', internalType: 'uint128', type: 'uint128' },
-      { name: 'liquidityNet', internalType: 'int128', type: 'int128' },
-      {
-        name: 'feeGrowthOutside0X128',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      {
-        name: 'feeGrowthOutside1X128',
-        internalType: 'uint256',
-        type: 'uint256'
-      },
-      { name: 'tickCumulativeOutside', internalType: 'int56', type: 'int56' },
-      {
-        name: 'secondsPerLiquidityOutsideX128',
-        internalType: 'uint160',
-        type: 'uint160'
-      },
-      { name: 'secondsOutside', internalType: 'uint32', type: 'uint32' },
-      { name: 'initialized', internalType: 'bool', type: 'bool' }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'token0',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'token1',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'unlocked',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'owner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'tickLower',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'tickUpper',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'amount',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      },
-      {
-        name: 'amount0',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'Burn'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'owner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'recipient',
-        internalType: 'address',
-        type: 'address',
-        indexed: false
-      },
-      {
-        name: 'tickLower',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'tickUpper',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'amount0',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      }
-    ],
-    name: 'Collect'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sender',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'recipient',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'amount0',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      }
-    ],
-    name: 'CollectProtocol'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sender',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'recipient',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'amount0',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      },
-      {
-        name: 'paid0',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      },
-      {
-        name: 'paid1',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'Flash'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'observationCardinalityNextOld',
-        internalType: 'uint16',
-        type: 'uint16',
-        indexed: false
-      },
-      {
-        name: 'observationCardinalityNextNew',
-        internalType: 'uint16',
-        type: 'uint16',
-        indexed: false
-      }
-    ],
-    name: 'IncreaseObservationCardinalityNext'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sqrtPriceX96',
-        internalType: 'uint160',
-        type: 'uint160',
-        indexed: false
-      },
-      { name: 'tick', internalType: 'int24', type: 'int24', indexed: false }
-    ],
-    name: 'Initialize'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sender',
-        internalType: 'address',
-        type: 'address',
-        indexed: false
-      },
-      {
-        name: 'owner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'tickLower',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'tickUpper',
-        internalType: 'int24',
-        type: 'int24',
-        indexed: true
-      },
-      {
-        name: 'amount',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      },
-      {
-        name: 'amount0',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'Mint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sqrtPriceX96',
-        internalType: 'uint160',
-        type: 'uint160',
-        indexed: false
-      }
-    ],
-    name: 'PoolInitialized'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'feeProtocol0Old',
-        internalType: 'uint8',
-        type: 'uint8',
-        indexed: false
-      },
-      {
-        name: 'feeProtocol1Old',
-        internalType: 'uint8',
-        type: 'uint8',
-        indexed: false
-      },
-      {
-        name: 'feeProtocol0New',
-        internalType: 'uint8',
-        type: 'uint8',
-        indexed: false
-      },
-      {
-        name: 'feeProtocol1New',
-        internalType: 'uint8',
-        type: 'uint8',
-        indexed: false
-      }
-    ],
-    name: 'SetFeeProtocol'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'sender',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'recipient',
-        internalType: 'address',
-        type: 'address',
-        indexed: true
-      },
-      {
-        name: 'amount0',
-        internalType: 'int256',
-        type: 'int256',
-        indexed: false
-      },
-      {
-        name: 'amount1',
-        internalType: 'int256',
-        type: 'int256',
-        indexed: false
-      },
-      {
-        name: 'sqrtPriceX96',
-        internalType: 'uint160',
-        type: 'uint160',
-        indexed: false
-      },
-      {
-        name: 'liquidity',
-        internalType: 'uint128',
-        type: 'uint128',
-        indexed: false
-      },
-      { name: 'tick', internalType: 'int24', type: 'int24', indexed: false }
-    ],
-    name: 'Swap'
-  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11781,7 +8925,8 @@ export const permissionAbi = [
     outputs: [],
     stateMutability: 'nonpayable'
   },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' }
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12426,6 +9571,7 @@ export const puppetVoteTokenAbi = [
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
   { type: 'error', inputs: [], name: 'PuppetVoteToken__Unsupported' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
@@ -12580,7 +9726,7 @@ export const rewardDistributorAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'function',
@@ -12627,6 +9773,7 @@ export const rewardDistributorAbi = [
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [{ name: 'accured', internalType: 'uint256', type: 'uint256' }],
@@ -12734,6 +9881,7 @@ export const rewardStoreAbi = [
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
@@ -12827,7 +9975,241 @@ export const routerProxyAbi = [
     name: 'ERC1967InvalidImplementation'
   },
   { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedCall' }
+  { type: 'error', inputs: [], name: 'FailedCall' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Rule
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ruleAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_authority',
+        internalType: 'contract IAuthority',
+        type: 'address'
+      },
+      {
+        name: '_config',
+        internalType: 'struct Rule.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'minExpiryDuration',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      }
+    ],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'authority',
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' }
+    ],
+    name: 'canCall',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct Rule.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'minExpiryDuration',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxAllowanceRate',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'minActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'maxActivityThrottle',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'getRuleList',
+    outputs: [
+      {
+        name: '_ruleList',
+        internalType: 'struct Rule.RuleParams[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'throttleActivity',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'expiry', internalType: 'uint256', type: 'uint256' }
+        ]
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'traderMatchingKey', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'puppet', internalType: 'address', type: 'address' }
+    ],
+    name: 'matchingRuleMap',
+    outputs: [
+      { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
+      { name: 'throttleActivity', internalType: 'uint256', type: 'uint256' },
+      { name: 'expiry', internalType: 'uint256', type: 'uint256' }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
+    name: 'setConfig',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' },
+      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
+    ],
+    name: 'setPermission',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'mirror', internalType: 'contract Mirror', type: 'address' },
+      {
+        name: '_collateralToken',
+        internalType: 'contract IERC20',
+        type: 'address'
+      },
+      { name: '_user', internalType: 'address', type: 'address' },
+      { name: '_trader', internalType: 'address', type: 'address' },
+      {
+        name: '_ruleParams',
+        internalType: 'struct Rule.RuleParams',
+        type: 'tuple',
+        components: [
+          { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'throttleActivity',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          { name: 'expiry', internalType: 'uint256', type: 'uint256' }
+        ]
+      }
+    ],
+    name: 'setRule',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure'
+  },
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'minAllocationActivity',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'maxAllocationActivity',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
+    ],
+    name: 'Rule__InvalidActivityThrottle'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'min', internalType: 'uint256', type: 'uint256' },
+      { name: 'max', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Rule__InvalidAllowanceRate'
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'minExpiryDuration', internalType: 'uint256', type: 'uint256' }],
+    name: 'Rule__InvalidExpiryDuration'
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12864,20 +10246,6 @@ export const safeCastAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Script
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const scriptAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_SCRIPT',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Settle
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -12888,11 +10256,6 @@ export const settleAbi = [
       {
         name: '_authority',
         internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      {
-        name: '_allocationStore',
-        internalType: 'contract AllocationStore',
         type: 'address'
       },
       {
@@ -12929,13 +10292,6 @@ export const settleAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'authority',
     outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
     stateMutability: 'view'
@@ -12953,26 +10309,24 @@ export const settleAbi = [
   {
     type: 'function',
     inputs: [
-      {
-        name: '_allocationAccount',
-        internalType: 'contract AllocationAccount',
-        type: 'address'
-      },
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_allocationAccount', internalType: 'address', type: 'address' },
       { name: '_dustToken', internalType: 'contract IERC20', type: 'address' },
       { name: '_receiver', internalType: 'address', type: 'address' }
     ],
-    name: 'collectDust',
+    name: 'collectAllocationAccountDust',
     outputs: [{ name: '_dustAmount', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'nonpayable'
   },
   {
     type: 'function',
     inputs: [
+      { name: '_account', internalType: 'contract Account', type: 'address' },
       { name: '_token', internalType: 'contract IERC20', type: 'address' },
       { name: '_receiver', internalType: 'address', type: 'address' },
       { name: '_amount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'collectFees',
+    name: 'collectPlatformFees',
     outputs: [],
     stateMutability: 'nonpayable'
   },
@@ -13058,7 +10412,8 @@ export const settleAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' },
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_mirror', internalType: 'contract Mirror', type: 'address' },
       {
         name: '_callParams',
         internalType: 'struct Settle.CallSettle',
@@ -13103,7 +10458,7 @@ export const settleAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'function',
@@ -13119,59 +10474,46 @@ export const settleAbi = [
     outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
     stateMutability: 'view'
   },
+  { type: 'error', inputs: [], name: 'Mirror__PuppetListEmpty' },
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'threshold', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__AmountExceedsDustThreshold'
+    name: 'Settle__AmountExceedsDustThreshold'
   },
   {
     type: 'error',
     inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
-    name: 'Allocation__DustThresholdNotSet'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'Allocation__DustTransferFailed'
+    name: 'Settle__DustThresholdNotSet'
   },
   {
     type: 'error',
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
-    name: 'Allocation__InvalidAllocation'
+    name: 'Settle__InvalidAllocation'
   },
   {
     type: 'error',
     inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeAmount'
+    name: 'Settle__InvalidKeeperExecutionFeeAmount'
   },
   {
     type: 'error',
     inputs: [],
-    name: 'Allocation__InvalidKeeperExecutionFeeReceiver'
+    name: 'Settle__InvalidKeeperExecutionFeeReceiver'
   },
-  { type: 'error', inputs: [], name: 'Allocation__InvalidReceiver' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
-      { name: 'recordedAmount', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Allocation__InvalidSettledAmount'
-  },
+  { type: 'error', inputs: [], name: 'Settle__InvalidReceiver' },
   {
     type: 'error',
     inputs: [
       { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
       { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__KeeperFeeExceedsSettledAmount'
+    name: 'Settle__KeeperFeeExceedsSettledAmount'
   },
   {
     type: 'error',
@@ -13179,27 +10521,16 @@ export const settleAbi = [
       { name: 'token', internalType: 'address', type: 'address' },
       { name: 'account', internalType: 'address', type: 'address' }
     ],
-    name: 'Allocation__NoDustToCollect'
+    name: 'Settle__NoDustToCollect'
   },
-  { type: 'error', inputs: [], name: 'Allocation__PuppetListEmpty' },
   {
     type: 'error',
     inputs: [
       { name: 'provided', internalType: 'uint256', type: 'uint256' },
       { name: 'maximum', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Allocation__PuppetListExceedsMaximum'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'token', internalType: 'address', type: 'address' },
-      { name: 'account', internalType: 'address', type: 'address' }
-    ],
-    name: 'Allocation__SettlementTransferFailed'
-  },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' }
+    name: 'Settle__PuppetListExceedsMaximum'
+  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13212,386 +10543,6 @@ export const shortStringsAbi = [
     type: 'error',
     inputs: [{ name: 'str', internalType: 'string', type: 'string' }],
     name: 'StringTooLong'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// StdAssertions
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const stdAssertionsAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// StdInvariant
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const stdInvariantAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
   }
 ] as const
 
@@ -14080,7 +11031,7 @@ export const tokenRouterAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'function',
@@ -14096,6 +11047,7 @@ export const tokenRouterAbi = [
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   { type: 'error', inputs: [], name: 'TokenRouter__EmptyTokenTranferGasLimit' },
   {
     type: 'error',
@@ -14110,1017 +11062,6 @@ export const tokenRouterAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TradingForkTest
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const tradingForkTestAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_TEST',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'allocationStore',
-    outputs: [{ name: '', internalType: 'contract AllocationStore', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'dictator',
-    outputs: [{ name: '', internalType: 'contract Dictatorship', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeMarketplace',
-    outputs: [{ name: '', internalType: 'contract FeeMarketplace', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'feeMarketplaceStore',
-    outputs: [
-      {
-        name: '',
-        internalType: 'contract FeeMarketplaceStore',
-        type: 'address'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'isRPCAvailable',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'isSetupComplete',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'keeper',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'keeperRouter',
-    outputs: [{ name: '', internalType: 'contract KeeperRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'matchingRule',
-    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'mirrorPosition',
-    outputs: [{ name: '', internalType: 'contract MirrorPosition', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppet1',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppet2',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'puppetToken',
-    outputs: [{ name: '', internalType: 'contract PuppetToken', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'setUp',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'settle',
-    outputs: [{ name: '', internalType: 'contract Settle', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCompleteMirrorToSettlement',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testGasAnalysisReport',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testLiveGmxPositionMirror',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'tokenRouter',
-    outputs: [{ name: '', internalType: 'contract TokenRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'trader',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'userRouter',
-    outputs: [{ name: '', internalType: 'contract UserRouter', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TradingTest
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const tradingTestAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'IS_TEST',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeArtifacts',
-    outputs: [
-      {
-        name: 'excludedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeContracts',
-    outputs: [
-      {
-        name: 'excludedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSelectors',
-    outputs: [
-      {
-        name: 'excludedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'excludeSenders',
-    outputs: [
-      {
-        name: 'excludedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'failed',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'setUp',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifactSelectors',
-    outputs: [
-      {
-        name: 'targetedArtifactSelectors_',
-        internalType: 'struct StdInvariant.FuzzArtifactSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'artifact', internalType: 'string', type: 'string' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetArtifacts',
-    outputs: [
-      {
-        name: 'targetedArtifacts_',
-        internalType: 'string[]',
-        type: 'string[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetContracts',
-    outputs: [
-      {
-        name: 'targetedContracts_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetInterfaces',
-    outputs: [
-      {
-        name: 'targetedInterfaces_',
-        internalType: 'struct StdInvariant.FuzzInterface[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'artifacts', internalType: 'string[]', type: 'string[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSelectors',
-    outputs: [
-      {
-        name: 'targetedSelectors_',
-        internalType: 'struct StdInvariant.FuzzSelector[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'targetSenders',
-    outputs: [
-      {
-        name: 'targetedSenders_',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testCollectDust',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testDecreasePosition',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testDustThresholdTooHigh',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testEmptyPuppetList',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testExpiredRule',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testMultipleTraders',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testRequestAdjustSuccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testRequestMirrorInsufficientFunds',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testRequestMirrorSuccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testSettleSuccess',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'testThrottleActivity',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
-    name: 'log_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'log_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
-    name: 'log_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
-    name: 'log_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'address', type: 'address', indexed: false }
-    ],
-    name: 'log_named_address'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'uint256[]',
-        type: 'uint256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'int256[]',
-        type: 'int256[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'val',
-        internalType: 'address[]',
-        type: 'address[]',
-        indexed: false
-      }
-    ],
-    name: 'log_named_array'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false }
-    ],
-    name: 'log_named_bytes'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false }
-    ],
-    name: 'log_named_bytes32'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
-      {
-        name: 'decimals',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'log_named_decimal_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'int256', type: 'int256', indexed: false }
-    ],
-    name: 'log_named_int'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'string', type: 'string', indexed: false }
-    ],
-    name: 'log_named_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'key', internalType: 'string', type: 'string', indexed: false },
-      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false }
-    ],
-    name: 'log_named_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
-    name: 'log_string'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'log_uint'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
-    name: 'logs'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UserRouter
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -15128,17 +11069,14 @@ export const userRouterAbi = [
   {
     type: 'constructor',
     inputs: [
-      {
-        name: '_matchingRule',
-        internalType: 'contract MatchingRule',
-        type: 'address'
-      },
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_ruleContract', internalType: 'contract Rule', type: 'address' },
       {
         name: '_feeMarketplace',
         internalType: 'contract FeeMarketplace',
         type: 'address'
       },
-      { name: '_allocate', internalType: 'contract Allocate', type: 'address' }
+      { name: '_mirror', internalType: 'contract Mirror', type: 'address' }
     ],
     stateMutability: 'nonpayable'
   },
@@ -15156,8 +11094,8 @@ export const userRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'allocate',
-    outputs: [{ name: '', internalType: 'contract Allocate', type: 'address' }],
+    name: 'account',
+    outputs: [{ name: '', internalType: 'contract Account', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -15180,8 +11118,15 @@ export const userRouterAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'matchingRule',
-    outputs: [{ name: '', internalType: 'contract MatchingRule', type: 'address' }],
+    name: 'mirror',
+    outputs: [{ name: '', internalType: 'contract Mirror', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'ruleContract',
+    outputs: [{ name: '', internalType: 'contract Rule', type: 'address' }],
     stateMutability: 'view'
   },
   {
@@ -15195,7 +11140,7 @@ export const userRouterAbi = [
       { name: 'trader', internalType: 'address', type: 'address' },
       {
         name: 'ruleParams',
-        internalType: 'struct MatchingRule.Rule',
+        internalType: 'struct Rule.RuleParams',
         type: 'tuple',
         components: [
           { name: 'allowanceRate', internalType: 'uint256', type: 'uint256' },
@@ -15224,9374 +11169,6 @@ export const userRouterAbi = [
     stateMutability: 'nonpayable'
   },
   { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Vm
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const vmAbi = [
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'access',
-        internalType: 'struct VmSafe.AccessListItem[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'target', internalType: 'address', type: 'address' },
-          { name: 'storageKeys', internalType: 'bytes32[]', type: 'bytes32[]' }
-        ]
-      }
-    ],
-    name: 'accessList',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'accesses',
-    outputs: [
-      { name: 'readSlots', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'writeSlots', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'activeFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'addr',
-    outputs: [{ name: 'keyAddr', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'allowCheatcodes',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'condition', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertFalse',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assertFalse',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assertTrue',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'condition', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertTrue',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assume',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'potentialReverts',
-        internalType: 'struct VmSafe.PotentialRevert[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'reverter', internalType: 'address', type: 'address' },
-          { name: 'partialMatch', internalType: 'bool', type: 'bool' },
-          { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'potentialRevert',
-        internalType: 'struct VmSafe.PotentialRevert',
-        type: 'tuple',
-        components: [
-          { name: 'reverter', internalType: 'address', type: 'address' },
-          { name: 'partialMatch', internalType: 'bool', type: 'bool' },
-          { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'blob', internalType: 'bytes', type: 'bytes' }],
-    name: 'attachBlob',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    name: 'attachDelegation',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newBlobBaseFee', internalType: 'uint256', type: 'uint256' }],
-    name: 'blobBaseFee',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'hashes', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    name: 'blobhashes',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'char', internalType: 'string', type: 'string' }],
-    name: 'breakpoint',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'char', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'breakpoint',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'signer', internalType: 'address', type: 'address' }],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'broadcastRawTransaction',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newChainId', internalType: 'uint256', type: 'uint256' }],
-    name: 'chainId',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'clearMockedCalls',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'source', internalType: 'address', type: 'address' },
-      { name: 'target', internalType: 'address', type: 'address' }
-    ],
-    name: 'cloneAccount',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'closeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newCoinbase', internalType: 'address', type: 'address' }],
-    name: 'coinbase',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'initCodeHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'computeCreate2Address',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'initCodeHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'deployer', internalType: 'address', type: 'address' }
-    ],
-    name: 'computeCreate2Address',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'deployer', internalType: 'address', type: 'address' },
-      { name: 'nonce', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'computeCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'subject', internalType: 'string', type: 'string' },
-      { name: 'search', internalType: 'string', type: 'string' }
-    ],
-    name: 'contains',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'cool',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'slot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'coolSlot',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'string', type: 'string' },
-      { name: 'to', internalType: 'string', type: 'string' }
-    ],
-    name: 'copyFile',
-    outputs: [{ name: 'copied', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' }
-    ],
-    name: 'copyStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'recursive', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'createDir',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'urlOrAlias', internalType: 'string', type: 'string' }],
-    name: 'createFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'createFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'createFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'createSelectFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'createSelectFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'urlOrAlias', internalType: 'string', type: 'string' }],
-    name: 'createSelectFork',
-    outputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'walletLabel', internalType: 'string', type: 'string' }],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'walletLabel', internalType: 'string', type: 'string' }
-    ],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'newBalance', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'deal',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'deleteSnapshot',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'deleteSnapshots',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'deleteStateSnapshot',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'deleteStateSnapshots',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' },
-      { name: 'language', internalType: 'string', type: 'string' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' },
-      { name: 'language', internalType: 'string', type: 'string' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newDifficulty', internalType: 'uint256', type: 'uint256' }],
-    name: 'difficulty',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'pathToStateJson', internalType: 'string', type: 'string' }],
-    name: 'dumpState',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'ensNamehash',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envAddress',
-    outputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envAddress',
-    outputs: [{ name: 'value', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBool',
-    outputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBool',
-    outputs: [{ name: 'value', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBytes',
-    outputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBytes',
-    outputs: [{ name: 'value', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBytes32',
-    outputs: [{ name: 'value', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBytes32',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envExists',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envInt',
-    outputs: [{ name: 'value', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envInt',
-    outputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'address', type: 'address' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'string', type: 'string' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envString',
-    outputs: [{ name: 'value', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envString',
-    outputs: [{ name: 'value', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envUint',
-    outputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envUint',
-    outputs: [{ name: 'value', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'newRuntimeBytecode', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'etch',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'fromBlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'toBlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'eth_getLogs',
-    outputs: [
-      {
-        name: 'logs',
-        internalType: 'struct VmSafe.EthGetLogs[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'emitter', internalType: 'address', type: 'address' },
-          { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'blockHash', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'transactionHash', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'transactionIndex', internalType: 'uint64', type: 'uint64' },
-          { name: 'logIndex', internalType: 'uint256', type: 'uint256' },
-          { name: 'removed', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'exists',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'gas', internalType: 'uint64', type: 'uint64' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'gas', internalType: 'uint64', type: 'uint64' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'expectCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'minGas', internalType: 'uint64', type: 'uint64' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'expectCallMinGas',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'minGas', internalType: 'uint64', type: 'uint64' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectCallMinGas',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'bytecode', internalType: 'bytes', type: 'bytes' },
-      { name: 'deployer', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectCreate',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'bytecode', internalType: 'bytes', type: 'bytes' },
-      { name: 'deployer', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectCreate2',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint64', type: 'uint64' }],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' },
-      { name: 'emitter', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'emitter', internalType: 'address', type: 'address' }],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'emitter', internalType: 'address', type: 'address' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' },
-      { name: 'emitter', internalType: 'address', type: 'address' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectEmit',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'expectEmitAnonymous',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'emitter', internalType: 'address', type: 'address' }],
-    name: 'expectEmitAnonymous',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic0', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' },
-      { name: 'emitter', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectEmitAnonymous',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'checkTopic0', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic1', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic2', internalType: 'bool', type: 'bool' },
-      { name: 'checkTopic3', internalType: 'bool', type: 'bool' },
-      { name: 'checkData', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'expectEmitAnonymous',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'revertData', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'expectPartialRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'reverter', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectPartialRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'reverter', internalType: 'address', type: 'address' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'reverter', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'count', internalType: 'uint64', type: 'uint64' }],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' },
-      { name: 'reverter', internalType: 'address', type: 'address' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'reverter', internalType: 'address', type: 'address' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'revertData', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' },
-      { name: 'reverter', internalType: 'address', type: 'address' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'reverter', internalType: 'address', type: 'address' }],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'revertData', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'count', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'revertData', internalType: 'bytes', type: 'bytes' }],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'expectRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'min', internalType: 'uint64', type: 'uint64' },
-      { name: 'max', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectSafeMemory',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'min', internalType: 'uint64', type: 'uint64' },
-      { name: 'max', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'expectSafeMemoryCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newBasefee', internalType: 'uint256', type: 'uint256' }],
-    name: 'fee',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'commandInput', internalType: 'string[]', type: 'string[]' }],
-    name: 'ffi',
-    outputs: [{ name: 'result', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    name: 'foundryVersionAtLeast',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    name: 'foundryVersionCmp',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'fsMetadata',
-    outputs: [
-      {
-        name: 'metadata',
-        internalType: 'struct VmSafe.FsMetadata',
-        type: 'tuple',
-        components: [
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' },
-          { name: 'length', internalType: 'uint256', type: 'uint256' },
-          { name: 'readOnly', internalType: 'bool', type: 'bool' },
-          { name: 'modified', internalType: 'uint256', type: 'uint256' },
-          { name: 'accessed', internalType: 'uint256', type: 'uint256' },
-          { name: 'created', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'code', internalType: 'bytes', type: 'bytes' }],
-    name: 'getArtifactPathByCode',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'deployedCode', internalType: 'bytes', type: 'bytes' }],
-    name: 'getArtifactPathByDeployedCode',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlobBaseFee',
-    outputs: [{ name: 'blobBaseFee', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlobhashes',
-    outputs: [{ name: 'hashes', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlockNumber',
-    outputs: [{ name: 'height', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlockTimestamp',
-    outputs: [{ name: 'timestamp', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' },
-      {
-        name: 'txType',
-        internalType: 'enum VmSafe.BroadcastTxType',
-        type: 'uint8'
-      }
-    ],
-    name: 'getBroadcast',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary',
-        type: 'tuple',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getBroadcasts',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' },
-      {
-        name: 'txType',
-        internalType: 'enum VmSafe.BroadcastTxType',
-        type: 'uint8'
-      }
-    ],
-    name: 'getBroadcasts',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'chainAlias', internalType: 'string', type: 'string' }],
-    name: 'getChain',
-    outputs: [
-      {
-        name: 'chain',
-        internalType: 'struct VmSafe.Chain',
-        type: 'tuple',
-        components: [
-          { name: 'name', internalType: 'string', type: 'string' },
-          { name: 'chainId', internalType: 'uint256', type: 'uint256' },
-          { name: 'chainAlias', internalType: 'string', type: 'string' },
-          { name: 'rpcUrl', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'chainId', internalType: 'uint256', type: 'uint256' }],
-    name: 'getChain',
-    outputs: [
-      {
-        name: 'chain',
-        internalType: 'struct VmSafe.Chain',
-        type: 'tuple',
-        components: [
-          { name: 'name', internalType: 'string', type: 'string' },
-          { name: 'chainId', internalType: 'uint256', type: 'uint256' },
-          { name: 'chainAlias', internalType: 'string', type: 'string' },
-          { name: 'rpcUrl', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'getCode',
-    outputs: [{ name: 'creationBytecode', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'getDeployedCode',
-    outputs: [{ name: 'runtimeBytecode', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getDeployment',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'contractName', internalType: 'string', type: 'string' }],
-    name: 'getDeployment',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getDeployments',
-    outputs: [
-      {
-        name: 'deployedAddresses',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getFoundryVersion',
-    outputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'getLabel',
-    outputs: [{ name: 'currentLabel', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'elementSlot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'getMappingKeyAndParentOf',
-    outputs: [
-      { name: 'found', internalType: 'bool', type: 'bool' },
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'parent', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'mappingSlot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'getMappingLength',
-    outputs: [{ name: 'length', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'mappingSlot', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'idx', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'getMappingSlotAt',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'getNonce',
-    outputs: [{ name: 'nonce', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    name: 'getNonce',
-    outputs: [{ name: 'nonce', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getRecordedLogs',
-    outputs: [
-      {
-        name: 'logs',
-        internalType: 'struct VmSafe.Log[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'emitter', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getStateDiff',
-    outputs: [{ name: 'diff', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getStateDiffJson',
-    outputs: [{ name: 'diff', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getWallets',
-    outputs: [{ name: 'wallets', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'indexOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'interceptInitcode',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'context',
-        internalType: 'enum VmSafe.ForgeContext',
-        type: 'uint8'
-      }
-    ],
-    name: 'isContext',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'isDir',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'isFile',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'isPersistent',
-    outputs: [{ name: 'persistent', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExists',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExistsJson',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExistsToml',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'newLabel', internalType: 'string', type: 'string' }
-    ],
-    name: 'label',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'lastCallGas',
-    outputs: [
-      {
-        name: 'gas',
-        internalType: 'struct VmSafe.Gas',
-        type: 'tuple',
-        components: [
-          { name: 'gasLimit', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasTotalUsed', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasMemoryUsed', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasRefunded', internalType: 'int64', type: 'int64' },
-          { name: 'gasRemaining', internalType: 'uint64', type: 'uint64' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'slot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'load',
-    outputs: [{ name: 'data', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'pathToAllocsJson', internalType: 'string', type: 'string' }],
-    name: 'loadAllocs',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'accounts', internalType: 'address[]', type: 'address[]' }],
-    name: 'makePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account0', internalType: 'address', type: 'address' },
-      { name: 'account1', internalType: 'address', type: 'address' }
-    ],
-    name: 'makePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'makePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account0', internalType: 'address', type: 'address' },
-      { name: 'account1', internalType: 'address', type: 'address' },
-      { name: 'account2', internalType: 'address', type: 'address' }
-    ],
-    name: 'makePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'returnData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'returnData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'returnData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'returnData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCall',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCallRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCallRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCallRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockCallRevert',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'msgValue', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'returnData', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'mockCalls',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'returnData', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'mockCalls',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'callee', internalType: 'address', type: 'address' },
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'mockFunction',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'noAccessList',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseAddress',
-    outputs: [{ name: 'parsedValue', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBool',
-    outputs: [{ name: 'parsedValue', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBytes',
-    outputs: [{ name: 'parsedValue', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBytes32',
-    outputs: [{ name: 'parsedValue', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseInt',
-    outputs: [{ name: 'parsedValue', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    name: 'parseJson',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJson',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonAddressArray',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBoolArray',
-    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes32',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes32Array',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytesArray',
-    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonIntArray',
-    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonKeys',
-    outputs: [{ name: 'keys', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonString',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonStringArray',
-    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonTypeArray',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonUintArray',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseToml',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'toml', internalType: 'string', type: 'string' }],
-    name: 'parseToml',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlAddressArray',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBoolArray',
-    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes32',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes32Array',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytesArray',
-    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlIntArray',
-    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlKeys',
-    outputs: [{ name: 'keys', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlString',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlStringArray',
-    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlTypeArray',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlUintArray',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseUint',
-    outputs: [{ name: 'parsedValue', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'pauseGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'pauseTracing',
-    outputs: [],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'txOrigin', internalType: 'address', type: 'address' }
-    ],
-    name: 'prank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'txOrigin', internalType: 'address', type: 'address' },
-      { name: 'delegateCall', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'prank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'delegateCall', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'prank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'msgSender', internalType: 'address', type: 'address' }],
-    name: 'prank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newPrevrandao', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'prevrandao',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newPrevrandao', internalType: 'uint256', type: 'uint256' }],
-    name: 'prevrandao',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'projectRoot',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'prompt',
-    outputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptSecret',
-    outputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptSecretUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'publicKeyP256',
-    outputs: [
-      { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-      { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'len', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBytes4',
-    outputs: [{ name: '', internalType: 'bytes4', type: 'bytes4' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBytes8',
-    outputs: [{ name: '', internalType: 'bytes8', type: 'bytes8' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'bits', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'bits', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'min', internalType: 'uint256', type: 'uint256' },
-      { name: 'max', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'readCallers',
-    outputs: [
-      {
-        name: 'callerMode',
-        internalType: 'enum VmSafe.CallerMode',
-        type: 'uint8'
-      },
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'txOrigin', internalType: 'address', type: 'address' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'maxDepth', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'maxDepth', internalType: 'uint64', type: 'uint64' },
-      { name: 'followLinks', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readFile',
-    outputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readFileBinary',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readLine',
-    outputs: [{ name: 'line', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'linkPath', internalType: 'string', type: 'string' }],
-    name: 'readLink',
-    outputs: [{ name: 'targetPath', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'record',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'recordLogs',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'rememberKey',
-    outputs: [{ name: 'keyAddr', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'count', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'rememberKeys',
-    outputs: [{ name: 'keyAddrs', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'language', internalType: 'string', type: 'string' },
-      { name: 'count', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'rememberKeys',
-    outputs: [{ name: 'keyAddrs', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'recursive', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'removeDir',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'removeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'from', internalType: 'string', type: 'string' },
-      { name: 'to', internalType: 'string', type: 'string' }
-    ],
-    name: 'replace',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resetGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'resetNonce',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resumeGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resumeTracing',
-    outputs: [],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'revertTo',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'revertToAndDelete',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'revertToState',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'revertToStateAndDelete',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'accounts', internalType: 'address[]', type: 'address[]' }],
-    name: 'revokePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'revokePersistent',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newHeight', internalType: 'uint256', type: 'uint256' }],
-    name: 'roll',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'txHash', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'rollFork',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'forkId', internalType: 'uint256', type: 'uint256' },
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'rollFork',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'blockNumber', internalType: 'uint256', type: 'uint256' }],
-    name: 'rollFork',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'forkId', internalType: 'uint256', type: 'uint256' },
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'rollFork',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'method', internalType: 'string', type: 'string' },
-      { name: 'params', internalType: 'string', type: 'string' }
-    ],
-    name: 'rpc',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'method', internalType: 'string', type: 'string' },
-      { name: 'params', internalType: 'string', type: 'string' }
-    ],
-    name: 'rpc',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'rpcAlias', internalType: 'string', type: 'string' }],
-    name: 'rpcUrl',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'rpcUrlStructs',
-    outputs: [
-      {
-        name: 'urls',
-        internalType: 'struct VmSafe.Rpc[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'key', internalType: 'string', type: 'string' },
-          { name: 'url', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'rpcUrls',
-    outputs: [{ name: 'urls', internalType: 'string[2][]', type: 'string[2][]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'forkId', internalType: 'uint256', type: 'uint256' }],
-    name: 'selectFork',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'serializeAddress',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'address', type: 'address' }
-    ],
-    name: 'serializeAddress',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'serializeBool',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'serializeBool',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'serializeBytes',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeBytes',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'serializeBytes32',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'serializeBytes32',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'serializeInt',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'serializeInt',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'serializeJson',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'typeDescription', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeJsonType',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeJsonType',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'serializeString',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'serializeString',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'serializeUint',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'serializeUint',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'serializeUintToHex',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'overwrite', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setArbitraryStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'setArbitraryStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' },
-      { name: 'blockHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'setBlockhash',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'setEnv',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'newNonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'setNonce',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'newNonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'setNonceUnsafe',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'array', internalType: 'uint256[]', type: 'uint256[]' }],
-    name: 'shuffle',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'digest', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signer', internalType: 'address', type: 'address' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'signAndAttachDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'nonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'signAndAttachDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signer', internalType: 'address', type: 'address' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'digest', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'signDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'nonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'signDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signP256',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'skipTest', internalType: 'bool', type: 'bool' },
-      { name: 'reason', internalType: 'string', type: 'string' }
-    ],
-    name: 'skip',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'skipTest', internalType: 'bool', type: 'bool' }],
-    name: 'skip',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'duration', internalType: 'uint256', type: 'uint256' }],
-    name: 'sleep',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'snapshot',
-    outputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'group', internalType: 'string', type: 'string' },
-      { name: 'name', internalType: 'string', type: 'string' }
-    ],
-    name: 'snapshotGasLastCall',
-    outputs: [{ name: 'gasUsed', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'snapshotGasLastCall',
-    outputs: [{ name: 'gasUsed', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'snapshotState',
-    outputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'snapshotValue',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'group', internalType: 'string', type: 'string' },
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'snapshotValue',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'array', internalType: 'uint256[]', type: 'uint256[]' }],
-    name: 'sort',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'delimiter', internalType: 'string', type: 'string' }
-    ],
-    name: 'split',
-    outputs: [{ name: 'outputs', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'signer', internalType: 'address', type: 'address' }],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startDebugTraceRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startMappingRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'msgSender', internalType: 'address', type: 'address' }],
-    name: 'startPrank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'delegateCall', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'startPrank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'txOrigin', internalType: 'address', type: 'address' }
-    ],
-    name: 'startPrank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'msgSender', internalType: 'address', type: 'address' },
-      { name: 'txOrigin', internalType: 'address', type: 'address' },
-      { name: 'delegateCall', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'startPrank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'startSnapshotGas',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'group', internalType: 'string', type: 'string' },
-      { name: 'name', internalType: 'string', type: 'string' }
-    ],
-    name: 'startSnapshotGas',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startStateDiffRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopAndReturnDebugTraceRecording',
-    outputs: [
-      {
-        name: 'step',
-        internalType: 'struct VmSafe.DebugStep[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'stack', internalType: 'uint256[]', type: 'uint256[]' },
-          { name: 'memoryInput', internalType: 'bytes', type: 'bytes' },
-          { name: 'opcode', internalType: 'uint8', type: 'uint8' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isOutOfGas', internalType: 'bool', type: 'bool' },
-          { name: 'contractAddr', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopAndReturnStateDiff',
-    outputs: [
-      {
-        name: 'accountAccesses',
-        internalType: 'struct VmSafe.AccountAccess[]',
-        type: 'tuple[]',
-        components: [
-          {
-            name: 'chainInfo',
-            internalType: 'struct VmSafe.ChainInfo',
-            type: 'tuple',
-            components: [
-              { name: 'forkId', internalType: 'uint256', type: 'uint256' },
-              { name: 'chainId', internalType: 'uint256', type: 'uint256' }
-            ]
-          },
-          {
-            name: 'kind',
-            internalType: 'enum VmSafe.AccountAccessKind',
-            type: 'uint8'
-          },
-          { name: 'account', internalType: 'address', type: 'address' },
-          { name: 'accessor', internalType: 'address', type: 'address' },
-          { name: 'initialized', internalType: 'bool', type: 'bool' },
-          { name: 'oldBalance', internalType: 'uint256', type: 'uint256' },
-          { name: 'newBalance', internalType: 'uint256', type: 'uint256' },
-          { name: 'deployedCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'reverted', internalType: 'bool', type: 'bool' },
-          {
-            name: 'storageAccesses',
-            internalType: 'struct VmSafe.StorageAccess[]',
-            type: 'tuple[]',
-            components: [
-              { name: 'account', internalType: 'address', type: 'address' },
-              { name: 'slot', internalType: 'bytes32', type: 'bytes32' },
-              { name: 'isWrite', internalType: 'bool', type: 'bool' },
-              {
-                name: 'previousValue',
-                internalType: 'bytes32',
-                type: 'bytes32'
-              },
-              { name: 'newValue', internalType: 'bytes32', type: 'bytes32' },
-              { name: 'reverted', internalType: 'bool', type: 'bool' }
-            ]
-          },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopExpectSafeMemory',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopMappingRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopPrank',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'group', internalType: 'string', type: 'string' },
-      { name: 'name', internalType: 'string', type: 'string' }
-    ],
-    name: 'stopSnapshotGas',
-    outputs: [{ name: 'gasUsed', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'stopSnapshotGas',
-    outputs: [{ name: 'gasUsed', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopSnapshotGas',
-    outputs: [{ name: 'gasUsed', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'slot', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'store',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    name: 'toBase64',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'toBase64',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    name: 'toBase64URL',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'toBase64URL',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'toLowercase',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'toUppercase',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'forkId', internalType: 'uint256', type: 'uint256' },
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'transact',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'txHash', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'transact',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'trim',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'commandInput', internalType: 'string[]', type: 'string[]' }],
-    name: 'tryFfi',
-    outputs: [
-      {
-        name: 'result',
-        internalType: 'struct VmSafe.FfiResult',
-        type: 'tuple',
-        components: [
-          { name: 'exitCode', internalType: 'int32', type: 'int32' },
-          { name: 'stdout', internalType: 'bytes', type: 'bytes' },
-          { name: 'stderr', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newGasPrice', internalType: 'uint256', type: 'uint256' }],
-    name: 'txGasPrice',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'unixTime',
-    outputs: [{ name: 'milliseconds', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'slot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'warmSlot',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newTimestamp', internalType: 'uint256', type: 'uint256' }],
-    name: 'warp',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'writeFileBinary',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeJson',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeJson',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeLine',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeToml',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeToml',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// VmSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const vmSafeAbi = [
-  {
-    type: 'function',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'accesses',
-    outputs: [
-      { name: 'readSlots', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'writeSlots', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'addr',
-    outputs: [{ name: 'keyAddr', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbs',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqAbsDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRel',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'maxPercentDelta', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertApproxEqRelDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'condition', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertFalse',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assertFalse',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertGtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLe',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLeDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLt',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertLtDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool', type: 'bool' },
-      { name: 'right', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'right', internalType: 'bool[]', type: 'bool[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address[]', type: 'address[]' },
-      { name: 'right', internalType: 'address[]', type: 'address[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string', type: 'string' },
-      { name: 'right', internalType: 'string', type: 'string' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes', type: 'bytes' },
-      { name: 'right', internalType: 'bytes', type: 'bytes' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'right', internalType: 'uint256[]', type: 'uint256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'address', type: 'address' },
-      { name: 'right', internalType: 'address', type: 'address' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'right', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'right', internalType: 'bytes32[]', type: 'bytes32[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'string[]', type: 'string[]' },
-      { name: 'right', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'right', internalType: 'int256[]', type: 'int256[]' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'bytes[]', type: 'bytes[]' },
-      { name: 'right', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'assertNotEq',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'int256', type: 'int256' },
-      { name: 'right', internalType: 'int256', type: 'int256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'left', internalType: 'uint256', type: 'uint256' },
-      { name: 'right', internalType: 'uint256', type: 'uint256' },
-      { name: 'decimals', internalType: 'uint256', type: 'uint256' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertNotEqDecimal',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assertTrue',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'condition', internalType: 'bool', type: 'bool' },
-      { name: 'error', internalType: 'string', type: 'string' }
-    ],
-    name: 'assertTrue',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'condition', internalType: 'bool', type: 'bool' }],
-    name: 'assume',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'potentialReverts',
-        internalType: 'struct VmSafe.PotentialRevert[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'reverter', internalType: 'address', type: 'address' },
-          { name: 'partialMatch', internalType: 'bool', type: 'bool' },
-          { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'potentialRevert',
-        internalType: 'struct VmSafe.PotentialRevert',
-        type: 'tuple',
-        components: [
-          { name: 'reverter', internalType: 'address', type: 'address' },
-          { name: 'partialMatch', internalType: 'bool', type: 'bool' },
-          { name: 'revertData', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    name: 'assumeNoRevert',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'blob', internalType: 'bytes', type: 'bytes' }],
-    name: 'attachBlob',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    name: 'attachDelegation',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'char', internalType: 'string', type: 'string' }],
-    name: 'breakpoint',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'char', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'breakpoint',
-    outputs: [],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'signer', internalType: 'address', type: 'address' }],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'broadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'broadcastRawTransaction',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'closeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'initCodeHash', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'computeCreate2Address',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'initCodeHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'deployer', internalType: 'address', type: 'address' }
-    ],
-    name: 'computeCreate2Address',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'deployer', internalType: 'address', type: 'address' },
-      { name: 'nonce', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'computeCreateAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'subject', internalType: 'string', type: 'string' },
-      { name: 'search', internalType: 'string', type: 'string' }
-    ],
-    name: 'contains',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'string', type: 'string' },
-      { name: 'to', internalType: 'string', type: 'string' }
-    ],
-    name: 'copyFile',
-    outputs: [{ name: 'copied', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' }
-    ],
-    name: 'copyStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'recursive', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'createDir',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'walletLabel', internalType: 'string', type: 'string' }],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'walletLabel', internalType: 'string', type: 'string' }
-    ],
-    name: 'createWallet',
-    outputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'salt', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'artifactPath', internalType: 'string', type: 'string' },
-      { name: 'constructorArgs', internalType: 'bytes', type: 'bytes' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'deployCode',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' },
-      { name: 'language', internalType: 'string', type: 'string' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' },
-      { name: 'language', internalType: 'string', type: 'string' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'index', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'deriveKey',
-    outputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'ensNamehash',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envAddress',
-    outputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envAddress',
-    outputs: [{ name: 'value', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBool',
-    outputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBool',
-    outputs: [{ name: 'value', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBytes',
-    outputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBytes',
-    outputs: [{ name: 'value', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envBytes32',
-    outputs: [{ name: 'value', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envBytes32',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envExists',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envInt',
-    outputs: [{ name: 'value', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envInt',
-    outputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'address', type: 'address' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'string', type: 'string' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' },
-      { name: 'defaultValue', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'envOr',
-    outputs: [{ name: 'value', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envString',
-    outputs: [{ name: 'value', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envString',
-    outputs: [{ name: 'value', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'string', type: 'string' }],
-    name: 'envUint',
-    outputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'delim', internalType: 'string', type: 'string' }
-    ],
-    name: 'envUint',
-    outputs: [{ name: 'value', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'fromBlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'toBlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'eth_getLogs',
-    outputs: [
-      {
-        name: 'logs',
-        internalType: 'struct VmSafe.EthGetLogs[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'emitter', internalType: 'address', type: 'address' },
-          { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'blockHash', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'transactionHash', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'transactionIndex', internalType: 'uint64', type: 'uint64' },
-          { name: 'logIndex', internalType: 'uint256', type: 'uint256' },
-          { name: 'removed', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'exists',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'commandInput', internalType: 'string[]', type: 'string[]' }],
-    name: 'ffi',
-    outputs: [{ name: 'result', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    name: 'foundryVersionAtLeast',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    name: 'foundryVersionCmp',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'fsMetadata',
-    outputs: [
-      {
-        name: 'metadata',
-        internalType: 'struct VmSafe.FsMetadata',
-        type: 'tuple',
-        components: [
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' },
-          { name: 'length', internalType: 'uint256', type: 'uint256' },
-          { name: 'readOnly', internalType: 'bool', type: 'bool' },
-          { name: 'modified', internalType: 'uint256', type: 'uint256' },
-          { name: 'accessed', internalType: 'uint256', type: 'uint256' },
-          { name: 'created', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'code', internalType: 'bytes', type: 'bytes' }],
-    name: 'getArtifactPathByCode',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'deployedCode', internalType: 'bytes', type: 'bytes' }],
-    name: 'getArtifactPathByDeployedCode',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlobBaseFee',
-    outputs: [{ name: 'blobBaseFee', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlockNumber',
-    outputs: [{ name: 'height', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getBlockTimestamp',
-    outputs: [{ name: 'timestamp', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' },
-      {
-        name: 'txType',
-        internalType: 'enum VmSafe.BroadcastTxType',
-        type: 'uint8'
-      }
-    ],
-    name: 'getBroadcast',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary',
-        type: 'tuple',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getBroadcasts',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' },
-      {
-        name: 'txType',
-        internalType: 'enum VmSafe.BroadcastTxType',
-        type: 'uint8'
-      }
-    ],
-    name: 'getBroadcasts',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct VmSafe.BroadcastTxSummary[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'txHash', internalType: 'bytes32', type: 'bytes32' },
-          {
-            name: 'txType',
-            internalType: 'enum VmSafe.BroadcastTxType',
-            type: 'uint8'
-          },
-          { name: 'contractAddress', internalType: 'address', type: 'address' },
-          { name: 'blockNumber', internalType: 'uint64', type: 'uint64' },
-          { name: 'success', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'chainAlias', internalType: 'string', type: 'string' }],
-    name: 'getChain',
-    outputs: [
-      {
-        name: 'chain',
-        internalType: 'struct VmSafe.Chain',
-        type: 'tuple',
-        components: [
-          { name: 'name', internalType: 'string', type: 'string' },
-          { name: 'chainId', internalType: 'uint256', type: 'uint256' },
-          { name: 'chainAlias', internalType: 'string', type: 'string' },
-          { name: 'rpcUrl', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'chainId', internalType: 'uint256', type: 'uint256' }],
-    name: 'getChain',
-    outputs: [
-      {
-        name: 'chain',
-        internalType: 'struct VmSafe.Chain',
-        type: 'tuple',
-        components: [
-          { name: 'name', internalType: 'string', type: 'string' },
-          { name: 'chainId', internalType: 'uint256', type: 'uint256' },
-          { name: 'chainAlias', internalType: 'string', type: 'string' },
-          { name: 'rpcUrl', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'getCode',
-    outputs: [{ name: 'creationBytecode', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'artifactPath', internalType: 'string', type: 'string' }],
-    name: 'getDeployedCode',
-    outputs: [{ name: 'runtimeBytecode', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getDeployment',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'contractName', internalType: 'string', type: 'string' }],
-    name: 'getDeployment',
-    outputs: [{ name: 'deployedAddress', internalType: 'address', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'contractName', internalType: 'string', type: 'string' },
-      { name: 'chainId', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'getDeployments',
-    outputs: [
-      {
-        name: 'deployedAddresses',
-        internalType: 'address[]',
-        type: 'address[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getFoundryVersion',
-    outputs: [{ name: 'version', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'getLabel',
-    outputs: [{ name: 'currentLabel', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'elementSlot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'getMappingKeyAndParentOf',
-    outputs: [
-      { name: 'found', internalType: 'bool', type: 'bool' },
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'parent', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'mappingSlot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'getMappingLength',
-    outputs: [{ name: 'length', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'mappingSlot', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'idx', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'getMappingSlotAt',
-    outputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'getNonce',
-    outputs: [{ name: 'nonce', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      }
-    ],
-    name: 'getNonce',
-    outputs: [{ name: 'nonce', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getRecordedLogs',
-    outputs: [
-      {
-        name: 'logs',
-        internalType: 'struct VmSafe.Log[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'topics', internalType: 'bytes32[]', type: 'bytes32[]' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'emitter', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getStateDiff',
-    outputs: [{ name: 'diff', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getStateDiffJson',
-    outputs: [{ name: 'diff', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getWallets',
-    outputs: [{ name: 'wallets', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'indexOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'context',
-        internalType: 'enum VmSafe.ForgeContext',
-        type: 'uint8'
-      }
-    ],
-    name: 'isContext',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'isDir',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'isFile',
-    outputs: [{ name: 'result', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExists',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExistsJson',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'keyExistsToml',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'newLabel', internalType: 'string', type: 'string' }
-    ],
-    name: 'label',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'lastCallGas',
-    outputs: [
-      {
-        name: 'gas',
-        internalType: 'struct VmSafe.Gas',
-        type: 'tuple',
-        components: [
-          { name: 'gasLimit', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasTotalUsed', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasMemoryUsed', internalType: 'uint64', type: 'uint64' },
-          { name: 'gasRefunded', internalType: 'int64', type: 'int64' },
-          { name: 'gasRemaining', internalType: 'uint64', type: 'uint64' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'slot', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'load',
-    outputs: [{ name: 'data', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseAddress',
-    outputs: [{ name: 'parsedValue', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBool',
-    outputs: [{ name: 'parsedValue', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBytes',
-    outputs: [{ name: 'parsedValue', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseBytes32',
-    outputs: [{ name: 'parsedValue', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseInt',
-    outputs: [{ name: 'parsedValue', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    name: 'parseJson',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJson',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonAddressArray',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBoolArray',
-    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes32',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytes32Array',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonBytesArray',
-    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonIntArray',
-    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonKeys',
-    outputs: [{ name: 'keys', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonString',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonStringArray',
-    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonTypeArray',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseJsonUintArray',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseToml',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'toml', internalType: 'string', type: 'string' }],
-    name: 'parseToml',
-    outputs: [{ name: 'abiEncodedData', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlAddressArray',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBoolArray',
-    outputs: [{ name: '', internalType: 'bool[]', type: 'bool[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes32',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytes32Array',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlBytesArray',
-    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlIntArray',
-    outputs: [{ name: '', internalType: 'int256[]', type: 'int256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlKeys',
-    outputs: [{ name: 'keys', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlString',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlStringArray',
-    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlType',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlTypeArray',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'toml', internalType: 'string', type: 'string' },
-      { name: 'key', internalType: 'string', type: 'string' }
-    ],
-    name: 'parseTomlUintArray',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    name: 'parseUint',
-    outputs: [{ name: 'parsedValue', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'pauseGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'pauseTracing',
-    outputs: [],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'projectRoot',
-    outputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'prompt',
-    outputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptSecret',
-    outputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptSecretUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'promptText', internalType: 'string', type: 'string' }],
-    name: 'promptUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'publicKeyP256',
-    outputs: [
-      { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-      { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBool',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'len', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomBytes',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBytes4',
-    outputs: [{ name: '', internalType: 'bytes4', type: 'bytes4' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomBytes8',
-    outputs: [{ name: '', internalType: 'bytes8', type: 'bytes8' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'bits', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomInt',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'bits', internalType: 'uint256', type: 'uint256' }],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'min', internalType: 'uint256', type: 'uint256' },
-      { name: 'max', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'randomUint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'maxDepth', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'maxDepth', internalType: 'uint64', type: 'uint64' },
-      { name: 'followLinks', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readDir',
-    outputs: [
-      {
-        name: 'entries',
-        internalType: 'struct VmSafe.DirEntry[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'errorMessage', internalType: 'string', type: 'string' },
-          { name: 'path', internalType: 'string', type: 'string' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isDir', internalType: 'bool', type: 'bool' },
-          { name: 'isSymlink', internalType: 'bool', type: 'bool' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readFile',
-    outputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readFileBinary',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'readLine',
-    outputs: [{ name: 'line', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'linkPath', internalType: 'string', type: 'string' }],
-    name: 'readLink',
-    outputs: [{ name: 'targetPath', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'record',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'recordLogs',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'rememberKey',
-    outputs: [{ name: 'keyAddr', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'count', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'rememberKeys',
-    outputs: [{ name: 'keyAddrs', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mnemonic', internalType: 'string', type: 'string' },
-      { name: 'derivationPath', internalType: 'string', type: 'string' },
-      { name: 'language', internalType: 'string', type: 'string' },
-      { name: 'count', internalType: 'uint32', type: 'uint32' }
-    ],
-    name: 'rememberKeys',
-    outputs: [{ name: 'keyAddrs', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'recursive', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'removeDir',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'path', internalType: 'string', type: 'string' }],
-    name: 'removeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'from', internalType: 'string', type: 'string' },
-      { name: 'to', internalType: 'string', type: 'string' }
-    ],
-    name: 'replace',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resetGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resumeGasMetering',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'resumeTracing',
-    outputs: [],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'urlOrAlias', internalType: 'string', type: 'string' },
-      { name: 'method', internalType: 'string', type: 'string' },
-      { name: 'params', internalType: 'string', type: 'string' }
-    ],
-    name: 'rpc',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'method', internalType: 'string', type: 'string' },
-      { name: 'params', internalType: 'string', type: 'string' }
-    ],
-    name: 'rpc',
-    outputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'rpcAlias', internalType: 'string', type: 'string' }],
-    name: 'rpcUrl',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'rpcUrlStructs',
-    outputs: [
-      {
-        name: 'urls',
-        internalType: 'struct VmSafe.Rpc[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'key', internalType: 'string', type: 'string' },
-          { name: 'url', internalType: 'string', type: 'string' }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'rpcUrls',
-    outputs: [{ name: 'urls', internalType: 'string[2][]', type: 'string[2][]' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'serializeAddress',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'address', type: 'address' }
-    ],
-    name: 'serializeAddress',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bool[]', type: 'bool[]' }
-    ],
-    name: 'serializeBool',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'serializeBool',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bytes[]', type: 'bytes[]' }
-    ],
-    name: 'serializeBytes',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeBytes',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'bytes32[]', type: 'bytes32[]' }
-    ],
-    name: 'serializeBytes32',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'serializeBytes32',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'int256', type: 'int256' }
-    ],
-    name: 'serializeInt',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'int256[]', type: 'int256[]' }
-    ],
-    name: 'serializeInt',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'serializeJson',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'typeDescription', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeJsonType',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'typeDescription', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'serializeJsonType',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'string[]', type: 'string[]' }
-    ],
-    name: 'serializeString',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'serializeString',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'serializeUint',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'values', internalType: 'uint256[]', type: 'uint256[]' }
-    ],
-    name: 'serializeUint',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'objectKey', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'serializeUintToHex',
-    outputs: [{ name: 'json', internalType: 'string', type: 'string' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'overwrite', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setArbitraryStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'setArbitraryStorage',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'value', internalType: 'string', type: 'string' }
-    ],
-    name: 'setEnv',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'array', internalType: 'uint256[]', type: 'uint256[]' }],
-    name: 'shuffle',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'digest', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signer', internalType: 'address', type: 'address' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'sign',
-    outputs: [
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'signAndAttachDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'nonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'signAndAttachDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'wallet',
-        internalType: 'struct VmSafe.Wallet',
-        type: 'tuple',
-        components: [
-          { name: 'addr', internalType: 'address', type: 'address' },
-          { name: 'publicKeyX', internalType: 'uint256', type: 'uint256' },
-          { name: 'publicKeyY', internalType: 'uint256', type: 'uint256' },
-          { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signer', internalType: 'address', type: 'address' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'digest', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signCompact',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'vs', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'signDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'nonce', internalType: 'uint64', type: 'uint64' }
-    ],
-    name: 'signDelegation',
-    outputs: [
-      {
-        name: 'signedDelegation',
-        internalType: 'struct VmSafe.SignedDelegation',
-        type: 'tuple',
-        components: [
-          { name: 'v', internalType: 'uint8', type: 'uint8' },
-          { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-          { name: 's', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'nonce', internalType: 'uint64', type: 'uint64' },
-          { name: 'implementation', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'privateKey', internalType: 'uint256', type: 'uint256' },
-      { name: 'digest', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    name: 'signP256',
-    outputs: [
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'duration', internalType: 'uint256', type: 'uint256' }],
-    name: 'sleep',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'array', internalType: 'uint256[]', type: 'uint256[]' }],
-    name: 'sort',
-    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'input', internalType: 'string', type: 'string' },
-      { name: 'delimiter', internalType: 'string', type: 'string' }
-    ],
-    name: 'split',
-    outputs: [{ name: 'outputs', internalType: 'string[]', type: 'string[]' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'signer', internalType: 'address', type: 'address' }],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'privateKey', internalType: 'uint256', type: 'uint256' }],
-    name: 'startBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startDebugTraceRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startMappingRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'startStateDiffRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopAndReturnDebugTraceRecording',
-    outputs: [
-      {
-        name: 'step',
-        internalType: 'struct VmSafe.DebugStep[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'stack', internalType: 'uint256[]', type: 'uint256[]' },
-          { name: 'memoryInput', internalType: 'bytes', type: 'bytes' },
-          { name: 'opcode', internalType: 'uint8', type: 'uint8' },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' },
-          { name: 'isOutOfGas', internalType: 'bool', type: 'bool' },
-          { name: 'contractAddr', internalType: 'address', type: 'address' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopAndReturnStateDiff',
-    outputs: [
-      {
-        name: 'accountAccesses',
-        internalType: 'struct VmSafe.AccountAccess[]',
-        type: 'tuple[]',
-        components: [
-          {
-            name: 'chainInfo',
-            internalType: 'struct VmSafe.ChainInfo',
-            type: 'tuple',
-            components: [
-              { name: 'forkId', internalType: 'uint256', type: 'uint256' },
-              { name: 'chainId', internalType: 'uint256', type: 'uint256' }
-            ]
-          },
-          {
-            name: 'kind',
-            internalType: 'enum VmSafe.AccountAccessKind',
-            type: 'uint8'
-          },
-          { name: 'account', internalType: 'address', type: 'address' },
-          { name: 'accessor', internalType: 'address', type: 'address' },
-          { name: 'initialized', internalType: 'bool', type: 'bool' },
-          { name: 'oldBalance', internalType: 'uint256', type: 'uint256' },
-          { name: 'newBalance', internalType: 'uint256', type: 'uint256' },
-          { name: 'deployedCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-          { name: 'reverted', internalType: 'bool', type: 'bool' },
-          {
-            name: 'storageAccesses',
-            internalType: 'struct VmSafe.StorageAccess[]',
-            type: 'tuple[]',
-            components: [
-              { name: 'account', internalType: 'address', type: 'address' },
-              { name: 'slot', internalType: 'bytes32', type: 'bytes32' },
-              { name: 'isWrite', internalType: 'bool', type: 'bool' },
-              {
-                name: 'previousValue',
-                internalType: 'bytes32',
-                type: 'bytes32'
-              },
-              { name: 'newValue', internalType: 'bytes32', type: 'bytes32' },
-              { name: 'reverted', internalType: 'bool', type: 'bool' }
-            ]
-          },
-          { name: 'depth', internalType: 'uint64', type: 'uint64' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopBroadcast',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'stopMappingRecording',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    name: 'toBase64',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'toBase64',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'string', type: 'string' }],
-    name: 'toBase64URL',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
-    name: 'toBase64URL',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'toLowercase',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'address', type: 'address' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bytes', type: 'bytes' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bool', type: 'bool' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'int256', type: 'int256' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'value', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'toString',
-    outputs: [{ name: 'stringifiedValue', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'toUppercase',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'input', internalType: 'string', type: 'string' }],
-    name: 'trim',
-    outputs: [{ name: 'output', internalType: 'string', type: 'string' }],
-    stateMutability: 'pure'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'commandInput', internalType: 'string[]', type: 'string[]' }],
-    name: 'tryFfi',
-    outputs: [
-      {
-        name: 'result',
-        internalType: 'struct VmSafe.FfiResult',
-        type: 'tuple',
-        components: [
-          { name: 'exitCode', internalType: 'int32', type: 'int32' },
-          { name: 'stdout', internalType: 'bytes', type: 'bytes' },
-          { name: 'stderr', internalType: 'bytes', type: 'bytes' }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'unixTime',
-    outputs: [{ name: 'milliseconds', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeFile',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' }
-    ],
-    name: 'writeFileBinary',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeJson',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeJson',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'data', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeLine',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' },
-      { name: 'valueKey', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeToml',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'json', internalType: 'string', type: 'string' },
-      { name: 'path', internalType: 'string', type: 'string' }
-    ],
-    name: 'writeToml',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  }
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24967,7 +11544,7 @@ export const votingEscrowAbi = [
     inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
+    stateMutability: 'pure'
   },
   {
     type: 'function',
@@ -25008,6 +11585,7 @@ export const votingEscrowAbi = [
   },
   { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   { type: 'error', inputs: [], name: 'VotingEscrow__ExceedMaxTime' },
   {
     type: 'error',
@@ -25116,6 +11694,7 @@ export const votingEscrowStoreAbi = [
   { type: 'error', inputs: [], name: 'Access__CallerNotAuthority' },
   { type: 'error', inputs: [], name: 'Access__Unauthorized' },
   { type: 'error', inputs: [], name: 'BankStore__InsufficientBalance' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
   {
     type: 'error',
     inputs: [
@@ -25124,117 +11703,5 @@ export const votingEscrowStoreAbi = [
       { name: 'amount', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'TransferUtils__TokenTransferError'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// stdError
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const stdErrorAbi = [
-  {
-    type: 'function',
-    inputs: [],
-    name: 'arithmeticError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'assertionError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'divisionError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'encodeStorageError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'enumConversionError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'indexOOBError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'memOverflowError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'popError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'zeroVarError',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-    stateMutability: 'view'
-  }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// stdStorageSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const stdStorageSafeAbi = [
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'who', internalType: 'address', type: 'address', indexed: false },
-      { name: 'fsig', internalType: 'bytes4', type: 'bytes4', indexed: false },
-      {
-        name: 'keysHash',
-        internalType: 'bytes32',
-        type: 'bytes32',
-        indexed: false
-      },
-      {
-        name: 'slot',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'SlotFound'
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'who', internalType: 'address', type: 'address', indexed: false },
-      {
-        name: 'slot',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false
-      }
-    ],
-    name: 'WARNING_UninitedSlot'
   }
 ] as const

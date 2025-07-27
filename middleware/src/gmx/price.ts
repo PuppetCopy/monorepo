@@ -1,8 +1,9 @@
 import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION } from '../const/index.js'
-import { abs, applyFactor, delta, getDenominator, getTokenUsd, groupArrayByKeyMap } from '../utils/index.js'
+import { abs, delta } from '../core/mathUtils.js'
+import { getDenominator } from '../core/utils.js'
 import { getTokenDescription } from './gmxUtils.js'
-import type { IMarketInfo, IMarketPrice, IOraclePrice, IPriceMinMax, IPriceOracleMap } from './types.js'
+import type { IOraclePrice, IPriceMinMax } from './types.js'
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,
@@ -62,79 +63,79 @@ export function calculateImpactForCrossoverRebalance(
   return positiveImpact > negativeImpactUsd ? deltaDiffUsd : 0n - deltaDiffUsd
 }
 
-export function getCappedPositionImpactUsd(
-  marketPrice: IMarketPrice,
-  marketPoolInfo: IMarketInfo,
-  sizeDeltaUsd: bigint,
-  isLong: boolean
-) {
-  const priceImpactDeltaUsd = getPriceImpactForPosition(marketPoolInfo, sizeDeltaUsd, isLong)
+// export function getCappedPositionImpactUsd(
+//   marketPrice: IMarketPrice,
+//   marketPoolInfo: IMarketInfo,
+//   sizeDeltaUsd: bigint,
+//   isLong: boolean
+// ) {
+//   const priceImpactDeltaUsd = getPriceImpactForPosition(marketPoolInfo, sizeDeltaUsd, isLong)
 
-  if (priceImpactDeltaUsd < 0n) return priceImpactDeltaUsd
+//   if (priceImpactDeltaUsd < 0n) return priceImpactDeltaUsd
 
-  const impactPoolAmount = marketPoolInfo.usage.positionImpactPoolAmount
+//   const impactPoolAmount = marketPoolInfo.usage.positionImpactPoolAmount
 
-  const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(marketPrice.indexTokenPrice.min, impactPoolAmount)
+//   const maxPriceImpactUsdBasedOnImpactPool = getTokenUsd(marketPrice.indexTokenPrice.min, impactPoolAmount)
 
-  let cappedImpactUsd = priceImpactDeltaUsd
+//   let cappedImpactUsd = priceImpactDeltaUsd
 
-  if (cappedImpactUsd > maxPriceImpactUsdBasedOnImpactPool) {
-    cappedImpactUsd = maxPriceImpactUsdBasedOnImpactPool
-  }
+//   if (cappedImpactUsd > maxPriceImpactUsdBasedOnImpactPool) {
+//     cappedImpactUsd = maxPriceImpactUsdBasedOnImpactPool
+//   }
 
-  const maxPriceImpactFactor = marketPoolInfo.config.maxPositionImpactFactorPositive
-  const maxPriceImpactUsdBasedOnMaxPriceImpactFactor = applyFactor(abs(sizeDeltaUsd), maxPriceImpactFactor)
+//   const maxPriceImpactFactor = marketPoolInfo.config.maxPositionImpactFactorPositive
+//   const maxPriceImpactUsdBasedOnMaxPriceImpactFactor = applyFactor(abs(sizeDeltaUsd), maxPriceImpactFactor)
 
-  if (cappedImpactUsd > maxPriceImpactUsdBasedOnMaxPriceImpactFactor) {
-    cappedImpactUsd = maxPriceImpactUsdBasedOnMaxPriceImpactFactor
-  }
+//   if (cappedImpactUsd > maxPriceImpactUsdBasedOnMaxPriceImpactFactor) {
+//     cappedImpactUsd = maxPriceImpactUsdBasedOnMaxPriceImpactFactor
+//   }
 
-  return cappedImpactUsd
-}
+//   return cappedImpactUsd
+// }
 
-export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd: bigint, isLong: boolean) {
-  const longInterestInUsd = marketInfo.usage.longInterestUsd
-  const shortInterestInUsd = marketInfo.usage.shortInterestUsd
+// export function getPriceImpactForPosition(marketInfo: IMarketInfo, sizeDeltaUsd: bigint, isLong: boolean) {
+//   const longInterestInUsd = marketInfo.usage.longInterestUsd
+//   const shortInterestInUsd = marketInfo.usage.shortInterestUsd
 
-  const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
-  const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
+//   const nextLongUsd = longInterestInUsd + (isLong ? sizeDeltaUsd : 0n)
+//   const nextShortUsd = shortInterestInUsd + (isLong ? 0n : sizeDeltaUsd)
 
-  const priceImpactUsd = getPriceImpactUsd(
-    longInterestInUsd,
-    shortInterestInUsd,
-    nextLongUsd,
-    nextShortUsd,
-    marketInfo.config.positionImpactFactorPositive,
-    marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor
-  )
+//   const priceImpactUsd = getPriceImpactUsd(
+//     longInterestInUsd,
+//     shortInterestInUsd,
+//     nextLongUsd,
+//     nextShortUsd,
+//     marketInfo.config.positionImpactFactorPositive,
+//     marketInfo.config.positionImpactFactorNegative,
+//     marketInfo.config.positionImpactExponentFactor
+//   )
 
-  if (priceImpactUsd > 0n) {
-    return priceImpactUsd
-  }
+//   if (priceImpactUsd > 0n) {
+//     return priceImpactUsd
+//   }
 
-  if (!(abs(marketInfo.fees.virtualInventory.virtualInventoryForPositions) > 0n)) {
-    return priceImpactUsd
-  }
+//   if (!(abs(marketInfo.fees.virtualInventory.virtualInventoryForPositions) > 0n)) {
+//     return priceImpactUsd
+//   }
 
-  const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
-    marketInfo.fees.virtualInventory.virtualInventoryForPositions,
-    sizeDeltaUsd,
-    isLong
-  )
+//   const virtualInventoryParams = getNextOpenInterestForVirtualInventory(
+//     marketInfo.fees.virtualInventory.virtualInventoryForPositions,
+//     sizeDeltaUsd,
+//     isLong
+//   )
 
-  const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
-    longInterestInUsd,
-    shortInterestInUsd,
-    virtualInventoryParams.nextLongUsd,
-    virtualInventoryParams.nextShortUsd,
-    marketInfo.config.positionImpactFactorPositive,
-    marketInfo.config.positionImpactFactorNegative,
-    marketInfo.config.positionImpactExponentFactor
-  )
+//   const priceImpactUsdForVirtualInventory = getPriceImpactUsd(
+//     longInterestInUsd,
+//     shortInterestInUsd,
+//     virtualInventoryParams.nextLongUsd,
+//     virtualInventoryParams.nextShortUsd,
+//     marketInfo.config.positionImpactFactorPositive,
+//     marketInfo.config.positionImpactFactorNegative,
+//     marketInfo.config.positionImpactExponentFactor
+//   )
 
-  return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
-}
+//   return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
+// }
 
 export function getMarkPrice(price: IPriceMinMax, isIncrease: boolean, isLong: boolean) {
   const shouldUseMaxPrice = getShouldUseMaxPrice(isIncrease, isLong)
@@ -237,42 +238,16 @@ function applyImpactFactor(diff: bigint, factor: bigint, exponent: bigint): bigi
   return (result * factor) / FLOAT_PRECISION
 }
 
-// Signed Prices
-// To get the latest signed price information for sending transactions:
-// {
-//     "id": "1242386390",
-//     "minBlockNumber": 164915223,
-//     "minBlockHash": null,
-//     "oracleDecimals": null,
-//     "tokenSymbol": "ETH",
-//     "tokenAddress": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-//     "minPrice": null,
-//     "maxPrice": null,
-//     "signer": null,
-//     "signature": null,
-//     "signatureWithoutBlockHash": null,
-//     "createdAt": "2023-12-29T10:15:08.255Z",
-//     "minBlockTimestamp": null,
-//     "oracleKeeperKey": "realtimeFeed",
-//     "maxBlockTimestamp": 1703844907,
-//     "maxBlockNumber": 164915224,
-//     "maxBlockHash": "0x9128656166fbfc678d4261157a55a3d2643fe69a0bd38ea7db081b4ed101366f",
-//     "maxPriceFull": "2366066074010000",
-//     "minPriceFull": "2365810898560000",
-//     "oracleKeeperRecordId": null,
-//     "oracleKeeperFetchType": "ws",
-//     "oracleType": "realtimeFeed",
-//     "blob": "0x000637558ae605b87120ff75c52308703f79ebafba207a65d69705ec7ba8beb70000000000000000000000000000000000000000000000000000000012e3be19000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000022000000000000000000000000000000000000000000000000000000000000002c00000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000012074aca63821bf7ead199e924d261d277cbec96d1026ab65267d655c51b453691400000000000000000000000000000000000000000000000000000000658e9c2b000000000000000000000000000000000000000000000000000000371617a135000000000000000000000000000000000000000000000000000000371554f2400000000000000000000000000000000000000000000000000000003716da50290000000000000000000000000000000000000000000000000000000009d468189128656166fbfc678d4261157a55a3d2643fe69a0bd38ea7db081b4ed101366f0000000000000000000000000000000000000000000000000000000009d4681700000000000000000000000000000000000000000000000000000000658e9c2b0000000000000000000000000000000000000000000000000000000000000004df7cd1c994c57352532cf49a0b1de5a791b2e9cc4e267786b59814b7aee75e08a4f2ef7e8b0dd79cab5dd6ed2c91fc038da4c645d366c1560ceac4f6d4989a11721b3e5d45d9a551d06907b3385133c8373cc63b2b9f71072e2f53f0b20c28689f6d436cd010a1add6d9a6ae651e20ff76ba380afc43e8afd0a64b9be265290d000000000000000000000000000000000000000000000000000000000000000412fde004a5c2285defe03416bb10e8e19a3d794e635165fd5d65ea0fb3843a0e4f1edd2287148ad93d7c62045de30b4d464a8116b52f19c1324e4bab4661165b6b3bfedbf81de92bfb89ef62f3d013600ea62a86ebd24c261df1e089b3fc2dbe17b007e5e04c1d5875da912d581df4a44088a05c76a8757e012d4bd5031449cf"
-// }
+// Signed Prices from GMX API
 // Arbitrum URL: https://arbitrum-api.gmxinfra.io/signed_prices/latest
 // Avalanche URL: https://avalanche-api.gmxinfra.io/signed_prices/latest
-interface ISignedPrice {
+export interface IGmxSignedPriceData {
   id: string
   minBlockNumber: number
   minBlockHash: string | null
   oracleDecimals: number | null
   tokenSymbol: string
-  tokenAddress: string
+  tokenAddress: Address
   minPrice: number | null
   maxPrice: number | null
   signer: string | null
@@ -292,24 +267,42 @@ interface ISignedPrice {
   blob: string
 }
 
-export async function querySignedPrices(): Promise<IPriceOracleMap> {
-  const x = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
+export interface ISimplifiedOraclePrice {
+  min: bigint
+  max: bigint
+  timestamp: number
+}
 
-  const res = (await x.json()) as { signedPrices: ISignedPrice[] }
-  return groupArrayByKeyMap(
-    res.signedPrices,
-    (price) => price.tokenAddress.toLowerCase() as Address,
-    (price, token) => {
-      const priceMin = BigInt(price.minPriceFull)
-      const priceMax = BigInt(price.maxPriceFull)
+export async function querySignedPrices(): Promise<Record<Address, ISimplifiedOraclePrice>> {
+  try {
+    const response = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
 
-      return {
-        priceSourceType: 0n,
-        timestamp: price.maxBlockTimestamp,
-        token,
-        min: priceMin,
-        max: priceMax
+    if (!response.ok) {
+      throw new Error(`GMX signed prices API error! status: ${response.status}`)
+    }
+
+    const data = (await response.json()) as { signedPrices: IGmxSignedPriceData[] }
+    const priceMap: Record<Address, ISimplifiedOraclePrice> = {}
+
+    for (const priceData of data.signedPrices) {
+      try {
+        priceMap[priceData.tokenAddress] = {
+          min: BigInt(priceData.minPriceFull),
+          max: BigInt(priceData.maxPriceFull),
+          timestamp: priceData.minBlockTimestamp || priceData.maxBlockTimestamp
+        }
+      } catch (parseError) {
+        console.warn(
+          `Failed to parse signed price for ${priceData.tokenSymbol} (${priceData.tokenAddress}):`,
+          parseError
+        )
       }
     }
-  )
+
+    return priceMap
+  } catch (error) {
+    console.error('Error fetching GMX signed prices:', error)
+    // Return empty object on error to maintain type consistency
+    return {}
+  }
 }

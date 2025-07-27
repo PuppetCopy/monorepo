@@ -1,16 +1,17 @@
 import { constant, empty, map, multicast } from '@most/core'
 import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
-import { getTraderMatchingKey } from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import {
   filterNull,
   getDuration,
+  getTraderMatchingKey,
+  groupArrayMany,
   readableDate,
   readablePercentage,
   unixTimestampNow
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -51,7 +52,7 @@ export const $PortfolioPage = ({
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, Address>
     ) => {
-      const positionLinkListQuery = multicast(
+      const positionLinkMapQuery = multicast(
         map(
           async (params) => {
             const address = params.wallet.address
@@ -63,40 +64,90 @@ export const $PortfolioPage = ({
             const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
             const result = await sqlClient.query.puppetLink.findMany({
-              // where: (t, f) =>
-              //   f.and(
-              //     f.eq(t.puppet, address),
-              //     f.gte(t.createdAt, startActivityTimeframe),
-              //     f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
-              //   ),
+              where: (t, f) =>
+                f.and(
+                  f.eq(t.puppet, address),
+                  f.gte(t.createdAt, startActivityTimeframe),
+                  params.collateralTokenList.length > 0
+                    ? f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
+                    : undefined
+                ),
+              columns: {
+                callParamsTrader: true,
+                callParamsCollateralToken: true,
+                allocationAddress: true,
+                createdAt: true,
+                amount: true,
+                createdTxHash: true
+              },
               with: {
                 mirrorLink: {
+                  columns: {
+                    callParamsTrader: true,
+                    sizeDelta: true,
+                    requestKey: true,
+                    traderTargetLeverage: true,
+                    callParamsIsLong: true,
+                    callParamsMarket: true
+                  },
                   with: {
-                    createAllocation: true,
-                    executeList: true,
-                    // liquidate: true,
-                    // puppetLinkList: true,
-                    // requestAdjustList: true,
-                    requestMirror: true,
-                    settleList: true,
-                    updateAllocationForKeeperFeeList: true
+                    executeList: {
+                      columns: {
+                        positionSize: true,
+                        transactionHash: true,
+                        traderSize: true,
+                        traderCollateral: true,
+                        traderTargetLeverage: true
+                      }
+                    },
+                    liquidate: {
+                      columns: {
+                        transactionHash: true,
+                        blockTimestamp: true
+                      }
+                    },
+                    puppetLinkList: {
+                      columns: {
+                        amount: true,
+                        puppet: true
+                      }
+                    },
+                    requestAdjustList: {
+                      columns: {
+                        sizeDelta: true
+                      }
+                    },
+                    settleList: {
+                      columns: {
+                        settledAmount: true,
+                        distributionAmount: true,
+                        platformFeeAmount: true,
+                        puppetBalanceList: true,
+                        transactionHash: true,
+                        blockTimestamp: true
+                      }
+                    }
                   }
                 }
               }
             })
 
-            return result
+            return groupArrayMany(result, (row) =>
+              getTraderMatchingKey(row.callParamsCollateralToken, row.mirrorLink.callParamsTrader)
+            )
           },
           combineState({ activityTimeframe, collateralTokenList, wallet: wallet.account })
         )
       )
 
-      const stateParams = combineState({
-        userMatchingRuleQuery,
-        positionLinkListQuery,
-        activityTimeframe,
-        collateralTokenList
-      })
+      const stateParams = multicast(
+        combineState({
+          userMatchingRuleQuery,
+          positionLinkMapQuery,
+          activityTimeframe,
+          collateralTokenList
+        })
+      )
 
       // const matchingRuleQuery = map(async (params) => {
       //   const ruleList = params.collateralTokenList.map((collateralToken) => {
@@ -155,8 +206,13 @@ export const $PortfolioPage = ({
 
               $intermediatePromise({
                 $display: map(async (params) => {
-                  const settlementList = await params.positionLinkListQuery
-                  if (settlementList.length === 0) {
+                  const settlementList = await params.positionLinkMapQuery
+
+                  if (settlementList === null) {
+                    return empty()
+                  }
+
+                  if (Object.keys(settlementList).length === 0) {
                     return $column(style({ alignItems: 'center' }), spacing.small)(
                       // no activity within the selected timeframe
                       $text(`No matching activity in the last ${getDuration(params.activityTimeframe)}`),
@@ -176,7 +232,7 @@ export const $PortfolioPage = ({
               const activeRouteList =
                 params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
 
-              const positionList = await params.positionListQuery
+              const positionMap = await params.positionLinkMapQuery
               const matchingRuleList = await params.userMatchingRuleQuery
 
               return $column(spacing.default)(
@@ -210,54 +266,66 @@ export const $PortfolioPage = ({
                           ...matchingRuleListForToken.map((rule) => {
                             const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 
-                            return $Popover({
-                              $open: filterNull(
-                                map((trader) => {
-                                  if (trader !== rule.trader) {
-                                    return null
-                                  }
+                            const mirrorLinkList = positionMap?.[traderMatchingKey] || []
 
-                                  return $MatchingRuleEditor({
-                                    draftMatchingRuleList,
-                                    model: rule,
-                                    traderMatchingKey,
-                                    collateralToken,
-                                    trader: rule.trader
-                                  })({
-                                    changeMatchRuleList: changeMatchRuleListTether()
-                                  })
-                                }, popRouteSubscriptionEditor)
-                              ),
-                              dismiss: changeMatchRuleList,
-                              $target: $row(
-                                isDesktopScreen ? spacing.big : spacing.default,
-                                style({ alignItems: 'center' })
-                              )(
-                                $ButtonCircular({
-                                  $iconPath: $caretDown,
-                                  $container: $defaultButtonCircularContainer(
-                                    style({
-                                      marginLeft: '-32px',
-                                      backgroundColor: pallete.background,
-                                      cursor: 'pointer'
+                            return $column(
+                              $Popover({
+                                $open: filterNull(
+                                  map((trader) => {
+                                    if (trader !== rule.trader) {
+                                      return null
+                                    }
+
+                                    return $MatchingRuleEditor({
+                                      draftMatchingRuleList,
+                                      model: rule,
+                                      traderMatchingKey,
+                                      collateralToken,
+                                      trader: rule.trader
+                                    })({
+                                      changeMatchRuleList: changeMatchRuleListTether()
                                     })
+                                  }, popRouteSubscriptionEditor)
+                                ),
+                                dismiss: changeMatchRuleList,
+                                $target: $row(
+                                  isDesktopScreen ? spacing.big : spacing.default,
+                                  style({ alignItems: 'center' })
+                                )(
+                                  $ButtonCircular({
+                                    $iconPath: $caretDown,
+                                    $container: $defaultButtonCircularContainer(
+                                      style({
+                                        marginLeft: '-32px',
+                                        backgroundColor: pallete.background,
+                                        cursor: 'pointer'
+                                      })
+                                    )
+                                  })({
+                                    click: popRouteSubscriptionEditorTether(constant(rule.trader))
+                                  }),
+                                  $profileDisplay({
+                                    address: rule.trader
+                                  }),
+                                  $responsiveFlex(spacing.default, style({ flex: 1 }))(
+                                    $infoLabeledValue(
+                                      'Allowance Rate',
+                                      $text(`${readablePercentage(rule.allowanceRate)}`)
+                                    ),
+                                    $infoLabeledValue('Expiry', readableDate(Number(rule.expiry))),
+                                    $infoLabeledValue(
+                                      'Throttle Duration',
+                                      $text(`${getDuration(rule.throttleActivity)}`)
+                                    )
                                   )
-                                })({
-                                  click: popRouteSubscriptionEditorTether(constant(rule.trader))
-                                }),
-                                $profileDisplay({
-                                  address: rule.trader
-                                }),
-                                $responsiveFlex(spacing.default, style({ flex: 1 }))(
-                                  $infoLabeledValue(
-                                    'Allowance Rate',
-                                    $text(`${readablePercentage(rule.allowanceRate)}`)
-                                  ),
-                                  $infoLabeledValue('Expiry', readableDate(Number(rule.expiry))),
-                                  $infoLabeledValue('Throttle Duration', $text(`${getDuration(rule.throttleActivity)}`))
                                 )
+                              })({}),
+                              $text(
+                                `(${mirrorLinkList.length}) ${getTokenDescription(collateralToken).name} - ${
+                                  rule.trader
+                                }`
                               )
-                            })({})
+                            )
                           })
                         )
                       )

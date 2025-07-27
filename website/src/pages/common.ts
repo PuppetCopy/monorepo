@@ -1,4 +1,4 @@
-import { unixTimestampNow } from '@puppet-copy/middleware/utils'
+import { unixTimestampNow } from '@puppet-copy/middleware/core'
 import type {
   IPositionDecrease,
   IPositionIncrease,

@@ -2,6 +2,14 @@ import { awaitPromises, empty, map, mergeArray, now, startWith } from '@most/cor
 import type { Stream } from '@most/types'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
+  fillTimeline,
+  formatFixed,
+  getMappedValue,
+  type InferStream,
+  readablePnl,
+  unixTimestampNow
+} from '@puppet-copy/middleware/core'
+import {
   $Baseline,
   $ButtonToggle,
   $defaultTableCell,
@@ -19,14 +27,6 @@ import {
   type TableColumn
 } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import {
-  fillTimeline,
-  formatFixed,
-  getMappedValue,
-  type InferStream,
-  readablePnl,
-  unixTimestampNow
-} from '@puppet-copy/middleware/utils'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'

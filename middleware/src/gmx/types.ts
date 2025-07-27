@@ -1,185 +1,187 @@
-import type { Abi, Address, ExtractAbiEvent } from 'abitype'
-import type { GetEventArgs, Hex, Log } from 'viem'
-import type { IntervalTime } from '../const/index.js'
+// import type { Abi, Address, ExtractAbiEvent } from 'abitype'
+// import type { GetEventArgs, Hex, Log } from 'viem'
+// import type { IntervalTime } from '../const/index.js'
 
-export interface IIdentifiableEntity {
-  id: string
-}
+import type { Address } from 'viem/accounts'
 
-export interface ILogIndex<TQuantity = bigint, TIndex = number> {
-  blockNumber: TQuantity
-  // transactionIndex: TIndex
-  logIndex: TIndex
-}
+// export interface IIdentifiableEntity {
+//   id: string
+// }
 
-export interface ILogOrdered {
-  orderId: number
-}
+// export interface ILogIndex<TQuantity = bigint, TIndex = number> {
+//   blockNumber: TQuantity
+//   // transactionIndex: TIndex
+//   logIndex: TIndex
+// }
 
-export type ILogType<T extends string> = {
-  __typename: T
-}
+// export interface ILogOrdered {
+//   orderId: number
+// }
 
-export type ILogTypeId<T extends string> = ILogType<T> & {
-  id: string
-}
+// export type ILogType<T extends string> = {
+//   __typename: T
+// }
 
-export type ILogTxType<T extends string> = ILogTypeId<T> & {
-  blockTimestamp: number
-  transactionHash: string
-}
+// export type ILogTypeId<T extends string> = ILogType<T> & {
+//   id: string
+// }
 
-export type ILogArgs<TAbi extends Abi = Abi, TEventName extends string = string> = GetEventArgs<
-  TAbi,
-  TEventName,
-  { Required: true }
->
-export type ILogEvent<TAbi extends Abi = Abi, TEventName extends string = string> = Log<
-  bigint,
-  number,
-  false,
-  ExtractAbiEvent<TAbi, TEventName>,
-  true,
-  TAbi,
-  TEventName
-> // ILogIndex & ILogOrdered & GetEventArgs<TAbi, TEventName, { Required: true }>
-export type ILogOrderedEvent<TAbi extends Abi = Abi, TEventName extends string = string> = ILogOrdered &
-  Omit<ILogEvent<TAbi, TEventName>, 'data'>
-export type ILog<TAbi extends Abi = Abi, TEventName extends string = string> = ILogTxType<TEventName> &
-  ILogArgs<TAbi, TEventName>
+// export type ILogTxType<T extends string> = ILogTypeId<T> & {
+//   blockTimestamp: number
+//   transactionHash: string
+// }
 
-export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
-  token: Address
-  interval: IntervalTime
-  slotTime: number
-  o: bigint // open
-  h: bigint // high
-  l: bigint // low
-  c: bigint // close
-}
+// export type ILogArgs<TAbi extends Abi = Abi, TEventName extends string = string> = GetEventArgs<
+//   TAbi,
+//   TEventName,
+//   { Required: true }
+// >
+// export type ILogEvent<TAbi extends Abi = Abi, TEventName extends string = string> = Log<
+//   bigint,
+//   number,
+//   false,
+//   ExtractAbiEvent<TAbi, TEventName>,
+//   true,
+//   TAbi,
+//   TEventName
+// > // ILogIndex & ILogOrdered & GetEventArgs<TAbi, TEventName, { Required: true }>
+// export type ILogOrderedEvent<TAbi extends Abi = Abi, TEventName extends string = string> = ILogOrdered &
+//   Omit<ILogEvent<TAbi, TEventName>, 'data'>
+// export type ILog<TAbi extends Abi = Abi, TEventName extends string = string> = ILogTxType<TEventName> &
+//   ILogArgs<TAbi, TEventName>
 
-export interface IPricetick {
-  price: bigint
-  timestamp: number
-}
+// export interface IPriceCandle extends ILogTypeId<'PriceCandle'> {
+//   token: Address
+//   interval: IntervalTime
+//   slotTime: number
+//   o: bigint // open
+//   h: bigint // high
+//   l: bigint // low
+//   c: bigint // close
+// }
 
-export type IPriceTickListMap = Record<Address, IPricetick[]>
-export type IPricefeedMap = Record<Address, IPriceCandle[]>
-export type IPriceOracleMap = Record<Address, IOraclePrice>
+// export interface IPricetick {
+//   price: bigint
+//   timestamp: number
+// }
 
-export type ILatestPriceMap = Record<Address, IPricetick>
+// export type IPriceTickListMap = Record<Address, IPricetick[]>
+// export type IPricefeedMap = Record<Address, IPriceCandle[]>
+// export type IPriceOracleMap = Record<Address, IOraclePrice>
 
-export interface IChainParamApi {
-  chain: number
-}
+// export type ILatestPriceMap = Record<Address, IPricetick>
 
-export interface IRequestTimerangeApi {
-  from: number
-  to: number
-}
+// export interface IChainParamApi {
+//   chain: number
+// }
 
-export type IRequestAccountApi = IChainParamApi & { account: Address }
+// export interface IRequestTimerangeApi {
+//   from: number
+//   to: number
+// }
 
-export type IRequestPriceTimelineApi = IChainParamApi & IRequestTimerangeApi & { tokenAddress: Address }
-export type IRequestAccountHistoricalDataApi = IChainParamApi & IRequestAccountApi & IRequestTimerangeApi
-export type IRequestPricefeedApi = IChainParamApi &
-  IRequestTimerangeApi & { interval: IntervalTime; tokenAddress: Address }
+// export type IRequestAccountApi = IChainParamApi & { account: Address }
 
-export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity {}
+// export type IRequestPriceTimelineApi = IChainParamApi & IRequestTimerangeApi & { tokenAddress: Address }
+// export type IRequestAccountHistoricalDataApi = IChainParamApi & IRequestAccountApi & IRequestTimerangeApi
+// export type IRequestPricefeedApi = IChainParamApi &
+//   IRequestTimerangeApi & { interval: IntervalTime; tokenAddress: Address }
 
-export type IPositionNumbers = {
-  sizeInUsd: bigint
-  sizeInTokens: bigint
-  collateralAmount: bigint
-  borrowingFactor: bigint
-  fundingFeeAmountPerSize: bigint
-  longTokenClaimableFundingAmountPerSize: bigint
-  shortTokenClaimableFundingAmountPerSize: bigint
-}
+// export interface IRequestGraphEntityApi extends IChainParamApi, IIdentifiableEntity {}
 
-export const OrderType = {
-  // the order will be cancelled if the minOutputAmount cannot be fulfilled
-  MarketSwap: 0n,
-  // @dev LimitSwap: swap token A to token B if the minOutputAmount can be fulfilled
-  LimitSwap: 1n,
-  // @dev MarketIncrease: increase position at the current market price
-  // the order will be cancelled if the position cannot be increased at the acceptablePrice
-  MarketIncrease: 2n,
-  // @dev LimitIncrease: increase position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  LimitIncrease: 3n,
-  // @dev MarketDecrease: decrease position at the curent market price
-  // the order will be cancelled if the position cannot be decreased at the acceptablePrice
-  MarketDecrease: 4n,
-  // @dev LimitDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  LimitDecrease: 5n,
-  // @dev StopLossDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-  StopLossDecrease: 6n,
-  // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
-  Liquidation: 7n
-} as const
+// export type IPositionNumbers = {
+//   sizeInUsd: bigint
+//   sizeInTokens: bigint
+//   collateralAmount: bigint
+//   borrowingFactor: bigint
+//   fundingFeeAmountPerSize: bigint
+//   longTokenClaimableFundingAmountPerSize: bigint
+//   shortTokenClaimableFundingAmountPerSize: bigint
+// }
 
-export interface PositionReferralFees {
-  referralCode: Hex
-  affiliate: Address
-  trader: Address
+// export const OrderType = {
+//   // the order will be cancelled if the minOutputAmount cannot be fulfilled
+//   MarketSwap: 0n,
+//   // @dev LimitSwap: swap token A to token B if the minOutputAmount can be fulfilled
+//   LimitSwap: 1n,
+//   // @dev MarketIncrease: increase position at the current market price
+//   // the order will be cancelled if the position cannot be increased at the acceptablePrice
+//   MarketIncrease: 2n,
+//   // @dev LimitIncrease: increase position if the triggerPrice is reached and the acceptablePrice can be fulfilled
+//   LimitIncrease: 3n,
+//   // @dev MarketDecrease: decrease position at the curent market price
+//   // the order will be cancelled if the position cannot be decreased at the acceptablePrice
+//   MarketDecrease: 4n,
+//   // @dev LimitDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
+//   LimitDecrease: 5n,
+//   // @dev StopLossDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
+//   StopLossDecrease: 6n,
+//   // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
+//   Liquidation: 7n
+// } as const
 
-  totalRebateFactor: bigint
-  traderDiscountFactor: bigint
-  totalRebateAmount: bigint
-  traderDiscountAmount: bigint
-  affiliateRewardAmount: bigint
-}
+// export interface PositionReferralFees {
+//   referralCode: Hex
+//   affiliate: Address
+//   trader: Address
 
-export interface IPositionFundingFees {
-  fundingFeeAmount: bigint
-  claimableLongTokenAmount: bigint
-  claimableShortTokenAmount: bigint
-  latestFundingFeeAmountPerSize: bigint
-  latestLongTokenClaimableFundingAmountPerSize: bigint
-  latestShortTokenClaimableFundingAmountPerSize: bigint
-}
+//   totalRebateFactor: bigint
+//   traderDiscountFactor: bigint
+//   totalRebateAmount: bigint
+//   traderDiscountAmount: bigint
+//   affiliateRewardAmount: bigint
+// }
 
-export interface PositionBorrowingFees {
-  borrowingFeeUsd: bigint
-  borrowingFeeAmount: bigint
-  borrowingFeeReceiverFactor: bigint
-  borrowingFeeAmountForFeeReceiver: bigint
-}
+// export interface IPositionFundingFees {
+//   fundingFeeAmount: bigint
+//   claimableLongTokenAmount: bigint
+//   claimableShortTokenAmount: bigint
+//   latestFundingFeeAmountPerSize: bigint
+//   latestLongTokenClaimableFundingAmountPerSize: bigint
+//   latestShortTokenClaimableFundingAmountPerSize: bigint
+// }
 
-export interface IPositionUiFees {
-  uiFeeReceiver: Address
-  uiFeeReceiverFactor: bigint
-  uiFeeAmount: bigint
-}
+// export interface PositionBorrowingFees {
+//   borrowingFeeUsd: bigint
+//   borrowingFeeAmount: bigint
+//   borrowingFeeReceiverFactor: bigint
+//   borrowingFeeAmountForFeeReceiver: bigint
+// }
+
+// export interface IPositionUiFees {
+//   uiFeeReceiver: Address
+//   uiFeeReceiverFactor: bigint
+//   uiFeeAmount: bigint
+// }
 
 export interface IPriceMinMax {
   min: bigint
   max: bigint
 }
 
-export interface IPositionFees {
-  referral: PositionReferralFees
-  funding: IPositionFundingFees
-  borrowing: PositionBorrowingFees
-  ui: IPositionUiFees
-  collateralTokenPrice: IPriceMinMax
+// export interface IPositionFees {
+//   referral: PositionReferralFees
+//   funding: IPositionFundingFees
+//   borrowing: PositionBorrowingFees
+//   ui: IPositionUiFees
+//   collateralTokenPrice: IPriceMinMax
 
-  positionFeeFactor: bigint
-  protocolFeeAmount: bigint
-  positionFeeReceiverFactor: bigint
-  feeReceiverAmount: bigint
-  feeAmountForPool: bigint
-  positionFeeAmountForPool: bigint
-  positionFeeAmount: bigint
-  totalCostAmountExcludingFunding: bigint
-  totalCostAmount: bigint
-}
+//   positionFeeFactor: bigint
+//   protocolFeeAmount: bigint
+//   positionFeeReceiverFactor: bigint
+//   feeReceiverAmount: bigint
+//   feeAmountForPool: bigint
+//   positionFeeAmountForPool: bigint
+//   positionFeeAmount: bigint
+//   totalCostAmountExcludingFunding: bigint
+//   totalCostAmount: bigint
+// }
 
-export interface IExecutionPriceResult {
-  priceImpactUsd: bigint
-  priceImpactDiffUsd: bigint
-  executionPrice: bigint
-}
+// export interface IExecutionPriceResult {
+//   priceImpactUsd: bigint
+//   priceImpactDiffUsd: bigint
+//   executionPrice: bigint
+// }
 
 export type IOraclePrice = IPriceMinMax & {
   priceSourceType: bigint
@@ -187,123 +189,123 @@ export type IOraclePrice = IPriceMinMax & {
   token: Address
 }
 
-export type IInsolventClose = {
-  orderKey: Hex
-  positionCollateralAmount: bigint
-  remainingCostUsd: bigint
-  basePnlUsd: bigint
-}
+// export type IInsolventClose = {
+//   orderKey: Hex
+//   positionCollateralAmount: bigint
+//   remainingCostUsd: bigint
+//   basePnlUsd: bigint
+// }
 
-export interface IMarketPrice {
-  indexTokenPrice: IPriceMinMax
-  longTokenPrice: IPriceMinMax
-  shortTokenPrice: IPriceMinMax
-}
+// export interface IMarketPrice {
+//   indexTokenPrice: IPriceMinMax
+//   longTokenPrice: IPriceMinMax
+//   shortTokenPrice: IPriceMinMax
+// }
 
-export type IMarket = {
-  indexToken: Address
-  longToken: Address
-  shortToken: Address
-  marketToken: Address
-}
+// export type IMarket = {
+//   indexToken: Address
+//   longToken: Address
+//   shortToken: Address
+//   marketToken: Address
+// }
 
-export interface IMarketPool {
-  poolValue: bigint
-  longPnl: bigint
-  shortPnl: bigint
-  netPnl: bigint
+// export interface IMarketPool {
+//   poolValue: bigint
+//   longPnl: bigint
+//   shortPnl: bigint
+//   netPnl: bigint
 
-  longTokenAmount: bigint
-  shortTokenAmount: bigint
-  longTokenUsd: bigint
-  shortTokenUsd: bigint
+//   longTokenAmount: bigint
+//   shortTokenAmount: bigint
+//   longTokenUsd: bigint
+//   shortTokenUsd: bigint
 
-  borrowingFeePoolFactor: bigint
-  totalBorrowingFees: bigint
+//   borrowingFeePoolFactor: bigint
+//   totalBorrowingFees: bigint
 
-  impactPoolAmount: bigint
-}
+//   impactPoolAmount: bigint
+// }
 
-export interface IMarketFees {
-  borrowingFactorPerSecondForLongs: bigint
-  borrowingFactorPerSecondForShorts: bigint
-  baseFunding: IBaseFundingValues
-  nextFunding: IGetNextFundingAmountPerSizeResult
-  virtualInventory: IVirtualInventory
-  isDisabled: boolean
-}
+// export interface IMarketFees {
+//   borrowingFactorPerSecondForLongs: bigint
+//   borrowingFactorPerSecondForShorts: bigint
+//   baseFunding: IBaseFundingValues
+//   nextFunding: IGetNextFundingAmountPerSizeResult
+//   virtualInventory: IVirtualInventory
+//   isDisabled: boolean
+// }
 
-export interface IMarketUsageInfo {
-  longInterestInTokens: bigint
-  shortInterestInTokens: bigint
+// export interface IMarketUsageInfo {
+//   longInterestInTokens: bigint
+//   shortInterestInTokens: bigint
 
-  longInterestUsd: bigint
-  shortInterestUsd: bigint
+//   longInterestUsd: bigint
+//   shortInterestUsd: bigint
 
-  longInterestInTokensUsingLongToken: bigint
-  longInterestInTokensUsingShortToken: bigint
-  shortInterestInTokensUsingLongToken: bigint
-  shortInterestInTokensUsingShortToken: bigint
+//   longInterestInTokensUsingLongToken: bigint
+//   longInterestInTokensUsingShortToken: bigint
+//   shortInterestInTokensUsingLongToken: bigint
+//   shortInterestInTokensUsingShortToken: bigint
 
-  positionImpactPoolAmount: bigint
-}
+//   positionImpactPoolAmount: bigint
+// }
 
-export interface IMarketConfig {
-  reserveFactorLong: bigint
-  reserveFactorShort: bigint
+// export interface IMarketConfig {
+//   reserveFactorLong: bigint
+//   reserveFactorShort: bigint
 
-  maxPnlFactorForTradersLong: bigint
-  maxPnlFactorForTradersShort: bigint
+//   maxPnlFactorForTradersLong: bigint
+//   maxPnlFactorForTradersShort: bigint
 
-  openInterestReserveFactorLong: bigint
-  openInterestReserveFactorShort: bigint
+//   openInterestReserveFactorLong: bigint
+//   openInterestReserveFactorShort: bigint
 
-  positionFeeFactorForPositiveImpact: bigint
-  positionFeeFactorForNegativeImpact: bigint
-  minCollateralFactor: bigint
+//   positionFeeFactorForPositiveImpact: bigint
+//   positionFeeFactorForNegativeImpact: bigint
+//   minCollateralFactor: bigint
 
-  positionImpactFactorPositive: bigint
-  positionImpactFactorNegative: bigint
-  positionImpactExponentFactor: bigint
+//   positionImpactFactorPositive: bigint
+//   positionImpactFactorNegative: bigint
+//   positionImpactExponentFactor: bigint
 
-  maxPositionImpactFactorForLiquidations: bigint
-  maxPositionImpactFactorPositive: bigint
-}
+//   maxPositionImpactFactorForLiquidations: bigint
+//   maxPositionImpactFactorPositive: bigint
+// }
 
-export interface IMarketInfo {
-  market: IMarket
-  price: IMarketPrice
-  fees: IMarketFees
-  pool: IMarketPool
-  config: IMarketConfig
-  usage: IMarketUsageInfo
-}
+// export interface IMarketInfo {
+//   market: IMarket
+//   price: IMarketPrice
+//   fees: IMarketFees
+//   pool: IMarketPool
+//   config: IMarketConfig
+//   usage: IMarketUsageInfo
+// }
 
-interface ICollateralType {
-  longToken: bigint
-  shortToken: bigint
-}
+// interface ICollateralType {
+//   longToken: bigint
+//   shortToken: bigint
+// }
 
-export type IPositionType = {
-  long: ICollateralType
-  short: ICollateralType
-}
+// export type IPositionType = {
+//   long: ICollateralType
+//   short: ICollateralType
+// }
 
-export interface IBaseFundingValues {
-  fundingFeeAmountPerSize: IPositionType
-  claimableFundingAmountPerSize: IPositionType
-}
+// export interface IBaseFundingValues {
+//   fundingFeeAmountPerSize: IPositionType
+//   claimableFundingAmountPerSize: IPositionType
+// }
 
-export interface IGetNextFundingAmountPerSizeResult {
-  longsPayShorts: boolean
-  fundingFactorPerSecond: bigint
+// export interface IGetNextFundingAmountPerSizeResult {
+//   longsPayShorts: boolean
+//   fundingFactorPerSecond: bigint
 
-  fundingFeeAmountPerSizeDelta: IPositionType
-  claimableFundingAmountPerSizeDelta: IPositionType
-}
+//   fundingFeeAmountPerSizeDelta: IPositionType
+//   claimableFundingAmountPerSizeDelta: IPositionType
+// }
 
-export interface IVirtualInventory {
-  virtualPoolAmountForLongToken: bigint
-  virtualPoolAmountForShortToken: bigint
-  virtualInventoryForPositions: bigint
-}
+// export interface IVirtualInventory {
+//   virtualPoolAmountForLongToken: bigint
+//   virtualPoolAmountForShortToken: bigint
+//   virtualInventoryForPositions: bigint
+// }

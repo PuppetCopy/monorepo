@@ -22,7 +22,8 @@ import {
 import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
-import { getExplorerUrl, getMappedValue, type ITokenDescription, shortenTxAddress } from '../utils/index.js'
+import type { ITokenDescription } from '../core/types.js'
+import { getExplorerUrl, getMappedValue, shortenTxAddress } from '../core/utils.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
 import { $defaultTooltipDropContainer, $Tooltip } from './$Tooltip.js'
 

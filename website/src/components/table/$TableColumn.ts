@@ -1,14 +1,14 @@
 import { empty, map, skipRepeats } from '@most/core'
-import { latestPriceMap } from '@puppet-copy/middleware/core'
-import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
 import {
   getMappedValue,
   getTimeSince,
+  latestPriceMap,
   readableDate,
   readablePercentage,
   toBasisPoints
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
+import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
+import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, type IComposeBehavior, type INode, style, switchMap, toStream } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

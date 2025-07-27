@@ -12,6 +12,7 @@ import {
 import { remove } from '@most/prelude'
 import type { Stream } from '@most/types'
 import { CONTRACT } from '@puppet-copy/middleware/const'
+import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
 import {
   $alert,
   $alertIntermediateTooltip,
@@ -21,7 +22,6 @@ import {
   $target,
   $xCross
 } from '@puppet-copy/middleware/ui-components'
-import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/utils'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'

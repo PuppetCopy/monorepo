@@ -7,7 +7,7 @@ import {
   periodicRun,
   type StateParams,
   unixTimestampNow
-} from '@puppet-copy/middleware/utils'
+} from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'

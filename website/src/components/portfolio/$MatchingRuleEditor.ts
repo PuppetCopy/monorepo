@@ -1,9 +1,9 @@
 import { empty, map, mergeArray, now, snapshot, startWith } from '@most/core'
 import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet-copy/middleware/const'
+import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
 import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/utils'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import {
   $element,

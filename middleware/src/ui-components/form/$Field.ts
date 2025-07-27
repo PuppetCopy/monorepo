@@ -15,7 +15,7 @@ import {
 } from 'aelea/core'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { filterNull } from '../../utils/stream.js'
+import { filterNull } from '../../core/stream.js'
 import { dismissOp, interactionOp } from './common.js'
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

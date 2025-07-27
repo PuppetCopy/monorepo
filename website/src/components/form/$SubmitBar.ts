@@ -1,12 +1,12 @@
 import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
 import type { Stream } from '@most/types'
+import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import {
   $alertPositiveTooltip,
   $alertTooltip,
   $spinnerTooltip,
   $txHashRef
 } from '@puppet-copy/middleware/ui-components'
-import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/utils'
 import {
   $node,
   $text,

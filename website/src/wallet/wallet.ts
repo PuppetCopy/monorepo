@@ -1,6 +1,6 @@
 import { skipRepeatsWith } from '@most/core'
 import type { Stream } from '@most/types'
-import { replayState } from '@puppet-copy/middleware/utils'
+import { replayState } from '@puppet-copy/middleware/core'
 import { createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import {
