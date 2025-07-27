@@ -1,5 +1,5 @@
 import { CONTRACTS } from '@gmx-io/sdk/configs/contracts'
-import { erc20Abi } from 'viem'
+import { type Address, erc20Abi } from 'viem'
 import * as abi from './abi/__generated/abi.js'
 import datastore from './abi/datastore.js'
 import exchangeRouter from './abi/exchangeRouter.js'
@@ -67,32 +67,32 @@ export const CONTRACT = {
   },
 
   GMX: {
-    address: CONTRACTS[42161].GMX,
+    address: CONTRACTS[42161].GMX as Address,
     abi: erc20Abi
   },
   ReferralStorage: {
-    address: CONTRACTS[42161].ReferralStorage,
+    address: CONTRACTS[42161].ReferralStorage as Address,
     abi: referralStorage
   },
 
   // V2
   GmxReaderV2: {
-    address: CONTRACTS[42161].Reader,
+    address: CONTRACTS[42161].Reader as Address,
     abi: reader
   },
   GmxExchangeRouter: {
-    address: CONTRACTS[42161].Router,
+    address: CONTRACTS[42161].Router as Address,
     abi: exchangeRouter
   },
   GmxOrderVault: {
-    address: CONTRACTS[42161].OrderVault
+    address: CONTRACTS[42161].OrderVault as Address
   },
   GmxDatastore: {
-    address: CONTRACTS[42161].DataStore,
+    address: CONTRACTS[42161].DataStore as Address,
     abi: datastore
   },
   GmxEventEmitter: {
-    address: CONTRACTS[42161].EventEmitter,
+    address: CONTRACTS[42161].EventEmitter as Address,
     abi: gmxEventEmitter
   },
   GmxCustomError: {

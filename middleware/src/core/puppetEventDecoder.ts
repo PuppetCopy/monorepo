@@ -46,7 +46,7 @@ export const EVENT_PARAMS_MAP = {
   RequestCloseStalledPosition: parseAbiParameters(
     '(address, address, address, bool, uint256, uint256, uint256), address, bytes32, bytes32'
   ),
-  Execute: parseAbiParameters('address, bytes32, uint256, uint256, uint256, uint256'),
+  Execute: parseAbiParameters('address, bytes32, bool, bool, uint256, uint256, uint256'),
   Liquidate: parseAbiParameters('address'),
 
   // Settle.sol events
