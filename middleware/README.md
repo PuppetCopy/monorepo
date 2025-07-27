@@ -21,7 +21,3 @@ This package is dual-licensed:
 - **MIT License** for open-source utilities
 
 See the root [LICENSE.md](../LICENSE.md) for detailed licensing information.
-
----
-
-For more information about Puppet, visit the [main repository](https://github.com/PuppetCopy/monorepo).
