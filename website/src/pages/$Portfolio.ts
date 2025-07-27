@@ -126,12 +126,6 @@ export const $PortfolioPage = ({
                         transactionHash: true,
                         blockTimestamp: true
                       }
-                    },
-                    updateAllocationForKeeperFeeList: {
-                      columns: {
-                        keeperExecutionFeeInsolvency: true,
-                        nextAllocated: true
-                      }
                     }
                   }
                 }
