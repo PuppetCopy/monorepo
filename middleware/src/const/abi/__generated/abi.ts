@@ -1765,7 +1765,6 @@ export const errorAbi = [
   { type: 'error', inputs: [], name: 'FeeMarketplace__InvalidReceiver' },
   { type: 'error', inputs: [], name: 'FeeMarketplace__NotAuctionableToken' },
   { type: 'error', inputs: [], name: 'FeeMarketplace__ZeroDeposit' },
-  { type: 'error', inputs: [], name: 'KeeperRouter__FailedRefundExecutionFee' },
   {
     type: 'error',
     inputs: [
@@ -1784,9 +1783,9 @@ export const errorAbi = [
     type: 'error',
     inputs: [
       { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Mirror__InsufficientAllocationForKeeperFee'
+    name: 'Mirror__InsufficientAllocationForSequencerFee'
   },
   {
     type: 'error',
@@ -1806,33 +1805,9 @@ export const errorAbi = [
   {
     type: 'error',
     inputs: [],
-    name: 'Mirror__InvalidKeeperExecutionFeeAmount'
+    name: 'Mirror__InvalidSequencerExecutionFeeAmount'
   },
   { type: 'error', inputs: [], name: 'Mirror__InvalidSizeDelta' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeExceedsAdjustmentRatio'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeExceedsCostFactor'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
-      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeNotFullyCovered'
-  },
   { type: 'error', inputs: [], name: 'Mirror__NoAdjustmentRequired' },
   { type: 'error', inputs: [], name: 'Mirror__OrderCreationFailed' },
   {
@@ -1856,6 +1831,30 @@ export const errorAbi = [
       { name: 'provided', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'Mirror__PuppetListMismatch'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeExceedsAdjustmentRatio'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeExceedsCostFactor'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
+      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeNotFullyCovered'
   },
   {
     type: 'error',
@@ -1910,6 +1909,11 @@ export const errorAbi = [
   },
   {
     type: 'error',
+    inputs: [],
+    name: 'SequencerRouter__FailedRefundExecutionFee'
+  },
+  {
+    type: 'error',
     inputs: [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'threshold', internalType: 'uint256', type: 'uint256' }
@@ -1926,24 +1930,16 @@ export const errorAbi = [
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'Settle__InvalidAllocation'
   },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Settle__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Settle__InvalidKeeperExecutionFeeReceiver'
-  },
   { type: 'error', inputs: [], name: 'Settle__InvalidReceiver' },
   {
     type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Settle__KeeperFeeExceedsSettledAmount'
+    inputs: [],
+    name: 'Settle__InvalidSequencerExecutionFeeAmount'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Settle__InvalidSequencerExecutionFeeReceiver'
   },
   {
     type: 'error',
@@ -1960,6 +1956,14 @@ export const errorAbi = [
       { name: 'maximum', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'Settle__PuppetListExceedsMaximum'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Settle__SequencerFeeExceedsSettledAmount'
   },
   { type: 'error', inputs: [], name: 'TokenRouter__EmptyTokenTranferGasLimit' },
   { type: 'error', inputs: [], name: 'TransferUtils__EmptyHoldingAddress' },
@@ -6721,1530 +6725,6 @@ export const iwntAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SequencerRouter
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const sequencerRouterAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      {
-        name: '_authority',
-        internalType: 'contract IAuthority',
-        type: 'address'
-      },
-      { name: '_account', internalType: 'contract Account', type: 'address' },
-      { name: '_ruleContract', internalType: 'contract Rule', type: 'address' },
-      { name: '_mirror', internalType: 'contract Mirror', type: 'address' },
-      { name: '_settle', internalType: 'contract Settle', type: 'address' },
-      {
-        name: '_config',
-        internalType: 'struct KeeperRouter.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'mirrorBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'mirrorPerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'adjustBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'adjustPerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'settleBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'settlePerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'fallbackRefundExecutionFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'account',
-    outputs: [{ name: '', internalType: 'contract Account', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.Props',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addresses',
-            internalType: 'struct GmxPositionUtils.Addresses',
-            type: 'tuple',
-            components: [
-              { name: 'account', internalType: 'address', type: 'address' },
-              { name: 'receiver', internalType: 'address', type: 'address' },
-              {
-                name: 'cancellationReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'callbackContract',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'uiFeeReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              { name: 'market', internalType: 'address', type: 'address' },
-              {
-                name: 'initialCollateralToken',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'swapPath',
-                internalType: 'address[]',
-                type: 'address[]'
-              }
-            ]
-          },
-          {
-            name: 'numbers',
-            internalType: 'struct GmxPositionUtils.Numbers',
-            type: 'tuple',
-            components: [
-              {
-                name: 'orderType',
-                internalType: 'enum GmxPositionUtils.OrderType',
-                type: 'uint8'
-              },
-              {
-                name: 'decreasePositionSwapType',
-                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-                type: 'uint8'
-              },
-              {
-                name: 'sizeDeltaUsd',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'initialCollateralDeltaAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'triggerPrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'acceptablePrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'executionFee',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'callbackGasLimit',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'minOutputAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'updatedAtTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'validFromTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              }
-            ]
-          },
-          {
-            name: 'flags',
-            internalType: 'struct GmxPositionUtils.Flags',
-            type: 'tuple',
-            components: [
-              { name: 'isLong', internalType: 'bool', type: 'bool' },
-              {
-                name: 'shouldUnwrapNativeToken',
-                internalType: 'bool',
-                type: 'bool'
-              },
-              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
-              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
-            ]
-          }
-        ]
-      },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.EventLogData',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addressItems',
-            internalType: 'struct GmxPositionUtils.AddressItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'address', type: 'address' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'address[]',
-                    type: 'address[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'uintItems',
-            internalType: 'struct GmxPositionUtils.UintItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'uint256', type: 'uint256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'uint256[]',
-                    type: 'uint256[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'intItems',
-            internalType: 'struct GmxPositionUtils.IntItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256', type: 'int256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'boolItems',
-            internalType: 'struct GmxPositionUtils.BoolItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool', type: 'bool' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytes32Items',
-            internalType: 'struct GmxPositionUtils.Bytes32Items',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'bytes32[]',
-                    type: 'bytes32[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytesItems',
-            internalType: 'struct GmxPositionUtils.BytesItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes', type: 'bytes' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'stringItems',
-            internalType: 'struct GmxPositionUtils.StringItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string', type: 'string' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string[]', type: 'string[]' }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    name: 'afterOrderCancellation',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: 'order',
-        internalType: 'struct GmxPositionUtils.Props',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addresses',
-            internalType: 'struct GmxPositionUtils.Addresses',
-            type: 'tuple',
-            components: [
-              { name: 'account', internalType: 'address', type: 'address' },
-              { name: 'receiver', internalType: 'address', type: 'address' },
-              {
-                name: 'cancellationReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'callbackContract',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'uiFeeReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              { name: 'market', internalType: 'address', type: 'address' },
-              {
-                name: 'initialCollateralToken',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'swapPath',
-                internalType: 'address[]',
-                type: 'address[]'
-              }
-            ]
-          },
-          {
-            name: 'numbers',
-            internalType: 'struct GmxPositionUtils.Numbers',
-            type: 'tuple',
-            components: [
-              {
-                name: 'orderType',
-                internalType: 'enum GmxPositionUtils.OrderType',
-                type: 'uint8'
-              },
-              {
-                name: 'decreasePositionSwapType',
-                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-                type: 'uint8'
-              },
-              {
-                name: 'sizeDeltaUsd',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'initialCollateralDeltaAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'triggerPrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'acceptablePrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'executionFee',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'callbackGasLimit',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'minOutputAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'updatedAtTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'validFromTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              }
-            ]
-          },
-          {
-            name: 'flags',
-            internalType: 'struct GmxPositionUtils.Flags',
-            type: 'tuple',
-            components: [
-              { name: 'isLong', internalType: 'bool', type: 'bool' },
-              {
-                name: 'shouldUnwrapNativeToken',
-                internalType: 'bool',
-                type: 'bool'
-              },
-              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
-              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
-            ]
-          }
-        ]
-      },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.EventLogData',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addressItems',
-            internalType: 'struct GmxPositionUtils.AddressItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'address', type: 'address' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'address[]',
-                    type: 'address[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'uintItems',
-            internalType: 'struct GmxPositionUtils.UintItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'uint256', type: 'uint256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'uint256[]',
-                    type: 'uint256[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'intItems',
-            internalType: 'struct GmxPositionUtils.IntItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256', type: 'int256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'boolItems',
-            internalType: 'struct GmxPositionUtils.BoolItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool', type: 'bool' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytes32Items',
-            internalType: 'struct GmxPositionUtils.Bytes32Items',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'bytes32[]',
-                    type: 'bytes32[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytesItems',
-            internalType: 'struct GmxPositionUtils.BytesItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes', type: 'bytes' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'stringItems',
-            internalType: 'struct GmxPositionUtils.StringItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string', type: 'string' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string[]', type: 'string[]' }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    name: 'afterOrderExecution',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.Props',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addresses',
-            internalType: 'struct GmxPositionUtils.Addresses',
-            type: 'tuple',
-            components: [
-              { name: 'account', internalType: 'address', type: 'address' },
-              { name: 'receiver', internalType: 'address', type: 'address' },
-              {
-                name: 'cancellationReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'callbackContract',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'uiFeeReceiver',
-                internalType: 'address',
-                type: 'address'
-              },
-              { name: 'market', internalType: 'address', type: 'address' },
-              {
-                name: 'initialCollateralToken',
-                internalType: 'address',
-                type: 'address'
-              },
-              {
-                name: 'swapPath',
-                internalType: 'address[]',
-                type: 'address[]'
-              }
-            ]
-          },
-          {
-            name: 'numbers',
-            internalType: 'struct GmxPositionUtils.Numbers',
-            type: 'tuple',
-            components: [
-              {
-                name: 'orderType',
-                internalType: 'enum GmxPositionUtils.OrderType',
-                type: 'uint8'
-              },
-              {
-                name: 'decreasePositionSwapType',
-                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
-                type: 'uint8'
-              },
-              {
-                name: 'sizeDeltaUsd',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'initialCollateralDeltaAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'triggerPrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'acceptablePrice',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'executionFee',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'callbackGasLimit',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'minOutputAmount',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'updatedAtTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              },
-              {
-                name: 'validFromTime',
-                internalType: 'uint256',
-                type: 'uint256'
-              }
-            ]
-          },
-          {
-            name: 'flags',
-            internalType: 'struct GmxPositionUtils.Flags',
-            type: 'tuple',
-            components: [
-              { name: 'isLong', internalType: 'bool', type: 'bool' },
-              {
-                name: 'shouldUnwrapNativeToken',
-                internalType: 'bool',
-                type: 'bool'
-              },
-              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
-              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
-            ]
-          }
-        ]
-      },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.EventLogData',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addressItems',
-            internalType: 'struct GmxPositionUtils.AddressItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'address', type: 'address' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'address[]',
-                    type: 'address[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'uintItems',
-            internalType: 'struct GmxPositionUtils.UintItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'uint256', type: 'uint256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'uint256[]',
-                    type: 'uint256[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'intItems',
-            internalType: 'struct GmxPositionUtils.IntItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256', type: 'int256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'boolItems',
-            internalType: 'struct GmxPositionUtils.BoolItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool', type: 'bool' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytes32Items',
-            internalType: 'struct GmxPositionUtils.Bytes32Items',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'bytes32[]',
-                    type: 'bytes32[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytesItems',
-            internalType: 'struct GmxPositionUtils.BytesItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes', type: 'bytes' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'stringItems',
-            internalType: 'struct GmxPositionUtils.StringItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string', type: 'string' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string[]', type: 'string[]' }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    name: 'afterOrderFrozen',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'authority',
-    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' }
-    ],
-    name: 'canCall',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_allocationAccount', internalType: 'address', type: 'address' },
-      { name: '_dustToken', internalType: 'contract IERC20', type: 'address' },
-      { name: '_receiver', internalType: 'address', type: 'address' }
-    ],
-    name: 'collectAllocationAccountDust',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getConfig',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct KeeperRouter.Config',
-        type: 'tuple',
-        components: [
-          {
-            name: 'mirrorBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'mirrorPerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'adjustBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'adjustPerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'settleBaseGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'settlePerPuppetGasLimit',
-            internalType: 'uint256',
-            type: 'uint256'
-          },
-          {
-            name: 'fallbackRefundExecutionFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'mirror',
-    outputs: [{ name: '', internalType: 'contract Mirror', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: '',
-        internalType: 'struct GmxPositionUtils.EventLogData',
-        type: 'tuple',
-        components: [
-          {
-            name: 'addressItems',
-            internalType: 'struct GmxPositionUtils.AddressItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'address', type: 'address' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'address[]',
-                    type: 'address[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'uintItems',
-            internalType: 'struct GmxPositionUtils.UintItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'uint256', type: 'uint256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'uint256[]',
-                    type: 'uint256[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'intItems',
-            internalType: 'struct GmxPositionUtils.IntItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256', type: 'int256' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'boolItems',
-            internalType: 'struct GmxPositionUtils.BoolItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool', type: 'bool' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytes32Items',
-            internalType: 'struct GmxPositionUtils.Bytes32Items',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  {
-                    name: 'value',
-                    internalType: 'bytes32[]',
-                    type: 'bytes32[]'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'bytesItems',
-            internalType: 'struct GmxPositionUtils.BytesItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes', type: 'bytes' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'stringItems',
-            internalType: 'struct GmxPositionUtils.StringItems',
-            type: 'tuple',
-            components: [
-              {
-                name: 'items',
-                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string', type: 'string' }
-                ]
-              },
-              {
-                name: 'arrayItems',
-                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
-                type: 'tuple[]',
-                components: [
-                  { name: 'key', internalType: 'string', type: 'string' },
-                  { name: 'value', internalType: 'string[]', type: 'string[]' }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    name: 'refundExecutionFee',
-    outputs: [],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_callParams',
-        internalType: 'struct Mirror.CallPosition',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          {
-            name: 'traderRequestKey',
-            internalType: 'bytes32',
-            type: 'bytes32'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
-          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
-          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
-          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'requestAdjust',
-    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_params',
-        internalType: 'struct Mirror.StalledPositionParams',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          { name: 'market', internalType: 'address', type: 'address' },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
-          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'requestCloseStalledPosition',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_callParams',
-        internalType: 'struct Mirror.CallPosition',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          {
-            name: 'traderRequestKey',
-            internalType: 'bytes32',
-            type: 'bytes32'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'market', internalType: 'address', type: 'address' },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
-          { name: 'isLong', internalType: 'bool', type: 'bool' },
-          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
-          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
-          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
-          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
-        ]
-      },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'requestOpen',
-    outputs: [
-      { name: '_allocationAddress', internalType: 'address', type: 'address' },
-      { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
-    ],
-    stateMutability: 'payable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'ruleContract',
-    outputs: [{ name: '', internalType: 'contract Rule', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
-    name: 'setConfig',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
-      { name: 'user', internalType: 'address', type: 'address' },
-      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
-    ],
-    name: 'setPermission',
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'settle',
-    outputs: [{ name: '', internalType: 'contract Settle', type: 'address' }],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_settleParams',
-        internalType: 'struct Settle.CallSettle',
-        type: 'tuple',
-        components: [
-          {
-            name: 'collateralToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          {
-            name: 'distributionToken',
-            internalType: 'contract IERC20',
-            type: 'address'
-          },
-          {
-            name: 'keeperFeeReceiver',
-            internalType: 'address',
-            type: 'address'
-          },
-          { name: 'trader', internalType: 'address', type: 'address' },
-          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'keeperExecutionFee',
-            internalType: 'uint256',
-            type: 'uint256'
-          }
-        ]
-      },
-      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
-    ],
-    name: 'settleAllocation',
-    outputs: [
-      { name: 'settledBalance', internalType: 'uint256', type: 'uint256' },
-      { name: 'distributionAmount', internalType: 'uint256', type: 'uint256' },
-      { name: 'platformFeeAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'pure'
-  },
-  { type: 'error', inputs: [], name: 'KeeperRouter__FailedRefundExecutionFee' },
-  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
-  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
-  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' }
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Mirror
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8286,12 +6766,12 @@ export const mirrorAbi = [
           },
           { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
           {
-            name: 'maxKeeperFeeToAllocationRatio',
+            name: 'maxSequencerFeeToAllocationRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'maxKeeperFeeToAdjustmentRatio',
+            name: 'maxSequencerFeeToAdjustmentRatio',
             internalType: 'uint256',
             type: 'uint256'
           }
@@ -8363,12 +6843,12 @@ export const mirrorAbi = [
       },
       { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
       {
-        name: 'maxKeeperFeeToAllocationRatio',
+        name: 'maxSequencerFeeToAllocationRatio',
         internalType: 'uint256',
         type: 'uint256'
       },
       {
-        name: 'maxKeeperFeeToAdjustmentRatio',
+        name: 'maxSequencerFeeToAdjustmentRatio',
         internalType: 'uint256',
         type: 'uint256'
       }
@@ -8430,12 +6910,12 @@ export const mirrorAbi = [
           },
           { name: 'maxPuppetList', internalType: 'uint256', type: 'uint256' },
           {
-            name: 'maxKeeperFeeToAllocationRatio',
+            name: 'maxSequencerFeeToAllocationRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
           {
-            name: 'maxKeeperFeeToAdjustmentRatio',
+            name: 'maxSequencerFeeToAdjustmentRatio',
             internalType: 'uint256',
             type: 'uint256'
           }
@@ -8551,7 +7031,7 @@ export const mirrorAbi = [
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
           {
-            name: 'keeperFeeReceiver',
+            name: 'sequencerFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
@@ -8563,7 +7043,7 @@ export const mirrorAbi = [
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
           { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+          { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
         ]
       },
       { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
@@ -8643,7 +7123,7 @@ export const mirrorAbi = [
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'market', internalType: 'address', type: 'address' },
           {
-            name: 'keeperFeeReceiver',
+            name: 'sequencerFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
@@ -8655,7 +7135,7 @@ export const mirrorAbi = [
           { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
           { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
           { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
-          { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+          { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
         ]
       },
       { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
@@ -8702,9 +7182,9 @@ export const mirrorAbi = [
     type: 'error',
     inputs: [
       { name: 'allocation', internalType: 'uint256', type: 'uint256' },
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' }
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
     ],
-    name: 'Mirror__InsufficientAllocationForKeeperFee'
+    name: 'Mirror__InsufficientAllocationForSequencerFee'
   },
   {
     type: 'error',
@@ -8724,33 +7204,9 @@ export const mirrorAbi = [
   {
     type: 'error',
     inputs: [],
-    name: 'Mirror__InvalidKeeperExecutionFeeAmount'
+    name: 'Mirror__InvalidSequencerExecutionFeeAmount'
   },
   { type: 'error', inputs: [], name: 'Mirror__InvalidSizeDelta' },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeExceedsAdjustmentRatio'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeExceedsCostFactor'
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
-      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Mirror__KeeperFeeNotFullyCovered'
-  },
   { type: 'error', inputs: [], name: 'Mirror__NoAdjustmentRequired' },
   { type: 'error', inputs: [], name: 'Mirror__OrderCreationFailed' },
   {
@@ -8774,6 +7230,30 @@ export const mirrorAbi = [
       { name: 'provided', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'Mirror__PuppetListMismatch'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeExceedsAdjustmentRatio'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'allocationAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeExceedsCostFactor'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'totalPaid', internalType: 'uint256', type: 'uint256' },
+      { name: 'requiredFee', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Mirror__SequencerFeeNotFullyCovered'
   },
   {
     type: 'error',
@@ -10246,6 +8726,1534 @@ export const safeCastAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SequencerRouter
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const sequencerRouterAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_authority',
+        internalType: 'contract IAuthority',
+        type: 'address'
+      },
+      { name: '_account', internalType: 'contract Account', type: 'address' },
+      { name: '_ruleContract', internalType: 'contract Rule', type: 'address' },
+      { name: '_mirror', internalType: 'contract Mirror', type: 'address' },
+      { name: '_settle', internalType: 'contract Settle', type: 'address' },
+      {
+        name: '_config',
+        internalType: 'struct SequencerRouter.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'mirrorBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'mirrorPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'adjustBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'adjustPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'fallbackRefundExecutionFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
+        ]
+      }
+    ],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'account',
+    outputs: [{ name: '', internalType: 'contract Account', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.Props',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addresses',
+            internalType: 'struct GmxPositionUtils.Addresses',
+            type: 'tuple',
+            components: [
+              { name: 'account', internalType: 'address', type: 'address' },
+              { name: 'receiver', internalType: 'address', type: 'address' },
+              {
+                name: 'cancellationReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'callbackContract',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'uiFeeReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              { name: 'market', internalType: 'address', type: 'address' },
+              {
+                name: 'initialCollateralToken',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'swapPath',
+                internalType: 'address[]',
+                type: 'address[]'
+              }
+            ]
+          },
+          {
+            name: 'numbers',
+            internalType: 'struct GmxPositionUtils.Numbers',
+            type: 'tuple',
+            components: [
+              {
+                name: 'orderType',
+                internalType: 'enum GmxPositionUtils.OrderType',
+                type: 'uint8'
+              },
+              {
+                name: 'decreasePositionSwapType',
+                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
+                type: 'uint8'
+              },
+              {
+                name: 'sizeDeltaUsd',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'initialCollateralDeltaAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'triggerPrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'acceptablePrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'executionFee',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'callbackGasLimit',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'minOutputAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'updatedAtTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'validFromTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              }
+            ]
+          },
+          {
+            name: 'flags',
+            internalType: 'struct GmxPositionUtils.Flags',
+            type: 'tuple',
+            components: [
+              { name: 'isLong', internalType: 'bool', type: 'bool' },
+              {
+                name: 'shouldUnwrapNativeToken',
+                internalType: 'bool',
+                type: 'bool'
+              },
+              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
+              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
+            ]
+          }
+        ]
+      },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.EventLogData',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addressItems',
+            internalType: 'struct GmxPositionUtils.AddressItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'address', type: 'address' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'address[]',
+                    type: 'address[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'uintItems',
+            internalType: 'struct GmxPositionUtils.UintItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'uint256', type: 'uint256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'uint256[]',
+                    type: 'uint256[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'intItems',
+            internalType: 'struct GmxPositionUtils.IntItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256', type: 'int256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'boolItems',
+            internalType: 'struct GmxPositionUtils.BoolItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool', type: 'bool' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytes32Items',
+            internalType: 'struct GmxPositionUtils.Bytes32Items',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'bytes32[]',
+                    type: 'bytes32[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytesItems',
+            internalType: 'struct GmxPositionUtils.BytesItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes', type: 'bytes' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'stringItems',
+            internalType: 'struct GmxPositionUtils.StringItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string', type: 'string' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string[]', type: 'string[]' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    name: 'afterOrderCancellation',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: 'order',
+        internalType: 'struct GmxPositionUtils.Props',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addresses',
+            internalType: 'struct GmxPositionUtils.Addresses',
+            type: 'tuple',
+            components: [
+              { name: 'account', internalType: 'address', type: 'address' },
+              { name: 'receiver', internalType: 'address', type: 'address' },
+              {
+                name: 'cancellationReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'callbackContract',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'uiFeeReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              { name: 'market', internalType: 'address', type: 'address' },
+              {
+                name: 'initialCollateralToken',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'swapPath',
+                internalType: 'address[]',
+                type: 'address[]'
+              }
+            ]
+          },
+          {
+            name: 'numbers',
+            internalType: 'struct GmxPositionUtils.Numbers',
+            type: 'tuple',
+            components: [
+              {
+                name: 'orderType',
+                internalType: 'enum GmxPositionUtils.OrderType',
+                type: 'uint8'
+              },
+              {
+                name: 'decreasePositionSwapType',
+                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
+                type: 'uint8'
+              },
+              {
+                name: 'sizeDeltaUsd',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'initialCollateralDeltaAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'triggerPrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'acceptablePrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'executionFee',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'callbackGasLimit',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'minOutputAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'updatedAtTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'validFromTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              }
+            ]
+          },
+          {
+            name: 'flags',
+            internalType: 'struct GmxPositionUtils.Flags',
+            type: 'tuple',
+            components: [
+              { name: 'isLong', internalType: 'bool', type: 'bool' },
+              {
+                name: 'shouldUnwrapNativeToken',
+                internalType: 'bool',
+                type: 'bool'
+              },
+              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
+              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
+            ]
+          }
+        ]
+      },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.EventLogData',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addressItems',
+            internalType: 'struct GmxPositionUtils.AddressItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'address', type: 'address' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'address[]',
+                    type: 'address[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'uintItems',
+            internalType: 'struct GmxPositionUtils.UintItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'uint256', type: 'uint256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'uint256[]',
+                    type: 'uint256[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'intItems',
+            internalType: 'struct GmxPositionUtils.IntItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256', type: 'int256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'boolItems',
+            internalType: 'struct GmxPositionUtils.BoolItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool', type: 'bool' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytes32Items',
+            internalType: 'struct GmxPositionUtils.Bytes32Items',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'bytes32[]',
+                    type: 'bytes32[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytesItems',
+            internalType: 'struct GmxPositionUtils.BytesItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes', type: 'bytes' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'stringItems',
+            internalType: 'struct GmxPositionUtils.StringItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string', type: 'string' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string[]', type: 'string[]' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    name: 'afterOrderExecution',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.Props',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addresses',
+            internalType: 'struct GmxPositionUtils.Addresses',
+            type: 'tuple',
+            components: [
+              { name: 'account', internalType: 'address', type: 'address' },
+              { name: 'receiver', internalType: 'address', type: 'address' },
+              {
+                name: 'cancellationReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'callbackContract',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'uiFeeReceiver',
+                internalType: 'address',
+                type: 'address'
+              },
+              { name: 'market', internalType: 'address', type: 'address' },
+              {
+                name: 'initialCollateralToken',
+                internalType: 'address',
+                type: 'address'
+              },
+              {
+                name: 'swapPath',
+                internalType: 'address[]',
+                type: 'address[]'
+              }
+            ]
+          },
+          {
+            name: 'numbers',
+            internalType: 'struct GmxPositionUtils.Numbers',
+            type: 'tuple',
+            components: [
+              {
+                name: 'orderType',
+                internalType: 'enum GmxPositionUtils.OrderType',
+                type: 'uint8'
+              },
+              {
+                name: 'decreasePositionSwapType',
+                internalType: 'enum GmxPositionUtils.DecreasePositionSwapType',
+                type: 'uint8'
+              },
+              {
+                name: 'sizeDeltaUsd',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'initialCollateralDeltaAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'triggerPrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'acceptablePrice',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'executionFee',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'callbackGasLimit',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'minOutputAmount',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'updatedAtTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              },
+              {
+                name: 'validFromTime',
+                internalType: 'uint256',
+                type: 'uint256'
+              }
+            ]
+          },
+          {
+            name: 'flags',
+            internalType: 'struct GmxPositionUtils.Flags',
+            type: 'tuple',
+            components: [
+              { name: 'isLong', internalType: 'bool', type: 'bool' },
+              {
+                name: 'shouldUnwrapNativeToken',
+                internalType: 'bool',
+                type: 'bool'
+              },
+              { name: 'isFrozen', internalType: 'bool', type: 'bool' },
+              { name: 'autoCancel', internalType: 'bool', type: 'bool' }
+            ]
+          }
+        ]
+      },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.EventLogData',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addressItems',
+            internalType: 'struct GmxPositionUtils.AddressItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'address', type: 'address' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'address[]',
+                    type: 'address[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'uintItems',
+            internalType: 'struct GmxPositionUtils.UintItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'uint256', type: 'uint256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'uint256[]',
+                    type: 'uint256[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'intItems',
+            internalType: 'struct GmxPositionUtils.IntItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256', type: 'int256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'boolItems',
+            internalType: 'struct GmxPositionUtils.BoolItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool', type: 'bool' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytes32Items',
+            internalType: 'struct GmxPositionUtils.Bytes32Items',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'bytes32[]',
+                    type: 'bytes32[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytesItems',
+            internalType: 'struct GmxPositionUtils.BytesItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes', type: 'bytes' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'stringItems',
+            internalType: 'struct GmxPositionUtils.StringItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string', type: 'string' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string[]', type: 'string[]' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    name: 'afterOrderFrozen',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'authority',
+    outputs: [{ name: '', internalType: 'contract IAuthority', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'signatureHash', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' }
+    ],
+    name: 'canCall',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_allocationAccount', internalType: 'address', type: 'address' },
+      { name: '_dustToken', internalType: 'contract IERC20', type: 'address' },
+      { name: '_receiver', internalType: 'address', type: 'address' }
+    ],
+    name: 'collectAllocationAccountDust',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct SequencerRouter.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'mirrorBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'mirrorPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'adjustBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'adjustPerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settleBaseGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'settlePerPuppetGasLimit',
+            internalType: 'uint256',
+            type: 'uint256'
+          },
+          {
+            name: 'fallbackRefundExecutionFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          }
+        ]
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'mirror',
+    outputs: [{ name: '', internalType: 'contract Mirror', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'key', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: '',
+        internalType: 'struct GmxPositionUtils.EventLogData',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addressItems',
+            internalType: 'struct GmxPositionUtils.AddressItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.AddressKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'address', type: 'address' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.AddressArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'address[]',
+                    type: 'address[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'uintItems',
+            internalType: 'struct GmxPositionUtils.UintItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.UintKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'uint256', type: 'uint256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.UintArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'uint256[]',
+                    type: 'uint256[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'intItems',
+            internalType: 'struct GmxPositionUtils.IntItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.IntKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256', type: 'int256' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.IntArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'int256[]', type: 'int256[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'boolItems',
+            internalType: 'struct GmxPositionUtils.BoolItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BoolKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool', type: 'bool' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BoolArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bool[]', type: 'bool[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytes32Items',
+            internalType: 'struct GmxPositionUtils.Bytes32Items',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.Bytes32KeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes32', type: 'bytes32' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.Bytes32ArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  {
+                    name: 'value',
+                    internalType: 'bytes32[]',
+                    type: 'bytes32[]'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'bytesItems',
+            internalType: 'struct GmxPositionUtils.BytesItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.BytesKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes', type: 'bytes' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.BytesArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'bytes[]', type: 'bytes[]' }
+                ]
+              }
+            ]
+          },
+          {
+            name: 'stringItems',
+            internalType: 'struct GmxPositionUtils.StringItems',
+            type: 'tuple',
+            components: [
+              {
+                name: 'items',
+                internalType: 'struct GmxPositionUtils.StringKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string', type: 'string' }
+                ]
+              },
+              {
+                name: 'arrayItems',
+                internalType: 'struct GmxPositionUtils.StringArrayKeyValue[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'key', internalType: 'string', type: 'string' },
+                  { name: 'value', internalType: 'string[]', type: 'string[]' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    name: 'refundExecutionFee',
+    outputs: [],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
+          {
+            name: 'sequencerFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
+          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
+          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestAdjust',
+    outputs: [{ name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_params',
+        internalType: 'struct Mirror.StalledPositionParams',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          { name: 'market', internalType: 'address', type: 'address' },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestCloseStalledPosition',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_callParams',
+        internalType: 'struct Mirror.CallPosition',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'traderRequestKey',
+            internalType: 'bytes32',
+            type: 'bytes32'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'market', internalType: 'address', type: 'address' },
+          {
+            name: 'sequencerFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
+          { name: 'isIncrease', internalType: 'bool', type: 'bool' },
+          { name: 'isLong', internalType: 'bool', type: 'bool' },
+          { name: 'executionFee', internalType: 'uint256', type: 'uint256' },
+          { name: 'collateralDelta', internalType: 'uint256', type: 'uint256' },
+          { name: 'sizeDeltaInUsd', internalType: 'uint256', type: 'uint256' },
+          { name: 'acceptablePrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'triggerPrice', internalType: 'uint256', type: 'uint256' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'requestOpen',
+    outputs: [
+      { name: '_allocationAddress', internalType: 'address', type: 'address' },
+      { name: '_requestKey', internalType: 'bytes32', type: 'bytes32' }
+    ],
+    stateMutability: 'payable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'ruleContract',
+    outputs: [{ name: '', internalType: 'contract Rule', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_data', internalType: 'bytes', type: 'bytes' }],
+    name: 'setConfig',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'functionSig', internalType: 'bytes4', type: 'bytes4' },
+      { name: 'user', internalType: 'address', type: 'address' },
+      { name: 'isEnabled', internalType: 'bool', type: 'bool' }
+    ],
+    name: 'setPermission',
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'settle',
+    outputs: [{ name: '', internalType: 'contract Settle', type: 'address' }],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_settleParams',
+        internalType: 'struct Settle.CallSettle',
+        type: 'tuple',
+        components: [
+          {
+            name: 'collateralToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'distributionToken',
+            internalType: 'contract IERC20',
+            type: 'address'
+          },
+          {
+            name: 'sequencerFeeReceiver',
+            internalType: 'address',
+            type: 'address'
+          },
+          { name: 'trader', internalType: 'address', type: 'address' },
+          { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'sequencerExecutionFee',
+            internalType: 'uint256',
+            type: 'uint256'
+          }
+        ]
+      },
+      { name: '_puppetList', internalType: 'address[]', type: 'address[]' }
+    ],
+    name: 'settleAllocation',
+    outputs: [
+      { name: 'settledBalance', internalType: 'uint256', type: 'uint256' },
+      { name: 'distributionAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'platformFeeAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure'
+  },
+  { type: 'error', inputs: [], name: 'Permission__CallerNotAuthority' },
+  { type: 'error', inputs: [], name: 'Permission__Unauthorized' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'SequencerRouter__FailedRefundExecutionFee'
+  }
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Settle
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10274,7 +10282,7 @@ export const settleAbi = [
             type: 'uint256'
           },
           {
-            name: 'maxKeeperFeeToSettleRatio',
+            name: 'maxSequencerFeeToSettleRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
@@ -10351,7 +10359,7 @@ export const settleAbi = [
             type: 'uint256'
           },
           {
-            name: 'maxKeeperFeeToSettleRatio',
+            name: 'maxSequencerFeeToSettleRatio',
             internalType: 'uint256',
             type: 'uint256'
           },
@@ -10430,14 +10438,14 @@ export const settleAbi = [
             type: 'address'
           },
           {
-            name: 'keeperFeeReceiver',
+            name: 'sequencerFeeReceiver',
             internalType: 'address',
             type: 'address'
           },
           { name: 'trader', internalType: 'address', type: 'address' },
           { name: 'allocationId', internalType: 'uint256', type: 'uint256' },
           {
-            name: 'keeperExecutionFee',
+            name: 'sequencerExecutionFee',
             internalType: 'uint256',
             type: 'uint256'
           }
@@ -10496,24 +10504,16 @@ export const settleAbi = [
     inputs: [{ name: 'allocationAddress', internalType: 'address', type: 'address' }],
     name: 'Settle__InvalidAllocation'
   },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Settle__InvalidKeeperExecutionFeeAmount'
-  },
-  {
-    type: 'error',
-    inputs: [],
-    name: 'Settle__InvalidKeeperExecutionFeeReceiver'
-  },
   { type: 'error', inputs: [], name: 'Settle__InvalidReceiver' },
   {
     type: 'error',
-    inputs: [
-      { name: 'keeperFee', internalType: 'uint256', type: 'uint256' },
-      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
-    ],
-    name: 'Settle__KeeperFeeExceedsSettledAmount'
+    inputs: [],
+    name: 'Settle__InvalidSequencerExecutionFeeAmount'
+  },
+  {
+    type: 'error',
+    inputs: [],
+    name: 'Settle__InvalidSequencerExecutionFeeReceiver'
   },
   {
     type: 'error',
@@ -10530,6 +10530,14 @@ export const settleAbi = [
       { name: 'maximum', internalType: 'uint256', type: 'uint256' }
     ],
     name: 'Settle__PuppetListExceedsMaximum'
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sequencerFee', internalType: 'uint256', type: 'uint256' },
+      { name: 'settledAmount', internalType: 'uint256', type: 'uint256' }
+    ],
+    name: 'Settle__SequencerFeeExceedsSettledAmount'
   }
 ] as const
 
