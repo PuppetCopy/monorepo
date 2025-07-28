@@ -154,7 +154,7 @@ import type { Address } from 'viem/accounts'
 //   uiFeeAmount: bigint
 // }
 
-export interface IPriceMinMax {
+export interface IMinMax {
   min: bigint
   max: bigint
 }
@@ -183,8 +183,16 @@ export interface IPriceMinMax {
 //   executionPrice: bigint
 // }
 
-export type IOraclePrice = IPriceMinMax & {
+export type IOraclePrice = IMinMax & {
   priceSourceType: bigint
+  timestamp: number
+  token: Address
+}
+
+export interface ISimpleOraclePrice {
+  source: string
+  min: bigint
+  max: bigint
   timestamp: number
   token: Address
 }

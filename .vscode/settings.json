@@ -19,5 +19,10 @@
     "**/dist": true
   },
   "biome.enabled": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.experimental.useTsgo": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
+  }
 }

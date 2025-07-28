@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "typescriptteam.native-preview",
+    "biomejs.biome",
+    "NomicFoundation.hardhat-solidity"
+  ]
+}

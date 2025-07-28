@@ -44,8 +44,5 @@
     "ethereum",
     "dapp",
     "wallet"
-  ],
-  "publishConfig": {
-    "access": "public"
-  }
+  ]
 }

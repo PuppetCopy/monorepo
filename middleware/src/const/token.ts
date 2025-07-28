@@ -1,6 +1,7 @@
 import { TOKENS } from '@gmx-io/sdk/configs/tokens'
 import type { Token } from '@gmx-io/sdk/types/tokens'
 import type { Address } from 'abitype'
+import { getAddress } from 'viem'
 import { arbitrum } from 'viem/chains'
 import type { ITokenDescription } from '../core/types.js'
 import { getDenominator, groupArrayByKey } from '../core/utils.js'
@@ -25,10 +26,12 @@ export const TOKEN_DESCRIPTION_LIST: ITokenDescription[] = [
   }
 ]
 
-export const TOKEN_ADDRESS_DESCRIPTION_MAP: Record<Address, ITokenDescription> = groupArrayByKey(
-  TOKEN_DESCRIPTION_LIST,
-  (token) => token.address
-)
+export const TOKEN_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(TOKEN_DESCRIPTION_LIST, (token) => {
+  if (token.address === ('<market-token-address>' as any)) {
+    return '<market-token-address>'
+  }
+  return getAddress(token.address)
+})
 
 export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupArrayByKey(TOKEN_DESCRIPTION_LIST, (token) =>
   token.symbol.toUpperCase()
