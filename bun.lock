@@ -57,7 +57,7 @@
         "@most/types": "1.1.0",
         "@puppet-copy/middleware": "workspace:*",
         "@puppet-copy/sql": "workspace:*",
-        "superjson": "2.2.2",
+        "superjson": "^2.2.2",
         "viem": "2.31.6",
       },
       "devDependencies": {

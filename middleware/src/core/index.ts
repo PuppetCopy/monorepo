@@ -1,5 +1,5 @@
 export * as gmx from '../gmx/index.js'
-export { type ISimplifiedOraclePrice, querySignedPrices } from '../gmx/price.js'
+export * from '../gmx/price.js'
 export * from './fillTimeline.js'
 export * from './keys.js'
 export * from './mathUtils.js'

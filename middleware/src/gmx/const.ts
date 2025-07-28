@@ -1,13 +1,15 @@
 import { MARKETS } from '@gmx-io/sdk/configs/markets'
-import type { Address } from 'viem'
+import { getAddress } from 'viem'
 import { arbitrum } from 'viem/chains'
 import { groupArrayByKey } from '../core/utils.js'
 
 export const MARKET_DESCRIPTION_LIST = Object.entries(MARKETS[arbitrum.id]).map(([token, config]) => ({
-  indexToken: config.indexTokenAddress as Address,
-  longToken: config.longTokenAddress as Address,
-  marketToken: token as Address,
-  shortToken: config.shortTokenAddress as Address
+  indexToken: getAddress(config.indexTokenAddress),
+  longToken: getAddress(config.longTokenAddress),
+  marketToken: getAddress(token),
+  shortToken: getAddress(config.shortTokenAddress)
 }))
 
-export const MARKET_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(MARKET_DESCRIPTION_LIST, (market) => market.marketToken)
+export const MARKET_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(MARKET_DESCRIPTION_LIST, (market) =>
+  getAddress(market.marketToken)
+)
