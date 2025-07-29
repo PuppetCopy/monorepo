@@ -190,11 +190,11 @@ export type IOraclePrice = IMinMax & {
 }
 
 export interface ISimpleOraclePrice {
-  source: string
-  min: bigint
-  max: bigint
-  timestamp: number
-  token: Address
+  readonly source: string
+  readonly min: bigint
+  readonly max: bigint
+  readonly timestamp: number
+  readonly token: Address
 }
 
 // export type IInsolventClose = {
