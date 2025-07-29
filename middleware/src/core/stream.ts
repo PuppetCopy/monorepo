@@ -29,7 +29,7 @@ import type {
   WatchContractEventOnLogsParameter,
   WatchContractEventParameters
 } from 'viem'
-import { countdownFn, unixTimestampNow } from './utils.js'
+import { countdownFn, unixTimestampNow } from './date.js'
 
 export type StateParams<T> = {
   [P in keyof T]: Stream<T[P]> | T[P]

@@ -1,7 +1,7 @@
 import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION } from '../const/index.js'
-import { abs, delta } from '../core/mathUtils.js'
-import { getDenominator } from '../core/utils.js'
+import { abs, delta } from '../core/math.js'
+import { getDenominator } from '../core/parse.js'
 import { getTokenDescription } from './gmxUtils.js'
 import type { IMinMax, IOraclePrice } from './types.js'
 
