@@ -1,4 +1,4 @@
-import { BASIS_POINTS_DIVISOR } from '../const/index.js'
+import { BASIS_POINTS_DIVISOR } from '../const/common.js'
 
 export function getPositionPnlUsd(isLong: boolean, sizeInUsd: bigint, sizeInTokens: bigint, markPrice: bigint) {
   const positionValueUsd = markPrice * sizeInTokens

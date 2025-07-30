@@ -8,6 +8,12 @@ export function safeDiv(a: bigint, b: bigint): bigint {
   return a / b
 }
 
+export function div(a: bigint, b: bigint): bigint {
+  if (b === 0n) return 0n
+
+  return (a * BASIS_POINTS_DIVISOR) / b
+}
+
 export function factor(a: bigint, b: bigint): bigint {
   return a ? (a * FLOAT_PRECISION) / b : 0n
 }

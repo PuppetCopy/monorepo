@@ -1,6 +1,5 @@
 // import type { Abi, Address, ExtractAbiEvent } from 'abitype'
 // import type { GetEventArgs, Hex, Log } from 'viem'
-// import type { IntervalTime } from '../const/index.js'
 
 import type { Address } from 'viem/accounts'
 
@@ -190,11 +189,11 @@ export type IOraclePrice = IMinMax & {
 }
 
 export interface ISimpleOraclePrice {
-  source: string
-  min: bigint
-  max: bigint
-  timestamp: number
-  token: Address
+  readonly source: string
+  readonly min: bigint
+  readonly max: bigint
+  readonly timestamp: number
+  readonly token: Address
 }
 
 // export type IInsolventClose = {

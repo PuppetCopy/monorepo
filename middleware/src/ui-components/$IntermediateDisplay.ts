@@ -4,7 +4,7 @@ import { $node, $text, type Fn, type I$Node, type IOps, replayLatest, style, swi
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
-import { PromiseStatus, promiseState } from '../core/stream.js'
+import { PromiseStatus, promiseState } from '../core/stream/stream.js'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
 
 export const $spinner = $node(

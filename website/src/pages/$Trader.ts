@@ -4,9 +4,9 @@ import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   getDebankProfileUrl,
   pagingQuery,
+  readableAddress,
   readableLeverage,
   readableUsd,
-  shortenAddress,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
@@ -173,7 +173,7 @@ export const $TraderPage = ({
                 target: '_blank'
               })
             )(
-              $text(shortenAddress(account)),
+              $text(readableAddress(account)),
               $icon({
                 $content: $external,
                 width: '12px'

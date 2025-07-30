@@ -33,7 +33,7 @@ import {
   type SeriesMarker,
   type Time
 } from 'lightweight-charts'
-import { filterNull } from '../../core/stream.js'
+import { filterNull } from '../../core/stream/stream.js'
 
 export type ISeriesTime = Time
 export type IMarker = SeriesMarker<ISeriesTime> & {}

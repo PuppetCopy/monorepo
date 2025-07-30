@@ -112,7 +112,7 @@ export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '1
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: size, height: size })($tokenIcon(description)),
     displayLabel ? $text(`${description.symbol}`) : empty()
-    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  shortenAddress(indexToken)}`),
+    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  readableAddress(indexToken)}`),
   )
 }
 
