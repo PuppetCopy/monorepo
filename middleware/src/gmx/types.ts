@@ -1,6 +1,5 @@
 // import type { Abi, Address, ExtractAbiEvent } from 'abitype'
 // import type { GetEventArgs, Hex, Log } from 'viem'
-// import type { IntervalTime } from '../const/index.js'
 
 import type { Address } from 'viem/accounts'
 

@@ -1,7 +1,10 @@
+import { map, multicast } from '@most/core'
+import { replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
-import { FLOAT_PRECISION } from '../const/index.js'
+import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
 import { getDenominator } from '../core/parse.js'
+import { periodicRun } from '../core/stream/recover.js'
 import { getTokenDescription } from './gmxUtils.js'
 import type { IMinMax, IOraclePrice } from './types.js'
 
@@ -282,3 +285,16 @@ export async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
     return []
   }
 }
+
+export const latestPriceMap = replayLatest(
+  multicast(
+    periodicRun({
+      startImmediate: true,
+      interval: 2500,
+      actionOp: map(async () => {
+        const newLocal = await querySignedPrices()
+        return newLocal
+      })
+    })
+  )
+)

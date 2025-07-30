@@ -1,7 +1,7 @@
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
-import { FUNDING_RATE_PRECISION } from '../const/index.js'
+import { FUNDING_RATE_PRECISION } from '../const/common.js'
 import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
 import { factor, toBasisPoints } from '../core/math.js'
 import { formatFixed } from '../core/parse.js'
