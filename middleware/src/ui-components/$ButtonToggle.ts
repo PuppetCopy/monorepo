@@ -13,11 +13,9 @@ import { constant, type IBehavior, type IOps, type IStream, map, now, switchLate
 import { $row } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
-type Stream<T> = IStream<T>
-
 export interface IButtonToggle<T> {
   optionList: T[]
-  value: Stream<T>
+  value: IStream<T>
 
   $container?: INodeCompose
   $button?: INodeCompose

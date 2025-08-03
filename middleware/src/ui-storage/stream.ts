@@ -1,27 +1,5 @@
 import { continueWith, debounce, type IStream, map, now } from 'aelea/stream'
 
-// Custom implementation of awaitPromises since it's not in aelea/stream
-function awaitPromises<T>(stream: IStream<Promise<T>>): IStream<T> {
-  return {
-    run(scheduler, sink) {
-      return stream.run(scheduler, {
-        event(promise) {
-          promise.then(
-            (value) => sink.event(value),
-            (error) => sink.error(error)
-          )
-        },
-        error(err) {
-          sink.error(err)
-        },
-        end() {
-          sink.end()
-        }
-      })
-    }
-  }
-}
-
 import * as indexDB from './storage.js'
 import { openDatabase } from './storage.js'
 
@@ -69,7 +47,7 @@ export function replayWrite<TSchema, TKey extends indexDB.GetKey<TSchema>, TRetu
   writeEvent: IStream<TReturn>,
   key: TKey
 ): IStream<TReturn> {
-  const storedValue = awaitPromises(map(() => indexDB.get(params, key), now(null)))
+  const storedValue = map(() => indexDB.get(params, key), now(null))
   const writeSrc = write(params, writeEvent, key)
 
   return continueWith(() => writeSrc, storedValue)

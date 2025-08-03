@@ -7,18 +7,17 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combineState, type IStream, map, multicast, replayLatest } from 'aelea/stream'
+import { combineState, type IStream, map, op, replayState } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
-export const subgraphStatus = replayLatest(
-  multicast(
-    periodicRun({
-      startImmediate: true,
-      interval: 2500,
-      actionOp: map(() => getStatus())
-    })
-  )
+export const subgraphStatus = op(
+  periodicRun({
+    startImmediate: true,
+    interval: 2500,
+    actionOp: map(getStatus)
+  }),
+  replayState
 )
 
 export function queryPricefeed(

@@ -154,7 +154,7 @@ export const $PortfolioPage = ({
       //     if (address === undefined) return null
 
       //     return wallet.read({
-      //       ...CONTRACT.MatchingRule,
+      //       ...CONTRACT.Rule,
       //       functionName: 'getRuleList',
       //       args: [collateralToken, address]
       //     })

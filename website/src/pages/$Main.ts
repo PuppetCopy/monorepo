@@ -1,11 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import {
-  ETH_ADDRESS_REGEXP,
-  getTimeSince,
-  readableUnitAmount,
-  unixTimestampNow,
-  zipState
-} from '@puppet-copy/middleware/core'
+import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
 import {
   $alertNegativeContainer,
   $alertPositiveContainer,
@@ -24,10 +18,12 @@ import {
   merge,
   multicast,
   now,
+  op,
   replayLatest,
   switchMap,
   take,
-  tap
+  tap,
+  zipState
 } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -103,7 +99,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         'collateralTokenList'
       )
 
-      const _pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
+      const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)
 
       const subgraphBeaconStatusColor = map((status) => {
         const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
@@ -119,16 +115,20 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         wallet.blockChange
       )
 
-      const userMatchingRuleQuery = replayLatest(
-        multicast(
-          queryUserMatchingRuleList({
-            address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
-          })
-        )
+      const userMatchingRuleQuery = op(
+        queryUserMatchingRuleList({
+          address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
+        }),
+        multicast,
+        replayLatest
       )
 
-      const draftMatchingRuleList = replayLatest(multicast(changeMatchRuleList), [] as ISetMatchingRuleEditorDraft[])
-      const draftDepositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorDraft[])
+      const draftMatchingRuleList = op(changeMatchRuleList, multicast, (stream) =>
+        replayLatest(stream, [] as ISetMatchingRuleEditorDraft[])
+      )
+      const draftDepositTokenList = op(changeDepositTokenList, multicast, (stream) =>
+        replayLatest(stream, [] as IDepositEditorDraft[])
+      )
 
       return [
         $column(spacing.big)(

@@ -1,10 +1,10 @@
-import { map, multicast, replayLatest } from 'aelea/stream'
+import { map, op, replayState } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
 import { getDenominator } from '../core/parse.js'
 import { periodicRun } from '../core/stream/recover.js'
-import { groupArrayByKey, groupArrayByKeyMap } from '../core/utils.js'
+import { groupArrayByKeyMap } from '../core/utils.js'
 import { getTokenDescription } from './gmxUtils.js'
 import type { IMinMax, IOraclePrice, ISimpleOraclePrice } from './types.js'
 
@@ -286,28 +286,27 @@ export async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
   }
 }
 
-export const latestPriceMap = replayLatest(
-  multicast(
-    periodicRun({
-      startImmediate: true,
-      interval: 2500,
-      actionOp: map(async () => {
-        const newLocal = await querySignedPrices()
-        return groupArrayByKeyMap(
-          newLocal,
-          (item) => item.tokenAddress,
-          (item): ISimpleOraclePrice => {
-            const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
-            return {
-              source: 'GMX API',
-              token: item.tokenAddress,
-              min: BigInt(item.minPriceFull),
-              max: BigInt(item.maxPriceFull),
-              timestamp: timestampMs
-            }
+export const latestPriceMap = op(
+  periodicRun({
+    startImmediate: true,
+    interval: 2500,
+    actionOp: map(async () => {
+      const newLocal = await querySignedPrices()
+      return groupArrayByKeyMap(
+        newLocal,
+        (item) => item.tokenAddress,
+        (item): ISimpleOraclePrice => {
+          const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
+          return {
+            source: 'GMX API',
+            token: item.tokenAddress,
+            min: BigInt(item.minPriceFull),
+            max: BigInt(item.maxPriceFull),
+            timestamp: timestampMs
           }
-        )
-      })
+        }
+      )
     })
-  )
+  }),
+  replayState
 )

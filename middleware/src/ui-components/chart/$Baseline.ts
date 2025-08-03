@@ -12,14 +12,12 @@ import {
 import { readableUnitAmount } from '../../core/readable.js'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
 
-type Stream<T> = IStream<T>
-
 export interface IBaselineChart {
   baselineOptions?: BaselineSeriesPartialOptions
   data: ISeriesType['Baseline'][]
 
   chartConfig?: DeepPartial<ChartOptions>
-  markers?: Stream<IMarker[]>
+  markers?: IStream<IMarker[]>
 }
 
 export const $Baseline = ({ data, baselineOptions, chartConfig, markers }: IBaselineChart) => {

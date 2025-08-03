@@ -28,7 +28,7 @@
       "dependencies": {
         "@gmx-io/sdk": "1.2.0",
         "abitype": "1.0.8",
-        "aelea": "2.0.4",
+        "aelea": "2.0.5",
         "jazzicon": "1.5.0",
         "lightweight-charts": "5.0.8",
         "viem": "2.33.2",
@@ -42,7 +42,7 @@
       "dependencies": {
         "@puppet-copy/middleware": "workspace:*",
         "@puppet-copy/sql": "workspace:*",
-        "aelea": "2.0.4",
+        "aelea": "2.0.5",
         "superjson": "2.2.2",
         "viem": "2.33.2",
       },
@@ -59,7 +59,7 @@
         "@reown/appkit-adapter-wagmi": "1.7.17",
         "@wagmi/core": "2.18.1",
         "abitype": "1.0.8",
-        "aelea": "2.0.4",
+        "aelea": "2.0.5",
         "color": "5.0.0",
         "lightweight-charts": "5.0.8",
         "mersenne-twister": "1.1.0",
@@ -798,7 +798,7 @@
 
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
-    "aelea": ["aelea@2.0.4", "", { "dependencies": { "csstype": "3.1.3" } }, "sha512-3KeEN+sNDHRBIpJ3xQdi0jZ++ihxP/IMnJKbeEyU5dtk8senQjWgaLty+N2OEYqUJtFD8fHRjatwb5uGbjPA/A=="],
+    "aelea": ["aelea@2.0.5", "", { "dependencies": { "csstype": "3.1.3" } }, "sha512-0TTfaOIMwd+v8eI/IDlF3EZJezUBrnuUYdXat7DBQswSZshAx9iRdXitb1TJbEEE2kfxnJq9mVKFNJO7AZBLPQ=="],
 
     "aes-js": ["aes-js@4.0.0-beta.5", "", {}, "sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q=="],
 

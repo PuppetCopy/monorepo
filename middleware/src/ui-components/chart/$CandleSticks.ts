@@ -11,14 +11,12 @@ import {
 } from 'lightweight-charts'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
 
-type Stream<T> = IStream<T>
-
 export interface ICandlesticksChart {
   data: ISeriesType['Candlestick'][]
   candlestickConfig?: CandlestickSeriesOptions
 
   chartConfig?: DeepPartial<ChartOptions>
-  markers?: Stream<IMarker[]>
+  markers?: IStream<IMarker[]>
 }
 
 export const $CandleSticks = ({ data, candlestickConfig, chartConfig, markers }: ICandlesticksChart) => {

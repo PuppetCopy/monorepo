@@ -1,26 +1,4 @@
-import { at, continueWith, type IOps, type IStream, now, switchMap } from 'aelea/stream'
-
-// Custom implementation of awaitPromises since it's not in aelea/stream
-function awaitPromises<T>(stream: IStream<Promise<T>>): IStream<T> {
-  return {
-    run(scheduler, sink) {
-      return stream.run(scheduler, {
-        event(promise) {
-          promise.then(
-            (value) => sink.event(value),
-            (error) => sink.error(error)
-          )
-        },
-        error(err) {
-          sink.error(err)
-        },
-        end() {
-          sink.end()
-        }
-      })
-    }
-  }
-}
+import { at, chain, continueWith, fromPromise, type IOps, type IStream, now, switchMap } from 'aelea/stream'
 
 export interface IRunPeriodically<T> {
   actionOp: IOps<any, Promise<T>>
@@ -35,7 +13,7 @@ export const periodicRun = <T>({
   const run = startImmediate
     ? actionOp(now(undefined)) //
     : actionOp(at(interval, undefined))
-  const awaitExecution = awaitPromises(run)
+  const awaitExecution = chain(fromPromise, run)
   const runArgs = { actionOp, interval, startImmediate: false }
 
   return continueWith(() => periodicRun<T>(runArgs), awaitExecution)

@@ -1,50 +1,10 @@
 import type { IScheduler, ISink, IStream } from 'aelea/stream'
-import { continueWith, disposeNone, disposeWith, filter, fromPromise, map, now, periodic } from 'aelea/stream'
+import { disposeNone, disposeWith, filter, fromPromise, map, periodic } from 'aelea/stream'
 import { countdownFn, unixTimestampNow } from '../date.js'
 
-// Custom implementation of takeWhile since it's not in aelea/stream
-function takeWhile<T>(predicate: (value: T) => boolean, stream: IStream<T>): IStream<T> {
-  return {
-    run(scheduler, sink) {
-      let active = true
-      return stream.run(scheduler, {
-        event(value) {
-          if (active && predicate(value)) {
-            sink.event(value)
-          } else {
-            active = false
-            sink.end()
-          }
-        },
-        error(err) {
-          sink.error(err)
-        },
-        end() {
-          sink.end()
-        }
-      })
-    }
-  }
-}
-
 export type StateParams<T> = {
-  [P in keyof T]: IStream<T[P]> | T[P]
+  [P in keyof T]: IStream<T[P]>
 }
-
-export function takeUntilLast<T>(fn: (t: T) => boolean, s: IStream<T>) {
-  let last: T
-
-  return continueWith(
-    () => now(last),
-    takeWhile((x) => {
-      const res = !fn(x)
-      last = x
-      return res
-    }, s)
-  )
-}
-
-export const filterNull = <T>(prov: IStream<T | null>) => filter((ev): ev is T => ev !== null, prov)
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 

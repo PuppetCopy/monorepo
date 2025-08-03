@@ -6,15 +6,17 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, component, type IOps, style } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
 import {
   combineState,
   constant,
   empty,
   type IBehavior,
+  type IOps,
   type IStream,
   map,
   merge,
+  op,
   sample,
   snapshot,
   switchMap
@@ -56,14 +58,14 @@ export const $DepositEditor = (config: {
         changeDepositMode
       )
 
-      const maxAmount = switchMap(
-        (action) => {
-          return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
-        },
+      const maxAmount = op(
         merge(
           map((model) => model.action, config.model),
           changeDepositMode
-        )
+        ),
+        switchMap((action) => {
+          return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
+        })
       )
 
       const inputMaxAmount = sample(maxAmount, clickMax)

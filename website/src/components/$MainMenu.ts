@@ -13,7 +13,7 @@ import {
   styleBehavior
 } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
-import { constant, empty, type IBehavior, o, startWith, zipArray } from 'aelea/stream'
+import { constant, empty, type IBehavior, o, startWith, zip } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -182,7 +182,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
         styleBehavior(
-          zipArray(
+          zip(
             (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? {

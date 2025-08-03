@@ -1,8 +1,17 @@
-import { readableTokenAmount, replayState } from '@puppet-copy/middleware/core'
+import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet-copy/middleware/ui-components'
 import { $text, component, style } from 'aelea/core'
-import { combineState, constant, type IBehavior, type IStream, map, snapshot, switchMap } from 'aelea/stream'
+import {
+  combineState,
+  constant,
+  type IBehavior,
+  type IStream,
+  map,
+  replayState,
+  snapshot,
+  switchMap
+} from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

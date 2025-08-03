@@ -10,16 +10,16 @@ import {
   type IBehavior,
   type IStream,
   map,
+  merge,
   now,
   o,
   snapshot,
   startWith,
   switchMap,
   toStream,
-  zipArray
+  zip
 } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
-import { merge } from 'aelea/stream'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
 import { $labeledDivider } from '../../common/elements/$common.js'
@@ -56,7 +56,7 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
     return startWith(defualtState[key], toStream(stream))
   })
 
-  const zipped = zipArray(
+  const zipped = zip(
     (...arrgs: A[K][]) => {
       return arrgs.reduce((seed, val, idx) => {
         const key = entries[idx][0]

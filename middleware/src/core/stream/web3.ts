@@ -19,19 +19,23 @@ export const watchContractEvent = <
 ): IStream<WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>> => {
   return {
     run(scheduler, sink) {
-      const removeListenerFn = client.watchContractEvent({
-        ...params,
-        onLogs: (
-          logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>
-        ) => {
-          sink.event(logList)
-        },
-        onError: (err: Error) => {
-          sink.error(err)
-        }
-      } as any) // Type assertion needed due to Viem's complex transport constraints
+      try {
+        const removeListenerFn = client.watchContractEvent({
+          ...params,
+          onLogs: (
+            logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>
+          ) => {
+            sink.event(logList)
+          },
+          onError: (err: Error) => {
+            sink.error(err)
+          }
+        } as any) // Type assertion needed due to Viem's complex transport constraints
 
-      return disposeWith(removeListenerFn)
+        return disposeWith(removeListenerFn)
+      } catch (err) {
+        return scheduler.asap(sink, () => sink.error(err as Error))
+      }
     }
   }
 }

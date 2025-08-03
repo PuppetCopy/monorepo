@@ -29,6 +29,7 @@ import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sq
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
 import {
+  chain,
   combineState,
   empty,
   fromPromise,
@@ -37,6 +38,7 @@ import {
   map,
   merge,
   now,
+  op,
   startWith,
   switchMap
 } from 'aelea/stream'
@@ -273,9 +275,11 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   {
                     $head: $text('Collateral'),
                     gridTemplate: isDesktopScreen ? '104px' : '52px',
-                    $bodyCallback: map((routeMetric) => {
-                      return switchMap(
-                        (list: ISetMatchingRule[]) => {
+                    $bodyCallback: map((routeMetric: ILeaderboardCellData) => {
+                      return op(
+                        userMatchingRuleQuery,
+                        chain(fromPromise),
+                        switchMap((list) => {
                           return $RouteEditor({
                             draftMatchingRuleList,
                             collateralToken: routeMetric.metric.collateralToken,
@@ -285,8 +289,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           })({
                             changeMatchRuleList: changeMatchRuleListTether()
                           })
-                        },
-                        switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                        })
                       )
                     })
                   },
