@@ -4,8 +4,9 @@ import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
 import { getDenominator } from '../core/parse.js'
 import { periodicRun } from '../core/stream/recover.js'
+import { groupArrayByKey, groupArrayByKeyMap } from '../core/utils.js'
 import { getTokenDescription } from './gmxUtils.js'
-import type { IMinMax, IOraclePrice } from './types.js'
+import type { IMinMax, IOraclePrice, ISimpleOraclePrice } from './types.js'
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,
@@ -292,7 +293,20 @@ export const latestPriceMap = replayLatest(
       interval: 2500,
       actionOp: map(async () => {
         const newLocal = await querySignedPrices()
-        return newLocal
+        return groupArrayByKeyMap(
+          newLocal,
+          (item) => item.tokenAddress,
+          (item): ISimpleOraclePrice => {
+            const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
+            return {
+              source: 'GMX API',
+              token: item.tokenAddress,
+              min: BigInt(item.minPriceFull),
+              max: BigInt(item.maxPriceFull),
+              timestamp: timestampMs
+            }
+          }
+        )
       })
     })
   )

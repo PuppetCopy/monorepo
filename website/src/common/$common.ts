@@ -204,12 +204,20 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
-  const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
+  const latestPrice = map((pm) => {
+    const price = getMappedValue(pm, indexToken)
+    return price && typeof price === 'object' && 'max' in price ? price.max : 0n
+  }, latestPriceMap)
 
   const roi = isPositionSettled(pos)
     ? readablePercentage(toBasisPoints(pos.realisedPnlUsd, collateralUsd))
     : map((markPrice) => {
-        const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
+        const delta = getPositionPnlUsd(
+          pos.isLong,
+          pos.lastUpdate.sizeInUsd,
+          pos.lastUpdate.sizeInTokens,
+          markPrice as bigint
+        )
         return readablePercentage(toBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
       }, latestPrice)
   return $node(style({ fontSize: '.8rem' }))($text(roi))
@@ -270,21 +278,16 @@ export const $marketSmallLabel = (market: IMarket) => {
 
 export const $openPositionBreakdown = (pos: IPosition) => {
   const indexToken = pos.indexToken
-  const latestPrice = map((pm) => pm[indexToken].max, latestPriceMap)
+  const latestPrice = map((pm: any) => {
+    const price = pm[indexToken]
+    return price && typeof price === 'object' && 'max' in price ? price.max : 0n
+  }, latestPriceMap)
 
-  const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-  const totalPositionFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
-  const totalBorrowingFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
-  const totalFundingFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
+  // const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
+  // TODO: Fix fee collection - need to include feeCollected relation in query
+  const totalPositionFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalBorrowingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalFundingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
   const latestUpdate = pos.lastUpdate
 

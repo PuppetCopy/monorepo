@@ -81,7 +81,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
-      const { activityTimeframe, collateralTokenList, draftMatchingRuleList, userMatchingRuleQuery, route } = config
+      const { activityTimeframe, collateralTokenList, draftMatchingRuleList, userMatchingRuleQuery } = config
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
@@ -275,7 +275,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     gridTemplate: isDesktopScreen ? '104px' : '52px',
                     $bodyCallback: map((routeMetric) => {
                       return switchMap(
-                        (list) => {
+                        (list: ISetMatchingRule[]) => {
                           return $RouteEditor({
                             draftMatchingRuleList,
                             collateralToken: routeMetric.metric.collateralToken,

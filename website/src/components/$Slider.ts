@@ -3,7 +3,6 @@ import {
   $node,
   $text,
   component,
-  drawLatest,
   eventElementTarget,
   type I$Node,
   type INode,
@@ -13,7 +12,7 @@ import {
   styleBehavior,
   styleInline
 } from 'aelea/core'
-import { combineState, type IBehavior, type IStream, join, map, now, snapshot, until } from 'aelea/stream'
+import { combineState, type IBehavior, type IStream, join, map, merge, now, snapshot, until } from 'aelea/stream'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -95,8 +94,7 @@ export const $Slider = ({
                   if (startFromBar) {
                     const initOffsetX = downEvent.layerX || downEvent.offsetX // Firefox uses layerX
                     const initialOffset = now(Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max))
-                    const moveDelta = drawLatest(
-                      map((moveEvent) => {
+                    const moveDelta = map((moveEvent) => {
                         const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
 
                         moveEvent.preventDefault()
@@ -108,26 +106,23 @@ export const $Slider = ({
 
                         return steppedVal
                       }, drag)
-                    )
 
                     return merge(initialOffset, moveDelta)
                   }
 
-                  return drawLatest(
-                    map((moveEvent) => {
-                      const normalisedValue = Math.min(Math.max(params.value, params.min), params.max)
-                      const deltaX = moveEvent.clientX - downEvent.clientX + rectWidth * normalisedValue
+                  return map((moveEvent) => {
+                    const normalisedValue = Math.min(Math.max(params.value, params.min), params.max)
+                    const deltaX = moveEvent.clientX - downEvent.clientX + rectWidth * normalisedValue
 
-                      moveEvent.preventDefault()
+                    moveEvent.preventDefault()
 
-                      const val = deltaX / rectWidth
+                    const val = deltaX / rectWidth
 
-                      const cVal = Math.min(Math.max(val, params.min), params.max)
-                      const steppedVal = step > 0 ? (cVal / step) * step : cVal
+                    const cVal = Math.min(Math.max(val, params.min), params.max)
+                    const steppedVal = step > 0 ? (cVal / step) * step : cVal
 
-                      return steppedVal
-                    }, drag)
-                  )
+                    return steppedVal
+                  }, drag)
                 },
                 combineState({ value, min, max, color, changeSliderDimension }),
                 downSrc

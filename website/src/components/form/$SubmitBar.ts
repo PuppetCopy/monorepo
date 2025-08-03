@@ -13,6 +13,7 @@ import {
   type IBehavior,
   type IStream,
   map,
+  merge,
   multicast,
   now,
   startWith,

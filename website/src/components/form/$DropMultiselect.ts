@@ -5,7 +5,6 @@ import {
   type I$Node,
   type INode,
   type INodeCompose,
-  type IOps,
   nodeEvent,
   style,
   stylePseudo
@@ -13,8 +12,10 @@ import {
 import {
   constant,
   type IBehavior,
+  type IOps,
   type IStream,
   map,
+  merge,
   never,
   now,
   o,

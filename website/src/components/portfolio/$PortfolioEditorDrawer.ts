@@ -8,6 +8,7 @@ import {
   type IBehavior,
   type IStream,
   map,
+  merge,
   skipRepeatsWith,
   snapshot,
   switchLatest,
@@ -254,7 +255,7 @@ export const $PortfolioEditorDrawer = ({
                       })
                     )
                   },
-                  switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                  switchMap(fromPromise, userMatchingRuleQuery)
                 ),
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
@@ -297,7 +298,7 @@ export const $PortfolioEditorDrawer = ({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async (account) => {
-                        const routerContractaParams = CONTRACT.RouterProxy
+                        const routerContractaParams = CONTRACT.UserRouter
                         const tokenRouteContractParams = CONTRACT.TokenRouter
 
                         const callStack: IBatchCall[] = []

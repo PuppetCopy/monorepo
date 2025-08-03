@@ -19,6 +19,7 @@ import {
   zipArray
 } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
+import { merge } from 'aelea/stream'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
 import { $labeledDivider } from '../../common/elements/$common.js'

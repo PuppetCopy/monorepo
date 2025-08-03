@@ -29,6 +29,8 @@ const config: IRunEnvironment = {
   )($Main({})({}))
 }
 
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, config.stylesheet]
+
 $createRoot(config).run(browserScheduler, {
   end() {
     console.log('Application has ended.')
