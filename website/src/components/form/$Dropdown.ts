@@ -1,24 +1,5 @@
-import { constant, empty, map, merge, mergeArray, now, skip, skipRepeats, switchLatest, take, zip } from '@most/core'
-import type { Stream } from '@most/types'
-import {
-  $node,
-  $text,
-  combineState,
-  component,
-  eventElementTarget,
-  type I$Node,
-  type I$Slottable,
-  type IBehavior,
-  type INode,
-  type INodeCompose,
-  type IOps,
-  nodeEvent,
-  style,
-  styleInline,
-  stylePseudo,
-  switchMap,
-  toStream
-} from 'aelea/core'
+import {  IStream, combineState, constant, empty, map, merge, now, skip, skipRepeats, switchLatest, switchMap, take, type IBehavior, zip , toStream } from 'aelea/stream'
+import { $node, $text, component, eventElementTarget, type I$Node, type I$Slottable, type INode, type INodeCompose, type IOps, nodeEvent, style, styleInline, stylePseudo } from 'aelea/core'
 import { $column, $row, observer, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -68,7 +49,7 @@ export const $defaulMultiselectDropContainer = $node(
 )
 
 export interface IDropdown<T> {
-  optionList: Stream<readonly T[]> | readonly T[]
+  optionList: IStream<readonly T[]> | readonly T[]
   $anchor: I$Node
 
   closeOnSelect?: boolean
@@ -97,12 +78,12 @@ export function $Dropdown<T>({
       [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
       [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
-      const openTrigger = constant(true, mergeArray([openMenu]))
+      const openTrigger = constant(true, openMenu)
       const windowClick = switchLatest(
         map((_open) => take(1, skip(1, eventElementTarget('click', window))), openTrigger)
       )
 
-      const closeTrigger = constant(false, mergeArray([windowClick, closeOnSelect ? select : empty()]))
+      const closeTrigger = constant(false, merge(windowClick, closeOnSelect ? select : empty))
 
       const isOpen = skipRepeats(merge(closeTrigger, openTrigger))
 
@@ -114,7 +95,7 @@ export function $Dropdown<T>({
           switchMap(
             (params) => {
               if (!params.isOpen) {
-                return empty()
+                return empty
               }
 
               return $dropListContainer(

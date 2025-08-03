@@ -1,8 +1,6 @@
-import { constant, empty, map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, constant, empty, filterNull, map, multicast, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
 import {
-  filterNull,
   getDuration,
   getTraderMatchingKey,
   groupArrayMany,
@@ -13,7 +11,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -32,9 +30,9 @@ import { $seperator2 } from './common.js'
 import type { IPageFilterParams } from './type.js'
 
 interface IWalletPuppet extends IPageFilterParams {
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
-  draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
+  draftDepositTokenList: IStream<IDepositEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
 }
 
 export const $PortfolioPage = ({
@@ -209,7 +207,7 @@ export const $PortfolioPage = ({
                   const settlementList = await params.positionLinkMapQuery
 
                   if (settlementList === null) {
-                    return empty()
+                    return empty
                   }
 
                   if (Object.keys(settlementList).length === 0) {
@@ -221,7 +219,7 @@ export const $PortfolioPage = ({
                   }
 
                   // TODO
-                  return empty()
+                  return empty
                 }, stateParams)
               })
             )
@@ -262,7 +260,7 @@ export const $PortfolioPage = ({
                             ? $infoLabel(
                                 $text(`No matching rules set for ${getTokenDescription(collateralToken).name}`)
                               )
-                            : empty(),
+                            : empty,
                           ...matchingRuleListForToken.map((rule) => {
                             const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 

@@ -1,4 +1,4 @@
-import { combine, now } from '@most/core'
+import { combine, now } from 'aelea/stream'
 import { type I$Node, motion, styleInline } from 'aelea/core'
 
 export function fadeIn($content: I$Node) {

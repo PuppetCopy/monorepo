@@ -1,9 +1,8 @@
-import { empty, map } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, empty, map, type IBehavior } from 'aelea/stream'
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import { $caretDown, $icon } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $text, component, type IBehavior, type INodeCompose, style } from 'aelea/core'
+import { $text, component, type INodeCompose, style } from 'aelea/core'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
@@ -21,7 +20,7 @@ interface ITraderMatchingRouteEditor {
   userMatchingRuleList: ISetMatchingRule[]
   collateralToken: Address
   displayCollateralTokenSymbol?: boolean
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
   $container?: INodeCompose
 }
 
@@ -75,7 +74,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
                       svgOps: style({ marginLeft: '4px', minWidth: '8px' }),
                       viewBox: '0 0 32 32'
                     })
-                  : empty()
+                  : empty
               ),
               $seperator2,
               $row(style({ gap: '6px' }))(
@@ -87,7 +86,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
                       svgOps: style({ marginTop: '2px', minWidth: '8px' }),
                       viewBox: '0 0 32 32'
                     })
-                  : empty()
+                  : empty
               )
             ),
             $container: $defaultMiniButtonSecondary(

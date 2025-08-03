@@ -1,9 +1,8 @@
-import { constant, map, snapshot } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, constant, map, snapshot, switchMap, type IBehavior } from 'aelea/stream'
 import { readableTokenAmount, replayState } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $infoLabel, $labeledhintAdjustment } from '@puppet-copy/middleware/ui-components'
-import { $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
+import { $text, component, style } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -18,7 +17,7 @@ import { $DepositEditor, DepositEditorAction, type IDepositEditorDraft } from '.
 
 interface IRouteDepositEditor extends IComponentPageParams {
   collateralToken: Address
-  draftDepositTokenList: Stream<IDepositEditorDraft[]>
+  draftDepositTokenList: IStream<IDepositEditorDraft[]>
 }
 
 export const $RouteDepositEditor = (config: IRouteDepositEditor) =>

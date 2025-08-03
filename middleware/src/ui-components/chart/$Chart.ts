@@ -4,6 +4,7 @@ import {
   disposeWith,
   empty,
   filter,
+  filterNull,
   fromCallback,
   type IBehavior,
   type IStream,
@@ -35,7 +36,6 @@ import {
   type SeriesMarker,
   type Time
 } from 'lightweight-charts'
-import { filterNull } from '../../core/stream/stream.js'
 
 export type ISeriesTime = Time
 export type IMarker = SeriesMarker<ISeriesTime> & {}
@@ -186,7 +186,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
         {
           // yAxisCoords: yAxisState
-          //   ? mergeArray([
+          //   ? merge([
           //       map(
           //         (coords) => {
           //           if (coords.isFocused) {

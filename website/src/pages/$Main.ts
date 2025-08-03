@@ -1,9 +1,7 @@
-import { constant, map, merge, mergeArray, multicast, now, take, tap } from '@most/core'
-import type { Stream } from '@most/types'
+import {  IStream, constant, filterNull, map, merge, multicast, now, replayLatest, switchMap, take, tap, type IBehavior , behavior } from 'aelea/stream'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   ETH_ADDRESS_REGEXP,
-  filterNull,
   getTimeSince,
   readableUnitAmount,
   unixTimestampNow,
@@ -16,17 +14,7 @@ import {
   $Tooltip
 } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import {
-  $node,
-  $text,
-  component,
-  eventElementTarget,
-  type IBehavior,
-  replayLatest,
-  style,
-  styleBehavior,
-  switchMap
-} from 'aelea/core'
+import { $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -113,10 +101,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       }, subgraphStatus)
       const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
-      const latestBlock: Stream<bigint> = mergeArray([
+      const latestBlock: IStream<bigint> = merge(
         // fromPromise(useBlockNumber().promise),
         wallet.blockChange
-      ])
+      )
 
       const userMatchingRuleQuery = replayLatest(
         multicast(
@@ -319,7 +307,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           switchMap((cb) => {
             return fadeIn(
               $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-                filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
+                filterNull(constant(null, clickUpdateVersion)) as IStream<never>,
 
                 $text('New version Available'),
                 $ButtonSecondary({

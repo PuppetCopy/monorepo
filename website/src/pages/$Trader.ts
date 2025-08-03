@@ -1,5 +1,4 @@
-import { awaitPromises, map, multicast, startWith } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, fromPromise, map, multicast, replayLatest, startWith, switchMap, type IBehavior } from 'aelea/stream'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   getDebankProfileUrl,
@@ -22,7 +21,7 @@ import {
   type ISortBy
 } from '@puppet-copy/middleware/ui-components'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
+import { $node, $text, attr, component, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
@@ -39,8 +38,8 @@ import { $seperator2, accountSettledPositionListSummary, aggregatePositionList }
 import type { IPageFilterParams } from './type.js'
 
 interface ITraderPage extends IPageFilterParams {
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $TraderPage = ({
@@ -286,7 +285,7 @@ export const $TraderPage = ({
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()
                       })
-                    }, awaitPromises(userMatchingRuleQuery)),
+                    }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)),
                     $row(
                       style({ marginRight: '26px' })($seperator2),
                       $Table({

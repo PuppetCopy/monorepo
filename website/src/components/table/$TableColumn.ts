@@ -1,4 +1,4 @@
-import { empty, map, skipRepeats } from '@most/core'
+import {    empty, map, skipRepeats , switchMap , toStream , behavior } from 'aelea/stream'
 import {
   getMappedValue,
   getTimeSince,
@@ -9,7 +9,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
 import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, type IComposeBehavior, type INode, style, switchMap, toStream } from 'aelea/core'
+import { $node, $text, type INode, style } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -121,6 +121,6 @@ export const timeColumn: TableColumn<IPosition> = {
           $text(getTimeSince(pos.lastUpdateTimestamp)),
           $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
         )
-      : empty()
+      : empty
   })
 }

@@ -1,22 +1,6 @@
-import { join, map, mergeArray, now, snapshot, until } from '@most/core'
-import type { Stream } from '@most/types'
+import {  IStream, combineState, join, map, now, snapshot, type IBehavior, until , behavior } from 'aelea/stream'
 import { invertColor } from '@puppet-copy/middleware/core'
-import {
-  $node,
-  $text,
-  combineState,
-  component,
-  drawLatest,
-  eventElementTarget,
-  type I$Node,
-  type IBehavior,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style,
-  styleBehavior,
-  styleInline
-} from 'aelea/core'
+import { $node, $text, component, drawLatest, eventElementTarget, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior, styleInline } from 'aelea/core'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -25,11 +9,11 @@ export interface ISliderParams extends Input<number> {
 
   $thumb?: I$Node
   $container?: INodeCompose
-  disabled?: Stream<boolean>
-  min?: Stream<number>
-  max?: Stream<number>
+  disabled?: IStream<boolean>
+  min?: IStream<number>
+  max?: IStream<number>
 
-  color?: Stream<string>
+  color?: IStream<string>
 }
 
 export const $defaultSliderThumb = $row(
@@ -113,7 +97,7 @@ export const $Slider = ({
                       }, drag)
                     )
 
-                    return mergeArray([initialOffset, moveDelta])
+                    return merge(initialOffset, moveDelta)
                   }
 
                   return drawLatest(

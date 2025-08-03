@@ -1,5 +1,4 @@
-import { awaitPromises, empty, map, mergeArray, now, startWith } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, empty, fromPromise, map, merge, now, startWith, switchMap, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
@@ -29,7 +28,7 @@ import {
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
-import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
@@ -49,8 +48,8 @@ import { $seperator2 } from './common.js'
 import type { IPageFilterParams, IPageParams } from './type.js'
 
 interface ILeaderboard extends IPageFilterParams, IPageParams {
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 type ISortLeaderboardBy = ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>
@@ -78,12 +77,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
       const screenerFocus = uiStorage.replayWrite(localStore.leaderboard, changeScreenerFocus, 'focus')
       const sortBy = uiStorage.replayWrite(
         localStore.leaderboard,
-        mergeArray([
+        merge(
           sortByChange,
           map((selector) => {
             return { direction: 'desc', selector } as const
           }, changeScreenerFocus)
-        ]),
+        ),
         'sortBy'
       )
       // const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
@@ -113,7 +112,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 $$option: map((option) => {
                   return $row(spacing.small, style({ alignItems: 'center' }))(
                     option === undefined
-                      ? empty()
+                      ? empty
                       : $icon({
                           $content: option === 'pnl' ? $bagOfCoins : $trophy,
                           width: '18px',
@@ -138,7 +137,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               //   $$option: map((il) => {
               //     return $row(spacing.tiny, style({ alignItems: 'center' }))(
               //       il === undefined
-              //         ? empty()
+              //         ? empty
               //         : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
               //       $text(il === undefined ? 'Both' : il ? 'Long' : 'Short')
               //     )
@@ -274,7 +273,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         })({
                           changeMatchRuleList: changeMatchRuleListTether()
                         })
-                      }, awaitPromises(userMatchingRuleQuery))
+                      }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery))
                     })
                   },
                   ...((isDesktopScreen
@@ -297,10 +296,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             const marketList = pos.metric.traderRouteMetric.marketList
                             const marketListLength = marketList.length
                             return $row(spacing.small)(
-                              ...marketList.slice(0, 4).map((token) => $tokenTryLabeled(token, false, '32px')),
+                              ...marketList.slice(0, 4).map((token: Address) => $tokenTryLabeled(token, false, '32px')),
                               marketListLength > 4
                                 ? style({ fontSize: '.8rem' })($infoLabel($text(`+${marketListLength - 4} more`)))
-                                : empty()
+                                : empty
                             )
                           })
                         },
@@ -331,11 +330,11 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       const sourceList = [
                         { value: 0n, time: startTime },
                         ...pos.metric.pnlList
-                          .map((pnl, index) => ({
+                          .map((pnl: bigint, index: number) => ({
                             value: pnl,
                             time: pos.metric.pnlTimestampList[index]
                           }))
-                          .filter((item) => item.time > startTime),
+                          .filter((item: {value: bigint, time: number}) => item.time > startTime),
                         { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
                       ]
 

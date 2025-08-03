@@ -1,4 +1,4 @@
-import { empty } from '@most/core'
+import { empty } from 'aelea/stream'
 import { $node, $text, type INodeCompose, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -25,7 +25,7 @@ export const $profileDisplay = ({
           address,
           $container: $labelContainer
         })
-      : empty()
+      : empty
   )
 }
 

@@ -1,11 +1,10 @@
-import { snapshot } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, snapshot } from 'aelea/stream'
 import { $svg, $text, attr, component, nodeEvent, style, stylePseudo } from 'aelea/core'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete, type Theme, themeList } from 'aelea/ui-components-theme'
 import { setTheme } from 'aelea/ui-components-theme-browser'
 
-export const $ThemePicker = (theme: Stream<Theme>) =>
+export const $ThemePicker = (theme: IStream<Theme>) =>
   component(([changeTheme, changeThemeTether]: any) => {
     return [
       $row(

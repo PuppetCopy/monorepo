@@ -1,4 +1,4 @@
-import { tap } from '@most/core'
+import { tap } from 'aelea/stream'
 import { $svg, attr } from 'aelea/core'
 import Color from 'color'
 // @ts-ignore

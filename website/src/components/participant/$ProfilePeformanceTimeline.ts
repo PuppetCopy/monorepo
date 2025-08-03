@@ -1,9 +1,7 @@
-import { empty, map, skipRepeatsWith, startWith, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, empty, filterNull, map, skipRepeatsWith, startWith, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
-  filterNull,
   formatFixed,
   parseReadableNumber,
   readableUnitAmount,
@@ -15,7 +13,7 @@ import {
   $intermediatePromise,
   type ISeriesTime
 } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, type IBehavior, motion, style, switchMap } from 'aelea/core'
+import { $node, $text, component, motion, style } from 'aelea/core'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
@@ -26,7 +24,7 @@ import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 
 interface IProfilePeformanceTimeline extends IPageFilterParams {
-  metricsQuery: Stream<Promise<ITraderRouteMetricSummary>>
+  metricsQuery: IStream<Promise<ITraderRouteMetricSummary>>
 }
 
 export const $TradeRouteTimeline = ({
@@ -99,7 +97,7 @@ export const $TradeRouteTimeline = ({
                 const timeline = await paramsQuery
 
                 if (timeline.length === 0) {
-                  return empty()
+                  return empty
                 }
 
                 const pnlCrossHairTimeChange = startWith(

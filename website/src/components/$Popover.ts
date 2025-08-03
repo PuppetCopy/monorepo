@@ -1,17 +1,5 @@
-import { constant, empty, filter, map, merge, mergeArray, multicast, switchLatest, until, zip } from '@most/core'
-import type { Stream } from '@most/types'
-import {
-  $node,
-  component,
-  type I$Node,
-  type IBehavior,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  O,
-  style,
-  styleBehavior
-} from 'aelea/core'
+import {   IStream, constant, empty, filter, map, merge, multicast, switchLatest, type IBehavior, until, zip , o , behavior } from 'aelea/stream'
+import { $node, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/core'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -26,10 +14,10 @@ export const $defaultPopoverContentContainer = $column(
 )
 
 interface IPocus {
-  $open: Stream<I$Node>
+  $open: IStream<I$Node>
   $target: I$Node
 
-  dismiss?: Stream<any>
+  dismiss?: IStream<any>
   spacing?: number
   $contentContainer?: INodeCompose
   $container?: INodeCompose
@@ -40,7 +28,7 @@ export const $Popover = ({
   $target,
   $contentContainer = $defaultPopoverContentContainer,
   $container = $node,
-  dismiss = empty(),
+  dismiss = empty,
   spacing = 10
 }: IPocus) =>
   component(
@@ -122,11 +110,11 @@ export const $Popover = ({
 
       const $content = switchLatest(
         map((content) => {
-          return until(dismissEvent, mergeArray([style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()]))
+          return until(dismissEvent, merge(style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()))
         }, openMulticast)
       )
 
-      const targetOp = O(
+      const targetOp = o(
         targetIntersectionTether(
           observer.intersection()
           // map(node => {

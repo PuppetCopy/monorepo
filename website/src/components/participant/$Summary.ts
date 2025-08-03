@@ -1,8 +1,7 @@
-import { map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, map, multicast } from 'aelea/stream'
 import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
 import { intermediateText } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, style } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -12,7 +11,7 @@ import type { IPosition } from '../../pages/type.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
-  positionListQuery: Stream<Promise<IPosition[]>>
+  positionListQuery: IStream<Promise<IPosition[]>>
   account: Address
   puppet?: Address
 }

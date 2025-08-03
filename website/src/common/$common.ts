@@ -1,5 +1,4 @@
-import { empty, map, skipRepeats } from '@most/core'
-import type { Stream } from '@most/types'
+import { IBehavior, IStream, empty, map, skipRepeats, toStream, type IComposeBehavior } from 'aelea/stream'
 import {
   getMappedValue,
   type ITokenDescription,
@@ -28,8 +27,7 @@ import {
   $unknown
 } from '@puppet-copy/middleware/ui-components'
 import type { IMarket } from '@puppet-copy/sql/schema'
-import type { IBehavior, IComposeBehavior } from 'aelea/core'
-import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
+import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
 import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -70,7 +68,7 @@ export const $entry = (pos: IPosition) => {
               $label($text('Close Time')),
               $node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp)))
             )
-          : empty()
+          : empty
       ),
       $anchor: $route(indexDescription, false)
     })({}),
@@ -95,7 +93,7 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
         marginLeft: '-15px'
       })($tokenIcon(collateralTokenDescription))
     ),
-    displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty()
+    displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty
   )
 }
 
@@ -111,7 +109,7 @@ export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '1
 
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: size, height: size })($tokenIcon(description)),
-    displayLabel ? $text(`${description.symbol}`) : empty()
+    displayLabel ? $text(`${description.symbol}`) : empty
     // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  readableAddress(indexToken)}`),
   )
 }
@@ -166,7 +164,7 @@ export const $leverage = (size: bigint, collateral: bigint) => {
   )
 }
 
-export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
+export const $pnlDisplay = (pnlSrc: IStream<bigint> | bigint, bold = true) => {
   const pnl = toStream(pnlSrc)
   const display = map((value) => readablePnl(value), pnl)
   const displayColor = skipRepeats(
@@ -184,7 +182,7 @@ export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
   return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
-export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
+export const $roiDisplay = (roiSrc: IStream<bigint> | bigint, bold = true) => {
   const roi = toStream(roiSrc)
   const display = map((value) => readablePercentage(value), roi)
   const displayColor = skipRepeats(
@@ -222,7 +220,7 @@ export function $liquidationSeparator(
   sizeUsd: bigint,
   sizeInTokens: bigint,
   collateralAmount: bigint,
-  markPrice: Stream<bigint>
+  markPrice: IStream<bigint>
 ) {
   const liqWeight = map((price) => {
     const collateralUsd = price * collateralAmount
@@ -256,7 +254,7 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
             $text(`${longTokenDescription.symbol}/${shortTokenDescription.symbol}`)
           )
         )
-      : empty()
+      : empty
   )
 }
 
@@ -361,7 +359,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                       $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
                     )
               )
-            : empty()
+            : empty
         ),
         route: route.create({ fragment: 'baseRoute' }),
         url: `/${IWalletTab.TRADER.toLowerCase()}/${address}`

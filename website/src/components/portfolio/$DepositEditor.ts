@@ -1,5 +1,4 @@
-import { constant, empty, map, mergeArray, sample, snapshot } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, constant, empty, map, merge, sample, snapshot, switchMap, type IBehavior } from 'aelea/stream'
 import {
   parseFixed,
   parseReadableNumber,
@@ -8,7 +7,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, type IBehavior, type IOps, style, switchMap } from 'aelea/core'
+import { $node, $text, component, type IOps, style } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -26,9 +25,9 @@ export interface IDepositEditorDraft {
 }
 
 export const $DepositEditor = (config: {
-  walletBalance: Stream<bigint> //
-  depositBalance: Stream<bigint> //
-  model: Stream<IDepositEditorDraft>
+  walletBalance: IStream<bigint> //
+  depositBalance: IStream<bigint> //
+  model: IStream<IDepositEditorDraft>
   token: Address
   validation?: IOps<bigint, string | null>
 }) =>
@@ -41,25 +40,25 @@ export const $DepositEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
-      const action = mergeArray([map((model) => model.action, config.model), changeDepositMode])
+      const action = merge(map((model) => model.action, config.model), changeDepositMode)
 
       const maxAmount = switchMap(
         (action) => {
           return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
         },
-        mergeArray([map((model) => model.action, config.model), changeDepositMode])
+        merge(map((model) => model.action, config.model), changeDepositMode)
       )
 
       const inputMaxAmount = sample(maxAmount, clickMax)
 
-      const value = mergeArray([
+      const value = merge(
         inputMaxAmount,
         inputAmount,
         constant(0n, changeDepositMode),
         map((model) => model.amount, config.model)
-      ])
+      )
 
-      const alert = mergeArray([
+      const alert = merge(
         map((params) => {
           if (params.action === DepositEditorAction.DEPOSIT && params.value > params.maxAmount) {
             return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
@@ -75,8 +74,8 @@ export const $DepositEditor = (config: {
 
           return null
         }, combineState({ maxAmount, value, action })),
-        config.validation ? config.validation(value) : empty()
-      ])
+        config.validation ? config.validation(value) : empty
+      )
 
       return [
         $column(spacing.default, style({ minWidth: '230px' }))(
@@ -147,7 +146,7 @@ export const $DepositEditor = (config: {
         ),
 
         {
-          changeModel: mergeArray([
+          changeModel: merge(
             snapshot(
               (params): IDepositEditorDraft => {
                 return {
@@ -163,7 +162,7 @@ export const $DepositEditor = (config: {
               clickSave
             )
             // constant(0n, changeDepositMode)
-          ])
+          )
         }
       ]
     }

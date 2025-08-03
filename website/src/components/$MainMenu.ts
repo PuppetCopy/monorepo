@@ -1,21 +1,6 @@
-import { constant, empty, startWith } from '@most/core'
+import { constant, empty, startWith, type IBehavior, o, behavior, zipArray } from 'aelea/stream'
 import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet-copy/middleware/ui-components'
-import {
-  $element,
-  $node,
-  attr,
-  combineArray,
-  component,
-  type I$Node,
-  type IBehavior,
-  type INodeCompose,
-  type ISlottable,
-  type IStyleCSS,
-  nodeEvent,
-  O,
-  style,
-  styleBehavior
-} from 'aelea/core'
+import { $element, $node, attr, component, type I$Node, type INodeCompose, type ISlottable, type IStyleCSS, nodeEvent, style, styleBehavior } from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
@@ -87,7 +72,7 @@ export const $MainMenu = (config: MainMenu) =>
           $column(spacing.default)(
             isMobileScreen
               ? $row(spacing.big, style({ flexWrap: 'wrap', placeContent: 'center' }))(...$socialLinkList)
-              : empty(),
+              : empty,
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
                 changeTheme: changeThemeTether()
@@ -98,7 +83,7 @@ export const $MainMenu = (config: MainMenu) =>
         ),
         dismiss: routeChange,
         $target: $icon({
-          svgOps: O(
+          svgOps: o(
             clickPopoverClaimTether(nodeEvent('click')),
             style({
               padding: '6px',
@@ -185,7 +170,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
         styleBehavior(
-          combineArray(
+          zipArray(
             (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? {

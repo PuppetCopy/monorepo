@@ -1,4 +1,4 @@
-import type { Stream } from '@most/types'
+import type { IStream } from 'aelea/stream'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import type {
   IPositionDecrease,
@@ -16,8 +16,8 @@ export interface IPageParams extends IComponentPageParams {
 }
 
 export interface IPageFilterParams {
-  activityTimeframe: Stream<IntervalTime>
-  collateralTokenList: Stream<Address[]>
+  activityTimeframe: IStream<IntervalTime>
+  collateralTokenList: IStream<Address[]>
 }
 
 export interface IEarningsPlan {

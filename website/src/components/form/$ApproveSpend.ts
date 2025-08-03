@@ -1,5 +1,4 @@
-import { empty, fromPromise, map, mergeArray, now, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, empty, fromPromise, map, merge, now, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import {
@@ -10,18 +9,7 @@ import {
 } from '@puppet-copy/middleware/ui-components'
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
-import {
-  $node,
-  $text,
-  combineState,
-  component,
-  type I$Node,
-  type I$Slottable,
-  type IBehavior,
-  type INodeCompose,
-  style,
-  switchMap
-} from 'aelea/core'
+import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
 import { $row, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
 import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
@@ -31,14 +19,14 @@ import { $ButtonCore } from './$ButtonCore'
 export interface ISpend {
   spender: Address
   token: Address
-  amount?: Stream<bigint>
+  amount?: IStream<bigint>
   $label?: I$Slottable
 }
 
 interface IApproveSpend extends ISpend {
   wallet: IWalletConnected
-  disabled?: Stream<boolean>
-  txQuery: Stream<IWriteContractReturn>
+  disabled?: IStream<boolean>
+  txQuery: IStream<IWriteContractReturn>
   $content?: I$Node
   $container?: INodeCompose
 }
@@ -47,7 +35,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
   component(([approveTokenSpend, approveTokenSpendTether]: IBehavior<PointerEvent, IWriteContractReturn>) => {
     const { $content, amount, token, spender, $label, disabled, $container = $row(style({ minWidth: 0 })) } = config
 
-    const allowance = mergeArray([
+    const allowance = merge(  
       switchMap(async (query) => {
         return ((await query).events[0].args as any).value as bigint
       }, config.txQuery),
@@ -59,7 +47,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
           args: [config.wallet.address, spender]
         })
       )
-    ])
+    )
 
     const requestStatus = promiseState(config.txQuery)
 
@@ -68,14 +56,14 @@ export const $ApproveSpend = (config: IApproveSpend) =>
         switchMap(
           (params) => {
             if (params.allowance >= params.amount) {
-              return $content || empty()
+              return $content || empty
             }
 
             return $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
               switchLatest(
                 map((status) => {
                   if (status === null) {
-                    return empty()
+                    return empty
                   }
 
                   if (status.status === PromiseStatus.PENDING) {

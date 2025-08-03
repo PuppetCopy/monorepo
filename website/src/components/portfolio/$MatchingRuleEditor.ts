@@ -1,25 +1,10 @@
-import { empty, map, mergeArray, now, snapshot, startWith } from '@most/core'
-import type { Stream } from '@most/types'
+import {   IStream, combineState, empty, map, now, snapshot, startWith, switchMap, type IBehavior , toStream , o, zipArray } from 'aelea/stream'
 import { IntervalTime } from '@puppet-copy/middleware/const'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
 import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import {
-  $element,
-  $node,
-  $text,
-  attr,
-  combineArray,
-  combineState,
-  component,
-  type IBehavior,
-  O,
-  style,
-  stylePseudo,
-  switchMap,
-  toStream
-} from 'aelea/core'
+import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
@@ -35,19 +20,19 @@ export type IMatchRuleEditor = {
   traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export type InputStateParams<T> = {
-  [P in keyof T]: Stream<T[P]> | T[P]
+  [P in keyof T]: IStream<T[P]> | T[P]
 }
 
 export type InputArrayParams<T extends any[]> = {
-  [P in keyof T]: Stream<T[P]>
+  [P in keyof T]: IStream<T[P]>
 }
 
-export function combineForm<A, K extends keyof A = keyof A>(state: InputStateParams<A>, defualtState: A): Stream<A> {
-  const entries = Object.entries(state) as [keyof A, Stream<A[K]> | A[K]][]
+export function combineForm<A, K extends keyof A = keyof A>(state: InputStateParams<A>, defualtState: A): IStream<A> {
+  const entries = Object.entries(state) as [keyof A, IStream<A[K]> | A[K]][]
 
   if (entries.length === 0) {
     return now({} as A)
@@ -57,7 +42,7 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
     return startWith(defualtState[key], toStream(stream))
   })
 
-  const zipped = combineArray(
+  const zipped = zipArray(
     (...arrgs: A[K][]) => {
       return arrgs.reduce((seed, val, idx) => {
         const key = entries[idx][0]
@@ -134,7 +119,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
           $row(
             switchMap((isEnabled) => {
               if (!isEnabled) {
-                return empty()
+                return empty
               }
 
               return $column(spacing.default)(
@@ -166,7 +151,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                 $Dropdown({
                   $anchor: $FieldLabeled({
                     label: 'Activity throttle',
-                    value: map(O(Number, getDuration), throttleActivity),
+                    value: map(o(Number, getDuration), throttleActivity),
                     placeholder: getDuration(Number(model?.throttleActivity || defaultDraft.throttleActivity)),
                     labelWidth: 150,
                     hint: 'Ignore positions that are too close to each other in time'
@@ -203,7 +188,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
         ),
 
         {
-          changeMatchRuleList: mergeArray([
+          changeMatchRuleList: merge(
             snapshot(
               (params) => {
                 const modelIndex = params.draftMatchingRuleList.findIndex(
@@ -264,7 +249,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
               combineState({ draftMatchingRuleList, draft }),
               clickRemove
             )
-          ])
+          )
         }
       ]
     }

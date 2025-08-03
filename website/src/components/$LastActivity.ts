@@ -1,9 +1,7 @@
-import { empty, map } from '@most/core'
-import type { Stream } from '@most/types'
+import { IBehavior, IStream, empty, map } from 'aelea/stream'
 import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet-copy/middleware/const'
 import { getMappedValue } from '@puppet-copy/middleware/core'
 import { $caretDown, $icon, $infoLabel } from '@puppet-copy/middleware/ui-components'
-import type { IBehavior } from 'aelea/core'
 import { $node, $text, component, style } from 'aelea/core'
 import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { $Dropdown } from './form/$Dropdown'
@@ -16,7 +14,7 @@ export const activityOptionLabelMap = {
   [IntervalTime.YEAR]: '1 Year'
 } as const
 
-export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
+export const $LastAtivity = (activityTimeframe: IStream<IntervalTime>) =>
   component(([changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>) => {
     return [
       $row(
@@ -43,7 +41,7 @@ export const $LastAtivity = (activityTimeframe: Stream<IntervalTime>) =>
           $anchor: $row(
             $node(style({ whiteSpace: 'nowrap', padding: '12px 0px 12px 18px' }))(
               $row(spacing.tiny)(
-                isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty(),
+                isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty,
                 $text(map((tf) => getMappedValue(activityOptionLabelMap, tf), activityTimeframe))
               )
             ),

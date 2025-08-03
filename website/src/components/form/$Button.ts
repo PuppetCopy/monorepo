@@ -1,23 +1,7 @@
-import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
-import type { Stream } from '@most/types'
+import {  IStream, combineState, empty, map, multicast, now, startWith, type IBehavior , behavior } from 'aelea/stream'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import { $icon } from '@puppet-copy/middleware/ui-components'
-import {
-  $node,
-  attrBehavior,
-  combineArray,
-  combineState,
-  component,
-  type I$Node,
-  type IBehavior,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style,
-  styleBehavior,
-  styleInline,
-  stylePseudo
-} from 'aelea/core'
+import { $node, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from 'aelea/core'
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -81,8 +65,8 @@ export const $ButtonSecondary = (config: IButtonCore) => {
 }
 
 export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
-  txQuery: Stream<Promise<any>>
-  alert?: Stream<string | null>
+  txQuery: IStream<Promise<any>>
+  alert?: IStream<string | null>
 }
 
 export const $Submit = (config: IButtonPrimaryCtx) =>
@@ -93,10 +77,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
-      const isTxPending = recoverWith(
-        () => now(false),
-        map((s) => s.status === PromiseStatus.PENDING, promiseState(txQuery))
-      )
+      const isTxPending = map((s) => s.status === PromiseStatus.PENDING, promiseState(txQuery))
       const isRequestPending = startWith(false, isTxPending)
 
       return [
@@ -107,7 +88,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
               overflow: 'hidden'
             })
           ),
-          disabled: combineArray((params) => {
+          disabled: map((params) => {
             return params.alert !== null || params.disabled || params.isRequestPending
           }, combineState({ disabled, isRequestPending, alert })),
           $content: $row(
@@ -170,7 +151,7 @@ export const $defaultButtonCircularContainer = $row(
 
 export const $ButtonCircular = ({
   $iconPath,
-  disabled = empty(),
+  disabled = empty,
   $container = $defaultButtonCircularContainer
 }: IButtonCircular) =>
   component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {

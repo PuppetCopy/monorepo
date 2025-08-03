@@ -1,5 +1,4 @@
-import { map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
+import { IStream, combineState, map, multicast, replayLatest } from 'aelea/stream'
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import {
   getClosestNumber,
@@ -9,7 +8,6 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combineState, replayLatest } from 'aelea/core'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
@@ -54,7 +52,7 @@ export function queryUserMatchingRuleList(
   queryParams: StateParams<{
     address: Address | undefined
   }>
-): Stream<Promise<ISetMatchingRule[]>> {
+): IStream<Promise<ISetMatchingRule[]>> {
   return map(async (params) => {
     const address = params.address
     if (address === undefined) {

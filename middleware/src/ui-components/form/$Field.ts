@@ -2,6 +2,7 @@ import { $element, component, type INode, type INodeCompose, nodeEvent, style, s
 import {
   combineState,
   empty,
+  filterNull,
   type IBehavior,
   type IStream,
   map,
@@ -13,7 +14,6 @@ import {
 } from 'aelea/stream'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { filterNull } from '../../core/stream/stream.js'
 import { dismissOp, interactionOp } from './common.js'
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

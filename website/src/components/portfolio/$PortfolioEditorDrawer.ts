@@ -1,18 +1,9 @@
-import {
-  awaitPromises,
-  constant,
-  empty,
-  fromPromise,
-  map,
-  mergeArray,
-  skipRepeatsWith,
-  snapshot,
-  switchLatest
-} from '@most/core'
-import { remove } from '@most/prelude'
-import type { Stream } from '@most/types'
+import { IStream, combineState, constant, empty, fromPromise, map, skipRepeatsWith, snapshot, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
+
+// Array utility function (previously from @most/prelude)
+const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
 import {
   $alert,
   $alertIntermediateTooltip,
@@ -24,7 +15,7 @@ import {
 } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
-import { $node, $text, combineState, component, type IBehavior, style, switchMap } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
 import type { Route } from 'aelea/router'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -52,9 +43,9 @@ interface IPortfolioRoute {
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   route: Route
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
-  draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  draftDepositTokenList: IStream<IDepositEditorDraft[]>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $PortfolioEditorDrawer = ({
@@ -83,7 +74,7 @@ export const $PortfolioEditorDrawer = ({
         fadeIn(
           switchMap((params) => {
             if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
-              return empty()
+              return empty
             }
 
             const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
@@ -228,7 +219,7 @@ export const $PortfolioEditorDrawer = ({
                                 })({
                                   click: routeChangeTether()
                                 }),
-                                isDesktopScreen ? $node(style({ flex: 1 }))() : empty(),
+                                isDesktopScreen ? $node(style({ flex: 1 }))() : empty,
                                 $infoLabeledValue(
                                   'Allowance Rate',
                                   $text(`${readablePercentage(modSubsc.allowanceRate)}`)
@@ -248,7 +239,7 @@ export const $PortfolioEditorDrawer = ({
                       )
                     })
                   )
-                }, awaitPromises(userMatchingRuleQuery)),
+                }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)),
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(
@@ -361,7 +352,7 @@ export const $PortfolioEditorDrawer = ({
         {
           routeChange,
           changeWallet,
-          changeMatchRuleList: mergeArray([
+          changeMatchRuleList: merge(
             snapshot(
               (list, subsc) => {
                 const idx = list.indexOf(subsc)
@@ -376,8 +367,8 @@ export const $PortfolioEditorDrawer = ({
               clickRemoveSubsc
             ),
             constant([], clickClose)
-          ]),
-          changeDepositTokenList: mergeArray([changeDepositTokenList, constant([], clickClose)])
+          ),
+          changeDepositTokenList: merge(changeDepositTokenList, constant([], clickClose))
         }
       ]
     }

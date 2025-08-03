@@ -1,24 +1,13 @@
-import { constant, map, mergeArray, never, now, snapshot, switchLatest, tap } from '@most/core'
-import { append, remove } from '@most/prelude'
-import type { Stream } from '@most/types'
+import {  IStream, constant, map, never, now, snapshot, switchLatest, switchMap, tap, type IBehavior , o } from 'aelea/stream'
 import { $caretDown, $infoLabel, $xCross } from '@puppet-copy/middleware/ui-components'
-import {
-  $text,
-  component,
-  type I$Node,
-  type IBehavior,
-  type INode,
-  type INodeCompose,
-  type IOps,
-  nodeEvent,
-  O,
-  style,
-  stylePseudo,
-  switchMap
-} from 'aelea/core'
+import { $text, component, type I$Node, type INode, type INodeCompose, type IOps, nodeEvent, style, stylePseudo } from 'aelea/core'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'
+
+// Array utility functions (previously from @most/prelude)
+const append = <T>(item: T, array: T[]): T[] => [...array, item]
+const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
 
 export const $defaultDropMultiSelectOption = $row(
   spacing.small,
@@ -42,8 +31,8 @@ export const $defaultOptionContainer = $row(
 )
 
 export interface IMultiselectDrop<T> {
-  value: Stream<T[]>
-  optionList: Stream<T[]> | T[]
+  value: IStream<T[]>
+  optionList: IStream<T[]> | T[]
 
   getId?: (item: T) => string | number
   $noneSelected?: I$Node
@@ -96,7 +85,7 @@ export const $DropMultiSelect = <T>({
                   $icon({
                     $content: $xCross,
                     width: '28px',
-                    svgOps: O(
+                    svgOps: o(
                       style({ padding: '4px', cursor: 'pointer' }),
                       pluckTether(
                         nodeEvent('click'),
@@ -127,7 +116,7 @@ export const $DropMultiSelect = <T>({
         select: selectTether()
       }),
       {
-        select: mergeArray([
+        select: merge(
           snapshot(
             (seed, next) => {
               const matchedIndex = getId ? seed.findIndex((item) => getId(item) === getId(next)) : seed.indexOf(next)
@@ -154,7 +143,7 @@ export const $DropMultiSelect = <T>({
             value,
             pluck
           )
-        ])
+        )
         // alert
       }
     ]
