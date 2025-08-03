@@ -1,17 +1,15 @@
-import { multicast, zipArray } from '@most/core'
-import type { Stream } from '@most/types'
-import { replayLatest } from 'aelea/core'
+import { type IStream, multicast, replayLatest, zipArray } from 'aelea/stream'
 
-export function replayState<T>(s: Stream<T>, initialState?: T): Stream<T> {
+export function replayState<T>(s: IStream<T>, initialState?: T): IStream<T> {
   return replayLatest(multicast(s), initialState)
 }
 
 export type StateStream<T> = {
-  [P in keyof T]: Stream<T[P]>
+  [P in keyof T]: IStream<T[P]>
 }
 
-export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>): Stream<A> {
-  const entries = Object.entries(state) as [keyof A, Stream<A[K]>][]
+export function zipState<A, K extends keyof A = keyof A>(state: StateStream<A>): IStream<A> {
+  const entries = Object.entries(state) as [keyof A, IStream<A[K]>][]
   const streams = entries.map(([_, stream]) => stream)
 
   const zipped = zipArray((...arrgs: A[K][]) => {

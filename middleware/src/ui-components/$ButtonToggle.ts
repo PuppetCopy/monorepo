@@ -1,6 +1,3 @@
-import { constant, map, now, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
-import type { IBehavior, IOps } from 'aelea/core'
 import {
   $node,
   $text,
@@ -12,8 +9,11 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
+import { constant, type IBehavior, type IOps, type IStream, map, now, switchLatest } from 'aelea/stream'
 import { $row } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+
+type Stream<T> = IStream<T>
 
 export interface IButtonToggle<T> {
   optionList: T[]

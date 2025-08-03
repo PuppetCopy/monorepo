@@ -1,18 +1,20 @@
-import { empty, filter, map, mergeArray, multicast, scan, snapshot, tap } from '@most/core'
-import { disposeWith } from '@most/disposable'
-import type { Stream } from '@most/types'
+import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/core'
 import {
-  $wrapNativeElement,
   combineState,
-  component,
+  disposeWith,
+  empty,
+  filter,
   fromCallback,
-  type I$Node,
   type IBehavior,
-  type INode,
-  style,
-  styleInline,
-  switchMap
-} from 'aelea/core'
+  type IStream,
+  map,
+  merge,
+  multicast,
+  scan,
+  snapshot,
+  switchMap,
+  tap
+} from 'aelea/stream'
 import { $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
@@ -40,18 +42,18 @@ export type IMarker = SeriesMarker<ISeriesTime> & {}
 export type ISeriesType = SeriesDataItemTypeMap<ISeriesTime>
 
 export interface ICHartAxisChange {
-  coords: Stream<Coordinate | null>
-  isFocused: Stream<boolean>
-  price: Stream<number | null>
+  coords: IStream<Coordinate | null>
+  isFocused: IStream<boolean>
+  price: IStream<number | null>
 }
 
 export interface IChart<TSeriesType extends keyof ISeriesType> {
   chartApi: IChartApi
   series: ISeriesApi<TSeriesType>
 
-  appendData?: Stream<ISeriesType[TSeriesType]>
-  priceLines?: Stream<(Partial<PriceLineOptions> & Pick<PriceLineOptions, 'price'>) | null>[]
-  markers?: Stream<IMarker[]>
+  appendData?: IStream<ISeriesType[TSeriesType]>
+  priceLines?: IStream<(Partial<PriceLineOptions> & Pick<PriceLineOptions, 'price'>) | null>[]
+  markers?: IStream<IMarker[]>
 
   $content?: I$Node
 
@@ -90,7 +92,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
       const timeScale = chartApi.timeScale()
 
-      const visibleLogicalRangeChange: Stream<LogicalRange | null> = multicast(
+      const visibleLogicalRangeChange: IStream<LogicalRange | null> = multicast(
         fromCallback((cb) => {
           timeScale.subscribeVisibleLogicalRangeChange(cb)
           return disposeWith((handler) => timeScale.subscribeVisibleLogicalRangeChange(handler), cb)
@@ -137,15 +139,15 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                     }
                   }, combineState(yAxisState))
                 )
-              )($content || empty())
-            : empty(),
+              )($content || empty)
+            : empty,
 
           ignoreAll(
-            mergeArray([
+            merge(
               switchMap(([containerObserver]) => {
                 chartApi.resize(containerObserver.contentRect.width, containerObserver.contentRect.height)
                 timeScale.fitContent()
-                return empty()
+                return empty
               }, containerDimension),
               appendData
                 ? tap((next) => {
@@ -153,7 +155,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                       series.update(next)
                     }
                   }, appendData)
-                : empty(),
+                : empty,
               ...priceLineConfigList.map((lineStreamConfig) => {
                 return scan(
                   (prev, params) => {
@@ -177,8 +179,8 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
               }),
               tap((next) => {
                 seriesMarkers.setMarkers(next)
-              }, markers || empty())
-            ])
+              }, markers || empty)
+            )
           )
         ),
 
@@ -207,10 +209,10 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
           //         visibleLogicalRangeChange
           //       )
           //     ])
-          //   : empty(),
+          //   : empty,
           focusPrice: yAxisState
             ? filterNull(
-                mergeArray([
+                merge(
                   snapshot(
                     (params, ev) => {
                       if (params.isFocused) {
@@ -233,10 +235,10 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                     combineState(yAxisState),
                     yAxisState.coords
                   )
-                ])
+                )
               )
-            : empty(),
-          isFocused: yAxisState ? snapshot((focused) => !focused, yAxisState.isFocused, click) : empty(),
+            : empty,
+          isFocused: yAxisState ? snapshot((focused) => !focused, yAxisState.isFocused, click) : empty,
           crosshairMove,
           click,
           visibleLogicalRangeChange,

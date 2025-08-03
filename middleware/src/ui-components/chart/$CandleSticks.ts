@@ -1,4 +1,4 @@
-import type { Stream } from '@most/types'
+import type { IStream } from 'aelea/stream'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   CandlestickSeries,
@@ -10,6 +10,8 @@ import {
   LineStyle
 } from 'lightweight-charts'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
+
+type Stream<T> = IStream<T>
 
 export interface ICandlesticksChart {
   data: ISeriesType['Candlestick'][]

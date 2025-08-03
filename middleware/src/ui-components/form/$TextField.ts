@@ -1,20 +1,5 @@
-import { empty, map, startWith } from '@most/core'
-import type { Stream } from '@most/types'
-import {
-  $element,
-  $node,
-  $text,
-  attrBehavior,
-  combineState,
-  component,
-  type IBehavior,
-  type INodeCompose,
-  O,
-  style,
-  stylePseudo,
-  switchMap,
-  toStream
-} from 'aelea/core'
+import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/core'
+import { combineState, empty, type IBehavior, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $Field, type Field } from './$Field.js'
@@ -41,7 +26,7 @@ export const $labelDisplay = $node(
   })
 )
 
-const overideInputStyle = O(
+const overideInputStyle = o(
   style({
     backgroundColor: pallete.background,
     color: pallete.message,
@@ -56,8 +41,8 @@ const overideInputStyle = O(
 
 export interface ITextField extends Field {
   label: string
-  hint?: string | Stream<string>
-  placeholder?: string | Stream<string>
+  hint?: string | IStream<string>
+  placeholder?: string | IStream<string>
 
   $container?: INodeCompose<HTMLLabelElement>
   labelWidth?: number
@@ -70,7 +55,7 @@ export const $FieldLabeled = ({
   labelWidth,
   value,
   $input,
-  validation = empty(),
+  validation = empty,
   $container = $defaultTextFieldContainer
 }: ITextField) =>
   component(([change, sampleValue]: IBehavior<string, string>) => {
@@ -80,7 +65,7 @@ export const $FieldLabeled = ({
           return $node(style({ color: pallete.negative }))($text(params.validation))
         }
 
-        return params.hint ? $node($text(params.hint)) : empty()
+        return params.hint ? $node($text(params.hint)) : empty
       },
       combineState({ validation: startWith(null, validation), hint: toStream(hint) })
     )
@@ -89,7 +74,7 @@ export const $FieldLabeled = ({
       $container(
         $row(spacing.small, style({ width: '100%' }))(
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
-          O(
+          o(
             attrBehavior(map((placeholder) => ({ placeholder }), toStream(placeholder))),
             overideInputStyle
           )(

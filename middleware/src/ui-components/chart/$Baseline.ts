@@ -1,4 +1,4 @@
-import type { Stream } from '@most/types'
+import type { IStream } from 'aelea/stream'
 import { pallete } from 'aelea/ui-components-theme'
 import {
   type BarPrice,
@@ -11,6 +11,8 @@ import {
 } from 'lightweight-charts'
 import { readableUnitAmount } from '../../core/readable.js'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
+
+type Stream<T> = IStream<T>
 
 export interface IBaselineChart {
   baselineOptions?: BaselineSeriesPartialOptions

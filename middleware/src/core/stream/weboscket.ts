@@ -1,29 +1,26 @@
-import { empty, tap } from '@most/core'
-import { disposeBoth, disposeWith } from '@most/disposable'
-import type { Stream } from '@most/types'
-import { nullSink } from 'aelea/core'
+import { disposeBoth, disposeWith, empty, type IStream, nullSink, tap } from 'aelea/stream'
 
 export function fromWebsocket<OUTPUT, INPUT>(
   url: string,
-  input: Stream<INPUT> = empty(),
+  input: IStream<INPUT> = empty,
   protocols: string | string[] | undefined = undefined
-): Stream<OUTPUT> {
+): IStream<OUTPUT> {
   return {
-    run(sink, scheduler) {
+    run(scheduler, sink) {
       let socket: WebSocket | null = new WebSocket(url, protocols)
       const messageBuffer: INPUT[] = []
 
       const onError = (error: Event) => {
         const errorMsg = error instanceof ErrorEvent ? error.message : 'WebSocket connection error'
-        sink.error(scheduler.currentTime(), new Error(`WebSocket error: ${errorMsg}`))
+        sink.error(new Error(`WebSocket error: ${errorMsg}`))
       }
 
       const onMessage = (msg: MessageEvent) => {
         try {
           const data = JSON.parse(msg.data)
-          sink.event(scheduler.currentTime(), data)
+          sink.event(data)
         } catch (parseError) {
-          sink.error(scheduler.currentTime(), new Error(`JSON parse error: ${parseError}`))
+          sink.error(new Error(`JSON parse error: ${parseError}`))
         }
       }
 
@@ -50,7 +47,7 @@ export function fromWebsocket<OUTPUT, INPUT>(
       const onClose = () => {
         if (!isCleanedUp) {
           cleanup()
-          sink.end(scheduler.currentTime())
+          sink.end()
         }
       }
 
@@ -85,14 +82,14 @@ export function fromWebsocket<OUTPUT, INPUT>(
         } else if (socket && socket.readyState === WebSocket.CONNECTING) {
           messageBuffer.push(value)
         }
-      }, input).run(nullSink, scheduler)
+      }, input).run(scheduler, nullSink)
 
       const disposeSocket = disposeWith(() => {
         cleanup()
         if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
           socket.close()
         }
-      }, {})
+      })
 
       return disposeBoth(disposeSocket, sendInputEffect)
     }

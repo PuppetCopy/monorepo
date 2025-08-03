@@ -1,7 +1,7 @@
-import type { Stream } from '@most/types'
 import type { Address } from 'abitype'
+import type { IStream } from 'aelea/stream'
 
-export type InferStream<T> = T extends Stream<infer U> ? U : T
+export type InferStream<T> = T extends IStream<infer U> ? U : T
 
 export interface IRequestPagePositionApi {
   offset: number

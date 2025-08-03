@@ -1,5 +1,4 @@
-import { map, multicast } from '@most/core'
-import { replayLatest } from 'aelea/core'
+import { map, multicast, replayLatest } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'

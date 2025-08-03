@@ -1,4 +1,4 @@
-import { curry2 } from '@most/prelude'
+import { curry2 } from 'aelea/stream'
 import { BASIS_POINTS_DIVISOR } from '../const/common.js'
 import { formatFixed } from './parse.js'
 import type { ITokenDescription } from './types.js'

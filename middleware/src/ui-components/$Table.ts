@@ -1,5 +1,3 @@
-import { constant, empty, map, now, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $node,
   $svg,
@@ -7,13 +5,12 @@ import {
   component,
   type I$Node,
   type I$Slottable,
-  type IBehavior,
   type INode,
   type INodeCompose,
-  type IOps,
   nodeEvent,
   style
 } from 'aelea/core'
+import { constant, empty, type IBehavior, type IOps, type IStream, map, now, switchLatest } from 'aelea/stream'
 import { $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
@@ -25,7 +22,7 @@ export type TablePageResponse<T> = IQuantumScrollPage & {
 export interface TableOption<T> {
   columns: TableColumn<T>[]
   gridTemplateColumns?: string
-  dataSource: Stream<TablePageResponse<T> | T[]>
+  dataSource: IStream<TablePageResponse<T> | T[]>
 
   $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
@@ -95,7 +92,7 @@ export const $Table = <T>({
   $rowContainer = $defaultTableRowContainer,
 
   sortBy,
-  $between = empty(),
+  $between = empty,
   $sortArrowDown = $caretDown
 }: TableOption<T>) =>
   component(
@@ -144,7 +141,7 @@ export const $Table = <T>({
                       viewBox: '0 0 32 19.43'
                     })
                   )
-                : empty()
+                : empty
             )
           }
 

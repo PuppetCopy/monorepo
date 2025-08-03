@@ -1,14 +1,37 @@
-import { continueWith, filter, fromPromise, map, now, periodic, takeWhile } from '@most/core'
-import { disposeNone, disposeWith } from '@most/disposable'
-import { currentTime } from '@most/scheduler'
-import type { Disposable, Scheduler, Sink, Stream, Time } from '@most/types'
+import type { IScheduler, ISink, IStream } from 'aelea/stream'
+import { continueWith, disposeNone, disposeWith, filter, fromPromise, map, now, periodic } from 'aelea/stream'
 import { countdownFn, unixTimestampNow } from '../date.js'
 
-export type StateParams<T> = {
-  [P in keyof T]: Stream<T[P]> | T[P]
+// Custom implementation of takeWhile since it's not in aelea/stream
+function takeWhile<T>(predicate: (value: T) => boolean, stream: IStream<T>): IStream<T> {
+  return {
+    run(scheduler, sink) {
+      let active = true
+      return stream.run(scheduler, {
+        event(value) {
+          if (active && predicate(value)) {
+            sink.event(value)
+          } else {
+            active = false
+            sink.end()
+          }
+        },
+        error(err) {
+          sink.error(err)
+        },
+        end() {
+          sink.end()
+        }
+      })
+    }
+  }
 }
 
-export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
+export type StateParams<T> = {
+  [P in keyof T]: IStream<T[P]> | T[P]
+}
+
+export function takeUntilLast<T>(fn: (t: T) => boolean, s: IStream<T>) {
   let last: T
 
   return continueWith(
@@ -21,25 +44,25 @@ export function takeUntilLast<T>(fn: (t: T) => boolean, s: Stream<T>) {
   )
 }
 
-export const filterNull = <T>(prov: Stream<T | null>) => filter((ev): ev is T => ev !== null, prov)
+export const filterNull = <T>(prov: IStream<T | null>) => filter((ev): ev is T => ev !== null, prov)
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 
-export function importGlobal<T>(queryCb: () => Promise<T>): Stream<T> {
+export function importGlobal<T>(queryCb: () => Promise<T>): IStream<T> {
   let cacheQuery: Promise<T> | null = null
 
   return {
-    run(sink, scheduler) {
+    run(scheduler, sink) {
       if (cacheQuery === null) {
         cacheQuery = queryCb()
       }
 
       cacheQuery
         .then((res) => {
-          sink.event(scheduler.currentTime(), res)
+          sink.event(res)
         })
         .catch((err) => {
-          sink.error(scheduler.currentTime(), err as Error)
+          sink.error(err as Error)
         })
 
       return disposeNone()
@@ -47,7 +70,7 @@ export function importGlobal<T>(queryCb: () => Promise<T>): Stream<T> {
   }
 }
 
-export const everySec = map(unixTimestampNow, periodic(1000))
+export const everySec = map(unixTimestampNow, periodic(1000, null))
 
 export const countdown = (targetDate: number) => {
   return map((now) => countdownFn(targetDate, now), everySec)
@@ -66,30 +89,27 @@ export type PromiseStatePending = { status: PromiseStatus.PENDING }
 export type PromiseStateError = { status: PromiseStatus.ERROR; error: Error }
 export type PromiseState<T> = PromiseStateDone<T> | PromiseStatePending | PromiseStateError
 
-export const promiseState = <T>(querySrc: Stream<Promise<T>>): Stream<PromiseState<T>> => {
+export const promiseState = <T>(querySrc: IStream<Promise<T>>): IStream<PromiseState<T>> => {
   return {
-    run(sink, scheduler) {
-      return querySrc.run(new PromiseStateSink(sink, scheduler), scheduler)
+    run(scheduler, sink) {
+      return querySrc.run(scheduler, new PromiseStateSink(sink))
     }
   }
 }
 
-class PromiseStateSink<T> implements Sink<Promise<T>> {
+class PromiseStateSink<T> implements ISink<Promise<T>> {
   private latestPromiseId = 0
   private isPending = false
   private isEnded = false
 
-  constructor(
-    private readonly sink: Sink<PromiseState<T>>,
-    private readonly scheduler: Scheduler
-  ) {}
+  constructor(private readonly sink: ISink<PromiseState<T>>) {}
 
-  event(_t: Time, promise: Promise<T>): void {
+  event(promise: Promise<T>): void {
     const promiseId = ++this.latestPromiseId
 
     if (!this.isPending) {
       this.isPending = true
-      this.sink.event(currentTime(this.scheduler), { status: PromiseStatus.PENDING })
+      this.sink.event({ status: PromiseStatus.PENDING })
     }
 
     promise.then(
@@ -107,107 +127,123 @@ class PromiseStateSink<T> implements Sink<Promise<T>> {
     if (this.isEnded || promiseId !== this.latestPromiseId) return
 
     this.isPending = false
-    this.sink.event(currentTime(this.scheduler), state)
+    this.sink.event(state)
   }
 
   end(): void {
     this.isEnded = true
-    this.sink.end(currentTime(this.scheduler))
+    this.sink.end()
   }
 
-  error(_t: Time, e: Error): void {
-    this.sink.error(currentTime(this.scheduler), e)
+  error(e: unknown): void {
+    this.sink.error(e)
   }
 }
 
-export function flattenEvents<T>(source: Stream<T[]>): Stream<T> {
+export function flattenEvents<T>(source: IStream<T[]>): IStream<T> {
   return {
-    run(sink, scheduler) {
-      return source.run(
-        {
-          event: (time, items) => {
-            if (!Array.isArray(items)) {
-              sink.error(time, new Error(`flattenEvents: expected array but got ${typeof items}`))
-              return
-            }
+    run(scheduler, sink) {
+      return source.run(scheduler, {
+        event: (items) => {
+          if (!Array.isArray(items)) {
+            sink.error(new Error(`flattenEvents: expected array but got ${typeof items}`))
+            return
+          }
 
-            for (const item of items) {
-              sink.event(time, item)
-            }
-          },
-          error: (time, error) => sink.error(time, error), // Use original time
-          end: (time) => sink.end(time)
+          for (const item of items) {
+            sink.event(item)
+          }
         },
-        scheduler
-      )
+        error: (error) => sink.error(error),
+        end: () => sink.end()
+      })
     }
   }
 }
 
-export function bufferEvents<T>(source: Stream<T>, period = 1000): Stream<readonly T[]> {
+export function bufferEvents<T>(
+  source: IStream<T>,
+  period = 1000,
+  maxSize = Number.POSITIVE_INFINITY
+): IStream<readonly T[]> {
   if (period <= 0) {
     throw new Error('Buffer period must be positive')
   }
+  if (maxSize <= 0) {
+    throw new Error('Max buffer size must be positive')
+  }
 
   return {
-    run(sink, scheduler) {
+    run(scheduler, sink) {
       let buffer: T[] = []
-      let lastEmitTime: number | null = null // Don't initialize until first event
+      let nextEmitTime: number | null = null
 
-      const onEvent = (time: number, event: T) => {
+      const emitBuffer = (time: number) => {
+        if (buffer.length > 0) {
+          sink.event(buffer)
+          buffer = []
+        }
+        nextEmitTime = time + period
+      }
+
+      const onEvent = (event: T) => {
+        const time = scheduler.time()
+        // Initialize timing on first event
+        if (nextEmitTime === null) {
+          nextEmitTime = time + period
+        }
+
         buffer.push(event)
 
-        if (lastEmitTime === null || time - lastEmitTime >= period) {
-          const bufferToEmit = buffer
-          buffer = []
-          lastEmitTime = time
-          sink.event(time, bufferToEmit)
+        // Emit if period elapsed or buffer full
+        if (time >= nextEmitTime || buffer.length >= maxSize) {
+          emitBuffer(time)
         }
       }
 
-      const onError = (time: number, error: Error) => sink.error(time, error)
+      const onError = (error: unknown) => sink.error(error)
 
-      const onEnd = (time: number) => {
+      const onEnd = () => {
         if (buffer.length > 0) {
-          sink.event(time, buffer)
+          sink.event(buffer)
         }
-        sink.end(time)
+        sink.end()
       }
 
-      const disposable = source.run({ event: onEvent, error: onError, end: onEnd }, scheduler)
+      const disposable = source.run(scheduler, { event: onEvent, error: onError, end: onEnd })
 
       return disposeWith(() => {
         buffer = []
         disposable.dispose()
-      }, disposable)
+      })
     }
   }
 }
 
-export type Adapter<A, B> = [(event: A) => void, Stream<B>]
+export type Adapter<A, B> = [(event: A) => void, IStream<B>]
 
 export const createAdapter = <A>(): Adapter<A, A> => {
-  const sinks: { sink: Sink<A>; scheduler: Scheduler }[] = []
+  const sinks: { sink: ISink<A>; scheduler: IScheduler }[] = []
   return [(a) => broadcast(sinks, a), new FanoutPortStream(sinks)]
 }
 
-const broadcast = <A>(sinks: { sink: Sink<A>; scheduler: Scheduler }[], a: A): void =>
-  sinks.slice().forEach(({ sink, scheduler }) => tryEvent(scheduler.currentTime(), a, sink))
+const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A): void =>
+  sinks.slice().forEach(({ sink }) => tryEvent(a, sink))
 
 export class FanoutPortStream<A> {
-  constructor(private readonly sinks: { sink: Sink<A>; scheduler: Scheduler }[]) {}
+  constructor(private readonly sinks: { sink: ISink<A>; scheduler: IScheduler }[]) {}
 
-  run(sink: Sink<A>, scheduler: Scheduler): Disposable {
+  run(scheduler: IScheduler, sink: ISink<A>): { dispose(): void } {
     const s = { sink, scheduler }
     this.sinks.push(s)
     return new RemovePortDisposable(s, this.sinks)
   }
 }
 
-export class RemovePortDisposable<A> implements Disposable {
+export class RemovePortDisposable<A> {
   constructor(
-    private readonly sink: { sink: Sink<A>; scheduler: Scheduler },
-    private readonly sinks: { sink: Sink<A>; scheduler: Scheduler }[]
+    private readonly sink: { sink: ISink<A>; scheduler: IScheduler },
+    private readonly sinks: { sink: ISink<A>; scheduler: IScheduler }[]
   ) {}
 
   dispose() {
@@ -218,10 +254,10 @@ export class RemovePortDisposable<A> implements Disposable {
   }
 }
 
-function tryEvent<A>(t: Time, a: A, sink: Sink<A>) {
+function tryEvent<A>(a: A, sink: ISink<A>) {
   try {
-    sink.event(t, a)
+    sink.event(a)
   } catch (e) {
-    sink.error(t, e as Error)
+    sink.error(e as Error)
   }
 }

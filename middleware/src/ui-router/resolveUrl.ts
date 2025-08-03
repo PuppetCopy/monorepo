@@ -1,10 +1,8 @@
-import { constant, filter, join, map, skipRepeatsWith, switchLatest, tap, until } from '@most/core'
-import type { Stream } from '@most/types'
-import { O } from 'aelea/core'
+import { constant, filter, type IStream, join, map, o, skipRepeatsWith, switchLatest, tap, until } from 'aelea/stream'
 import type { Fragment, Path, PathEvent, Route, RouteConfig } from './types.js'
 
 type RootRouteConfig = RouteConfig & {
-  fragmentsChange: Stream<PathEvent>
+  fragmentsChange: IStream<PathEvent>
 }
 
 export const create = ({ fragment = '', fragmentsChange, title }: RootRouteConfig) => {
@@ -15,25 +13,25 @@ export const create = ({ fragment = '', fragmentsChange, title }: RootRouteConfi
   return resolveRoute(ignoreRepeatPathChanges, [])({ fragment, title })
 }
 
-function resolveRoute(pathChange: Stream<PathEvent>, parentFragments: Fragment[]) {
+function resolveRoute(pathChange: IStream<PathEvent>, parentFragments: Fragment[]) {
   return ({ fragment, title }: RouteConfig): Route => {
     const fragments = [...parentFragments, fragment]
     const fragIdx = parentFragments.length
 
-    const diff = O(
+    const diff = o(
       skipRepeatsWith((prev: PathEvent, next: PathEvent) => {
         return next[fragIdx] === prev[fragIdx]
       })
     )
 
-    const contains = O(
+    const contains = o(
       diff,
       filter((next) => {
         return isMatched(fragment, next[fragIdx])
       })
     )
 
-    const match = O(
+    const match = o(
       map((evt: PathEvent) => {
         if (evt.length !== fragments.length) {
           return false
@@ -50,7 +48,7 @@ function resolveRoute(pathChange: Stream<PathEvent>, parentFragments: Fragment[]
       })
     )
 
-    const miss = O(
+    const miss = o(
       diff,
       filter((next) => !isMatched(fragment, next[fragIdx]))
     )
@@ -74,13 +72,13 @@ export function isMatched(frag: Fragment, path: Path) {
 
 export const contains =
   <T>(route: Route) =>
-  (ns: Stream<T>) => {
+  (ns: IStream<T>) => {
     return switchLatest(constant(until(route.miss, ns), route.contains))
   }
 
 export const match =
   <T>(route: Route) =>
-  (ns: Stream<T>) => {
+  (ns: IStream<T>) => {
     const exactMatch = filter((isMatch) => isMatch, route.match)
     const unmatch = filter((isMatch) => !isMatch, route.match)
 

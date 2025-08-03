@@ -1,6 +1,5 @@
-import { disposeWith } from '@most/disposable'
-import type { Stream } from '@most/types'
 import type { Abi } from 'abitype'
+import { disposeWith, type IStream } from 'aelea/stream'
 import type {
   ContractEventName,
   PublicClient,
@@ -17,22 +16,22 @@ export const watchContractEvent = <
 >(
   client: PublicClient,
   params: Omit<WatchContractEventParameters<abi, eventName, strict, transport>, 'onLogs' | 'onError'>
-): Stream<WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>> => {
+): IStream<WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>> => {
   return {
-    run(sink, scheduler) {
+    run(scheduler, sink) {
       const removeListenerFn = client.watchContractEvent({
         ...params,
         onLogs: (
           logList: WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>
         ) => {
-          sink.event(scheduler.currentTime(), logList)
+          sink.event(logList)
         },
         onError: (err: Error) => {
-          sink.error(scheduler.currentTime(), err)
+          sink.error(err)
         }
       } as any) // Type assertion needed due to Viem's complex transport constraints
 
-      return disposeWith(removeListenerFn, null)
+      return disposeWith(removeListenerFn)
     }
   }
 }

@@ -1,5 +1,3 @@
-import { constant, empty, map, skip, skipRepeats, startWith, switchLatest, zip } from '@most/core'
-import type { IBehavior } from 'aelea/core'
 import {
   component,
   eventElementTarget,
@@ -8,9 +6,20 @@ import {
   type INodeCompose,
   nodeEvent,
   style,
-  styleInline,
-  switchMap
+  styleInline
 } from 'aelea/core'
+import {
+  constant,
+  empty,
+  type IBehavior,
+  map,
+  skip,
+  skipRepeats,
+  startWith,
+  switchLatest,
+  switchMap,
+  zip
+} from 'aelea/stream'
 import { $column, $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -80,7 +89,7 @@ export const $Tooltip = ({
           style({ cursor: 'help' })($anchor),
           switchMap((show) => {
             if (!show) {
-              return empty()
+              return empty
             }
 
             return $row(

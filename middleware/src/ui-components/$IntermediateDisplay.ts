@@ -1,6 +1,19 @@
-import { constant, empty, fromPromise, map, multicast, now, startWith, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
-import { $node, $text, type Fn, type I$Node, type IOps, replayLatest, style, switchMap } from 'aelea/core'
+import { $node, $text, type I$Node, style } from 'aelea/core'
+import {
+  constant,
+  empty,
+  type Fn,
+  fromPromise,
+  type IOps,
+  type IStream,
+  map,
+  multicast,
+  now,
+  replayLatest,
+  startWith,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
@@ -16,8 +29,8 @@ export const $spinner = $node(
 )($text('Loading...'))
 
 export interface I$IntermediatPromise<_T> {
-  clean?: Stream<any>
-  $display: Stream<Promise<I$Node>>
+  clean?: IStream<any>
+  $display: IStream<Promise<I$Node>>
   $$fail?: Fn<Error, I$Node>
 
   $loader?: I$Node
@@ -43,15 +56,15 @@ export const $intermediatePromise = <T>({
 type IIntermediateTx<TSuccess extends TransactionReceipt> = {
   $$success?: IOps<TSuccess, I$Node>
   chain: Chain
-  query: Stream<Promise<TSuccess>>
-  clean?: Stream<any>
+  query: IStream<Promise<TSuccess>>
+  clean?: IStream<any>
   showTooltip?: boolean
 }
 
 export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
   query,
   chain,
-  clean = empty(),
+  clean = empty,
   $$success = constant($node(style({ color: pallete.positive }))($text('Transaction confirmed'))),
   showTooltip = false
 }: IIntermediateTx<TSuccess>) => {

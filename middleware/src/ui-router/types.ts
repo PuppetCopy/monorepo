@@ -1,4 +1,4 @@
-import type { Stream } from '@most/types'
+import type { IStream } from 'aelea/stream'
 
 export type Path = string
 export type Fragment = string | RegExp
@@ -7,9 +7,9 @@ export type PathEvent = Path[]
 
 export type Route = {
   create: (newPath: RouteConfig) => Route
-  contains: Stream<PathEvent>
-  match: Stream<boolean>
-  miss: Stream<PathEvent>
+  contains: IStream<PathEvent>
+  match: IStream<boolean>
+  miss: IStream<PathEvent>
   fragments: Fragment[]
 }
 

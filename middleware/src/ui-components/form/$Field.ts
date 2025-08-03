@@ -1,18 +1,16 @@
-import { empty, map, merge, mergeArray, now, startWith } from '@most/core'
-import type { Stream } from '@most/types'
+import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/core'
 import {
-  $element,
   combineState,
-  component,
+  empty,
   type IBehavior,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  O,
-  style,
-  styleBehavior,
+  type IStream,
+  map,
+  merge,
+  now,
+  o,
+  startWith,
   switchMap
-} from 'aelea/core'
+} from 'aelea/stream'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { filterNull } from '../../core/stream/stream.js'
@@ -34,18 +32,18 @@ export declare enum InputType {
   HIDDEN = 'hidden'
 }
 export interface Control {
-  disabled?: Stream<boolean>
+  disabled?: IStream<boolean>
 }
 export interface Input<T> extends Control {
-  value: Stream<T>
-  validation?: Stream<string | null>
+  value: IStream<T>
+  validation?: IStream<string | null>
 }
 
 export interface Field extends Optional<Input<string>, 'value'> {
   $input?: INodeCompose<HTMLInputElement>
 }
 
-export const $Field = ({ value = empty(), disabled, validation = empty(), $input = $element('input') }: Field) =>
+export const $Field = ({ value = empty, disabled, validation = empty, $input = $element('input') }: Field) =>
   component(
     (
       [focusStyle, interactionTether]: IBehavior<INode, true>,
@@ -72,19 +70,20 @@ export const $Field = ({ value = empty(), disabled, validation = empty(), $input
           ),
 
           styleBehavior(
-            mergeArray([
-              startWith(
-                { opacity: '.5' },
-                map(() => ({ opacity: '' }), value)
-              ),
-              map((params) => {
-                if (params.validation) {
-                  return { borderBottom: `2px solid ${pallete.negative}` }
-                }
+            map((params) => {
+              const hasValue = params.value
+              const opacity = hasValue ? '' : '.5'
 
-                return params.focus ? { borderBottom: `2px solid ${pallete.primary}` } : null
-              }, state)
-            ])
+              if (params.validation) {
+                return { opacity, borderBottom: `2px solid ${pallete.negative}` }
+              }
+
+              if (params.focus) {
+                return { opacity, borderBottom: `2px solid ${pallete.primary}` }
+              }
+
+              return { opacity }
+            }, combineState({ value, focus, validation }))
           ),
 
           interactionTether(interactionOp),
@@ -100,7 +99,7 @@ export const $Field = ({ value = empty(), disabled, validation = empty(), $input
                   startWith(true, disabled)
                 )
               )
-            : O(),
+            : o(),
 
           switchMap((node) =>
             merge(

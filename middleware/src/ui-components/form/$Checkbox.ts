@@ -1,5 +1,3 @@
-import { empty, map, mergeArray, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $element,
   $node,
@@ -7,20 +5,19 @@ import {
   attr,
   attrBehavior,
   component,
-  type IBehavior,
   type INode,
   nodeEvent,
-  O,
   style,
   styleBehavior
 } from 'aelea/core'
+import { empty, type IBehavior, type IStream, map, merge, o, startWith } from 'aelea/stream'
 import { type Input, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $label } from '../$common.js'
 import { dismissOp, interactionOp } from './common.js'
 
 export interface Checkbox extends Input<boolean> {
-  label?: string | Stream<string>
+  label?: string | IStream<string>
 }
 
 export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
@@ -60,19 +57,16 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
                   startWith(true, disabled)
                 )
               )
-            : O()
+            : o()
         )(
           $node(
             styleBehavior(
-              map(
-                (active) => (active ? { borderColor: pallete.primary } : null),
-                mergeArray([focusStyle, dismissstyle])
-              )
+              map((active) => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
             ),
             style({ position: 'relative', width: '18px', height: '18px', border: `2px solid ${pallete.message}` })
           )($overlay(), $checkInput()),
 
-          label ? $text(label) : empty()
+          label ? $text(label) : empty
         ),
         { check }
       ]

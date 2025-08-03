@@ -1,24 +1,31 @@
-import { empty, fromPromise, map, now, skipRepeats, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $element,
   $node,
   $svg,
   $text,
   attr,
-  combineState,
   type I$Node,
   type I$Slottable,
   type I$Text,
   type INode,
-  type IOps,
-  isStream,
-  O,
   style,
   styleBehavior,
-  stylePseudo,
-  switchMap
+  stylePseudo
 } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  fromPromise,
+  type IOps,
+  type IStream,
+  isStream,
+  map,
+  now,
+  o,
+  skipRepeats,
+  startWith,
+  switchMap
+} from 'aelea/stream'
 import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
@@ -191,7 +198,7 @@ export const $infoLabeledValue = (label: string | I$Slottable, value: string | I
 }
 
 export const $infoTooltipLabel = (text: string | I$Slottable, label?: string | I$Slottable) => {
-  return $row(style({ alignItems: 'center' }))(label ? $infoLabel($fromText(label)) : empty(), $infoTooltip(text))
+  return $row(style({ alignItems: 'center' }))(label ? $infoLabel($fromText(label)) : empty, $infoTooltip(text))
 }
 
 export const $infoTooltip = (text: string | I$Slottable, color = pallete.foreground, size = '24px') => {
@@ -225,7 +232,7 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ fontSize: '.8rem', color: pallete.foreground }))($text(token.symbol))
     ),
-    $label ? $elipsisTextWrapper($label) : empty()
+    $label ? $elipsisTextWrapper($label) : empty
   )
 }
 
@@ -240,7 +247,7 @@ export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Slot
       $node(style({ fontWeight: 'bold' }))($text(token.symbol)),
       $node(style({ color: pallete.foreground }))($text(token.name))
     ),
-    $label ? $elipsisTextWrapper($label) : empty()
+    $label ? $elipsisTextWrapper($label) : empty
   )
 }
 
@@ -251,9 +258,9 @@ export function $txHashRef(txHash: string, chain: Chain = arbitrum) {
 }
 
 interface IHintAdjustment {
-  color?: Stream<string>
+  color?: IStream<string>
   $val: I$Slottable | string
-  change: Stream<string>
+  change: IStream<string>
 }
 
 interface ILabeledHintAdjustment extends IHintAdjustment {
@@ -288,7 +295,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
 
 export const $labeledhintAdjustment = ({ change, color, $val, label, tooltip }: ILabeledHintAdjustment) => {
   return $row(spacing.small, style({ alignItems: 'center' }))(
-    tooltip ? $infoTooltipLabel(tooltip, label) : label ? $infoLabel($fromText(label)) : empty(),
+    tooltip ? $infoTooltipLabel(tooltip, label) : label ? $infoLabel($fromText(label)) : empty,
 
     $hintAdjustment({ change, color, $val })
   )
@@ -305,14 +312,14 @@ interface Icon {
   svgOps?: IOps<INode<SVGSVGElement>, INode<SVGSVGElement>>
 }
 
-export const $icon = ({ $content, width = '24px', viewBox = '0 0 32 32', fill = 'inherit', svgOps = O() }: Icon) =>
+export const $icon = ({ $content, width = '24px', viewBox = '0 0 32 32', fill = 'inherit', svgOps = o() }: Icon) =>
   $svg('svg')(attr({ viewBox, fill }), style({ width, aspectRatio: '1 /1' }), svgOps)($content)
 
-export const $intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): I$Slottable => {
+export const $intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'): I$Slottable => {
   return $text(intermediateText(querySrc, hint))
 }
 
-export const intermediateText = (querySrc: Stream<Promise<string>>, hint = '-'): Stream<string> => {
+export const intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'): IStream<string> => {
   const text = switchMap((res) => {
     return startWith(hint, fromPromise(res))
   }, querySrc)

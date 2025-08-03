@@ -1,22 +1,11 @@
-import { empty, map } from '@most/core'
-import type { Stream } from '@most/types'
-import {
-  $element,
-  combineArray,
-  component,
-  type I$Node,
-  type IBehavior,
-  type IStyleCSS,
-  O,
-  style,
-  styleBehavior
-} from 'aelea/core'
+import { $element, component, type I$Node, type IStyleCSS, style, styleBehavior } from 'aelea/core'
 import { $RouterAnchor, type IAnchor } from 'aelea/router'
+import { combine, empty, type IBehavior, type IStream, map, o } from 'aelea/stream'
 import { pallete } from 'aelea/ui-components-theme'
 
 export interface ILink extends Omit<IAnchor, '$anchor'> {
   $content: I$Node<HTMLAnchorElement>
-  disabled?: Stream<boolean>
+  disabled?: IStream<boolean>
 }
 
 const $anchor = $element('a')(
@@ -27,7 +16,7 @@ const $anchor = $element('a')(
   })
 )
 
-export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: ILink) =>
+export const $Link = ({ url, route, $content, anchorOp, disabled = empty }: ILink) =>
   component(
     (
       [click, clickTether]: IBehavior<string, string>,
@@ -36,7 +25,7 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: IL
     ) => {
       const $anchorEl = $anchor(
         styleBehavior(
-          combineArray(
+          combine(
             (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? { color: `${pallete.message} !important`, fill: pallete.message, cursor: 'default' }
@@ -52,7 +41,7 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: IL
       )($content)
 
       return [
-        $RouterAnchor({ $anchor: $anchorEl, url, route, anchorOp: O(anchorOp || O(), style({ padding: 0 })) })({
+        $RouterAnchor({ $anchor: $anchorEl, url, route, anchorOp: o(anchorOp || o(), style({ padding: 0 })) })({
           click: clickTether(),
           focus: focusTether(),
           contains: containsTether()
@@ -66,8 +55,8 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty() }: IL
 export const $AnchorLink = (config: ILink) => {
   return $Link({
     ...config,
-    anchorOp: O(
-      config.anchorOp || O(),
+    anchorOp: o(
+      config.anchorOp || o(),
       style({ textDecoration: 'underline', minWidth: 0, textDecorationColor: pallete.primary })
     )
   })

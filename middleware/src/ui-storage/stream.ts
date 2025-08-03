@@ -1,5 +1,27 @@
-import { awaitPromises, continueWith, debounce, map, now } from '@most/core'
-import type { Stream } from '@most/types'
+import { continueWith, debounce, type IStream, map, now } from 'aelea/stream'
+
+// Custom implementation of awaitPromises since it's not in aelea/stream
+function awaitPromises<T>(stream: IStream<Promise<T>>): IStream<T> {
+  return {
+    run(scheduler, sink) {
+      return stream.run(scheduler, {
+        event(promise) {
+          promise.then(
+            (value) => sink.event(value),
+            (error) => sink.error(error)
+          )
+        },
+        error(err) {
+          sink.error(err)
+        },
+        end() {
+          sink.end()
+        }
+      })
+    }
+  }
+}
+
 import * as indexDB from './storage.js'
 import { openDatabase } from './storage.js'
 
@@ -32,9 +54,9 @@ export const createStoreDefinition = <T, TDefinition extends { [P in keyof T]: i
 
 export function write<TSchema, TKey extends indexDB.GetKey<TSchema>, TData extends TSchema[TKey]>(
   params: indexDB.IStoreDefinition<TSchema>,
-  writeEvent: Stream<TData>,
+  writeEvent: IStream<TData>,
   key: TKey
-): Stream<TData> {
+): IStream<TData> {
   const debouncedWrite = debounce(100, writeEvent)
   return map((data) => {
     indexDB.set(params, key, data)
@@ -44,9 +66,9 @@ export function write<TSchema, TKey extends indexDB.GetKey<TSchema>, TData exten
 
 export function replayWrite<TSchema, TKey extends indexDB.GetKey<TSchema>, TReturn extends TSchema[TKey]>(
   params: indexDB.IStoreDefinition<TSchema>,
-  writeEvent: Stream<TReturn>,
+  writeEvent: IStream<TReturn>,
   key: TKey
-): Stream<TReturn> {
+): IStream<TReturn> {
   const storedValue = awaitPromises(map(() => indexDB.get(params, key), now(null)))
   const writeSrc = write(params, writeEvent, key)
 
