@@ -1,4 +1,3 @@
-import {  IStream, constant, filterNull, map, merge, multicast, now, replayLatest, switchMap, take, tap, type IBehavior , behavior } from 'aelea/stream'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   ETH_ADDRESS_REGEXP,
@@ -16,6 +15,20 @@ import {
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import { $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
+import {
+  constant,
+  filterNull,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  multicast,
+  now,
+  replayLatest,
+  switchMap,
+  take,
+  tap
+} from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'

@@ -1,4 +1,3 @@
-import { IStream, combineState, fromPromise, map, multicast, replayLatest, startWith, switchMap, type IBehavior } from 'aelea/stream'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   getDebankProfileUrl,
@@ -22,6 +21,17 @@ import {
 } from '@puppet-copy/middleware/ui-components'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, component, style } from 'aelea/core'
+import {
+  combineState,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  map,
+  multicast,
+  replayLatest,
+  startWith,
+  switchMap
+} from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
@@ -271,21 +281,24 @@ export const $TraderPage = ({
                   return $column(
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
-                    switchMap((list) => {
-                      return $RouteEditor({
-                        displayCollateralTokenSymbol: true,
-                        collateralToken: routeMetric.collateralToken,
-                        traderMatchedPuppetList: routeMetric.matchedPuppetList,
-                        userMatchingRuleList: [],
-                        draftMatchingRuleList,
-                        trader: routeMetric.account,
-                        $container: $defaultTraderMatchRouteEditorContainer(
-                          style({ marginLeft: '-12px', paddingBottom: '12px' })
-                        )
-                      })({
-                        changeMatchRuleList: changeMatchRuleListTether()
-                      })
-                    }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)),
+                    switchMap(
+                      (list) => {
+                        return $RouteEditor({
+                          displayCollateralTokenSymbol: true,
+                          collateralToken: routeMetric.collateralToken,
+                          traderMatchedPuppetList: routeMetric.matchedPuppetList,
+                          userMatchingRuleList: [],
+                          draftMatchingRuleList,
+                          trader: routeMetric.account,
+                          $container: $defaultTraderMatchRouteEditorContainer(
+                            style({ marginLeft: '-12px', paddingBottom: '12px' })
+                          )
+                        })({
+                          changeMatchRuleList: changeMatchRuleListTether()
+                        })
+                      },
+                      switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                    ),
                     $row(
                       style({ marginRight: '26px' })($seperator2),
                       $Table({

@@ -1,6 +1,19 @@
-import {  IStream, combineState, join, map, now, snapshot, type IBehavior, until , behavior } from 'aelea/stream'
 import { invertColor } from '@puppet-copy/middleware/core'
-import { $node, $text, component, drawLatest, eventElementTarget, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior, styleInline } from 'aelea/core'
+import {
+  $node,
+  $text,
+  component,
+  drawLatest,
+  eventElementTarget,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleBehavior,
+  styleInline
+} from 'aelea/core'
+import { combineState, type IBehavior, type IStream, join, map, now, snapshot, until } from 'aelea/stream'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

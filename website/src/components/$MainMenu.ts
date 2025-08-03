@@ -1,7 +1,19 @@
-import { constant, empty, startWith, type IBehavior, o, behavior, zipArray } from 'aelea/stream'
 import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet-copy/middleware/ui-components'
-import { $element, $node, attr, component, type I$Node, type INodeCompose, type ISlottable, type IStyleCSS, nodeEvent, style, styleBehavior } from 'aelea/core'
+import {
+  $element,
+  $node,
+  attr,
+  component,
+  type I$Node,
+  type INodeCompose,
+  type ISlottable,
+  type IStyleCSS,
+  nodeEvent,
+  style,
+  styleBehavior
+} from 'aelea/core'
 import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
+import { constant, empty, type IBehavior, o, startWith, zipArray } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'

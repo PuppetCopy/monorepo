@@ -1,8 +1,8 @@
-import { IBehavior, IStream, empty, map } from 'aelea/stream'
 import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet-copy/middleware/const'
 import { getMappedValue } from '@puppet-copy/middleware/core'
 import { $caretDown, $icon, $infoLabel } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, component, style } from 'aelea/core'
+import { empty, type IBehavior, type IStream, map } from 'aelea/stream'
 import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { $Dropdown } from './form/$Dropdown'
 

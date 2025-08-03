@@ -1,4 +1,3 @@
-import { IStream, combineState, empty, fromPromise, map, merge, now, startWith, switchMap, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
@@ -29,6 +28,18 @@ import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  now,
+  startWith,
+  switchMap
+} from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
@@ -263,17 +274,20 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $text('Collateral'),
                     gridTemplate: isDesktopScreen ? '104px' : '52px',
                     $bodyCallback: map((routeMetric) => {
-                      return switchMap((list) => {
-                        return $RouteEditor({
-                          draftMatchingRuleList,
-                          collateralToken: routeMetric.metric.collateralToken,
-                          traderMatchedPuppetList: routeMetric.metric.matchedPuppetList,
-                          userMatchingRuleList: list,
-                          trader: routeMetric.metric.account
-                        })({
-                          changeMatchRuleList: changeMatchRuleListTether()
-                        })
-                      }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery))
+                      return switchMap(
+                        (list) => {
+                          return $RouteEditor({
+                            draftMatchingRuleList,
+                            collateralToken: routeMetric.metric.collateralToken,
+                            traderMatchedPuppetList: routeMetric.metric.matchedPuppetList,
+                            userMatchingRuleList: list,
+                            trader: routeMetric.metric.account
+                          })({
+                            changeMatchRuleList: changeMatchRuleListTether()
+                          })
+                        },
+                        switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                      )
                     })
                   },
                   ...((isDesktopScreen
@@ -334,7 +348,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             value: pnl,
                             time: pos.metric.pnlTimestampList[index]
                           }))
-                          .filter((item: {value: bigint, time: number}) => item.time > startTime),
+                          .filter((item: { value: bigint; time: number }) => item.time > startTime),
                         { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
                       ]
 

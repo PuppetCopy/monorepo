@@ -1,4 +1,3 @@
-import { IStream, combineState, constant, empty, map, merge, sample, snapshot, switchMap, type IBehavior } from 'aelea/stream'
 import {
   parseFixed,
   parseReadableNumber,
@@ -8,6 +7,18 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, component, type IOps, style } from 'aelea/core'
+import {
+  combineState,
+  constant,
+  empty,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  sample,
+  snapshot,
+  switchMap
+} from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -40,13 +51,19 @@ export const $DepositEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
-      const action = merge(map((model) => model.action, config.model), changeDepositMode)
+      const action = merge(
+        map((model) => model.action, config.model),
+        changeDepositMode
+      )
 
       const maxAmount = switchMap(
         (action) => {
           return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
         },
-        merge(map((model) => model.action, config.model), changeDepositMode)
+        merge(
+          map((model) => model.action, config.model),
+          changeDepositMode
+        )
       )
 
       const inputMaxAmount = sample(maxAmount, clickMax)

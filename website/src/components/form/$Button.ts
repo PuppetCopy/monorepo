@@ -1,7 +1,18 @@
-import {  IStream, combineState, empty, map, multicast, now, startWith, type IBehavior , behavior } from 'aelea/stream'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import { $icon } from '@puppet-copy/middleware/ui-components'
-import { $node, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior, styleInline, stylePseudo } from 'aelea/core'
+import {
+  $node,
+  component,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleBehavior,
+  styleInline,
+  stylePseudo
+} from 'aelea/core'
+import { combineState, empty, type IBehavior, type IStream, map, multicast, now, startWith } from 'aelea/stream'
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'

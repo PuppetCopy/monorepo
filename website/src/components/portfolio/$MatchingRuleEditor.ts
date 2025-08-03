@@ -1,10 +1,23 @@
-import {   IStream, combineState, empty, map, now, snapshot, startWith, switchMap, type IBehavior , toStream , o, zipArray } from 'aelea/stream'
 import { IntervalTime } from '@puppet-copy/middleware/const'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
 import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
 import { uiStorage } from '@puppet-copy/middleware/ui-storage'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  type IBehavior,
+  type IStream,
+  map,
+  now,
+  o,
+  snapshot,
+  startWith,
+  switchMap,
+  toStream,
+  zipArray
+} from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'

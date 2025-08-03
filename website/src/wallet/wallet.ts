@@ -1,4 +1,3 @@
-import { IStream, fromCallback, skipRepeatsWith } from 'aelea/stream'
 import { replayState } from '@puppet-copy/middleware/core'
 import { createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
@@ -14,6 +13,7 @@ import {
   watchBlockNumber,
   writeContract
 } from '@wagmi/core'
+import { fromCallback, type IStream, skipRepeatsWith } from 'aelea/stream'
 import {
   type Abi,
   type Chain,

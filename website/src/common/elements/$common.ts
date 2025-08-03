@@ -1,6 +1,6 @@
-import { empty, isStream } from 'aelea/stream'
 import { $caretDblDown } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, type I$Node, style } from 'aelea/core'
+import { empty, isStream } from 'aelea/stream'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
 import { $trash } from './$icons.js'

@@ -1,4 +1,3 @@
-import { IStream, combineState, empty, filterNull, map, skipRepeatsWith, startWith, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
@@ -14,6 +13,18 @@ import {
   type ISeriesTime
 } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, component, motion, style } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  filterNull,
+  type IBehavior,
+  type IStream,
+  map,
+  skipRepeatsWith,
+  startWith,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'

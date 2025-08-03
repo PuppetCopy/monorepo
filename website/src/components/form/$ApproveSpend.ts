@@ -1,4 +1,3 @@
-import { IStream, combineState, empty, fromPromise, map, merge, now, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import {
@@ -10,6 +9,18 @@ import {
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  now,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
 import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
@@ -35,7 +46,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
   component(([approveTokenSpend, approveTokenSpendTether]: IBehavior<PointerEvent, IWriteContractReturn>) => {
     const { $content, amount, token, spender, $label, disabled, $container = $row(style({ minWidth: 0 })) } = config
 
-    const allowance = merge(  
+    const allowance = merge(
       switchMap(async (query) => {
         return ((await query).events[0].args as any).value as bigint
       }, config.txQuery),

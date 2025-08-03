@@ -1,5 +1,14 @@
-import {    constant, filter, map, merge, startWith , type IBehavior , o , behavior } from 'aelea/stream'
-import { $element, component, type I$Node, type I$Slottable, type INode, type INodeCompose, nodeEvent, styleBehavior } from 'aelea/core'
+import {
+  $element,
+  component,
+  type I$Node,
+  type I$Slottable,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  styleBehavior
+} from 'aelea/core'
+import { constant, filter, type IBehavior, map, merge, o, startWith } from 'aelea/stream'
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 

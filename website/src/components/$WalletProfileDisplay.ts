@@ -1,6 +1,6 @@
-import {   tap , switchMap , behavior } from 'aelea/stream'
 import { ignoreAll } from '@puppet-copy/middleware/core'
 import { $node, $text, nodeEvent, style } from 'aelea/core'
+import { behavior, switchMap, tap } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import { wallet } from '../wallet/wallet.js'

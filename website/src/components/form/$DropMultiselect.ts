@@ -1,6 +1,28 @@
-import {  IStream, constant, map, never, now, snapshot, switchLatest, switchMap, tap, type IBehavior , o } from 'aelea/stream'
 import { $caretDown, $infoLabel, $xCross } from '@puppet-copy/middleware/ui-components'
-import { $text, component, type I$Node, type INode, type INodeCompose, type IOps, nodeEvent, style, stylePseudo } from 'aelea/core'
+import {
+  $text,
+  component,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  type IOps,
+  nodeEvent,
+  style,
+  stylePseudo
+} from 'aelea/core'
+import {
+  constant,
+  type IBehavior,
+  type IStream,
+  map,
+  never,
+  now,
+  o,
+  snapshot,
+  switchLatest,
+  switchMap,
+  tap
+} from 'aelea/stream'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'

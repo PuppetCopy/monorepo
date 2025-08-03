@@ -1,5 +1,35 @@
-import {  IStream, combineState, constant, empty, map, merge, now, skip, skipRepeats, switchLatest, switchMap, take, type IBehavior, zip , toStream } from 'aelea/stream'
-import { $node, $text, component, eventElementTarget, type I$Node, type I$Slottable, type INode, type INodeCompose, type IOps, nodeEvent, style, styleInline, stylePseudo } from 'aelea/core'
+import {
+  $node,
+  $text,
+  component,
+  eventElementTarget,
+  type I$Node,
+  type I$Slottable,
+  type INode,
+  type INodeCompose,
+  type IOps,
+  nodeEvent,
+  style,
+  styleInline,
+  stylePseudo
+} from 'aelea/core'
+import {
+  combineState,
+  constant,
+  empty,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  now,
+  skip,
+  skipRepeats,
+  switchLatest,
+  switchMap,
+  take,
+  toStream,
+  zip
+} from 'aelea/stream'
 import { $column, $row, observer, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

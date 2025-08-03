@@ -1,4 +1,3 @@
-import { IStream, combineState, map, multicast, replayLatest } from 'aelea/stream'
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import {
   getClosestNumber,
@@ -8,6 +7,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import { combineState, type IStream, map, multicast, replayLatest } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 

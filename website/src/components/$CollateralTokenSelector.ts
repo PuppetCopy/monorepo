@@ -1,7 +1,7 @@
-import { IBehavior, IStream, map } from 'aelea/stream'
 import { PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $text, component } from 'aelea/core'
+import { type IBehavior, type IStream, map } from 'aelea/stream'
 import { isDesktopScreen } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
 import { $tokenIcon, $tokenLabeled } from '../common/$common'

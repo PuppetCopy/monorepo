@@ -1,4 +1,3 @@
-import { IStream, combineState, constant, empty, map, multicast, now, startWith, switchLatest, type IBehavior } from 'aelea/stream'
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import {
   $alertPositiveTooltip,
@@ -7,6 +6,18 @@ import {
   $txHashRef
 } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
+import {
+  combineState,
+  constant,
+  empty,
+  type IBehavior,
+  type IStream,
+  map,
+  multicast,
+  now,
+  startWith,
+  switchLatest
+} from 'aelea/stream'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'

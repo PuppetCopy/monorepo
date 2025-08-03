@@ -1,4 +1,3 @@
-import { IStream, combineState, constant, empty, filterNull, map, multicast, type IBehavior } from 'aelea/stream'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
 import {
   getDuration,
@@ -12,6 +11,7 @@ import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
+import { combineState, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

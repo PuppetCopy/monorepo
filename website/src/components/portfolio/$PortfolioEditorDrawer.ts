@@ -1,9 +1,22 @@
-import { IStream, combineState, constant, empty, fromPromise, map, skipRepeatsWith, snapshot, switchLatest, switchMap, type IBehavior } from 'aelea/stream'
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
+import {
+  combineState,
+  constant,
+  empty,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  map,
+  skipRepeatsWith,
+  snapshot,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 
 // Array utility function (previously from @most/prelude)
 const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
+
 import {
   $alert,
   $alertIntermediateTooltip,
@@ -133,113 +146,116 @@ export const $PortfolioEditorDrawer = ({
                   })
                 ),
 
-                switchMap((userMatchingRuleList) => {
-                  return $column(
-                    spacing.default,
-                    designSheet.customScroll,
-                    style({
-                      overflow: 'auto',
-                      maxHeight: '35vh',
-                      padding: `0 ${isDesktopScreen ? '24px' : '12px'}`
-                    })
-                  )(
-                    ...portfolioRouteList.map((portfolioRoute) => {
-                      return $column(style({ paddingLeft: '16px' }))(
-                        $row(
-                          $RouteDepositEditor({
-                            collateralToken: portfolioRoute.collateralToken,
-                            draftDepositTokenList: draftDepositTokenList
-                          })({
-                            changeDepositTokenList: changeDepositTokenListTether()
-                          })
-                        ),
-                        $row(spacing.default)(
-                          style({ marginBottom: '30px' })($seperator2),
-                          $column(
-                            spacing.default,
-                            style({ flex: 1, padding: '8px 0 18px' })
-                          )(
-                            ...portfolioRoute.matchingRuleList.map((modSubsc) => {
-                              const userMatchingRule = userMatchingRuleList.find(
-                                (rule) =>
-                                  rule.collateralToken === portfolioRoute.collateralToken &&
-                                  rule.trader === modSubsc.trader
-                              )
-
-                              const iconColorParams = userMatchingRule
-                                ? modSubsc.expiry === 0n
-                                  ? {
-                                      fill: pallete.negative,
-                                      icon: $xCross,
-                                      label: isDesktopScreen ? 'Remove' : '-'
-                                    }
-                                  : {
-                                      fill: pallete.message,
-                                      icon: $target,
-                                      label: isDesktopScreen ? 'Edit' : '~'
-                                    }
-                                : {
-                                    fill: pallete.positive,
-                                    icon: $check,
-                                    label: isDesktopScreen ? 'Add' : '+'
-                                  }
-
-                              return $row(
-                                isDesktopScreen ? spacing.default : spacing.small,
-                                style({ alignItems: 'center', flex: 1 })
-                              )(
-                                $ButtonCircular({
-                                  $iconPath: $xCross,
-                                  $container: $defaultButtonCircularContainer(
-                                    style({
-                                      marginLeft: '-32px',
-                                      backgroundColor: pallete.horizon,
-                                      position: 'relative',
-                                      cursor: 'pointer'
-                                    })
-                                  )
-                                })({
-                                  click: clickRemoveSubscTether(constant(modSubsc))
-                                }),
-                                $row(
-                                  style({
-                                    backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
-                                    marginLeft: '-28px',
-                                    borderRadius: '6px',
-                                    padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
-                                    color: iconColorParams.fill
-                                  })
-                                )($text(iconColorParams.label)),
-
-                                $TraderDisplay({
-                                  labelSize: isDesktopScreen ? 1 : 0,
-                                  route,
-                                  address: modSubsc.trader,
-                                  puppetList: []
-                                })({
-                                  click: routeChangeTether()
-                                }),
-                                isDesktopScreen ? $node(style({ flex: 1 }))() : empty,
-                                $infoLabeledValue(
-                                  'Allowance Rate',
-                                  $text(`${readablePercentage(modSubsc.allowanceRate)}`)
-                                ),
-                                $infoLabeledValue(
-                                  'Expiry',
-                                  modSubsc.expiry > 0n ? readableDate(Number(modSubsc.expiry)) : $text('Never')
-                                ),
-                                $infoLabeledValue(
-                                  'Throttle Duration',
-                                  $text(`${getDuration(modSubsc.throttleActivity)}`)
-                                )
-                              )
+                switchMap(
+                  (userMatchingRuleList) => {
+                    return $column(
+                      spacing.default,
+                      designSheet.customScroll,
+                      style({
+                        overflow: 'auto',
+                        maxHeight: '35vh',
+                        padding: `0 ${isDesktopScreen ? '24px' : '12px'}`
+                      })
+                    )(
+                      ...portfolioRouteList.map((portfolioRoute) => {
+                        return $column(style({ paddingLeft: '16px' }))(
+                          $row(
+                            $RouteDepositEditor({
+                              collateralToken: portfolioRoute.collateralToken,
+                              draftDepositTokenList: draftDepositTokenList
+                            })({
+                              changeDepositTokenList: changeDepositTokenListTether()
                             })
+                          ),
+                          $row(spacing.default)(
+                            style({ marginBottom: '30px' })($seperator2),
+                            $column(
+                              spacing.default,
+                              style({ flex: 1, padding: '8px 0 18px' })
+                            )(
+                              ...portfolioRoute.matchingRuleList.map((modSubsc) => {
+                                const userMatchingRule = userMatchingRuleList.find(
+                                  (rule) =>
+                                    rule.collateralToken === portfolioRoute.collateralToken &&
+                                    rule.trader === modSubsc.trader
+                                )
+
+                                const iconColorParams = userMatchingRule
+                                  ? modSubsc.expiry === 0n
+                                    ? {
+                                        fill: pallete.negative,
+                                        icon: $xCross,
+                                        label: isDesktopScreen ? 'Remove' : '-'
+                                      }
+                                    : {
+                                        fill: pallete.message,
+                                        icon: $target,
+                                        label: isDesktopScreen ? 'Edit' : '~'
+                                      }
+                                  : {
+                                      fill: pallete.positive,
+                                      icon: $check,
+                                      label: isDesktopScreen ? 'Add' : '+'
+                                    }
+
+                                return $row(
+                                  isDesktopScreen ? spacing.default : spacing.small,
+                                  style({ alignItems: 'center', flex: 1 })
+                                )(
+                                  $ButtonCircular({
+                                    $iconPath: $xCross,
+                                    $container: $defaultButtonCircularContainer(
+                                      style({
+                                        marginLeft: '-32px',
+                                        backgroundColor: pallete.horizon,
+                                        position: 'relative',
+                                        cursor: 'pointer'
+                                      })
+                                    )
+                                  })({
+                                    click: clickRemoveSubscTether(constant(modSubsc))
+                                  }),
+                                  $row(
+                                    style({
+                                      backgroundColor: colorAlpha(iconColorParams.fill, 0.1),
+                                      marginLeft: '-28px',
+                                      borderRadius: '6px',
+                                      padding: isDesktopScreen ? '6px 12px 6px 22px' : '6px 8px 6px 30px',
+                                      color: iconColorParams.fill
+                                    })
+                                  )($text(iconColorParams.label)),
+
+                                  $TraderDisplay({
+                                    labelSize: isDesktopScreen ? 1 : 0,
+                                    route,
+                                    address: modSubsc.trader,
+                                    puppetList: []
+                                  })({
+                                    click: routeChangeTether()
+                                  }),
+                                  isDesktopScreen ? $node(style({ flex: 1 }))() : empty,
+                                  $infoLabeledValue(
+                                    'Allowance Rate',
+                                    $text(`${readablePercentage(modSubsc.allowanceRate)}`)
+                                  ),
+                                  $infoLabeledValue(
+                                    'Expiry',
+                                    modSubsc.expiry > 0n ? readableDate(Number(modSubsc.expiry)) : $text('Never')
+                                  ),
+                                  $infoLabeledValue(
+                                    'Throttle Duration',
+                                    $text(`${getDuration(modSubsc.throttleActivity)}`)
+                                  )
+                                )
+                              })
+                            )
                           )
                         )
-                      )
-                    })
-                  )
-                }, switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)),
+                      })
+                    )
+                  },
+                  switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                ),
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(

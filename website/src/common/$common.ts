@@ -1,4 +1,3 @@
-import { IBehavior, IStream, empty, map, skipRepeats, toStream, type IComposeBehavior } from 'aelea/stream'
 import {
   getMappedValue,
   type ITokenDescription,
@@ -29,6 +28,7 @@ import {
 import type { IMarket } from '@puppet-copy/sql/schema'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
+import { empty, type IBehavior, type IComposeBehavior, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
 import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

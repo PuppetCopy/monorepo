@@ -1,5 +1,5 @@
-import { combine, now } from 'aelea/stream'
 import { type I$Node, motion, styleInline } from 'aelea/core'
+import { combine, now } from 'aelea/stream'
 
 export function fadeIn($content: I$Node) {
   const fadeIn = motion({ stiffness: 170, damping: 26, precision: 1 }, 0, now(100))

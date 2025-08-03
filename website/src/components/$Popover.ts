@@ -1,5 +1,27 @@
-import {   IStream, constant, empty, filter, map, merge, multicast, switchLatest, type IBehavior, until, zip , o , behavior } from 'aelea/stream'
-import { $node, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/core'
+import {
+  $node,
+  component,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleBehavior
+} from 'aelea/core'
+import {
+  constant,
+  empty,
+  filter,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  multicast,
+  o,
+  switchLatest,
+  until,
+  zip
+} from 'aelea/stream'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

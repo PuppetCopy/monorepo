@@ -1,6 +1,6 @@
-import { IStream, empty, filterNull, fromCallback, map, now, switchMap, type IBehavior } from 'aelea/stream'
 import { $element, $node, $text, attr, component, eventElementTarget, type I$Node, style } from 'aelea/core'
 import type { Route } from 'aelea/router'
+import { empty, filterNull, fromCallback, type IBehavior, type IStream, map, now, switchMap } from 'aelea/stream'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'

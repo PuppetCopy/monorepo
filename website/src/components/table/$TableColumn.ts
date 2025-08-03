@@ -1,4 +1,3 @@
-import {    empty, map, skipRepeats , switchMap , toStream , behavior } from 'aelea/stream'
 import {
   getMappedValue,
   getTimeSince,
@@ -10,6 +9,7 @@ import {
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
 import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
 import { $node, $text, type INode, style } from 'aelea/core'
+import { empty, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
