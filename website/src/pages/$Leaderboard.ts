@@ -23,8 +23,8 @@ import {
   type ISeriesTime,
   type ISortBy,
   type TableColumn
-} from '@puppet-copy/middleware/ui-components'
-import { uiStorage } from '@puppet-copy/middleware/ui-storage'
+} from '../ui-components'
+import { uiStorage } from '../ui-storage'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'

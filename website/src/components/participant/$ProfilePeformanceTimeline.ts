@@ -11,7 +11,7 @@ import {
   $infoTooltipLabel,
   $intermediatePromise,
   type ISeriesTime
-} from '@puppet-copy/middleware/ui-components'
+} from '../ui-components'
 import { $node, $text, component, motion, style } from 'aelea/core'
 import {
   combineState,

@@ -1,5 +1,5 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $caretDown, $icon } from '@puppet-copy/middleware/ui-components'
+import { $caretDown, $icon } from '../ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $text, component, type INodeCompose, style } from 'aelea/core'
 import { empty, type IBehavior, type IStream, map } from 'aelea/stream'

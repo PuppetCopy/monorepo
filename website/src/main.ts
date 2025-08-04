@@ -31,14 +31,17 @@ const config: IRunEnvironment = {
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, config.stylesheet]
 
-$createRoot(config).run({
-  end() {
-    console.log('Application has ended.')
+$createRoot(config).run(
+  {
+    end() {
+      console.log('Application has ended.')
+    },
+    error(err: Error) {
+      console.error('An error occurred:', err)
+    },
+    event() {
+      // Handle events if necessary
+    }
   },
-  error(err: Error) {
-    console.error('An error occurred:', err)
-  },
-  event() {
-    // Handle events if necessary
-  }
-}, browserScheduler)
+  browserScheduler
+)

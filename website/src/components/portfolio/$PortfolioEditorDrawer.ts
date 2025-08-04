@@ -26,7 +26,7 @@ import {
   $infoTooltip,
   $target,
   $xCross
-} from '@puppet-copy/middleware/ui-components'
+} from '../ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, component, style } from 'aelea/core'

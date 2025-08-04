@@ -7,7 +7,7 @@ import {
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
+import { $defaultTableCell, $infoTooltip, type TableColumn } from '../ui-components'
 import { $node, $text, type INode, style } from 'aelea/core'
 import { empty, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'

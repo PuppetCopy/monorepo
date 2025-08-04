@@ -24,7 +24,7 @@ import {
   $Tooltip,
   $tokenIconMap,
   $unknown
-} from '@puppet-copy/middleware/ui-components'
+} from '../ui-components'
 import type { IMarket } from '@puppet-copy/sql/schema'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'

@@ -4,6 +4,9 @@
     "src",
   ],
   "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
     "outDir": "dist/esm",
     "rootDir": "./src",
     "declaration": true,

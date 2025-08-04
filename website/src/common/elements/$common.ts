@@ -1,4 +1,4 @@
-import { $caretDblDown } from '@puppet-copy/middleware/ui-components'
+import { $caretDblDown } from '../ui-components'
 import { $node, $text, type I$Node, style } from 'aelea/core'
 import { empty, isStream } from 'aelea/stream'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'

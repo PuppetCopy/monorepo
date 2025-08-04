@@ -5,7 +5,7 @@ import {
   $alertTooltip,
   $spinnerTooltip,
   $txHashRef
-} from '@puppet-copy/middleware/ui-components'
+} from '../ui-components'
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'

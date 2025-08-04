@@ -1,6 +1,6 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $infoLabel, $labeledhintAdjustment } from '@puppet-copy/middleware/ui-components'
+import { $infoLabel, $labeledhintAdjustment } from '../ui-components'
 import { $text, component, style } from 'aelea/core'
 import {
   combineState,

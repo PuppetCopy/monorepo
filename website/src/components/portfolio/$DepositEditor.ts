@@ -5,7 +5,7 @@ import {
   readableTokenAmountLabel
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '../ui-components'
 import { $node, $text, component, style } from 'aelea/core'
 import {
   combineState,

@@ -5,8 +5,8 @@ import {
   $alertPositiveContainer,
   $infoLabeledValue,
   $Tooltip
-} from '@puppet-copy/middleware/ui-components'
-import { uiStorage } from '@puppet-copy/middleware/ui-storage'
+} from '../ui-components'
+import { uiStorage } from '../ui-storage'
 import { $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
 import {

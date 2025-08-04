@@ -1,4 +1,4 @@
-import { $caretDown, $infoLabel, $xCross } from '@puppet-copy/middleware/ui-components'
+import { $caretDown, $infoLabel, $xCross } from '../ui-components'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/core'
 import {
   constant,

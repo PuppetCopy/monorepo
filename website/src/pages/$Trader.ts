@@ -18,7 +18,7 @@ import {
   $Table,
   type IQuantumScrollPage,
   type ISortBy
-} from '@puppet-copy/middleware/ui-components'
+} from '../ui-components'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, component, style } from 'aelea/core'
 import {

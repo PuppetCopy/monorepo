@@ -151,7 +151,7 @@ export function bufferEvents<T>(
 
       return disposeWith(() => {
         buffer = []
-        disposable.dispose()
+        disposable[Symbol.dispose]()
       })
     }
   }
@@ -167,17 +167,17 @@ export const createAdapter = <A>(): Adapter<A, A> => {
 const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A): void =>
   sinks.slice().forEach(({ sink }) => tryEvent(a, sink))
 
-export class FanoutPortStream<A> {
+export class FanoutPortStream<A> implements IStream<A> {
   constructor(private readonly sinks: { sink: ISink<A>; scheduler: IScheduler }[]) {}
 
-  run(sink: ISink<A>, scheduler: IScheduler): { dispose(): void } {
+  run(sink: ISink<A>, scheduler: IScheduler): Disposable {
     const s = { sink, scheduler }
     this.sinks.push(s)
     return new RemovePortDisposable(s, this.sinks)
   }
 }
 
-export class RemovePortDisposable<A> {
+export class RemovePortDisposable<A> implements Disposable {
   constructor(
     private readonly sink: { sink: ISink<A>; scheduler: IScheduler },
     private readonly sinks: { sink: ISink<A>; scheduler: IScheduler }[]
@@ -188,6 +188,10 @@ export class RemovePortDisposable<A> {
     if (i >= 0) {
       this.sinks.splice(i, 1)
     }
+  }
+
+  [Symbol.dispose]() {
+    this.dispose()
   }
 }
 

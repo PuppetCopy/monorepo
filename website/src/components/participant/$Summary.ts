@@ -1,5 +1,5 @@
 import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
-import { intermediateText } from '@puppet-copy/middleware/ui-components'
+import { intermediateText } from '../ui-components'
 import { $node, $text, component, style } from 'aelea/core'
 import { combineState, type IStream, map, multicast } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'

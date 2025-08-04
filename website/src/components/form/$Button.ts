@@ -1,5 +1,5 @@
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import { $icon } from '@puppet-copy/middleware/ui-components'
+import { $icon } from '../ui-components'
 import {
   $node,
   attrBehavior,

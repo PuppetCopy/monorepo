@@ -8,7 +8,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
+import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '../ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
 import { combineState, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'

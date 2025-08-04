@@ -1,7 +1,7 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
 import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
-import { uiStorage } from '@puppet-copy/middleware/ui-storage'
+import { $Checkbox, $FieldLabeled } from '../ui-components'
+import { uiStorage } from '../ui-storage'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
 import {
