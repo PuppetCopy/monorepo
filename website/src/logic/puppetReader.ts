@@ -20,5 +20,6 @@ export default {
     wallet.read({ ...contractDefs.Rule, functionName: 'matchingRuleMap', args: [puppet, key] }),
   getMatchRuleList: (puppet: Address, keyList: Hex[], contractDefs = PUPPET.CONTRACT) =>
     wallet.read({ ...contractDefs.Rule, functionName: 'getRuleList', args: [puppet, keyList] }),
-  getConfig: (contractDefs = PUPPET.CONTRACT) => wallet.read({ ...contractDefs.Rule, functionName: 'getConfig', args: [] })
+  getConfig: (contractDefs = PUPPET.CONTRACT) =>
+    wallet.read({ ...contractDefs.Rule, functionName: 'getConfig', args: [] })
 }
