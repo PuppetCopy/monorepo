@@ -5,7 +5,6 @@ import {
   readableTokenAmountLabel
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '../ui-components'
 import { $node, $text, component, style } from 'aelea/core'
 import {
   combineState,
@@ -18,12 +17,13 @@ import {
   merge,
   op,
   sample,
-  snapshot,
+  sampleMap,
   switchMap
 } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
 export enum DepositEditorAction {
@@ -166,7 +166,7 @@ export const $DepositEditor = (config: {
 
         {
           changeModel: merge(
-            snapshot(
+            sampleMap(
               (params): IDepositEditorDraft => {
                 return {
                   action: params.action,

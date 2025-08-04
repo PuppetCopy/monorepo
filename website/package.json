@@ -10,7 +10,8 @@
     "clean:rimraf": "rimraf dist && tsc -build --clean",
     "preview": "bunx --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
-    "build:clean:all": "bun --filter '*' clean:tsc"
+    "build:clean:all": "bun --filter '*' clean:tsc",
+    "tsc:check": "bunx tsc --noEmit"
   },
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
@@ -19,7 +20,7 @@
     "@reown/appkit-adapter-wagmi": "1.7.17",
     "@wagmi/core": "2.18.1",
     "abitype": "1.0.8",
-    "aelea": "2.1.2",
+    "aelea": "2.2.0",
     "color": "5.0.0",
     "lightweight-charts": "5.0.8",
     "mersenne-twister": "1.1.0",

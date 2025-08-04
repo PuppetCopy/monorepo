@@ -1,12 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
-import {
-  $alertNegativeContainer,
-  $alertPositiveContainer,
-  $infoLabeledValue,
-  $Tooltip
-} from '../ui-components'
-import { uiStorage } from '../ui-storage'
 import { $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
 import {
@@ -25,10 +18,12 @@ import {
   tap,
   zipState
 } from 'aelea/stream'
-import { $column, $row, spacing } from 'aelea/ui-components'
+import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type { Address } from 'viem/accounts'
+import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
+import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu } from '../components/$MainMenu.js'
@@ -129,7 +124,22 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
 
       return [
-        $column(spacing.big)(
+        $column(
+          spacing.big,
+          designSheet.customScroll,
+          style({
+            color: pallete.message,
+            fill: pallete.message,
+            // position: 'relative',
+            // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
+            backgroundColor: pallete.horizon,
+            fontSize: isDesktopScreen ? '16px' : '14px',
+            // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
+            fontWeight: 400
+            // flexDirection: 'row',
+          }),
+          isMobileScreen ? style({ userSelect: 'none' }) : style({})
+        )(
           $MainMenu({ route: rootRoute })({
             routeChange: changeRouteTether(),
             changeWallet: changeWalletTether()

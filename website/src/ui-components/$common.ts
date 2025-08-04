@@ -1,3 +1,5 @@
+import type { ITokenDescription } from '@puppet-copy/middleware/core'
+import { getExplorerUrl, getMappedValue, readableHash } from '@puppet-copy/middleware/core'
 import {
   $element,
   $node,
@@ -29,9 +31,6 @@ import {
 import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { arbitrum, type Chain } from 'viem/chains'
-import { getExplorerUrl, readableHash } from '../core/format.js'
-import type { ITokenDescription } from '../core/types.js'
-import { getMappedValue } from '../core/utils.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
 import { $defaultTooltipDropContainer, $Tooltip } from './$Tooltip.js'
 

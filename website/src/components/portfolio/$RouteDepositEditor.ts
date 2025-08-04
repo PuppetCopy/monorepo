@@ -1,6 +1,5 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $infoLabel, $labeledhintAdjustment } from '../ui-components'
 import { $text, component, style } from 'aelea/core'
 import {
   combineState,
@@ -9,12 +8,13 @@ import {
   type IStream,
   map,
   replayState,
-  snapshot,
+  sampleMap,
   switchMap
 } from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $infoLabel, $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
 import { tokenBalanceOf } from '../../logic/commonRead.js'
 import puppetReader from '../../logic/puppetReader.js'
@@ -125,7 +125,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         })({}),
 
         {
-          changeDepositTokenList: snapshot(
+          changeDepositTokenList: sampleMap(
             (changeList, draft) => {
               const model = changeList.find(ct => ct.token === collateralToken)
 

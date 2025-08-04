@@ -1,4 +1,3 @@
-import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '../ui-components'
 import {
   $element,
   $node,
@@ -12,11 +11,13 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
-import { constant, empty, type IBehavior, o, startWith, zip } from 'aelea/stream'
+import type { IAnchor, Route } from 'aelea/router'
+import { constant, empty, type IBehavior, o, startWith, zipMap } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
+import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@/ui-components'
+import { $RouterAnchor } from '@/ui-router'
 import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/type.js'
 import { $Popover } from './$Popover.js'
@@ -182,7 +183,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
         styleBehavior(
-          zip(
+          zipMap(
             (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? {

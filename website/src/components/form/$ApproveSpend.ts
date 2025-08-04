@@ -1,11 +1,5 @@
 import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import {
-  $alertPositiveTooltip,
-  $alertTooltip,
-  $spinnerTooltip,
-  $txHashRef
-} from '../ui-components'
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
@@ -23,6 +17,7 @@ import {
 } from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'
+import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { type IWalletConnected, type IWriteContractReturn, wallet } from '../../wallet/wallet'
 import { $defaultButtonPrimary } from './$Button'
 import { $ButtonCore } from './$ButtonCore'

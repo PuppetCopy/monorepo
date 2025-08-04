@@ -1,3 +1,4 @@
+import { readableUnitAmount } from '@puppet-copy/middleware/core'
 import type { IStream } from 'aelea/stream'
 import { pallete } from 'aelea/ui-components-theme'
 import {
@@ -9,7 +10,6 @@ import {
   type DeepPartial,
   LineStyle
 } from 'lightweight-charts'
-import { readableUnitAmount } from '../../core/readable.js'
 import { $Chart, defaultChartConfig, type IMarker, type ISeriesType } from './$Chart.js'
 
 export interface IBaselineChart {

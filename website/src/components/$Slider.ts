@@ -12,7 +12,7 @@ import {
   styleBehavior,
   styleInline
 } from 'aelea/core'
-import { combineState, type IBehavior, type IStream, join, map, merge, now, snapshot, until } from 'aelea/stream'
+import { combineState, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -82,7 +82,7 @@ export const $Slider = ({
           thumbePositionDeltaTether(
             nodeEvent('pointerdown'),
             downSrc => {
-              return snapshot(
+              return sampleMap(
                 (params, downEvent) => {
                   const dragEnd = eventElementTarget('pointerup', window.document)
                   const dragStart = eventElementTarget('pointermove', window.document)

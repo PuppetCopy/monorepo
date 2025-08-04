@@ -1,7 +1,7 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
-import type { ISortBy } from '../ui-components'
-import { uiStorage } from '../ui-storage'
 import { arbitrum } from 'viem/chains'
+import type { ISortBy } from '@/ui-components'
+import { uiStorage } from '@/ui-storage'
 import { IWalletTab } from '../pages/type.js'
 
 export const localStore = uiStorage.createStoreDefinition('root', 8, {

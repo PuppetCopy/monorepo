@@ -28,7 +28,7 @@ import {
   switchMap,
   take,
   toStream,
-  zip
+  zipMap
 } from 'aelea/stream'
 import { $column, $row, observer, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -128,7 +128,7 @@ export function $Dropdown<T>({
 
               return $dropListContainer(
                 styleInline(
-                  zip(
+                  zipMap(
                     ([targetRect], [contentRect]) => {
                       const { bottom, right, left } = targetRect.intersectionRect
                       const { width } = contentRect.boundingClientRect

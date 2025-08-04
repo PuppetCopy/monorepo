@@ -1,4 +1,4 @@
-import { at, chain, continueWith, fromPromise, type IOps, type IStream, now, switchMap } from 'aelea/stream'
+import { at, continueWith, fromPromise, type IOps, type IStream, joinMap, now, switchMap } from 'aelea/stream'
 
 export interface IRunPeriodically<T> {
   actionOp: IOps<any, Promise<T>>
@@ -13,7 +13,7 @@ export const periodicRun = <T>({
   const run = startImmediate
     ? actionOp(now(undefined)) //
     : actionOp(at(interval, undefined))
-  const awaitExecution = chain(fromPromise, run)
+  const awaitExecution = joinMap(fromPromise, run)
   const runArgs = { actionOp, interval, startImmediate: false }
 
   return continueWith(() => periodicRun<T>(runArgs), awaitExecution)

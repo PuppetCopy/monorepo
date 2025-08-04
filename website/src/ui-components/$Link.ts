@@ -1,6 +1,6 @@
 import { $element, component, type I$Node, type IStyleCSS, style, styleBehavior } from 'aelea/core'
 import { $RouterAnchor, type IAnchor } from 'aelea/router'
-import { combine, empty, type IBehavior, type IStream, map, o } from 'aelea/stream'
+import { combineMap, empty, type IBehavior, type IStream, map, o } from 'aelea/stream'
 import { pallete } from 'aelea/ui-components-theme'
 
 export interface ILink extends Omit<IAnchor, '$anchor'> {
@@ -25,7 +25,7 @@ export const $Link = ({ url, route, $content, anchorOp, disabled = empty }: ILin
     ) => {
       const $anchorEl = $anchor(
         styleBehavior(
-          combine(
+          combineMap(
             (isActive, isFocus): IStyleCSS | null => {
               return isActive
                 ? { color: `${pallete.message} !important`, fill: pallete.message, cursor: 'default' }

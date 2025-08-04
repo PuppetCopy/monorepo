@@ -9,8 +9,8 @@ import {
   type IStream,
   map,
   merge,
+  sampleMap,
   skipRepeatsWith,
-  snapshot,
   switchLatest,
   switchMap
 } from 'aelea/stream'
@@ -18,15 +18,6 @@ import {
 // Array utility function (previously from @most/prelude)
 const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
 
-import {
-  $alert,
-  $alertIntermediateTooltip,
-  $check,
-  $infoLabeledValue,
-  $infoTooltip,
-  $target,
-  $xCross
-} from '../ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
 import { $node, $text, component, style } from 'aelea/core'
@@ -35,6 +26,15 @@ import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-c
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { type Address, encodeFunctionData, erc20Abi, MethodNotFoundRpcError } from 'viem'
+import {
+  $alert,
+  $alertIntermediateTooltip,
+  $check,
+  $infoLabeledValue,
+  $infoTooltip,
+  $target,
+  $xCross
+} from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
@@ -370,7 +370,7 @@ export const $PortfolioEditorDrawer = ({
           routeChange,
           changeWallet,
           changeMatchRuleList: merge(
-            snapshot(
+            sampleMap(
               (list, subsc) => {
                 const idx = list.indexOf(subsc)
 

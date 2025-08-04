@@ -1,19 +1,19 @@
 import {
   getMappedValue,
   getTimeSince,
-  latestPriceMap,
   readableDate,
   readablePercentage,
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { $defaultTableCell, $infoTooltip, type TableColumn } from '../ui-components'
 import { $node, $text, type INode, style } from 'aelea/core'
-import { empty, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import { empty, IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $defaultTableCell, $infoTooltip, type TableColumn } from '@/ui-components'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
+import { latestPriceMap } from '../../logic/latestPriceMap.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IPosition } from '../../pages/type.js'
 import { isPositionSettled } from '../../utils/utils.js'

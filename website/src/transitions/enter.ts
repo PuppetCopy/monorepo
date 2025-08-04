@@ -1,12 +1,12 @@
 import { type I$Node, motion, styleInline } from 'aelea/core'
-import { combine, fromArray } from 'aelea/stream'
+import { combineMap, fromArray } from 'aelea/stream'
 
 export function fadeIn($content: I$Node) {
   const fadeIn = motion({ stiffness: 170, damping: 26, precision: 1 }, fromArray([0, 100]))
   const slideIn = motion({ stiffness: 190, damping: 48, precision: 1 }, fromArray([25, 0]))
 
   const animation = styleInline(
-    combine(
+    combineMap(
       (opacity, slide) => {
         return {
           opacity: opacity === 100 ? '' : `${opacity}%`,

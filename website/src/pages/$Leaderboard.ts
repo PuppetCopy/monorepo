@@ -7,6 +7,28 @@ import {
   readablePnl,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
+import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
+import * as schema from '@puppet-copy/sql/schema'
+import { $node, $text, component, style } from 'aelea/core'
+import {
+  combineState,
+  empty,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  joinMap,
+  map,
+  merge,
+  now,
+  op,
+  startWith,
+  switchMap
+} from 'aelea/stream'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { type BaselineData, LineType, type Time } from 'lightweight-charts'
+import { asc, desc } from 'ponder'
+import type { Address } from 'viem/accounts'
 import {
   $Baseline,
   $ButtonToggle,
@@ -23,30 +45,8 @@ import {
   type ISeriesTime,
   type ISortBy,
   type TableColumn
-} from '../ui-components'
-import { uiStorage } from '../ui-storage'
-import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
-import * as schema from '@puppet-copy/sql/schema'
-import { $node, $text, component, style } from 'aelea/core'
-import {
-  chain,
-  combineState,
-  empty,
-  fromPromise,
-  type IBehavior,
-  type IStream,
-  map,
-  merge,
-  now,
-  op,
-  startWith,
-  switchMap
-} from 'aelea/stream'
-import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type BaselineData, LineType, type Time } from 'lightweight-charts'
-import { asc, desc } from 'ponder'
-import type { Address } from 'viem/accounts'
+} from '@/ui-components'
+import { uiStorage } from '@/ui-storage'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
@@ -278,7 +278,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $bodyCallback: map((routeMetric: ILeaderboardCellData) => {
                       return op(
                         userMatchingRuleQuery,
-                        chain(fromPromise),
+                        joinMap(fromPromise),
                         switchMap(list => {
                           return $RouteEditor({
                             draftMatchingRuleList,

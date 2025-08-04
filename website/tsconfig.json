@@ -25,7 +25,17 @@
     "noUnusedParameters": false,
     "noEmit": true,
     "isolatedModules": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/ui-components": ["src/ui-components/index.ts"],
+      "@/ui-components/*": ["src/ui-components/*"],
+      "@/ui-router": ["src/ui-router/index.ts"],
+      "@/ui-router/*": ["src/ui-router/*"],
+      "@/ui-storage": ["src/ui-storage/index.ts"],
+      "@/ui-storage/*": ["src/ui-storage/*"]
+    }
   },
   "references": [
     {

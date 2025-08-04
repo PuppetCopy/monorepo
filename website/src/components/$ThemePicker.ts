@@ -1,5 +1,5 @@
 import { $svg, $text, attr, component, nodeEvent, style, stylePseudo } from 'aelea/core'
-import { type IStream, snapshot } from 'aelea/stream'
+import { type IStream, sampleMap } from 'aelea/stream'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete, type Theme, themeList } from 'aelea/ui-components-theme'
 import { setTheme } from 'aelea/ui-components-theme-browser'
@@ -13,7 +13,7 @@ export const $ThemePicker = (theme: IStream<Theme>) =>
         stylePseudo(':hover', { fill: pallete.primary, color: pallete.primary }),
         changeThemeTether(
           nodeEvent('click'),
-          snapshot(current => {
+          sampleMap(current => {
             const toIdx = (themeList.findIndex(t => t.name === current.name) + 1) % themeList.length
             const toTheme = themeList[toIdx]
 

@@ -18,7 +18,7 @@ import {
   startWith,
   switchLatest,
   switchMap,
-  zip
+  zipMap
 } from 'aelea/stream'
 import { $column, $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -102,7 +102,7 @@ export const $Tooltip = ({
                 padding: '8px'
               }),
               styleInline(
-                zip(
+                zipMap(
                   ([contentRect], [targetRect]) => {
                     const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
                     const targetBound = targetRect.intersectionRect

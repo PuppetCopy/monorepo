@@ -1,5 +1,4 @@
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import { $icon } from '../ui-components'
 import {
   $node,
   attrBehavior,
@@ -17,6 +16,7 @@ import { combineState, empty, type IBehavior, type IStream, map, multicast, now,
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
+import { $icon } from '@/ui-components'
 import { $ButtonCore, $defaultButtonCore, type IButtonCore } from './$ButtonCore.js'
 
 export const $defaultButtonPrimary = $defaultButtonCore(

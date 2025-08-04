@@ -1,5 +1,4 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $caretDown, $icon } from '../ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $text, component, type INodeCompose, style } from 'aelea/core'
 import { empty, type IBehavior, type IStream, map } from 'aelea/stream'
@@ -7,6 +6,7 @@ import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-compone
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
+import { $caretDown, $icon } from '@/ui-components'
 import { $tokenTryLabeled } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'

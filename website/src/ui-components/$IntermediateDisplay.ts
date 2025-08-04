@@ -1,3 +1,4 @@
+import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import { $node, $text, type I$Node, style } from 'aelea/core'
 import {
   constant,
@@ -17,7 +18,6 @@ import {
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
-import { PromiseStatus, promiseState } from '../core/stream/stream.js'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
 
 export const $spinner = $node(

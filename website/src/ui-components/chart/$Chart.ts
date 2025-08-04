@@ -1,5 +1,6 @@
 import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/core'
 import {
+  aggregate,
   combineState,
   disposeWith,
   empty,
@@ -11,8 +12,8 @@ import {
   map,
   merge,
   multicast,
-  scan,
-  snapshot,
+  sampleMap,
+  startWith,
   switchMap,
   tap
 } from 'aelea/stream'
@@ -157,24 +158,27 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                   }, appendData)
                 : empty,
               ...priceLineConfigList.map(lineStreamConfig => {
-                return scan(
-                  (prev, params) => {
-                    if (prev && params === null) {
-                      series.removePriceLine(prev)
-                    }
-
-                    if (params) {
-                      if (prev) {
-                        prev.applyOptions(params)
-                        return prev
+                return startWith(
+                  null,
+                  aggregate(
+                    (prev, params) => {
+                      if (prev && params === null) {
+                        series.removePriceLine(prev)
                       }
-                      return series.createPriceLine(params)
-                    }
 
-                    return null
-                  },
-                  null as IPriceLine | null,
-                  lineStreamConfig
+                      if (params) {
+                        if (prev) {
+                          prev.applyOptions(params)
+                          return prev
+                        }
+                        return series.createPriceLine(params)
+                      }
+
+                      return null
+                    },
+                    null as IPriceLine | null,
+                    lineStreamConfig
+                  )
                 )
               }),
               tap(next => {
@@ -197,7 +201,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
           //         },
           //         combineState({ crosshairMove, isFocused: yAxisState.isFocused })
           //       ),
-          //       snapshot(
+          //       sampleMap(
           //         (params) => {
           //           if (params.isFocused && params.price) {
           //             return seriesApi.priceToCoordinate(params.price)
@@ -213,7 +217,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
           focusPrice: yAxisState
             ? filterNull(
                 merge(
-                  snapshot(
+                  sampleMap(
                     (params, ev) => {
                       if (params.isFocused) {
                         return null
@@ -224,7 +228,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                     combineState(yAxisState),
                     click
                   ),
-                  snapshot(
+                  sampleMap(
                     (params, coords) => {
                       if (params.isFocused) {
                         return null
@@ -238,7 +242,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                 )
               )
             : empty,
-          isFocused: yAxisState ? snapshot(focused => !focused, yAxisState.isFocused, click) : empty,
+          isFocused: yAxisState ? sampleMap(focused => !focused, yAxisState.isFocused, click) : empty,
           crosshairMove,
           click,
           visibleLogicalRangeChange,

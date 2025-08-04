@@ -32,10 +32,7 @@ export default defineConfig({
             '@puppet-copy/middleware/const',
             '@puppet-copy/middleware/core',
             '@puppet-copy/middleware/gmx',
-            '@puppet-copy/middleware/gbc',
-            '@puppet-copy/middleware/ui-components',
-            '@puppet-copy/middleware/ui-router',
-            '@puppet-copy/middleware/ui-storage'
+            '@puppet-copy/middleware/gbc'
           ],
           vendor: [
             '@most/core',

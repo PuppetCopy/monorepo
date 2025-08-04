@@ -20,7 +20,7 @@ import {
   o,
   switchLatest,
   until,
-  zip
+  zipMap
 } from 'aelea/stream'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -64,7 +64,7 @@ export const $Popover = ({
       const contentOps = $contentContainer(
         popoverContentDimensionTether(observer.resize({})),
         styleBehavior(
-          zip(
+          zipMap(
             ([contentRect], [targetRect]) => {
               const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
               const targetBound = targetRect.intersectionRect

@@ -1,4 +1,3 @@
-import { $caretDown, $infoLabel, $xCross } from '../ui-components'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/core'
 import {
   constant,
@@ -10,13 +9,14 @@ import {
   never,
   now,
   o,
-  snapshot,
+  sampleMap,
   switchLatest,
   switchMap,
   tap
 } from 'aelea/stream'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
+import { $caretDown, $infoLabel, $xCross } from '@/ui-components'
 import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'
 
 // Array utility functions (previously from @most/prelude)
@@ -131,7 +131,7 @@ export const $DropMultiSelect = <T>({
       }),
       {
         select: merge(
-          snapshot(
+          sampleMap(
             (seed, next) => {
               const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 
@@ -144,7 +144,7 @@ export const $DropMultiSelect = <T>({
             value,
             select
           ),
-          snapshot(
+          sampleMap(
             (seed, next) => {
               const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 

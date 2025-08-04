@@ -6,12 +6,6 @@ import {
   readableUnitAmount,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
-import {
-  $Baseline,
-  $infoTooltipLabel,
-  $intermediatePromise,
-  type ISeriesTime
-} from '../ui-components'
 import { $node, $text, component, motion, style } from 'aelea/core'
 import {
   combineState,
@@ -30,6 +24,7 @@ import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
+import { $Baseline, $infoTooltipLabel, $intermediatePromise, type ISeriesTime } from '@/ui-components'
 import type { IPageFilterParams, ITraderRouteMetricSummary } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
@@ -222,7 +217,7 @@ export const $TradeRouteTimeline = ({
                       type: 'price'
                     }
                   },
-                  // appendData: scan((prev, next) => {
+                  // appendData: aggregate((prev, next) => {
                   //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
                   //   const timeNow = unixTimestampNow()
                   //   const prevTimeSlot = Math.floor(prev.time as number / tf)

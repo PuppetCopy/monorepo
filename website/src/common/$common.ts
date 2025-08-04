@@ -1,7 +1,6 @@
 import {
   getMappedValue,
   type ITokenDescription,
-  latestPriceMap,
   lst,
   readableDate,
   readableLeverage,
@@ -16,6 +15,13 @@ import {
   getTokenDescription,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
+import type { IMarket } from '@puppet-copy/sql/schema'
+import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
+import type * as router from 'aelea/router'
+import { empty, type IBehavior, type IComposeBehavior, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
+import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
+import type { Address } from 'viem/accounts'
 import {
   $infoLabel,
   $infoLabeledValue,
@@ -24,15 +30,9 @@ import {
   $Tooltip,
   $tokenIconMap,
   $unknown
-} from '../ui-components'
-import type { IMarket } from '@puppet-copy/sql/schema'
-import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
-import type * as router from 'aelea/router'
-import { empty, type IBehavior, type IComposeBehavior, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
-import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
-import type { Address } from 'viem/accounts'
+} from '@/ui-components'
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
+import { latestPriceMap } from '../logic/latestPriceMap.js'
 import { $seperator2 } from '../pages/common.js'
 import { type IPosition, IWalletTab } from '../pages/type.js'
 import { isPositionSettled } from '../utils/utils.js'
