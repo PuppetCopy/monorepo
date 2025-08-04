@@ -37,7 +37,7 @@ export const $RouterAnchor = ({ url, route, $anchor, anchorOp = o() }: IAnchor) 
           throw new Error('target anchor contains no href')
         })
       ),
-      focusTether(($anchor) => {
+      focusTether($anchor => {
         const focus = constant(true, merge(nodeEvent('focus', $anchor), nodeEvent('pointerenter', $anchor)))
         const blur = constant(false, merge(nodeEvent('blur', $anchor), nodeEvent('pointerleave', $anchor)))
 

@@ -24,7 +24,7 @@ function _createAnimationKeyframe(keyframes: string) {
   return animationId
 }
 
-const installUserChoice: IStream<any> = fromCallback((cb) => {
+const installUserChoice: IStream<any> = fromCallback(cb => {
   return window.addEventListener('beforeinstallprompt', cb)
 })
 
@@ -212,10 +212,10 @@ export const $Home = (_config: ITreasury) =>
                 ),
 
                 isMobileScreen
-                  ? switchMap((deferredPrompt) => {
+                  ? switchMap(deferredPrompt => {
                       return $column(spacing.default)(
                         filterNull(
-                          map((_req) => {
+                          map(_req => {
                             return null
                           }, clickDownloadBtn)
                         ) as any,

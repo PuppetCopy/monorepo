@@ -16,7 +16,7 @@ const interactionOp = o((src: I$Node) => merge(nodeEvent('focus', src), nodeEven
 
 const dismissOp = o(
   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
-  filter((x) => document.activeElement !== x.target), // focused elements cannot be dismissed
+  filter(x => document.activeElement !== x.target), // focused elements cannot be dismissed
   constant(false)
 )
 
@@ -39,7 +39,7 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
         disabled
           ? styleBehavior(
               map(
-                (isDisabled) => {
+                isDisabled => {
                   return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                 },
                 startWith(true, disabled)
@@ -48,7 +48,7 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
           : (o() as any),
 
         styleBehavior(
-          map((active) => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
+          map(active => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
         ),
 
         interactionTether(interactionOp),

@@ -17,7 +17,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
 
     return [
       $container(
-        switchMap((getAccountStatus) => {
+        switchMap(getAccountStatus => {
           if (getAccountStatus.status === 'connecting' || getAccountStatus.status === 'reconnecting') {
             return $node($text('Connecting...'))
           }
@@ -34,7 +34,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
               )
             })({
               click: changeWalletTether(
-                map(async (_xx) => {
+                map(async _xx => {
                   wallet.appkit.open({})
 
                   return null

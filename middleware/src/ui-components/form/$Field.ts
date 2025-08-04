@@ -60,7 +60,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
 
           changeTether(
             nodeEvent('input'),
-            map((inputEv) => {
+            map(inputEv => {
               if (inputEv.target instanceof HTMLInputElement) {
                 const text = inputEv.target.value
                 return text || ''
@@ -70,7 +70,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
           ),
 
           styleBehavior(
-            map((params) => {
+            map(params => {
               const hasValue = params.value
               const opacity = hasValue ? '' : '.5'
 
@@ -93,7 +93,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
           disabled
             ? styleBehavior(
                 map(
-                  (isDisabled) => {
+                  isDisabled => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
                   startWith(true, disabled)
@@ -101,12 +101,12 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
               )
             : o(),
 
-          switchMap((node) =>
+          switchMap(node =>
             merge(
               now(node),
               filterNull(
                 map(
-                  (params) => {
+                  params => {
                     if (params.focus) {
                       return null
                     }

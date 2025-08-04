@@ -16,14 +16,14 @@ export const $SelectCollateralToken = ({ selectedList }: ISelectCollateralToken)
     return [
       $DropMultiSelect({
         $noneSelected: $defaultNoneSelected($text(isDesktopScreen ? 'All Collateral' : 'All')),
-        $$option: map((tr) => {
+        $$option: map(tr => {
           return $tokenLabeled(getTokenDescription(tr))
         }),
-        $$selectedOption: map((tr) => {
+        $$selectedOption: map(tr => {
           return $tokenIcon(getTokenDescription(tr))
         }),
         value: selectedList,
-        optionList: map((list) => PUPPET_COLLATERAL_LIST.filter((item) => list.indexOf(item) === -1), selectedList)
+        optionList: map(list => PUPPET_COLLATERAL_LIST.filter(item => list.indexOf(item) === -1), selectedList)
       })({
         select: changeCollateralTokenListTether()
       }),

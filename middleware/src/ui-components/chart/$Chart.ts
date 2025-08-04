@@ -76,33 +76,33 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
     ) => {
       const containerEl = chartApi.chartElement()
 
-      const crosshairMove = fromCallback<MouseEventParams>((cb) => {
-        chartApi.subscribeCrosshairMove((xx) => {
+      const crosshairMove = fromCallback<MouseEventParams>(cb => {
+        chartApi.subscribeCrosshairMove(xx => {
           return cb(xx)
         })
-        return disposeWith((handler) => chartApi.unsubscribeCrosshairMove(handler), cb)
+        return disposeWith(handler => chartApi.unsubscribeCrosshairMove(handler), cb)
       })
 
       const click = multicast(
-        fromCallback<MouseEventParams>((cb) => {
+        fromCallback<MouseEventParams>(cb => {
           chartApi.subscribeClick(cb)
-          return disposeWith((handler) => chartApi.unsubscribeClick(handler), cb)
+          return disposeWith(handler => chartApi.unsubscribeClick(handler), cb)
         })
       )
 
       const timeScale = chartApi.timeScale()
 
       const visibleLogicalRangeChange: IStream<LogicalRange | null> = multicast(
-        fromCallback((cb) => {
+        fromCallback(cb => {
           timeScale.subscribeVisibleLogicalRangeChange(cb)
-          return disposeWith((handler) => timeScale.subscribeVisibleLogicalRangeChange(handler), cb)
+          return disposeWith(handler => timeScale.subscribeVisibleLogicalRangeChange(handler), cb)
         })
       )
 
       const visibleTimeRangeChange = multicast(
-        fromCallback<IRange<Time> | null>((cb) => {
-          timeScale.subscribeVisibleTimeRangeChange((x) => cb(x))
-          return disposeWith((handler) => timeScale.unsubscribeVisibleTimeRangeChange(handler), cb)
+        fromCallback<IRange<Time> | null>(cb => {
+          timeScale.subscribeVisibleTimeRangeChange(x => cb(x))
+          return disposeWith(handler => timeScale.unsubscribeVisibleTimeRangeChange(handler), cb)
         })
       )
 
@@ -127,7 +127,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                   position: 'absolute'
                 }),
                 styleInline(
-                  map((params) => {
+                  map(params => {
                     if (params.isFocused === false && params.coords === null) {
                       return { display: 'none' }
                     }
@@ -150,13 +150,13 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                 return empty
               }, containerDimension),
               appendData
-                ? tap((next) => {
+                ? tap(next => {
                     if (next?.time) {
                       series.update(next)
                     }
                   }, appendData)
                 : empty,
-              ...priceLineConfigList.map((lineStreamConfig) => {
+              ...priceLineConfigList.map(lineStreamConfig => {
                 return scan(
                   (prev, params) => {
                     if (prev && params === null) {
@@ -177,7 +177,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                   lineStreamConfig
                 )
               }),
-              tap((next) => {
+              tap(next => {
                 seriesMarkers.setMarkers(next)
               }, markers || empty)
             )
@@ -238,7 +238,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                 )
               )
             : empty,
-          isFocused: yAxisState ? snapshot((focused) => !focused, yAxisState.isFocused, click) : empty,
+          isFocused: yAxisState ? snapshot(focused => !focused, yAxisState.isFocused, click) : empty,
           crosshairMove,
           click,
           visibleLogicalRangeChange,

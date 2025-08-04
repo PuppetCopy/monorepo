@@ -77,11 +77,11 @@ export const $Slider = ({
         $container(
           changeSliderDimensionTether(
             observer.resize({}),
-            map((res) => res[0])
+            map(res => res[0])
           ),
           thumbePositionDeltaTether(
             nodeEvent('pointerdown'),
-            (downSrc) => {
+            downSrc => {
               return snapshot(
                 (params, downEvent) => {
                   const dragEnd = eventElementTarget('pointerup', window.document)
@@ -94,7 +94,7 @@ export const $Slider = ({
                   if (startFromBar) {
                     const initOffsetX = downEvent.layerX || downEvent.offsetX // Firefox uses layerX
                     const initialOffset = now(Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max))
-                    const moveDelta = map((moveEvent) => {
+                    const moveDelta = map(moveEvent => {
                       const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
 
                       moveEvent.preventDefault()
@@ -110,7 +110,7 @@ export const $Slider = ({
                     return merge(initialOffset, moveDelta)
                   }
 
-                  return map((moveEvent) => {
+                  return map(moveEvent => {
                     const normalisedValue = Math.min(Math.max(params.value, params.min), params.max)
                     const deltaX = moveEvent.clientX - downEvent.clientX + rectWidth * normalisedValue
 
@@ -133,7 +133,7 @@ export const $Slider = ({
         )(
           $rangeWrapper(
             styleInline(
-              map((params) => {
+              map(params => {
                 const gutterColor = colorAlpha(pallete.background, 0.35)
                 const minArea = `${colorAlpha(params.color, 0.35)} ${params.min * 100}%,`
                 const valArea = `${params.color} ${params.min * 100}% ${params.value * 100}%,`
@@ -146,7 +146,7 @@ export const $Slider = ({
             )
           )(
             $row(
-              styleInline(map((val) => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
+              styleInline(map(val => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
               style({
                 width: '0px',
                 top: '50%',
@@ -157,7 +157,7 @@ export const $Slider = ({
               })
             )(
               styleBehavior(
-                map((params) => {
+                map(params => {
                   return params.disabled
                     ? {
                         borderColor: colorAlpha(pallete.foreground, 0.2),
@@ -169,7 +169,7 @@ export const $Slider = ({
                 $thumb
                   ? $thumb
                   : $defaultSliderThumb(
-                      $node(style({ paddingTop: '2px' }))($text(map((n) => `${Math.floor(n * 100)}%`, value)))
+                      $node(style({ paddingTop: '2px' }))($text(map(n => `${Math.floor(n * 100)}%`, value)))
                     )
               )
             )

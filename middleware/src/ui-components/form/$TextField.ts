@@ -60,7 +60,7 @@ export const $FieldLabeled = ({
 }: ITextField) =>
   component(([change, sampleValue]: IBehavior<string, string>) => {
     const $message = switchMap(
-      (params) => {
+      params => {
         if (params.validation) {
           return $node(style({ color: pallete.negative }))($text(params.validation))
         }
@@ -75,7 +75,7 @@ export const $FieldLabeled = ({
         $row(spacing.small, style({ width: '100%' }))(
           $labelDisplay(style({ width: labelWidth ? `${labelWidth}px` : '' }))($text(label)),
           o(
-            attrBehavior(map((placeholder) => ({ placeholder }), toStream(placeholder))),
+            attrBehavior(map(placeholder => ({ placeholder }), toStream(placeholder))),
             overideInputStyle
           )(
             $Field({

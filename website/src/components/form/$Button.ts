@@ -89,7 +89,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
-      const isTxPending = map((s) => s.status === PromiseStatus.PENDING, promiseState(txQuery))
+      const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
       const isRequestPending = startWith(false, isTxPending)
 
       return [
@@ -100,7 +100,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
               overflow: 'hidden'
             })
           ),
-          disabled: map((params) => {
+          disabled: map(params => {
             return params.alert !== null || params.disabled || params.isRequestPending
           }, combineState({ disabled, isRequestPending, alert })),
           $content: $row(
@@ -113,7 +113,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 position: 'absolute',
                 background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
             $node(
               style({
@@ -123,7 +123,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 background: colorAlpha(pallete.background, 0.9),
                 borderRadius: '30px'
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
             style({ position: 'relative' })(config.$content)
           )
@@ -170,9 +170,9 @@ export const $ButtonCircular = ({
     return [
       $container(
         clickTether(nodeEvent('pointerup')),
-        styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
+        styleBehavior(map(isDisabled => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
         attrBehavior(
-          map((d) => {
+          map(d => {
             return { disabled: d ? 'true' : null }
           }, disabled)
         )

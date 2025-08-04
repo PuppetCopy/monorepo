@@ -12,9 +12,9 @@ export interface ISelect<T> {
 export const $Select = <T>({ list, $$option, $container = $defaultSelectContainer }: ISelect<T>) =>
   component(([select, selectTether]: IBehavior<INode, T>) => {
     return [
-      switchMap((_list) => {
+      switchMap(_list => {
         return $container(
-          ..._list.map((item) => {
+          ..._list.map(item => {
             const selectBehavior = selectTether(nodeEvent('click'), constant(item))
 
             const $opt = style({ cursor: 'pointer' })(switchLatest($$option(now(item))))

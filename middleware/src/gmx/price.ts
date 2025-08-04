@@ -294,7 +294,7 @@ export const latestPriceMap = op(
       const newLocal = await querySignedPrices()
       return groupArrayByKeyMap(
         newLocal,
-        (item) => item.tokenAddress,
+        item => item.tokenAddress,
         (item): ISimpleOraclePrice => {
           const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
           return {

@@ -18,7 +18,7 @@ export const watchContractEvent = <
   params: Omit<WatchContractEventParameters<abi, eventName, strict, transport>, 'onLogs' | 'onError'>
 ): IStream<WatchContractEventOnLogsParameter<abi, eventName, strict extends undefined ? true : strict>> => {
   return {
-    run(scheduler, sink) {
+    run(sink, scheduler) {
       try {
         const removeListenerFn = client.watchContractEvent({
           ...params,
@@ -34,7 +34,7 @@ export const watchContractEvent = <
 
         return disposeWith(removeListenerFn)
       } catch (err) {
-        return scheduler.asap(sink, () => sink.error(err as Error))
+        return scheduler.asap(() => sink.error(err as Error))
       }
     }
   }

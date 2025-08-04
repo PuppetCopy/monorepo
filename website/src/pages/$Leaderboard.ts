@@ -92,7 +92,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
         localStore.leaderboard,
         merge(
           sortByChange,
-          map((selector) => {
+          map(selector => {
             return { direction: 'desc', selector } as const
           }, changeScreenerFocus)
         ),
@@ -122,7 +122,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               $ButtonToggle({
                 value: screenerFocus,
                 optionList: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
-                $$option: map((option) => {
+                $$option: map(option => {
                   return $row(spacing.small, style({ alignItems: 'center' }))(
                     option === undefined
                       ? empty
@@ -159,13 +159,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
               //   select: switchIsLongTether()
               // }),
             ),
-            switchMap((params) => {
+            switchMap(params => {
               // const interval = IntervalTime.MIN
               const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = switchMap(
-                async (filterParams) => {
+                async filterParams => {
                   const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
                     where: (t, f) =>
                       f.and(
@@ -215,7 +215,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     }
                   })
 
-                  const page = metrictList.map((metric) => {
+                  const page = metrictList.map(metric => {
                     return { metric }
                   })
                   return { ...filterParams.paging, page }
@@ -262,7 +262,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   {
                     $head: $text('Trader'),
                     gridTemplate: isDesktopScreen ? '149px' : '136px',
-                    $bodyCallback: map((pos) => {
+                    $bodyCallback: map(pos => {
                       return $TraderDisplay({
                         route: config.route,
                         address: pos.metric.account,
@@ -279,7 +279,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return op(
                         userMatchingRuleQuery,
                         chain(fromPromise),
-                        switchMap((list) => {
+                        switchMap(list => {
                           return $RouteEditor({
                             draftMatchingRuleList,
                             collateralToken: routeMetric.metric.collateralToken,
@@ -309,7 +309,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         {
                           $head: $text('Markets'),
                           gridTemplate: isDesktopScreen ? '210px' : undefined,
-                          $bodyCallback: map((pos) => {
+                          $bodyCallback: map(pos => {
                             const marketList = pos.metric.traderRouteMetric.marketList
                             const marketListLength = marketList.length
                             return $row(spacing.small)(
@@ -325,7 +325,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           sortBy: 'sizeUsd',
                           // $headerCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
                           // $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
-                          $bodyCallback: map((pos) => {
+                          $bodyCallback: map(pos => {
                             return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
                           })
                         }
@@ -341,7 +341,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     ),
                     sortBy: params.screenerFocus,
                     gridTemplate: isDesktopScreen ? '200px' : undefined,
-                    $bodyCallback: map((pos) => {
+                    $bodyCallback: map(pos => {
                       const endTime = unixTimestampNow()
                       const startTime = endTime - params.activityTimeframe
                       const sourceList = [
@@ -357,8 +357,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                       const timeline = fillTimeline({
                         sourceList,
-                        getTime: (item) => item.time,
-                        sourceMap: (next) => {
+                        getTime: item => item.time,
+                        sourceMap: next => {
                           return formatFixed(USD_DECIMALS, next.value)
                         }
                       })

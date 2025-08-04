@@ -27,14 +27,14 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
 export const sizeColumn = (): TableColumn<IPosition> => ({
   $head: $tableHeader('Max Size', 'Leverage'),
   gridTemplate: '78px',
-  $bodyCallback: map((mp) => {
+  $bodyCallback: map(mp => {
     return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
   })
 })
 
 export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return $entry(pos)
   })
 }
@@ -42,7 +42,7 @@ export const entryColumn: TableColumn<IPosition> = {
 export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColumn<IPosition> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return $puppetList(pos.puppetList, click)
   })
 })
@@ -51,8 +51,8 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '100px',
   $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-start' })),
-  $bodyCallback: map((pos) => {
-    const latestPrice = map((pm) => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
+  $bodyCallback: map(pos => {
+    const latestPrice = map(pm => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
 
     const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
@@ -73,7 +73,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
 
     const pnl = isSettled
       ? pos.realisedPnlUsd
-      : map((price) => {
+      : map(price => {
           return (
             pos.realisedPnlUsd +
             getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, price) -
@@ -82,7 +82,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
         }, latestPrice)
 
     const displayColor = skipRepeats(
-      map((value) => {
+      map(value => {
         return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
       }, toStream(pnl))
     )
@@ -91,7 +91,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
       ? $pnlDisplay(pnl)
       : $column(spacing.tiny)(
           $row(style({ alignItems: 'center' }))(
-            switchMap((color) => {
+            switchMap(color => {
               return style({ backgroundColor: colorAlpha(color, 0.1), borderRadius: '50%' })(
                 $infoTooltip($openPositionBreakdown(pos), color, '18px')
               )
@@ -102,7 +102,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
           // $liquidationSeparator(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, pos.lastUpdate.collateralAmount, latestPrice),
           $node(style({ fontSize: '.8rem' }))(
             $text(
-              map((value) => {
+              map(value => {
                 return readablePercentage(toBasisPoints(value, pos.maxCollateralInUsd))
               }, toStream(pnl))
             )
@@ -115,7 +115,7 @@ export const timeColumn: TableColumn<IPosition> = {
   $head: $text('Settle Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   // sortBy: 'openTimestamp',
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return pos.lastUpdate.sizeInUsd === 0n
       ? $column(spacing.tiny)(
           $text(getTimeSince(pos.lastUpdateTimestamp)),

@@ -49,7 +49,7 @@ export const $TradeRouteTimeline = ({
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const timelineQuery = map(async (params) => {
+      const timelineQuery = map(async params => {
         const pos = await params.metricsQuery
 
         if (pos.pnlTimeline.length === 0) {
@@ -60,7 +60,7 @@ export const $TradeRouteTimeline = ({
         const startTime = endTime - params.activityTimeframe
         const sourceList = [
           { value: 0n, time: startTime, traderMatchingKey: pos.pnlTimeline[0].traderMatchingKey },
-          ...pos.pnlTimeline.filter((item) => item.time > startTime),
+          ...pos.pnlTimeline.filter(item => item.time > startTime),
           { value: 0n, time: endTime, traderMatchingKey: '0xdead' as Hex }
         ]
 
@@ -69,8 +69,8 @@ export const $TradeRouteTimeline = ({
         const timelinbe = fillTimeline({
           sourceList,
           ticks: 280,
-          getTime: (item) => item.time,
-          sourceMap: (next) => {
+          getTime: item => item.time,
+          sourceMap: next => {
             sumMap.set(next.traderMatchingKey, next.value)
 
             const sum = [...sumMap.values()].reduce((acc, curr) => acc + curr, 0n)
@@ -104,7 +104,7 @@ export const $TradeRouteTimeline = ({
               })
             ),
             switchLatest(
-              switchMap(async (paramsQuery) => {
+              switchMap(async paramsQuery => {
                 const timeline = await paramsQuery
 
                 if (timeline.length === 0) {
@@ -118,7 +118,7 @@ export const $TradeRouteTimeline = ({
                   }, crosshairMove)
                 )
                 const hoverChartPnl = filterNull(
-                  map((cross) => {
+                  map(cross => {
                     if (cross?.point) {
                       const value = cross.seriesData.values().next().value?.value || 0
                       return value
@@ -137,7 +137,7 @@ export const $TradeRouteTimeline = ({
                     },
                     // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
                     value$: map(
-                      (hoverValue) => {
+                      hoverValue => {
                         const newLocal2 = readableUnitAmount(hoverValue)
                         const newLocal = parseReadableNumber(newLocal2)
                         return newLocal
@@ -161,7 +161,7 @@ export const $TradeRouteTimeline = ({
           ),
           $intermediatePromise({
             $display: map(
-              async (params) => {
+              async params => {
                 const timeline = await params.timelineQuery
 
                 if (timeline.length === 0) {

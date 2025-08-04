@@ -47,7 +47,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
     const { $content, amount, token, spender, $label, disabled, $container = $row(style({ minWidth: 0 })) } = config
 
     const allowance = merge(
-      switchMap(async (query) => {
+      switchMap(async query => {
         return ((await query).events[0].args as any).value as bigint
       }, config.txQuery),
       fromPromise(
@@ -65,14 +65,14 @@ export const $ApproveSpend = (config: IApproveSpend) =>
     return [
       $container(
         switchMap(
-          (params) => {
+          params => {
             if (params.allowance >= params.amount) {
               return $content || empty
             }
 
             return $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
               switchLatest(
-                map((status) => {
+                map(status => {
                   if (status === null) {
                     return empty
                   }

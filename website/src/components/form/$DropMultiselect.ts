@@ -73,8 +73,8 @@ export const $DropMultiSelect = <T>({
 
   getId,
   $noneSelected = $defaultNoneSelected($text('None selected')),
-  $$selectedOption = map((item) => $defaultDropMultiSelectOption($text(String(item)))),
-  $$option = map((item) => $defaultDropMultiSelectOption($text(String(item)))),
+  $$selectedOption = map(item => $defaultDropMultiSelectOption($text(String(item)))),
+  $$option = map(item => $defaultDropMultiSelectOption($text(String(item)))),
   $container = $defaulMultiselectDropContainer,
   $dropListContainer,
   $optionContainer = $defaultOptionContainer,
@@ -84,7 +84,7 @@ export const $DropMultiSelect = <T>({
     return [
       $Dropdown({
         $anchor: $row(style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
-          switchMap((valueList) => {
+          switchMap(valueList => {
             if (!valueList.length) {
               return $noneSelected
             }
@@ -93,7 +93,7 @@ export const $DropMultiSelect = <T>({
               spacing.tiny,
               style({ alignItems: 'center', paddingLeft: '6px' })
             )(
-              ...valueList.map((token) => {
+              ...valueList.map(token => {
                 return $optionContainer(
                   switchLatest($$selectedOption(now(token))),
                   $icon({
@@ -103,7 +103,7 @@ export const $DropMultiSelect = <T>({
                       style({ padding: '4px', cursor: 'pointer' }),
                       pluckTether(
                         nodeEvent('click'),
-                        tap((x) => x.preventDefault()),
+                        tap(x => x.preventDefault()),
                         constant(token)
                       )
                     ),
@@ -133,7 +133,7 @@ export const $DropMultiSelect = <T>({
         select: merge(
           snapshot(
             (seed, next) => {
-              const matchedIndex = getId ? seed.findIndex((item) => getId(item) === getId(next)) : seed.indexOf(next)
+              const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 
               if (matchedIndex === -1) {
                 return append(next, seed)
@@ -146,7 +146,7 @@ export const $DropMultiSelect = <T>({
           ),
           snapshot(
             (seed, next) => {
-              const matchedIndex = getId ? seed.findIndex((item) => getId(item) === getId(next)) : seed.indexOf(next)
+              const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 
               if (matchedIndex !== -1) {
                 return remove(matchedIndex, seed)

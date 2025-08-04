@@ -94,13 +94,13 @@ const appkit = createAppKit({
   }
 })
 
-const blockChange: IStream<bigint> = fromCallback((cb) => {
-  return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: (res) => cb(res) })
+const blockChange: IStream<bigint> = fromCallback(cb => {
+  return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: res => cb(res) })
 })
 
 const appkitAccountEvent: IStream<GetAccountReturnType> = skipRepeatsWith(
   (prev, next) => prev.isConnected === next.isConnected && prev.address === next.address,
-  fromCallback((cb) => {
+  fromCallback(cb => {
     watchAccount(wagmiAdapter.wagmiConfig, {
       onChange(account, _prevAccount) {
         cb(account)

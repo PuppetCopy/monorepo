@@ -86,7 +86,7 @@ export const $PortfolioEditorDrawer = ({
 
       return [
         fadeIn(
-          switchMap((params) => {
+          switchMap(params => {
             if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
               return empty
             }
@@ -94,7 +94,7 @@ export const $PortfolioEditorDrawer = ({
             const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
             const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
               const collateralToken = 'action' in item ? item.token : item.collateralToken
-              const existingRoute = acc.find((route) => route.collateralToken === collateralToken)
+              const existingRoute = acc.find(route => route.collateralToken === collateralToken)
 
               if (existingRoute) {
                 if ('throttleActivity' in item) {
@@ -148,7 +148,7 @@ export const $PortfolioEditorDrawer = ({
                 ),
 
                 switchMap(
-                  (userMatchingRuleList) => {
+                  userMatchingRuleList => {
                     return $column(
                       spacing.default,
                       designSheet.customScroll,
@@ -158,7 +158,7 @@ export const $PortfolioEditorDrawer = ({
                         padding: `0 ${isDesktopScreen ? '24px' : '12px'}`
                       })
                     )(
-                      ...portfolioRouteList.map((portfolioRoute) => {
+                      ...portfolioRouteList.map(portfolioRoute => {
                         return $column(style({ paddingLeft: '16px' }))(
                           $row(
                             $RouteDepositEditor({
@@ -174,9 +174,9 @@ export const $PortfolioEditorDrawer = ({
                               spacing.default,
                               style({ flex: 1, padding: '8px 0 18px' })
                             )(
-                              ...portfolioRoute.matchingRuleList.map((modSubsc) => {
+                              ...portfolioRoute.matchingRuleList.map(modSubsc => {
                                 const userMatchingRule = userMatchingRuleList.find(
-                                  (rule) =>
+                                  rule =>
                                     rule.collateralToken === portfolioRoute.collateralToken &&
                                     rule.trader === modSubsc.trader
                                 )
@@ -262,13 +262,13 @@ export const $PortfolioEditorDrawer = ({
                   $node(style({ flex: 1, minWidth: 0 }))(
                     switchLatest(
                       switchMap(
-                        async (getWalelt) => {
+                        async getWalelt => {
                           try {
                             const capabilities = await getWalelt.getCapabilities()
                             if (capabilities) {
                               return $text(
                                 ...Object.values(capabilities)
-                                  .map((cap) => cap.name)
+                                  .map(cap => cap.name)
                                   .join(', ')
                               )
                             }
@@ -297,7 +297,7 @@ export const $PortfolioEditorDrawer = ({
                   })({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
-                      map(async (account) => {
+                      map(async account => {
                         const routerContractaParams = CONTRACT.UserRouter
                         const tokenRouteContractParams = CONTRACT.TokenRouter
 
@@ -336,7 +336,7 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         callStack.push(
-                          ...params.draftMatchingRuleList.map((matchRule) => {
+                          ...params.draftMatchingRuleList.map(matchRule => {
                             return {
                               to: routerContractaParams.address,
                               data: encodeFunctionData({

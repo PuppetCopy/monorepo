@@ -11,7 +11,7 @@ export const $berry = (displayTuple: Partial<IBerryDisplayTupleMap>) => {
       viewBox: '0 0 1500 1500'
     })
   )(
-    tap((node) => {
+    tap(node => {
       node.element.innerHTML = berryPartsToSvg(displayTuple)
       return node
     })

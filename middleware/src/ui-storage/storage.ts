@@ -47,7 +47,7 @@ export async function get<TSchema, TKey extends GetKey<TSchema>, TData extends T
 export async function add<TResult>(params: IDbStoreParams, list: TResult[]): Promise<TResult[]> {
   const db = await params.dbQuery
   const store = db.transaction(params.name, 'readwrite').objectStore(params.name)
-  const requestList = list.map((item) => request(store.add(item)))
+  const requestList = list.map(item => request(store.add(item)))
 
   await Promise.all(requestList)
   return list
@@ -76,7 +76,7 @@ export function openDatabase<TName extends string>(
 ): Promise<IDBDatabase> {
   const openDbRequest = indexedDB.open(name, version)
 
-  openDbRequest.onupgradeneeded = (_) => {
+  openDbRequest.onupgradeneeded = _ => {
     const db = openDbRequest.result
     try {
       for (const params of storeParamList) {
@@ -96,7 +96,7 @@ export function openDatabase<TName extends string>(
 
 function request<TResult>(req: IDBRequest<any>): Promise<TResult> {
   return new Promise<TResult>((resolve, reject) => {
-    req.onerror = (err) => reject(req.error || new Error(`${err.type}: Unknown error`))
+    req.onerror = err => reject(req.error || new Error(`${err.type}: Unknown error`))
     req.onsuccess = () => {
       resolve(req.result)
     }

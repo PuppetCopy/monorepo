@@ -21,7 +21,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
     const { account, positionListQuery, puppet } = config
 
     const metricsQuery = multicast(
-      map(async (params) => {
+      map(async params => {
         const allPositions = await params.positionListQuery
 
         return accountSettledPositionListSummary(allPositions, puppet)
@@ -56,7 +56,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
                       return `${summary.winCount} / ${summary.lossCount}`
@@ -71,7 +71,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
                       return readableUsd(summary.avgCollateral)
@@ -85,7 +85,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
                       return readableLeverage(summary.avgSize, summary.avgCollateral)

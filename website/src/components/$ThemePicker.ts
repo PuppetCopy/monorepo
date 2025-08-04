@@ -13,8 +13,8 @@ export const $ThemePicker = (theme: IStream<Theme>) =>
         stylePseudo(':hover', { fill: pallete.primary, color: pallete.primary }),
         changeThemeTether(
           nodeEvent('click'),
-          snapshot((current) => {
-            const toIdx = (themeList.findIndex((t) => t.name === current.name) + 1) % themeList.length
+          snapshot(current => {
+            const toIdx = (themeList.findIndex(t => t.name === current.name) + 1) % themeList.length
             const toTheme = themeList[toIdx]
 
             setTheme(themeList, toTheme)

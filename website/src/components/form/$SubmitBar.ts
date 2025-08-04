@@ -60,17 +60,17 @@ export const $SubmitBar = (config: ISubmitBar) =>
       const multicastTxQuery = multicast(promiseState(txQuery))
       const requestStatus = merge(
         multicastTxQuery,
-        map((a) => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
+        map(a => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
       )
       const isRequestPending = startWith(
         false,
-        map((s) => s.status === PromiseStatus.PENDING, multicastTxQuery)
+        map(s => s.status === PromiseStatus.PENDING, multicastTxQuery)
       )
 
       return [
         $container(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
           switchLatest(
-            map((status) => {
+            map(status => {
               if (status === null) {
                 return empty
               }
@@ -83,7 +83,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 let message: string | undefined
 
                 if (err instanceof BaseError) {
-                  const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError)
+                  const revertError = err.walk(err => err instanceof ContractFunctionRevertedError)
                   if (revertError instanceof ContractFunctionRevertedError) {
                     if (revertError.data) {
                       message = getContractErrorMessage(revertError.data)
@@ -111,7 +111,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     $row(spacing.small)(
                       $text('Transaction confirmed'),
 
-                      ...(status.value.receipts?.map((receipt) =>
+                      ...(status.value.receipts?.map(receipt =>
                         $txHashRef(receipt.transactionHash)
                           ? $node($text(receipt.transactionHash))
                           : $node($text(receipt.transactionHash || ''))
@@ -123,7 +123,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
           ),
           $barContent ?? empty,
           $IntermediateConnectButton({
-            $$display: map((wallet) => {
+            $$display: map(wallet => {
               const $primaryActionButton = $ButtonCore({
                 $container: $defaultButtonPrimary(
                   style({
@@ -131,7 +131,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     overflow: 'hidden'
                   })
                 ),
-                disabled: map((params) => {
+                disabled: map(params => {
                   return params.alert !== null || params.disabled || params.isRequestPending
                 }, combineState({ disabled, isRequestPending, alert })),
                 $content: $submitContent
@@ -142,7 +142,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               if (spend) {
                 const isSpendPending = startWith(
                   false,
-                  map((s) => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
+                  map(s => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({
@@ -151,7 +151,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
                   $content: $primaryActionButton,
-                  disabled: map((params) => params.isSpendPending, combineState({ isSpendPending }))
+                  disabled: map(params => params.isSpendPending, combineState({ isSpendPending }))
                 })({
                   approveTokenSpend: approveTokenSpendTether()
                 })

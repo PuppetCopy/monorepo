@@ -35,7 +35,7 @@ export const $QuantumScroll = ({
   // scrollRequest = empty
 }: QuantumScroll) =>
   component(([nextScrollRequest, nextScrollRequestTether]: IBehavior<any, IQuantumScrollPage>) => {
-    const $itemLoader = map((nextResponse) => {
+    const $itemLoader = map(nextResponse => {
       const itemCount = Array.isArray(nextResponse) ? nextResponse.length : nextResponse.$items.length
 
       if (itemCount === 0) {
@@ -66,7 +66,7 @@ export const $QuantumScroll = ({
     }, dataSource)
 
     return [
-      $container(map((node) => ({ ...node, insertAscending })))(join($itemLoader)),
+      $container(map(node => ({ ...node, insertAscending })))(join($itemLoader)),
 
       {
         scrollRequest: nextScrollRequest

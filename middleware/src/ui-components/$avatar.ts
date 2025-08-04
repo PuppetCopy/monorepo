@@ -8,7 +8,7 @@ export function $jazzicon(address: string, size = '24px') {
   const el: HTMLElement = jazzicon(Number.parseInt(size), cnt)
 
   return $wrapNativeElement(el)(
-    map((node) => {
+    map(node => {
       const el: HTMLElement = node.element
       const svg = el.querySelector('svg')
       if (svg) {

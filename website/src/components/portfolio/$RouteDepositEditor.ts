@@ -38,8 +38,8 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
       const { draftDepositTokenList, collateralToken } = config
 
       const model = replayState(
-        map((list) => {
-          const match = list.find((ct) => ct.token === collateralToken)
+        map(list => {
+          const match = list.find(ct => ct.token === collateralToken)
           return (
             match ?? {
               action: DepositEditorAction.DEPOSIT,
@@ -51,7 +51,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
       )
 
       const walletBalance = replayState(
-        switchMap(async (wallet) => {
+        switchMap(async wallet => {
           if (!wallet.address) return 0n
 
           return tokenBalanceOf(collateralToken, wallet.address)
@@ -59,7 +59,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
       )
 
       const depositBalance = replayState(
-        switchMap(async (account) => {
+        switchMap(async account => {
           if (!account.address) return 0n
 
           return puppetReader.getUserBalance(collateralToken, account.address)
@@ -88,11 +88,11 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                 $infoLabel($text('Balance')),
                 $labeledhintAdjustment({
                   color: map(
-                    (c) =>
+                    c =>
                       c ? (c.action === DepositEditorAction.DEPOSIT ? pallete.positive : pallete.negative) : undefined,
                     model
                   ),
-                  change: map((params) => {
+                  change: map(params => {
                     if (!params.model) return ''
 
                     if (params.model.action === DepositEditorAction.DEPOSIT) {
@@ -107,7 +107,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                     )
                   }, combineState({ depositBalance, model })),
                   $val: $text(
-                    map((amount) => {
+                    map(amount => {
                       return readableTokenAmount(collateralTokenDescription, amount)
                     }, depositBalance)
                   )
@@ -127,7 +127,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         {
           changeDepositTokenList: snapshot(
             (changeList, draft) => {
-              const model = changeList.find((ct) => ct.token === collateralToken)
+              const model = changeList.find(ct => ct.token === collateralToken)
 
               if (model) {
                 changeList[changeList.indexOf(model)] = draft

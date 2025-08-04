@@ -110,12 +110,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
 
           $FieldLabeled({
             label: 'Allocate %',
-            value: map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), allowanceRate),
+            value: map(x => (x ? `${formatFixed(4, x) * 100}` : ''), allowanceRate),
             placeholder: `${formatFixed(4, defaultDraft.allowanceRate) * 100}`,
             labelWidth: 150,
             hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
-            change: inputAllowanceTether(map((x) => parseBps(x / 100)))
+            change: inputAllowanceTether(map(x => parseBps(x / 100)))
           }),
 
           style({ margin: '10px 0' })(
@@ -131,7 +131,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
           ),
 
           $row(
-            switchMap((isEnabled) => {
+            switchMap(isEnabled => {
               if (!isEnabled) {
                 return empty
               }
@@ -150,12 +150,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                     })
                   ),
                   hint: 'set a date when this rule will expire, default is 1 year',
-                  value: map((time) => {
+                  value: map(time => {
                     return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
                   }, expiry)
                 })({
                   change: inputEndDateTether(
-                    map((date) => {
+                    map(date => {
                       const parsed = Date.parse(date)
                       return parsed ? BigInt(Math.floor(parsed / 1000)) : BigInt(0)
                     })
@@ -171,7 +171,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                     hint: 'Ignore positions that are too close to each other in time'
                   })({}),
                   $container: $row(style({ right: '0', position: 'relative' })),
-                  $$option: map((tf) => {
+                  $$option: map(tf => {
                     return $node($text(getDuration(Number(tf))))
                   }),
                   optionList: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
@@ -194,7 +194,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
 
             $ButtonSecondary({
               $content: $text('Copy'),
-              disabled: map((params) => !params.allowanceRate, draft)
+              disabled: map(params => !params.allowanceRate, draft)
             })({
               click: saveTether()
             })
@@ -204,9 +204,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
         {
           changeMatchRuleList: merge(
             snapshot(
-              (params) => {
+              params => {
                 const modelIndex = params.draftMatchingRuleList.findIndex(
-                  (x) => x.traderMatchingKey === traderMatchingKey
+                  x => x.traderMatchingKey === traderMatchingKey
                 )
                 const model = modelIndex > -1 ? params.draftMatchingRuleList[modelIndex] : undefined
 
@@ -234,12 +234,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
               save
             ),
             snapshot(
-              (params) => {
-                const match = params.draftMatchingRuleList.find((x) => x.traderMatchingKey === traderMatchingKey)
+              params => {
+                const match = params.draftMatchingRuleList.find(x => x.traderMatchingKey === traderMatchingKey)
 
                 if (match) {
                   const modelIndex = params.draftMatchingRuleList.findIndex(
-                    (x) => x.traderMatchingKey === traderMatchingKey
+                    x => x.traderMatchingKey === traderMatchingKey
                   )
                   params.draftMatchingRuleList[modelIndex] = {
                     ...match,

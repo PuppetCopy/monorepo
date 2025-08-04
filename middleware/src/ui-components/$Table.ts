@@ -102,11 +102,11 @@ export const $Table = <T>({
     ) => {
       const gridTemplateColumns = style({
         display: 'grid',
-        gridTemplateColumns: columns.map((col) => col.gridTemplate || '1fr').join(' ')
+        gridTemplateColumns: columns.map(col => col.gridTemplate || '1fr').join(' ')
       })
 
       const $header = $headerRowContainer(gridTemplateColumns)(
-        ...columns.map((col) => {
+        ...columns.map(col => {
           const $headerCellContainer = col.$headerCellContainer || $headerCell
           if (col.sortBy) {
             return $headerCellContainer(style({ cursor: 'pointer' }))(
@@ -151,14 +151,14 @@ export const $Table = <T>({
 
       const $body = $QuantumScroll({
         ...scrollConfig,
-        dataSource: map((res) => {
-          const $items = (Array.isArray(res) ? res : res.page).map((rowData) => {
+        dataSource: map(res => {
+          const $items = (Array.isArray(res) ? res : res.page).map(rowData => {
             return $rowCallback
               ? switchLatest(
                   map(
-                    ($rowContainer) => {
+                    $rowContainer => {
                       return $rowContainer(gridTemplateColumns)(
-                        ...columns.map((col) => {
+                        ...columns.map(col => {
                           const $body = col.$bodyCellContainer ?? $bodyCell
                           return $body(switchLatest(col.$bodyCallback(now(rowData))))
                         })
@@ -168,7 +168,7 @@ export const $Table = <T>({
                   )
                 )
               : $rowContainer(gridTemplateColumns)(
-                  ...columns.map((col) => {
+                  ...columns.map(col => {
                     const $body = col.$bodyCellContainer ?? $bodyCell
                     return $body(switchLatest(col.$bodyCallback(now(rowData))))
                   })
@@ -193,7 +193,7 @@ export const $Table = <T>({
 
         {
           scrollRequest,
-          sortBy: map((selector) => {
+          sortBy: map(selector => {
             if (!sortBy) {
               return sortBy
             }

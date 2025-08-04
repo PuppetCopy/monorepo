@@ -137,7 +137,7 @@ export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode,
   }
 
   return $row(style({ cursor: 'pointer' }))(
-    ...puppets.map((account) => {
+    ...puppets.map(account => {
       if (!click) {
         return style({ marginRight: '-12px', border: '2px solid black' })(
           $profileAvatar({ address: account, size: 25 })
@@ -166,15 +166,15 @@ export const $leverage = (size: bigint, collateral: bigint) => {
 
 export const $pnlDisplay = (pnlSrc: IStream<bigint> | bigint, bold = true) => {
   const pnl = toStream(pnlSrc)
-  const display = map((value) => readablePnl(value), pnl)
+  const display = map(value => readablePnl(value), pnl)
   const displayColor = skipRepeats(
-    map((value) => {
+    map(value => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
     }, pnl)
   )
 
   const colorStyle = styleInline(
-    map((color) => {
+    map(color => {
       return { color }
     }, displayColor)
   )
@@ -184,15 +184,15 @@ export const $pnlDisplay = (pnlSrc: IStream<bigint> | bigint, bold = true) => {
 
 export const $roiDisplay = (roiSrc: IStream<bigint> | bigint, bold = true) => {
   const roi = toStream(roiSrc)
-  const display = map((value) => readablePercentage(value), roi)
+  const display = map(value => readablePercentage(value), roi)
   const displayColor = skipRepeats(
-    map((value) => {
+    map(value => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
     }, roi)
   )
 
   const colorStyle = styleInline(
-    map((color) => {
+    map(color => {
       return { color }
     }, displayColor)
   )
@@ -204,14 +204,14 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
-  const latestPrice = map((pm) => {
+  const latestPrice = map(pm => {
     const price = getMappedValue(pm, indexToken)
     return price && typeof price === 'object' && 'max' in price ? price.max : 0n
   }, latestPriceMap)
 
   const roi = isPositionSettled(pos)
     ? readablePercentage(toBasisPoints(pos.realisedPnlUsd, collateralUsd))
-    : map((markPrice) => {
+    : map(markPrice => {
         const delta = getPositionPnlUsd(
           pos.isLong,
           pos.lastUpdate.sizeInUsd,
@@ -230,7 +230,7 @@ export function $liquidationSeparator(
   collateralAmount: bigint,
   markPrice: IStream<bigint>
 ) {
-  const liqWeight = map((price) => {
+  const liqWeight = map(price => {
     const collateralUsd = price * collateralAmount
     const liquidationPrice = getRoughLiquidationPrice(isLong, sizeUsd, sizeInTokens, collateralUsd, collateralAmount)
 
@@ -238,7 +238,7 @@ export function $liquidationSeparator(
   }, markPrice)
 
   return styleInline(
-    map((weight) => {
+    map(weight => {
       return {
         width: '100%',
         background: `linear-gradient(90deg, ${pallete.negative} ${`${weight * 100}%`}, ${pallete.foreground} 0)`
@@ -301,7 +301,7 @@ export const $openPositionBreakdown = (pos: IPosition) => {
     $row(style({ placeContent: 'space-between' }))(
       $node(style({ color: pallete.foreground, flex: 1 }))($text('Open Pnl')),
       $pnlDisplay(
-        map((markPrice) => {
+        map(markPrice => {
           return getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
         }, latestPrice)
       )
@@ -351,7 +351,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                 }),
                 puppetList.length > 0
                   ? $row(style({ alignItems: 'center' }))(
-                      ...puppetList.map((puppet) => {
+                      ...puppetList.map(puppet => {
                         return style({ marginRight: '-12px', border: '2px solid black' })(
                           $profileAvatar({ address: puppet, size: 25 })
                         )

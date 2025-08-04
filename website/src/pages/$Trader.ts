@@ -73,7 +73,7 @@ export const $TraderPage = ({
       const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address
 
       const routeMetricListQuery = multicast(
-        map(async (params) => {
+        map(async params => {
           const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
           const routeMetricList = await sqlClient.query.traderRouteLatestMetric.findMany({
@@ -103,12 +103,12 @@ export const $TraderPage = ({
       )
 
       const metricsQuery = multicast(
-        map(async (metricList) => {
+        map(async metricList => {
           return accountSettledPositionListSummary(account, await metricList)
         }, routeMetricListQuery)
       )
 
-      const pageParams = switchMap(async (params) => {
+      const pageParams = switchMap(async params => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
         const _paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -225,7 +225,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return `${summary.winCount} / ${summary.lossCount}`
                       }, metricsQuery)
@@ -236,7 +236,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return readableUsd(summary.sizeUsd)
                       }, metricsQuery)
@@ -247,7 +247,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return readableLeverage(summary.sizeUsd, summary.collateralUsd)
                       }, metricsQuery)
@@ -258,7 +258,7 @@ export const $TraderPage = ({
               )
             ),
 
-            switchMap((params) => {
+            switchMap(params => {
               const _startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -270,11 +270,11 @@ export const $TraderPage = ({
               }
 
               return $column(spacing.big)(
-                ...params.routeMetricList.map((routeMetric) => {
-                  const dataSource = map((pageParams) => {
+                ...params.routeMetricList.map(routeMetric => {
+                  const dataSource = map(pageParams => {
                     return pagingQuery(
                       { ...pageParams.paging, ...pageParams.sortBy },
-                      params.positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
+                      params.positionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
                   }, combineState({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
@@ -282,7 +282,7 @@ export const $TraderPage = ({
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
                     switchMap(
-                      (list) => {
+                      list => {
                         return $RouteEditor({
                           displayCollateralTokenSymbol: true,
                           collateralToken: routeMetric.collateralToken,
@@ -297,7 +297,7 @@ export const $TraderPage = ({
                           changeMatchRuleList: changeMatchRuleListTether()
                         })
                       },
-                      switchMap((promise) => fromPromise(promise), userMatchingRuleQuery)
+                      switchMap(promise => fromPromise(promise), userMatchingRuleQuery)
                     ),
                     $row(
                       style({ marginRight: '26px' })($seperator2),

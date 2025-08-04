@@ -45,7 +45,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       } = config
 
       const matchingRule = userMatchingRuleList.length
-        ? userMatchingRuleList.find((mr) => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+        ? userMatchingRuleList.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
         : undefined
 
       return [

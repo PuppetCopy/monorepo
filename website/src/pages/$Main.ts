@@ -47,7 +47,7 @@ import { $TraderPage } from './$Trader.js'
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
 const requestRouteChange = merge(initialLocation, popStateEvent)
-const locationChange = map((location) => {
+const locationChange = map(location => {
   return location
 }, requestRouteChange)
 
@@ -101,7 +101,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)
 
-      const subgraphBeaconStatusColor = map((status) => {
+      const subgraphBeaconStatusColor = map(status => {
         const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
 
         const color =
@@ -117,16 +117,14 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const userMatchingRuleQuery = op(
         queryUserMatchingRuleList({
-          address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
+          address: map(getAccountStatus => getAccountStatus.address, wallet.account)
         }),
         multicast,
         replayLatest
       )
 
-      const draftMatchingRuleList = op(changeMatchRuleList, multicast, (stream) =>
-        replayLatest(stream, [] as ISetMatchingRuleEditorDraft[])
-      )
-      const draftDepositTokenList = op(changeDepositTokenList, multicast, (stream) =>
+      const draftMatchingRuleList = op(changeMatchRuleList, multicast, stream => replayLatest(stream, []))
+      const draftDepositTokenList = op(changeDepositTokenList, multicast, stream =>
         replayLatest(stream, [] as IDepositEditorDraft[])
       )
 
@@ -226,7 +224,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           )(
             $Tooltip({
               $content: switchMap(
-                (params) => {
+                params => {
                   const status = params.subgraphStatus.arbitrum
 
                   if (!status.ready || status.block === null) {
@@ -260,7 +258,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   padding: '6px'
                 }),
                 styleBehavior(
-                  map((color) => {
+                  map(color => {
                     return { backgroundColor: colorAlpha(color, 0.5), outlineColor: color }
                   }, subgraphStatusColorOnce)
                 )
@@ -280,7 +278,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                     animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                   }),
                   styleBehavior(
-                    map((color) => {
+                    map(color => {
                       return {
                         backgroundColor: colorAlpha(color, 0.5),
                         animationIterationCount: color === pallete.negative ? 'infinite' : 1
@@ -317,7 +315,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               })
             )
           ),
-          switchMap((cb) => {
+          switchMap(cb => {
             return fadeIn(
               $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
                 filterNull(constant(null, clickUpdateVersion)) as IStream<never>,

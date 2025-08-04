@@ -52,7 +52,7 @@ export const $PortfolioPage = ({
     ) => {
       const positionLinkMapQuery = multicast(
         map(
-          async (params) => {
+          async params => {
             const address = params.wallet.address
 
             if (address === undefined) {
@@ -130,7 +130,7 @@ export const $PortfolioPage = ({
               }
             })
 
-            return groupArrayMany(result, (row) =>
+            return groupArrayMany(result, row =>
               getTraderMatchingKey(row.callParamsCollateralToken, row.mirrorLink.callParamsTrader)
             )
           },
@@ -203,7 +203,7 @@ export const $PortfolioPage = ({
               ),
 
               $intermediatePromise({
-                $display: map(async (params) => {
+                $display: map(async params => {
                   const settlementList = await params.positionLinkMapQuery
 
                   if (settlementList === null) {
@@ -226,7 +226,7 @@ export const $PortfolioPage = ({
           ),
 
           $intermediatePromise({
-            $display: map(async (params) => {
+            $display: map(async params => {
               const activeRouteList =
                 params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
 
@@ -234,9 +234,9 @@ export const $PortfolioPage = ({
               const matchingRuleList = await params.userMatchingRuleQuery
 
               return $column(spacing.default)(
-                ...activeRouteList.map((collateralToken) => {
+                ...activeRouteList.map(collateralToken => {
                   const matchingRuleListForToken = matchingRuleList.filter(
-                    (rule) => rule.collateralToken === collateralToken
+                    rule => rule.collateralToken === collateralToken
                   )
 
                   return $column(style({ paddingLeft: '16px' }))(
@@ -261,7 +261,7 @@ export const $PortfolioPage = ({
                                 $text(`No matching rules set for ${getTokenDescription(collateralToken).name}`)
                               )
                             : empty,
-                          ...matchingRuleListForToken.map((rule) => {
+                          ...matchingRuleListForToken.map(rule => {
                             const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 
                             const mirrorLinkList = positionMap?.[traderMatchingKey] || []
@@ -269,7 +269,7 @@ export const $PortfolioPage = ({
                             return $column(
                               $Popover({
                                 $open: filterNull(
-                                  map((trader) => {
+                                  map(trader => {
                                     if (trader !== rule.trader) {
                                       return null
                                     }

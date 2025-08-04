@@ -31,7 +31,7 @@ const config: IRunEnvironment = {
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, config.stylesheet]
 
-$createRoot(config).run(browserScheduler, {
+$createRoot(config).run({
   end() {
     console.log('Application has ended.')
   },
@@ -41,4 +41,4 @@ $createRoot(config).run(browserScheduler, {
   event() {
     // Handle events if necessary
   }
-})
+}, browserScheduler)

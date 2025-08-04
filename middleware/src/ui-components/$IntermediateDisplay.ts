@@ -38,10 +38,10 @@ export interface I$IntermediatPromise<_T> {
 
 export const $intermediatePromise = <T>({
   $loader = $spinner,
-  $$fail = (res) => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message)))),
+  $$fail = res => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message)))),
   $display
 }: I$IntermediatPromise<T>) =>
-  switchMap((state) => {
+  switchMap(state => {
     if (state.status === PromiseStatus.PENDING) {
       return $loader
     }
@@ -72,7 +72,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
 
   return $intermediatePromise<TSuccess>({
     clean,
-    $display: map(async (query) => {
+    $display: map(async query => {
       const res = await query
 
       return $row(spacing.small, style({ color: pallete.positive }))(
@@ -81,7 +81,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
       )
     }, multicastQuery),
     $loader: switchLatest(
-      map((c) => {
+      map(c => {
         return $row(spacing.small, style({ alignItems: 'center', fontSize: '.8rem' }))(
           $spinner,
           $text(
@@ -91,11 +91,11 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
             )
           ),
           $node(style({ flex: 1 }))(),
-          switchLatest(map((txHash) => $txHashRef(txHash.transactionHash, chain), fromPromise(c)))
+          switchLatest(map(txHash => $txHashRef(txHash.transactionHash, chain), fromPromise(c)))
         )
       }, multicastQuery)
     ),
-    $$fail: (res) => {
+    $$fail: res => {
       const error = String(res)
 
       return showTooltip ? $alertTooltip($node($text(error))) : $alert($node($text(error)))

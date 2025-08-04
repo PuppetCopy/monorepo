@@ -14,7 +14,7 @@ if (!fontUrl) {
 
 runBrowser({ $rootNode: $node(style({ backgroundColor: 'red' }))($text('hello worldzz')) })
 
-const fontData = await fetch(fontUrl).then((res) => res.arrayBuffer())
+const fontData = await fetch(fontUrl).then(res => res.arrayBuffer())
 
 const markup = html`<div style="color: black;">hello, world</div>`
 

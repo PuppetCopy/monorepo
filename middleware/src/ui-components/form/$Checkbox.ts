@@ -30,7 +30,7 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
       const $overlay = $node(
         layoutSheet.stretch,
         style({ flex: 1, margin: '3px' }),
-        styleBehavior(map((ch) => (ch ? { backgroundColor: pallete.message } : null), value))
+        styleBehavior(map(ch => (ch ? { backgroundColor: pallete.message } : null), value))
       )
 
       const $checkInput = $element('input')(
@@ -38,10 +38,10 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
         layoutSheet.stretch,
         checkTether(
           nodeEvent('change'),
-          map((evt) => (<HTMLInputElement>evt.target).checked)
+          map(evt => (<HTMLInputElement>evt.target).checked)
         ),
         attr({ type: 'checkbox' }),
-        attrBehavior(map((checked) => ({ checked: checked ? true : null }), value)),
+        attrBehavior(map(checked => ({ checked: checked ? true : null }), value)),
         interactionTether(interactionOp),
         dismissTether(dismissOp)
       )
@@ -51,7 +51,7 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
           disabled
             ? styleBehavior(
                 map(
-                  (isDisabled) => {
+                  isDisabled => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
                   startWith(true, disabled)
@@ -61,7 +61,7 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
         )(
           $node(
             styleBehavior(
-              map((active) => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
+              map(active => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
             ),
             style({ position: 'relative', width: '18px', height: '18px', border: `2px solid ${pallete.message}` })
           )($overlay(), $checkInput()),

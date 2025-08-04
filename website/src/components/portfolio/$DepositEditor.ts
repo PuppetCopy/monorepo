@@ -54,16 +54,16 @@ export const $DepositEditor = (config: {
       const tokenDescription = getTokenDescription(config.token)
 
       const action = merge(
-        map((model) => model.action, config.model),
+        map(model => model.action, config.model),
         changeDepositMode
       )
 
       const maxAmount = op(
         merge(
-          map((model) => model.action, config.model),
+          map(model => model.action, config.model),
           changeDepositMode
         ),
-        switchMap((action) => {
+        switchMap(action => {
           return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
         })
       )
@@ -74,11 +74,11 @@ export const $DepositEditor = (config: {
         inputMaxAmount,
         inputAmount,
         constant(0n, changeDepositMode),
-        map((model) => model.amount, config.model)
+        map(model => model.amount, config.model)
       )
 
       const alert = merge(
-        map((params) => {
+        map(params => {
           if (params.action === DepositEditorAction.DEPOSIT && params.value > params.maxAmount) {
             return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
           }
@@ -102,7 +102,7 @@ export const $DepositEditor = (config: {
             $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
             optionList: [DepositEditorAction.DEPOSIT, DepositEditorAction.WITHDRAW],
             value: action,
-            $$option: map((action) => {
+            $$option: map(action => {
               const label = action === DepositEditorAction.DEPOSIT ? 'Deposit' : 'Withdraw'
               return $node(style({ width: '100px', textAlign: 'center' }))($text(label))
             })
@@ -114,12 +114,12 @@ export const $DepositEditor = (config: {
             $FieldLabeled({
               label: 'Amount',
               validation: alert,
-              value: map((value) => {
+              value: map(value => {
                 return value ? readableTokenAmount(tokenDescription, value) : ''
               }, value),
               placeholder: 'Enter amount',
               hint: map(
-                (params) => {
+                params => {
                   return `${params.action === DepositEditorAction.DEPOSIT ? 'Wallet' : 'Deposit'} Balance: ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
                 },
                 combineState({
@@ -129,7 +129,7 @@ export const $DepositEditor = (config: {
               )
             })({
               change: inputAmountTether(
-                map((val) => {
+                map(val => {
                   return val ? parseFixed(tokenDescription.decimals, parseReadableNumber(val)) : 0n
                 })
               )
@@ -154,7 +154,7 @@ export const $DepositEditor = (config: {
 
             $ButtonSecondary({
               disabled: map(
-                (params) => params.alert !== null || params.model?.amount === params.value,
+                params => params.alert !== null || params.model?.amount === params.value,
                 combineState({ alert, value, model: config.model })
               ),
               $content: $text('Save')

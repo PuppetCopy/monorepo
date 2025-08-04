@@ -64,7 +64,7 @@ export const $Tooltip = ({
         $container(
           hoverTether(
             nodeEvent(isTouchDevice ? 'pointerenter' : 'pointerenter'),
-            map((enterEvent) => {
+            map(enterEvent => {
               // prevent selection highlighting
               if (isTouchDevice) {
                 enterEvent.preventDefault()
@@ -87,7 +87,7 @@ export const $Tooltip = ({
           targetIntersectionTether(observer.intersection())
         )(
           style({ cursor: 'help' })($anchor),
-          switchMap((show) => {
+          switchMap(show => {
             if (!show) {
               return empty
             }

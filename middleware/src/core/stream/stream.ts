@@ -1,5 +1,5 @@
 import type { IScheduler, ISink, IStream } from 'aelea/stream'
-import { disposeNone, disposeWith, filter, fromPromise, map, periodic } from 'aelea/stream'
+import { disposeWith, filter, fromPromise, map, periodic, stream } from 'aelea/stream'
 import { countdownFn, unixTimestampNow } from '../date.js'
 
 export type StateParams<T> = {
@@ -8,32 +8,10 @@ export type StateParams<T> = {
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 
-export function importGlobal<T>(queryCb: () => Promise<T>): IStream<T> {
-  let cacheQuery: Promise<T> | null = null
-
-  return {
-    run(scheduler, sink) {
-      if (cacheQuery === null) {
-        cacheQuery = queryCb()
-      }
-
-      cacheQuery
-        .then((res) => {
-          sink.event(res)
-        })
-        .catch((err) => {
-          sink.error(err as Error)
-        })
-
-      return disposeNone()
-    }
-  }
-}
-
 export const everySec = map(unixTimestampNow, periodic(1000, null))
 
 export const countdown = (targetDate: number) => {
-  return map((now) => countdownFn(targetDate, now), everySec)
+  return map(now => countdownFn(targetDate, now), everySec)
 }
 
 export const ignoreAll = filter(() => false)
@@ -50,11 +28,7 @@ export type PromiseStateError = { status: PromiseStatus.ERROR; error: Error }
 export type PromiseState<T> = PromiseStateDone<T> | PromiseStatePending | PromiseStateError
 
 export const promiseState = <T>(querySrc: IStream<Promise<T>>): IStream<PromiseState<T>> => {
-  return {
-    run(scheduler, sink) {
-      return querySrc.run(scheduler, new PromiseStateSink(sink))
-    }
-  }
+  return stream((sink, scheduler) => querySrc.run(new PromiseStateSink(sink), scheduler))
 }
 
 class PromiseStateSink<T> implements ISink<Promise<T>> {
@@ -73,8 +47,8 @@ class PromiseStateSink<T> implements ISink<Promise<T>> {
     }
 
     promise.then(
-      (value) => this.handleResult(promiseId, { status: PromiseStatus.DONE, value }),
-      (error) =>
+      value => this.handleResult(promiseId, { status: PromiseStatus.DONE, value }),
+      error =>
         this.handleResult(promiseId, {
           status: PromiseStatus.ERROR,
           error: error instanceof Error ? error : new Error(String(error))
@@ -102,21 +76,24 @@ class PromiseStateSink<T> implements ISink<Promise<T>> {
 
 export function flattenEvents<T>(source: IStream<T[]>): IStream<T> {
   return {
-    run(scheduler, sink) {
-      return source.run(scheduler, {
-        event: (items) => {
-          if (!Array.isArray(items)) {
-            sink.error(new Error(`flattenEvents: expected array but got ${typeof items}`))
-            return
-          }
+    run(sink, scheduler) {
+      return source.run(
+        {
+          event: items => {
+            if (!Array.isArray(items)) {
+              sink.error(new Error(`flattenEvents: expected array but got ${typeof items}`))
+              return
+            }
 
-          for (const item of items) {
-            sink.event(item)
-          }
+            for (const item of items) {
+              sink.event(item)
+            }
+          },
+          error: error => sink.error(error),
+          end: () => sink.end()
         },
-        error: (error) => sink.error(error),
-        end: () => sink.end()
-      })
+        scheduler
+      )
     }
   }
 }
@@ -134,7 +111,7 @@ export function bufferEvents<T>(
   }
 
   return {
-    run(scheduler, sink) {
+    run(sink, scheduler) {
       let buffer: T[] = []
       let nextEmitTime: number | null = null
 
@@ -170,7 +147,7 @@ export function bufferEvents<T>(
         sink.end()
       }
 
-      const disposable = source.run(scheduler, { event: onEvent, error: onError, end: onEnd })
+      const disposable = source.run({ event: onEvent, error: onError, end: onEnd }, scheduler)
 
       return disposeWith(() => {
         buffer = []
@@ -184,7 +161,7 @@ export type Adapter<A, B> = [(event: A) => void, IStream<B>]
 
 export const createAdapter = <A>(): Adapter<A, A> => {
   const sinks: { sink: ISink<A>; scheduler: IScheduler }[] = []
-  return [(a) => broadcast(sinks, a), new FanoutPortStream(sinks)]
+  return [a => broadcast(sinks, a), new FanoutPortStream(sinks)]
 }
 
 const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A): void =>
@@ -193,7 +170,7 @@ const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A):
 export class FanoutPortStream<A> {
   constructor(private readonly sinks: { sink: ISink<A>; scheduler: IScheduler }[]) {}
 
-  run(scheduler: IScheduler, sink: ISink<A>): { dispose(): void } {
+  run(sink: ISink<A>, scheduler: IScheduler): { dispose(): void } {
     const s = { sink, scheduler }
     this.sinks.push(s)
     return new RemovePortDisposable(s, this.sinks)

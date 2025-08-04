@@ -38,7 +38,7 @@ try {
   console.log(`📈 Creating ${releaseType} changeset...`)
   const changesetId = `release-${Date.now()}`
   const changesetContent = `---
-${packages.map((pkg) => `"@puppet-copy/${pkg}": ${releaseType}`).join('\n')}
+${packages.map(pkg => `"@puppet-copy/${pkg}": ${releaseType}`).join('\n')}
 ---
 
 ${releaseType.charAt(0).toUpperCase() + releaseType.slice(1)} release

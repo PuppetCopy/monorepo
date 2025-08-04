@@ -11,7 +11,7 @@ export const $walletProfileDisplay = () => {
 
   const [click, clickTether] = behavior()
 
-  return switchMap((getAccountStatus) => {
+  return switchMap(getAccountStatus => {
     if (getAccountStatus.status === 'connecting' || getAccountStatus.status === 'reconnecting') {
       return $node($text('Connecting...'))
     }
@@ -20,7 +20,7 @@ export const $walletProfileDisplay = () => {
       return $row(
         clickTether(
           nodeEvent('pointerdown'),
-          tap((_es) => {
+          tap(_es => {
             wallet.appkit.open()
           })
         ),

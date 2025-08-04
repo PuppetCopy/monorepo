@@ -269,12 +269,12 @@ interface ILabeledHintAdjustment extends IHintAdjustment {
 }
 
 export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
-  const displayChange = skipRepeats(map((str) => !!str, startWith('', change)))
+  const displayChange = skipRepeats(map(str => !!str, startWith('', change)))
   const arrowColor = color ?? now(pallete.foreground)
 
   return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(
-      map((str) => (str ? { color: pallete.foreground } : {}), change),
+      map(str => (str ? { color: pallete.foreground } : {}), change),
       $node(isStream($val) ? $val : $text($val))
     ),
 
@@ -282,14 +282,14 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
       $content: $arrowRight,
       width: '10px',
       svgOps: styleBehavior(
-        map((params) => {
+        map(params => {
           return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
         }, combineState({ displayChange, arrowColor }))
       ),
       viewBox: '0 0 32 32'
     }),
 
-    $text(map((str) => str ?? '', change))
+    $text(map(str => str ?? '', change))
   )
 }
 
@@ -320,7 +320,7 @@ export const $intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'
 }
 
 export const intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'): IStream<string> => {
-  const text = switchMap((res) => {
+  const text = switchMap(res => {
     return startWith(hint, fromPromise(res))
   }, querySrc)
   return text

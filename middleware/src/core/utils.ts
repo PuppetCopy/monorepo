@@ -62,7 +62,7 @@ export function groupArrayManyMap<A, B extends string | symbol | number, R>(
 ): Record<B, R[]> {
   const gmap = {} as { [P in B]: R[] }
 
-  list.forEach((item) => {
+  list.forEach(item => {
     const key = getKey(item)
 
     if (key === undefined) {
@@ -81,14 +81,14 @@ export function groupArrayMany<A, B extends string | symbol | number>(
   list: readonly A[],
   getKey: (v: A) => B
 ): Record<B, A[]> {
-  return groupArrayManyMap(list, getKey, (x) => x)
+  return groupArrayManyMap(list, getKey, x => x)
 }
 
 export function groupArrayByKey<A, B extends string | symbol | number>(
   list: readonly A[],
   getKey: (v: A) => B
 ): Record<B, A> {
-  return groupArrayByKeyMap(list, getKey, (x) => x)
+  return groupArrayByKeyMap(list, getKey, x => x)
 }
 
 export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(

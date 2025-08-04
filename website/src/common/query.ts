@@ -27,7 +27,7 @@ export function queryPricefeed(
   }>,
   estTickAmout = 10
 ) {
-  return map(async (params) => {
+  return map(async params => {
     const priceList = await sqlClient.query.priceCandle.findMany({
       columns: {
         c: true,
@@ -41,7 +41,7 @@ export function queryPricefeed(
           params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
         )
     })
-    return groupArrayMany(priceList, (c) => c.token)
+    return groupArrayMany(priceList, c => c.token)
 
     // map results by token
   }, combineState(queryParams))
@@ -52,7 +52,7 @@ export function queryUserMatchingRuleList(
     address: Address | undefined
   }>
 ): IStream<Promise<ISetMatchingRule[]>> {
-  return map(async (params) => {
+  return map(async params => {
     const address = params.address
     if (address === undefined) {
       return []

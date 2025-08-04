@@ -58,11 +58,11 @@ export const $ButtonToggle = <T>({
   component(([select, sampleSelect]: IBehavior<INode, T>) => {
     return [
       $container(
-        ...optionList.map((opt) =>
+        ...optionList.map(opt =>
           $button(
             sampleSelect(nodeEvent('click'), constant(opt)),
             styleBehavior(
-              map((selectedOpt) => {
+              map(selectedOpt => {
                 return selectedOpt === opt
                   ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, pointerEvents: 'none' }
                   : { color: pallete.foreground }
