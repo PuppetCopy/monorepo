@@ -10,7 +10,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
-import { combineState, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'
+import { combine, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -94,8 +94,8 @@ export const $PortfolioPage = ({
                         positionSize: true,
                         transactionHash: true,
                         traderSize: true,
-                        traderCollateral: true,
-                        traderTargetLeverage: true
+                        traderCollateral: true
+                        // traderTargetLeverage: true // TODO: Field no longer exists in schema
                       }
                     },
                     liquidate: {
@@ -131,15 +131,15 @@ export const $PortfolioPage = ({
             })
 
             return groupArrayMany(result, row =>
-              getTraderMatchingKey(row.callParamsCollateralToken, row.mirrorLink.callParamsTrader)
+              getTraderMatchingKey(row.callParamsCollateralToken, row.callParamsTrader)
             )
           },
-          combineState({ activityTimeframe, collateralTokenList, wallet: wallet.account })
+          combine({ activityTimeframe, collateralTokenList, wallet: wallet.account })
         )
       )
 
       const stateParams = multicast(
-        combineState({
+        combine({
           userMatchingRuleQuery,
           positionLinkMapQuery,
           activityTimeframe,
@@ -161,7 +161,7 @@ export const $PortfolioPage = ({
       //   })
 
       //   return Promise.all(ruleList)
-      // }, combineState({ collateralTokenList, wallet: wallet.account }))
+      // }, combine({ collateralTokenList, wallet: wallet.account }))
 
       return [
         $card(spacing.big, style({ flex: 1, width: '100%' }))(

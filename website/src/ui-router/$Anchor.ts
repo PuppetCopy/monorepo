@@ -1,6 +1,6 @@
 import { attr, component, type I$Node, type INode, nodeEvent, style } from 'aelea/core'
+import type { Route } from 'aelea/router'
 import { constant, type IBehavior, type IOps, map, merge, o, op, startWith } from 'aelea/stream'
-import type { Route } from './types.js'
 
 export interface IAnchor {
   url: string

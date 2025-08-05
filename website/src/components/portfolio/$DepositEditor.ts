@@ -7,7 +7,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $node, $text, component, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   constant,
   empty,
   type IBehavior,
@@ -92,7 +92,7 @@ export const $DepositEditor = (config: {
           }
 
           return null
-        }, combineState({ maxAmount, value, action })),
+        }, combine({ maxAmount, value, action })),
         config.validation ? config.validation(value) : empty
       )
 
@@ -122,7 +122,7 @@ export const $DepositEditor = (config: {
                 params => {
                   return `${params.action === DepositEditorAction.DEPOSIT ? 'Wallet' : 'Deposit'} Balance: ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
                 },
-                combineState({
+                combine({
                   maxAmount,
                   action: action
                 })
@@ -155,7 +155,7 @@ export const $DepositEditor = (config: {
             $ButtonSecondary({
               disabled: map(
                 params => params.alert !== null || params.model?.amount === params.value,
-                combineState({ alert, value, model: config.model })
+                combine({ alert, value, model: config.model })
               ),
               $content: $text('Save')
             })({
@@ -174,7 +174,7 @@ export const $DepositEditor = (config: {
                   amount: params.value
                 }
               },
-              combineState({
+              combine({
                 value,
                 action
               }),

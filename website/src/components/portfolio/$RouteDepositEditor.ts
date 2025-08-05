@@ -1,16 +1,7 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { $text, component, style } from 'aelea/core'
-import {
-  combineState,
-  constant,
-  type IBehavior,
-  type IStream,
-  map,
-  replayState,
-  sampleMap,
-  switchMap
-} from 'aelea/stream'
+import { combine, constant, type IBehavior, type IStream, map, replayState, sampleMap, switchMap } from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -105,7 +96,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                         ? params.model.amount + params.depositBalance
                         : params.depositBalance - params.model.amount
                     )
-                  }, combineState({ depositBalance, model })),
+                  }, combine({ depositBalance, model })),
                   $val: $text(
                     map(amount => {
                       return readableTokenAmount(collateralTokenDescription, amount)

@@ -1,4 +1,14 @@
-import { continueWith, disposeBoth, disposeWith, type IStream, multicast, op, stream, switchMap } from 'aelea/stream'
+import {
+  continueWith,
+  disposeBoth,
+  disposeWith,
+  type IStream,
+  multicast,
+  op,
+  replayState,
+  stream,
+  switchMap
+} from 'aelea/stream'
 
 export type GetKey<TSchema> = Extract<keyof TSchema, string | number>
 
@@ -6,11 +16,6 @@ export interface IDbParams<TName extends string = string> {
   name: TName
   keyPath?: string | string[] | null
   autoIncrement?: boolean
-}
-
-export interface IStoreConfig<TState, TType extends { [P in keyof TState]: TState[P] }> {
-  initialState: TType
-  options?: IDBObjectStoreParameters
 }
 
 export interface IStreamStore<TSchema> {
@@ -21,47 +26,47 @@ export interface IStreamStore<TSchema> {
 
 // Create database stream once and multicast it
 function createDbStream<TName extends string>(dbName: TName, version: number): IStream<IDBDatabase> {
-  const newLocal = stream(sink => {
-    let db: IDBDatabase | null = null
+  return replayState(
+    stream(sink => {
+      let db: IDBDatabase | null = null
 
-    const openDbRequest = indexedDB.open(dbName, version)
+      const openDbRequest = indexedDB.open(dbName, version)
 
-    openDbRequest.onsuccess = () => {
-      db = openDbRequest.result
-      sink.event(db)
-      sink.end()
-    }
-
-    openDbRequest.onerror = () => {
-      sink.error(openDbRequest.error || new Error('Failed to open database'))
-    }
-
-    // Cleanup function - close DB connection if subscription is cancelled
-    return disposeWith(() => {
-      if (db) {
-        db.close()
-        db = null
+      openDbRequest.onsuccess = () => {
+        db = openDbRequest.result
+        sink.event(db)
       }
+
+      openDbRequest.onerror = () => {
+        sink.error(openDbRequest.error || new Error('Failed to open database'))
+      }
+
+      // Cleanup function - close DB connection if subscription is cancelled
+      return disposeWith(() => {
+        if (db) {
+          db.close()
+          db = null
+        }
+      })
     })
-  })
-  return multicast(newLocal)
+  )
 }
 
 // Create store definitions
-export function createStoreDefinition<T, TDefinition extends { [P in keyof T]: IStoreConfig<any, any> }>(
+export function createStoreDefinition<T, TDefinition extends { [P in keyof T]: TDefinition[P] }>(
   dbName: string,
   dbVersion: number,
   definitions: TDefinition
-): { [P in keyof TDefinition]: IStreamStore<TDefinition[P]['initialState']> } {
+): { [P in keyof TDefinition]: IStreamStore<TDefinition[P]> } {
   const dbStream = createDbStream(dbName, dbVersion)
 
-  return Object.entries(definitions).reduce((acc, [name, config]) => {
+  return Object.entries(definitions).reduce((acc, [name, initialState]) => {
     return {
       ...acc,
       [name]: {
         name,
         db: dbStream,
-        initialState: (config as any).initialState
+        initialState
       }
     }
   }, {} as any)

@@ -1,7 +1,7 @@
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   constant,
   empty,
   type IBehavior,
@@ -128,7 +128,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 ),
                 disabled: map(params => {
                   return params.alert !== null || params.disabled || params.isRequestPending
-                }, combineState({ disabled, isRequestPending, alert })),
+                }, combine({ disabled, isRequestPending, alert })),
                 $content: $submitContent
               })({
                 click: submitTether(constant(wallet))
@@ -146,7 +146,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
                   $content: $primaryActionButton,
-                  disabled: map(params => params.isSpendPending, combineState({ isSpendPending }))
+                  disabled: map(params => params.isSpendPending, combine({ isSpendPending }))
                 })({
                   approveTokenSpend: approveTokenSpendTether()
                 })

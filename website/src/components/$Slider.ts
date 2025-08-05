@@ -12,7 +12,7 @@ import {
   styleBehavior,
   styleInline
 } from 'aelea/core'
-import { combineState, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
+import { combine, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -124,7 +124,7 @@ export const $Slider = ({
                     return steppedVal
                   }, drag)
                 },
-                combineState({ value, min, max, color, changeSliderDimension }),
+                combine({ value, min, max, color, changeSliderDimension }),
                 downSrc
               )
             },
@@ -142,7 +142,7 @@ export const $Slider = ({
 
                 const background = `linear-gradient(90deg, ${minArea} ${valArea} ${freeArea} ${maxArea}`
                 return { background }
-              }, combineState({ value, min, max, color }))
+              }, combine({ value, min, max, color }))
             )
           )(
             $row(
@@ -164,7 +164,7 @@ export const $Slider = ({
                         pointerEvents: params.disabled ? 'none' : 'all'
                       }
                     : { borderColor: params.color }
-                }, combineState({ disabled, color }))
+                }, combine({ disabled, color }))
               )(
                 $thumb
                   ? $thumb

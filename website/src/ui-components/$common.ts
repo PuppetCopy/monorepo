@@ -15,7 +15,7 @@ import {
   stylePseudo
 } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   fromPromise,
   type IOps,
@@ -283,7 +283,7 @@ export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
       svgOps: styleBehavior(
         map(params => {
           return params.displayChange ? { fill: params.arrowColor } : { display: 'none' }
-        }, combineState({ displayChange, arrowColor }))
+        }, combine({ displayChange, arrowColor }))
       ),
       viewBox: '0 0 32 32'
     }),

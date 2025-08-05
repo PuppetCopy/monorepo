@@ -1,5 +1,5 @@
 import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/core'
-import { combineState, empty, type IBehavior, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
+import { combine, empty, type IBehavior, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $Field, type Field } from './$Field.js'
@@ -67,7 +67,7 @@ export const $FieldLabeled = ({
 
         return params.hint ? $node($text(params.hint)) : empty
       },
-      combineState({ validation: startWith(null, validation), hint: toStream(hint) })
+      combine({ validation: startWith(null, validation), hint: toStream(hint) })
     )
 
     return [

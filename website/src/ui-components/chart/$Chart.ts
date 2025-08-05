@@ -1,7 +1,7 @@
 import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/core'
 import {
   aggregate,
-  combineState,
+  combine,
   disposeWith,
   empty,
   filter,
@@ -138,7 +138,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                       top: `${params.coords}px`,
                       display: 'flex'
                     }
-                  }, combineState(yAxisState))
+                  }, combine(yAxisState))
                 )
               )($content || empty)
             : empty,
@@ -199,7 +199,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
           //           return coords.crosshairMove?.point?.y || null
           //         },
-          //         combineState({ crosshairMove, isFocused: yAxisState.isFocused })
+          //         combine({ crosshairMove, isFocused: yAxisState.isFocused })
           //       ),
           //       sampleMap(
           //         (params) => {
@@ -209,7 +209,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
           //           return null
           //         },
-          //         combineState(yAxisState),
+          //         combine(yAxisState),
           //         visibleLogicalRangeChange
           //       )
           //     ])
@@ -225,7 +225,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
                       return ev.point ? series.coordinateToPrice(ev.point.y) : null
                     },
-                    combineState(yAxisState),
+                    combine(yAxisState),
                     click
                   ),
                   sampleMap(
@@ -236,7 +236,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
 
                       return coords ? series.coordinateToPrice(coords) : null
                     },
-                    combineState(yAxisState),
+                    combine(yAxisState),
                     yAxisState.coords
                   )
                 )

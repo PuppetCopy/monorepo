@@ -12,7 +12,7 @@ import {
   styleBehavior
 } from 'aelea/core'
 import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, type IBehavior, o, startWith, zipMap } from 'aelea/stream'
+import { constant, empty, type IBehavior, map, o, startWith, zipState } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -182,24 +182,20 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
           borderRadius: '50px',
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
         }),
-        styleBehavior(
-          zipMap(
-            (isActive, isFocus): IStyleCSS | null => {
-              return isActive
-                ? {
-                    backgroundColor: `${pallete.background} !important`,
-                    fill: pallete.foreground,
-                    borderColor: `${pallete.primary} !important`,
-                    cursor: 'default  !important'
-                  }
-                : isFocus
-                  ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
-                  : null
-            },
-            active,
-            focus
-          )
-        )
+        // styleBehavior(
+        //   map((params): IStyleCSS | null => {
+        //     return params.active
+        //       ? {
+        //           backgroundColor: `${pallete.background} !important`,
+        //           fill: pallete.foreground,
+        //           borderColor: `${pallete.primary} !important`,
+        //           cursor: 'default  !important'
+        //         }
+        //       : params.focus
+        //         ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
+        //         : null
+        //   }, zipState({ active, focus }))
+        // )
         // styleBehavior(map(isDisabled => (isDisabled ?  { pointerEvents: 'none', opacity: .3 } : {}), disabled))
       )(config.$content)
 

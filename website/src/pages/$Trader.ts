@@ -11,7 +11,7 @@ import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { $node, $text, attr, component, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   fromPromise,
   type IBehavior,
   type IStream,
@@ -89,17 +89,12 @@ export const $TraderPage = ({
                 f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
               ),
             with: {
-              traderRouteMetric: {
-                columns: {
-                  marketList: true,
-                  positionList: true
-                }
-              }
+              traderRouteMetric: true
             }
           })
 
           return routeMetricList
-        }, combineState({ activityTimeframe, collateralTokenList }))
+        }, combine({ activityTimeframe, collateralTokenList }))
       )
 
       const metricsQuery = multicast(
@@ -154,7 +149,7 @@ export const $TraderPage = ({
         //   }
 
         return { ...params, routeMetricList, increaseList, decreaseList, positionList }
-      }, combineState({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
+      }, combine({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
 
       return [
         $column(spacing.small)(
@@ -276,7 +271,7 @@ export const $TraderPage = ({
                       { ...pageParams.paging, ...pageParams.sortBy },
                       params.positionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
-                  }, combineState({ sortBy, paging }))
+                  }, combine({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),

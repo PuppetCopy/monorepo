@@ -36,7 +36,7 @@ import type { Address } from 'viem/accounts'
 import { sendCalls } from 'viem/actions'
 import { arbitrum } from 'viem/chains'
 
-type IWalletConnected = {
+export type IWalletConnected = {
   address: Address
   addresses: readonly [Address, ...Address[]]
   chain: Chain
@@ -48,7 +48,7 @@ type IWalletConnected = {
   status: 'connected'
 }
 
-type IGetWalletStatus = Prettify<GetAccountReturnType>
+export type IGetWalletStatus = Prettify<GetAccountReturnType>
 
 const projectId = import.meta.env.VITE__WC_PROJECT_ID
 
@@ -122,7 +122,7 @@ async function read<
   return readContract(wagmiAdapter.wagmiConfig, parameters as any)
 }
 
-type IWriteContractReturn<
+export type IWriteContractReturn<
   TAbi extends Abi = Abi,
   TEventName extends ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined
 > = Promise<{
@@ -160,7 +160,7 @@ async function write<
   }
 }
 
-type IBatchCall = {
+export type IBatchCall = {
   to: Address
   data: Hex
   value?: bigint | undefined
@@ -238,5 +238,3 @@ export const wallet = {
   account,
   transport
 }
-
-export type { IGetWalletStatus, IWalletConnected, IWriteContractReturn, IBatchCall }

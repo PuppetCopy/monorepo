@@ -11,7 +11,7 @@ import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sq
 import * as schema from '@puppet-copy/sql/schema'
 import { $node, $text, component, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   fromPromise,
   type IBehavior,
@@ -220,7 +220,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   })
                   return { ...filterParams.paging, page }
                 },
-                combineState({
+                combine({
                   paging
                 })
               )
@@ -453,7 +453,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combineState({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList }))
+            }, combine({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList }))
           )
         ),
 

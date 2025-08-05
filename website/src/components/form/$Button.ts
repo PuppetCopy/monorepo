@@ -12,7 +12,7 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
-import { combineState, empty, type IBehavior, type IStream, map, multicast, now, startWith } from 'aelea/stream'
+import { combine, empty, type IBehavior, type IStream, map, multicast, now, startWith } from 'aelea/stream'
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -102,7 +102,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
           ),
           disabled: map(params => {
             return params.alert !== null || params.disabled || params.isRequestPending
-          }, combineState({ disabled, isRequestPending, alert })),
+          }, combine({ disabled, isRequestPending, alert })),
           $content: $row(
             $node(
               style({

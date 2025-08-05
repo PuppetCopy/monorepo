@@ -6,7 +6,6 @@ import {
   type IStream,
   map,
   merge,
-  never,
   now,
   o,
   sampleMap,
@@ -78,7 +77,7 @@ export const $DropMultiSelect = <T>({
   $container = $defaulMultiselectDropContainer,
   $dropListContainer,
   $optionContainer = $defaultOptionContainer,
-  validation = never
+  validation = constant(null)
 }: IMultiselectDrop<T>) =>
   component(([select, selectTether]: IBehavior<T>, [pluck, pluckTether]: IBehavior<INode, T>) => {
     return [

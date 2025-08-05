@@ -1,6 +1,6 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $node, $text, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
+import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
 import {
   constant,
@@ -124,7 +124,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
 
       return [
-        $column(
+        $wrapNativeElement(document.body)(
           spacing.big,
           designSheet.customScroll,
           style({
@@ -237,7 +237,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 params => {
                   const status = params.subgraphStatus.arbitrum
 
-                  if (!status.ready || status.block === null) {
+                  if (status.block === null) {
                     return $column(spacing.tiny)(
                       $text('Subgraph Status'),
                       $alertNegativeContainer(

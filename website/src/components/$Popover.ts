@@ -146,7 +146,7 @@ export const $Popover = ({
           // switchLatest
         ),
         styleBehavior(
-          merge(constant({ zIndex: 2345, position: 'relative' }, openMulticast), constant(null, dismissEvent))
+          merge(constant({ zIndex: 2345, position: 'relative' as const }, openMulticast), constant(null, dismissEvent))
         )
       )
 

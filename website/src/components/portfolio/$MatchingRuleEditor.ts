@@ -1,9 +1,15 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
-import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
+import {
+  formatFixed,
+  getDuration,
+  getTraderMatchingKey,
+  parseBps,
+  unixTimestampNow
+} from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   type IBehavior,
   type IStream,
@@ -90,7 +96,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       const { model, traderMatchingKey, draftMatchingRuleList, collateralToken, trader } = config
 
       const defaultDraft = {
-        allowanceRate: BigInt(1000),
+        allowanceRate: 1000n,
         throttleActivity: BigInt(IntervalTime.HR),
         expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
       }
@@ -206,7 +212,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
             sampleMap(
               params => {
                 const modelIndex = params.draftMatchingRuleList.findIndex(
-                  x => x.traderMatchingKey === traderMatchingKey
+                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
                 )
                 const model = modelIndex > -1 ? params.draftMatchingRuleList[modelIndex] : undefined
 
@@ -230,16 +236,18 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                   }
                 ]
               },
-              combineState({ draftMatchingRuleList, draft }),
+              combine({ draftMatchingRuleList, draft }),
               save
             ),
             sampleMap(
               params => {
-                const match = params.draftMatchingRuleList.find(x => x.traderMatchingKey === traderMatchingKey)
+                const match = params.draftMatchingRuleList.find(
+                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
+                )
 
                 if (match) {
                   const modelIndex = params.draftMatchingRuleList.findIndex(
-                    x => x.traderMatchingKey === traderMatchingKey
+                    x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
                   )
                   params.draftMatchingRuleList[modelIndex] = {
                     ...match,
@@ -260,7 +268,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                   }
                 ]
               },
-              combineState({ draftMatchingRuleList, draft }),
+              combine({ draftMatchingRuleList, draft }),
               clickRemove
             )
           )

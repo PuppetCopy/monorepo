@@ -13,7 +13,7 @@ import {
   stylePseudo
 } from 'aelea/core'
 import {
-  combineState,
+  combine,
   constant,
   empty,
   type IBehavior,
@@ -113,7 +113,7 @@ export function $Dropdown<T>({
 
       const closeTrigger = constant(false, merge(windowClick, closeOnSelect ? select : empty))
 
-      const isOpen = skipRepeats(merge(closeTrigger, openTrigger))
+      const isOpen = merge(closeTrigger, openTrigger)
 
       return [
         $container(
@@ -164,7 +164,7 @@ export function $Dropdown<T>({
                 )
               )
             },
-            combineState({ isOpen, list: toStream(optionList) })
+            combine({ isOpen, list: toStream(optionList) })
           ),
           $anchor
         ),

@@ -4,7 +4,7 @@ import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   fromPromise,
   type IBehavior,
@@ -89,7 +89,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
                   return $alertPositiveTooltip(
                     $row(spacing.small)(
                       $text('Transaction confirmed'),
-                      $txHashRef(status.value.transactionReceipt.transactionHash)
+                      $txHashRef((status.value as any).transactionReceipt.transactionHash)
                     )
                   )
                 }, requestStatus)
@@ -118,7 +118,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
               })
             )
           },
-          combineState({ allowance, amount: amount ?? now(MAX_UINT256) })
+          combine({ allowance, amount: amount ?? now(MAX_UINT256) })
         )
       ),
       {

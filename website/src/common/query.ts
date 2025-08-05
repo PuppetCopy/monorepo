@@ -7,7 +7,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combineState, type IStream, map, op, replayState } from 'aelea/stream'
+import { combine, type IStream, map, op, replayState } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
@@ -44,7 +44,7 @@ export function queryPricefeed(
     return groupArrayMany(priceList, c => c.token)
 
     // map results by token
-  }, combineState(queryParams))
+  }, combine(queryParams))
 }
 
 export function queryUserMatchingRuleList(
@@ -86,5 +86,5 @@ export function queryUserMatchingRuleList(
     })
 
     return metrictList
-  }, combineState(queryParams))
+  }, combine(queryParams))
 }

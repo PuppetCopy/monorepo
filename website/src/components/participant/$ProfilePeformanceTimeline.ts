@@ -8,7 +8,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { $node, $text, component, motion, style } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   filterNull,
   type IBehavior,
@@ -75,7 +75,7 @@ export const $TradeRouteTimeline = ({
         })
 
         return timelinbe
-      }, combineState({ metricsQuery, activityTimeframe }))
+      }, combine({ metricsQuery, activityTimeframe }))
 
       return [
         $column(style({ width: '100%', padding: 0, height: '200px', placeContent: 'center' }))(
@@ -115,7 +115,8 @@ export const $TradeRouteTimeline = ({
                 const hoverChartPnl = filterNull(
                   map(cross => {
                     if (cross?.point) {
-                      const value = cross.seriesData.values().next().value?.value || 0
+                      const seriesData = cross.seriesData.values().next().value as any
+                      const value = seriesData?.value || 0
                       return value
                     }
 
@@ -137,7 +138,7 @@ export const $TradeRouteTimeline = ({
                         const newLocal = parseReadableNumber(newLocal2)
                         return newLocal
                       },
-                      motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
+                      motion({ damping: 26, precision: 15, stiffness: 210 }, hoverChartPnl)
                     ),
                     incrementColor: pallete.positive,
                     decrementColor: pallete.negative
@@ -235,7 +236,7 @@ export const $TradeRouteTimeline = ({
                   crosshairMove: crosshairMoveTether()
                 })
               },
-              combineState({
+              combine({
                 timelineQuery,
                 activityTimeframe,
                 collateralTokenList

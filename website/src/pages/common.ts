@@ -171,7 +171,7 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        traderMatchingKey: next.traderMatchingKey
+        traderMatchingKey: next.traderRouteMetric.traderMatchingKey
       })
     })
 

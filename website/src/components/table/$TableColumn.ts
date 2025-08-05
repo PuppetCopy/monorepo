@@ -7,7 +7,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
 import { $node, $text, type INode, style } from 'aelea/core'
-import { empty, IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import { empty, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -55,19 +55,11 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
     const latestPrice = map(pm => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
 
-    const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-    const totalPositionFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
-    const totalBorrowingFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
-    const totalFundingFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
+    // const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
+    // TODO: Fix fee collection - need to include feeCollected relation in query
+    const totalPositionFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
+    const totalBorrowingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
+    const totalFundingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
     const totalFeesUsd = totalPositionFeeAmount + totalBorrowingFeeAmount + totalFundingFeeAmount
 

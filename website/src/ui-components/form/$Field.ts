@@ -1,6 +1,6 @@
 import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/core'
 import {
-  combineState,
+  combine,
   empty,
   filterNull,
   type IBehavior,
@@ -52,7 +52,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
       [change, changeTether]: IBehavior<INode<HTMLInputElement>, string>
     ) => {
       const focus = merge(focusStyle, dismissstyle)
-      const state = combineState({ focus, validation })
+      const state = combine({ focus, validation })
 
       return [
         $input(
@@ -83,7 +83,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
               }
 
               return { opacity }
-            }, combineState({ value, focus, validation }))
+            }, combine({ value, focus, validation }))
           ),
 
           interactionTether(interactionOp),
@@ -116,7 +116,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
 
                     return null
                   },
-                  combineState({ value, focus: startWith(null, focus) })
+                  combine({ value, focus: startWith(null, focus) })
                 )
               )
             )
