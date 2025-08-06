@@ -44,5 +44,14 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           curl -fsSL https://railway.app/install.sh | sh
-          cd website
+          
+          # Create minimal deployment directory
+          mkdir -p railway-deploy
+          cp -r website/dist railway-deploy/
+          cp website/railway.json railway-deploy/
+          cp website/railpack.config.js railway-deploy/
+          echo '{"name":"website-static","version":"1.0.0","private":true}' > railway-deploy/package.json
+          
+          # Deploy from the minimal directory
+          cd railway-deploy
           railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
