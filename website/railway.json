@@ -5,6 +5,7 @@
     "buildCommand": "echo 'Using pre-built files from GitHub Actions'"
   },
   "deploy": {
+    "installCommand": "echo 'Skip install - using pre-built files'",
     "startCommand": "bunx serve@latest dist -s -l $PORT",
     "restartPolicyType": "NEVER"
   }
