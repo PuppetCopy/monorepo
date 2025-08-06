@@ -2,12 +2,6 @@
   "name": "website",
   "private": true,
   "type": "module",
-  "sideEffects": [
-    "src/sw/service-worker.ts",
-    "src/common/style.ts",
-    "src/main.ts",
-    "**/aelea/ui-components-theme-browser/**"
-  ],
   "scripts": {
     "start": "bunx serve@latest dist -s -l $PORT",
     "dev": "vite",
