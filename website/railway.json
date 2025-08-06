@@ -1,7 +1,20 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "buildCommand": "echo 'Already built'"
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["bun"]
+        },
+        "install": {
+          "cmds": ["echo 'Skipping install - using pre-built files'"]
+        },
+        "build": {
+          "cmds": ["echo 'Skipping build - using pre-built files'"]
+        }
+      }
+    }
   },
   "deploy": {
     "startCommand": "bunx serve@latest dist -s -l $PORT",
