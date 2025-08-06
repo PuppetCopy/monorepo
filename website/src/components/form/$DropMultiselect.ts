@@ -1,24 +1,26 @@
-import { constant, map, mergeArray, never, now, snapshot, switchLatest, tap } from '@most/core'
-import { append, remove } from '@most/prelude'
-import type { Stream } from '@most/types'
-import { $caretDown, $infoLabel, $xCross } from '@puppet-copy/middleware/ui-components'
+import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/core'
 import {
-  $text,
-  component,
-  type I$Node,
+  constant,
   type IBehavior,
-  type INode,
-  type INodeCompose,
   type IOps,
-  nodeEvent,
-  O,
-  style,
-  stylePseudo,
-  switchMap
-} from 'aelea/core'
-import { $icon, $row, spacing } from 'aelea/ui-components'
+  type IStream,
+  map,
+  merge,
+  now,
+  o,
+  sampleMap,
+  switchLatest,
+  switchMap,
+  tap
+} from 'aelea/stream'
+import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
+import { $caretDown, $icon, $infoLabel, $xCross } from '@/ui-components'
 import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'
+
+// Array utility functions (previously from @most/prelude)
+const append = <T>(item: T, array: T[]): T[] => [...array, item]
+const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
 
 export const $defaultDropMultiSelectOption = $row(
   spacing.small,
@@ -42,8 +44,8 @@ export const $defaultOptionContainer = $row(
 )
 
 export interface IMultiselectDrop<T> {
-  value: Stream<T[]>
-  optionList: Stream<T[]> | T[]
+  value: IStream<T[]>
+  optionList: IStream<T[]> | T[]
 
   getId?: (item: T) => string | number
   $noneSelected?: I$Node
@@ -70,18 +72,18 @@ export const $DropMultiSelect = <T>({
 
   getId,
   $noneSelected = $defaultNoneSelected($text('None selected')),
-  $$selectedOption = map((item) => $defaultDropMultiSelectOption($text(String(item)))),
-  $$option = map((item) => $defaultDropMultiSelectOption($text(String(item)))),
+  $$selectedOption = map(item => $defaultDropMultiSelectOption($text(String(item)))),
+  $$option = map(item => $defaultDropMultiSelectOption($text(String(item)))),
   $container = $defaulMultiselectDropContainer,
   $dropListContainer,
   $optionContainer = $defaultOptionContainer,
-  validation = never
+  validation = constant(null)
 }: IMultiselectDrop<T>) =>
   component(([select, selectTether]: IBehavior<T>, [pluck, pluckTether]: IBehavior<INode, T>) => {
     return [
       $Dropdown({
         $anchor: $row(style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
-          switchMap((valueList) => {
+          switchMap(valueList => {
             if (!valueList.length) {
               return $noneSelected
             }
@@ -90,17 +92,17 @@ export const $DropMultiSelect = <T>({
               spacing.tiny,
               style({ alignItems: 'center', paddingLeft: '6px' })
             )(
-              ...valueList.map((token) => {
+              ...valueList.map(token => {
                 return $optionContainer(
                   switchLatest($$selectedOption(now(token))),
                   $icon({
                     $content: $xCross,
                     width: '28px',
-                    svgOps: O(
+                    svgOps: o(
                       style({ padding: '4px', cursor: 'pointer' }),
                       pluckTether(
                         nodeEvent('click'),
-                        tap((x) => x.preventDefault()),
+                        tap(x => x.preventDefault()),
                         constant(token)
                       )
                     ),
@@ -127,10 +129,10 @@ export const $DropMultiSelect = <T>({
         select: selectTether()
       }),
       {
-        select: mergeArray([
-          snapshot(
+        select: merge(
+          sampleMap(
             (seed, next) => {
-              const matchedIndex = getId ? seed.findIndex((item) => getId(item) === getId(next)) : seed.indexOf(next)
+              const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 
               if (matchedIndex === -1) {
                 return append(next, seed)
@@ -141,9 +143,9 @@ export const $DropMultiSelect = <T>({
             value,
             select
           ),
-          snapshot(
+          sampleMap(
             (seed, next) => {
-              const matchedIndex = getId ? seed.findIndex((item) => getId(item) === getId(next)) : seed.indexOf(next)
+              const matchedIndex = getId ? seed.findIndex(item => getId(item) === getId(next)) : seed.indexOf(next)
 
               if (matchedIndex !== -1) {
                 return remove(matchedIndex, seed)
@@ -154,7 +156,7 @@ export const $DropMultiSelect = <T>({
             value,
             pluck
           )
-        ])
+        )
         // alert
       }
     ]

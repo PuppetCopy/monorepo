@@ -1,24 +1,22 @@
-import { constant, filter, map, merge, mergeArray, startWith } from '@most/core'
 import {
   $element,
   component,
   type I$Node,
   type I$Slottable,
-  type IBehavior,
   type INode,
   type INodeCompose,
   nodeEvent,
-  O,
   styleBehavior
 } from 'aelea/core'
+import { constant, filter, type IBehavior, map, merge, o, startWith } from 'aelea/stream'
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 
-const interactionOp = O((src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)), constant(true))
+const interactionOp = o((src: I$Node) => merge(nodeEvent('focus', src), nodeEvent('pointerover', src)), constant(true))
 
-const dismissOp = O(
+const dismissOp = o(
   (src: I$Node) => merge(nodeEvent('blur', src), nodeEvent('pointerout', src)),
-  filter((x) => document.activeElement !== x.target), // focused elements cannot be dismissed
+  filter(x => document.activeElement !== x.target), // focused elements cannot be dismissed
   constant(false)
 )
 
@@ -41,16 +39,16 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
         disabled
           ? styleBehavior(
               map(
-                (isDisabled) => {
+                isDisabled => {
                   return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                 },
                 startWith(true, disabled)
               )
             )
-          : (O() as any),
+          : (o() as any),
 
         styleBehavior(
-          map((active) => (active ? { borderColor: pallete.primary } : null), mergeArray([focusStyle, dismissstyle]))
+          map(active => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))
         ),
 
         interactionTether(interactionOp),

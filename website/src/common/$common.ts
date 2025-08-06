@@ -1,9 +1,6 @@
-import { empty, map, skipRepeats } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   getMappedValue,
   type ITokenDescription,
-  latestPriceMap,
   lst,
   readableDate,
   readableLeverage,
@@ -18,7 +15,15 @@ import {
   getTokenDescription,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
+import type { IMarket } from '@puppet-copy/sql/schema'
+import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
+import type * as router from 'aelea/router'
+import { empty, type IBehavior, type IComposeBehavior, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
+import { $column, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
+import type { Address } from 'viem/accounts'
 import {
+  $icon,
   $infoLabel,
   $infoLabeledValue,
   $Link,
@@ -26,15 +31,9 @@ import {
   $Tooltip,
   $tokenIconMap,
   $unknown
-} from '@puppet-copy/middleware/ui-components'
-import type { IMarket } from '@puppet-copy/sql/schema'
-import type { IBehavior, IComposeBehavior } from 'aelea/core'
-import { $node, $text, component, type INode, nodeEvent, style, styleInline, toStream } from 'aelea/core'
-import type * as router from 'aelea/router'
-import { $column, $icon, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
-import type { Address } from 'viem/accounts'
+} from '@/ui-components'
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
+import { latestPriceMap } from '../logic/latestPriceMap.js'
 import { $seperator2 } from '../pages/common.js'
 import { type IPosition, IWalletTab } from '../pages/type.js'
 import { isPositionSettled } from '../utils/utils.js'
@@ -70,7 +69,7 @@ export const $entry = (pos: IPosition) => {
               $label($text('Close Time')),
               $node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp)))
             )
-          : empty()
+          : empty
       ),
       $anchor: $route(indexDescription, false)
     })({}),
@@ -95,7 +94,7 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
         marginLeft: '-15px'
       })($tokenIcon(collateralTokenDescription))
     ),
-    displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty()
+    displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty
   )
 }
 
@@ -111,8 +110,8 @@ export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '1
 
   return $row(spacing.small, style({ alignItems: 'center' }))(
     style({ width: size, height: size })($tokenIcon(description)),
-    displayLabel ? $text(`${description.symbol}`) : empty()
-    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  shortenAddress(indexToken)}`),
+    displayLabel ? $text(`${description.symbol}`) : empty
+    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  readableAddress(indexToken)}`),
   )
 }
 
@@ -139,7 +138,7 @@ export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode,
   }
 
   return $row(style({ cursor: 'pointer' }))(
-    ...puppets.map((account) => {
+    ...puppets.map(account => {
       if (!click) {
         return style({ marginRight: '-12px', border: '2px solid black' })(
           $profileAvatar({ address: account, size: 25 })
@@ -166,17 +165,17 @@ export const $leverage = (size: bigint, collateral: bigint) => {
   )
 }
 
-export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
+export const $pnlDisplay = (pnlSrc: IStream<bigint> | bigint, bold = true) => {
   const pnl = toStream(pnlSrc)
-  const display = map((value) => readablePnl(value), pnl)
+  const display = map(value => readablePnl(value), pnl)
   const displayColor = skipRepeats(
-    map((value) => {
+    map(value => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
     }, pnl)
   )
 
   const colorStyle = styleInline(
-    map((color) => {
+    map(color => {
       return { color }
     }, displayColor)
   )
@@ -184,17 +183,17 @@ export const $pnlDisplay = (pnlSrc: Stream<bigint> | bigint, bold = true) => {
   return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
-export const $roiDisplay = (roiSrc: Stream<bigint> | bigint, bold = true) => {
+export const $roiDisplay = (roiSrc: IStream<bigint> | bigint, bold = true) => {
   const roi = toStream(roiSrc)
-  const display = map((value) => readablePercentage(value), roi)
+  const display = map(value => readablePercentage(value), roi)
   const displayColor = skipRepeats(
-    map((value) => {
+    map(value => {
       return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
     }, roi)
   )
 
   const colorStyle = styleInline(
-    map((color) => {
+    map(color => {
       return { color }
     }, displayColor)
   )
@@ -206,12 +205,20 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
-  const latestPrice = map((pm) => getMappedValue(pm, indexToken).max, latestPriceMap)
+  const latestPrice = map(pm => {
+    const price = getMappedValue(pm, indexToken)
+    return price && typeof price === 'object' && 'max' in price ? price.max : 0n
+  }, latestPriceMap)
 
   const roi = isPositionSettled(pos)
     ? readablePercentage(toBasisPoints(pos.realisedPnlUsd, collateralUsd))
-    : map((markPrice) => {
-        const delta = getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
+    : map(markPrice => {
+        const delta = getPositionPnlUsd(
+          pos.isLong,
+          pos.lastUpdate.sizeInUsd,
+          pos.lastUpdate.sizeInTokens,
+          markPrice as bigint
+        )
         return readablePercentage(toBasisPoints(pos.realisedPnlUsd + delta, collateralUsd))
       }, latestPrice)
   return $node(style({ fontSize: '.8rem' }))($text(roi))
@@ -222,9 +229,9 @@ export function $liquidationSeparator(
   sizeUsd: bigint,
   sizeInTokens: bigint,
   collateralAmount: bigint,
-  markPrice: Stream<bigint>
+  markPrice: IStream<bigint>
 ) {
-  const liqWeight = map((price) => {
+  const liqWeight = map(price => {
     const collateralUsd = price * collateralAmount
     const liquidationPrice = getRoughLiquidationPrice(isLong, sizeUsd, sizeInTokens, collateralUsd, collateralAmount)
 
@@ -232,7 +239,7 @@ export function $liquidationSeparator(
   }, markPrice)
 
   return styleInline(
-    map((weight) => {
+    map(weight => {
       return {
         width: '100%',
         background: `linear-gradient(90deg, ${pallete.negative} ${`${weight * 100}%`}, ${pallete.foreground} 0)`
@@ -256,7 +263,7 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
             $text(`${longTokenDescription.symbol}/${shortTokenDescription.symbol}`)
           )
         )
-      : empty()
+      : empty
   )
 }
 
@@ -272,21 +279,16 @@ export const $marketSmallLabel = (market: IMarket) => {
 
 export const $openPositionBreakdown = (pos: IPosition) => {
   const indexToken = pos.indexToken
-  const latestPrice = map((pm) => pm[indexToken].max, latestPriceMap)
+  const latestPrice = map((pm: any) => {
+    const price = pm[indexToken]
+    return price && typeof price === 'object' && 'max' in price ? price.max : 0n
+  }, latestPriceMap)
 
-  const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-  const totalPositionFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
-  const totalBorrowingFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
-  const totalFundingFeeAmount = updateList.reduce(
-    (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-    0n
-  )
+  // const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
+  // TODO: Fix fee collection - need to include feeCollected relation in query
+  const totalPositionFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalBorrowingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
+  const totalFundingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
   const latestUpdate = pos.lastUpdate
 
@@ -300,7 +302,7 @@ export const $openPositionBreakdown = (pos: IPosition) => {
     $row(style({ placeContent: 'space-between' }))(
       $node(style({ color: pallete.foreground, flex: 1 }))($text('Open Pnl')),
       $pnlDisplay(
-        map((markPrice) => {
+        map(markPrice => {
           return getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, markPrice)
         }, latestPrice)
       )
@@ -350,7 +352,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                 }),
                 puppetList.length > 0
                   ? $row(style({ alignItems: 'center' }))(
-                      ...puppetList.map((puppet) => {
+                      ...puppetList.map(puppet => {
                         return style({ marginRight: '-12px', border: '2px solid black' })(
                           $profileAvatar({ address: puppet, size: 25 })
                         )
@@ -361,7 +363,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
                       $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
                     )
               )
-            : empty()
+            : empty
         ),
         route: route.create({ fragment: 'baseRoute' }),
         url: `/${IWalletTab.TRADER.toLowerCase()}/${address}`

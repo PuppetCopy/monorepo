@@ -1,7 +1,6 @@
-import type { Address } from 'viem/accounts'
-import { FLOAT_PRECISION } from '../const/index.js'
-import { abs, delta } from '../core/mathUtils.js'
-import { getDenominator } from '../core/utils.js'
+import { FLOAT_PRECISION } from '../const/common.js'
+import { abs, delta } from '../core/math.js'
+import { getDenominator } from '../core/parse.js'
 import { getTokenDescription } from './gmxUtils.js'
 import type { IMinMax, IOraclePrice } from './types.js'
 
@@ -236,49 +235,4 @@ function applyImpactFactor(diff: bigint, factor: bigint, exponent: bigint): bigi
   const result = BigInt(Math.round(_diff ** _exponent * 10 ** 30))
 
   return (result * factor) / FLOAT_PRECISION
-}
-
-// Signed Prices from GMX API
-// Arbitrum URL: https://arbitrum-api.gmxinfra.io/signed_prices/latest
-// Avalanche URL: https://avalanche-api.gmxinfra.io/signed_prices/latest
-export interface IGmxSignedPriceData {
-  id: string // "4003688959"
-  minBlockNumber: number // null
-  minBlockHash: string | null // null
-  oracleDecimals: number | null // null
-  tokenSymbol: string // "ETH"
-  tokenAddress: Address // "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
-  minPrice: number | null // null
-  maxPrice: number | null // null
-  signer: string | null // null
-  signature: string | null // null
-  signatureWithoutBlockHash: string | null // null
-  createdAt: string // "2025-07-28T19:30:24.419Z"
-  minBlockTimestamp: number | null // 1753731023 (seconds - Unix timestamp)
-  oracleKeeperKey: string // "realtimeFeed"
-  maxBlockTimestamp: number // 1753731023 (seconds - Unix timestamp)
-  maxBlockNumber: number // null
-  maxBlockHash: string // null
-  maxPriceFull: string // "3791200513446191" (price with full precision)
-  minPriceFull: string // "3791014710710536" (price with full precision)
-  oracleKeeperRecordId: string | null // null
-  oracleKeeperFetchType: string // "ws"
-  oracleType: string // "realtimeFeed2"
-  blob: string // "0x00094baebfda9b87..." (binary data)
-}
-
-export async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
-  try {
-    const response = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
-
-    if (!response.ok) {
-      throw new Error(`GMX signed prices API error! status: ${response.status}`)
-    }
-
-    const data = (await response.json()) as { signedPrices: IGmxSignedPriceData[] }
-    return data.signedPrices || []
-  } catch (error) {
-    console.error('Error fetching GMX signed prices:', error)
-    return []
-  }
 }

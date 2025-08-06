@@ -1,17 +1,27 @@
-import { constant, empty, filter, map, merge, mergeArray, multicast, switchLatest, until, zip } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $node,
   component,
   type I$Node,
-  type IBehavior,
   type INode,
   type INodeCompose,
   nodeEvent,
-  O,
   style,
   styleBehavior
 } from 'aelea/core'
+import {
+  constant,
+  empty,
+  filter,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  multicast,
+  o,
+  switchLatest,
+  until,
+  zipMap
+} from 'aelea/stream'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -26,10 +36,10 @@ export const $defaultPopoverContentContainer = $column(
 )
 
 interface IPocus {
-  $open: Stream<I$Node>
+  $open: IStream<I$Node>
   $target: I$Node
 
-  dismiss?: Stream<any>
+  dismiss?: IStream<any>
   spacing?: number
   $contentContainer?: INodeCompose
   $container?: INodeCompose
@@ -40,7 +50,7 @@ export const $Popover = ({
   $target,
   $contentContainer = $defaultPopoverContentContainer,
   $container = $node,
-  dismiss = empty(),
+  dismiss = empty,
   spacing = 10
 }: IPocus) =>
   component(
@@ -54,7 +64,7 @@ export const $Popover = ({
       const contentOps = $contentContainer(
         popoverContentDimensionTether(observer.resize({})),
         styleBehavior(
-          zip(
+          zipMap(
             ([contentRect], [targetRect]) => {
               const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
               const targetBound = targetRect.intersectionRect
@@ -104,7 +114,7 @@ export const $Popover = ({
         }),
         overlayClickTether(
           nodeEvent('pointerdown'),
-          filter((ev) => {
+          filter(ev => {
             if (ev.target instanceof HTMLElement) {
               const computedStyle = getComputedStyle(ev.target)
               if (computedStyle.zIndex === '2321' && computedStyle.inset === '0px') {
@@ -121,12 +131,12 @@ export const $Popover = ({
       const dismissEvent = merge(overlayClick, dismiss)
 
       const $content = switchLatest(
-        map((content) => {
-          return until(dismissEvent, mergeArray([style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()]))
+        map(content => {
+          return until(dismissEvent, merge(style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()))
         }, openMulticast)
       )
 
-      const targetOp = O(
+      const targetOp = o(
         targetIntersectionTether(
           observer.intersection()
           // map(node => {
@@ -136,7 +146,7 @@ export const $Popover = ({
           // switchLatest
         ),
         styleBehavior(
-          merge(constant({ zIndex: 2345, position: 'relative' }, openMulticast), constant(null, dismissEvent))
+          merge(constant({ zIndex: 2345, position: 'relative' as const }, openMulticast), constant(null, dismissEvent))
         )
       )
 

@@ -1,5 +1,5 @@
-import { tap } from '@most/core'
 import { $svg, attr } from 'aelea/core'
+import { tap } from 'aelea/stream'
 import Color from 'color'
 // @ts-ignore
 import MersenneTwister from 'mersenne-twister'
@@ -34,7 +34,7 @@ function jazzicon(
 
   const position = generator.random()
   const hueShift = 30 * position - wobble / 2
-  const colors = baseColors.map((hex) => Color(hex).rotate(hueShift).hex())
+  const colors = baseColors.map(hex => Color(hex).rotate(hueShift).hex())
 
   function nextColor(): string {
     generator.random()
@@ -66,7 +66,7 @@ function jazzicon(
 
 export function $jazzicon(address: Address) {
   return $svg('svg')(attr({ xmlns: 'http://www.w3.org/2000/svg', x: 0, y: 0, viewBox: '0 0 100 100' }))(
-    tap((node) => {
+    tap(node => {
       node.element.innerHTML = jazzicon(address)
       return node
     })

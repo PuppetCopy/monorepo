@@ -1,4 +1,3 @@
-import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import type {
   IPositionDecrease,
@@ -7,6 +6,7 @@ import type {
   ITraderRouteMetric
 } from '@puppet-copy/sql/schema'
 import type * as router from 'aelea/router'
+import type { IStream } from 'aelea/stream'
 import type { Address, Hex } from 'viem'
 
 export interface IComponentPageParams {}
@@ -16,8 +16,8 @@ export interface IPageParams extends IComponentPageParams {
 }
 
 export interface IPageFilterParams {
-  activityTimeframe: Stream<IntervalTime>
-  collateralTokenList: Stream<Address[]>
+  activityTimeframe: IStream<IntervalTime>
+  collateralTokenList: IStream<Address[]>
 }
 
 export interface IEarningsPlan {

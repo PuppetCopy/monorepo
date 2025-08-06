@@ -1,6 +1,6 @@
-import { tap } from '@most/core'
 import { ignoreAll } from '@puppet-copy/middleware/core'
-import { $node, $text, behavior, nodeEvent, style, switchMap } from 'aelea/core'
+import { $node, $text, nodeEvent, style } from 'aelea/core'
+import { behavior, switchMap, tap } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import { wallet } from '../wallet/wallet.js'
@@ -11,7 +11,7 @@ export const $walletProfileDisplay = () => {
 
   const [click, clickTether] = behavior()
 
-  return switchMap((getAccountStatus) => {
+  return switchMap(getAccountStatus => {
     if (getAccountStatus.status === 'connecting' || getAccountStatus.status === 'reconnecting') {
       return $node($text('Connecting...'))
     }
@@ -20,7 +20,7 @@ export const $walletProfileDisplay = () => {
       return $row(
         clickTether(
           nodeEvent('pointerdown'),
-          tap((_es) => {
+          tap(_es => {
             wallet.appkit.open()
           })
         ),

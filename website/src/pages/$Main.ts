@@ -1,37 +1,29 @@
-import { constant, map, merge, mergeArray, multicast, now, take, tap } from '@most/core'
-import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import {
-  ETH_ADDRESS_REGEXP,
-  filterNull,
-  getTimeSince,
-  readableUnitAmount,
-  unixTimestampNow,
-  zipState
-} from '@puppet-copy/middleware/core'
-import {
-  $alertNegativeContainer,
-  $alertPositiveContainer,
-  $infoLabeledValue,
-  $Tooltip
-} from '@puppet-copy/middleware/ui-components'
-import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import {
-  $node,
-  $text,
-  component,
-  eventElementTarget,
-  type IBehavior,
-  replayLatest,
-  style,
-  styleBehavior,
-  switchMap
-} from 'aelea/core'
+import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
-import { $column, $row, spacing } from 'aelea/ui-components'
+import {
+  constant,
+  filterNull,
+  type IBehavior,
+  type IStream,
+  map,
+  merge,
+  multicast,
+  now,
+  op,
+  replayLatest,
+  switchMap,
+  take,
+  tap,
+  zipState
+} from 'aelea/stream'
+import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type { Address } from 'viem/accounts'
+import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
+import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu } from '../components/$MainMenu.js'
@@ -50,7 +42,7 @@ import { $TraderPage } from './$Trader.js'
 const popStateEvent = eventElementTarget('popstate', window)
 const initialLocation = now(document.location)
 const requestRouteChange = merge(initialLocation, popStateEvent)
-const locationChange = map((location) => {
+const locationChange = map(location => {
   return location
 }, requestRouteChange)
 
@@ -95,16 +87,15 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       })
       const portfolioRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
 
-      const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
+      const activityTimeframe = uiStorage.replayWrite(localStore.global.activityTimeframe, changeActivityTimeframe)
       const collateralTokenList = uiStorage.replayWrite(
-        localStore.global,
-        selectCollateralTokenList,
-        'collateralTokenList'
+        localStore.global.collateralTokenList,
+        selectCollateralTokenList
       )
 
-      const _pricefeedMapQuery = replayLatest(multicast(queryPricefeed({ activityTimeframe })))
+      const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)
 
-      const subgraphBeaconStatusColor = map((status) => {
+      const subgraphBeaconStatusColor = map(status => {
         const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
 
         const color =
@@ -113,24 +104,41 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       }, subgraphStatus)
       const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
 
-      const latestBlock: Stream<bigint> = mergeArray([
+      const latestBlock: IStream<bigint> = merge(
         // fromPromise(useBlockNumber().promise),
         wallet.blockChange
-      ])
-
-      const userMatchingRuleQuery = replayLatest(
-        multicast(
-          queryUserMatchingRuleList({
-            address: map((getAccountStatus) => getAccountStatus.address, wallet.account)
-          })
-        )
       )
 
-      const draftMatchingRuleList = replayLatest(multicast(changeMatchRuleList), [] as ISetMatchingRuleEditorDraft[])
-      const draftDepositTokenList = replayLatest(multicast(changeDepositTokenList), [] as IDepositEditorDraft[])
+      const userMatchingRuleQuery = op(
+        queryUserMatchingRuleList({
+          address: map(getAccountStatus => getAccountStatus.address, wallet.account)
+        }),
+        multicast,
+        replayLatest
+      )
+
+      const draftMatchingRuleList = op(changeMatchRuleList, multicast, stream => replayLatest(stream, []))
+      const draftDepositTokenList = op(changeDepositTokenList, multicast, stream =>
+        replayLatest(stream, [] as IDepositEditorDraft[])
+      )
 
       return [
-        $column(spacing.big)(
+        $wrapNativeElement(document.body)(
+          spacing.big,
+          designSheet.customScroll,
+          style({
+            color: pallete.message,
+            fill: pallete.message,
+            // position: 'relative',
+            // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
+            backgroundColor: pallete.horizon,
+            fontSize: isDesktopScreen ? '16px' : '14px',
+            // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
+            fontWeight: 400
+            // flexDirection: 'row',
+          }),
+          isMobileScreen ? style({ userSelect: 'none' }) : style({})
+        )(
           $MainMenu({ route: rootRoute })({
             routeChange: changeRouteTether(),
             changeWallet: changeWalletTether()
@@ -225,10 +233,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           )(
             $Tooltip({
               $content: switchMap(
-                (params) => {
+                params => {
                   const status = params.subgraphStatus.arbitrum
 
-                  if (!status.ready || status.block === null) {
+                  if (status.block === null) {
                     return $column(spacing.tiny)(
                       $text('Subgraph Status'),
                       $alertNegativeContainer(
@@ -259,7 +267,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   padding: '6px'
                 }),
                 styleBehavior(
-                  map((color) => {
+                  map(color => {
                     return { backgroundColor: colorAlpha(color, 0.5), outlineColor: color }
                   }, subgraphStatusColorOnce)
                 )
@@ -279,7 +287,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                     animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                   }),
                   styleBehavior(
-                    map((color) => {
+                    map(color => {
                       return {
                         backgroundColor: colorAlpha(color, 0.5),
                         animationIterationCount: color === pallete.negative ? 'infinite' : 1
@@ -316,10 +324,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               })
             )
           ),
-          switchMap((cb) => {
+          switchMap(cb => {
             return fadeIn(
               $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-                filterNull(constant(null, clickUpdateVersion)) as Stream<never>,
+                filterNull(constant(null, clickUpdateVersion)) as IStream<never>,
 
                 $text('New version Available'),
                 $ButtonSecondary({

@@ -1,15 +1,9 @@
-import { empty, map, multicast, now, recoverWith, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import { $icon } from '@puppet-copy/middleware/ui-components'
 import {
   $node,
   attrBehavior,
-  combineArray,
-  combineState,
   component,
   type I$Node,
-  type IBehavior,
   type INode,
   type INodeCompose,
   nodeEvent,
@@ -18,9 +12,11 @@ import {
   styleInline,
   stylePseudo
 } from 'aelea/core'
+import { combine, empty, type IBehavior, type IStream, map, multicast, now, startWith } from 'aelea/stream'
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
+import { $icon } from '@/ui-components'
 import { $ButtonCore, $defaultButtonCore, type IButtonCore } from './$ButtonCore.js'
 
 export const $defaultButtonPrimary = $defaultButtonCore(
@@ -81,8 +77,8 @@ export const $ButtonSecondary = (config: IButtonCore) => {
 }
 
 export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
-  txQuery: Stream<Promise<any>>
-  alert?: Stream<string | null>
+  txQuery: IStream<Promise<any>>
+  alert?: IStream<string | null>
 }
 
 export const $Submit = (config: IButtonPrimaryCtx) =>
@@ -93,10 +89,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
     ) => {
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
-      const isTxPending = recoverWith(
-        () => now(false),
-        map((s) => s.status === PromiseStatus.PENDING, promiseState(txQuery))
-      )
+      const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
       const isRequestPending = startWith(false, isTxPending)
 
       return [
@@ -107,9 +100,9 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
               overflow: 'hidden'
             })
           ),
-          disabled: combineArray((params) => {
+          disabled: map(params => {
             return params.alert !== null || params.disabled || params.isRequestPending
-          }, combineState({ disabled, isRequestPending, alert })),
+          }, combine({ disabled, isRequestPending, alert })),
           $content: $row(
             $node(
               style({
@@ -120,7 +113,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 position: 'absolute',
                 background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
             $node(
               style({
@@ -130,7 +123,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
                 background: colorAlpha(pallete.background, 0.9),
                 borderRadius: '30px'
               }),
-              styleInline(map((isDisabled) => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
             )(),
             style({ position: 'relative' })(config.$content)
           )
@@ -170,16 +163,16 @@ export const $defaultButtonCircularContainer = $row(
 
 export const $ButtonCircular = ({
   $iconPath,
-  disabled = empty(),
+  disabled = empty,
   $container = $defaultButtonCircularContainer
 }: IButtonCircular) =>
   component(([click, clickTether]: IBehavior<INode, PointerEvent>) => {
     return [
       $container(
         clickTether(nodeEvent('pointerup')),
-        styleBehavior(map((isDisabled) => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
+        styleBehavior(map(isDisabled => (isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null), disabled)),
         attrBehavior(
-          map((d) => {
+          map(d => {
             return { disabled: d ? 'true' : null }
           }, disabled)
         )

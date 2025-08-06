@@ -1,15 +1,10 @@
-import { join, map, mergeArray, now, snapshot, until } from '@most/core'
-import type { Stream } from '@most/types'
 import { invertColor } from '@puppet-copy/middleware/core'
 import {
   $node,
   $text,
-  combineState,
   component,
-  drawLatest,
   eventElementTarget,
   type I$Node,
-  type IBehavior,
   type INode,
   type INodeCompose,
   nodeEvent,
@@ -17,6 +12,7 @@ import {
   styleBehavior,
   styleInline
 } from 'aelea/core'
+import { combine, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -25,11 +21,11 @@ export interface ISliderParams extends Input<number> {
 
   $thumb?: I$Node
   $container?: INodeCompose
-  disabled?: Stream<boolean>
-  min?: Stream<number>
-  max?: Stream<number>
+  disabled?: IStream<boolean>
+  min?: IStream<number>
+  max?: IStream<number>
 
-  color?: Stream<string>
+  color?: IStream<string>
 }
 
 export const $defaultSliderThumb = $row(
@@ -81,12 +77,12 @@ export const $Slider = ({
         $container(
           changeSliderDimensionTether(
             observer.resize({}),
-            map((res) => res[0])
+            map(res => res[0])
           ),
           thumbePositionDeltaTether(
             nodeEvent('pointerdown'),
-            (downSrc) => {
-              return snapshot(
+            downSrc => {
+              return sampleMap(
                 (params, downEvent) => {
                   const dragEnd = eventElementTarget('pointerup', window.document)
                   const dragStart = eventElementTarget('pointermove', window.document)
@@ -98,28 +94,8 @@ export const $Slider = ({
                   if (startFromBar) {
                     const initOffsetX = downEvent.layerX || downEvent.offsetX // Firefox uses layerX
                     const initialOffset = now(Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max))
-                    const moveDelta = drawLatest(
-                      map((moveEvent) => {
-                        const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
-
-                        moveEvent.preventDefault()
-
-                        const val = deltaX / rectWidth
-
-                        const cVal = Math.min(Math.max(val, params.min), params.max)
-                        const steppedVal = step > 0 ? (cVal / step) * step : cVal
-
-                        return steppedVal
-                      }, drag)
-                    )
-
-                    return mergeArray([initialOffset, moveDelta])
-                  }
-
-                  return drawLatest(
-                    map((moveEvent) => {
-                      const normalisedValue = Math.min(Math.max(params.value, params.min), params.max)
-                      const deltaX = moveEvent.clientX - downEvent.clientX + rectWidth * normalisedValue
+                    const moveDelta = map(moveEvent => {
+                      const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
 
                       moveEvent.preventDefault()
 
@@ -130,9 +106,25 @@ export const $Slider = ({
 
                       return steppedVal
                     }, drag)
-                  )
+
+                    return merge(initialOffset, moveDelta)
+                  }
+
+                  return map(moveEvent => {
+                    const normalisedValue = Math.min(Math.max(params.value, params.min), params.max)
+                    const deltaX = moveEvent.clientX - downEvent.clientX + rectWidth * normalisedValue
+
+                    moveEvent.preventDefault()
+
+                    const val = deltaX / rectWidth
+
+                    const cVal = Math.min(Math.max(val, params.min), params.max)
+                    const steppedVal = step > 0 ? (cVal / step) * step : cVal
+
+                    return steppedVal
+                  }, drag)
                 },
-                combineState({ value, min, max, color, changeSliderDimension }),
+                combine({ value, min, max, color, changeSliderDimension }),
                 downSrc
               )
             },
@@ -141,7 +133,7 @@ export const $Slider = ({
         )(
           $rangeWrapper(
             styleInline(
-              map((params) => {
+              map(params => {
                 const gutterColor = colorAlpha(pallete.background, 0.35)
                 const minArea = `${colorAlpha(params.color, 0.35)} ${params.min * 100}%,`
                 const valArea = `${params.color} ${params.min * 100}% ${params.value * 100}%,`
@@ -150,11 +142,11 @@ export const $Slider = ({
 
                 const background = `linear-gradient(90deg, ${minArea} ${valArea} ${freeArea} ${maxArea}`
                 return { background }
-              }, combineState({ value, min, max, color }))
+              }, combine({ value, min, max, color }))
             )
           )(
             $row(
-              styleInline(map((val) => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
+              styleInline(map(val => ({ left: `${Math.min(Math.max(val, 0), 1) * 100}%` }), value)),
               style({
                 width: '0px',
                 top: '50%',
@@ -165,19 +157,19 @@ export const $Slider = ({
               })
             )(
               styleBehavior(
-                map((params) => {
+                map(params => {
                   return params.disabled
                     ? {
                         borderColor: colorAlpha(pallete.foreground, 0.2),
                         pointerEvents: params.disabled ? 'none' : 'all'
                       }
                     : { borderColor: params.color }
-                }, combineState({ disabled, color }))
+                }, combine({ disabled, color }))
               )(
                 $thumb
                   ? $thumb
                   : $defaultSliderThumb(
-                      $node(style({ paddingTop: '2px' }))($text(map((n) => `${Math.floor(n * 100)}%`, value)))
+                      $node(style({ paddingTop: '2px' }))($text(map(n => `${Math.floor(n * 100)}%`, value)))
                     )
               )
             )

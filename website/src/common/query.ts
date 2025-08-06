@@ -1,5 +1,3 @@
-import { map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import {
   getClosestNumber,
@@ -9,18 +7,17 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combineState, replayLatest } from 'aelea/core'
+import { combine, type IStream, map, op, replayState } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
-export const subgraphStatus = replayLatest(
-  multicast(
-    periodicRun({
-      startImmediate: true,
-      interval: 2500,
-      actionOp: map(() => getStatus())
-    })
-  )
+export const subgraphStatus = op(
+  periodicRun({
+    startImmediate: true,
+    interval: 2500,
+    actionOp: map(getStatus)
+  }),
+  replayState
 )
 
 export function queryPricefeed(
@@ -30,7 +27,7 @@ export function queryPricefeed(
   }>,
   estTickAmout = 10
 ) {
-  return map(async (params) => {
+  return map(async params => {
     const priceList = await sqlClient.query.priceCandle.findMany({
       columns: {
         c: true,
@@ -44,18 +41,18 @@ export function queryPricefeed(
           params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
         )
     })
-    return groupArrayMany(priceList, (c) => c.token)
+    return groupArrayMany(priceList, c => c.token)
 
     // map results by token
-  }, combineState(queryParams))
+  }, combine(queryParams))
 }
 
 export function queryUserMatchingRuleList(
   queryParams: StateParams<{
     address: Address | undefined
   }>
-): Stream<Promise<ISetMatchingRule[]>> {
-  return map(async (params) => {
+): IStream<Promise<ISetMatchingRule[]>> {
+  return map(async params => {
     const address = params.address
     if (address === undefined) {
       return []
@@ -89,5 +86,5 @@ export function queryUserMatchingRuleList(
     })
 
     return metrictList
-  }, combineState(queryParams))
+  }, combine(queryParams))
 }

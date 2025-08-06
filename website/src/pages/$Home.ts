@@ -1,20 +1,6 @@
-import { empty, map, now } from '@most/core'
-import type { Stream } from '@most/types'
-import { filterNull } from '@puppet-copy/middleware/core'
-import {
-  $element,
-  $node,
-  $text,
-  attr,
-  component,
-  eventElementTarget,
-  fromCallback,
-  type I$Node,
-  type IBehavior,
-  style,
-  switchMap
-} from 'aelea/core'
+import { $element, $node, $text, attr, component, eventElementTarget, type I$Node, style } from 'aelea/core'
 import type { Route } from 'aelea/router'
+import { empty, filterNull, fromCallback, type IBehavior, type IStream, map, now, switchMap } from 'aelea/stream'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
@@ -38,7 +24,7 @@ function _createAnimationKeyframe(keyframes: string) {
   return animationId
 }
 
-const installUserChoice: Stream<any> = fromCallback((cb) => {
+const installUserChoice: IStream<any> = fromCallback(cb => {
   return window.addEventListener('beforeinstallprompt', cb)
 })
 
@@ -144,7 +130,7 @@ export const $Home = (_config: ITreasury) =>
               $node(),
 
               $column(spacing.default, style({ minWidth: '250px' }))(
-                isMobileScreen ? $node(style({ textAlign: 'center' }))($text('< Comming Soon >')) : empty(),
+                isMobileScreen ? $node(style({ textAlign: 'center' }))($text('< Comming Soon >')) : empty,
 
                 $row(spacing.default, style({ alignItems: 'center' }))(
                   // $Link({
@@ -185,7 +171,7 @@ export const $Home = (_config: ITreasury) =>
                   // })({
                   //   click: linkClickTether()
                   // }),
-                  // isDesktopScreen ? $text('< Comming Soon >') : empty(),
+                  // isDesktopScreen ? $text('< Comming Soon >') : empty,
                   // $Link({
                   //   disabled: now(true),
                   //   $content: $anchor(
@@ -226,10 +212,10 @@ export const $Home = (_config: ITreasury) =>
                 ),
 
                 isMobileScreen
-                  ? switchMap((deferredPrompt) => {
+                  ? switchMap(deferredPrompt => {
                       return $column(spacing.default)(
                         filterNull(
-                          map((_req) => {
+                          map(_req => {
                             return null
                           }, clickDownloadBtn)
                         ) as any,
@@ -257,7 +243,7 @@ export const $Home = (_config: ITreasury) =>
                         })
                       )
                     }, installUserChoice)
-                  : empty()
+                  : empty
               ),
               $node(
                 style({

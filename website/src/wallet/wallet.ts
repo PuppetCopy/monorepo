@@ -1,6 +1,3 @@
-import { skipRepeatsWith } from '@most/core'
-import type { Stream } from '@most/types'
-import { replayState } from '@puppet-copy/middleware/core'
 import { createAppKit } from '@reown/appkit'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import {
@@ -15,7 +12,7 @@ import {
   watchBlockNumber,
   writeContract
 } from '@wagmi/core'
-import { fromCallback } from 'aelea/core'
+import { fromCallback, type IStream, replayState, skipRepeatsWith } from 'aelea/stream'
 import {
   type Abi,
   type Chain,
@@ -39,7 +36,7 @@ import type { Address } from 'viem/accounts'
 import { sendCalls } from 'viem/actions'
 import { arbitrum } from 'viem/chains'
 
-type IWalletConnected = {
+export type IWalletConnected = {
   address: Address
   addresses: readonly [Address, ...Address[]]
   chain: Chain
@@ -51,7 +48,7 @@ type IWalletConnected = {
   status: 'connected'
 }
 
-type IGetWalletStatus = Prettify<GetAccountReturnType>
+export type IGetWalletStatus = Prettify<GetAccountReturnType>
 
 const projectId = import.meta.env.VITE__WC_PROJECT_ID
 
@@ -97,13 +94,13 @@ const appkit = createAppKit({
   }
 })
 
-const blockChange: Stream<bigint> = fromCallback((cb) => {
-  return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: (res) => cb(res) })
+const blockChange: IStream<bigint> = fromCallback(cb => {
+  return watchBlockNumber(wagmiAdapter.wagmiConfig, { onBlockNumber: res => cb(res) })
 })
 
-const appkitAccountEvent: Stream<GetAccountReturnType> = skipRepeatsWith(
+const appkitAccountEvent: IStream<GetAccountReturnType> = skipRepeatsWith(
   (prev, next) => prev.isConnected === next.isConnected && prev.address === next.address,
-  fromCallback((cb) => {
+  fromCallback(cb => {
     watchAccount(wagmiAdapter.wagmiConfig, {
       onChange(account, _prevAccount) {
         cb(account)
@@ -111,9 +108,9 @@ const appkitAccountEvent: Stream<GetAccountReturnType> = skipRepeatsWith(
     })
 
     cb(getAccount(wagmiAdapter.wagmiConfig))
-  }) as Stream<GetAccountReturnType>
+  }) as IStream<GetAccountReturnType>
 )
-const account: Stream<IGetWalletStatus> = replayState(appkitAccountEvent)
+const account: IStream<IGetWalletStatus> = replayState(appkitAccountEvent)
 
 async function read<
   TAbi extends Abi,
@@ -125,7 +122,7 @@ async function read<
   return readContract(wagmiAdapter.wagmiConfig, parameters as any)
 }
 
-type IWriteContractReturn<
+export type IWriteContractReturn<
   TAbi extends Abi = Abi,
   TEventName extends ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined
 > = Promise<{
@@ -163,7 +160,7 @@ async function write<
   }
 }
 
-type IBatchCall = {
+export type IBatchCall = {
   to: Address
   data: Hex
   value?: bigint | undefined
@@ -241,5 +238,3 @@ export const wallet = {
   account,
   transport
 }
-
-export type { IGetWalletStatus, IWalletConnected, IWriteContractReturn, IBatchCall }

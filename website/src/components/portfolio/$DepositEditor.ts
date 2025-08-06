@@ -1,5 +1,3 @@
-import { constant, empty, map, mergeArray, sample, snapshot } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   parseFixed,
   parseReadableNumber,
@@ -7,11 +5,25 @@ import {
   readableTokenAmountLabel
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, type IBehavior, type IOps, style, switchMap } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
+import {
+  combine,
+  constant,
+  empty,
+  type IBehavior,
+  type IOps,
+  type IStream,
+  map,
+  merge,
+  op,
+  sample,
+  sampleMap,
+  switchMap
+} from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
 export enum DepositEditorAction {
@@ -26,9 +38,9 @@ export interface IDepositEditorDraft {
 }
 
 export const $DepositEditor = (config: {
-  walletBalance: Stream<bigint> //
-  depositBalance: Stream<bigint> //
-  model: Stream<IDepositEditorDraft>
+  walletBalance: IStream<bigint> //
+  depositBalance: IStream<bigint> //
+  model: IStream<IDepositEditorDraft>
   token: Address
   validation?: IOps<bigint, string | null>
 }) =>
@@ -41,26 +53,32 @@ export const $DepositEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
-      const action = mergeArray([map((model) => model.action, config.model), changeDepositMode])
+      const action = merge(
+        map(model => model.action, config.model),
+        changeDepositMode
+      )
 
-      const maxAmount = switchMap(
-        (action) => {
+      const maxAmount = op(
+        merge(
+          map(model => model.action, config.model),
+          changeDepositMode
+        ),
+        switchMap(action => {
           return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
-        },
-        mergeArray([map((model) => model.action, config.model), changeDepositMode])
+        })
       )
 
       const inputMaxAmount = sample(maxAmount, clickMax)
 
-      const value = mergeArray([
+      const value = merge(
         inputMaxAmount,
         inputAmount,
         constant(0n, changeDepositMode),
-        map((model) => model.amount, config.model)
-      ])
+        map(model => model.amount, config.model)
+      )
 
-      const alert = mergeArray([
-        map((params) => {
+      const alert = merge(
+        map(params => {
           if (params.action === DepositEditorAction.DEPOSIT && params.value > params.maxAmount) {
             return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
           }
@@ -74,9 +92,9 @@ export const $DepositEditor = (config: {
           }
 
           return null
-        }, combineState({ maxAmount, value, action })),
-        config.validation ? config.validation(value) : empty()
-      ])
+        }, combine({ maxAmount, value, action })),
+        config.validation ? config.validation(value) : empty
+      )
 
       return [
         $column(spacing.default, style({ minWidth: '230px' }))(
@@ -84,7 +102,7 @@ export const $DepositEditor = (config: {
             $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
             optionList: [DepositEditorAction.DEPOSIT, DepositEditorAction.WITHDRAW],
             value: action,
-            $$option: map((action) => {
+            $$option: map(action => {
               const label = action === DepositEditorAction.DEPOSIT ? 'Deposit' : 'Withdraw'
               return $node(style({ width: '100px', textAlign: 'center' }))($text(label))
             })
@@ -96,22 +114,22 @@ export const $DepositEditor = (config: {
             $FieldLabeled({
               label: 'Amount',
               validation: alert,
-              value: map((value) => {
+              value: map(value => {
                 return value ? readableTokenAmount(tokenDescription, value) : ''
               }, value),
               placeholder: 'Enter amount',
               hint: map(
-                (params) => {
+                params => {
                   return `${params.action === DepositEditorAction.DEPOSIT ? 'Wallet' : 'Deposit'} Balance: ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
                 },
-                combineState({
+                combine({
                   maxAmount,
                   action: action
                 })
               )
             })({
               change: inputAmountTether(
-                map((val) => {
+                map(val => {
                   return val ? parseFixed(tokenDescription.decimals, parseReadableNumber(val)) : 0n
                 })
               )
@@ -136,8 +154,8 @@ export const $DepositEditor = (config: {
 
             $ButtonSecondary({
               disabled: map(
-                (params) => params.alert !== null || params.model?.amount === params.value,
-                combineState({ alert, value, model: config.model })
+                params => params.alert !== null || params.model?.amount === params.value,
+                combine({ alert, value, model: config.model })
               ),
               $content: $text('Save')
             })({
@@ -147,8 +165,8 @@ export const $DepositEditor = (config: {
         ),
 
         {
-          changeModel: mergeArray([
-            snapshot(
+          changeModel: merge(
+            sampleMap(
               (params): IDepositEditorDraft => {
                 return {
                   action: params.action,
@@ -156,14 +174,14 @@ export const $DepositEditor = (config: {
                   amount: params.value
                 }
               },
-              combineState({
+              combine({
                 value,
                 action
               }),
               clickSave
             )
             // constant(0n, changeDepositMode)
-          ])
+          )
         }
       ]
     }

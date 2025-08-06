@@ -1,11 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": [
-      "./**/*.ts",
-      "!**/node_modules",
-      "!**/dist"
-    ]
+    "includes": ["./**/*.ts", "!**/node_modules", "!**/dist"]
   },
   "formatter": {
     "attributePosition": "multiline",
@@ -66,7 +62,8 @@
     "formatter": {
       "quoteStyle": "single",
       "trailingCommas": "none",
-      "semicolons": "asNeeded"
+      "semicolons": "asNeeded",
+      "arrowParentheses": "asNeeded"
     }
   },
   "assist": {

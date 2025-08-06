@@ -1,3 +1,6 @@
+import { style, stylePseudo } from 'aelea/core'
+import { $column, isDesktopScreen } from 'aelea/ui-components'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {
   $defaultTableCell,
   $defaultTableRowContainer,
@@ -6,10 +9,7 @@ import {
   $spinner,
   $Table,
   type TableOption
-} from '@puppet-copy/middleware/ui-components'
-import { style, stylePseudo } from 'aelea/core'
-import { $column, isDesktopScreen } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+} from '@/ui-components'
 
 export interface ICardTable<T> extends TableOption<T> {}
 

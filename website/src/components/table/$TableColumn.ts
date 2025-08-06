@@ -1,19 +1,19 @@
-import { empty, map, skipRepeats } from '@most/core'
 import {
   getMappedValue,
   getTimeSince,
-  latestPriceMap,
   readableDate,
   readablePercentage,
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { $defaultTableCell, $infoTooltip, type TableColumn } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, type IComposeBehavior, type INode, style, switchMap, toStream } from 'aelea/core'
+import { $node, $text, type INode, style } from 'aelea/core'
+import { empty, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $defaultTableCell, $infoTooltip, type TableColumn } from '@/ui-components'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
+import { latestPriceMap } from '../../logic/latestPriceMap.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IPosition } from '../../pages/type.js'
 import { isPositionSettled } from '../../utils/utils.js'
@@ -27,14 +27,14 @@ export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
 export const sizeColumn = (): TableColumn<IPosition> => ({
   $head: $tableHeader('Max Size', 'Leverage'),
   gridTemplate: '78px',
-  $bodyCallback: map((mp) => {
+  $bodyCallback: map(mp => {
     return $size(mp.maxSizeInUsd, mp.maxCollateralInUsd)
   })
 })
 
 export const entryColumn: TableColumn<IPosition> = {
   $head: $text('Entry'),
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return $entry(pos)
   })
 }
@@ -42,7 +42,7 @@ export const entryColumn: TableColumn<IPosition> = {
 export const puppetsColumn = (click: IComposeBehavior<INode, string>): TableColumn<IPosition> => ({
   $head: $text('Puppets'),
   gridTemplate: '90px',
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return $puppetList(pos.puppetList, click)
   })
 })
@@ -51,29 +51,21 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $head: $tableHeader('PnL $', 'ROI'),
   gridTemplate: '100px',
   $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-start' })),
-  $bodyCallback: map((pos) => {
-    const latestPrice = map((pm) => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
+  $bodyCallback: map(pos => {
+    const latestPrice = map(pm => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
     const isSettled = isPositionSettled(pos)
 
-    const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-    const totalPositionFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
-    const totalBorrowingFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
-    const totalFundingFeeAmount = updateList.reduce(
-      (acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax,
-      0n
-    )
+    // const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)
+    // TODO: Fix fee collection - need to include feeCollected relation in query
+    const totalPositionFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.positionFeeAmount * next.collateralTokenPriceMax, 0n)
+    const totalBorrowingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.borrowingFeeAmount * next.collateralTokenPriceMax, 0n)
+    const totalFundingFeeAmount = 0n // updateList.reduce((acc, next) => acc + next.feeCollected.fundingFeeAmount * next.collateralTokenPriceMax, 0n)
 
     const totalFeesUsd = totalPositionFeeAmount + totalBorrowingFeeAmount + totalFundingFeeAmount
 
     const pnl = isSettled
       ? pos.realisedPnlUsd
-      : map((price) => {
+      : map(price => {
           return (
             pos.realisedPnlUsd +
             getPositionPnlUsd(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, price) -
@@ -82,7 +74,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
         }, latestPrice)
 
     const displayColor = skipRepeats(
-      map((value) => {
+      map(value => {
         return value > 0n ? pallete.positive : value === 0n ? pallete.foreground : pallete.negative
       }, toStream(pnl))
     )
@@ -91,7 +83,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
       ? $pnlDisplay(pnl)
       : $column(spacing.tiny)(
           $row(style({ alignItems: 'center' }))(
-            switchMap((color) => {
+            switchMap(color => {
               return style({ backgroundColor: colorAlpha(color, 0.1), borderRadius: '50%' })(
                 $infoTooltip($openPositionBreakdown(pos), color, '18px')
               )
@@ -102,7 +94,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
           // $liquidationSeparator(pos.isLong, pos.lastUpdate.sizeInUsd, pos.lastUpdate.sizeInTokens, pos.lastUpdate.collateralAmount, latestPrice),
           $node(style({ fontSize: '.8rem' }))(
             $text(
-              map((value) => {
+              map(value => {
                 return readablePercentage(toBasisPoints(value, pos.maxCollateralInUsd))
               }, toStream(pnl))
             )
@@ -115,12 +107,12 @@ export const timeColumn: TableColumn<IPosition> = {
   $head: $text('Settle Timestamp'),
   gridTemplate: 'minmax(110px, 120px)',
   // sortBy: 'openTimestamp',
-  $bodyCallback: map((pos) => {
+  $bodyCallback: map(pos => {
     return pos.lastUpdate.sizeInUsd === 0n
       ? $column(spacing.tiny)(
           $text(getTimeSince(pos.lastUpdateTimestamp)),
           $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
         )
-      : empty()
+      : empty
   })
 }

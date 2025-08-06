@@ -1,28 +1,33 @@
-import { empty, map, mergeArray, now, snapshot, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import { IntervalTime } from '@puppet-copy/middleware/const'
-import { formatFixed, getDuration, parseBps, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $Checkbox, $FieldLabeled } from '@puppet-copy/middleware/ui-components'
-import { uiStorage } from '@puppet-copy/middleware/ui-storage'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import {
-  $element,
-  $node,
-  $text,
-  attr,
-  combineArray,
-  combineState,
-  component,
+  formatFixed,
+  getDuration,
+  getTraderMatchingKey,
+  parseBps,
+  unixTimestampNow
+} from '@puppet-copy/middleware/core'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
+import {
+  combine,
+  empty,
   type IBehavior,
-  O,
-  style,
-  stylePseudo,
+  type IStream,
+  map,
+  merge,
+  now,
+  o,
+  sampleMap,
+  startWith,
   switchMap,
-  toStream
-} from 'aelea/core'
+  toStream,
+  zipMap
+} from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
+import { $Checkbox, $FieldLabeled } from '@/ui-components'
+import { uiStorage } from '@/ui-storage'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
@@ -35,19 +40,19 @@ export type IMatchRuleEditor = {
   traderMatchingKey: Hex
   collateralToken: Address
   trader: Address
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export type InputStateParams<T> = {
-  [P in keyof T]: Stream<T[P]> | T[P]
+  [P in keyof T]: IStream<T[P]> | T[P]
 }
 
 export type InputArrayParams<T extends any[]> = {
-  [P in keyof T]: Stream<T[P]>
+  [P in keyof T]: IStream<T[P]>
 }
 
-export function combineForm<A, K extends keyof A = keyof A>(state: InputStateParams<A>, defualtState: A): Stream<A> {
-  const entries = Object.entries(state) as [keyof A, Stream<A[K]> | A[K]][]
+export function combineForm<A, K extends keyof A = keyof A>(state: InputStateParams<A>, defualtState: A): IStream<A> {
+  const entries = Object.entries(state) as [keyof A, IStream<A[K]> | A[K]][]
 
   if (entries.length === 0) {
     return now({} as A)
@@ -57,7 +62,7 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
     return startWith(defualtState[key], toStream(stream))
   })
 
-  const zipped = combineArray(
+  const zipped = zipMap(
     (...arrgs: A[K][]) => {
       return arrgs.reduce((seed, val, idx) => {
         const key = entries[idx][0]
@@ -83,15 +88,14 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       [save, saveTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
-        localStore.ruleEditor,
-        changeAdvancedRouteEditorEnabled,
-        'advancedRouteEditorEnabled'
+        localStore.ruleEditor.advancedRouteEditorEnabled,
+        changeAdvancedRouteEditorEnabled
       )
 
       const { model, traderMatchingKey, draftMatchingRuleList, collateralToken, trader } = config
 
       const defaultDraft = {
-        allowanceRate: BigInt(1000),
+        allowanceRate: 1000n,
         throttleActivity: BigInt(IntervalTime.HR),
         expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
       }
@@ -111,12 +115,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
 
           $FieldLabeled({
             label: 'Allocate %',
-            value: map((x) => (x ? `${formatFixed(4, x) * 100}` : ''), allowanceRate),
+            value: map(x => (x ? `${formatFixed(4, x) * 100}` : ''), allowanceRate),
             placeholder: `${formatFixed(4, defaultDraft.allowanceRate) * 100}`,
             labelWidth: 150,
             hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
-            change: inputAllowanceTether(map((x) => parseBps(x / 100)))
+            change: inputAllowanceTether(map(x => parseBps(x / 100)))
           }),
 
           style({ margin: '10px 0' })(
@@ -132,9 +136,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
           ),
 
           $row(
-            switchMap((isEnabled) => {
+            switchMap(isEnabled => {
               if (!isEnabled) {
-                return empty()
+                return empty
               }
 
               return $column(spacing.default)(
@@ -151,12 +155,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                     })
                   ),
                   hint: 'set a date when this rule will expire, default is 1 year',
-                  value: map((time) => {
+                  value: map(time => {
                     return new Date(Number(time * 1000n)).toISOString().slice(0, 10)
                   }, expiry)
                 })({
                   change: inputEndDateTether(
-                    map((date) => {
+                    map(date => {
                       const parsed = Date.parse(date)
                       return parsed ? BigInt(Math.floor(parsed / 1000)) : BigInt(0)
                     })
@@ -166,13 +170,13 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                 $Dropdown({
                   $anchor: $FieldLabeled({
                     label: 'Activity throttle',
-                    value: map(O(Number, getDuration), throttleActivity),
+                    value: map(o(Number, getDuration), throttleActivity),
                     placeholder: getDuration(Number(model?.throttleActivity || defaultDraft.throttleActivity)),
                     labelWidth: 150,
                     hint: 'Ignore positions that are too close to each other in time'
                   })({}),
                   $container: $row(style({ right: '0', position: 'relative' })),
-                  $$option: map((tf) => {
+                  $$option: map(tf => {
                     return $node($text(getDuration(Number(tf))))
                   }),
                   optionList: [IntervalTime.HR, IntervalTime.HR2, IntervalTime.HR6, IntervalTime.DAY, IntervalTime.WEEK]
@@ -195,7 +199,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
 
             $ButtonSecondary({
               $content: $text('Copy'),
-              disabled: map((params) => !params.allowanceRate, draft)
+              disabled: map(params => !params.allowanceRate, draft)
             })({
               click: saveTether()
             })
@@ -203,11 +207,11 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
         ),
 
         {
-          changeMatchRuleList: mergeArray([
-            snapshot(
-              (params) => {
+          changeMatchRuleList: merge(
+            sampleMap(
+              params => {
                 const modelIndex = params.draftMatchingRuleList.findIndex(
-                  (x) => x.traderMatchingKey === traderMatchingKey
+                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
                 )
                 const model = modelIndex > -1 ? params.draftMatchingRuleList[modelIndex] : undefined
 
@@ -231,16 +235,18 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                   }
                 ]
               },
-              combineState({ draftMatchingRuleList, draft }),
+              combine({ draftMatchingRuleList, draft }),
               save
             ),
-            snapshot(
-              (params) => {
-                const match = params.draftMatchingRuleList.find((x) => x.traderMatchingKey === traderMatchingKey)
+            sampleMap(
+              params => {
+                const match = params.draftMatchingRuleList.find(
+                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
+                )
 
                 if (match) {
                   const modelIndex = params.draftMatchingRuleList.findIndex(
-                    (x) => x.traderMatchingKey === traderMatchingKey
+                    x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
                   )
                   params.draftMatchingRuleList[modelIndex] = {
                     ...match,
@@ -261,10 +267,10 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                   }
                 ]
               },
-              combineState({ draftMatchingRuleList, draft }),
+              combine({ draftMatchingRuleList, draft }),
               clickRemove
             )
-          ])
+          )
         }
       ]
     }

@@ -1,25 +1,21 @@
-import { constant, empty, startWith } from '@most/core'
-import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@puppet-copy/middleware/ui-components'
 import {
   $element,
   $node,
   attr,
-  combineArray,
   component,
   type I$Node,
-  type IBehavior,
   type INodeCompose,
   type ISlottable,
-  type IStyleCSS,
   nodeEvent,
-  O,
-  style,
-  styleBehavior
+  style
 } from 'aelea/core'
-import { $RouterAnchor, type IAnchor, type Route } from 'aelea/router'
+import type { IAnchor, Route } from 'aelea/router'
+import { constant, empty, type IBehavior, o, startWith } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
+import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@/ui-components'
+import { $RouterAnchor } from '@/ui-router'
 import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/type.js'
 import { $Popover } from './$Popover.js'
@@ -87,7 +83,7 @@ export const $MainMenu = (config: MainMenu) =>
           $column(spacing.default)(
             isMobileScreen
               ? $row(spacing.big, style({ flexWrap: 'wrap', placeContent: 'center' }))(...$socialLinkList)
-              : empty(),
+              : empty,
             $ButtonSecondary({
               $content: $ThemePicker(themeState)({
                 changeTheme: changeThemeTether()
@@ -98,7 +94,7 @@ export const $MainMenu = (config: MainMenu) =>
         ),
         dismiss: routeChange,
         $target: $icon({
-          svgOps: O(
+          svgOps: o(
             clickPopoverClaimTether(nodeEvent('click')),
             style({
               padding: '6px',
@@ -183,25 +179,21 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
         style({
           borderRadius: '50px',
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
-        }),
-        styleBehavior(
-          combineArray(
-            (isActive, isFocus): IStyleCSS | null => {
-              return isActive
-                ? {
-                    backgroundColor: `${pallete.background} !important`,
-                    fill: pallete.foreground,
-                    borderColor: `${pallete.primary} !important`,
-                    cursor: 'default  !important'
-                  }
-                : isFocus
-                  ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
-                  : null
-            },
-            active,
-            focus
-          )
-        )
+        })
+        // styleBehavior(
+        //   map((params): IStyleCSS | null => {
+        //     return params.active
+        //       ? {
+        //           backgroundColor: `${pallete.background} !important`,
+        //           fill: pallete.foreground,
+        //           borderColor: `${pallete.primary} !important`,
+        //           cursor: 'default  !important'
+        //         }
+        //       : params.focus
+        //         ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
+        //         : null
+        //   }, zipState({ active, focus }))
+        // )
         // styleBehavior(map(isDisabled => (isDisabled ?  { pointerEvents: 'none', opacity: .3 } : {}), disabled))
       )(config.$content)
 

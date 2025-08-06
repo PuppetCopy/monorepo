@@ -3,7 +3,7 @@
   "private": true,
   "license": "BSL-1.1 and MIT",
   "description": "Puppet Monorepo",
-  "packageManager": "bun@1.2.15",
+  "packageManager": "bun@1.2.19",
   "keywords": [
     "Puppet",
     "Copy Trading",
@@ -34,6 +34,6 @@
     "@biomejs/biome": "2.1.2",
     "@changesets/changelog-github": "0.5.1",
     "sherif": "1.6.1",
-    "@typescript/native-preview": "^7.0.0-dev.20250728.1"
+    "typescript": "^5.8.3"
   }
 }

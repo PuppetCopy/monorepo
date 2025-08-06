@@ -1,24 +1,36 @@
 export { setTheme } from 'aelea/ui-components-theme-browser'
 
-import { $wrapNativeElement, runBrowser, style } from 'aelea/core'
-import { designSheet, isDesktopScreen, isMobileScreen } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { render } from 'aelea/core'
 import { $Main } from './pages/$Main.js'
 
-runBrowser({
-  $rootNode: $wrapNativeElement(document.body)(
-    designSheet.customScroll,
-    style({
-      color: pallete.message,
-      fill: pallete.message,
-      // position: 'relative',
-      // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
-      backgroundColor: pallete.horizon,
-      fontSize: isDesktopScreen ? '16px' : '14px',
-      // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
-      fontWeight: 400
-      // flexDirection: 'row',
-    }),
-    isMobileScreen ? style({ userSelect: 'none' }) : style({})
-  )($Main({})({}))
+render({
+  rootAttachment: document.querySelector('html')!,
+  $rootNode: $Main({})({})
 })
+
+// const browserScheduler = createDomScheduler()
+// const config: IRunEnvironment = {
+//   namespace: '•',
+//   stylesheet: new CSSStyleSheet(),
+//   cache: [],
+//   rootAttachment: document.querySelector('html')!,
+//   scheduler: browserScheduler,
+//   $rootNode: $Main({})({})
+// }
+
+// document.adoptedStyleSheets = [...document.adoptedStyleSheets, config.stylesheet]
+
+// $createRoot(config).run(
+//   {
+//     end() {
+//       console.log('Application has ended.')
+//     },
+//     error(err: Error) {
+//       console.error('An error occurred:', err)
+//     },
+//     event() {
+//       // Handle events if necessary
+//     }
+//   },
+//   browserScheduler
+// )

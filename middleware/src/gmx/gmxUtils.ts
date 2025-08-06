@@ -1,11 +1,12 @@
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
-import { FUNDING_RATE_PRECISION } from '../const/index.js'
+import { FUNDING_RATE_PRECISION } from '../const/common.js'
 import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
-import { factor, toBasisPoints } from '../core/mathUtils.js'
+import { factor, toBasisPoints } from '../core/math.js'
+import { formatFixed } from '../core/parse.js'
 import type { ITokenDescription } from '../core/types.js'
-import { easeInExpo, formatFixed, getMappedValue, getPriceDelta } from '../core/utils.js'
+import { easeInExpo, getMappedValue } from '../core/utils.js'
 import { MARKET_ADDRESS_DESCRIPTION_MAP } from './const.js'
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
@@ -13,7 +14,7 @@ export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint,
     return 0n
   }
 
-  const priceDelta = getPriceDelta(isLong, entryPrice, priceChange)
+  const priceDelta = isLong ? priceChange - entryPrice : entryPrice - priceChange
   return (size * priceDelta) / entryPrice
 }
 

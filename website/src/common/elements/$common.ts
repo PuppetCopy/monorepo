@@ -1,8 +1,8 @@
-import { empty } from '@most/core'
-import { $caretDblDown } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, type I$Node, isStream, style } from 'aelea/core'
+import { $node, $text, type I$Node, style } from 'aelea/core'
+import { empty, isStream } from 'aelea/stream'
 import { $ButtonIcon, $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, theme } from 'aelea/ui-components-theme'
+import { $caretDblDown } from '@/ui-components'
 import { $trash } from './$icons.js'
 
 export const $TrashBtn = $ButtonIcon($trash)
@@ -54,7 +54,7 @@ export const $labeledDivider = (label: string | I$Node, displayIcon = true) => {
       isStream(label) ? label : $node(style({ fontSize: '.8rem' }))($text(label)),
       displayIcon
         ? $icon({ $content: $caretDblDown, width: '10px', viewBox: '0 0 32 32', fill: pallete.foreground })
-        : empty()
+        : empty
     ),
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))()
   )

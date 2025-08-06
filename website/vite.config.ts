@@ -22,30 +22,13 @@ export default defineConfig({
       output: {
         manualChunks: {
           subgraph: ['ponder'],
-          aelea: [
-            'aelea/core',
-            'aelea/ui-components',
-            'aelea/ui-components-theme',
-            'aelea/ui-components-theme-browser'
-          ],
           middleware: [
             '@puppet-copy/middleware/const',
             '@puppet-copy/middleware/core',
             '@puppet-copy/middleware/gmx',
-            '@puppet-copy/middleware/gbc',
-            '@puppet-copy/middleware/ui-components',
-            '@puppet-copy/middleware/ui-router',
-            '@puppet-copy/middleware/ui-storage'
+            '@puppet-copy/middleware/gbc'
           ],
-          vendor: [
-            '@most/core',
-            '@most/disposable',
-            '@most/prelude',
-            '@most/scheduler',
-            '@most/types',
-            'color',
-            'mersenne-twister'
-          ],
+          vendor: ['color', 'mersenne-twister'],
           // wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
           charts: ['lightweight-charts']
         }

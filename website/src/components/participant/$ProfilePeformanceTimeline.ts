@@ -1,32 +1,36 @@
-import { empty, map, skipRepeatsWith, startWith, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
 import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
-  filterNull,
   formatFixed,
   parseReadableNumber,
   readableUnitAmount,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
+import { $node, $text, component, motion, style } from 'aelea/core'
 import {
-  $Baseline,
-  $infoTooltipLabel,
-  $intermediatePromise,
-  type ISeriesTime
-} from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, type IBehavior, motion, style, switchMap } from 'aelea/core'
+  combine,
+  empty,
+  filterNull,
+  type IBehavior,
+  type IStream,
+  map,
+  skipRepeatsWith,
+  startWith,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
+import { $Baseline, $infoTooltipLabel, $intermediatePromise, type ISeriesTime } from '@/ui-components'
 import type { IPageFilterParams, ITraderRouteMetricSummary } from '../../pages/type.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 
 interface IProfilePeformanceTimeline extends IPageFilterParams {
-  metricsQuery: Stream<Promise<ITraderRouteMetricSummary>>
+  metricsQuery: IStream<Promise<ITraderRouteMetricSummary>>
 }
 
 export const $TradeRouteTimeline = ({
@@ -40,7 +44,7 @@ export const $TradeRouteTimeline = ({
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
-      const timelineQuery = map(async (params) => {
+      const timelineQuery = map(async params => {
         const pos = await params.metricsQuery
 
         if (pos.pnlTimeline.length === 0) {
@@ -51,7 +55,7 @@ export const $TradeRouteTimeline = ({
         const startTime = endTime - params.activityTimeframe
         const sourceList = [
           { value: 0n, time: startTime, traderMatchingKey: pos.pnlTimeline[0].traderMatchingKey },
-          ...pos.pnlTimeline.filter((item) => item.time > startTime),
+          ...pos.pnlTimeline.filter(item => item.time > startTime),
           { value: 0n, time: endTime, traderMatchingKey: '0xdead' as Hex }
         ]
 
@@ -60,8 +64,8 @@ export const $TradeRouteTimeline = ({
         const timelinbe = fillTimeline({
           sourceList,
           ticks: 280,
-          getTime: (item) => item.time,
-          sourceMap: (next) => {
+          getTime: item => item.time,
+          sourceMap: next => {
             sumMap.set(next.traderMatchingKey, next.value)
 
             const sum = [...sumMap.values()].reduce((acc, curr) => acc + curr, 0n)
@@ -71,7 +75,7 @@ export const $TradeRouteTimeline = ({
         })
 
         return timelinbe
-      }, combineState({ metricsQuery, activityTimeframe }))
+      }, combine({ metricsQuery, activityTimeframe }))
 
       return [
         $column(style({ width: '100%', padding: 0, height: '200px', placeContent: 'center' }))(
@@ -95,11 +99,11 @@ export const $TradeRouteTimeline = ({
               })
             ),
             switchLatest(
-              switchMap(async (paramsQuery) => {
+              switchMap(async paramsQuery => {
                 const timeline = await paramsQuery
 
                 if (timeline.length === 0) {
-                  return empty()
+                  return empty
                 }
 
                 const pnlCrossHairTimeChange = startWith(
@@ -109,9 +113,10 @@ export const $TradeRouteTimeline = ({
                   }, crosshairMove)
                 )
                 const hoverChartPnl = filterNull(
-                  map((cross) => {
+                  map(cross => {
                     if (cross?.point) {
-                      const value = cross.seriesData.values().next().value?.value || 0
+                      const seriesData = cross.seriesData.values().next().value as any
+                      const value = seriesData?.value || 0
                       return value
                     }
 
@@ -128,12 +133,12 @@ export const $TradeRouteTimeline = ({
                     },
                     // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
                     value$: map(
-                      (hoverValue) => {
+                      hoverValue => {
                         const newLocal2 = readableUnitAmount(hoverValue)
                         const newLocal = parseReadableNumber(newLocal2)
                         return newLocal
                       },
-                      motion({ damping: 26, precision: 15, stiffness: 210 }, 0, hoverChartPnl)
+                      motion({ damping: 26, precision: 15, stiffness: 210 }, hoverChartPnl)
                     ),
                     incrementColor: pallete.positive,
                     decrementColor: pallete.negative
@@ -152,7 +157,7 @@ export const $TradeRouteTimeline = ({
           ),
           $intermediatePromise({
             $display: map(
-              async (params) => {
+              async params => {
                 const timeline = await params.timelineQuery
 
                 if (timeline.length === 0) {
@@ -213,7 +218,7 @@ export const $TradeRouteTimeline = ({
                       type: 'price'
                     }
                   },
-                  // appendData: scan((prev, next) => {
+                  // appendData: aggregate((prev, next) => {
                   //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
                   //   const timeNow = unixTimestampNow()
                   //   const prevTimeSlot = Math.floor(prev.time as number / tf)
@@ -231,7 +236,7 @@ export const $TradeRouteTimeline = ({
                   crosshairMove: crosshairMoveTether()
                 })
               },
-              combineState({
+              combine({
                 timelineQuery,
                 activityTimeframe,
                 collateralTokenList

@@ -1,8 +1,5 @@
-import { constant, empty, map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
 import {
-  filterNull,
   getDuration,
   getTraderMatchingKey,
   groupArrayMany,
@@ -11,12 +8,13 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@puppet-copy/middleware/ui-components'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $node, $text, combineState, component, type IBehavior, style } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
+import { combine, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { $caretDown, $infoLabel, $infoLabeledValue, $intermediatePromise } from '@/ui-components'
 import { $card, $card2, $responsiveFlex } from '../common/elements/$common.js'
 import { sqlClient } from '../common/sqlClient.js'
 import { $profileDisplay } from '../components/$AccountProfile.js'
@@ -32,9 +30,9 @@ import { $seperator2 } from './common.js'
 import type { IPageFilterParams } from './type.js'
 
 interface IWalletPuppet extends IPageFilterParams {
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
-  draftDepositTokenList: Stream<IDepositEditorDraft[]>
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
+  draftDepositTokenList: IStream<IDepositEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
 }
 
 export const $PortfolioPage = ({
@@ -54,7 +52,7 @@ export const $PortfolioPage = ({
     ) => {
       const positionLinkMapQuery = multicast(
         map(
-          async (params) => {
+          async params => {
             const address = params.wallet.address
 
             if (address === undefined) {
@@ -96,8 +94,8 @@ export const $PortfolioPage = ({
                         positionSize: true,
                         transactionHash: true,
                         traderSize: true,
-                        traderCollateral: true,
-                        traderTargetLeverage: true
+                        traderCollateral: true
+                        // traderTargetLeverage: true // TODO: Field no longer exists in schema
                       }
                     },
                     liquidate: {
@@ -132,16 +130,16 @@ export const $PortfolioPage = ({
               }
             })
 
-            return groupArrayMany(result, (row) =>
-              getTraderMatchingKey(row.callParamsCollateralToken, row.mirrorLink.callParamsTrader)
+            return groupArrayMany(result, row =>
+              getTraderMatchingKey(row.callParamsCollateralToken, row.callParamsTrader)
             )
           },
-          combineState({ activityTimeframe, collateralTokenList, wallet: wallet.account })
+          combine({ activityTimeframe, collateralTokenList, wallet: wallet.account })
         )
       )
 
       const stateParams = multicast(
-        combineState({
+        combine({
           userMatchingRuleQuery,
           positionLinkMapQuery,
           activityTimeframe,
@@ -156,14 +154,14 @@ export const $PortfolioPage = ({
       //     if (address === undefined) return null
 
       //     return wallet.read({
-      //       ...CONTRACT.MatchingRule,
+      //       ...CONTRACT.Rule,
       //       functionName: 'getRuleList',
       //       args: [collateralToken, address]
       //     })
       //   })
 
       //   return Promise.all(ruleList)
-      // }, combineState({ collateralTokenList, wallet: wallet.account }))
+      // }, combine({ collateralTokenList, wallet: wallet.account }))
 
       return [
         $card(spacing.big, style({ flex: 1, width: '100%' }))(
@@ -205,11 +203,11 @@ export const $PortfolioPage = ({
               ),
 
               $intermediatePromise({
-                $display: map(async (params) => {
+                $display: map(async params => {
                   const settlementList = await params.positionLinkMapQuery
 
                   if (settlementList === null) {
-                    return empty()
+                    return empty
                   }
 
                   if (Object.keys(settlementList).length === 0) {
@@ -221,14 +219,14 @@ export const $PortfolioPage = ({
                   }
 
                   // TODO
-                  return empty()
+                  return empty
                 }, stateParams)
               })
             )
           ),
 
           $intermediatePromise({
-            $display: map(async (params) => {
+            $display: map(async params => {
               const activeRouteList =
                 params.collateralTokenList.length > 0 ? params.collateralTokenList : PUPPET_COLLATERAL_LIST
 
@@ -236,9 +234,9 @@ export const $PortfolioPage = ({
               const matchingRuleList = await params.userMatchingRuleQuery
 
               return $column(spacing.default)(
-                ...activeRouteList.map((collateralToken) => {
+                ...activeRouteList.map(collateralToken => {
                   const matchingRuleListForToken = matchingRuleList.filter(
-                    (rule) => rule.collateralToken === collateralToken
+                    rule => rule.collateralToken === collateralToken
                   )
 
                   return $column(style({ paddingLeft: '16px' }))(
@@ -262,8 +260,8 @@ export const $PortfolioPage = ({
                             ? $infoLabel(
                                 $text(`No matching rules set for ${getTokenDescription(collateralToken).name}`)
                               )
-                            : empty(),
-                          ...matchingRuleListForToken.map((rule) => {
+                            : empty,
+                          ...matchingRuleListForToken.map(rule => {
                             const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
 
                             const mirrorLinkList = positionMap?.[traderMatchingKey] || []
@@ -271,7 +269,7 @@ export const $PortfolioPage = ({
                             return $column(
                               $Popover({
                                 $open: filterNull(
-                                  map((trader) => {
+                                  map(trader => {
                                     if (trader !== rule.trader) {
                                       return null
                                     }

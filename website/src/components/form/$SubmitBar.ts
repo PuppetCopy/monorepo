@@ -1,27 +1,22 @@
-import { constant, empty, map, mergeArray, multicast, now, startWith, switchLatest } from '@most/core'
-import type { Stream } from '@most/types'
 import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
+import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
 import {
-  $alertPositiveTooltip,
-  $alertTooltip,
-  $spinnerTooltip,
-  $txHashRef
-} from '@puppet-copy/middleware/ui-components'
-import {
-  $node,
-  $text,
-  combineArray,
-  combineState,
-  component,
-  type I$Node,
-  type I$Slottable,
+  combine,
+  constant,
+  empty,
   type IBehavior,
-  type INodeCompose,
-  style
-} from 'aelea/core'
+  type IStream,
+  map,
+  merge,
+  multicast,
+  now,
+  startWith,
+  switchLatest
+} from 'aelea/stream'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'
+import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
 import type { IWalletConnected, IWriteContractReturn } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
@@ -30,12 +25,12 @@ import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
 export interface ISubmitBar {
-  txQuery: Stream<Promise<GetCallsStatusReturnType>>
-  alert?: Stream<string | null>
+  txQuery: IStream<Promise<GetCallsStatusReturnType>>
+  alert?: IStream<string | null>
   $container?: INodeCompose
   $submitContent: I$Slottable
   $barContent?: I$Node
-  disabled?: Stream<boolean>
+  disabled?: IStream<boolean>
 
   spend?: ISpend
 }
@@ -58,21 +53,21 @@ export const $SubmitBar = (config: ISubmitBar) =>
       } = config
 
       const multicastTxQuery = multicast(promiseState(txQuery))
-      const requestStatus = mergeArray([
+      const requestStatus = merge(
         multicastTxQuery,
-        map((a) => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
-      ])
+        map(a => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
+      )
       const isRequestPending = startWith(
         false,
-        map((s) => s.status === PromiseStatus.PENDING, multicastTxQuery)
+        map(s => s.status === PromiseStatus.PENDING, multicastTxQuery)
       )
 
       return [
         $container(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
           switchLatest(
-            map((status) => {
+            map(status => {
               if (status === null) {
-                return empty()
+                return empty
               }
 
               if (status.status === PromiseStatus.PENDING) {
@@ -83,7 +78,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 let message: string | undefined
 
                 if (err instanceof BaseError) {
-                  const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError)
+                  const revertError = err.walk(err => err instanceof ContractFunctionRevertedError)
                   if (revertError instanceof ContractFunctionRevertedError) {
                     if (revertError.data) {
                       message = getContractErrorMessage(revertError.data)
@@ -111,7 +106,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     $row(spacing.small)(
                       $text('Transaction confirmed'),
 
-                      ...(status.value.receipts?.map((receipt) =>
+                      ...(status.value.receipts?.map(receipt =>
                         $txHashRef(receipt.transactionHash)
                           ? $node($text(receipt.transactionHash))
                           : $node($text(receipt.transactionHash || ''))
@@ -121,9 +116,9 @@ export const $SubmitBar = (config: ISubmitBar) =>
                 : $alertTooltip($node($text('Transaction failed')))
             }, requestStatus)
           ),
-          $barContent ?? empty(),
+          $barContent ?? empty,
           $IntermediateConnectButton({
-            $$display: map((wallet) => {
+            $$display: map(wallet => {
               const $primaryActionButton = $ButtonCore({
                 $container: $defaultButtonPrimary(
                   style({
@@ -131,9 +126,9 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     overflow: 'hidden'
                   })
                 ),
-                disabled: map((params) => {
+                disabled: map(params => {
                   return params.alert !== null || params.disabled || params.isRequestPending
-                }, combineState({ disabled, isRequestPending, alert })),
+                }, combine({ disabled, isRequestPending, alert })),
                 $content: $submitContent
               })({
                 click: submitTether(constant(wallet))
@@ -142,7 +137,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               if (spend) {
                 const isSpendPending = startWith(
                   false,
-                  map((s) => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
+                  map(s => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )
 
                 return $ApproveSpend({
@@ -151,7 +146,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                   txQuery: approveTokenSpend,
                   $label: spend.$label,
                   $content: $primaryActionButton,
-                  disabled: combineArray((params) => params.isSpendPending, combineState({ isSpendPending }))
+                  disabled: map(params => params.isSpendPending, combine({ isSpendPending }))
                 })({
                   approveTokenSpend: approveTokenSpendTether()
                 })

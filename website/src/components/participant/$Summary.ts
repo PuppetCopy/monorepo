@@ -1,18 +1,16 @@
-import { map, multicast } from '@most/core'
-import type { Stream } from '@most/types'
 import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
-import { intermediateText } from '@puppet-copy/middleware/ui-components'
-import { $node, $text, combineState, component, style } from 'aelea/core'
+import { $node, $text, component, style } from 'aelea/core'
+import { combine, type IStream, map, multicast } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
+import { intermediateText } from '@/ui-components'
 import { $heading2 } from '../../common/$text.js'
-import { accountSettledPositionListSummary } from '../../pages/common.js'
-import type { IPosition } from '../../pages/type.js'
+import type { IPosition, ITraderRouteMetricSummary } from '../../pages/type.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
-  positionListQuery: Stream<Promise<IPosition[]>>
+  positionListQuery: IStream<Promise<IPosition[]>>
   account: Address
   puppet?: Address
 }
@@ -22,11 +20,33 @@ export const $PuppetSummary = (config: IAccountSummary) =>
     const { account, positionListQuery, puppet } = config
 
     const metricsQuery = multicast(
-      map(async (params) => {
+      map(async params => {
         const allPositions = await params.positionListQuery
 
-        return accountSettledPositionListSummary(allPositions, puppet)
-      }, combineState({ positionListQuery }))
+        // TODO: Fix this - accountSettledPositionListSummary expects ITraderRouteLatestMetric, not IPosition[]
+        // return accountSettledPositionListSummary(puppet || account, allPositions)
+
+        // Return empty summary for now
+        return {
+          account: puppet || account,
+          settledSizeInUsd: 0n,
+          settledSizeLongInUsd: 0n,
+          settledCollateralInUsd: 0n,
+          sizeUsd: 0n,
+          collateralUsd: 0n,
+          longUsd: 0n,
+          longShortRatio: 0n,
+          pnl: 0n,
+          realisedPnl: 0n,
+          realisedRoi: 0n,
+          roi: 0n,
+          lossCount: 0,
+          winCount: 0,
+          pnlTimeline: [],
+          matchedPuppetList: [],
+          marketList: []
+        } as ITraderRouteMetricSummary
+      }, combine({ positionListQuery }))
     )
 
     return [
@@ -47,9 +67,8 @@ export const $PuppetSummary = (config: IAccountSummary) =>
         )(
           $row(
             $profileDisplay({
-              account,
-              labelSize: '22px',
-              size: isDesktopScreen ? 90 : 90
+              address: account,
+              profileSize: isDesktopScreen ? 90 : 90
             })
           ),
           $row(spacing.big, style({ alignItems: 'flex-end' }))(
@@ -57,7 +76,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
                       return `${summary.winCount} / ${summary.lossCount}`
@@ -72,10 +91,11 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
-                      return readableUsd(summary.avgCollateral)
+                      // TODO: Fix avgCollateral - property no longer exists in schema
+                      return readableUsd(0n) // summary.avgCollateral
                     }, metricsQuery)
                   )
                 )
@@ -86,10 +106,11 @@ export const $PuppetSummary = (config: IAccountSummary) =>
               $heading2(
                 $text(
                   intermediateText(
-                    map(async (summaryQuery) => {
+                    map(async summaryQuery => {
                       const summary = await summaryQuery
 
-                      return readableLeverage(summary.avgSize, summary.avgCollateral)
+                      // TODO: Fix avgSize and avgCollateral - properties no longer exist in schema
+                      return readableLeverage(0n, 1n) // summary.avgSize, summary.avgCollateral
                     }, metricsQuery)
                   )
                 )

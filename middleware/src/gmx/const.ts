@@ -10,6 +10,6 @@ export const MARKET_DESCRIPTION_LIST = Object.entries(MARKETS[arbitrum.id]).map(
   shortToken: getAddress(config.shortTokenAddress)
 }))
 
-export const MARKET_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(MARKET_DESCRIPTION_LIST, (market) =>
+export const MARKET_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(MARKET_DESCRIPTION_LIST, market =>
   getAddress(market.marketToken)
 )

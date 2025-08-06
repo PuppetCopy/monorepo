@@ -1,15 +1,30 @@
-import { awaitPromises, map, multicast, startWith } from '@most/core'
-import type { Stream } from '@most/types'
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   getDebankProfileUrl,
   pagingQuery,
+  readableAddress,
   readableLeverage,
   readableUsd,
-  shortenAddress,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
+import { $node, $text, attr, component, style } from 'aelea/core'
+import {
+  combine,
+  fromPromise,
+  type IBehavior,
+  type IStream,
+  map,
+  multicast,
+  replayLatest,
+  startWith,
+  switchMap
+} from 'aelea/stream'
+import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
+import { asc } from 'ponder'
+import type { Address } from 'viem/accounts'
 import {
   $anchor,
   $arrowRight,
@@ -20,13 +35,7 @@ import {
   $Table,
   type IQuantumScrollPage,
   type ISortBy
-} from '@puppet-copy/middleware/ui-components'
-import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import { $node, $text, attr, combineState, component, type IBehavior, replayLatest, style, switchMap } from 'aelea/core'
-import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
-import { asc } from 'ponder'
-import type { Address } from 'viem/accounts'
+} from '@/ui-components'
 import { $heading2 } from '../common/$text.js'
 import { $card, $card2 } from '../common/elements/$common.js'
 import { sqlClient } from '../common/sqlClient.js'
@@ -39,8 +48,8 @@ import { $seperator2, accountSettledPositionListSummary, aggregatePositionList }
 import type { IPageFilterParams } from './type.js'
 
 interface ITraderPage extends IPageFilterParams {
-  userMatchingRuleQuery: Stream<Promise<ISetMatchingRule[]>>
-  draftMatchingRuleList: Stream<ISetMatchingRuleEditorDraft[]>
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $TraderPage = ({
@@ -64,7 +73,7 @@ export const $TraderPage = ({
       const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address
 
       const routeMetricListQuery = multicast(
-        map(async (params) => {
+        map(async params => {
           const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
           const routeMetricList = await sqlClient.query.traderRouteLatestMetric.findMany({
@@ -80,26 +89,21 @@ export const $TraderPage = ({
                 f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
               ),
             with: {
-              traderRouteMetric: {
-                columns: {
-                  marketList: true,
-                  positionList: true
-                }
-              }
+              traderRouteMetric: true
             }
           })
 
           return routeMetricList
-        }, combineState({ activityTimeframe, collateralTokenList }))
+        }, combine({ activityTimeframe, collateralTokenList }))
       )
 
       const metricsQuery = multicast(
-        map(async (metricList) => {
+        map(async metricList => {
           return accountSettledPositionListSummary(account, await metricList)
         }, routeMetricListQuery)
       )
 
-      const pageParams = switchMap(async (params) => {
+      const pageParams = switchMap(async params => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
         const _paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -145,7 +149,7 @@ export const $TraderPage = ({
         //   }
 
         return { ...params, routeMetricList, increaseList, decreaseList, positionList }
-      }, combineState({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
+      }, combine({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
 
       return [
         $column(spacing.small)(
@@ -173,7 +177,7 @@ export const $TraderPage = ({
                 target: '_blank'
               })
             )(
-              $text(shortenAddress(account)),
+              $text(readableAddress(account)),
               $icon({
                 $content: $external,
                 width: '12px'
@@ -216,7 +220,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return `${summary.winCount} / ${summary.lossCount}`
                       }, metricsQuery)
@@ -227,7 +231,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return readableUsd(summary.sizeUsd)
                       }, metricsQuery)
@@ -238,7 +242,7 @@ export const $TraderPage = ({
                 $metricRow(
                   $heading2(
                     $intermediateText(
-                      map(async (summaryQuery) => {
+                      map(async summaryQuery => {
                         const summary = await summaryQuery
                         return readableLeverage(summary.sizeUsd, summary.collateralUsd)
                       }, metricsQuery)
@@ -249,7 +253,7 @@ export const $TraderPage = ({
               )
             ),
 
-            switchMap((params) => {
+            switchMap(params => {
               const _startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -261,32 +265,35 @@ export const $TraderPage = ({
               }
 
               return $column(spacing.big)(
-                ...params.routeMetricList.map((routeMetric) => {
-                  const dataSource = map((pageParams) => {
+                ...params.routeMetricList.map(routeMetric => {
+                  const dataSource = map(pageParams => {
                     return pagingQuery(
                       { ...pageParams.paging, ...pageParams.sortBy },
-                      params.positionList.filter((item) => item.collateralToken === routeMetric.collateralToken)
+                      params.positionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
-                  }, combineState({ sortBy, paging }))
+                  }, combine({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(
                     // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
-                    switchMap((list) => {
-                      return $RouteEditor({
-                        displayCollateralTokenSymbol: true,
-                        collateralToken: routeMetric.collateralToken,
-                        traderMatchedPuppetList: routeMetric.matchedPuppetList,
-                        userMatchingRuleList: [],
-                        draftMatchingRuleList,
-                        trader: routeMetric.account,
-                        $container: $defaultTraderMatchRouteEditorContainer(
-                          style({ marginLeft: '-12px', paddingBottom: '12px' })
-                        )
-                      })({
-                        changeMatchRuleList: changeMatchRuleListTether()
-                      })
-                    }, awaitPromises(userMatchingRuleQuery)),
+                    switchMap(
+                      list => {
+                        return $RouteEditor({
+                          displayCollateralTokenSymbol: true,
+                          collateralToken: routeMetric.collateralToken,
+                          traderMatchedPuppetList: routeMetric.matchedPuppetList,
+                          userMatchingRuleList: [],
+                          draftMatchingRuleList,
+                          trader: routeMetric.account,
+                          $container: $defaultTraderMatchRouteEditorContainer(
+                            style({ marginLeft: '-12px', paddingBottom: '12px' })
+                          )
+                        })({
+                          changeMatchRuleList: changeMatchRuleListTether()
+                        })
+                      },
+                      switchMap(promise => fromPromise(promise), userMatchingRuleQuery)
+                    ),
                     $row(
                       style({ marginRight: '26px' })($seperator2),
                       $Table({

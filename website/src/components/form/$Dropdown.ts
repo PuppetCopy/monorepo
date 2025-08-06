@@ -1,24 +1,34 @@
-import { constant, empty, map, merge, mergeArray, now, skip, skipRepeats, switchLatest, take, zip } from '@most/core'
-import type { Stream } from '@most/types'
 import {
   $node,
   $text,
-  combineState,
   component,
   eventElementTarget,
   type I$Node,
   type I$Slottable,
-  type IBehavior,
   type INode,
   type INodeCompose,
-  type IOps,
   nodeEvent,
   style,
   styleInline,
-  stylePseudo,
-  switchMap,
-  toStream
+  stylePseudo
 } from 'aelea/core'
+import {
+  combine,
+  constant,
+  empty,
+  type IBehavior,
+  type IOps,
+  type IStream,
+  map,
+  merge,
+  now,
+  skip,
+  switchLatest,
+  switchMap,
+  take,
+  toStream,
+  zipMap
+} from 'aelea/stream'
 import { $column, $row, observer, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -68,7 +78,7 @@ export const $defaulMultiselectDropContainer = $node(
 )
 
 export interface IDropdown<T> {
-  optionList: Stream<readonly T[]> | readonly T[]
+  optionList: IStream<readonly T[]> | readonly T[]
   $anchor: I$Node
 
   closeOnSelect?: boolean
@@ -97,14 +107,12 @@ export function $Dropdown<T>({
       [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
       [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
-      const openTrigger = constant(true, mergeArray([openMenu]))
-      const windowClick = switchLatest(
-        map((_open) => take(1, skip(1, eventElementTarget('click', window))), openTrigger)
-      )
+      const openTrigger = constant(true, openMenu)
+      const windowClick = switchLatest(map(_open => take(1, skip(1, eventElementTarget('click', window))), openTrigger))
 
-      const closeTrigger = constant(false, mergeArray([windowClick, closeOnSelect ? select : empty()]))
+      const closeTrigger = constant(false, merge(windowClick, closeOnSelect ? select : empty))
 
-      const isOpen = skipRepeats(merge(closeTrigger, openTrigger))
+      const isOpen = merge(closeTrigger, openTrigger)
 
       return [
         $container(
@@ -112,14 +120,14 @@ export function $Dropdown<T>({
           targetIntersectionTether(observer.intersection())
         )(
           switchMap(
-            (params) => {
+            params => {
               if (!params.isOpen) {
-                return empty()
+                return empty
               }
 
               return $dropListContainer(
                 styleInline(
-                  zip(
+                  zipMap(
                     ([targetRect], [contentRect]) => {
                       const { bottom, right, left } = targetRect.intersectionRect
                       const { width } = contentRect.boundingClientRect
@@ -148,14 +156,14 @@ export function $Dropdown<T>({
                   position: 'absolute'
                 })
               )(
-                ...params.list.map((opt) =>
+                ...params.list.map(opt =>
                   $optionContainer(
                     selectTether(nodeEvent('click'), constant(opt)) //
                   )(switchLatest($$option(now(opt))))
                 )
               )
             },
-            combineState({ isOpen, list: toStream(optionList) })
+            combine({ isOpen, list: toStream(optionList) })
           ),
           $anchor
         ),
