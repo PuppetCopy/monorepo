@@ -30,7 +30,7 @@ try {
   await write('./src/const/address.ts', addressContent)
   console.log('✅ Address updated')
 
-  await $`bunx wagmi generate`
+  await $`bun wagmi generate`
   console.log('✅ ABIs generated successfully')
 } catch (error) {
   console.error('❌ Error updating address or generating ABIs:', error)

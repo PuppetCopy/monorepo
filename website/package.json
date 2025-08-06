@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite",
+    "dev": "vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",
-    "build": "bunx --bun vite build",
+    "build": "vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
     "clean:rimraf": "rimraf dist && tsc -build --clean",
-    "preview": "bunx --bun vite preview",
+    "preview": "vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
     "tsc:check": "bunx tsc --noEmit"
