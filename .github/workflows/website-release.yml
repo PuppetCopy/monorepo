@@ -68,6 +68,16 @@ jobs:
       - name: Setup deployment
         run: |
           cp website/railway.json railway.json
+          # Create package.json with custom install script to skip dependencies
+          cat > package.json << 'EOF'
+          {
+            "name": "puppet-website",
+            "type": "module",
+            "scripts": {
+              "install": "echo 'Skip install - using pre-built files'"
+            }
+          }
+          EOF
           ls -la dist/
       
       - name: Deploy to Railway
