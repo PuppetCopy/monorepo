@@ -9,17 +9,7 @@ import {
   style,
   styleBehavior
 } from 'aelea/core'
-import {
-  constant,
-  type IBehavior,
-  type IOps,
-  type IStream,
-  map,
-  never,
-  now,
-  startWith,
-  switchLatest
-} from 'aelea/stream'
+import { constant, type IBehavior, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
 import { $row } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 
@@ -68,7 +58,6 @@ export const $ButtonToggle = <T>({
   component(([select, sampleSelect]: IBehavior<INode, T>) => {
     return [
       $container(
-        $text(now('opt')),
         ...optionList.map(opt =>
           $button(
             sampleSelect(nodeEvent('click'), constant(opt)),

@@ -2,6 +2,12 @@
   "name": "website",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "src/sw/service-worker.ts",
+    "src/common/style.ts",
+    "src/main.ts",
+    "**/aelea/ui-components-theme-browser/**"
+  ],
   "scripts": {
     "dev": "vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",

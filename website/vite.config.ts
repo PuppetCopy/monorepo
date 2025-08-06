@@ -19,18 +19,37 @@ export default defineConfig({
   build: {
     sourcemap: true,
     rollupOptions: {
+      treeshake: 'recommended',
       output: {
-        manualChunks: {
-          subgraph: ['ponder'],
-          middleware: [
-            '@puppet-copy/middleware/const',
-            '@puppet-copy/middleware/core',
-            '@puppet-copy/middleware/gmx',
-            '@puppet-copy/middleware/gbc'
-          ],
-          vendor: ['color', 'mersenne-twister'],
-          // wallet: ['@reown/appkit', '@reown/appkit-adapter-wagmi', '@wagmi/core'],
-          charts: ['lightweight-charts']
+        manualChunks(id) {
+          if (id.includes('@reown')) {
+            return 'reown'
+          }
+
+          // Web3 related - keep together to avoid circular deps
+          if (id.includes('@wagmi') || id.includes('viem') || id.includes('abitype')) {
+            return 'web3'
+          }
+
+          // Skip non-node_modules
+          if (!id.includes('node_modules/') && !id.includes('/dist/')) {
+            return undefined
+          }
+
+          // // Group all aelea packages together
+          const coreList = ['aelea/', 'middleware/dist', 'indexer/dist', 'ponder']
+
+          // // Workspace packages
+          if (coreList.some(core => id.includes(core))) return 'puppet-core'
+
+          // // Heavy dependencies that should be isolated
+          if (id.includes('lightweight-charts')) return 'charts'
+          if (id.includes('ponder')) return 'subgraph'
+
+          // Web3 related - keep together to avoid circular deps
+
+          // All other node_modules go to vendor
+          // if (id.includes('node_modules/')) return 'vendor'
         }
       }
     }
