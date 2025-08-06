@@ -132,7 +132,7 @@ export const $TradeRouteTimeline = ({
                       fontWeight: '900'
                     },
                     // background: `radial-gradient(${colorAlpha(invertColor(pallete.message), .7)} 9%, transparent 63%)`,
-                    value$: map(
+                    value: map(
                       hoverValue => {
                         const newLocal2 = readableUnitAmount(hoverValue)
                         const newLocal = parseReadableNumber(newLocal2)

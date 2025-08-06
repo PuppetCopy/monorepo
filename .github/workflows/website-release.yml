@@ -30,6 +30,9 @@ jobs:
       - name: Build middleware
         run: bun run middleware:build
       
+      - name: Build indexer
+        run: cd indexer && bun run build
+      
       - name: Build website
         run: bun run website:build
       

@@ -5,10 +5,10 @@
   "version": "0.9.0",
   "type": "module",
   "scripts": {
-    "build": "bun run build:clean && bun run bunx tsc -b",
+    "build": "bun run build:clean && bun run tsc -b",
     "build:clean": "rm -rf dist",
     "build:pre-release": "bun run script/pre-release.ts",
-    "tsc:check": "bunx tsc --noEmit"
+    "tsc:check": "tsc --noEmit"
   },
   "devDependencies": {
     "@wagmi/cli": "2.3.2"

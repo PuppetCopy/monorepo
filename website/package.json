@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
-    "tsc:check": "bunx tsc --noEmit"
+    "tsc:check": "tsc --noEmit"
   },
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
