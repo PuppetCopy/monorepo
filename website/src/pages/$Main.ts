@@ -87,11 +87,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       })
       const portfolioRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
 
-      const activityTimeframe = uiStorage.replayWrite(localStore.global, changeActivityTimeframe, 'activityTimeframe')
+      const activityTimeframe = uiStorage.replayWrite(localStore.global.activityTimeframe, changeActivityTimeframe)
       const collateralTokenList = uiStorage.replayWrite(
-        localStore.global,
-        selectCollateralTokenList,
-        'collateralTokenList'
+        localStore.global.collateralTokenList,
+        selectCollateralTokenList
       )
 
       const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)

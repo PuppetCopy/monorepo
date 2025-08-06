@@ -88,9 +88,8 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       [save, saveTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
-        localStore.ruleEditor,
-        changeAdvancedRouteEditorEnabled,
-        'advancedRouteEditorEnabled'
+        localStore.ruleEditor.advancedRouteEditorEnabled,
+        changeAdvancedRouteEditorEnabled
       )
 
       const { model, traderMatchingKey, draftMatchingRuleList, collateralToken, trader } = config

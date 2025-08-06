@@ -6,13 +6,11 @@ import {
   type I$Node,
   type INodeCompose,
   type ISlottable,
-  type IStyleCSS,
   nodeEvent,
-  style,
-  styleBehavior
+  style
 } from 'aelea/core'
 import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, type IBehavior, map, o, startWith, zipState } from 'aelea/stream'
+import { constant, empty, type IBehavior, o, startWith } from 'aelea/stream'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -181,7 +179,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
         style({
           borderRadius: '50px',
           border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`
-        }),
+        })
         // styleBehavior(
         //   map((params): IStyleCSS | null => {
         //     return params.active

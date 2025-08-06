@@ -13,9 +13,9 @@ import {
   switchMap,
   tap
 } from 'aelea/stream'
-import { $icon, $row, spacing } from 'aelea/ui-components'
+import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { $caretDown, $infoLabel, $xCross } from '@/ui-components'
+import { $caretDown, $icon, $infoLabel, $xCross } from '@/ui-components'
 import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'
 
 // Array utility functions (previously from @most/prelude)

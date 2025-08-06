@@ -87,19 +87,18 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
-      const screenerFocus = uiStorage.replayWrite(localStore.leaderboard, changeScreenerFocus, 'focus')
+      const screenerFocus = uiStorage.replayWrite(localStore.leaderboard.focus, changeScreenerFocus)
       const sortBy = uiStorage.replayWrite(
-        localStore.leaderboard,
+        localStore.leaderboard.sortBy,
         merge(
           sortByChange,
           map(selector => {
             return { direction: 'desc', selector } as const
           }, changeScreenerFocus)
-        ),
-        'sortBy'
+        )
       )
-      // const isLong = uiStorage.replayWrite(localStore.leaderboard, switchIsLong, 'isLong')
-      const account = uiStorage.replayWrite(localStore.leaderboard, filterAccount, 'account')
+      // const isLong = uiStorage.replayWrite(localStore.leaderboard.isLong, switchIsLong)
+      const account = uiStorage.replayWrite(localStore.leaderboard.account, filterAccount)
       const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
 
       return [
