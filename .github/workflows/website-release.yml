@@ -34,7 +34,10 @@ jobs:
           wait
       
       - name: Build website
-        run: bun run website:build
+        run: |
+          # Use .env.website for production build
+          cp website/.env.website website/.env.production
+          bun run website:build
       
       - name: Upload dist folder
         if: github.ref == 'refs/heads/main'
