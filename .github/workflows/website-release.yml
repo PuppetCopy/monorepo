@@ -35,28 +35,14 @@ jobs:
       
       - name: Build website
         run: |
-          # Use .env.website for production build
           cp website/.env.website website/.env.production
           bun run website:build
-      
-      - name: Install Railway CLI
-        if: github.ref == 'refs/heads/main'
-        run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo "$HOME/.railway/bin" >> $GITHUB_PATH
       
       - name: Deploy to Railway
         if: github.ref == 'refs/heads/main'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          # Create deployment directory
-          mkdir -p deploy/dist
-          cp -r website/dist/* deploy/dist/
-          cp website/railway.json deploy/
-          cp website/railpack.config.js deploy/
-          echo '{"name":"static-site"}' > deploy/package.json
-          
-          # Deploy
-          cd deploy
-          railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
+          curl -fsSL https://railway.app/install.sh | sh
+          cd website
+          $HOME/.railway/bin/railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
