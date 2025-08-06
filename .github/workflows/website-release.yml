@@ -45,13 +45,6 @@ jobs:
         run: |
           curl -fsSL https://railway.app/install.sh | sh
           
-          # Create minimal deployment directory
-          mkdir -p railway-deploy
-          cp -r website/dist railway-deploy/
-          cp website/railway.json railway-deploy/
-          cp website/railpack.config.js railway-deploy/
-          echo '{"name":"website-static","version":"1.0.0","private":true}' > railway-deploy/package.json
-          
-          # Deploy from the minimal directory
-          cd railway-deploy
+          # Deploy from website directory using .railwayignore
+          cd website
           railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}

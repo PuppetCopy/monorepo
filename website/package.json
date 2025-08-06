@@ -9,6 +9,7 @@
     "**/aelea/ui-components-theme-browser/**"
   ],
   "scripts": {
+    "start": "bunx serve@latest dist -s -l $PORT",
     "dev": "vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",
     "build": "vite build",
