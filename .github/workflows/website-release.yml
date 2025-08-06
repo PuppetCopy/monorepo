@@ -27,11 +27,11 @@ jobs:
       - name: Install dependencies
         run: bun install
       
-      - name: Build middleware
-        run: bun run middleware:build
-      
-      - name: Build indexer
-        run: cd indexer && bun run build
+      - name: Build dependencies in parallel
+        run: |
+          bun run middleware:build &
+          cd indexer && bun run build &
+          wait
       
       - name: Build website
         run: bun run website:build
