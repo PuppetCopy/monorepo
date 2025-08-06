@@ -45,6 +45,10 @@ jobs:
         run: |
           curl -fsSL https://railway.app/install.sh | sh
           
-          # Deploy from website directory using .railwayignore
-          cd website
+          # Create a clean deployment directory
+          mkdir railway-app
+          cd railway-app
+          cp -r ../website/dist .
+          echo '{"name":"puppet-website","scripts":{"start":"npx serve dist -s -l $PORT"}}' > package.json
+          
           railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
