@@ -69,8 +69,12 @@ jobs:
       
       - name: Setup deployment
         run: |
-          cp website/railway.json railway.json
-          cp website/railpack.config.js railpack.config.js
+          # Copy only the config files
+          cp website/railway.json .
+          cp website/railpack.config.js .
+          # Create minimal package.json to prevent monorepo detection
+          echo '{"name":"static-site"}' > package.json
+          ls -la
           ls -la dist/
       
       - name: Deploy to Railway
