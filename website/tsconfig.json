@@ -3,7 +3,7 @@
     "sourceMap": true,
     "target": "ES2020",
     "lib": [
-      "ES2022",
+      "ESNext",
       "DOM"
     ],
     "types": [

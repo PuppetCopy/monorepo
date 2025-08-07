@@ -35,8 +35,6 @@ jobs:
       
       - name: Build website
         run: |
-          # Use .env.website for production build
-          cp website/.env.website website/.env.production
           bun run website:build
       
       - name: Upload dist folder

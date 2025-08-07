@@ -1,4 +1,5 @@
-import { continueWith, disposeBoth, disposeWith, type IStream, op, replayState, stream, switchMap } from 'aelea/stream'
+import { continueWith, disposeBoth, disposeNone, disposeWith, type IStream, op, stream, switchMap } from 'aelea/stream'
+import { replayState } from './replay'
 
 export type GetKey<TSchema> = Extract<keyof TSchema, string | number>
 
@@ -22,12 +23,12 @@ function createDbStream<TName extends string, TStore>(
   storeDefinitions: TStore
 ): IStream<IDBDatabase> {
   const storeNames = Object.keys(storeDefinitions as any)
+  const openDbRequest = indexedDB.open(dbName, version)
+
   return replayState(
     stream(sink => {
       let db: IDBDatabase | null = null
       let disposed = false
-
-      const openDbRequest = indexedDB.open(dbName, version)
 
       openDbRequest.onupgradeneeded = () => {
         const upgradeDb = openDbRequest.result
@@ -101,10 +102,10 @@ function createDbStream<TName extends string, TStore>(
       // Cleanup function - close DB connection if subscription is cancelled
       return disposeWith(() => {
         disposed = true
-        if (db) {
-          db.close()
-          db = null
-        }
+        // if (db) {
+        //   db.close()
+        //   db = null
+        // }
       })
     })
   )
@@ -122,7 +123,8 @@ export function createStoreDefinition<T, TStore extends { [P in keyof T]: TStore
 } {
   const dbStream = createDbStream(dbName, dbVersion, storeDefinitions)
 
-  return Object.entries(storeDefinitions).reduce((acc, [storeName, initialState]) => {
+  const storeEntries = Object.entries(storeDefinitions)
+  return storeEntries.reduce((acc, [storeName, initialState]) => {
     // Create key accessors for each property in the initial state
     const storeKeys = {} as any
 
@@ -161,11 +163,11 @@ export function read<TKey extends IDBValidKey, TData>(
       // Store doesn't exist, return default value
       if (e instanceof DOMException && e.name === 'NotFoundError') {
         sink.event(defaultValue)
-        sink.end()
-        return
       }
+
       sink.error(e)
-      return
+      sink.end()
+      return disposeNone
     }
 
     request.onsuccess = () => {

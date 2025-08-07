@@ -10,7 +10,17 @@ import {
   nodeEvent,
   style
 } from 'aelea/core'
-import { constant, empty, type IBehavior, type IOps, type IStream, map, now, switchLatest } from 'aelea/stream'
+import {
+  constant,
+  empty,
+  type IBehavior,
+  type IOps,
+  type IStream,
+  map,
+  now,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
@@ -153,31 +163,21 @@ export const $Table = <T>({
         ...scrollConfig,
         dataSource: map(res => {
           const $items = (Array.isArray(res) ? res : res.page).map(rowData => {
+            const $cellDataList = columns.map(col => {
+              const $body = col.$bodyCellContainer ?? $bodyCell
+              return $body(switchLatest(col.$bodyCallback(now(rowData))))
+            })
+
             return $rowCallback
-              ? switchLatest(
-                  map(
-                    $rowContainer => {
-                      return $rowContainer(gridTemplateColumns)(
-                        ...columns.map(col => {
-                          const $body = col.$bodyCellContainer ?? $bodyCell
-                          return $body(switchLatest(col.$bodyCallback(now(rowData))))
-                        })
-                      )
-                    },
-                    $rowCallback(now(rowData))
-                  )
+              ? switchMap(
+                  $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
+                  $rowCallback(now(rowData))
                 )
-              : $rowContainer(gridTemplateColumns)(
-                  ...columns.map(col => {
-                    const $body = col.$bodyCellContainer ?? $bodyCell
-                    return $body(switchLatest(col.$bodyCallback(now(rowData))))
-                  })
-                )
+              : $rowContainer(gridTemplateColumns)(...$cellDataList)
           })
 
-          if (Array.isArray(res)) {
-            return $items
-          }
+          if (Array.isArray(res)) return $items
+
           return {
             $items,
             offset: res.offset,

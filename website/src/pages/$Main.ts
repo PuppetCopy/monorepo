@@ -23,6 +23,7 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type { Address } from 'viem/accounts'
 import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
+import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
@@ -162,7 +163,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             )
           ),
-          router.contains(traderRoute)(
+          contains(traderRoute)(
             $midContainer(
               fadeIn(
                 $TraderPage({
@@ -179,7 +180,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             )
           ),
-          router.contains(portfolioRoute)(
+          contains(portfolioRoute)(
             $midContainer(
               fadeIn(
                 $PortfolioPage({
@@ -298,7 +299,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             })({})
           ),
-          router.contains(rootRoute)(
+          contains(rootRoute)(
             $column(
               style({
                 maxWidth: '1000px',

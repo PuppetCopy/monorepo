@@ -1,6 +1,7 @@
 import {
   $node,
   component,
+  eventElementTarget,
   type I$Node,
   type INode,
   type INodeCompose,
@@ -18,7 +19,9 @@ import {
   merge,
   multicast,
   o,
+  startWith,
   switchLatest,
+  throttle,
   until,
   zipMap
 } from 'aelea/stream'
@@ -57,15 +60,22 @@ export const $Popover = ({
     (
       [overlayClick, overlayClickTether]: IBehavior<INode, false>,
       [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
-      [popoverContentDimension, popoverContentDimensionTether]: IBehavior<INode, ResizeObserverEntry[]>
+      [popoverContentDimension, popoverContentDimensionTether]: IBehavior<INode, ResizeObserverEntry[]>,
+      [targetResize, targetResizeTether]: IBehavior<INode, ResizeObserverEntry[]>
     ) => {
       const openMulticast = multicast(open)
+
+      // Track scroll and resize events
+      const positionUpdateStream = merge(
+        eventElementTarget('scroll', window, { capture: true }),
+        eventElementTarget('resize', window)
+      )
 
       const contentOps = $contentContainer(
         popoverContentDimensionTether(observer.resize({})),
         styleBehavior(
           zipMap(
-            ([contentRect], [targetRect]) => {
+            ([contentRect], [targetRect], _targetResize, _positionUpdate) => {
               const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
               const targetBound = targetRect.intersectionRect
               const bottomSpace = window.innerHeight - targetBound.bottom
@@ -96,7 +106,9 @@ export const $Popover = ({
               }
             },
             popoverContentDimension,
-            targetIntersection
+            targetIntersection,
+            targetResize,
+            startWith(null as any, throttle(16, positionUpdateStream))
           )
         ),
         style({ position: 'fixed', visibility: 'hidden' })
@@ -137,14 +149,8 @@ export const $Popover = ({
       )
 
       const targetOp = o(
-        targetIntersectionTether(
-          observer.intersection()
-          // map(node => {
-          //   const root = node.element instanceof HTMLElement && node.element.offsetParent || null
-          //   return observer.intersection({ root })(now(node))
-          // }),
-          // switchLatest
-        ),
+        targetIntersectionTether(observer.intersection()),
+        targetResizeTether(observer.resize({})),
         styleBehavior(
           merge(constant({ zIndex: 2345, position: 'relative' as const }, openMulticast), constant(null, dismissEvent))
         )

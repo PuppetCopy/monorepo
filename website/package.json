@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "bunx serve@latest dist -s -l $PORT",
     "dev": "vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",
     "build": "vite build",
@@ -12,7 +11,8 @@
     "preview": "vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
-    "tsc:check": "tsc --noEmit"
+    "tsc:check": "tsc --noEmit",
+    "start": "bunx serve@latest dist -s -l $PORT"
   },
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
@@ -21,7 +21,7 @@
     "@reown/appkit-adapter-wagmi": "1.7.17",
     "@wagmi/core": "2.18.1",
     "abitype": "1.0.8",
-    "aelea": "2.2.5",
+    "aelea": "2.4.1",
     "color": "5.0.0",
     "lightweight-charts": "5.0.8",
     "mersenne-twister": "1.1.0",
