@@ -11,7 +11,12 @@ export function getContractErrorMessage(data: DecodeErrorResultReturnType): stri
     return
   }
 
-  const errorFunc = getMappedValue(errorMessages, data.errorName)
+  const errorFunc = getMappedValue(errorMessages, data.errorName, null)
+
+  if (errorFunc === null) {
+    return
+  }
+
   const params: any = {}
   const abiItem = data.abiItem
 

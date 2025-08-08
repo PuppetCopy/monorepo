@@ -1,4 +1,4 @@
-import { getSafeMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
+import { getMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
 import {
   combine,
@@ -93,7 +93,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     $text(
                       String(
                         message ||
-                          getSafeMappedValue(err, 'shortMessage', 'message') ||
+                          getMappedValue(err, 'shortMessage', (err as any).message) ||
                           'Transaction failed with an unknown error'
                       )
                     )

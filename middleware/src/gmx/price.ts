@@ -140,7 +140,7 @@ export function getMarkPrice(price: IMinMax, isIncrease: boolean, isLong: boolea
   return shouldUseMaxPrice ? price.max : price.min
 }
 
-function getNextOpenInterestForVirtualInventory(virtualInventory: bigint, deltaUsd: bigint, isLong: boolean) {
+export function getNextOpenInterestForVirtualInventory(virtualInventory: bigint, deltaUsd: bigint, isLong: boolean) {
   let currentLongUsd = 0n
   let currentShortUsd = 0n
 
@@ -179,7 +179,7 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
 
 // @dev pick the min or max price depending on whether it is for a long or short position
 // and whether the pending pnl should be maximized or not
-function pickPriceForPnl(price: IOraclePrice, isLong: boolean, maximize: boolean) {
+export function pickPriceForPnl(price: IOraclePrice, isLong: boolean, maximize: boolean) {
   // for long positions, pick the larger price to maximize pnl
   // for short positions, pick the smaller price to maximize pnl
   if (isLong) {

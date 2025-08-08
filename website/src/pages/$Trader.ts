@@ -139,7 +139,7 @@ export const $TraderPage = ({
           })
         ])
 
-        const positionList = aggregatePositionList([...increaseList, ...decreaseList])
+        const openPositionList = aggregatePositionList([...increaseList, ...decreaseList])
 
         //   if (list.length === 0) {
         //     return $column(spacing.small)(
@@ -148,7 +148,7 @@ export const $TraderPage = ({
         //     )
         //   }
 
-        return { ...params, routeMetricList, increaseList, decreaseList, positionList }
+        return { ...params, routeMetricList, increaseList, decreaseList, openPositionList }
       }, combine({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
 
       return [
@@ -269,7 +269,7 @@ export const $TraderPage = ({
                   const dataSource = map(pageParams => {
                     return pagingQuery(
                       { ...pageParams.paging, ...pageParams.sortBy },
-                      params.positionList.filter(item => item.collateralToken === routeMetric.collateralToken)
+                      params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
                   }, combine({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)

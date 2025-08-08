@@ -1,10 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import type {
-  IPositionDecrease,
-  IPositionIncrease,
-  ITraderRouteLatestMetric,
-  ITraderRouteMetric
-} from '@puppet-copy/sql/schema'
+import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
 import type { Address, Hex } from 'viem'
@@ -80,7 +75,7 @@ export type IRoute = {
 
 export interface ITraderRouteMetricSummary
   extends Omit<
-    ITraderRouteLatestMetric & Pick<ITraderRouteMetric, 'marketList'>,
+    ITraderRouteLatestMetric,
     | 'collateralToken'
     | 'traderMatchingKey'
     | 'id'

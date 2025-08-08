@@ -23,7 +23,7 @@ function positionLatestTimestamp(position: IPosition): number {
 export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrease)[]): IPosition[] {
   const sortedUpdateList = list.sort((a, b) => a.blockTimestamp - b.blockTimestamp)
   const positionMap = new Map<Hex, IPosition>()
-  const positionList: IPosition[] = []
+  const openPositionList: IPosition[] = []
 
   for (let index = 0; index < sortedUpdateList.length; index++) {
     const next = sortedUpdateList[index]
@@ -98,7 +98,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
       if (next.sizeInTokens === 0n) {
         position.lastUpdateTimestamp = next.blockTimestamp
 
-        positionList.push(position)
+        openPositionList.push(position)
         positionMap.delete(next.positionKey)
       }
     }
@@ -110,8 +110,8 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
     position.lastUpdateTimestamp = next.blockTimestamp
   }
 
-  positionList.push(...positionMap.values())
-  return positionList.sort((a, b) => {
+  openPositionList.push(...positionMap.values())
+  return openPositionList.sort((a, b) => {
     return positionLatestTimestamp(a) - positionLatestTimestamp(b)
   })
 }
@@ -119,7 +119,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 export function accountSettledPositionListSummary(
   account: Address,
   metricList: (ITraderRouteLatestMetric & {
-    traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'marketList' | 'positionList'>>
+    traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'openPositionList'>>
   })[]
 ): ITraderRouteMetricSummary {
   const seedAccountSummary: ITraderRouteMetricSummary = {
@@ -175,7 +175,7 @@ export function accountSettledPositionListSummary(
       })
     })
 
-    seed.marketList = [...new Set([...seed.marketList, ...next.traderRouteMetric.marketList])]
+    seed.marketList = [...new Set([...seed.marketList, ...next.marketList])]
     seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
 
     return seed

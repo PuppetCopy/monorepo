@@ -38,6 +38,7 @@ import {
   $icon,
   $infoLabel,
   $infoLabeledValue,
+  $marketLabelFromAddress,
   $spinner,
   $Table,
   type IMarker,
@@ -47,7 +48,7 @@ import {
   type TableColumn
 } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenTryLabeled } from '../common/$common.js'
+import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay } from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
 import { sqlClient } from '../common/sqlClient.js'
@@ -201,14 +202,14 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       pnlList: true,
                       pnlTimestampList: true,
                       matchedPuppetList: true,
+                      marketList: true,
 
                       id: true
                     },
                     with: {
                       traderRouteMetric: {
                         columns: {
-                          crossOpenSizeInUsd: true,
-                          marketList: true
+                          crossOpenSizeInUsd: true
                         }
                       }
                     }
@@ -309,10 +310,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           $head: $text('Markets'),
                           gridTemplate: isDesktopScreen ? '210px' : undefined,
                           $bodyCallback: map(pos => {
-                            const marketList = pos.metric.traderRouteMetric.marketList
+                            const marketList = pos.metric.marketList
                             const marketListLength = marketList.length
                             return $row(spacing.small)(
-                              ...marketList.slice(0, 4).map((token: Address) => $tokenTryLabeled(token, false, '32px')),
+                              ...marketList.slice(0, 4).map((token: Address) => {
+                                return $marketLabelFromAddress(token)
+                              }),
                               marketListLength > 4
                                 ? style({ fontSize: '.8rem' })($infoLabel($text(`+${marketListLength - 4} more`)))
                                 : empty

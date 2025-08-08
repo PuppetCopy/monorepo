@@ -177,8 +177,8 @@ export function read<TKey extends IDBValidKey, TData>(
       // Validate stored data structure if we have a default value
       if (result !== undefined && defaultValue !== undefined) {
         // Check if all keys from initial state exist in stored data
-        let isValid = result !== null && result !== undefined
-        if (isValid) {
+        let isValid = result !== null && result !== undefined && typeof result === 'object'
+        if (isValid && typeof defaultValue === 'object' && defaultValue !== null) {
           for (const key in defaultValue) {
             if (!(key in result)) {
               isValid = false

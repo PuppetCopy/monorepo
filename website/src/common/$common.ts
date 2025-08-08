@@ -1,5 +1,6 @@
 import {
   getMappedValue,
+  type IMarketDescription,
   type ITokenDescription,
   lst,
   readableDate,
@@ -15,10 +16,18 @@ import {
   getTokenDescription,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
-import type { IMarket } from '@puppet-copy/sql/schema'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
-import { empty, type IBehavior, type IComposeBehavior, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
+import {
+  empty,
+  filterNull,
+  type IBehavior,
+  type IComposeBehavior,
+  type IStream,
+  map,
+  skipRepeats,
+  toStream
+} from 'aelea/stream'
 import { $column, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -115,8 +124,8 @@ export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '1
   )
 }
 
-export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
-  const $token = tokenDesc ? $tokenIconMap[tokenDesc.symbol] || $unknown : $unknown
+export const $tokenIcon = (tokenDesc: ITokenDescription, size = '24px') => {
+  const $token = getMappedValue($tokenIconMap, tokenDesc.symbol, $unknown)
 
   if (!$token) {
     throw new Error('Unable to find matched token')
@@ -124,7 +133,7 @@ export const $tokenIcon = (tokenDesc: ITokenDescription | null) => {
 
   return $icon({
     $content: $token,
-    svgOps: style({ fill: pallete.message, width: '24px', height: '24px' }),
+    svgOps: style({ fill: pallete.message, width: size, height: size }),
     viewBox: '0 0 32 32'
   })
 }
@@ -205,10 +214,12 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
   const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
-  const latestPrice = map(pm => {
-    const price = getMappedValue(pm, indexToken)
-    return price && typeof price === 'object' && 'max' in price ? price.max : 0n
-  }, latestPriceMap)
+  const latestPrice = filterNull(
+    map(pm => {
+      const price = getMappedValue(pm, indexToken, null)
+      return price ? price.max : null
+    }, latestPriceMap)
+  )
 
   const roi = isPositionSettled(pos)
     ? readablePercentage(toBasisPoints(pos.realisedPnlUsd, collateralUsd))
@@ -248,7 +259,7 @@ export function $liquidationSeparator(
   )($seperator)
 }
 
-export const $marketLabel = (market: IMarket, showLabel = true) => {
+export const $marketLabel = (market: IMarketDescription, showLabel = true) => {
   const indexTokenDescription = getTokenDescription(market.indexToken)
   const longTokenDescription = getTokenDescription(market.longToken)
   const shortTokenDescription = getTokenDescription(market.shortToken)
@@ -267,7 +278,7 @@ export const $marketLabel = (market: IMarket, showLabel = true) => {
   )
 }
 
-export const $marketSmallLabel = (market: IMarket) => {
+export const $marketSmallLabel = (market: IMarketDescription) => {
   const indexTokenDescription = getTokenDescription(market.indexToken)
   const $iconG = $tokenIconMap[indexTokenDescription.symbol]
 

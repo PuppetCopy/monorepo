@@ -7,7 +7,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
 import { $node, $text, type INode, style } from 'aelea/core'
-import { empty, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import { empty, filterNull, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -52,7 +52,12 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   gridTemplate: '100px',
   $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-start' })),
   $bodyCallback: map(pos => {
-    const latestPrice = map(pm => getMappedValue(pm, pos.indexToken).max, latestPriceMap)
+    const latestPrice = filterNull(
+      map(pm => {
+        const price = getMappedValue(pm, pos.indexToken, null)
+        return price ? price.max : null
+      }, latestPriceMap)
+    )
     const isSettled = isPositionSettled(pos)
 
     // const updateList = [...pos.increaseList, ...pos.decreaseList].sort((a, b) => a.blockTimestamp - b.blockTimestamp)

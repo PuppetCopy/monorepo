@@ -102,9 +102,7 @@ export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
     const item = list[i]
     const key = getKey(item)
 
-    if (key === undefined) {
-      throw new Error('key is undefined')
-    }
+    if (key === undefined) throw new Error('key is undefined')
 
     gmap[key] = mapFn(item, key, i)
   }
@@ -112,19 +110,18 @@ export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
   return gmap
 }
 
-export function getSafeMappedValue<T extends object>(contractMap: T, prop: any, fallbackProp: keyof T): T[keyof T] {
-  return prop in contractMap ? contractMap[prop as keyof T] : contractMap[fallbackProp]
-}
+export function getMappedValue<TMap extends object, TKey extends keyof TMap, TFallback = never>(
+  map: TMap,
+  prop: unknown,
+  fallbackValue?: TFallback
+): TFallback extends never ? TMap[TKey] : TMap[TKey] | TFallback {
+  // Check if prop is a valid key type and exists in map
+  if (prop != null && (prop as any) in map) return map[prop as TKey] as any
 
-export function getMappedValue<TMap extends object, TMapkey extends keyof TMap>(
-  contractMap: TMap,
-  prop: unknown
-): TMap[TMapkey] {
-  if (contractMap[prop as TMapkey]) {
-    return contractMap[prop as TMapkey]
-  }
+  // Return fallback value if provided
+  if (fallbackValue !== undefined) return fallbackValue as any
 
-  throw new Error(`prop ${String(prop)} does not exist in object`)
+  throw new Error(`Property '${String(prop)}' does not exist in object and no fallback provided`)
 }
 
 export function easeInExpo(x: number) {

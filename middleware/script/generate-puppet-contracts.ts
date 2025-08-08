@@ -19,7 +19,7 @@ type ContractInfo = {
   abi?: any[]
 }
 
-async function findAbiFile(contractName: string): Promise<any[] | null> {
+async function findAbiFile(contractName: string): Promise<any[] | undefined> {
   try {
     // Look for the ABI file in forge-artifacts
     const artifactPath = join(FORGE_ARTIFACTS_PATH, `${contractName}.sol`, `${contractName}.json`)
@@ -31,10 +31,10 @@ async function findAbiFile(contractName: string): Promise<any[] | null> {
     }
 
     console.warn(`⚠️  No ABI found for ${contractName}`)
-    return null
+    return undefined
   } catch (error) {
     console.error(`❌ Error loading ABI for ${contractName}:`, error)
-    return null
+    return undefined
   }
 }
 

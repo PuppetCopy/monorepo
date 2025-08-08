@@ -1,7 +1,7 @@
 import { at, continueWith, fromPromise, type IOps, type IStream, joinMap, now, switchMap } from 'aelea/stream'
 
 export interface IRunPeriodically<T> {
-  actionOp: IOps<any, Promise<T>>
+  actionOp: IOps<void, Promise<T>>
   interval?: number
   startImmediate?: boolean
 }
