@@ -1,7 +1,5 @@
 import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
-import { getDenominator } from '../core/parse.js'
-import { getTokenDescription } from './gmxUtils.js'
 import type { IMinMax, IOraclePrice } from './types.js'
 
 export function getPriceImpactUsd(
@@ -177,20 +175,6 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
     nextLongUsd,
     nextShortUsd
   }
-}
-
-export function getOraclePriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
-  const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getTokenDescription(price.token)
-
-  return pickedPrice * getDenominator(desc.decimals)
-}
-
-export function getPriceUsd(price: IOraclePrice, isLong: boolean, maximize = false) {
-  const pickedPrice = pickPriceForPnl(price, isLong, maximize)
-  const desc = getTokenDescription(price.token)
-
-  return pickedPrice * getDenominator(desc.decimals)
 }
 
 // @dev pick the min or max price depending on whether it is for a long or short position

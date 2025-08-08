@@ -5,9 +5,10 @@ import { FUNDING_RATE_PRECISION } from '../const/common.js'
 import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
 import { factor, toBasisPoints } from '../core/math.js'
 import { formatFixed } from '../core/parse.js'
-import type { ITokenDescription } from '../core/types.js'
+import type { IMarketDescription, ITokenDescription } from '../core/types.js'
 import { easeInExpo, getMappedValue } from '../core/utils.js'
-import { MARKET_ADDRESS_DESCRIPTION_MAP } from './const.js'
+import { ARBITRUM_MARKET_LIST } from '../generated/marketList.js'
+import { MARKET_ADDRESS_DESCRIPTION_MAP } from './market.js'
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {
   if (size === 0n) {
@@ -58,8 +59,20 @@ export function getTokenDescription(token: Address): ITokenDescription {
   return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, getAddress(token))
 }
 
-export function getMarketDescription(market: Address) {
+export function getMarketDescription(market: Address): IMarketDescription {
   return getMappedValue(MARKET_ADDRESS_DESCRIPTION_MAP, getAddress(market))
+}
+
+export function getMarketDescriptionByToken(tokenAddress: Address): IMarketDescription[] {
+  const normalizedAddress = getAddress(tokenAddress)
+
+  return ARBITRUM_MARKET_LIST.filter(market => {
+    const indexToken = market.indexToken ? getAddress(market.indexToken) : null
+    const longToken = getAddress(market.longToken)
+    const shortToken = getAddress(market.shortToken)
+
+    return normalizedAddress === indexToken || normalizedAddress === longToken || normalizedAddress === shortToken
+  })
 }
 
 export function getblockOrderIdentifier(blockNumber: bigint): number {

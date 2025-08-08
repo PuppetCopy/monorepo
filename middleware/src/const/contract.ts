@@ -1,101 +1,52 @@
-import { CONTRACTS } from '@gmx-io/sdk/configs/contracts'
-import { type Address, erc20Abi } from 'viem'
-import * as abi from './abi/__generated/abi.js'
-import datastore from './abi/datastore.js'
-import exchangeRouter from './abi/exchangeRouter.js'
-import gmxCustomError from './abi/gmxCustomError.js'
-import gmxEventEmitter from './abi/gmxEventEmitter.js'
-import reader from './abi/reader.js'
-import referralStorage from './abi/referralStorage.js'
-
-import { addresses } from './address.js'
+import { erc20Abi } from 'viem'
+import { errorAbi } from '../generated/abi/errorAbi.js'
+import { GMX_V2_CONTRACT_MAP } from '../generated/contractList.js'
+import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
 
 export const CONTRACT = {
+  // Puppet contracts from generated file
   UserRouter: {
-    address: addresses.RouterProxy,
-    abi: abi.userRouterAbi
+    address: PUPPET_CONTRACT_MAP.UserRouter.address,
+    abi: PUPPET_CONTRACT_MAP.UserRouter.abi
   },
   SequencerRouter: {
-    address: addresses.SequencerRouter,
-    abi: [...abi.sequencerRouterAbi, ...abi.routerProxyAbi, ...abi.errorAbi]
+    address: PUPPET_CONTRACT_MAP.SequencerRouter.address,
+    // Combined ABIs for router proxy pattern
+    abi: [...PUPPET_CONTRACT_MAP.SequencerRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...errorAbi]
   },
 
-  Dictatorship: {
-    address: addresses.Dictatorship,
-    abi: abi.dictatorshipAbi
-  },
-  PuppetToken: {
-    address: addresses.PuppetToken,
-    abi: abi.puppetTokenAbi
-  },
+  Dictatorship: PUPPET_CONTRACT_MAP.Dictatorship,
+  PuppetToken: PUPPET_CONTRACT_MAP.PuppetToken,
   PuppetVoteToken: {
-    address: '',
-    abi: abi.puppetVoteTokenAbi
+    address: ''
   },
-  TokenRouter: {
-    address: addresses.TokenRouter,
-    abi: abi.tokenRouterAbi
-  },
-  AccountStore: {
-    address: addresses.AccountStore,
-    abi: abi.accountStoreAbi
-  },
+  TokenRouter: PUPPET_CONTRACT_MAP.TokenRouter,
+  AccountStore: PUPPET_CONTRACT_MAP.AccountStore,
+  Account: PUPPET_CONTRACT_MAP.Account,
+  Rule: PUPPET_CONTRACT_MAP.Rule,
+  Mirror: PUPPET_CONTRACT_MAP.Mirror,
+  Settle: PUPPET_CONTRACT_MAP.Settle,
+  FeeMarketplace: PUPPET_CONTRACT_MAP.FeeMarketplace,
 
-  Account: {
-    address: addresses.Account,
-    abi: abi.accountAbi
-  },
-  Rule: {
-    address: addresses.Rule,
-    abi: abi.ruleAbi
-  },
-  Mirror: {
-    address: addresses.Mirror,
-    abi: abi.mirrorAbi
-  },
-  Settle: {
-    address: addresses.Settle,
-    abi: abi.settleAbi
-  },
-  FeeMarketplace: {
-    address: addresses.FeeMarketplace,
-    abi: abi.feeMarketplaceAbi
-  },
-
+  // Custom error ABI
   CustomError: {
-    abi: abi.errorAbi
+    abi: errorAbi
   },
 
+  // GMX contracts from generated file
   GMX: {
-    address: CONTRACTS[42161].GMX as Address,
+    address: GMX_V2_CONTRACT_MAP.GMX.address,
     abi: erc20Abi
   },
-  ReferralStorage: {
-    address: CONTRACTS[42161].ReferralStorage as Address,
-    abi: referralStorage
-  },
+  ReferralStorage: GMX_V2_CONTRACT_MAP.ReferralStorage,
 
-  // V2
-  GmxReaderV2: {
-    address: CONTRACTS[42161].Reader as Address,
-    abi: reader
-  },
-  GmxExchangeRouter: {
-    address: CONTRACTS[42161].Router as Address,
-    abi: exchangeRouter
-  },
-  GmxOrderVault: {
-    address: CONTRACTS[42161].OrderVault as Address
-  },
-  GmxDatastore: {
-    address: CONTRACTS[42161].DataStore as Address,
-    abi: datastore
-  },
-  GmxEventEmitter: {
-    address: CONTRACTS[42161].EventEmitter as Address,
-    abi: gmxEventEmitter
-  },
+  // GMX V2 contracts
+  GmxReaderV2: GMX_V2_CONTRACT_MAP.GmxReaderV2,
+  GmxExchangeRouter: GMX_V2_CONTRACT_MAP.GmxExchangeRouter,
+  GmxOrderVault: GMX_V2_CONTRACT_MAP.GmxOrderVault,
+  GmxDatastore: GMX_V2_CONTRACT_MAP.GmxDatastore,
+  GmxEventEmitter: GMX_V2_CONTRACT_MAP.GmxEventEmitter,
   GmxCustomError: {
-    abi: gmxCustomError
+    abi: errorAbi
   }
 } as const

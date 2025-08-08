@@ -8,11 +8,9 @@
   "scripts": {
     "build": "bun run build:clean && bun run tsc -b",
     "build:clean": "rm -rf dist",
-    "build:pre-release": "bun run script/pre-release.ts",
-    "tsc:check": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@wagmi/cli": "2.3.2"
+    "tsc:check": "tsc --noEmit",
+    "generate": "bun run script/generate.ts",
+    "generate:sync": "bun run script/generate-gmx-contract-list.ts --sync && bun run script/generate.ts"
   },
   "files": [
     "dist"
@@ -24,7 +22,6 @@
     }
   },
   "dependencies": {
-    "@gmx-io/sdk": "1.2.0",
     "abitype": "1.0.8",
     "aelea": "2.4.1",
     "jazzicon": "1.5.0",

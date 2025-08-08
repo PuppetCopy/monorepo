@@ -26,10 +26,16 @@ export type NonNullableStruct<T> = {
   [P in keyof T]: NonNullable<T[P]>
 }
 
+export interface IMarketDescription {
+  marketToken: Address
+  indexToken: Address
+  longToken: Address
+  shortToken: Address
+}
+
 export interface ITokenDescription {
   name: string
   symbol: string
   decimals: number
-  denominator: bigint
   address: Address
 }
