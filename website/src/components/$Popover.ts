@@ -7,23 +7,21 @@ import {
   type INodeCompose,
   nodeEvent,
   style,
-  styleBehavior
+  styleBehavior,
+  styleInline
 } from 'aelea/core'
 import {
+  combine,
   constant,
   empty,
-  filter,
   type IBehavior,
   type IStream,
   map,
   merge,
   multicast,
-  o,
   startWith,
   switchLatest,
-  throttle,
-  until,
-  zipMap
+  until
 } from 'aelea/stream'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -41,7 +39,6 @@ export const $defaultPopoverContentContainer = $column(
 interface IPocus {
   $open: IStream<I$Node>
   $target: I$Node
-
   dismiss?: IStream<any>
   spacing?: number
   $contentContainer?: INodeCompose
@@ -59,59 +56,17 @@ export const $Popover = ({
   component(
     (
       [overlayClick, overlayClickTether]: IBehavior<INode, false>,
-      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
-      [popoverContentDimension, popoverContentDimensionTether]: IBehavior<INode, ResizeObserverEntry[]>,
-      [targetResize, targetResizeTether]: IBehavior<INode, ResizeObserverEntry[]>
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
       const openMulticast = multicast(open)
+      const dismissEvent = merge(overlayClick, dismiss)
 
-      // Track scroll and resize events
-      const positionUpdateStream = merge(
+      let targetElement: HTMLElement | null = null
+
+      // Update events stream
+      const updateEvents = merge(
         eventElementTarget('scroll', window, { capture: true }),
         eventElementTarget('resize', window)
-      )
-
-      const contentOps = $contentContainer(
-        popoverContentDimensionTether(observer.resize({})),
-        styleBehavior(
-          zipMap(
-            ([contentRect], [targetRect], _targetResize, _positionUpdate) => {
-              const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
-              const targetBound = targetRect.intersectionRect
-              const bottomSpace = window.innerHeight - targetBound.bottom
-              const goDown = bottomSpace > targetBound.bottom
-
-              // clamp width to screen minus both side‑spacings
-              const maxWidth = screenWidth - spacing * 2
-
-              const measured = contentRect.target.clientWidth
-              const width = Math.min(measured, maxWidth)
-
-              // center on target, then clamp left within [spacing, screenWidth - width - spacing]
-              const centerX = targetBound.x + targetBound.width / 2
-              const rawLeft = centerX - width / 2
-              const maxLeft = screenWidth - width - spacing
-              const left = `${Math.max(spacing, Math.min(rawLeft, maxLeft))}px`
-
-              const top = `${goDown ? targetBound.bottom + spacing : targetBound.y - spacing}px`
-
-              return {
-                top,
-                left,
-                width: `${width}px`,
-                maxWidth: `${maxWidth}px`,
-                transition: 'opacity .2s ease-in-out',
-                visibility: 'visible',
-                transform: `translate(0, ${goDown ? '0' : '-100%'})`
-              }
-            },
-            popoverContentDimension,
-            targetIntersection,
-            targetResize,
-            startWith(null as any, throttle(16, positionUpdateStream))
-          )
-        ),
-        style({ position: 'fixed', visibility: 'hidden' })
       )
 
       const $overlay = $node(
@@ -119,49 +74,72 @@ export const $Popover = ({
           position: 'fixed',
           zIndex: 2321,
           backgroundColor: colorAlpha(pallete.horizon, 0.85),
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0 // visibility: 'hidden',
+          inset: 0
         }),
-        overlayClickTether(
-          nodeEvent('pointerdown'),
-          filter(ev => {
-            if (ev.target instanceof HTMLElement) {
-              const computedStyle = getComputedStyle(ev.target)
-              if (computedStyle.zIndex === '2321' && computedStyle.inset === '0px') {
-                return true
-              }
-            }
-
-            return false
-          }),
-          constant(false)
-        )
+        overlayClickTether(nodeEvent('pointerdown'), constant(false))
       )
-
-      const dismissEvent = merge(overlayClick, dismiss)
 
       const $content = switchLatest(
         map(content => {
-          return until(dismissEvent, merge(style({ zIndex: 3456, left: 0 })(contentOps(content)), $overlay()))
+          const contentWithPosition = $contentContainer(
+            style({ position: 'fixed', zIndex: 3456 }),
+            styleInline(
+              map(
+                ({ targetIntersection, updateEvent }) => {
+                  const [entry] = targetIntersection
+
+                  // Store target element for scroll updates
+                  if (entry?.target) {
+                    targetElement = entry.target as HTMLElement
+                  }
+
+                  // Use stored element or entry
+                  const el = updateEvent ? targetElement : (entry?.target as HTMLElement)
+                  if (!el) return { visibility: 'hidden' }
+
+                  const rect = el.getBoundingClientRect()
+                  const bottomSpace = window.innerHeight - rect.bottom
+                  const topSpace = rect.top
+                  const goDown = bottomSpace > 200 || bottomSpace > topSpace
+
+                  // Center horizontally on the element
+                  const centerX = rect.left + rect.width / 2
+                  const popoverWidth = 400 // Estimated width
+                  const left = Math.max(
+                    spacing,
+                    Math.min(centerX - popoverWidth / 2, window.innerWidth - popoverWidth - spacing)
+                  )
+
+                  return {
+                    top: `${goDown ? rect.bottom + spacing : rect.top - spacing}px`,
+                    left: `${left}px`,
+                    transform: `translate(0, ${goDown ? '0' : '-100%'})`,
+                    maxWidth: `${Math.min(400, window.innerWidth - spacing * 2)}px`,
+                    visibility: 'visible'
+                  }
+                },
+                combine({
+                  targetIntersection,
+                  updateEvent: startWith(null, updateEvents)
+                })
+              )
+            )
+          )(content)
+
+          return until(dismissEvent, merge(contentWithPosition, $overlay()))
         }, openMulticast)
       )
 
-      const targetOp = o(
-        targetIntersectionTether(observer.intersection()),
-        targetResizeTether(observer.resize({})),
+      // Apply z-index to target when popover is open
+      const targetWithZIndex = targetIntersectionTether(observer.intersection())(
         styleBehavior(
-          merge(constant({ zIndex: 2345, position: 'relative' as const }, openMulticast), constant(null, dismissEvent))
-        )
+          merge(
+            map(() => ({ zIndex: 2345, position: 'relative' as const }), openMulticast),
+            map(() => null, dismissEvent)
+          )
+        )($target)
       )
 
-      return [
-        $container(targetOp($target), $content),
-
-        {
-          overlayClick
-        }
-      ]
+      return [$container(targetWithZIndex, $content), { overlayClick }]
     }
   )
