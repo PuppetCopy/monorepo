@@ -62,8 +62,7 @@ export const latestPriceMap = op(
           return {
             source: 'GMX API',
             token: item.tokenAddress,
-            min: BigInt(item.minPriceFull),
-            max: BigInt(item.maxPriceFull),
+            price: BigInt(item.maxPriceFull), // Use max price as the single price
             timestamp: timestampMs
           }
         }

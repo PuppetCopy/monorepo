@@ -134,9 +134,13 @@ export function calculateImpactForCrossoverRebalance(
 //   return priceImpactUsdForVirtualInventory < priceImpactUsd ? priceImpactUsdForVirtualInventory : priceImpactUsd
 // }
 
-export function getMarkPrice(price: IMinMax, isIncrease: boolean, isLong: boolean) {
-  const shouldUseMaxPrice = getShouldUseMaxPrice(isIncrease, isLong)
+export function getMarkPrice(price: IMinMax | { price: bigint }, isIncrease: boolean, isLong: boolean) {
+  // If using simplified price interface, return the single price
+  if ('price' in price) {
+    return price.price
+  }
 
+  const shouldUseMaxPrice = getShouldUseMaxPrice(isIncrease, isLong)
   return shouldUseMaxPrice ? price.max : price.min
 }
 
@@ -179,14 +183,20 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
 
 // @dev pick the min or max price depending on whether it is for a long or short position
 // and whether the pending pnl should be maximized or not
-export function pickPriceForPnl(price: IOraclePrice, isLong: boolean, maximize: boolean) {
-  // for long positions, pick the larger price to maximize pnl
-  // for short positions, pick the smaller price to maximize pnl
-  if (isLong) {
-    return maximize ? price.max : price.min
+export function pickPriceForPnl(price: IOraclePrice | { price: bigint }, isLong: boolean, maximize: boolean) {
+  // If using simplified price interface, return the single price
+  if ('price' in price && !('min' in price)) {
+    return price.price
   }
 
-  return maximize ? price.min : price.max
+  // for long positions, pick the larger price to maximize pnl
+  // for short positions, pick the smaller price to maximize pnl
+  const oraclePrice = price as IOraclePrice
+  if (isLong) {
+    return maximize ? oraclePrice.max : oraclePrice.min
+  }
+
+  return maximize ? oraclePrice.min : oraclePrice.max
 }
 
 export function getPriceImpactByAcceptablePrice(

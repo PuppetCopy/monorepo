@@ -38,7 +38,7 @@ import {
   $icon,
   $infoLabel,
   $infoLabeledValue,
-  $marketLabelFromAddress,
+  $marketLabelByAddress,
   $spinner,
   $Table,
   type IMarker,
@@ -314,10 +314,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             const marketListLength = marketList.length
                             return $row(spacing.small)(
                               ...marketList.slice(0, 4).map((token: Address) => {
-                                return $marketLabelFromAddress(token)
+                                return op($marketLabelByAddress(token), style({ marginRight: '-18px' }))
                               }),
                               marketListLength > 4
-                                ? style({ fontSize: '.8rem' })($infoLabel($text(`+${marketListLength - 4} more`)))
+                                ? style({ fontSize: '.8rem', marginLeft: '18px', placeContent: 'center' })(
+                                    $infoLabel($text(`+${marketListLength - 4} more`))
+                                  )
                                 : empty
                             )
                           })

@@ -33,7 +33,7 @@ import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-c
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem'
 import { arbitrum, type Chain } from 'viem/chains'
-import { $tokenIcon } from '../common/$common.js'
+import { $tokenIcon, $tokenLabeled } from '../common/$common.js'
 import { $alertIcon, $arrowRight, $caretDblDown, $info, $tokenIconMap } from './$icons.js'
 import { $defaultTooltipDropContainer, $Tooltip } from './$Tooltip.js'
 
@@ -257,39 +257,24 @@ export const $marketLabel = (
   indexToken: ITokenDescription,
   longToken: ITokenDescription,
   shortToken: ITokenDescription,
-  $label?: I$Slottable
+  $marketLabel?: I$Slottable
 ) => {
-  return $column(spacing.tiny, style({ alignItems: 'center' }))(
-    // Container for index token with floating long/short tokens
-    $node(style({ position: 'relative', display: 'inline-block' }))(
-      // Main index token icon (normal size)
-      $tokenIcon(indexToken, '32px'),
+  return $row(spacing.tiny, style({ position: 'relative', alignItems: 'center' }))(
+    $Tooltip({
+      // $dropContainer: $defaultDropContainer,
+      $content: $column(spacing.default)(
+        $infoLabeledValue($label($text('Index Token')), $tokenLabeled(indexToken)),
+        $infoLabeledValue($label($text('Long Token')), $tokenLabeled(longToken)),
+        $infoLabeledValue($label($text('Short Token')), $tokenLabeled(shortToken))
+      ),
+      $anchor: $tokenIcon(indexToken, '32px')
+    })({}),
 
-      // Long/Short token pair (smaller icons) - positioned at bottom
-      $row(
-        style({
-          position: 'absolute',
-          bottom: '-4px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: colorAlpha(pallete.background, 0.9),
-          borderRadius: '10px',
-          padding: '1px 3px',
-          alignItems: 'center',
-          boxShadow: `0 1px 2px ${colorAlpha(pallete.foreground, 0.2)}`
-        })
-      )(
-        $tokenIcon(longToken, '12px'),
-        $node(style({ fontSize: '.5rem', color: pallete.foreground, margin: '0 1px' }))($text('/')),
-        $tokenIcon(shortToken, '12px')
-      )
-    ),
-
-    $label ? $elipsisTextWrapper($label) : empty
+    $marketLabel ? $elipsisTextWrapper($marketLabel) : empty
   )
 }
 
-export const $marketLabelFromAddress = (marketToken: Address, $label?: I$Slottable) => {
+export const $marketLabelByAddress = (marketToken: Address, $label?: I$Slottable) => {
   const market = getMarketDescription(marketToken)
 
   if (!market) {

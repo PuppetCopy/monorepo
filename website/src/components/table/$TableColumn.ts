@@ -55,7 +55,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
     const latestPrice = filterNull(
       map(pm => {
         const price = getMappedValue(pm, pos.indexToken, null)
-        return price ? price.max : null
+        return price ? price.price : null
       }, latestPriceMap)
     )
     const isSettled = isPositionSettled(pos)

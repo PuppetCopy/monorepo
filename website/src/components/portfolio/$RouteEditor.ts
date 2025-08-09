@@ -7,7 +7,7 @@ import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $caretDown, $icon } from '@/ui-components'
-import { $tokenTryLabeled } from '../../common/$common.js'
+import { $tokenIconByAddress } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import { $Popover } from '../$Popover.js'
@@ -66,7 +66,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
           $target: $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '8px' : '4px' }))(
               $row(style({ alignItems: 'center' }))(
-                $tokenTryLabeled(collateralToken, displayCollateralTokenSymbol),
+                $tokenIconByAddress(collateralToken, isDesktopScreen ? '38px' : '24px'),
                 isMobileScreen
                   ? $icon({
                       $content: $caretDown,
@@ -91,8 +91,8 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
             ),
             $container: $defaultMiniButtonSecondary(
               style({
-                borderRadius: '16px',
-                padding: '8px',
+                borderRadius: isDesktopScreen ? '100px' : '8px',
+                padding: '0',
                 height: 'auto'
               }),
 

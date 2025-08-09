@@ -1,3 +1,4 @@
+import { formatUnits } from 'viem'
 import { BASIS_POINTS_DIVISOR } from '../const/common.js'
 import type { ITokenDescription } from './types.js'
 
@@ -18,36 +19,7 @@ function getMultiplier(decimals: number): string {
 }
 
 export function formatFixed(decimals: number, value: bigint): number {
-  const multiplier = getMultiplier(decimals)
-  const multiplierBn = BigInt(multiplier)
-  let parsedValue = ''
-
-  const negative = value < 0n
-  if (negative) {
-    value *= -1n
-  }
-
-  let fraction = (value % multiplierBn).toString()
-
-  while (fraction.length < multiplier.length - 1) {
-    fraction = `0${fraction}`
-  }
-
-  const matchFractions = fraction.match(/^([0-9]*[1-9]|0)(0*)/)
-
-  if (matchFractions) {
-    fraction = matchFractions[1]
-  }
-
-  const whole = (value / multiplierBn).toString()
-
-  parsedValue = `${whole}.${fraction}`
-
-  if (negative) {
-    parsedValue = `-${parsedValue}`
-  }
-
-  return Number(parsedValue)
+  return Number(formatUnits(value, decimals))
 }
 
 export function parseFixed(decimals: number, input: string | number) {

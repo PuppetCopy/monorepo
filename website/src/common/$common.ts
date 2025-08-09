@@ -114,16 +114,6 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
-export const $tokenTryLabeled = (token: Address, displayLabel = false, size = '18px') => {
-  const description = getTokenDescription(token)
-
-  return $row(spacing.small, style({ alignItems: 'center' }))(
-    style({ width: size, height: size })($tokenIcon(description)),
-    displayLabel ? $text(`${description.symbol}`) : empty
-    // $text(style({ fontSize: '1rem' }))(`${description ? description.symbol :  readableAddress(indexToken)}`),
-  )
-}
-
 export const $tokenIcon = (tokenDesc: ITokenDescription, size = '24px') => {
   const $token = getMappedValue($tokenIconMap, tokenDesc.symbol, $unknown)
 
@@ -133,9 +123,37 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, size = '24px') => {
 
   return $icon({
     $content: $token,
-    svgOps: style({ fill: pallete.message, width: size, height: size }),
+    svgOps: style({
+      fill: pallete.message,
+      width: size,
+      height: size,
+      backgroundColor: pallete.background,
+      padding: '1px',
+      borderRadius: '50%'
+    }),
     viewBox: '0 0 32 32'
   })
+}
+
+export const $tokenIconByAddress = (tokenAddress: Address, size = '24px') => {
+  const tokenDesc = getTokenDescription(tokenAddress)
+
+  if (!tokenDesc) {
+    // Fallback to unknown icon if token not found
+    return $icon({
+      $content: $unknown,
+      svgOps: style({
+        fill: pallete.message,
+        width: size,
+        height: size,
+        backgroundColor: pallete.background,
+        borderRadius: '50%'
+      }),
+      viewBox: '0 0 32 32'
+    })
+  }
+
+  return $tokenIcon(tokenDesc, size)
 }
 
 export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode, string>) => {
@@ -217,7 +235,7 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const latestPrice = filterNull(
     map(pm => {
       const price = getMappedValue(pm, indexToken, null)
-      return price ? price.max : null
+      return price ? price.price : null
     }, latestPriceMap)
   )
 
