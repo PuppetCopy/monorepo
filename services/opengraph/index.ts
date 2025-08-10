@@ -1,4 +1,4 @@
-import { $node, $text, runBrowser, style } from 'aelea/core'
+import { $node, $text, runBrowser, style } from 'aelea/ui'
 import { writeFileSync } from 'fs'
 import satori from 'satori'
 import { html } from 'satori-html'

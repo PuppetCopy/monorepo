@@ -6,10 +6,11 @@ import {
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { $node, $text, type INode, style } from 'aelea/core'
 import { empty, filterNull, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import { $node, $text, type INode, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $defaultTableCell, $infoTooltip, type TableColumn } from '@/ui-components'
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
@@ -54,8 +55,12 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $bodyCallback: map(pos => {
     const latestPrice = filterNull(
       map(pm => {
-        const price = getMappedValue(pm, pos.indexToken, null)
-        return price ? price.price : null
+        const oraclePrice = getMappedValue(pm, getAddress(pos.indexToken), null)
+
+        if (oraclePrice === null) {
+          return null
+        }
+        return oraclePrice.price
       }, latestPriceMap)
     )
     const isSettled = isPositionSettled(pos)

@@ -1,4 +1,4 @@
-import { $svg, attr } from 'aelea/core'
+import { $svg, attr } from 'aelea/ui'
 
 const $path = $svg('path')
 

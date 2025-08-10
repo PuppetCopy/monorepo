@@ -16,7 +16,6 @@ import {
   getTokenDescription,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
-import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/core'
 import type * as router from 'aelea/router'
 import {
   empty,
@@ -28,6 +27,7 @@ import {
   skipRepeats,
   toStream
 } from 'aelea/stream'
+import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/ui'
 import { $column, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

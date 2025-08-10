@@ -1,18 +1,4 @@
 import {
-  $node,
-  $text,
-  component,
-  eventElementTarget,
-  type I$Node,
-  type I$Slottable,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style,
-  styleInline,
-  stylePseudo
-} from 'aelea/core'
-import {
   combine,
   constant,
   empty,
@@ -29,6 +15,20 @@ import {
   toStream,
   zipMap
 } from 'aelea/stream'
+import {
+  $node,
+  $text,
+  component,
+  eventElementTarget,
+  type I$Node,
+  type I$Slottable,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleInline,
+  stylePseudo
+} from 'aelea/ui'
 import { $column, $row, observer, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

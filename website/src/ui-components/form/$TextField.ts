@@ -1,5 +1,5 @@
-import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/core'
 import { combine, empty, type IBehavior, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
+import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $Field, type Field } from './$Field.js'

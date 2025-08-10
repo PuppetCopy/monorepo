@@ -1,6 +1,6 @@
 import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
-import { $node, $text, component, style } from 'aelea/core'
 import { combine, type IStream, map, multicast } from 'aelea/stream'
+import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -44,7 +44,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
           winCount: 0,
           pnlTimeline: [],
           matchedPuppetList: [],
-          marketList: []
+          indexTokenList: []
         } as ITraderRouteMetricSummary
       }, combine({ positionListQuery }))
     )

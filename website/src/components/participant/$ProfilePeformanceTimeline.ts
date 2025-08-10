@@ -6,7 +6,6 @@ import {
   readableUnitAmount,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
-import { $node, $text, component, motion, style } from 'aelea/core'
 import {
   combine,
   empty,
@@ -19,6 +18,7 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
+import { $node, $text, component, motion, style } from 'aelea/ui'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { BaselineData, MouseEventParams } from 'lightweight-charts'
@@ -36,12 +36,14 @@ interface IProfilePeformanceTimeline extends IPageFilterParams {
 export const $TradeRouteTimeline = ({
   activityTimeframe,
   collateralTokenList,
+  indexTokenList,
   metricsQuery
 }: IProfilePeformanceTimeline) =>
   component(
     (
       [crosshairMove, crosshairMoveTether]: IBehavior<MouseEventParams>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
+      [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>
     ) => {
       const timelineQuery = map(async params => {
@@ -245,7 +247,7 @@ export const $TradeRouteTimeline = ({
           })
         ),
 
-        { selectCollateralTokenList, changeActivityTimeframe }
+        { selectCollateralTokenList, selectIndexTokenList, changeActivityTimeframe }
       ]
     }
   )

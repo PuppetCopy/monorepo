@@ -7,9 +7,9 @@ import {
   readablePnl,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
-import { $node, $text, component, style } from 'aelea/core'
 import {
   combine,
   empty,
@@ -24,6 +24,7 @@ import {
   startWith,
   switchMap
 } from 'aelea/stream'
+import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
@@ -38,7 +39,6 @@ import {
   $icon,
   $infoLabel,
   $infoLabeledValue,
-  $marketLabelByAddress,
   $spinner,
   $Table,
   type IMarker,
@@ -48,7 +48,7 @@ import {
   type TableColumn
 } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay } from '../common/$common.js'
+import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenIcon } from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
 import { sqlClient } from '../common/sqlClient.js'
@@ -66,17 +66,16 @@ interface ILeaderboard extends IPageFilterParams, IPageParams {
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
-type ISortLeaderboardBy = ISortBy<Omit<ITraderRouteLatestMetric, 'traderRouteMetric'>>
-
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortLeaderboardBy>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<ITraderRouteLatestMetric>>,
       [changeScreenerFocus, changeScreenerFocusTether]: IBehavior<'roi' | 'pnl'>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
+      [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
       // [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
@@ -84,7 +83,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
-      const { activityTimeframe, collateralTokenList, draftMatchingRuleList, userMatchingRuleQuery } = config
+      const { activityTimeframe, collateralTokenList, indexTokenList, draftMatchingRuleList, userMatchingRuleQuery } =
+        config
 
       // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
 
@@ -121,7 +121,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 ))(
               $ButtonToggle({
                 value: screenerFocus,
-                optionList: ['pnl', 'roi'] as ISortLeaderboardBy['selector'][],
+                optionList: ['pnl', 'roi'],
                 $$option: map(option => {
                   return $row(spacing.small, style({ alignItems: 'center' }))(
                     option === undefined
@@ -137,9 +137,15 @@ export const $Leaderboard = (config: ILeaderboard) =>
               })({
                 select: changeScreenerFocusTether()
               }),
-              $SelectCollateralToken({ selectedList: collateralTokenList })({
-                changeCollateralTokenList: selectCollateralTokenListTether()
-              }),
+
+              $row(
+                // $SelectIndexToken({ selectedList: indexTokenList })({
+                //   changeIndexTokenList: selectIndexTokenListTether()
+                // }),
+                $SelectCollateralToken({ selectedList: collateralTokenList })({
+                  changeCollateralTokenList: selectCollateralTokenListTether()
+                })
+              ),
 
               $LastAtivity(activityTimeframe)({
                 changeActivityTimeframe: changeActivityTimeframeTether()
@@ -167,8 +173,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
               const dataSource = switchMap(
                 async filterParams => {
                   const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
-                    where: (t, f) =>
-                      f.and(
+                    where: (t, f) => {
+                      return f.and(
                         f.eq(t.interval, params.activityTimeframe),
                         params.account ? f.ilike(t.account, params.account) : undefined,
                         // params.isLong !== undefined
@@ -180,8 +186,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         params.collateralTokenList.length > 0
                           ? f.inArray(t.collateralToken, params.collateralTokenList)
                           : undefined,
+                        // params.indexTokenList.length > 0
+                        //   ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
+                        //   : undefined,
                         f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
-                      ),
+                      )
+                    },
                     limit: filterParams.paging.pageSize,
                     offset: filterParams.paging.offset,
                     orderBy: params.sortBy
@@ -202,7 +212,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       pnlList: true,
                       pnlTimestampList: true,
                       matchedPuppetList: true,
-                      marketList: true,
+                      indexTokenList: true,
 
                       id: true
                     },
@@ -307,18 +317,19 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         //   })
                         // },
                         {
-                          $head: $text('Markets'),
+                          $head: $text('Traded Tokens'),
                           gridTemplate: isDesktopScreen ? '210px' : undefined,
                           $bodyCallback: map(pos => {
-                            const marketList = pos.metric.marketList
-                            const marketListLength = marketList.length
+                            const indexTokenList = pos.metric.indexTokenList
+                            const indexTokenListLength = indexTokenList.length
                             return $row(spacing.small)(
-                              ...marketList.slice(0, 4).map((token: Address) => {
-                                return op($marketLabelByAddress(token), style({ marginRight: '-18px' }))
+                              ...indexTokenList.slice(0, 4).map((token: Address) => {
+                                const tokenDesc = getTokenDescription(token)
+                                return tokenDesc ? op($tokenIcon(tokenDesc), style({ marginRight: '-18px' })) : empty
                               }),
-                              marketListLength > 4
+                              indexTokenListLength > 4
                                 ? style({ fontSize: '.8rem', marginLeft: '18px', placeContent: 'center' })(
-                                    $infoLabel($text(`+${marketListLength - 4} more`))
+                                    $infoLabel($text(`+${indexTokenListLength - 4} more`))
                                   )
                                 : empty
                             )
@@ -457,7 +468,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether(),
                 scrollRequest: scrollRequestTether()
               })
-            }, combine({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList }))
+            }, combine({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList, indexTokenList }))
           )
         ),
 
@@ -465,6 +476,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
           routeChange,
           changeActivityTimeframe,
           selectCollateralTokenList,
+          selectIndexTokenList,
           changeMatchRuleList
         }
       ]

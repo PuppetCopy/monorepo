@@ -1,4 +1,3 @@
-import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/core'
 import {
   aggregate,
   combine,
@@ -17,6 +16,7 @@ import {
   switchMap,
   tap
 } from 'aelea/stream'
+import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/ui'
 import { $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {

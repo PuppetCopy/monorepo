@@ -5,7 +5,6 @@ import {
   readableTokenAmountLabel
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $node, $text, component, style } from 'aelea/core'
 import {
   combine,
   constant,
@@ -20,6 +19,7 @@ import {
   sampleMap,
   switchMap
 } from 'aelea/stream'
+import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

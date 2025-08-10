@@ -1,3 +1,4 @@
+import { empty, type IBehavior, type IStream, map, merge, o, startWith } from 'aelea/stream'
 import {
   $element,
   $node,
@@ -9,8 +10,7 @@ import {
   nodeEvent,
   style,
   styleBehavior
-} from 'aelea/core'
-import { empty, type IBehavior, type IStream, map, merge, o, startWith } from 'aelea/stream'
+} from 'aelea/ui'
 import { type Input, layoutSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $label } from '../$common.js'

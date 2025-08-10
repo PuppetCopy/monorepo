@@ -1,4 +1,3 @@
-import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/core'
 import {
   combine,
   empty,
@@ -12,6 +11,7 @@ import {
   startWith,
   switchMap
 } from 'aelea/stream'
+import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/ui'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { dismissOp, interactionOp } from './common.js'

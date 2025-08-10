@@ -1,5 +1,5 @@
-import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/core'
 import { type IBehavior, type IOps, map, now, switchLatest, switchMap } from 'aelea/stream'
+import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { type IWalletConnected, wallet } from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'

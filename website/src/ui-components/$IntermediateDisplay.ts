@@ -1,5 +1,3 @@
-import { PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import { $node, $text, type I$Node, style } from 'aelea/core'
 import {
   constant,
   empty,
@@ -15,6 +13,8 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
+import { PromiseStatus, promiseState } from 'aelea/stream-extended'
+import { $node, $text, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'

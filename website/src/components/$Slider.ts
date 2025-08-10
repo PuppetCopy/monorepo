@@ -1,4 +1,5 @@
 import { invertColor } from '@puppet-copy/middleware/core'
+import { combine, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
 import {
   $node,
   $text,
@@ -11,8 +12,7 @@ import {
   style,
   styleBehavior,
   styleInline
-} from 'aelea/core'
-import { combine, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
+} from 'aelea/ui'
 import { $column, $row, type Input, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

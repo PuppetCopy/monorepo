@@ -21,8 +21,8 @@ const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !
 
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { getWalletClient } from '@wagmi/core'
-import { $node, $text, component, style } from 'aelea/core'
 import type { Route } from 'aelea/router'
+import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'

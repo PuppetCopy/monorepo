@@ -1,5 +1,5 @@
-import { $wrapNativeElement, style } from 'aelea/core'
 import { map } from 'aelea/stream'
+import { $wrapNativeElement, style } from 'aelea/ui'
 // @ts-ignore
 import jazzicon from 'jazzicon'
 

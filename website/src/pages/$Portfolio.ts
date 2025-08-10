@@ -9,8 +9,8 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $node, $text, component, style } from 'aelea/core'
 import { combine, constant, empty, filterNull, type IBehavior, type IStream, map, multicast } from 'aelea/stream'
+import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
@@ -38,6 +38,7 @@ interface IWalletPuppet extends IPageFilterParams {
 export const $PortfolioPage = ({
   activityTimeframe,
   collateralTokenList,
+  indexTokenList,
   userMatchingRuleQuery,
   draftDepositTokenList,
   draftMatchingRuleList
@@ -46,6 +47,7 @@ export const $PortfolioPage = ({
     (
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
+      [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, Address>
@@ -338,6 +340,7 @@ export const $PortfolioPage = ({
         {
           changeActivityTimeframe,
           selectCollateralTokenList,
+          selectIndexTokenList,
           changeDepositTokenList,
           changeMatchRuleList
         }

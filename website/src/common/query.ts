@@ -3,7 +3,6 @@ import {
   getClosestNumber,
   groupArrayMany,
   periodicRun,
-  type StateParams,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'

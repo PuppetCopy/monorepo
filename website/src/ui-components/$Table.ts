@@ -1,16 +1,4 @@
 import {
-  $node,
-  $svg,
-  attr,
-  component,
-  type I$Node,
-  type I$Slottable,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style
-} from 'aelea/core'
-import {
   constant,
   empty,
   type IBehavior,
@@ -21,6 +9,18 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
+import {
+  $node,
+  $svg,
+  attr,
+  component,
+  type I$Node,
+  type I$Slottable,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style
+} from 'aelea/ui'
 import { $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
@@ -47,7 +47,7 @@ export interface TableOption<T> {
   $bodyCell?: INodeCompose
   $headerCell?: INodeCompose
 
-  sortBy?: ISortBy
+  sortBy?: ISortBy<T>
   $sortArrowDown?: I$Node
 }
 

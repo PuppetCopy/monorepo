@@ -1,3 +1,4 @@
+import { constant, filter, type IBehavior, map, merge, o, startWith } from 'aelea/stream'
 import {
   $element,
   component,
@@ -7,8 +8,7 @@ import {
   type INodeCompose,
   nodeEvent,
   styleBehavior
-} from 'aelea/core'
-import { constant, filter, type IBehavior, map, merge, o, startWith } from 'aelea/stream'
+} from 'aelea/ui'
 import { type Control, designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 

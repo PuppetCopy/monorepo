@@ -1,16 +1,4 @@
 import {
-  $node,
-  component,
-  eventElementTarget,
-  type I$Node,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style,
-  styleBehavior,
-  styleInline
-} from 'aelea/core'
-import {
   combine,
   constant,
   empty,
@@ -23,6 +11,18 @@ import {
   switchLatest,
   until
 } from 'aelea/stream'
+import {
+  $node,
+  component,
+  eventElementTarget,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleBehavior,
+  styleInline
+} from 'aelea/ui'
 import { $column, isDesktopScreen, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

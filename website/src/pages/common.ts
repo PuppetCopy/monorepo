@@ -5,7 +5,7 @@ import type {
   ITraderRouteLatestMetric,
   ITraderRouteMetric
 } from '@puppet-copy/sql/schema'
-import { style } from 'aelea/core'
+import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex, Prettify } from 'viem'
@@ -146,7 +146,7 @@ export function accountSettledPositionListSummary(
     // positionList: [],
     matchedPuppetList: [],
 
-    marketList: []
+    indexTokenList: []
   }
 
   const summary = metricList.reduce((seed, next, _idx): ITraderRouteMetricSummary => {
@@ -175,7 +175,7 @@ export function accountSettledPositionListSummary(
       })
     })
 
-    seed.marketList = [...new Set([...seed.marketList, ...next.marketList])]
+    seed.indexTokenList = [...new Set([...seed.indexTokenList, ...next.indexTokenList])]
     seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
 
     return seed

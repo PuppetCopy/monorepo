@@ -1,4 +1,3 @@
-import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/core'
 import {
   constant,
   type IBehavior,
@@ -13,6 +12,7 @@ import {
   switchMap,
   tap
 } from 'aelea/stream'
+import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $caretDown, $icon, $infoLabel, $xCross } from '@/ui-components'

@@ -13,6 +13,7 @@ export interface IPageParams extends IComponentPageParams {
 export interface IPageFilterParams {
   activityTimeframe: IStream<IntervalTime>
   collateralTokenList: IStream<Address[]>
+  indexTokenList: IStream<Address[]>
 }
 
 export interface IEarningsPlan {
@@ -84,9 +85,11 @@ export interface ITraderRouteMetricSummary
     | 'traderRouteMetric'
     | 'lastUpdatedTimestamp'
     | 'interval'
+    | 'indexTokenList'
+    | 'indexTokenTimestampList'
   > {
   winCount: number
   lossCount: number
   pnlTimeline: { time: number; value: bigint; traderMatchingKey: Hex }[]
-  marketList: Address[]
+  indexTokenList: Address[]
 }

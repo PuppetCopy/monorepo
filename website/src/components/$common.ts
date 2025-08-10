@@ -1,4 +1,4 @@
-import { style, stylePseudo } from 'aelea/core'
+import { style, stylePseudo } from 'aelea/ui'
 import { $column, isDesktopScreen } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import {

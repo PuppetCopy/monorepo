@@ -174,23 +174,7 @@ export function read<TKey extends IDBValidKey, TData>(
       if (disposed) return
       const result = request.result
 
-      // Validate stored data structure if we have a default value
-      if (result !== undefined && defaultValue !== undefined) {
-        // Check if all keys from initial state exist in stored data
-        let isValid = result !== null && result !== undefined && typeof result === 'object'
-        if (isValid && typeof defaultValue === 'object' && defaultValue !== null) {
-          for (const key in defaultValue) {
-            if (!(key in result)) {
-              isValid = false
-              break
-            }
-          }
-        }
-        sink.event(isValid ? result : defaultValue)
-      } else {
-        sink.event(result !== undefined ? result : defaultValue)
-      }
-
+      sink.event(result !== undefined ? result : defaultValue)
       sink.end()
     }
 

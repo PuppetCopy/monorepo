@@ -1,7 +1,7 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $text, component, type INodeCompose, style } from 'aelea/core'
 import { empty, type IBehavior, type IStream, map } from 'aelea/stream'
+import { $text, component, type INodeCompose, style } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Hex } from 'viem'
@@ -64,7 +64,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
           }, popRouteSubscriptionEditor),
           dismiss: changeMatchRuleList,
           $target: $ButtonSecondary({
-            $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '8px' : '4px' }))(
+            $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '6px' : '4px' }))(
               $row(style({ alignItems: 'center' }))(
                 $tokenIconByAddress(collateralToken, isDesktopScreen ? '38px' : '24px'),
                 isMobileScreen
@@ -82,8 +82,8 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
                 isDesktopScreen
                   ? $icon({
                       $content: $caretDown,
-                      width: '12px',
-                      svgOps: style({ marginTop: '2px', minWidth: '8px' }),
+                      width: '8px',
+                      svgOps: style({ marginTop: '2px', minWidth: '8px', marginRight: '8px' }),
                       viewBox: '0 0 32 32'
                     })
                   : empty

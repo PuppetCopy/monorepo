@@ -1,3 +1,4 @@
+import { constant, type IBehavior, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
 import {
   $node,
   $text,
@@ -8,8 +9,7 @@ import {
   nodeEvent,
   style,
   styleBehavior
-} from 'aelea/core'
-import { constant, type IBehavior, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
+} from 'aelea/ui'
 import { $row } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

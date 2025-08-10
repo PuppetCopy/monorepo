@@ -1,6 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
-import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/core'
 import * as router from 'aelea/router'
 import {
   constant,
@@ -16,8 +15,9 @@ import {
   switchMap,
   take,
   tap,
-  zipState
+  zip
 } from 'aelea/stream'
+import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -59,6 +59,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
+      [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [_changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
@@ -93,6 +94,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         localStore.global.collateralTokenList,
         selectCollateralTokenList
       )
+      const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
 
       const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)
 
@@ -153,10 +155,12 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   draftMatchingRuleList,
                   activityTimeframe,
                   collateralTokenList,
+                  indexTokenList,
                   userMatchingRuleQuery
                 })({
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
+                  selectIndexTokenList: selectIndexTokenListTether(),
                   routeChange: changeRouteTether(),
                   changeMatchRuleList: changeMatchRuleListTether()
                 })
@@ -170,9 +174,11 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   userMatchingRuleQuery,
                   activityTimeframe,
                   collateralTokenList,
+                  indexTokenList,
                   draftMatchingRuleList
                 })({
                   selectCollateralTokenList: selectCollateralTokenListTether(),
+                  selectIndexTokenList: selectIndexTokenListTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   changeMatchRuleList: changeMatchRuleListTether(),
                   changeRoute: changeRouteTether()
@@ -188,10 +194,12 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   draftDepositTokenList,
                   userMatchingRuleQuery,
                   activityTimeframe,
-                  collateralTokenList
+                  collateralTokenList,
+                  indexTokenList
                 })({
                   changeDepositTokenList: changeDepositTokenListTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
+                  selectIndexTokenList: selectIndexTokenListTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
                   changeMatchRuleList: changeMatchRuleListTether()
                 })
@@ -257,7 +265,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                     )
                   )
                 },
-                zipState({ subgraphStatus: subgraphStatus, latestBlock })
+                zip({ subgraphStatus: subgraphStatus, latestBlock })
               ),
               $anchor: $row(
                 style({

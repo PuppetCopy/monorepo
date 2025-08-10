@@ -9,7 +9,6 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import { $node, $text, attr, component, style } from 'aelea/core'
 import {
   combine,
   fromPromise,
@@ -21,6 +20,7 @@ import {
   startWith,
   switchMap
 } from 'aelea/stream'
+import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { asc } from 'ponder'
@@ -55,6 +55,7 @@ interface ITraderPage extends IPageFilterParams {
 export const $TraderPage = ({
   activityTimeframe,
   collateralTokenList,
+  indexTokenList,
   userMatchingRuleQuery,
   draftMatchingRuleList
 }: ITraderPage) =>
@@ -65,6 +66,7 @@ export const $TraderPage = ({
       [sortByChange, _sortByChangeTether]: IBehavior<ISortBy>,
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<any, IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
+      [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
       const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
@@ -94,7 +96,7 @@ export const $TraderPage = ({
           })
 
           return routeMetricList
-        }, combine({ activityTimeframe, collateralTokenList }))
+        }, combine({ activityTimeframe, collateralTokenList, indexTokenList }))
       )
 
       const metricsQuery = multicast(
@@ -197,9 +199,11 @@ export const $TraderPage = ({
               $TradeRouteTimeline({
                 activityTimeframe,
                 collateralTokenList,
+                indexTokenList,
                 metricsQuery
               })({
                 selectCollateralTokenList: selectCollateralTokenListTether(),
+                selectIndexTokenList: selectIndexTokenListTether(),
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
             ),
@@ -317,7 +321,7 @@ export const $TraderPage = ({
             }, pageParams)
           )
         ),
-        { changeRoute, changeActivityTimeframe, selectCollateralTokenList, changeMatchRuleList }
+        { changeRoute, changeActivityTimeframe, selectCollateralTokenList, selectIndexTokenList, changeMatchRuleList }
       ]
     }
   )

@@ -1,4 +1,4 @@
-import { $svg, attr, type I$Node } from 'aelea/core'
+import { $svg, attr, type I$Node } from 'aelea/ui'
 
 export interface IIcon {
   width?: number // in pixels

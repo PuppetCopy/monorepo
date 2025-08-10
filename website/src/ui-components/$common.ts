@@ -2,20 +2,6 @@ import type { ITokenDescription } from '@puppet-copy/middleware/core'
 import { getExplorerUrl, getMappedValue, readableHash } from '@puppet-copy/middleware/core'
 import { getMarketDescription, getTokenDescription } from '@puppet-copy/middleware/gmx'
 import {
-  $element,
-  $node,
-  $svg,
-  $text,
-  attr,
-  type I$Node,
-  type I$Slottable,
-  type I$Text,
-  type INode,
-  style,
-  styleBehavior,
-  stylePseudo
-} from 'aelea/core'
-import {
   combine,
   empty,
   fromPromise,
@@ -29,6 +15,20 @@ import {
   startWith,
   switchMap
 } from 'aelea/stream'
+import {
+  $element,
+  $node,
+  $svg,
+  $text,
+  attr,
+  type I$Node,
+  type I$Slottable,
+  type I$Text,
+  type INode,
+  style,
+  styleBehavior,
+  stylePseudo
+} from 'aelea/ui'
 import { $column, $row, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem'

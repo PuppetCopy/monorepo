@@ -1,6 +1,6 @@
 import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet-copy/middleware/gbc'
-import { $svg, attr } from 'aelea/core'
 import { tap } from 'aelea/stream'
+import { $svg, attr } from 'aelea/ui'
 
 export const $berry = (displayTuple: Partial<IBerryDisplayTupleMap>) => {
   return $svg('svg')(

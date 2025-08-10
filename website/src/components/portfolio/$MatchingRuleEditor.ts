@@ -7,7 +7,6 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/core'
 import {
   combine,
   empty,
@@ -23,6 +22,7 @@ import {
   toStream,
   zipMap
 } from 'aelea/stream'
+import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'

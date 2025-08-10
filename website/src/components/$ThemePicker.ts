@@ -1,5 +1,5 @@
-import { $svg, $text, attr, component, nodeEvent, style, stylePseudo } from 'aelea/core'
 import { type IStream, sampleMap } from 'aelea/stream'
+import { $svg, $text, attr, component, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $icon, $row, spacing } from 'aelea/ui-components'
 import { pallete, type Theme, themeList } from 'aelea/ui-components-theme'
 import { setTheme } from 'aelea/ui-components-theme-browser'

@@ -1,7 +1,7 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { $text, component, style } from 'aelea/core'
 import { combine, constant, type IBehavior, type IStream, map, replayState, sampleMap, switchMap } from 'aelea/stream'
+import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'

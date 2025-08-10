@@ -1,5 +1,4 @@
-import { getMappedValue, type PromiseStateError, PromiseStatus, promiseState } from '@puppet-copy/middleware/core'
-import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/core'
+import { getMappedValue } from '@puppet-copy/middleware/core'
 import {
   combine,
   constant,
@@ -13,6 +12,8 @@ import {
   startWith,
   switchLatest
 } from 'aelea/stream'
+import { type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
+import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'

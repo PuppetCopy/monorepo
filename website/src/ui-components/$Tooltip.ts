@@ -1,14 +1,4 @@
 import {
-  component,
-  eventElementTarget,
-  type I$Node,
-  type INode,
-  type INodeCompose,
-  nodeEvent,
-  style,
-  styleInline
-} from 'aelea/core'
-import {
   constant,
   empty,
   type IBehavior,
@@ -20,6 +10,16 @@ import {
   switchMap,
   zipMap
 } from 'aelea/stream'
+import {
+  component,
+  eventElementTarget,
+  type I$Node,
+  type INode,
+  type INodeCompose,
+  nodeEvent,
+  style,
+  styleInline
+} from 'aelea/ui'
 import { $column, $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 

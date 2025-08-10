@@ -1,4 +1,4 @@
-import { $custom, style } from 'aelea/core'
+import { $custom, style } from 'aelea/ui'
 
 export const $heading1 = $custom('h1')(
   style({ fontSize: '1.45rem', fontWeight: 900, letterSpacing: '.05em', margin: 0 })

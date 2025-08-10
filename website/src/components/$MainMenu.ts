@@ -1,3 +1,6 @@
+import type { IAnchor, Route } from 'aelea/router'
+import { constant, empty, o, startWith } from 'aelea/stream'
+import { type IBehavior } from 'aelea/stream-extended'
 import {
   $element,
   $node,
@@ -8,9 +11,7 @@ import {
   type ISlottable,
   nodeEvent,
   style
-} from 'aelea/core'
-import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, type IBehavior, o, startWith } from 'aelea/stream'
+} from 'aelea/ui'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -192,7 +193,7 @@ const $pageLink = (config: Omit<IAnchor, '$anchor'> & { $container?: INodeCompos
         //       : params.focus
         //         ? { backgroundColor: `${pallete.background} !important`, fill: pallete.foreground }
         //         : null
-        //   }, zipState({ active, focus }))
+        //   }, zip({ active, focus }))
         // )
         // styleBehavior(map(isDisabled => (isDisabled ?  { pointerEvents: 'none', opacity: .3 } : {}), disabled))
       )(config.$content)

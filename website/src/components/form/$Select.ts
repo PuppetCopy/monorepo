@@ -1,5 +1,5 @@
-import { component, type I$Node, type INode, type INodeCompose, nodeEvent, style } from 'aelea/core'
 import { constant, type IBehavior, type IOps, type IStream, now, switchLatest, switchMap, toStream } from 'aelea/stream'
+import { component, type I$Node, type INode, type INodeCompose, nodeEvent, style } from 'aelea/ui'
 import { $defaultSelectContainer } from './$Dropdown.js'
 
 export interface ISelect<T> {

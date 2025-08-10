@@ -87,7 +87,7 @@ async function loadContractData(deploymentName: string, deployments: DeploymentD
   }
 }
 
-async function discoverAllContracts(deployments: DeploymentData): string[] {
+async function discoverAllContracts(deployments: DeploymentData) {
   try {
     const deploymentNames = Object.keys(deployments)
     console.log(`🔍 Discovered ${deploymentNames.length} deployments`)

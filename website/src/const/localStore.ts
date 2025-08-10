@@ -1,4 +1,5 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
+import type { ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import { arbitrum } from 'viem/chains'
 import type { ISortBy } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
@@ -9,13 +10,14 @@ export const localStore = uiStorage.createStoreDefinition('root', 8, {
     chain: arbitrum.id,
     wallet: null as null | string,
     activityTimeframe: IntervalTime.WEEK,
-    collateralTokenList: [] as string[]
+    collateralTokenList: [] as string[],
+    indexTokenList: [] as string[]
   },
   ruleEditor: {
     advancedRouteEditorEnabled: false
   },
   leaderboard: {
-    sortBy: { direction: 'desc', selector: 'pnl' } as ISortBy,
+    sortBy: { direction: 'desc', selector: 'pnl' } as ISortBy<ITraderRouteLatestMetric>,
     focus: 'pnl',
     isLong: undefined as boolean | undefined,
     account: undefined as string | undefined
