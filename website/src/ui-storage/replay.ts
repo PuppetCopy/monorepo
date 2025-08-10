@@ -1,12 +1,5 @@
-import {
-  disposeBoth,
-  type IScheduler,
-  type ISink,
-  type IStream,
-  multicast,
-  PipeSink,
-  propagateRunEventTask
-} from 'aelea/stream'
+import { disposeBoth, type IScheduler, type ISink, type IStream, PipeSink, propagateRunEventTask } from 'aelea/stream'
+import { multicast } from 'aelea/stream-extended'
 
 export const replayState = <T>(source: IStream<T>, initialState?: T): IStream<T> =>
   new ReplayLatest(multicast(source), initialState)

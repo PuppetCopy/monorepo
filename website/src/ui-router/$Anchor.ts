@@ -1,5 +1,6 @@
 import type { Route } from 'aelea/router'
-import { constant, type IBehavior, type IOps, map, merge, o, op, startWith } from 'aelea/stream'
+import { constant, type IOps, map, merge, o, op, startWith } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { attr, component, type I$Node, type INode, nodeEvent, style } from 'aelea/ui'
 
 export interface IAnchor {

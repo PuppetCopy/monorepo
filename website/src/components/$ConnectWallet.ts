@@ -1,4 +1,5 @@
-import { type IBehavior, type IOps, map, now, switchLatest, switchMap } from 'aelea/stream'
+import { type IOps, map, now, switchLatest, switchMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { type IWalletConnected, wallet } from '../wallet/wallet.js'

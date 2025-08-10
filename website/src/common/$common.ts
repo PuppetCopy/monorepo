@@ -17,16 +17,8 @@ import {
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
 import type * as router from 'aelea/router'
-import {
-  empty,
-  filterNull,
-  type IBehavior,
-  type IComposeBehavior,
-  type IStream,
-  map,
-  skipRepeats,
-  toStream
-} from 'aelea/stream'
+import { empty, filterNull, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
+import type { IBehavior, IComposeBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/ui'
 import { $column, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -127,8 +119,6 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, size = '24px') => {
       fill: pallete.message,
       width: size,
       height: size,
-      backgroundColor: pallete.background,
-      padding: '1px',
       borderRadius: '50%'
     }),
     viewBox: '0 0 32 32'

@@ -1,16 +1,5 @@
-import {
-  combine,
-  empty,
-  filterNull,
-  type IBehavior,
-  type IStream,
-  map,
-  merge,
-  now,
-  o,
-  startWith,
-  switchMap
-} from 'aelea/stream'
+import { combine, empty, filterNull, type IStream, map, merge, now, o, startWith, switchMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/ui'
 import { designSheet } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

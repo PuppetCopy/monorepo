@@ -1,4 +1,5 @@
-import { constant, filter, type IBehavior, type IStream, join, map, merge, until } from 'aelea/stream'
+import { constant, filter, type IStream, join, map, merge, until } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $custom, $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $column, observer, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

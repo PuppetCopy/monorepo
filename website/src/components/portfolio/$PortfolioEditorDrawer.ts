@@ -5,7 +5,6 @@ import {
   constant,
   empty,
   fromPromise,
-  type IBehavior,
   type IStream,
   map,
   merge,
@@ -15,6 +14,7 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 
 // Array utility function (previously from @most/prelude)
 const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)

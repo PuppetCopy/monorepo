@@ -10,7 +10,6 @@ import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import {
   combine,
   empty,
-  type IBehavior,
   type IStream,
   map,
   merge,
@@ -22,6 +21,7 @@ import {
   toStream,
   zipMap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $node, $text, attr, component, style, stylePseudo } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'

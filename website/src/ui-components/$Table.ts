@@ -1,14 +1,5 @@
-import {
-  constant,
-  empty,
-  type IBehavior,
-  type IOps,
-  type IStream,
-  map,
-  now,
-  switchLatest,
-  switchMap
-} from 'aelea/stream'
+import { constant, empty, type IOps, type IStream, map, now, switchLatest, switchMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
   $svg,

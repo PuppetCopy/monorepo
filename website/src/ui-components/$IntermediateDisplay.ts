@@ -6,14 +6,12 @@ import {
   type IOps,
   type IStream,
   map,
-  multicast,
   now,
-  replayLatest,
   startWith,
   switchLatest,
   switchMap
 } from 'aelea/stream'
-import { PromiseStatus, promiseState } from 'aelea/stream-extended'
+import { multicast, PromiseStatus, promiseState, replayLatest } from 'aelea/stream-extended'
 import { $node, $text, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

@@ -1,12 +1,8 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
-import {
-  getClosestNumber,
-  groupArrayMany,
-  periodicRun,
-  unixTimestampNow
-} from '@puppet-copy/middleware/core'
+import { getClosestNumber, groupArrayMany, periodicRun, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combine, type IStream, map, op, replayState } from 'aelea/stream'
+import { combine, type IStream, map, op } from 'aelea/stream'
+import { replayState } from 'aelea/stream-extended'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
@@ -18,6 +14,10 @@ export const subgraphStatus = op(
   }),
   replayState
 )
+
+export type StateParams<T> = {
+  [P in keyof T]: IStream<T[P]>
+}
 
 export function queryPricefeed(
   queryParams: StateParams<{

@@ -14,7 +14,6 @@ import {
   combine,
   empty,
   fromPromise,
-  type IBehavior,
   type IStream,
   joinMap,
   map,
@@ -24,6 +23,7 @@ import {
   startWith,
   switchMap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

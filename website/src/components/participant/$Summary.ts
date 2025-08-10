@@ -1,5 +1,6 @@
 import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
-import { combine, type IStream, map, multicast } from 'aelea/stream'
+import { combine, type IStream, map } from 'aelea/stream'
+import { multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

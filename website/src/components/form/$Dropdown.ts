@@ -2,7 +2,6 @@ import {
   combine,
   constant,
   empty,
-  type IBehavior,
   type IOps,
   type IStream,
   map,
@@ -15,6 +14,7 @@ import {
   toStream,
   zipMap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
   $text,

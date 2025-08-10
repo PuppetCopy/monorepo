@@ -1,16 +1,5 @@
-import {
-  combine,
-  constant,
-  empty,
-  type IBehavior,
-  type IStream,
-  map,
-  merge,
-  multicast,
-  startWith,
-  switchLatest,
-  until
-} from 'aelea/stream'
+import { combine, constant, empty, type IStream, map, merge, startWith, switchLatest, until } from 'aelea/stream'
+import { type IBehavior, multicast } from 'aelea/stream-extended'
 import {
   $node,
   component,

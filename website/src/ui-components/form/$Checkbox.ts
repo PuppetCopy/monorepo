@@ -1,4 +1,5 @@
-import { empty, type IBehavior, type IStream, map, merge, o, startWith } from 'aelea/stream'
+import { empty, type IStream, map, merge, o, startWith } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
   $node,

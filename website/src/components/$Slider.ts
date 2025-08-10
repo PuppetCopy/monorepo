@@ -1,5 +1,6 @@
 import { invertColor } from '@puppet-copy/middleware/core'
-import { combine, type IBehavior, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
+import { combine, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
   $text,

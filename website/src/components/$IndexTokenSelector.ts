@@ -1,6 +1,7 @@
 import { TOKEN_DESCRIPTION_LIST } from '@puppet-copy/middleware/const'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { type IBehavior, type IStream, map } from 'aelea/stream'
+import { type IStream, map } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component } from 'aelea/ui'
 import { isDesktopScreen } from 'aelea/ui-components'
 import type { Address } from 'viem/accounts'

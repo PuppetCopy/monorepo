@@ -12,7 +12,8 @@ import {
   watchBlockNumber,
   writeContract
 } from '@wagmi/core'
-import { fromCallback, type IStream, replayState, skipRepeatsWith } from 'aelea/stream'
+import { fromCallback, type IStream, skipRepeatsWith } from 'aelea/stream'
+import { replayState } from 'aelea/stream-extended'
 import {
   type Abi,
   type Chain,

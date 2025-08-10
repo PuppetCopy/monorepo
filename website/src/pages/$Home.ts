@@ -1,5 +1,6 @@
 import type { Route } from 'aelea/router'
-import { empty, filterNull, fromCallback, type IBehavior, type IStream, map, now, switchMap } from 'aelea/stream'
+import { empty, filterNull, fromCallback, type IStream, map, now, switchMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $node, $text, attr, component, eventElementTarget, type I$Node, style } from 'aelea/ui'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

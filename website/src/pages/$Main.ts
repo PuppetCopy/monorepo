@@ -4,19 +4,17 @@ import * as router from 'aelea/router'
 import {
   constant,
   filterNull,
-  type IBehavior,
   type IStream,
   map,
   merge,
-  multicast,
   now,
   op,
-  replayLatest,
   switchMap,
   take,
   tap,
   zip
 } from 'aelea/stream'
+import { multicast, replayLatest, type IBehavior } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

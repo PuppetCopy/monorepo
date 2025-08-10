@@ -1,4 +1,5 @@
-import { constant, type IBehavior, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
+import { constant, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
   $text,

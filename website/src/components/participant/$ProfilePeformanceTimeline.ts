@@ -10,7 +10,6 @@ import {
   combine,
   empty,
   filterNull,
-  type IBehavior,
   type IStream,
   map,
   skipRepeatsWith,
@@ -18,6 +17,7 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, motion, style } from 'aelea/ui'
 import { $column, $NumberTicker, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

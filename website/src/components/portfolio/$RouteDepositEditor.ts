@@ -1,6 +1,7 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, type IBehavior, type IStream, map, replayState, sampleMap, switchMap } from 'aelea/stream'
+import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
+import { type IBehavior, replayState } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

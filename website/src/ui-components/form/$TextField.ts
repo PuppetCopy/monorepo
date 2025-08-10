@@ -1,4 +1,5 @@
-import { combine, empty, type IBehavior, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
+import { combine, empty, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

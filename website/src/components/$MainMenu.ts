@@ -1,6 +1,6 @@
 import type { IAnchor, Route } from 'aelea/router'
 import { constant, empty, o, startWith } from 'aelea/stream'
-import { type IBehavior } from 'aelea/stream-extended'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
   $node,

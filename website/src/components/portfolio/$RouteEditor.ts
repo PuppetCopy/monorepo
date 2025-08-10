@@ -1,6 +1,7 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { empty, type IBehavior, type IStream, map } from 'aelea/stream'
+import { empty, type IStream, map } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

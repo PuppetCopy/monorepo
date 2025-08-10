@@ -9,17 +9,8 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import {
-  combine,
-  fromPromise,
-  type IBehavior,
-  type IStream,
-  map,
-  multicast,
-  replayLatest,
-  startWith,
-  switchMap
-} from 'aelea/stream'
+import { combine, fromPromise, type IStream, map, startWith, switchMap } from 'aelea/stream'
+import { multicast, replayLatest, type IBehavior } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

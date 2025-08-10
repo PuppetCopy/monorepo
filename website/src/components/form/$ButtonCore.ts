@@ -1,4 +1,5 @@
-import { constant, filter, type IBehavior, map, merge, o, startWith } from 'aelea/stream'
+import { constant, filter, map, merge, o, startWith } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
   component,

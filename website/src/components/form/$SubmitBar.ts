@@ -1,18 +1,6 @@
 import { getMappedValue } from '@puppet-copy/middleware/core'
-import {
-  combine,
-  constant,
-  empty,
-  type IBehavior,
-  type IStream,
-  map,
-  merge,
-  multicast,
-  now,
-  startWith,
-  switchLatest
-} from 'aelea/stream'
-import { type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
+import { combine, constant, empty, type IStream, map, merge, now, startWith, switchLatest } from 'aelea/stream'
+import { type IBehavior, multicast, type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, type Control, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'

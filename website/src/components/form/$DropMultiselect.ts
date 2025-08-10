@@ -1,6 +1,5 @@
 import {
   constant,
-  type IBehavior,
   type IOps,
   type IStream,
   map,
@@ -12,6 +11,7 @@ import {
   switchMap,
   tap
 } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

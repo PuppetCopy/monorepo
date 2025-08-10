@@ -118,9 +118,7 @@ export function aggregatePositionList(list: (IPositionIncrease | IPositionDecrea
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: (ITraderRouteLatestMetric & {
-    traderRouteMetric: Prettify<Pick<ITraderRouteMetric, 'openPositionList'>>
-  })[]
+  metricList: ITraderRouteLatestMetric[]
 ): ITraderRouteMetricSummary {
   const seedAccountSummary: ITraderRouteMetricSummary = {
     account,

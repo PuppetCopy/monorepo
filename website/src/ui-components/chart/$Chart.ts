@@ -6,16 +6,15 @@ import {
   filter,
   filterNull,
   fromCallback,
-  type IBehavior,
   type IStream,
   map,
   merge,
-  multicast,
   sampleMap,
   startWith,
   switchMap,
   tap
 } from 'aelea/stream'
+import { type IBehavior, multicast } from 'aelea/stream-extended'
 import { $wrapNativeElement, component, type I$Node, type INode, style, styleInline } from 'aelea/ui'
 import { $row, observer } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

@@ -1,15 +1,5 @@
-import {
-  constant,
-  empty,
-  type IBehavior,
-  map,
-  skip,
-  skipRepeats,
-  startWith,
-  switchLatest,
-  switchMap,
-  zipMap
-} from 'aelea/stream'
+import { constant, empty, map, skip, skipRepeats, startWith, switchLatest, switchMap, zipMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import {
   component,
   eventElementTarget,
