@@ -10,7 +10,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { combine, fromPromise, type IStream, map, startWith, switchMap } from 'aelea/stream'
-import { multicast, replayLatest, type IBehavior } from 'aelea/stream-extended'
+import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -60,7 +60,7 @@ export const $TraderPage = ({
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
-      const sortBy = replayLatest(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
+      const sortBy = state(sortByChange, { direction: 'desc', selector: 'openTimestamp' } as const)
 
       const urlFragments = document.location.pathname.split('/')
       const account = urlFragments[urlFragments.length - 1].toLowerCase() as Address

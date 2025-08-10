@@ -1,20 +1,8 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import {
-  constant,
-  filterNull,
-  type IStream,
-  map,
-  merge,
-  now,
-  op,
-  switchMap,
-  take,
-  tap,
-  zip
-} from 'aelea/stream'
-import { multicast, replayLatest, type IBehavior } from 'aelea/stream-extended'
+import { constant, filterNull, type IStream, map, merge, now, switchMap, take, tap, zip } from 'aelea/stream'
+import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -24,7 +12,7 @@ import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $T
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
-import { queryPricefeed, queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
+import { queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
@@ -94,8 +82,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
       const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
 
-      const _pricefeedMapQuery = op(queryPricefeed({ activityTimeframe }), multicast, replayLatest)
-
       const subgraphBeaconStatusColor = map(status => {
         const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
 
@@ -110,18 +96,14 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         wallet.blockChange
       )
 
-      const userMatchingRuleQuery = op(
+      const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
           address: map(getAccountStatus => getAccountStatus.address, wallet.account)
-        }),
-        multicast,
-        replayLatest
+        })
       )
 
-      const draftMatchingRuleList = op(changeMatchRuleList, multicast, stream => replayLatest(stream, []))
-      const draftDepositTokenList = op(changeDepositTokenList, multicast, stream =>
-        replayLatest(stream, [] as IDepositEditorDraft[])
-      )
+      const draftMatchingRuleList = state(changeMatchRuleList, [])
+      const draftDepositTokenList = state(changeDepositTokenList, [])
 
       return [
         $wrapNativeElement(document.body)(

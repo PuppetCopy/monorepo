@@ -1,14 +1,9 @@
 import { unixTimestampNow } from '@puppet-copy/middleware/core'
-import type {
-  IPositionDecrease,
-  IPositionIncrease,
-  ITraderRouteLatestMetric,
-  ITraderRouteMetric
-} from '@puppet-copy/sql/schema'
+import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { Address, Hex, Prettify } from 'viem'
+import type { Address, Hex } from 'viem'
 import type { IPosition, ITraderRouteMetricSummary } from './type'
 
 export const $seperator2 = style(

@@ -1,5 +1,5 @@
 import { continueWith, disposeBoth, disposeNone, disposeWith, type IStream, op, stream, switchMap } from 'aelea/stream'
-import { replayState } from './replay'
+import { state } from 'aelea/stream-extended'
 
 export type GetKey<TSchema> = Extract<keyof TSchema, string | number>
 
@@ -25,7 +25,7 @@ function createDbStream<TName extends string, TStore>(
   const storeNames = Object.keys(storeDefinitions as any)
   const openDbRequest = indexedDB.open(dbName, version)
 
-  return replayState(
+  return state(
     stream(sink => {
       let db: IDBDatabase | null = null
       let disposed = false

@@ -10,7 +10,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, constant, empty, filterNull, type IStream, map } from 'aelea/stream'
-import { multicast, type IBehavior } from 'aelea/stream-extended'
+import { type IBehavior, multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'

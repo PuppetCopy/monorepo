@@ -1,4 +1,4 @@
-import { formatUnits } from 'viem'
+import { formatUnits, parseUnits } from 'viem'
 import { BASIS_POINTS_DIVISOR } from '../const/common.js'
 import type { ITokenDescription } from './types.js'
 
@@ -10,64 +10,12 @@ while (zeros.length < 256) {
   zeros += zeros
 }
 
-function getMultiplier(decimals: number): string {
-  if (decimals >= 0 && decimals <= 256 && !(decimals % 1)) {
-    return `1${zeros.substring(0, decimals)}`
-  }
-
-  throw new Error('invalid decimal size')
-}
-
 export function formatFixed(decimals: number, value: bigint): number {
   return Number(formatUnits(value, decimals))
 }
 
 export function parseFixed(decimals: number, input: string | number) {
-  let value = typeof input === 'number' ? String(input) : input
-
-  const multiplier = getMultiplier(decimals)
-  const multiplierLength = multiplier.length
-
-  if (!VALID_FRACTIONAL_NUMBER_REGEXP.test(value)) {
-    throw new Error('invalid fractional value')
-  }
-
-  if (multiplier.length - 1 === 0) {
-    return BigInt(value)
-  }
-
-  const negative = value.substring(0, 1) === '-'
-  if (negative) {
-    value = value.substring(1)
-  }
-  const comps = value.split('.')
-
-  let whole = comps[0]
-  let fraction = comps[1]
-
-  if (!whole) {
-    whole = '0'
-  }
-  if (!fraction) {
-    fraction = '0'
-  }
-
-  // Prevent underflow
-  if (fraction.length > multiplierLength - 1) {
-    throw new Error('fractional component exceeds decimals')
-  }
-
-  // Fully pad the string with zeros to get to wei
-  while (fraction.length < multiplierLength - 1) {
-    fraction += '0'
-  }
-
-  const wholeValue = BigInt(whole)
-  const fractionValue = BigInt(fraction)
-
-  const wei = wholeValue * BigInt(multiplier) + fractionValue
-
-  return negative ? -wei : wei
+  return parseUnits(String(input), decimals)
 }
 
 export function parseBps(a: number | string): bigint {

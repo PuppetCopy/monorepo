@@ -1,7 +1,7 @@
 import { groupArrayByKeyMap, periodicRun } from '@puppet-copy/middleware/core'
 import type { ISimpleOraclePrice } from '@puppet-copy/middleware/gmx'
 import { map, op } from 'aelea/stream'
-import { replayState } from 'aelea/stream-extended'
+import { multicast } from 'aelea/stream-extended'
 import type { Address } from 'viem'
 
 // Arbitrum URL: https://arbitrum-api.gmxinfra.io/signed_prices/latest
@@ -70,5 +70,5 @@ export const latestPriceMap = op(
       )
     })
   }),
-  replayState
+  multicast
 )

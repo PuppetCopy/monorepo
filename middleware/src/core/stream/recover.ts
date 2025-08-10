@@ -1,4 +1,14 @@
-import { at, continueWith, fromPromise, type IOps, type IStream, joinMap, now, switchMap } from 'aelea/stream'
+import {
+  at,
+  continueWith,
+  curry2,
+  fromPromise,
+  type IOps,
+  type IStream,
+  joinMap,
+  now,
+  switchLatest
+} from 'aelea/stream'
 
 export interface IRunPeriodically<T> {
   actionOp: IOps<void, Promise<T>>
@@ -19,11 +29,14 @@ export const periodicRun = <T>({
   return continueWith(() => periodicRun<T>(runArgs), awaitExecution)
 }
 
-export const recover = <T>(source: IStream<T>, recoveryDelay = 1000): IStream<T> => {
-  const startAt = at(recoveryDelay, null)
-  const recoverFn = () => recover(source, recoveryDelay * 2)
-  const scheduleRecover = switchMap(recoverFn, startAt)
-  const runAndRecover = continueWith(() => scheduleRecover, source)
+export const recover: IRecoverCurry = curry2((recoveryDelay, source) =>
+  continueWith(
+    () => switchLatest(at(recoveryDelay, recover(recoveryDelay * 2, source))), //
+    source
+  )
+)
 
-  return runAndRecover
+export interface IRecoverCurry {
+  <T>(recoveryDelay: number, source: IStream<T>): IStream<T>
+  <T>(recoveryDelay: number): (source: IStream<T>) => IStream<T>
 }

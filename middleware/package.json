@@ -17,13 +17,14 @@
   ],
   "exports": {
     "./*": {
+      "development": "./src/*/index.ts",
       "types": "./dist/types/*/index.d.ts",
       "import": "./dist/esm/*/index.js"
     }
   },
   "dependencies": {
     "abitype": "1.0.8",
-    "aelea": "2.4.6",
+    "aelea": "2.4.9",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.8",
     "viem": "2.33.2"

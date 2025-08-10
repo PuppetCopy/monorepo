@@ -11,7 +11,7 @@ import {
   switchLatest,
   switchMap
 } from 'aelea/stream'
-import { multicast, PromiseStatus, promiseState, replayLatest } from 'aelea/stream-extended'
+import { multicast, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -66,7 +66,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
   $$success = constant($node(style({ color: pallete.positive }))($text('Transaction confirmed'))),
   showTooltip = false
 }: IIntermediateTx<TSuccess>) => {
-  const multicastQuery = replayLatest(multicast(query))
+  const multicastQuery = multicast(query)
 
   return $intermediatePromise<TSuccess>({
     clean,

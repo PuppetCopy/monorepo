@@ -13,7 +13,7 @@ import {
   writeContract
 } from '@wagmi/core'
 import { fromCallback, type IStream, skipRepeatsWith } from 'aelea/stream'
-import { replayState } from 'aelea/stream-extended'
+import { state } from 'aelea/stream-extended'
 import {
   type Abi,
   type Chain,
@@ -111,7 +111,7 @@ const appkitAccountEvent: IStream<GetAccountReturnType> = skipRepeatsWith(
     cb(getAccount(wagmiAdapter.wagmiConfig))
   }) as IStream<GetAccountReturnType>
 )
-const account: IStream<IGetWalletStatus> = replayState(appkitAccountEvent)
+const account: IStream<IGetWalletStatus> = state(appkitAccountEvent)
 
 async function read<
   TAbi extends Abi,

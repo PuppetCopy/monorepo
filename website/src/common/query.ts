@@ -1,19 +1,15 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import { getClosestNumber, groupArrayMany, periodicRun, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combine, type IStream, map, op } from 'aelea/stream'
-import { replayState } from 'aelea/stream-extended'
+import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
-export const subgraphStatus = op(
-  periodicRun({
-    startImmediate: true,
-    interval: 2500,
-    actionOp: map(getStatus)
-  }),
-  replayState
-)
+export const subgraphStatus = periodicRun({
+  startImmediate: true,
+  interval: 2500,
+  actionOp: map(getStatus)
+})
 
 export type StateParams<T> = {
   [P in keyof T]: IStream<T[P]>

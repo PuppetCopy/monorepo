@@ -8,8 +8,8 @@
     // tsBuildInfoFile configured per package to avoid conflicts
     "sourceMap": true,
     // Performance optimizations for IntelliSense
-    "disableSourceOfProjectReferenceRedirect": true,
-    "disableSolutionSearching": true,
+    "disableSourceOfProjectReferenceRedirect": false,
+    "disableSolutionSearching": false,
     // Type checking
     "strict": true,
     "alwaysStrict": true, // Always parse in strict mode

@@ -1,7 +1,7 @@
 import { readableTokenAmount } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
-import { type IBehavior, replayState } from 'aelea/stream-extended'
+import { type IBehavior, state } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -29,7 +29,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
     ) => {
       const { draftDepositTokenList, collateralToken } = config
 
-      const model = replayState(
+      const model = state(
         map(list => {
           const match = list.find(ct => ct.token === collateralToken)
           return (
@@ -42,7 +42,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         }, draftDepositTokenList)
       )
 
-      const walletBalance = replayState(
+      const walletBalance = state(
         switchMap(async wallet => {
           if (!wallet.address) return 0n
 
@@ -50,7 +50,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         }, wallet.account)
       )
 
-      const depositBalance = replayState(
+      const depositBalance = state(
         switchMap(async account => {
           if (!account.address) return 0n
 
