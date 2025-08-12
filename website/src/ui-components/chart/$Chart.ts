@@ -1,5 +1,4 @@
 import {
-  aggregate,
   combine,
   disposeWith,
   empty,
@@ -9,6 +8,7 @@ import {
   type IStream,
   map,
   merge,
+  reduce,
   sampleMap,
   startWith,
   switchMap,
@@ -159,7 +159,7 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
               ...priceLineConfigList.map(lineStreamConfig => {
                 return startWith(
                   null,
-                  aggregate(
+                  reduce(
                     (prev, params) => {
                       if (prev && params === null) {
                         series.removePriceLine(prev)

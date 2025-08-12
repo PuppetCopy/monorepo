@@ -196,8 +196,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     offset: filterParams.paging.offset,
                     orderBy: params.sortBy
                       ? params.sortBy.direction === 'asc'
-                        ? asc(schema.traderRouteLatestMetric[params.sortBy.selector])
-                        : desc(schema.traderRouteLatestMetric[params.sortBy.selector])
+                        ? asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                        : desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
                       : undefined,
                     columns: {
                       account: true,
@@ -266,7 +266,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 // $bodyRowContainer: $defaultTableRowContainer(
                 //   style({ margin: '0 1px' })
                 // ),
-                sortBy: params.sortBy,
+                sortBy: params.sortBy as any,
                 dataSource,
                 columns: [
                   {
@@ -325,7 +325,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             return $row(spacing.small)(
                               ...indexTokenList.slice(0, 4).map((token: Address) => {
                                 const tokenDesc = getTokenDescription(token)
-                                return tokenDesc ? op($tokenIcon(tokenDesc), style({ marginRight: '-18px' })) : empty
+                                return tokenDesc
+                                  ? op(
+                                      $tokenIcon(tokenDesc),
+                                      style({ marginRight: '-16px', border: `2px solid ${pallete.background}` })
+                                    )
+                                  : empty
                               }),
                               indexTokenListLength > 4
                                 ? style({ fontSize: '.8rem', marginLeft: '18px', placeContent: 'center' })(

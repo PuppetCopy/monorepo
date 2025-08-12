@@ -6,7 +6,8 @@ import {
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
-import { empty, filterNull, type IComposeBehavior, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import { empty, filterNull, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
+import type { IComposeBehavior } from 'aelea/stream-extended'
 import { $node, $text, type INode, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

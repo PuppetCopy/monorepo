@@ -34,7 +34,7 @@ export const watchContractEvent = <
 
         return disposeWith(removeListenerFn)
       } catch (err) {
-        return scheduler.asap(propagateErrorTask(sink, scheduler, err))
+        return scheduler.asap(propagateErrorTask(sink, err))
       }
     }
   }

@@ -1,5 +1,4 @@
-import { getAddress } from 'viem'
-import { groupArrayByKey } from '../core/utils.js'
+import { groupList } from '../core/utils.js'
 import { ARBITRUM_TOKEN_LIST } from '../generated/tokenList.js'
 import { CONTRACT } from './contract.js'
 
@@ -19,10 +18,9 @@ export const TOKEN_DESCRIPTION_LIST = [
     name: 'Puppet',
     symbol: 'PUPPET'
   }
-]
+] as const
 
-export const TOKEN_ADDRESS_DESCRIPTION_MAP = groupArrayByKey(TOKEN_DESCRIPTION_LIST, token => {
-  return getAddress(token.address)
-})
+export const TOKEN_ADDRESS_DESCRIPTION_MAP = groupList(TOKEN_DESCRIPTION_LIST, 'address')
+export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupList(TOKEN_DESCRIPTION_LIST, 'symbol')
 
-export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupArrayByKey(TOKEN_DESCRIPTION_LIST, token => token.symbol.toUpperCase())
+const www = TOKEN_SYMBOL_DESCRIPTION_MAP.AAVE

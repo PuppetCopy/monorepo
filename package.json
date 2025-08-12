@@ -3,7 +3,7 @@
   "private": true,
   "license": "BSL-1.1 and MIT",
   "description": "Puppet Monorepo",
-  "packageManager": "bun@1.2.19",
+  "packageManager": "bun@1.2.20",
   "keywords": [
     "Puppet",
     "Copy Trading",

@@ -3,7 +3,7 @@ import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { wallet } from '../wallet/wallet'
 
-export default {
+const puppetReader: Record<string, (...args: any[]) => any> = {
   getUserBalance: (token: Address, user: Address, contractDefs = PUPPET.CONTRACT) =>
     wallet.read({
       ...contractDefs.Account,
@@ -23,3 +23,5 @@ export default {
   getConfig: (contractDefs = PUPPET.CONTRACT) =>
     wallet.read({ ...contractDefs.Rule, functionName: 'getConfig', args: [] })
 }
+
+export default puppetReader

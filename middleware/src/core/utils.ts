@@ -55,7 +55,7 @@ export const cacheMap =
     return cacheMap[key].item
   }
 
-export function groupArrayManyMap<A, B extends string | symbol | number, R>(
+export function groupManyListMap<A, B extends string | symbol | number, R>(
   list: readonly A[],
   getKey: (v: A) => B,
   mapFn: (v: A, key: B) => R
@@ -77,37 +77,53 @@ export function groupArrayManyMap<A, B extends string | symbol | number, R>(
   return gmap
 }
 
-export function groupArrayMany<A, B extends string | symbol | number>(
+export function groupManyList<A, B extends string | symbol | number>(
   list: readonly A[],
   getKey: (v: A) => B
 ): Record<B, A[]> {
-  return groupArrayManyMap(list, getKey, x => x)
+  return groupManyListMap(list, getKey, x => x)
 }
 
-export function groupArrayByKey<A, B extends string | symbol | number>(
-  list: readonly A[],
-  getKey: (v: A) => B
-): Record<B, A> {
-  return groupArrayByKeyMap(list, getKey, x => x)
+export function groupList<const T extends readonly any[], K extends keyof T[number]>(
+  list: T,
+  key: K
+): { [P in T[number][K] & PropertyKey]: Extract<T[number], { [Q in K]: P }> } {
+  const result = {} as any
+  for (const item of list) {
+    const keyValue = item[key]
+    if (keyValue in result) {
+      throw new Error(`Duplicate key "${String(keyValue)}" found when grouping by "${String(key)}"`)
+    }
+    result[keyValue] = item
+  }
+  return result
 }
 
-export function groupArrayByKeyMap<A, B extends string | symbol | number, R>(
-  list: readonly A[],
-  getKey: (v: A) => B,
-  mapFn: (v: A, key: B, seed: number) => R
-) {
-  const gmap = {} as { [P in B]: R }
+export function groupListMap<
+  const T extends readonly any[],
+  K extends keyof T[number],
+  const V extends T[number][K] & PropertyKey,
+  R
+>(
+  list: T,
+  key: K,
+  mapFn: (item: Extract<T[number], { [Q in K]: V }>, keyValue: V, index: number) => R
+): { [P in T[number][K] & PropertyKey]: R } {
+  const result = {} as any
 
   for (let i = 0; i < list.length; i++) {
     const item = list[i]
-    const key = getKey(item)
+    const keyValue = item[key]
 
-    if (key === undefined) throw new Error('key is undefined')
+    if (keyValue === undefined) throw new Error(`Key "${String(key)}" is undefined for item at index ${i}`)
+    if (keyValue in result) {
+      throw new Error(`Duplicate key "${String(keyValue)}" found when grouping by "${String(key)}"`)
+    }
 
-    gmap[key] = mapFn(item, key, i)
+    result[keyValue] = mapFn(item as any, keyValue as any, i)
   }
 
-  return gmap
+  return result
 }
 
 export function getMappedValue<TMap extends object, TKey extends keyof TMap, TFallback = never>(

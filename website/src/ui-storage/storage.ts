@@ -1,5 +1,5 @@
-import { continueWith, disposeBoth, disposeNone, disposeWith, type IStream, op, stream, switchMap } from 'aelea/stream'
-import { state } from 'aelea/stream-extended'
+import { continueWith, disposeBoth, disposeNone, disposeWith, type IStream, op, switchMap } from 'aelea/stream'
+import { state, stream } from 'aelea/stream-extended'
 
 export type GetKey<TSchema> = Extract<keyof TSchema, string | number>
 

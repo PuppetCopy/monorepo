@@ -278,6 +278,7 @@ export const $PortfolioEditorDrawer = ({
                                       .join(', ')
                                   )
                                 }
+                                return empty
                               } catch (error) {
                                 if (error instanceof MethodNotFoundRpcError) {
                                   return $row(

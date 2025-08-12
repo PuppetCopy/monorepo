@@ -1,4 +1,4 @@
-import { groupArrayByKeyMap, periodicRun } from '@puppet-copy/middleware/core'
+import { groupListMap, periodicRun } from '@puppet-copy/middleware/core'
 import type { ISimpleOraclePrice } from '@puppet-copy/middleware/gmx'
 import { map, op } from 'aelea/stream'
 import { multicast } from 'aelea/stream-extended'
@@ -55,19 +55,15 @@ export const latestPriceMap = op(
     interval: 2500,
     actionOp: map(async () => {
       const newLocal = await querySignedPrices()
-      return groupArrayByKeyMap(
-        newLocal,
-        item => item.tokenAddress,
-        (item): ISimpleOraclePrice => {
-          const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
-          return {
-            source: 'GMX API',
-            token: item.tokenAddress,
-            price: BigInt(item.maxPriceFull), // Use max price as the single price
-            timestamp: timestampMs
-          }
+      return groupListMap(newLocal, 'tokenAddress', (item): ISimpleOraclePrice => {
+        const timestampMs = (item.minBlockTimestamp || item.maxBlockTimestamp) * 1000
+        return {
+          source: 'GMX API',
+          token: item.tokenAddress,
+          price: BigInt(item.maxPriceFull), // Use max price as the single price
+          timestamp: timestampMs
         }
-      )
+      })
     })
   }),
   multicast

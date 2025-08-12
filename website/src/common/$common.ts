@@ -106,7 +106,7 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
-export const $tokenIcon = (tokenDesc: ITokenDescription, size = '24px') => {
+export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
   const $token = getMappedValue($tokenIconMap, tokenDesc.symbol, $unknown)
 
   if (!$token) {
