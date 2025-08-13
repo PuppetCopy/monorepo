@@ -36,7 +36,7 @@ import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$Match
 import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from './common'
-import type { IPageFilterParams } from './type.js'
+import type { IPageFilterParams } from './types.js'
 
 interface ITraderPage extends IPageFilterParams {
   userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>

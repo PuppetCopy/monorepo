@@ -2,7 +2,7 @@ import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middlewa
 import {
   getDuration,
   getTraderMatchingKey,
-  groupArrayMany,
+  groupManyList,
   readableDate,
   readablePercentage,
   unixTimestampNow
@@ -28,7 +28,7 @@ import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from '../compon
 import { $RouteDepositEditor } from '../components/portfolio/$RouteDepositEditor.js'
 import { wallet } from '../wallet/wallet.js'
 import { $seperator2 } from './common.js'
-import type { IPageFilterParams } from './type.js'
+import type { IPageFilterParams } from './types.js'
 
 interface IWalletPuppet extends IPageFilterParams {
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
@@ -74,6 +74,7 @@ export const $PortfolioPage = ({
                     : undefined
                 ),
               columns: {
+                traderMatchingKey: true,
                 callParamsTrader: true,
                 callParamsCollateralToken: true,
                 allocationAddress: true,
@@ -133,9 +134,7 @@ export const $PortfolioPage = ({
               }
             })
 
-            return groupArrayMany(result, row =>
-              getTraderMatchingKey(row.callParamsCollateralToken, row.callParamsTrader)
-            )
+            return groupManyList(result, 'traderMatchingKey')
           },
           combine({ activityTimeframe, collateralTokenList, wallet: wallet.account })
         )

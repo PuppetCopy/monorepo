@@ -25,7 +25,7 @@ import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $Baseline, $infoTooltipLabel, $intermediatePromise, type ISeriesTime } from '@/ui-components'
-import type { IPageFilterParams, ITraderRouteMetricSummary } from '../../pages/type.js'
+import type { IPageFilterParams, ITraderRouteMetricSummary } from '../../pages/types.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 

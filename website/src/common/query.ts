@@ -1,5 +1,5 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
-import { getClosestNumber, groupArrayMany, periodicRun, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { getClosestNumber, groupManyList, periodicRun, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
@@ -36,7 +36,7 @@ export function queryPricefeed(
           params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
         )
     })
-    return groupArrayMany(priceList, c => c.token)
+    return groupManyList(priceList, 'token')
 
     // map results by token
   }, combine(queryParams))

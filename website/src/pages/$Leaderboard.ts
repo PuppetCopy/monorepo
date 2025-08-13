@@ -59,7 +59,7 @@ import { $RouteEditor } from '../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../components/table/$TableColumn.js'
 import { localStore } from '../const/localStore.js'
 import { $seperator2 } from './common.js'
-import type { IPageFilterParams, IPageParams } from './type.js'
+import type { IPageFilterParams, IPageParams } from './types.js'
 
 interface ILeaderboard extends IPageFilterParams, IPageParams {
   userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>

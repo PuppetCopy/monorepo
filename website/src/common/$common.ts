@@ -36,7 +36,7 @@ import {
 import { $AccountLabel, $profileAvatar } from '../components/$AccountProfile.js'
 import { latestPriceMap } from '../logic/latestPriceMap.js'
 import { $seperator2 } from '../pages/common.js'
-import { type IPosition, IWalletTab } from '../pages/type.js'
+import { type IPosition, IWalletTab } from '../pages/types.js'
 import { isPositionSettled } from '../utils/utils.js'
 
 export const $midContainer = $column(

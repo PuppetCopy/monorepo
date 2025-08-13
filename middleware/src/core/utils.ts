@@ -55,33 +55,47 @@ export const cacheMap =
     return cacheMap[key].item
   }
 
-export function groupManyListMap<A, B extends string | symbol | number, R>(
-  list: readonly A[],
-  getKey: (v: A) => B,
-  mapFn: (v: A, key: B) => R
-): Record<B, R[]> {
-  const gmap = {} as { [P in B]: R[] }
+export function groupManyListMap<const T extends readonly any[], K extends keyof T[number], R>(
+  list: T,
+  key: K,
+  mapFn: (item: T[number], keyValue: T[number][K] & PropertyKey, index: number) => R
+): { [P in T[number][K] & PropertyKey]: R[] } {
+  const gmap = {} as { [P in T[number][K] & PropertyKey]: R[] }
 
-  list.forEach(item => {
-    const key = getKey(item)
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    const keyValue = item[key]
 
-    if (key === undefined) {
-      throw new Error('key is undefined')
+    if (keyValue === undefined) {
+      throw new Error(`Key "${String(key)}" is undefined for item at index ${i}`)
     }
 
-    gmap[key] ??= []
-    const mappedValue = mapFn(item, key)
-    gmap[key].push(mappedValue)
-  })
+    const propertyKey = keyValue as T[number][K] & PropertyKey
+    gmap[propertyKey] ??= []
+    const mappedValue = mapFn(item, propertyKey, i)
+    gmap[propertyKey].push(mappedValue)
+  }
 
   return gmap
 }
 
-export function groupManyList<A, B extends string | symbol | number>(
-  list: readonly A[],
-  getKey: (v: A) => B
-): Record<B, A[]> {
-  return groupManyListMap(list, getKey, x => x)
+export function groupManyList<const T extends readonly any[], K extends keyof T[number]>(
+  list: T,
+  key: K
+): { [P in T[number][K] & PropertyKey]: Extract<T[number], { [Q in K]: P }>[] } {
+  const gmap = {} as { [P in T[number][K] & PropertyKey]: Extract<T[number], { [Q in K]: P }>[] }
+
+  for (const item of list) {
+    const keyValue = item[key] as T[number][K] & PropertyKey
+    if (keyValue === undefined) {
+      throw new Error(`Key "${String(key)}" is undefined`)
+    }
+
+    gmap[keyValue] ??= []
+    gmap[keyValue].push(item as any)
+  }
+
+  return gmap
 }
 
 export function groupList<const T extends readonly any[], K extends keyof T[number]>(

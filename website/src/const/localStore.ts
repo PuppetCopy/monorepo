@@ -3,7 +3,7 @@ import type { ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import { arbitrum } from 'viem/chains'
 import type { ISortBy } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import { IWalletTab } from '../pages/type.js'
+import { IWalletTab } from '../pages/types.js'
 
 export const localStore = uiStorage.createStoreDefinition('root', 8, {
   global: {

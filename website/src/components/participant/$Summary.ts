@@ -7,7 +7,7 @@ import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { intermediateText } from '@/ui-components'
 import { $heading2 } from '../../common/$text.js'
-import type { IPosition, ITraderRouteMetricSummary } from '../../pages/type.js'
+import type { IPosition, ITraderRouteMetricSummary } from '../../pages/types.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {

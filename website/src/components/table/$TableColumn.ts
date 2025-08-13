@@ -17,7 +17,7 @@ import { $defaultTableCell, $infoTooltip, type TableColumn } from '@/ui-componen
 import { $entry, $openPositionBreakdown, $pnlDisplay, $puppetList, $size } from '../../common/$common.js'
 import { latestPriceMap } from '../../logic/latestPriceMap.js'
 import { $seperator2 } from '../../pages/common.js'
-import type { IPosition } from '../../pages/type.js'
+import type { IPosition } from '../../pages/types.js'
 import { isPositionSettled } from '../../utils/utils.js'
 
 export const $tableHeader = (primaryLabel: string, secondaryLabel: string) =>
