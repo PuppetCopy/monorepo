@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "abitype": "1.0.8",
-    "aelea": "2.5.5",
+    "aelea": "2.5.7",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.8",
     "viem": "2.33.3"

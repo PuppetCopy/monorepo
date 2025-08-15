@@ -29,6 +29,7 @@ import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
+import { $SelectIndexToken } from 'src/components/$IndexTokenSelector.js'
 import type { Address } from 'viem/accounts'
 import {
   $Baseline,
@@ -139,9 +140,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
               }),
 
               $row(
-                // $SelectIndexToken({ selectedList: indexTokenList })({
-                //   changeIndexTokenList: selectIndexTokenListTether()
-                // }),
+                $SelectIndexToken({ selectedList: indexTokenList })({
+                  changeIndexTokenList: selectIndexTokenListTether()
+                }),
                 $SelectCollateralToken({ selectedList: collateralTokenList })({
                   changeCollateralTokenList: selectCollateralTokenListTether()
                 })
@@ -186,9 +187,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         params.collateralTokenList.length > 0
                           ? f.inArray(t.collateralToken, params.collateralTokenList)
                           : undefined,
-                        // params.indexTokenList.length > 0
-                        //   ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
-                        //   : undefined,
+                        params.indexTokenList.length > 0
+                          ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
+                          : undefined,
                         f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
                       )
                     },

@@ -16,7 +16,7 @@ export const $SelectIndexToken = ({ selectedList }: ISelectIndexToken) =>
   component(([changeIndexTokenList, changeIndexTokenListTether]: IBehavior<Address[]>) => {
     return [
       $DropMultiSelect({
-        $noneSelected: $defaultNoneSelected($text(isDesktopScreen ? 'All Index Tokens' : 'All')),
+        $noneSelected: $defaultNoneSelected($text(isDesktopScreen ? 'All Markets' : 'All')),
         $$option: map(address => {
           const token = getTokenDescription(address)
           return token ? $tokenLabeled(token) : $text(address)

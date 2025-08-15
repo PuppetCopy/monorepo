@@ -4,7 +4,7 @@ import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IPosition, ITraderRouteMetricSummary } from './type'
+import type { IPosition, ITraderRouteMetricSummary } from './types'
 
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
@@ -174,7 +174,7 @@ export function accountSettledPositionListSummary(
     return seed
   }, seedAccountSummary)
 
-  summary.pnlTimeline = summary.pnlTimeline.sort((a, b) => a.time - b.time)
+  summary.pnlTimeline = summary.pnlTimeline.sort((a: { time: number }, b: { time: number }) => a.time - b.time)
 
   return summary
 }

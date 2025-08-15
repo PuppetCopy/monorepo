@@ -15,7 +15,7 @@ export const boxShadow =
 export const $card = $column(
   spacing.default,
   style({
-    borderRadius: '20px',
+    borderRadius: '6px',
     boxShadow: boxShadow,
     padding: isDesktopScreen ? '36px' : '12px',
     backgroundColor: pallete.background
@@ -25,8 +25,8 @@ export const $card = $column(
 export const $card2 = $column(
   spacing.default,
   style({
-    borderRadius: '20px',
-    padding: '20px',
+    borderRadius: '6px',
+    padding: '12px',
     backgroundColor: pallete.middleground,
     boxShadow: 'rgba(0, 0, 0, 0.25) 0px 4px 20px 0px'
   })
