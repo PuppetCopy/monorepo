@@ -1,0 +1,79 @@
+name: Indexer Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'indexer/**'
+      - 'middleware/**'
+      - 'bun.lockb'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Indexer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT }}
+      
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.29
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Build middleware
+        run: bun run middleware:build
+      
+      - name: Run indexer codegen
+        run: |
+          cd indexer
+          bun run codegen
+      
+      - name: Upload indexer files
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: indexer-files
+          path: |
+            indexer/
+            middleware/dist/
+            bun.lockb
+            package.json
+            !indexer/node_modules/
+            !indexer/.ponder/
+            !indexer/generated/
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy to Railway
+    needs: build
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: indexer/railway.json
+      
+      - uses: actions/download-artifact@v4
+        with:
+          name: indexer-files
+          path: .
+      
+      - name: Setup deployment
+        run: |
+          # The downloaded artifact maintains the directory structure
+          ls -la
+          ls -la indexer/
+          ls -la middleware/dist/ || true
+      
+      - name: Deploy to Railway
+        run: railway up --service=${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}

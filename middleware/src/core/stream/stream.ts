@@ -16,15 +16,8 @@ export type Adapter<A, B> = [(event: A) => void, IStream<B>]
 
 export const createAdapter = <A>(): Adapter<A, A> => {
   const sinks: { sink: ISink<A>; scheduler: IScheduler }[] = []
-  return [a => broadcast(sinks, a), new FanoutPortStream(sinks)]
-}
-
-const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A): void => {
-  const sinkList = sinks.slice()
-
-  for (const { sink } of sinkList) {
-    tryEvent(a, sink)
-  }
+  const fanOut = new FanoutPortStream(sinks)
+  return [a => broadcast(sinks, a), fanOut]
 }
 
 export class FanoutPortStream<A> implements IStream<A> {
@@ -43,6 +36,14 @@ export class FanoutPortStream<A> implements IStream<A> {
         }
       }
     }
+  }
+}
+
+const broadcast = <A>(sinks: { sink: ISink<A>; scheduler: IScheduler }[], a: A): void => {
+  const sinkList = sinks.slice()
+
+  for (const { sink } of sinkList) {
+    tryEvent(a, sink)
   }
 }
 
