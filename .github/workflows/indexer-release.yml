@@ -35,18 +35,41 @@ jobs:
           cd indexer
           bun run codegen
       
+      - name: Prepare optimized artifacts
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Create artifact directory structure
+          mkdir -p artifact/indexer
+          mkdir -p artifact/middleware
+          
+          # Copy indexer files (excluding sensitive and unnecessary files)
+          rsync -av --progress indexer/ artifact/indexer/ \
+            --exclude 'node_modules/' \
+            --exclude '.ponder/' \
+            --exclude 'generated/' \
+            --exclude '.env*' \
+            --exclude '*.local' \
+            --exclude 'secrets/' \
+            --exclude '.git'
+          
+          # Copy middleware dist only
+          cp -r middleware/dist artifact/middleware/
+          
+          # Copy root config files needed for monorepo
+          cp package.json artifact/
+          cp bun.lock artifact/ || cp bun.lockb artifact/ || true
+          cp tsconfig.base.json artifact/
+          
+          # Show artifact size
+          echo "📊 Artifact size:"
+          du -sh artifact/
+      
       - name: Upload build artifacts
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: indexer-build
-          path: |
-            .
-            !node_modules/
-            !.git/
-            !.github/
-            !**/.ponder/
-            !**/generated/
+          path: artifact/
           retention-days: 1
           if-no-files-found: error
 
@@ -58,10 +81,6 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: indexer/railway.json
-      
       - uses: actions/download-artifact@v4
         with:
           name: indexer-build
@@ -69,10 +88,10 @@ jobs:
       
       - name: Setup deployment
         run: |
-          # The downloaded artifact maintains the directory structure
+          # The artifact is already in the correct structure
           ls -la
           ls -la indexer/
-          ls -la middleware/dist/ || true
+          ls -la middleware/dist/
       
       - name: Deploy to Railway
         run: railway up --service=${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}
