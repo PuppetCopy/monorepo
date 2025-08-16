@@ -30,8 +30,8 @@ export function expandDecimals(n: bigint, decimals: number) {
   return n * getDenominator(decimals)
 }
 
-export function getTokenDenominatedAmount(tokenDEsc: ITokenDescription, amount: number) {
-  return getDenominator(tokenDEsc.decimals) * BigInt(amount)
+export function getTokenDenominator(tokenDEsc: ITokenDescription) {
+  return getDenominator(tokenDEsc.decimals)
 }
 
 export function formatDiv(a: bigint, b: bigint): number {

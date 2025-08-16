@@ -26,18 +26,15 @@ export interface IRecoverConfig {
   maxDelay?: number
 }
 
-export function recover<T>(config: IRecoverConfig | number): (source: IStream<T>) => IStream<T>
-export function recover<T>(config: IRecoverConfig | number, source: IStream<T>): IStream<T>
-export function recover<T>(config: IRecoverConfig | number, source?: IStream<T>) {
-  // Normalize config
-  const recoverConfig: IRecoverConfig = typeof config === 'number' ? { delay: config } : config
-
+export function recover<T>(config: IRecoverConfig): (source: IStream<T>) => IStream<T>
+export function recover<T>(config: IRecoverConfig, source: IStream<T>): IStream<T>
+export function recover<T>(config: IRecoverConfig, source?: IStream<T>) {
   const {
     delay,
     message = `Stream error detected, recovering in ${delay}ms...`,
     backoffMultiplier = 2,
     maxDelay = 300000 // 5 minutes max
-  } = recoverConfig
+  } = config
 
   const recoverImpl =
     (currentDelay: number) =>
