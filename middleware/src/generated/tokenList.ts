@@ -1,14 +1,14 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-16T17:04:48.078Z
-// Source: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.3-branch/config/tokens.ts
-// Names from: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
+// Generated on: Sun, 17 Aug 2025 13:33:28 GMT
+// Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
+// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
 
 export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'AAVE',
     decimals: 18,
-    address: '0xba5ddd1f9d7f570dc94a51479a000e3bce967196',
+    address: '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196',
     name: 'Aave',
     dataStreamFeedId: '0x0003481a2f7fe21c01d427f39035541d2b7a53db9c76234dc36082e6ad6db7f5',
     dataStreamFeedDecimals: 18,
@@ -17,7 +17,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ADA',
     decimals: 6,
-    address: '0xD9f615A9b820225edbA2d821c4A696a0924051c6',
+    address: '0x53186c8419BEB83fE4Da74F7875041a1287337ED',
     name: 'ADA',
     synthetic: true,
     dataStreamFeedId: '0x00038580225b924c69e28ea101d4723d90c1b44ab83548a995c3d86ad9e92eb0',
@@ -27,7 +27,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'AI16Z',
     decimals: 9,
-    address: '0x000000000000000000000000AI16Z00000000000',
+    address: '0xBb69bd9dc152C2c0F083507641a46193d2B61EBb',
     name: 'ai16z',
     synthetic: true,
     dataStreamFeedId: '0x0003aa72a9b718ab413209e03abb04233846991294336169fc6a7a03081adb70',
@@ -36,16 +36,22 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'AIXBT',
     decimals: 18,
-    address: '0x000000000000000000000000AIXBT00000000000',
+    address: '0xcA543Cb8bCC76e4E0A034F56EB40a1029bDFd70E',
     name: 'AIXBT',
     synthetic: true,
     dataStreamFeedId: '0x0003234f809f57b656e7e76e9b640cded0625b08dade77d800579da1526ee543',
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'ALGO',
+    decimals: 6,
+    address: '0x72Cd3a21aA7A898028d9501868Fbe6dED0020434',
+    name: 'Algorand'
+  },
+  {
     symbol: 'ANIME',
     decimals: 18,
-    address: '0x37a645648df29205c6261289983fb04ecd70b4b3',
+    address: '0x37a645648dF29205C6261289983FB04ECD70b4B3',
     name: 'Animecoin',
     dataStreamFeedId: '0x0003f41975760eb180ad9f92ea069bbee557c655d6606884a5d810f42b22ee08',
     dataStreamFeedDecimals: 18
@@ -62,7 +68,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'APT',
     decimals: 8,
-    address: '0x000000000000000000000000APT0000000000000',
+    address: '0x3f8f0dCE4dCE4d0D1d0871941e79CDA82cA50d0B',
     name: 'APT',
     synthetic: true,
     dataStreamFeedId: '0x0003c6405661f306b96c352b0ed428e190b76e1f14641fb5b68652f9ca8d9af5',
@@ -80,7 +86,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ATOM',
     decimals: 6,
-    address: '0xCDA67618e51762235eacA373894F0C79256768fa',
+    address: '0x7D7F1765aCbaF847b9A1f7137FE8Ed4931FbfEbA',
     name: 'Cosmos',
     synthetic: true,
     dataStreamFeedId: '0x0003c93d9477344d0f2516c4605008399e6750d492a60ab85a9ecb2e441e87b3',
@@ -99,7 +105,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'BCH',
     decimals: 8,
-    address: '0x000000000000000000000000BCH0000000000000',
+    address: '0xc33D9C096e74aa4f571E9417b69a19C4A1e72ef2',
     name: 'BCH',
     synthetic: true,
     dataStreamFeedId: '0x00031dcbdf6f280392039ea6381b85a23bc0b90a40b676c4ec0b669dd8f0f38e',
@@ -108,7 +114,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'BERA',
     decimals: 18,
-    address: '0x000000000000000000000000BERA000000000000',
+    address: '0x67ADABbAd211eA9b3B4E2fd0FD165E593De1e983',
     name: 'Berachain',
     synthetic: true,
     dataStreamFeedId: '0x0003c800d35ffd2dbac08e275530d56e254ef08aaacacaa8e84dfc4a615504db',
@@ -126,7 +132,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'BOME',
     decimals: 6,
-    address: '0x000000000000000000000000BOME000000000000',
+    address: '0x3Eea56A1ccCdbfB70A26aD381C71Ee17E4c8A15F',
     name: 'BOME',
     synthetic: true,
     dataStreamFeedId: '0x0003bf78b6030628c512b439169066c7db546a4dea5a978b54dde6350b6764ad',
@@ -135,7 +141,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'BONK',
     decimals: 5,
-    address: '0x000000000000000000000000BONK000000000000',
+    address: '0x1FD10E767187A92f0AB2ABDEEF4505e319cA06B2',
     name: 'BONK',
     synthetic: true,
     dataStreamFeedId: '0x00033bba2b72b1d4220f0519eacd8a4d01e12aabb3eedb2c442db6e3d8994d99',
@@ -144,7 +150,17 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'BTC',
     decimals: 8,
-    address: '0x6ce185860a4963106506C203335A2910413708e9',
+    address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+    name: 'Wrapped Bitcoin',
+    synthetic: true,
+    dataStreamFeedId: '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x6ce185860a4963106506C203335A2910413708e9'
+  },
+  {
+    symbol: 'BTC',
+    decimals: 8,
+    address: '0x47904963fc8b2340414262125aF798B9655E58Cd',
     name: 'Bitcoin',
     synthetic: true,
     dataStreamFeedId: '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8',
@@ -154,7 +170,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'CAKE',
     decimals: 18,
-    address: '0x256654437f1ADA8057684b18d742eFD14034C400',
+    address: '0x580b373Ac16803BB0133356F470f3c7EEF54151B',
     name: 'pancakeswap',
     synthetic: true,
     dataStreamFeedId: '0x0003e9006db3ad7b39f342fc0bf0124b7600a6e5710f32ce659f6500216ba121',
@@ -162,9 +178,15 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0x256654437f1ADA8057684b18d742eFD14034C400'
   },
   {
+    symbol: 'CRO',
+    decimals: 8,
+    address: '0xB7EfE7c7f059E84Ab87A83A169c583Fb4A54fAc3',
+    name: 'Cronos'
+  },
+  {
     symbol: 'CRV',
     decimals: 18,
-    address: '0xaebDA2c976cfd1eE1977Eac079B4382acb849325',
+    address: '0xe5f01aeAcc8288E9838A60016AB00d7b6675900b',
     name: 'Curve DAO Token',
     synthetic: true,
     dataStreamFeedId: '0x0003d2e4f22df7caac63178e3f81ae33bbbf39ee1612bad959950424fe41412c',
@@ -183,7 +205,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'DOGE',
     decimals: 8,
-    address: '0x9A7FB1b3950837a8D9b40517626E11D4127C098C',
+    address: '0xC4da4c24fd591125c3F47b340b6f4f76111883d8',
     name: 'Dogecoin',
     synthetic: true,
     dataStreamFeedId: '0x000356ca64d3b32135e17dc0dc721a645bf50d0303be8ceb2cdca0a50bab8fdc',
@@ -193,7 +215,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'DOLO',
     decimals: 18,
-    address: '0x000000000000000000000000DOLO000000000000',
+    address: '0x97Ce1F309B949f7FBC4f58c5cb6aa417A5ff8964',
     name: 'Dolomite',
     synthetic: true,
     dataStreamFeedId: '0x000355d06b40dff314c9a283f9fd647690f5ebdce666453af72e3fbf08fdce5e',
@@ -202,7 +224,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'DOT',
     decimals: 10,
-    address: '0xa6bC5bAF2000424e90434bA7104ee399dEe80DEc',
+    address: '0xE958f107b467d5172573F761d26931D658C1b436',
     name: 'DOT',
     synthetic: true,
     dataStreamFeedId: '0x0003fdcc3acfa677b4f82bd4b8a6efaca91adcd9ae028e9f8cb65d1a85122b23',
@@ -212,7 +234,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'DYDX',
     decimals: 18,
-    address: '0x000000000000000000000000DYDX000000000000',
+    address: '0x0739Ad7AeA69aD36EdEb91b0e55cAC140427c632',
     name: 'dYdX',
     synthetic: true,
     dataStreamFeedId: '0x000348d8c6f4ff9e51a1baa88354d97749b3c1ffcdbfb9cf962b1882dba8cafb',
@@ -221,7 +243,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'EIGEN',
     decimals: 18,
-    address: '0x606c3e5075e5555e79aa15f1e9facb776f96c248',
+    address: '0x606C3e5075e5555e79Aa15F1E9FACB776F96C248',
     name: 'Eigen',
     dataStreamFeedId: '0x00032f3b5e95e313e484cac35ccff3904358100010b5f3ac2cf8e263c2ccc873',
     dataStreamFeedDecimals: 18
@@ -229,7 +251,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ENA',
     decimals: 18,
-    address: '0x9eE96caa9972c801058CAA8E23419fc6516FbF7e',
+    address: '0xfe1Aac2CD9C5cC77b58EeCfE75981866ed0c8b7a',
     name: 'Ethena Governance Token',
     synthetic: true,
     dataStreamFeedId: '0x00033e05a40dd8c25ffa1b88a35234845c067635f7ddf5edde701f859f8894c1',
@@ -239,7 +261,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'FARTCOIN',
     decimals: 6,
-    address: '0x000000000000000000000000FARTCOIN00000000',
+    address: '0xaca341E61aB6177B0b0Df46a612e4311F8a7605f',
     name: 'Fartcoin',
     synthetic: true,
     dataStreamFeedId: '0x00030e00d1ce95c5749cb258e583b96d072ca103d4552cda2593c96fca954c16',
@@ -248,7 +270,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'FET',
     decimals: 18,
-    address: '0x000000000000000000000000FET0000000000000',
+    address: '0x83D5944E7f5EF1d8432002d3cb062e1012f6F8e6',
     name: 'Artificial Superintelligence Alliance',
     synthetic: true,
     dataStreamFeedId: '0x000358ef51a7e155fda776c7bd79145631fa32d2b5285bb43c9f32dafed0a527',
@@ -257,7 +279,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'FIL',
     decimals: 18,
-    address: '0x000000000000000000000000FIL0000000000000',
+    address: '0x3AeBb98f57081DcBEb0B8EA823Cf84900A31e5D8',
     name: 'Filecoin',
     synthetic: true,
     dataStreamFeedId: '0x00036d46e681d182bbf68be46c5e5670c5b94329dba90ce5c52bf76c42bee68d',
@@ -266,25 +288,28 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'FLOKI',
     decimals: 9,
-    address: '0x000000000000000000000000FLOKI00000000000',
+    address: '0x6792c5B8962ffbDD020c6b6FD0Be7b182e0e33a3',
     name: 'FLOKI',
     synthetic: true,
     dataStreamFeedId: '0x000346d0958f98acea3450ce438790e5618fdfe50f8e36a80cabc622fe3e25ed',
     dataStreamFeedDecimals: 18
   },
   {
-    symbol: 'GMX',
+    symbol: 'FRAX',
     decimals: 18,
-    address: '0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a',
-    name: 'GMX',
-    dataStreamFeedId: '0x0003169a4ebb9178e5ec6281913d1a8a4f676f414c94b60a4cb2e432f9081c60',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0xDB98056FecFff59D032aB628337A4887110df3dB'
+    address: '0x17FC002b466eEc40DaE837Fc4bE5c67993ddBd6F',
+    name: 'Frax'
+  },
+  {
+    symbol: 'HBAR',
+    decimals: 8,
+    address: '0xEb2A83b973f4dbB9511D92dd40d2ba4C683f0971',
+    name: 'Hedera'
   },
   {
     symbol: 'HYPE',
     decimals: 8,
-    address: '0x000000000000000000000000HYPE000000000000',
+    address: '0xfDFA0A749dA3bCcee20aE0B4AD50E39B26F58f7C',
     name: 'Hyperliquid',
     synthetic: true,
     dataStreamFeedId: '0x0003d34539af562867c3cb309b59efccf40e74b404fb415eeb7699d61322aed9',
@@ -293,7 +318,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ICP',
     decimals: 8,
-    address: '0x000000000000000000000000ICP0000000000000',
+    address: '0xdaf0A71608938F762e37eC5F72F670Cc44703454',
     name: 'ICP',
     synthetic: true,
     dataStreamFeedId: '0x000379340f2deb2576ae338fc1043d63054326bc86862f7d8fc1519434712862',
@@ -302,7 +327,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'INJ',
     decimals: 18,
-    address: '0x000000000000000000000000INJ0000000000000',
+    address: '0xfdE73EddbE6c5712A12B72c470F8FE5c77A7fF17',
     name: 'Injective',
     synthetic: true,
     dataStreamFeedId: '0x000344d7a7d81f051ee273a63f94f8bef7d44ca89aa03e0c5bf4d085df19adb6',
@@ -311,7 +336,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'JUP',
     decimals: 6,
-    address: '0x000000000000000000000000JUP0000000000000',
+    address: '0xfEd500Df379427Fbc48BDaf3b511b519c7eCCD26',
     name: 'Jupiter',
     synthetic: true,
     dataStreamFeedId: '0x00031f0d2c5bd731a7e29b653af1958fe6328db094651396f1631560b9da14dc',
@@ -320,7 +345,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'LDO',
     decimals: 18,
-    address: '0xA43A34030088E6510FecCFb77E88ee5e7ed0fE64',
+    address: '0x9D678B4Dd38a6E01df8090aEB7974aD71142b05f',
     name: 'Lido DAO',
     synthetic: true,
     dataStreamFeedId: '0x0003fa5285b58655299e2bd92df12b3352209b3e460aea3c170eb9a96c8ceb1c',
@@ -339,7 +364,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'LTC',
     decimals: 8,
-    address: '0x000000000000000000000000LTC0000000000000',
+    address: '0xB46A094Bc4B0adBD801E14b9DB95e05E28962764',
     name: 'Litecoin',
     synthetic: true,
     dataStreamFeedId: '0x00033a4f1021830ac0e7b7a03f70ed56fecb0ac2a10c8ea5328c240c847b71f3',
@@ -348,7 +373,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'MELANIA',
     decimals: 6,
-    address: '0xE2CB592D636c500a6e469628054F09d58e4d91BB',
+    address: '0xfa4F8E582214eBCe1A08eB2a65e08082053E441F',
     name: 'Melania Meme',
     synthetic: true,
     dataStreamFeedId: '0x000334e8e9fd64bd9068f44e7779f9b6437c86b1c148549d026c00b3a642caeb',
@@ -358,7 +383,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'MEME',
     decimals: 18,
-    address: '0x000000000000000000000000MEME000000000000',
+    address: '0xaF770F03518686a365300ab35AD860e99967B2f0',
     name: 'MEME',
     synthetic: true,
     dataStreamFeedId: '0x0003f43194e41b8cb88e552eb5399be7d1f5d0c36b366eaa09e73fa9baf7bfd3',
@@ -367,16 +392,22 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'MEW',
     decimals: 5,
-    address: '0x000000000000000000000000MEW0000000000000',
+    address: '0x5503CF72f54b6d692d36BBCD391516A7dE068687',
     name: 'MEW',
     synthetic: true,
     dataStreamFeedId: '0x0003d0d97dfc557e862e944a4581956aff826e59ca3b57b19e22744055c11539',
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'MIM',
+    decimals: 18,
+    address: '0xFEa7a6a0B346362BF88A9e4A88416B77a57D6c2A',
+    name: 'Magic Internet Money'
+  },
+  {
     symbol: 'MKR',
     decimals: 18,
-    address: '0xdE9f0894670c4EFcacF370426F10C3AD2Cdf147e',
+    address: '0x8904De84c3bB3B7D2383F934Af40FcB3Ef82F28b',
     name: 'Maker',
     synthetic: true,
     dataStreamFeedId: '0x00038fde9456e8c1cc561816878c804d9e9965748c960deeac9ec2829d468ed3',
@@ -386,7 +417,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'MNT',
     decimals: 18,
-    address: '0x37DDEE84dE03d039e1Bf809b7a01EDd2c4665771',
+    address: '0x955cd91eEaE618F5a7b49E1e3c7482833B10DAb4',
     name: 'Mantle',
     synthetic: true,
     dataStreamFeedId: '0x0003dedb9e322eea3d1f6454b31241018b5fea9d0bffedbf4c49fec12798cb70',
@@ -396,7 +427,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'MOODENG',
     decimals: 6,
-    address: '0x000000000000000000000000MOODENG000000000',
+    address: '0xd3898c6570974AEca38a8ACf22fd60739e528A99',
     name: 'Moodeng',
     synthetic: true,
     dataStreamFeedId: '0x00037feb14674aa2c1d31bb808f3356b249ef73d447b0d93042320acfdebbd09',
@@ -405,7 +436,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'NEAR',
     decimals: 24,
-    address: '0xBF5C3fB2633e924598A46B9D07a174a9DBcF57C0',
+    address: '0x1FF7F3EFBb9481Cbd7db4F932cBCD4467144237C',
     name: 'Near',
     synthetic: true,
     dataStreamFeedId: '0x00036e9386eda6b177c6f7e9d493e60ae9ebaeb732a271b880b4d6a131d6b3f5',
@@ -415,7 +446,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'OM',
     decimals: 18,
-    address: '0x000000000000000000000000OM00000000000000',
+    address: '0x1f3407Ea067DfBDF6dEb6bBFdA4869215fB0ab77',
     name: 'MANTRA',
     synthetic: true,
     dataStreamFeedId: '0x00035edb821fff52719b8bfe732608168fa685ed32556d82b1c944d1f1cc15e2',
@@ -424,7 +455,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ONDO',
     decimals: 18,
-    address: '0x000000000000000000000000ONDO000000000000',
+    address: '0xEcFB4718aD19b626A77491895a2f99ea0cedEd08',
     name: 'Ondo',
     synthetic: true,
     dataStreamFeedId: '0x000380ec05b354a41eddf993234e7fb62bb1a39b1d63ada55a43bb2ef210de4a',
@@ -442,7 +473,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ORDI',
     decimals: 18,
-    address: '0x000000000000000000000000ORDI000000000000',
+    address: '0x1E15d08f3CA46853B692EE28AE9C7a0b88a9c994',
     name: 'ORDI',
     synthetic: true,
     dataStreamFeedId: '0x0003db12da014dbc5a928b9e7a8c6bc1fbab0c60d332ce26c644cc7477b6fe7f',
@@ -460,7 +491,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'PENGU',
     decimals: 6,
-    address: '0x000000000000000000000000PENGU00000000000',
+    address: '0x4C1dac9b6eAf122Fe3DE824c1C2220413F3aC197',
     name: 'Pudgy Penguins',
     synthetic: true,
     dataStreamFeedId: '0x0003558c1d478ac27b1acf078f7acf3a69bba77af948db5dd2499286e566a2f8',
@@ -478,7 +509,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'PI',
     decimals: 18,
-    address: '0x000000000000000000000000PI00000000000000',
+    address: '0xd1738d37401a0A71f7E382d2cFeCD3ab69687017',
     name: 'Pi Network',
     synthetic: true,
     dataStreamFeedId: '0x00036e16e272620ba510f635bc77fee9fb2de627343ce3aaa6cf068a3d078ac8',
@@ -487,7 +518,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'POL',
     decimals: 18,
-    address: '0x000000000000000000000000POL0000000000000',
+    address: '0x9c74772b713a1B032aEB173E28683D937E51921c',
     name: 'Polygon',
     synthetic: true,
     dataStreamFeedId: '0x0003a845b2e108468ec6f42a5c88609082e9ec86fe9d2529c9e5f8af440079f8',
@@ -496,7 +527,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'PUMP',
     decimals: 18,
-    address: '0x000000000000000000000000PUMP000000000000',
+    address: '0x9c060B2fA953b5f69879a8B7B81f62BFfEF360be',
     name: 'Pump',
     synthetic: true,
     dataStreamFeedId: '0x00032ce910d5ee7e47506b9f0607acdc017fb6cd92ed3696eb3573db6ad41cb9',
@@ -505,7 +536,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'RENDER',
     decimals: 18,
-    address: '0x000000000000000000000000RENDER0000000000',
+    address: '0x82BB89fcc64c5d4016C5Ed1AB016bB0D1C20D6C3',
     name: 'RENDER',
     synthetic: true,
     dataStreamFeedId: '0x00034e3ab3a1c0809fe3f56ffe755155ace8564512cbc3884e9463dba081c02a',
@@ -514,7 +545,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'S',
     decimals: 18,
-    address: '0x000000000000000000000000S000000000000000',
+    address: '0x8F6cCb99d4Fd0B4095915147b5ae3bbDb8075394',
     name: 'Sonic',
     synthetic: true,
     dataStreamFeedId: '0x0003bda9e85d7d4eccc82d4a5d5f074ce25ff7ba23892ca3abf2ea0d2250ad11',
@@ -523,7 +554,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'SATS',
     decimals: 6,
-    address: '0x000000000000000000000000SATS000000000000',
+    address: '0x2cD2eB61D17b78239Fcd19aafF72981B5D5eF319',
     name: 'Sats',
     synthetic: true,
     dataStreamFeedId: '0x000308eb21e48b6673ee81b8baf25b34468597824a7897f3392c499c6a080606',
@@ -532,7 +563,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'SEI',
     decimals: 18,
-    address: '0x000000000000000000000000SEI0000000000000',
+    address: '0x55e85A147a1029b985384822c0B2262dF8023452',
     name: 'SEI',
     synthetic: true,
     dataStreamFeedId: '0x0003487e79423ea3c34f4edfc8bb112b0d0fbe054906644912b04bd5a3c6243b',
@@ -541,7 +572,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'SHIB',
     decimals: 18,
-    address: '0x000000000000000000000000SHIB000000000000',
+    address: '0x3E57D02f9d196873e55727382974b02EdebE6bfd',
     name: 'Shiba Inu',
     synthetic: true,
     dataStreamFeedId: '0x0003591ce9a9d662c43124ca14fd6f8603c9ab856ee45358189a2ce6904b5a3c',
@@ -559,7 +590,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'SPX6900',
     decimals: 8,
-    address: '0x000000000000000000000000SPX6900000000000',
+    address: '0xb736be525A65326513351058427d1f47B0CfB045',
     name: 'SPX6900',
     synthetic: true,
     dataStreamFeedId: '0x0003c5eefa9b2f6a05d0f6613692ffc61083636429169b9a5b0353ea47b9091c',
@@ -568,7 +599,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'STX',
     decimals: 6,
-    address: '0x000000000000000000000000STX0000000000000',
+    address: '0xBaf07cF91D413C0aCB2b7444B9Bf13b4e03c9D71',
     name: 'Stacks',
     synthetic: true,
     dataStreamFeedId: '0x0003364401fcbe3153adf158017cd18a2833655db5cc5eb8fad2c16cb0ec82f4',
@@ -577,7 +608,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'SUI',
     decimals: 9,
-    address: '0x000000000000000000000000SUI0000000000000',
+    address: '0x197aa2DE1313c7AD50184234490E12409B2a1f95',
     name: 'SUI',
     synthetic: true,
     dataStreamFeedId: '0x000348ce31679e9ce1f80ec929f1d7c86499569d67f1cea80a90d6e5e3c127a7',
@@ -586,7 +617,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'TAO',
     decimals: 9,
-    address: '0x6aCcBB82aF71B8a576B4C05D4aF92A83A035B991',
+    address: '0x938aef36CAaFbcB37815251B602168087eC14648',
     name: 'TAO',
     synthetic: true,
     dataStreamFeedId: '0x0003194c47ff85edd20e877289d23f0cac00f425ea9b558b5b015df87e162cb2',
@@ -594,18 +625,15 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0x6aCcBB82aF71B8a576B4C05D4aF92A83A035B991'
   },
   {
-    symbol: 'tBTC',
+    symbol: 'TBTC',
     decimals: 18,
-    address: '0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40',
-    name: 'tBTC',
-    dataStreamFeedId: '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x6ce185860a4963106506C203335A2910413708e9'
+    address: '0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40',
+    name: 'tBTC'
   },
   {
     symbol: 'TIA',
     decimals: 6,
-    address: '0x4096b9bfB4c34497B7a3939D4f629cf65EBf5634',
+    address: '0x38676f62d166f5CE7De8433F51c6B3D6D9d66C19',
     name: 'TIA',
     synthetic: true,
     dataStreamFeedId: '0x00034a6c27424c06b3441b8714c9b11bb4e7dc38548a525cee36ee232ffea013',
@@ -615,7 +643,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'TON',
     decimals: 9,
-    address: '0x000000000000000000000000TON0000000000000',
+    address: '0xB2f7cefaeEb08Aa347705ac829a7b8bE2FB560f3',
     name: 'TON',
     synthetic: true,
     dataStreamFeedId: '0x0003f9ec12942ff27b28ab151905c8fc1cb280518d8bbd3885d410eaa50ddc56',
@@ -624,7 +652,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'TRUMP',
     decimals: 6,
-    address: '0x373510BDa1ab7e873c731968f4D81B685f520E4B',
+    address: '0x30021aFA4767Ad66aA52A06dF8a5AB3acA9371fD',
     name: 'Official Trump',
     synthetic: true,
     dataStreamFeedId: '0x0003eae10f93ab9aeb6d1aa757b07938eed75a0d09cbe15df8521dc3d6bfb633',
@@ -634,7 +662,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'TRX',
     decimals: 6,
-    address: '0x000000000000000000000000TRX0000000000000',
+    address: '0xb06aa7E4af937C130dDade66f6ed7642716fe07A',
     name: 'TRON',
     synthetic: true,
     dataStreamFeedId: '0x000310286f692877b46996d4c597fea8270d1922cc4ddf486165a192ed70111a',
@@ -659,13 +687,16 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3'
   },
   {
-    symbol: 'USDe',
+    symbol: 'USDC.E',
+    decimals: 6,
+    address: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
+    name: 'Bridged USDC (USDC.e)'
+  },
+  {
+    symbol: 'USDE',
     decimals: 18,
     address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
-    name: 'USDe',
-    dataStreamFeedId: '0x000379477abdca006db92300211242ba44479369a15be0ad8d59cabe00e63074',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x88AC7Bca36567525A866138F03a6F6844868E0Bc'
+    name: 'Ethena USDe'
   },
   {
     symbol: 'USDT',
@@ -679,7 +710,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'VIRTUAL',
     decimals: 18,
-    address: '0x000000000000000000000000VIRTUAL000000000',
+    address: '0xB6672496214C90134A9223894e709F26A5eED362',
     name: 'Virtuals Protocol',
     synthetic: true,
     dataStreamFeedId: '0x000385c20fe1d88dfbf4629f188bf03ee004a034c844ec31dbf57d197adade89',
@@ -706,24 +737,22 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'WLD',
     decimals: 18,
-    address: '0x000000000000000000000000WLD0000000000000',
+    address: '0x75B9AdD873641b253718810E6c65dB6d72311FD0',
     name: 'WLD',
     synthetic: true,
     dataStreamFeedId: '0x000365f820b0633946b78232bb91a97cf48100c426518e732465c3a050edb9f1',
     dataStreamFeedDecimals: 18
   },
   {
-    symbol: 'wstETH',
+    symbol: 'WSTETH',
     decimals: 18,
     address: '0x5979D7b546E38E414F7E9822514be443A4800529',
-    name: 'wstETH',
-    dataStreamFeedId: '0x0003db069f3010212c213d1a0d4bc2cce328471aca2bff86bbfc0226fd060e90',
-    dataStreamFeedDecimals: 18
+    name: 'Wrapped stETH'
   },
   {
     symbol: 'XLM',
     decimals: 7,
-    address: '0x000000000000000000000000XLM0000000000000',
+    address: '0xc5dbD52Ae5a927Cf585B884011d0C7631C9974c6',
     name: 'XLM',
     synthetic: true,
     dataStreamFeedId: '0x000358cb12b1f5bbeca8b5b4666025a40b15520af1f82516ee2fb9a335055e9a',
@@ -732,7 +761,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'XMR',
     decimals: 12,
-    address: '0x000000000000000000000000XMR0000000000000',
+    address: '0x13674172E6E44D31d4bE489d5184f3457c40153A',
     name: 'Monero',
     synthetic: true,
     dataStreamFeedId: '0x00038f3b8f8be4305564abf0ed3c9cc46cb8b4303c35ab54079ea873b7d74b3a',
@@ -741,7 +770,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'XRP',
     decimals: 6,
-    address: '0x000000000000000000000000XRP0000000000000',
+    address: '0xc14e065b0067dE91534e032868f5Ac6ecf2c6868',
     name: 'XRP',
     synthetic: true,
     dataStreamFeedId: '0x0003c16c6aed42294f5cb4741f6e59ba2d728f0eae2eb9e6d3f555808c59fc45',
@@ -750,7 +779,7 @@ export const ARBITRUM_TOKEN_LIST = [
   {
     symbol: 'ZRO',
     decimals: 18,
-    address: '0x1940fEd49cDBC397941f2D336eb4994D599e568B',
+    address: '0xa8193C55C34Ed22e1Dbe73FD5Adc668E51578a67',
     name: 'LayerZero',
     synthetic: true,
     dataStreamFeedId: '0x0003f57f2052095349bdb01a9a82b30701c5fbfa4c5a65c5d42031083890501e',

@@ -1,5 +1,5 @@
 import {
-  getMappedValue,
+  getMappedValueFallback,
   type IMarketDescription,
   type ITokenDescription,
   lst,
@@ -107,7 +107,7 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
 }
 
 export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
-  const $token = getMappedValue($tokenIconMap, tokenDesc.symbol, $unknown)
+  const $token = getMappedValueFallback($tokenIconMap, tokenDesc.symbol, $unknown)
 
   if (!$token) {
     throw new Error('Unable to find matched token')
@@ -224,7 +224,7 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const collateralUsd = lstIncrease.collateralTokenPriceMin * pos.maxCollateralInUsd
   const latestPrice = filterNull(
     map(pm => {
-      const price = getMappedValue(pm, indexToken, null)
+      const price = getMappedValueFallback(pm, indexToken, null)
       return price ? price.price : null
     }, latestPriceMap)
   )

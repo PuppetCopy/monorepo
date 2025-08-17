@@ -1,6 +1,7 @@
-const TOKENS_URL = 'https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.3-branch/config/tokens.ts'
 const INTERFACE_TOKENS_URL =
   'https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts'
+const SYNTHETICS_TOKENS_URL =
+  'https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts'
 
 // Make this file a module to allow top-level await
 export {}
@@ -16,20 +17,23 @@ type TokenData = {
   priceFeedAddress?: string
 }
 
-try {
-  console.log('📥 Fetching token data from GMX Synthetics...')
-
-  // Fetch the tokens.ts file content
-  const response = await fetch(TOKENS_URL)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch tokens: ${response.status} ${response.statusText}`)
+type SyntheticsTokenData = {
+  [symbol: string]: {
+    address?: string
+    decimals?: number
+    synthetic?: boolean
+    dataStreamFeedId?: string
+    dataStreamFeedDecimals?: number
+    priceFeed?: {
+      address?: string
+    }
   }
+}
 
-  const content = await response.text()
+try {
+  console.log('📥 Fetching token data from GMX Interface (primary source)...')
 
-  console.log('📥 Fetching token names from GMX Interface...')
-
-  // Fetch token names from the interface repository
+  // Fetch the interface tokens file content
   const interfaceResponse = await fetch(INTERFACE_TOKENS_URL)
   if (!interfaceResponse.ok) {
     throw new Error(`Failed to fetch interface tokens: ${interfaceResponse.status} ${interfaceResponse.statusText}`)
@@ -37,101 +41,120 @@ try {
 
   const interfaceContent = await interfaceResponse.text()
 
-  // Extract token names from interface tokens file
-  const tokenNames: Record<string, string> = {}
+  console.log('📥 Fetching additional data from GMX Synthetics...')
 
-  // Find ARBITRUM tokens array
-  const arbitrumTokensPattern = /\[ARBITRUM\]:\s*\[([\s\S]*?)\],?\s*\n\s*\[(?:AVALANCHE|BOTANIX)/
-  const arbitrumTokensMatch = interfaceContent.match(arbitrumTokensPattern)
+  // Fetch the synthetics tokens file content
+  const syntheticsResponse = await fetch(SYNTHETICS_TOKENS_URL)
+  if (!syntheticsResponse.ok) {
+    throw new Error(`Failed to fetch synthetics tokens: ${syntheticsResponse.status} ${syntheticsResponse.statusText}`)
+  }
 
-  if (arbitrumTokensMatch) {
-    // Match individual token objects in the array
-    const tokenObjectPattern = /\{[^}]*name:\s*"([^"]+)"[^}]*symbol:\s*"([^"]+)"[^}]*\}/g
-    let tokenMatch: RegExpExecArray | null
+  const syntheticsContent = await syntheticsResponse.text()
 
-    while ((tokenMatch = tokenObjectPattern.exec(arbitrumTokensMatch[1])) !== null) {
-      const name = tokenMatch[1]
-      const symbol = tokenMatch[2]
-      tokenNames[symbol] = name
+  // Parse synthetics tokens to get additional data
+  const syntheticsTokens: SyntheticsTokenData = {}
+
+  // Find the arbitrum tokens section in synthetics
+  const arbitrumPattern = /arbitrum:\s*\{([\s\S]*?)\n\s*\},?\s*\n\s*(?:avalanche|$)/
+  const arbitrumMatch = syntheticsContent.match(arbitrumPattern)
+
+  if (arbitrumMatch) {
+    const arbitrumContent = arbitrumMatch[1]
+
+    // Match token entries like: SYMBOL: { ... } or "SYMBOL": { ... }
+    const tokenEntryPattern = /(?:"([^"]+)"|(\w+)):\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g
+    let match: RegExpExecArray | null
+
+    while ((match = tokenEntryPattern.exec(arbitrumContent)) !== null) {
+      const symbol = match[1] || match[2]
+      const tokenContent = match[3]
+
+      // Skip special entries
+      if (symbol === 'default' || symbol === 'test' || symbol === 'priceFeed') continue
+
+      // Extract properties
+      const addressMatch = tokenContent.match(/address:\s*"(0x[a-fA-F0-9]{40})"/)
+      const decimalsMatch = tokenContent.match(/decimals:\s*(\d+)/)
+      const syntheticMatch = tokenContent.match(/synthetic:\s*true/)
+      const dataStreamMatch = tokenContent.match(/dataStreamFeedId:\s*"(0x[a-fA-F0-9]+)"/)
+      const dataStreamDecimalsMatch = tokenContent.match(/dataStreamFeedDecimals:\s*(\d+)/)
+      const priceFeedMatch = tokenContent.match(/priceFeed:\s*\{[^}]*address:\s*"(0x[a-fA-F0-9]{40})"[^}]*\}/)
+
+      syntheticsTokens[symbol] = {
+        ...(addressMatch && { address: addressMatch[1] }),
+        ...(decimalsMatch && { decimals: Number.parseInt(decimalsMatch[1]) }),
+        ...(syntheticMatch && { synthetic: true }),
+        ...(dataStreamMatch && { dataStreamFeedId: dataStreamMatch[1] }),
+        ...(dataStreamDecimalsMatch && { dataStreamFeedDecimals: Number.parseInt(dataStreamDecimalsMatch[1]) }),
+        ...(priceFeedMatch && { priceFeed: { address: priceFeedMatch[1] } })
+      }
     }
   }
 
-  // Find the arbitrum tokens section
-  // Look for pattern: arbitrum: {
-  const arbitrumPattern = /arbitrum:\s*\{([\s\S]*?)\n\s*\},?\s*\n\s*(?:avalanche|$)/
-  const arbitrumMatch = content.match(arbitrumPattern)
-
-  if (!arbitrumMatch) {
-    throw new Error('Could not find Arbitrum tokens in config')
-  }
-
-  const arbitrumContent = arbitrumMatch[1]
-
-  // Extract individual token objects
+  // Extract tokens from interface
   const tokens: TokenData[] = []
   const seenAddresses = new Set<string>()
 
-  // Match token entries like: SYMBOL: { ... }
-  // This regex matches nested objects including priceFeed
-  const tokenEntryPattern = /(\w+):\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g
-  let match: RegExpExecArray | null
+  // Find ARBITRUM tokens array in interface
+  const arbitrumTokensPattern = /\[ARBITRUM\]:\s*\[([\s\S]*?)\],?\s*\n\s*\[(?:AVALANCHE|BOTANIX)/
+  const arbitrumTokensMatch = interfaceContent.match(arbitrumTokensPattern)
 
-  while ((match = tokenEntryPattern.exec(arbitrumContent)) !== null) {
-    const symbol = match[1]
-    const tokenContent = match[2]
+  if (!arbitrumTokensMatch) {
+    throw new Error('Could not find Arbitrum tokens in interface')
+  }
 
-    // Skip special entries and non-token entries
-    if (symbol === 'default' || symbol === 'test' || symbol === 'priceFeed') continue
+  // Match individual token objects in the array
+  const tokenObjectPattern = /\{([^}]+)\}/g
+  let tokenMatch: RegExpExecArray | null
 
-    // Extract properties
+  while ((tokenMatch = tokenObjectPattern.exec(arbitrumTokensMatch[1])) !== null) {
+    const tokenContent = tokenMatch[1]
+
+    // Extract properties from interface
+    const nameMatch = tokenContent.match(/name:\s*"([^"]+)"/)
+    const symbolMatch = tokenContent.match(/symbol:\s*"([^"]+)"/)
     const addressMatch = tokenContent.match(/address:\s*"(0x[a-fA-F0-9]{40})"/)
     const decimalsMatch = tokenContent.match(/decimals:\s*(\d+)/)
-    const syntheticMatch = tokenContent.match(/synthetic:\s*true/)
-    const dataStreamMatch = tokenContent.match(/dataStreamFeedId:\s*"(0x[a-fA-F0-9]+)"/)
-    const dataStreamDecimalsMatch = tokenContent.match(/dataStreamFeedDecimals:\s*(\d+)/)
 
-    // Extract priceFeed address
-    const priceFeedMatch = tokenContent.match(/priceFeed:\s*\{[^}]*address:\s*"(0x[a-fA-F0-9]{40})"[^}]*\}/)
-    const priceFeedAddress = priceFeedMatch ? priceFeedMatch[1] : undefined
+    if (!symbolMatch || !addressMatch || !decimalsMatch) continue
 
-    // Skip if no decimals found
-    if (!decimalsMatch) continue
+    const symbol = symbolMatch[1]
+    const address = addressMatch[1]
+    const decimals = Number.parseInt(decimalsMatch[1])
+    const name = nameMatch ? nameMatch[1] : symbol
 
-    // For synthetics without address, generate a deterministic placeholder
-    // This will be handled by the contracts/indexer appropriately
-    const address = addressMatch ? addressMatch[1] : `0x${'0'.repeat(24)}${symbol.padEnd(16, '0').slice(0, 16)}`
+    // Skip duplicate addresses
+    if (seenAddresses.has(address.toLowerCase())) continue
+    seenAddresses.add(address.toLowerCase())
 
-    // Skip duplicate addresses (but allow synthetic placeholders)
-    if (addressMatch && seenAddresses.has(address.toLowerCase())) continue
-    if (address === '0x0000000000000000000000000000000000000000') continue
-
-    if (addressMatch) {
-      seenAddresses.add(address.toLowerCase())
-    }
+    // Get additional data from synthetics if available
+    const syntheticsData = syntheticsTokens[symbol] || {}
 
     tokens.push({
       symbol,
-      decimals: Number.parseInt(decimalsMatch[1]),
+      decimals,
       address,
-      name: tokenNames[symbol] || symbol, // Use symbol as name if no name found
-      ...(syntheticMatch && { synthetic: true }),
-      ...(dataStreamMatch && { dataStreamFeedId: dataStreamMatch[1] }),
-      ...(dataStreamDecimalsMatch && { dataStreamFeedDecimals: Number.parseInt(dataStreamDecimalsMatch[1]) }),
-      ...(priceFeedAddress && { priceFeedAddress })
+      name,
+      ...(syntheticsData.synthetic && { synthetic: true }),
+      ...(syntheticsData.dataStreamFeedId && { dataStreamFeedId: syntheticsData.dataStreamFeedId }),
+      ...(syntheticsData.dataStreamFeedDecimals !== undefined && {
+        dataStreamFeedDecimals: syntheticsData.dataStreamFeedDecimals
+      }),
+      ...(syntheticsData.priceFeed?.address && { priceFeedAddress: syntheticsData.priceFeed.address })
     })
   }
 
   // Sort tokens alphabetically by symbol
   tokens.sort((a, b) => a.symbol.localeCompare(b.symbol))
 
-  console.log(`\n✅ Generated ${tokens.length} tokens`)
-  console.log(`✅ Found names for ${Object.keys(tokenNames).length} tokens from interface`)
+  console.log(`\n✅ Generated ${tokens.length} tokens from GMX Interface`)
+  console.log(`✅ Enhanced ${Object.keys(syntheticsTokens).length} tokens with data from GMX Synthetics`)
 
   // Generate the TypeScript file content
   const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toISOString()}
-// Source: ${TOKENS_URL}
-// Names from: ${INTERFACE_TOKENS_URL}
+// Generated on: ${new Date().toUTCString()}
+// Primary source: ${INTERFACE_TOKENS_URL}
+// Enhanced with data from: ${SYNTHETICS_TOKENS_URL}
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
 
 export const ARBITRUM_TOKEN_LIST = [

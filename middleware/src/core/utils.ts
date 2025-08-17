@@ -140,18 +140,18 @@ export function groupListMap<
   return result
 }
 
-export function getMappedValue<TMap extends object, TKey extends keyof TMap, TFallback = never>(
+export function getMappedValue<TMap extends Record<PropertyKey, any>>(map: TMap, prop: PropertyKey): TMap[keyof TMap] {
+  if (prop in map) return map[prop as keyof TMap]
+  throw new Error(`Property '${String(prop)}' does not exist in object`)
+}
+
+export function getMappedValueFallback<TMap extends Record<PropertyKey, any>, TFallback>(
   map: TMap,
-  prop: unknown,
-  fallbackValue?: TFallback
-): TFallback extends never ? TMap[TKey] : TMap[TKey] | TFallback {
-  // Check if prop is a valid key type and exists in map
-  if (prop != null && (prop as any) in map) return map[prop as TKey] as any
-
-  // Return fallback value if provided
-  if (fallbackValue !== undefined) return fallbackValue as any
-
-  throw new Error(`Property '${String(prop)}' does not exist in object and no fallback provided`)
+  prop: PropertyKey,
+  fallbackValue: TFallback
+): TMap[keyof TMap] | TFallback {
+  if (prop in map) return map[prop as keyof TMap]
+  return fallbackValue
 }
 
 export function easeInExpo(x: number) {

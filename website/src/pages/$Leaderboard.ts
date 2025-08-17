@@ -29,7 +29,6 @@ import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
 import { asc, desc } from 'ponder'
-import { $SelectIndexToken } from 'src/components/$IndexTokenSelector.js'
 import type { Address } from 'viem/accounts'
 import {
   $Baseline,
@@ -140,9 +139,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
               }),
 
               $row(
-                $SelectIndexToken({ selectedList: indexTokenList })({
-                  changeIndexTokenList: selectIndexTokenListTether()
-                }),
+                // $SelectIndexToken({ selectedList: indexTokenList })({
+                //   changeIndexTokenList: selectIndexTokenListTether()
+                // }),
                 $SelectCollateralToken({ selectedList: collateralTokenList })({
                   changeCollateralTokenList: selectCollateralTokenListTether()
                 })

@@ -1,4 +1,4 @@
-import { getMappedValue } from '@puppet-copy/middleware/core'
+import { getMappedValueFallback } from '@puppet-copy/middleware/core'
 import type { DecodeErrorResultReturnType } from 'viem'
 
 const errorMessages = {
@@ -11,7 +11,7 @@ export function getContractErrorMessage(data: DecodeErrorResultReturnType): stri
     return
   }
 
-  const errorFunc = getMappedValue(errorMessages, data.errorName, null)
+  const errorFunc = getMappedValueFallback(errorMessages, data.errorName, null)
 
   if (errorFunc === null) {
     return

@@ -196,7 +196,7 @@ try {
       const abiFileName = `gmx${contract.name.replace('Gmx', '')}`
       const abiFilePath = `./src/generated/abi/${abiFileName}.ts`
       const abiContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toISOString()}
+// Generated on: ${new Date().toUTCString()}
 // Source: Local deployment file: ${contract.deploymentFile}.json
 
 export default ${JSON.stringify(contract.abi, null, 2)} as const
@@ -208,7 +208,7 @@ export default ${JSON.stringify(contract.abi, null, 2)} as const
 
   // Generate the TypeScript file content with contract mappings
   const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toISOString()}
+// Generated on: ${new Date().toUTCString()}
 // Source: Local GMX deployment files
 
 // Import generated ABIs

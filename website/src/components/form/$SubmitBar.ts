@@ -1,4 +1,4 @@
-import { getMappedValue } from '@puppet-copy/middleware/core'
+import { getMappedValueFallback } from '@puppet-copy/middleware/core'
 import { combine, constant, empty, type IStream, map, merge, now, startWith, switchLatest } from 'aelea/stream'
 import { type IBehavior, multicast, type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
@@ -82,7 +82,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
                     $text(
                       String(
                         message ||
-                          getMappedValue(err, 'shortMessage', (err as any).message) ||
+                          getMappedValueFallback(err, 'shortMessage', (err as any).message) ||
                           'Transaction failed with an unknown error'
                       )
                     )

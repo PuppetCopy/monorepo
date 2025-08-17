@@ -1,5 +1,5 @@
 import {
-  getMappedValue,
+  getMappedValueFallback,
   getTimeSince,
   readableDate,
   readablePercentage,
@@ -56,7 +56,7 @@ export const pnlColumn = (_puppet?: Address): TableColumn<IPosition> => ({
   $bodyCallback: map(pos => {
     const latestPrice = filterNull(
       map(pm => {
-        const oraclePrice = getMappedValue(pm, getAddress(pos.indexToken), null)
+        const oraclePrice = getMappedValueFallback(pm, getAddress(pos.indexToken), null)
 
         if (oraclePrice === null) {
           return null

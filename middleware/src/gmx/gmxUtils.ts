@@ -55,26 +55,20 @@ export function validateIdentityName(name: string) {
   }
 }
 
-export function getTokenDescription<TFallback = ITokenDescription>(
-  token: Address,
-  fallbackValue?: TFallback
-): ITokenDescription | TFallback {
+export function getTokenDescription(token: Address): ITokenDescription {
   const normalizedToken = getAddress(token)
-
   return getMappedValue(
-    TOKEN_ADDRESS_DESCRIPTION_MAP as Record<Address, ITokenDescription>,
-    normalizedToken,
-    fallbackValue
-  )
+    TOKEN_ADDRESS_DESCRIPTION_MAP,
+    normalizedToken as keyof typeof TOKEN_ADDRESS_DESCRIPTION_MAP
+  ) as ITokenDescription
 }
 
-export function getMarketDescription<TFallback = IMarketDescription>(
-  market: Address,
-  fallbackValue?: TFallback
-): IMarketDescription | TFallback {
+export function getMarketDescription(market: Address): IMarketDescription {
   const normalizedMarket = getAddress(market)
-
-  return getMappedValue(MARKET_ADDRESS_DESCRIPTION_MAP, normalizedMarket, fallbackValue)
+  return getMappedValue(
+    MARKET_ADDRESS_DESCRIPTION_MAP,
+    normalizedMarket as keyof typeof MARKET_ADDRESS_DESCRIPTION_MAP
+  ) as IMarketDescription
 }
 
 export function getMarketDescriptionByToken(tokenAddress: Address): IMarketDescription[] {

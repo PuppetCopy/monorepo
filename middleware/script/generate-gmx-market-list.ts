@@ -69,7 +69,7 @@ try {
 
   // Generate the TypeScript file content
   const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toISOString()}
+// Generated on: ${new Date().toUTCString()}
 // Source: GMX V2 Reader Contract (${READER_ADDRESS}) on Arbitrum
 
 export const ARBITRUM_MARKET_LIST = [

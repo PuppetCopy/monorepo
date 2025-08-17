@@ -241,7 +241,7 @@ export const $tokenLabel = (token: ITokenDescription, $iconPath: I$Node, $label?
 export const $tokenLabelFromSummary = (token: ITokenDescription, $label?: I$Slottable) => {
   return $row(spacing.default, style({ cursor: 'pointer', alignItems: 'center' }))(
     $icon({
-      $content: getMappedValue($tokenIconMap, token.symbol), //
+      $content: getMappedValue($tokenIconMap, token.symbol),
       width: '34px',
       viewBox: '0 0 32 32'
     }),
