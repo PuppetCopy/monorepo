@@ -5,7 +5,7 @@ import {
   $node,
   $text,
   component,
-  eventElementTarget,
+  fromEventTarget,
   type I$Node,
   type INode,
   type INodeCompose,
@@ -85,8 +85,8 @@ export const $Slider = ({
             downSrc => {
               return sampleMap(
                 (params, downEvent) => {
-                  const dragEnd = eventElementTarget('pointerup', window.document)
-                  const dragStart = eventElementTarget('pointermove', window.document)
+                  const dragEnd = fromEventTarget(window.document, 'pointerup')
+                  const dragStart = fromEventTarget(window.document, 'pointermove')
                   const drag = until(dragEnd, dragStart)
                   const rectWidth = params.changeSliderDimension.contentRect.width
 

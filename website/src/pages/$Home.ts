@@ -1,7 +1,7 @@
 import type { Route } from 'aelea/router'
 import { empty, filterNull, fromCallback, type IStream, map, now, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
-import { $element, $node, $text, attr, component, eventElementTarget, type I$Node, style } from 'aelea/ui'
+import { $element, $node, $text, attr, component, fromEventTarget, type I$Node, style } from 'aelea/ui'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import { $gmxLogo, $puppetLogo } from '../common/$icons.js'
@@ -45,7 +45,7 @@ export const $Home = (_config: ITreasury) =>
         })
       )
 
-      const _bodyPointerMove = eventElementTarget('pointermove', document.body)
+      const _bodyPointerMove = fromEventTarget(document.body, 'pointermove')
 
       const $windowButton = $row(
         style({ backgroundColor: pallete.negative, width: '8px', height: '8px', borderRadius: '50%' })

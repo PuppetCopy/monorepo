@@ -19,7 +19,7 @@ import {
   $node,
   $text,
   component,
-  eventElementTarget,
+  fromEventTarget,
   type I$Node,
   type I$Slottable,
   type INode,
@@ -108,7 +108,7 @@ export function $Dropdown<T>({
       [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
       const openTrigger = constant(true, openMenu)
-      const windowClick = switchLatest(map(_open => take(1, skip(1, eventElementTarget('click', window))), openTrigger))
+      const windowClick = switchLatest(map(_open => take(1, skip(1, fromEventTarget(window, 'click'))), openTrigger))
 
       const closeTrigger = constant(false, merge(windowClick, closeOnSelect ? select : empty))
 

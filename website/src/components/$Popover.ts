@@ -3,7 +3,7 @@ import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import {
   $node,
   component,
-  eventElementTarget,
+  fromEventTarget,
   type I$Node,
   type INode,
   type INodeCompose,
@@ -53,8 +53,8 @@ export const $Popover = ({
 
       // Update events stream
       const updateEvents = merge(
-        eventElementTarget('scroll', window, { capture: true }),
-        eventElementTarget('resize', window)
+        fromEventTarget(window, 'scroll', { capture: true }),
+        fromEventTarget(window, 'resize')
       )
 
       const $overlay = $node(

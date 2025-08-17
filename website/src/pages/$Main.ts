@@ -3,7 +3,7 @@ import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow 
 import * as router from 'aelea/router'
 import { constant, filterNull, type IStream, map, merge, now, switchMap, take, tap, zip } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
-import { $node, $text, $wrapNativeElement, component, eventElementTarget, style, styleBehavior } from 'aelea/ui'
+import { $node, $text, $wrapNativeElement, component, fromEventTarget, style, styleBehavior } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -26,7 +26,7 @@ import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
 import { $TraderPage } from './$Trader.js'
 
-const popStateEvent = eventElementTarget('popstate', window)
+const popStateEvent = fromEventTarget(window, 'popstate')
 const initialLocation = now(document.location)
 const requestRouteChange = merge(initialLocation, popStateEvent)
 const locationChange = map(location => {
