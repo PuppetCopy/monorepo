@@ -1,4 +1,18 @@
-import { at, continueWith, fromPromise, type IOps, type IStream, joinMap, now, switchLatest } from 'aelea/stream'
+import {
+  at,
+  continueWith,
+  curry2,
+  fromPromise,
+  type IOps,
+  type IStream,
+  joinMap,
+  now,
+  op,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
+import { stream } from 'aelea/stream-extended'
+import { IntervalTime } from '../../const/common.js'
 
 export interface IRunPeriodically<T> {
   actionOp: IOps<void, Promise<T>>
@@ -19,37 +33,44 @@ export const periodicRun = <T>({
   return continueWith(() => periodicRun<T>(runArgs), awaitExecution)
 }
 
-export interface IRecoverConfig {
-  delay: number
-  message?: string
-  backoffMultiplier?: number
-  maxDelay?: number
+export interface IRecoverConfig<T> {
+  recoverMessage?: string
+  recoverTime?: number // Default is 10 minutes
 }
 
-export function recover<T>(config: IRecoverConfig): (source: IStream<T>) => IStream<T>
-export function recover<T>(config: IRecoverConfig, source: IStream<T>): IStream<T>
-export function recover<T>(config: IRecoverConfig, source?: IStream<T>) {
-  const {
-    delay,
-    message = `Stream error detected, recovering in ${delay}ms...`,
-    backoffMultiplier = 2,
-    maxDelay = 300000 // 5 minutes max
-  } = config
-
-  const recoverImpl =
-    (currentDelay: number) =>
-    (src: IStream<T>): IStream<T> =>
-      continueWith(() => {
-        console.warn(`⚠️ ${message}`)
-        const nextDelay = Math.min(currentDelay * backoffMultiplier, maxDelay)
-        return switchLatest(at(currentDelay, recoverImpl(nextDelay)(src)))
-      }, src)
-
-  // If source is provided, apply immediately
-  if (source) {
-    return recoverImpl(delay)(source)
-  }
-
-  // Otherwise return curried function
-  return recoverImpl(delay)
+export interface IRecoverCurry {
+  <A>(config: IRecoverConfig<A>, s: IStream<A>): IStream<A>
+  <A>(config: IRecoverConfig<A>): (s: IStream<A>) => IStream<A>
 }
+
+export const recover: IRecoverCurry = curry2((config, source) => {
+  const { recoverMessage = 'Stream error detected', recoverTime = 600_000 } = config
+
+  return stream((sink, scheduler) => {
+    let lastRecoveryTime = 0
+
+    const attemptRecover = (): IStream<any> => {
+      return continueWith(() => {
+        const now = scheduler.time()
+        const timeElapsed = now - lastRecoveryTime
+        const delayTime =
+          recoverTime > timeElapsed
+            ? recoverTime - timeElapsed //
+            : 0
+
+        lastRecoveryTime = now
+        console.warn(`${recoverMessage} (next attempt in ${delayTime}ms)`)
+
+        // Return the source after delay, wrapped with recover using updated delay
+        return op(
+          at(delayTime, null),
+          switchMap(() => {
+            return attemptRecover()
+          })
+        )
+      }, source)
+    }
+
+    return attemptRecover().run(sink, scheduler)
+  })
+})
