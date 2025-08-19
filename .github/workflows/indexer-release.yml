@@ -50,7 +50,7 @@ jobs:
           
           # Copy root files needed for bun workspace
           cp package.json artifact/
-          cp bun.lockb artifact/
+          cp bun.lock artifact/
           cp tsconfig.base.json artifact/ || true
           
           # Clean up unnecessary files
@@ -105,7 +105,7 @@ jobs:
           ls -la middleware/dist/ || echo "Middleware dist not found"
           echo "=== Checking for required files ==="
           test -f package.json && echo "✓ package.json found" || echo "✗ package.json missing"
-          test -f bun.lockb && echo "✓ bun.lockb found" || echo "✗ bun.lockb missing"
+          test -f bun.lock && echo "✓ bun.lock found" || echo "✗ bun.lock missing"
           test -f indexer/railway.json && echo "✓ indexer/railway.json found" || echo "✗ indexer/railway.json missing"
       
       - name: Deploy to Railway
