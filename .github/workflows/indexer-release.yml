@@ -62,6 +62,9 @@ jobs:
           # Copy bun.lock for dependency installation
           cp bun.lock artifact/
           
+          # Copy root tsconfig.base.json that middleware extends
+          cp tsconfig.base.json artifact/
+          
           # Clean up unnecessary files
           rm -rf artifact/indexer/node_modules
           rm -rf artifact/indexer/.ponder
