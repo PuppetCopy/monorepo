@@ -45,10 +45,21 @@ jobs:
           # Ensure railway.json is copied (in case it's hidden)
           cp indexer/railway.json artifact/indexer/railway.json
           
-          # Copy middleware dist
+          # Copy middleware dist and package.json
           cp -r middleware/dist/* artifact/middleware/dist/
+          cp middleware/package.json artifact/middleware/
           
-          # No need for root workspace files since we're not installing dependencies
+          # Create minimal root package.json for workspace resolution
+          cat > artifact/package.json << 'EOF'
+          {
+            "name": "@puppet/monorepo",
+            "private": true,
+            "workspaces": ["indexer", "middleware"]
+          }
+          EOF
+          
+          # Copy bun.lock for dependency installation
+          cp bun.lock artifact/
           
           # Clean up unnecessary files
           rm -rf artifact/indexer/node_modules
