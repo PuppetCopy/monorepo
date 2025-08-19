@@ -1,5 +1,6 @@
 import { erc20Abi } from 'viem'
 import { errorAbi } from '../generated/abi/errorAbi.js'
+import referralStorageAbi from '../generated/abi/referralStorage.js'
 import { GMX_V2_CONTRACT_MAP } from '../generated/contractList.js'
 import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
 
@@ -35,10 +36,13 @@ export const CONTRACT = {
 
   // GMX contracts from generated file
   GMX: {
-    address: GMX_V2_CONTRACT_MAP.GMX.address,
+    address: '0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a',
     abi: erc20Abi
   },
-  ReferralStorage: GMX_V2_CONTRACT_MAP.ReferralStorage,
+  ReferralStorage: {
+    address: '0xe6fab3F0c7199b0d34d7FbE83394fc0e0D06e99d',
+    abi: referralStorageAbi
+  },
 
   // GMX V2 contracts
   GmxReaderV2: GMX_V2_CONTRACT_MAP.GmxReaderV2,

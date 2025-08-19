@@ -1,20 +1,17 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-08T18:10:59.238Z
-// Source: Local GMX deployment files
+// Generated on: Tue, 19 Aug 2025 17:22:46 GMT
+// Source: GMX deployment files from GitHub
 
-// Import hardcoded contract ABIs
-import { erc20Abi } from 'viem'
 import datastoreAbi from './abi/gmxDatastore.js'
 import eventemitterAbi from './abi/gmxEventEmitter.js'
 import exchangerouterAbi from './abi/gmxExchangeRouter.js'
 import ordervaultAbi from './abi/gmxOrderVault.js'
 // Import generated ABIs
 import readerv2Abi from './abi/gmxReaderV2.js'
-import referralStorageAbi from './abi/referralStorage.js'
 
 export const GMX_V2_CONTRACT_MAP = {
   GmxReaderV2: {
-    address: '0xcF2845Ab3866842A6b51Fb6a551b92dF58333574',
+    address: '0x0537C767cDAC0726c76Bb89e92904fe28fd02fE1',
     abi: readerv2Abi
   },
   GmxExchangeRouter: {
@@ -32,13 +29,5 @@ export const GMX_V2_CONTRACT_MAP = {
   GmxEventEmitter: {
     address: '0xC8ee91A54287DB53897056e12D9819156D3822Fb',
     abi: eventemitterAbi
-  },
-  GMX: {
-    address: '0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a',
-    abi: erc20Abi
-  },
-  ReferralStorage: {
-    address: '0xe6fab3F0c7199b0d34d7FbE83394fc0e0D06e99d',
-    abi: referralStorageAbi
   }
 } as const

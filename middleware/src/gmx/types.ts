@@ -1,8 +1,6 @@
 // import type { Abi, Address, ExtractAbiEvent } from 'abitype'
 // import type { GetEventArgs, Hex, Log } from 'viem'
 
-import type { Address } from 'viem/accounts'
-
 // export interface IIdentifiableEntity {
 //   id: string
 // }
@@ -181,19 +179,6 @@ export interface IMinMax {
 //   priceImpactDiffUsd: bigint
 //   executionPrice: bigint
 // }
-
-export type IOraclePrice = IMinMax & {
-  priceSourceType: bigint
-  timestamp: number
-  token: Address
-}
-
-export interface ISimpleOraclePrice {
-  readonly source: string
-  readonly price: bigint
-  readonly timestamp: number
-  readonly token: Address
-}
 
 // export type IInsolventClose = {
 //   orderKey: Hex

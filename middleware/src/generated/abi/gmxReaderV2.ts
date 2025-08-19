@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-08T18:10:59.237Z
-// Source: Local deployment file: Reader.json
+// Generated on: Tue, 19 Aug 2025 17:22:46 GMT
+// Source: GMX deployment files from GitHub
 
 export default [
   {

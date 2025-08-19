@@ -1,3 +1,7 @@
+import { BASIS_POINTS_DIVISOR, FLOAT_PRECISION } from '../const/common.js'
+
+const BASIS_FLOAT_PRECISION = BASIS_POINTS_DIVISOR * FLOAT_PRECISION
+
 /**
  * Calculate slippage in basis points for a position
  *
@@ -10,9 +14,11 @@
  * @returns Slippage in basis points (positive = favorable, negative = unfavorable)
  */
 export function calculateSlippageBps(isLong: boolean, executionPrice: bigint, currentPrice: bigint): bigint {
+  // Use FLOAT_PRECISION (10^30) for high precision calculation
+  // Returns basis points * FLOAT_PRECISION for maximum precision
   return isLong
-    ? ((executionPrice - currentPrice) * 10000n) / currentPrice
-    : ((currentPrice - executionPrice) * 10000n) / executionPrice
+    ? ((executionPrice - currentPrice) * BASIS_FLOAT_PRECISION) / currentPrice
+    : ((currentPrice - executionPrice) * BASIS_FLOAT_PRECISION) / executionPrice
 }
 
 /**

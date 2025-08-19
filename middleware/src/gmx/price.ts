@@ -1,6 +1,6 @@
 import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
-import type { IMinMax, IOraclePrice } from './types.js'
+import type { IMinMax } from './types.js'
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,
@@ -179,24 +179,6 @@ function getNextOpenInterestParams(currentLongUsd: bigint, currentShortUsd: bigi
     nextLongUsd,
     nextShortUsd
   }
-}
-
-// @dev pick the min or max price depending on whether it is for a long or short position
-// and whether the pending pnl should be maximized or not
-export function pickPriceForPnl(price: IOraclePrice | { price: bigint }, isLong: boolean, maximize: boolean) {
-  // If using simplified price interface, return the single price
-  if ('price' in price && !('min' in price)) {
-    return price.price
-  }
-
-  // for long positions, pick the larger price to maximize pnl
-  // for short positions, pick the smaller price to maximize pnl
-  const oraclePrice = price as IOraclePrice
-  if (isLong) {
-    return maximize ? oraclePrice.max : oraclePrice.min
-  }
-
-  return maximize ? oraclePrice.min : oraclePrice.max
 }
 
 export function getPriceImpactByAcceptablePrice(

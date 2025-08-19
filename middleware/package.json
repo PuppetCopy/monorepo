@@ -9,8 +9,7 @@
     "build": "bun run build:clean && bun run tsc -b",
     "build:clean": "rm -rf dist",
     "tsc:check": "tsc --noEmit",
-    "generate": "bun run script/generate.ts",
-    "generate:sync": "bun run script/generate-gmx-contract-list.ts --sync && bun run script/generate.ts"
+    "generate": "bun run script/generate.ts"
   },
   "files": [
     "dist"

@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Sun, 17 Aug 2025 13:33:28 GMT
+// Generated on: Tue, 19 Aug 2025 17:22:39 GMT
 // Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
 // Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets

@@ -38,7 +38,6 @@
         "useDefaultParameterLast": "error",
         "useImportType": "warn",
         "useExportType": "error",
-        "noUselessElse": "error",
         "useShorthandFunctionType": "error"
       },
       "suspicious": {

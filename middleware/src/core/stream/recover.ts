@@ -8,11 +8,9 @@ import {
   joinMap,
   now,
   op,
-  switchLatest,
   switchMap
 } from 'aelea/stream'
 import { stream } from 'aelea/stream-extended'
-import { IntervalTime } from '../../const/common.js'
 
 export interface IRunPeriodically<T> {
   actionOp: IOps<void, Promise<T>>
