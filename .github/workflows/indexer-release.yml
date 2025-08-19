@@ -33,18 +33,35 @@ jobs:
           cd indexer
           bun run codegen
       
+      - name: Prepare deployment artifact
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Create artifact directory with required files
+          mkdir -p artifact/indexer
+          mkdir -p artifact/middleware/dist
+          
+          # Copy indexer files
+          cp -r indexer/* artifact/indexer/
+          
+          # Copy middleware dist
+          cp -r middleware/dist/* artifact/middleware/dist/
+          
+          # Copy root files needed for bun workspace
+          cp package.json artifact/
+          cp bun.lockb artifact/
+          cp tsconfig.base.json artifact/ || true
+          
+          # Clean up unnecessary files
+          rm -rf artifact/indexer/node_modules
+          rm -rf artifact/indexer/.ponder
+          rm -rf artifact/indexer/generated
+          
       - name: Upload build artifacts
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: indexer-build
-          path: |
-            .
-            !node_modules/
-            !.git/
-            !.github/
-            !**/.ponder/
-            !**/generated/
+          path: artifact/
           retention-days: 1
           if-no-files-found: error
 
