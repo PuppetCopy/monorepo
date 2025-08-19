@@ -6,8 +6,7 @@ on:
     paths:
       - 'website/**'
       - 'middleware/**'
-      - 'bun.lockb'
-      - '.github/workflows/**'
+      - '.github/workflows/website-release.yml'
   workflow_dispatch:
 
 jobs:
