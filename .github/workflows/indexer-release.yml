@@ -48,6 +48,7 @@ jobs:
           # Copy middleware dist and package.json
           cp -r middleware/dist/* artifact/middleware/dist/
           cp middleware/package.json artifact/middleware/
+          cp middleware/tsconfig.json artifact/middleware/
           
           # Create minimal root package.json for workspace resolution
           cat > artifact/package.json << 'EOF'
