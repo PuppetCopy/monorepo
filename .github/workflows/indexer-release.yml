@@ -42,6 +42,8 @@ jobs:
           
           # Copy indexer files
           cp -r indexer/* artifact/indexer/
+          # Ensure railway.json is copied (in case it's hidden)
+          cp indexer/railway.json artifact/indexer/railway.json
           
           # Copy middleware dist
           cp -r middleware/dist/* artifact/middleware/dist/
@@ -73,21 +75,38 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: indexer/railway.json
-      
       - uses: actions/download-artifact@v4
         with:
           name: indexer-build
           path: .
       
-      - name: Setup deployment
+      - name: Verify deployment prerequisites
         run: |
-          # The downloaded artifact maintains the directory structure
+          echo "=== Checking secrets ==="
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "✗ RAILWAY_TOKEN is not set"
+            exit 1
+          else
+            echo "✓ RAILWAY_TOKEN is set"
+          fi
+          
+          if [ -z "${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}" ]; then
+            echo "✗ RAILWAY_INDEXER_SERVICE_ID is not set"
+            exit 1
+          else
+            echo "✓ RAILWAY_INDEXER_SERVICE_ID is set"
+          fi
+          
+          echo "=== Root directory ==="
           ls -la
+          echo "=== Indexer directory ==="
           ls -la indexer/
-          ls -la middleware/dist/ || true
+          echo "=== Middleware dist directory ==="
+          ls -la middleware/dist/ || echo "Middleware dist not found"
+          echo "=== Checking for required files ==="
+          test -f package.json && echo "✓ package.json found" || echo "✗ package.json missing"
+          test -f bun.lockb && echo "✓ bun.lockb found" || echo "✗ bun.lockb missing"
+          test -f indexer/railway.json && echo "✓ indexer/railway.json found" || echo "✗ indexer/railway.json missing"
       
       - name: Deploy to Railway
-        run: railway up --service=${{ secrets.RAILWAY_INDEXER_SERVICE_ID }}
+        run: railway up --service=${{ secrets.RAILWAY_INDEXER_SERVICE_ID }} --verbose
