@@ -42,6 +42,7 @@ jobs:
           
           # Copy indexer files
           cp -r indexer/* artifact/indexer/
+          cp indexer/railway.json artifact/indexer/railway.json
           
           # Copy middleware dist and package.json
           cp -r middleware/dist/* artifact/middleware/dist/
