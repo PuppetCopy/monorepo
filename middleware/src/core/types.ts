@@ -36,6 +36,7 @@ export interface IMarketDescription {
 export interface ITokenDescription {
   name: string
   symbol: string
+  baseSymbol?: string
   decimals: number
   address: Address
 }

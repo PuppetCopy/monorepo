@@ -1,4 +1,4 @@
-import { groupList, groupManyList } from '../core/utils.js'
+import { groupList } from '../core/utils.js'
 import { ARBITRUM_TOKEN_LIST } from '../generated/tokenList.js'
 import { CONTRACT } from './contract.js'
 
@@ -14,4 +14,4 @@ export const TOKEN_DESCRIPTION_LIST = [
 ] as const
 
 export const TOKEN_ADDRESS_DESCRIPTION_MAP = groupList(TOKEN_DESCRIPTION_LIST, 'address')
-export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupManyList(TOKEN_DESCRIPTION_LIST, 'symbol')
+export const TOKEN_SYMBOL_DESCRIPTION_MAP = groupList(TOKEN_DESCRIPTION_LIST, 'symbol')

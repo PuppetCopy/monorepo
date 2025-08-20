@@ -8,6 +8,7 @@ export {}
 
 type TokenData = {
   symbol: string
+  baseSymbol?: string
   decimals: number
   address: string
   name?: string
@@ -113,12 +114,26 @@ try {
     // Extract properties from interface
     const nameMatch = tokenContent.match(/name:\s*"([^"]+)"/)
     const symbolMatch = tokenContent.match(/symbol:\s*"([^"]+)"/)
+    const assetSymbolMatch = tokenContent.match(/assetSymbol:\s*"([^"]+)"/)
+    const baseSymbolMatch = tokenContent.match(/baseSymbol:\s*"([^"]+)"/)
     const addressMatch = tokenContent.match(/address:\s*"(0x[a-fA-F0-9]{40})"/)
     const decimalsMatch = tokenContent.match(/decimals:\s*(\d+)/)
 
     if (!symbolMatch || !addressMatch || !decimalsMatch) continue
 
-    const symbol = symbolMatch[1]
+    // Use assetSymbol if available, otherwise use symbol
+    const originalSymbol = symbolMatch[1]
+    const symbol = assetSymbolMatch ? assetSymbolMatch[1] : originalSymbol
+    let baseSymbol = baseSymbolMatch ? baseSymbolMatch[1] : undefined
+
+    // Extract base symbol from wrapped tokens with modifiers (e.g., "WAVAX (Wormhole)" -> "AVAX")
+    if (!baseSymbol && symbol.startsWith('W') && symbol.includes(' (')) {
+      const baseMatch = symbol.match(/^W(\w+)\s+\(/)
+      if (baseMatch) {
+        baseSymbol = baseMatch[1]
+      }
+    }
+
     const address = addressMatch[1]
     const decimals = Number.parseInt(decimalsMatch[1])
     const name = nameMatch ? nameMatch[1] : symbol
@@ -128,10 +143,12 @@ try {
     seenAddresses.add(address.toLowerCase())
 
     // Get additional data from synthetics if available
-    const syntheticsData = syntheticsTokens[symbol] || {}
+    // Try both the modified symbol and original symbol for synthetics lookup
+    const syntheticsData = syntheticsTokens[symbol] || syntheticsTokens[originalSymbol] || {}
 
     tokens.push({
       symbol,
+      ...(baseSymbol && { baseSymbol }),
       decimals,
       address,
       name,
@@ -161,7 +178,7 @@ export const ARBITRUM_TOKEN_LIST = [
 ${tokens
   .map(
     token => `  {
-    symbol: '${token.symbol}',
+    symbol: '${token.symbol}',${token.baseSymbol ? `\n    baseSymbol: '${token.baseSymbol}',` : ''}
     decimals: ${token.decimals},
     address: '${token.address}',
     name: '${token.name}'${token.synthetic ? ',\n    synthetic: true' : ''}${token.dataStreamFeedId ? `,\n    dataStreamFeedId: '${token.dataStreamFeedId}'` : ''}${token.dataStreamFeedDecimals !== undefined ? `,\n    dataStreamFeedDecimals: ${token.dataStreamFeedDecimals}` : ''}${token.priceFeedAddress ? `,\n    priceFeedAddress: '${token.priceFeedAddress}'` : ''}

@@ -12,7 +12,7 @@
   "packageManager": "bun@1.2.20",
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
-    "aelea": "2.0.7",
+    "aelea": "2.5.10",
     "og-img": "0.2.1",
     "satori": "0.15.2",
     "satori-html": "0.3.2"

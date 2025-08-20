@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Tue, 19 Aug 2025 17:22:39 GMT
+// Generated on: Wed, 20 Aug 2025 08:09:13 GMT
 // Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
 // Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
@@ -94,15 +94,6 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0xCDA67618e51762235eacA373894F0C79256768fa'
   },
   {
-    symbol: 'AVAX',
-    decimals: 18,
-    address: '0x565609fAF65B92F7be02468acF86f8979423e514',
-    name: 'Wrapped AVAX (Wormhole)',
-    dataStreamFeedId: '0x0003b1cb55b8a00a18111ff745b56d70f04c2d41e03fc7fd8d3d9b09f142aad9',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x8bf61728eeDCE2F32c456454d87B5d6eD6150208'
-  },
-  {
     symbol: 'BCH',
     decimals: 8,
     address: '0xc33D9C096e74aa4f571E9417b69a19C4A1e72ef2',
@@ -121,15 +112,6 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
-    symbol: 'BNB',
-    decimals: 18,
-    address: '0xa9004A5421372E1D83fB1f85b0fc986c912f91f3',
-    name: 'Wrapped BNB (LayerZero)',
-    dataStreamFeedId: '0x000335fd3f3ffa06cfd9297b97367f77145d7a5f132e84c736cc471dd98621fe',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x6970460aabF80C5BE983C6b74e5D06dEDCA95D4A'
-  },
-  {
     symbol: 'BOME',
     decimals: 6,
     address: '0x3Eea56A1ccCdbfB70A26aD381C71Ee17E4c8A15F',
@@ -146,16 +128,6 @@ export const ARBITRUM_TOKEN_LIST = [
     synthetic: true,
     dataStreamFeedId: '0x00033bba2b72b1d4220f0519eacd8a4d01e12aabb3eedb2c442db6e3d8994d99',
     dataStreamFeedDecimals: 18
-  },
-  {
-    symbol: 'BTC',
-    decimals: 8,
-    address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
-    name: 'Wrapped Bitcoin',
-    synthetic: true,
-    dataStreamFeedId: '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x6ce185860a4963106506C203335A2910413708e9'
   },
   {
     symbol: 'BTC',
@@ -579,15 +551,6 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
-    symbol: 'SOL',
-    decimals: 9,
-    address: '0x2bcC6D6CdBbDC0a4071e48bb3B969b06B3330c07',
-    name: 'Wrapped SOL (Wormhole)',
-    dataStreamFeedId: '0x0003b778d3f6b2ac4991302b89cb313f99a42467d6c9c5f96f57c29c0d2bc24f',
-    dataStreamFeedDecimals: 18,
-    priceFeedAddress: '0x24ceA4b8ce57cdA5058b924B9B9987992450590c'
-  },
-  {
     symbol: 'SPX6900',
     decimals: 8,
     address: '0xb736be525A65326513351058427d1f47B0CfB045',
@@ -717,7 +680,39 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'WAVAX (Wormhole)',
+    baseSymbol: 'AVAX',
+    decimals: 18,
+    address: '0x565609fAF65B92F7be02468acF86f8979423e514',
+    name: 'Wrapped AVAX (Wormhole)',
+    dataStreamFeedId: '0x0003b1cb55b8a00a18111ff745b56d70f04c2d41e03fc7fd8d3d9b09f142aad9',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x8bf61728eeDCE2F32c456454d87B5d6eD6150208'
+  },
+  {
+    symbol: 'WBNB (LayerZero)',
+    baseSymbol: 'BNB',
+    decimals: 18,
+    address: '0xa9004A5421372E1D83fB1f85b0fc986c912f91f3',
+    name: 'Wrapped BNB (LayerZero)',
+    dataStreamFeedId: '0x000335fd3f3ffa06cfd9297b97367f77145d7a5f132e84c736cc471dd98621fe',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x6970460aabF80C5BE983C6b74e5D06dEDCA95D4A'
+  },
+  {
+    symbol: 'WBTC',
+    baseSymbol: 'BTC',
+    decimals: 8,
+    address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+    name: 'Wrapped Bitcoin',
+    synthetic: true,
+    dataStreamFeedId: '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x6ce185860a4963106506C203335A2910413708e9'
+  },
+  {
     symbol: 'WETH',
+    baseSymbol: 'ETH',
     decimals: 18,
     address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     name: 'Wrapped Ethereum',
@@ -742,6 +737,16 @@ export const ARBITRUM_TOKEN_LIST = [
     synthetic: true,
     dataStreamFeedId: '0x000365f820b0633946b78232bb91a97cf48100c426518e732465c3a050edb9f1',
     dataStreamFeedDecimals: 18
+  },
+  {
+    symbol: 'WSOL (Wormhole)',
+    baseSymbol: 'SOL',
+    decimals: 9,
+    address: '0x2bcC6D6CdBbDC0a4071e48bb3B969b06B3330c07',
+    name: 'Wrapped SOL (Wormhole)',
+    dataStreamFeedId: '0x0003b778d3f6b2ac4991302b89cb313f99a42467d6c9c5f96f57c29c0d2bc24f',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x24ceA4b8ce57cdA5058b924B9B9987992450590c'
   },
   {
     symbol: 'WSTETH',
