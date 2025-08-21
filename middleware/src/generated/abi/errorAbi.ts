@@ -1,5 +1,5 @@
 // This file is auto-generated from contracts/src/utils/Error.sol
-// Generated on: Tue, 19 Aug 2025 17:22:47 GMT
+// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 
 export const errorAbi = [
   {

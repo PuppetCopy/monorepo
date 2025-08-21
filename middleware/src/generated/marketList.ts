@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Tue, 19 Aug 2025 17:22:38 GMT
-// Source: GMX V2 Reader Contract (0xcF2845Ab3866842A6b51Fb6a551b92dF58333574) on Arbitrum
+// Generated on: Thu, 21 Aug 2025 21:16:31 GMT
+// Source: GMX V2 Reader Contract (0x0537C767cDAC0726c76Bb89e92904fe28fd02fE1) on Arbitrum
 
 export const ARBITRUM_MARKET_LIST = [
   {
@@ -664,6 +664,34 @@ export const ARBITRUM_MARKET_LIST = [
   {
     marketToken: '0xa29FfE4152B65A0347512Ae5c6A4Bbc7a3d6d51B',
     indexToken: '0xB7EfE7c7f059E84Ab87A83A169c583Fb4A54fAc3',
+    longToken: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+    shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    marketType: 'PERP'
+  },
+  {
+    marketToken: '0x2a331e51a3D17211852d8625a1029898450e539B',
+    indexToken: '0xd37F01A3379f052FEF70F63c0Be27931891aa2B9',
+    longToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    marketType: 'PERP'
+  },
+  {
+    marketToken: '0x41E3bC5B72384C8B26b559B7d16C2B81Fd36fbA2',
+    indexToken: '0x3B6f801C0052Dfe0Ac80287D611F31B7c47B9A6b',
+    longToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    marketType: 'PERP'
+  },
+  {
+    marketToken: '0x4024418592450E4d62faB15e2f833FC03A3447dc',
+    indexToken: '0x91c6a8F6aFAC036F4ABf1bA55f4E76892E865E4a',
+    longToken: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+    shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    marketType: 'PERP'
+  },
+  {
+    marketToken: '0x3f649eab7f4CE4945F125939C64429Be2C5d0cB4',
+    indexToken: '0xA1b91fe9FD52141Ff8cac388Ce3F10BFDc1dE79d',
     longToken: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
     shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
     marketType: 'PERP'

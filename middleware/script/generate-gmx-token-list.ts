@@ -12,6 +12,7 @@ type TokenData = {
   decimals: number
   address: string
   name?: string
+  isFiat?: boolean
   synthetic?: boolean
   dataStreamFeedId?: string
   dataStreamFeedDecimals?: number
@@ -118,6 +119,7 @@ try {
     const baseSymbolMatch = tokenContent.match(/baseSymbol:\s*"([^"]+)"/)
     const addressMatch = tokenContent.match(/address:\s*"(0x[a-fA-F0-9]{40})"/)
     const decimalsMatch = tokenContent.match(/decimals:\s*(\d+)/)
+    const isFiatMatch = tokenContent.match(/isStable:\s*true/)
 
     if (!symbolMatch || !addressMatch || !decimalsMatch) continue
 
@@ -152,6 +154,7 @@ try {
       decimals,
       address,
       name,
+      ...(isFiatMatch && { isFiat: true }),
       ...(syntheticsData.synthetic && { synthetic: true }),
       ...(syntheticsData.dataStreamFeedId && { dataStreamFeedId: syntheticsData.dataStreamFeedId }),
       ...(syntheticsData.dataStreamFeedDecimals !== undefined && {
@@ -181,7 +184,7 @@ ${tokens
     symbol: '${token.symbol}',${token.baseSymbol ? `\n    baseSymbol: '${token.baseSymbol}',` : ''}
     decimals: ${token.decimals},
     address: '${token.address}',
-    name: '${token.name}'${token.synthetic ? ',\n    synthetic: true' : ''}${token.dataStreamFeedId ? `,\n    dataStreamFeedId: '${token.dataStreamFeedId}'` : ''}${token.dataStreamFeedDecimals !== undefined ? `,\n    dataStreamFeedDecimals: ${token.dataStreamFeedDecimals}` : ''}${token.priceFeedAddress ? `,\n    priceFeedAddress: '${token.priceFeedAddress}'` : ''}
+    name: '${token.name}'${token.isFiat ? ',\n    isFiat: true' : ''}${token.synthetic ? ',\n    synthetic: true' : ''}${token.dataStreamFeedId ? `,\n    dataStreamFeedId: '${token.dataStreamFeedId}'` : ''}${token.dataStreamFeedDecimals !== undefined ? `,\n    dataStreamFeedDecimals: ${token.dataStreamFeedDecimals}` : ''}${token.priceFeedAddress ? `,\n    priceFeedAddress: '${token.priceFeedAddress}'` : ''}
   }`
   )
   .join(',\n')}

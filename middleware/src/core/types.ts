@@ -37,6 +37,7 @@ export interface ITokenDescription {
   name: string
   symbol: string
   baseSymbol?: string
+  isFiat?: boolean
   decimals: number
   address: Address
 }

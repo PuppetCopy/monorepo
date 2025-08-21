@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Wed, 20 Aug 2025 08:09:13 GMT
+// Generated on: Thu, 21 Aug 2025 21:18:39 GMT
 // Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
 // Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
@@ -166,10 +166,17 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0xaebDA2c976cfd1eE1977Eac079B4382acb849325'
   },
   {
+    symbol: 'CVX',
+    decimals: 18,
+    address: '0x3B6f801C0052Dfe0Ac80287D611F31B7c47B9A6b',
+    name: 'Convex Finance'
+  },
+  {
     symbol: 'DAI',
     decimals: 18,
     address: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
     name: 'Dai',
+    isFiat: true,
     dataStreamFeedId: '0x0003571a596aab1cafe1a883795dab90cd8cca48e25f53ab3665aa67d008f386',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0xc5C8E77B397E531B8EC06BFb0048328B30E9eCfB'
@@ -270,7 +277,8 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'FRAX',
     decimals: 18,
     address: '0x17FC002b466eEc40DaE837Fc4bE5c67993ddBd6F',
-    name: 'Frax'
+    name: 'Frax',
+    isFiat: true
   },
   {
     symbol: 'HBAR',
@@ -313,6 +321,12 @@ export const ARBITRUM_TOKEN_LIST = [
     synthetic: true,
     dataStreamFeedId: '0x00031f0d2c5bd731a7e29b653af1958fe6328db094651396f1631560b9da14dc',
     dataStreamFeedDecimals: 18
+  },
+  {
+    symbol: 'KAS',
+    decimals: 8,
+    address: '0x91c6a8F6aFAC036F4ABf1bA55f4E76892E865E4a',
+    name: 'Kaspa'
   },
   {
     symbol: 'LDO',
@@ -374,7 +388,8 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'MIM',
     decimals: 18,
     address: '0xFEa7a6a0B346362BF88A9e4A88416B77a57D6c2A',
-    name: 'Magic Internet Money'
+    name: 'Magic Internet Money',
+    isFiat: true
   },
   {
     symbol: 'MKR',
@@ -414,6 +429,12 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedId: '0x00036e9386eda6b177c6f7e9d493e60ae9ebaeb732a271b880b4d6a131d6b3f5',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0xBF5C3fB2633e924598A46B9D07a174a9DBcF57C0'
+  },
+  {
+    symbol: 'OKB',
+    decimals: 18,
+    address: '0xd37F01A3379f052FEF70F63c0Be27931891aa2B9',
+    name: 'OKB'
   },
   {
     symbol: 'OM',
@@ -645,6 +666,7 @@ export const ARBITRUM_TOKEN_LIST = [
     decimals: 6,
     address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
     name: 'USD Coin',
+    isFiat: true,
     dataStreamFeedId: '0x00038f83323b6b08116d1614cf33a9bd71ab5e0abf0c9f1b783a74a43e7bd992',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3'
@@ -653,19 +675,22 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'USDC.E',
     decimals: 6,
     address: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-    name: 'Bridged USDC (USDC.e)'
+    name: 'Bridged USDC (USDC.e)',
+    isFiat: true
   },
   {
     symbol: 'USDE',
     decimals: 18,
     address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34',
-    name: 'Ethena USDe'
+    name: 'Ethena USDe',
+    isFiat: true
   },
   {
     symbol: 'USDT',
     decimals: 6,
     address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
     name: 'Tether',
+    isFiat: true,
     dataStreamFeedId: '0x0003a910a43485e0685ff5d6d366541f5c21150f0634c5b14254392d1a1c06db',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0x3f3f5dF88dC9F13eac63DF89EC16ef6e7E25DdE7'

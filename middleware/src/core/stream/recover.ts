@@ -32,8 +32,8 @@ export const periodicRun = <T>({
 }
 
 export interface IRecoverConfig<T> {
-  recoverMessage?: string
   recoverTime?: number // Default is 10 minutes
+  recoverWith?: (source: IStream<T>) => IStream<T>
 }
 
 export interface IRecoverCurry {
@@ -42,12 +42,16 @@ export interface IRecoverCurry {
 }
 
 export const recover: IRecoverCurry = curry2((config, source) => {
-  const { recoverMessage = 'Stream error detected', recoverTime = 600_000 } = config
+  const { recoverTime = 10_000 } = config
 
   return stream((sink, scheduler) => {
     let lastRecoveryTime = 0
 
-    const attemptRecover = (): IStream<any> => {
+    const runWith = (): IStream<any> => {
+      const sourceWith = config.recoverWith ? config.recoverWith(source) : source
+
+      lastRecoveryTime = scheduler.time()
+
       return continueWith(() => {
         const now = scheduler.time()
         const timeElapsed = now - lastRecoveryTime
@@ -56,19 +60,10 @@ export const recover: IRecoverCurry = curry2((config, source) => {
             ? recoverTime - timeElapsed //
             : 0
 
-        lastRecoveryTime = now
-        console.warn(`${recoverMessage} (next attempt in ${delayTime}ms)`)
-
         // Return the source after delay, wrapped with recover using updated delay
-        return op(
-          at(delayTime, null),
-          switchMap(() => {
-            return attemptRecover()
-          })
-        )
-      }, source)
+        return op(at(delayTime, null), switchMap(runWith))
+      }, sourceWith)
     }
-
-    return attemptRecover().run(sink, scheduler)
+    return runWith().run(sink, scheduler)
   })
 })
