@@ -13,6 +13,13 @@ export const TOKEN_DESCRIPTION_LIST = [
     symbol: '-'
   },
 
+  {
+    address: CONTRACT.GMX.address,
+    decimals: 18,
+    name: 'GMX',
+    symbol: 'GMX'
+  },
+
   // Puppet token
   {
     address: CONTRACT.PuppetToken.address,
