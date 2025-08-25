@@ -1,11 +1,11 @@
 import { map } from 'aelea/stream'
 import { $wrapNativeElement, style } from 'aelea/ui'
-// @ts-ignore
+// @ts-expect-error
 import jazzicon from 'jazzicon'
 
 export function $jazzicon(address: string, size = '24px') {
   const cnt = Number.parseInt(address.slice(2, 10), 16)
-  const el: HTMLElement = jazzicon(Number.parseInt(size), cnt)
+  const el: HTMLElement = jazzicon(Number.parseInt(size, 10), cnt)
 
   return $wrapNativeElement(el)(
     map(node => {

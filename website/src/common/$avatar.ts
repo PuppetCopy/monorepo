@@ -1,7 +1,7 @@
 import { tap } from 'aelea/stream'
 import { $svg, attr } from 'aelea/ui'
 import Color from 'color'
-// @ts-ignore
+// @ts-expect-error
 import MersenneTwister from 'mersenne-twister'
 import type { Address } from 'viem/accounts'
 

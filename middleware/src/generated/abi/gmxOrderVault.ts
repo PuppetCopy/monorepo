@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
-// Source: GMX deployment files from GitHub
+// Generated on: Mon, 25 Aug 2025 10:23:10 GMT
+// Source: GMX deployment files from GitHub (v2.2-branch)
 
 export default [
   {

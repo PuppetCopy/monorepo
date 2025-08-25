@@ -22,11 +22,11 @@
     }
   },
   "dependencies": {
-    "abitype": "1.0.8",
-    "aelea": "2.5.10",
+    "abitype": "1.0.9",
+    "aelea": "2.5.11",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.8",
-    "viem": "2.33.3"
+    "viem": "2.35.1"
   },
   "homepage": "https://puppet.tech",
   "keywords": [

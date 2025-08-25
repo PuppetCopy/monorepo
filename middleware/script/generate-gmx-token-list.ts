@@ -84,10 +84,10 @@ try {
 
       syntheticsTokens[symbol] = {
         ...(addressMatch && { address: addressMatch[1] }),
-        ...(decimalsMatch && { decimals: Number.parseInt(decimalsMatch[1]) }),
+        ...(decimalsMatch && { decimals: Number.parseInt(decimalsMatch[1], 10) }),
         ...(syntheticMatch && { synthetic: true }),
         ...(dataStreamMatch && { dataStreamFeedId: dataStreamMatch[1] }),
-        ...(dataStreamDecimalsMatch && { dataStreamFeedDecimals: Number.parseInt(dataStreamDecimalsMatch[1]) }),
+        ...(dataStreamDecimalsMatch && { dataStreamFeedDecimals: Number.parseInt(dataStreamDecimalsMatch[1], 10) }),
         ...(priceFeedMatch && { priceFeed: { address: priceFeedMatch[1] } })
       }
     }
@@ -137,7 +137,7 @@ try {
     }
 
     const address = addressMatch[1]
-    const decimals = Number.parseInt(decimalsMatch[1])
+    const decimals = Number.parseInt(decimalsMatch[1], 10)
     const name = nameMatch ? nameMatch[1] : symbol
 
     // Skip duplicate addresses
@@ -170,9 +170,38 @@ try {
   console.log(`\n✅ Generated ${tokens.length} tokens from GMX Interface`)
   console.log(`✅ Enhanced ${Object.keys(syntheticsTokens).length} tokens with data from GMX Synthetics`)
 
-  // Generate the TypeScript file content
-  const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
+  // Helper function to check if file content has changed
+  async function writeIfChanged(filePath: string, generateContent: (timestamp: string) => string): Promise<boolean> {
+    try {
+      const existingFile = Bun.file(filePath)
+      if (await existingFile.exists()) {
+        const existingContent = await existingFile.text()
+        
+        // Extract existing timestamp
+        const timestampMatch = existingContent.match(/Generated on: (.+)/)
+        const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
+        
+        // Generate content with existing timestamp for comparison
+        const contentWithOldTimestamp = generateContent(existingTimestamp)
+        
+        if (existingContent === contentWithOldTimestamp) {
+          return false // Content unchanged, no write needed
+        }
+      }
+    } catch {
+      // File doesn't exist or can't be read, proceed with write
+    }
+    
+    // Either file doesn't exist or content has changed - write with new timestamp
+    const newContent = generateContent(new Date().toUTCString())
+    await Bun.write(filePath, newContent)
+    return true // Content was written
+  }
+
+  // Write the file only if content has changed
+  const wasUpdated = await writeIfChanged('./src/generated/tokenList.ts', (timestamp) =>
+    `// This file is auto-generated. Do not edit manually.
+// Generated on: ${timestamp}
 // Primary source: ${INTERFACE_TOKENS_URL}
 // Enhanced with data from: ${SYNTHETICS_TOKENS_URL}
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
@@ -189,21 +218,25 @@ ${tokens
   )
   .join(',\n')}
 ] as const
-`
+`)
 
-  // Write the file
-  await Bun.write('./src/generated/tokenList.ts', fileContent)
-
-  // Format the generated file with biome
-  await Bun.$`bunx @biomejs/biome format --write ./src/generated/tokenList.ts`
-
-  console.log(`✅ Successfully generated token list with ${tokens.length} tokens`)
-  console.log('\nGenerated tokens:')
-  tokens.forEach(token => {
-    console.log(
-      `- ${token.symbol} (${token.decimals} decimals)${token.name ? ` - ${token.name}` : ''}${token.synthetic ? ' [synthetic]' : ''}${token.dataStreamFeedId ? ' [has Chainlink stream]' : ''}`
-    )
-  })
+  // Format the generated file with biome only if it was updated
+  if (wasUpdated) {
+    await Bun.$`bunx @biomejs/biome format --write ./src/generated/tokenList.ts`
+    console.log(`✅ Successfully updated token list with ${tokens.length} tokens`)
+  } else {
+    console.log(`✅ Token list unchanged (${tokens.length} tokens)`)
+  }
+  
+  // Only show detailed list if content was updated
+  if (wasUpdated) {
+    console.log('\nGenerated tokens:')
+    tokens.forEach(token => {
+      console.log(
+        `- ${token.symbol} (${token.decimals} decimals)${token.name ? ` - ${token.name}` : ''}${token.synthetic ? ' [synthetic]' : ''}${token.dataStreamFeedId ? ' [has Chainlink stream]' : ''}`
+      )
+    })
+  }
 } catch (error) {
   console.error('❌ Error generating token descriptions:', error)
   process.exit(1)

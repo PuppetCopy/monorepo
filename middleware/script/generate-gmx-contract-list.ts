@@ -26,12 +26,12 @@ type DeploymentData = {
 }
 
 async function fetchGmxDeployments(): Promise<DeploymentData> {
-  console.log('🔄 Fetching GMX deployments from GitHub...')
+  console.log('🔄 Fetching GMX deployments from GitHub (v2.2-branch)...')
 
   try {
-    // Clone the repository (shallow clone for speed)
-    console.log('📥 Cloning GMX synthetics repository...')
-    await $`git clone --depth 1 --sparse ${GMX_REPO_URL} ${TEMP_DIR}`
+    // Clone the repository (shallow clone for speed, specifically v2.2-branch)
+    console.log('📥 Cloning GMX synthetics repository (v2.2-branch)...')
+    await $`git clone --depth 1 --branch v2.2-branch --sparse ${GMX_REPO_URL} ${TEMP_DIR}`
 
     // Set up sparse checkout to only get deployments folder
     await $`cd ${TEMP_DIR} && git sparse-checkout init --cone`
@@ -70,7 +70,7 @@ async function fetchGmxDeployments(): Promise<DeploymentData> {
 }
 
 try {
-  // Always fetch from GitHub to ensure we have the latest addresses and ABIs
+  // Always fetch from GitHub v2.2-branch to ensure we have the latest addresses and ABIs
   const deployments = await fetchGmxDeployments()
   console.log()
 
@@ -98,26 +98,63 @@ try {
 
   console.log(`✅ Loaded ${contracts.length} contracts`)
 
+  // Helper function to check if file content has changed
+  async function writeIfChanged(filePath: string, generateContent: (timestamp: string) => string): Promise<boolean> {
+    try {
+      const existingFile = Bun.file(filePath)
+      if (await existingFile.exists()) {
+        const existingContent = await existingFile.text()
+
+        // Extract existing timestamp
+        const timestampMatch = existingContent.match(/Generated on: (.+)/)
+        const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
+        
+        // Generate content with existing timestamp for comparison
+        const contentWithOldTimestamp = generateContent(existingTimestamp)
+        
+        if (existingContent === contentWithOldTimestamp) {
+          return false // Content unchanged, no write needed
+        }
+      }
+    } catch {
+      // File doesn't exist or can't be read, proceed with write
+    }
+
+    // Either file doesn't exist or content has changed - write with new timestamp
+    const newContent = generateContent(new Date().toUTCString())
+    await Bun.write(filePath, newContent)
+    return true // Content was written
+  }
+
   // Write individual ABI files
+  let abiFilesUpdated = 0
   for (const contract of contracts) {
     if (contract.abi) {
       const abiFileName = `gmx${contract.name.replace('Gmx', '')}`
       const abiFilePath = `./src/generated/abi/${abiFileName}.ts`
-      const abiContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
-// Source: GMX deployment files from GitHub
+      
+      const wasUpdated = await writeIfChanged(abiFilePath, (timestamp) => 
+        `// This file is auto-generated. Do not edit manually.
+// Generated on: ${timestamp}
+// Source: GMX deployment files from GitHub (v2.2-branch)
 
 export default ${JSON.stringify(contract.abi, null, 2)} as const
-`
-      await Bun.write(abiFilePath, abiContent)
-      console.log(`📝 Generated ABI for ${contract.name}`)
+`)
+      
+      if (wasUpdated) {
+        console.log(`📝 Updated ABI for ${contract.name}`)
+        abiFilesUpdated++
+      } else {
+        console.log(`✓ ABI unchanged for ${contract.name}`)
+      }
     }
   }
 
-  // Generate the TypeScript file content
-  const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
-// Source: GMX deployment files from GitHub
+  // Write the main contracts file
+  const contractListUpdated = await writeIfChanged('./src/generated/contractList.ts', (timestamp) =>
+    `// This file is auto-generated. Do not edit manually.
+// Generated on: ${timestamp}
+// Source: GMX deployment files from GitHub (v2.2-branch)
 
 // Import generated ABIs
 ${contracts
@@ -143,20 +180,30 @@ ${contracts
   })
   .join(',\n')}
 } as const
-`
+`)
 
-  // Write the main contracts file
-  await Bun.write('./src/generated/contractList.ts', fileContent)
+  // Only format files that were actually updated
+  if (contractListUpdated) {
+    await Bun.$`bunx @biomejs/biome format --write ./src/generated/contractList.ts`
+    console.log('📝 Updated main contract list')
+  } else {
+    console.log('✓ Main contract list unchanged')
+  }
 
-  // Format the generated files with biome
-  await Bun.$`bunx @biomejs/biome format --write ./src/generated/contractList.ts`
-  await Bun.$`bunx @biomejs/biome format --write ./src/generated/abi/gmx*.ts`
+  if (abiFilesUpdated > 0) {
+    await Bun.$`bunx @biomejs/biome format --write ./src/generated/abi/gmx*.ts`
+  }
 
-  console.log('✅ Successfully generated GMX V2 contract list with ABIs')
-  console.log('\nGenerated contracts:')
-  contracts.forEach(contract => {
-    console.log(`- ${contract.name}: ${contract.address}`)
-  })
+  console.log('\n✅ GMX V2 contract generation complete')
+  console.log(`   - ${abiFilesUpdated} ABI file(s) updated`)
+  console.log(`   - Main contract list: ${contractListUpdated ? 'updated' : 'unchanged'}`)
+
+  if (abiFilesUpdated > 0 || contractListUpdated) {
+    console.log('\nUpdated contracts:')
+    contracts.forEach(contract => {
+      console.log(`- ${contract.name}: ${contract.address}`)
+    })
+  }
 } catch (error) {
   console.error('❌ Error generating contract list:', error)
   process.exit(1)
