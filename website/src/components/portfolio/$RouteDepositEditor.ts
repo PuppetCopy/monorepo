@@ -1,4 +1,4 @@
-import { readableTokenAmount } from '@puppet-copy/middleware/core'
+import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
@@ -91,7 +91,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                       if (params.model.amount === 0n) return ''
                     }
 
-                    return readableTokenAmount(
+                    return readableTokenAmountLabel(
                       collateralTokenDescription,
                       params.model.action === DepositEditorAction.DEPOSIT
                         ? params.model.amount + params.depositBalance
@@ -100,7 +100,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                   }, combine({ depositBalance, model })),
                   $val: $text(
                     map(amount => {
-                      return readableTokenAmount(collateralTokenDescription, amount)
+                      return readableTokenAmountLabel(collateralTokenDescription, amount)
                     }, depositBalance)
                   )
                 })

@@ -108,10 +108,10 @@ try {
         // Extract existing timestamp
         const timestampMatch = existingContent.match(/Generated on: (.+)/)
         const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
-        
+
         // Generate content with existing timestamp for comparison
         const contentWithOldTimestamp = generateContent(existingTimestamp)
-        
+
         if (existingContent === contentWithOldTimestamp) {
           return false // Content unchanged, no write needed
         }
@@ -132,15 +132,18 @@ try {
     if (contract.abi) {
       const abiFileName = `gmx${contract.name.replace('Gmx', '')}`
       const abiFilePath = `./src/generated/abi/${abiFileName}.ts`
-      
-      const wasUpdated = await writeIfChanged(abiFilePath, (timestamp) => 
-        `// This file is auto-generated. Do not edit manually.
+
+      const wasUpdated = await writeIfChanged(
+        abiFilePath,
+        timestamp =>
+          `// This file is auto-generated. Do not edit manually.
 // Generated on: ${timestamp}
 // Source: GMX deployment files from GitHub (v2.2-branch)
 
 export default ${JSON.stringify(contract.abi, null, 2)} as const
-`)
-      
+`
+      )
+
       if (wasUpdated) {
         console.log(`📝 Updated ABI for ${contract.name}`)
         abiFilesUpdated++
@@ -151,8 +154,10 @@ export default ${JSON.stringify(contract.abi, null, 2)} as const
   }
 
   // Write the main contracts file
-  const contractListUpdated = await writeIfChanged('./src/generated/contractList.ts', (timestamp) =>
-    `// This file is auto-generated. Do not edit manually.
+  const contractListUpdated = await writeIfChanged(
+    './src/generated/contractList.ts',
+    timestamp =>
+      `// This file is auto-generated. Do not edit manually.
 // Generated on: ${timestamp}
 // Source: GMX deployment files from GitHub (v2.2-branch)
 
@@ -180,7 +185,8 @@ ${contracts
   })
   .join(',\n')}
 } as const
-`)
+`
+  )
 
   // Only format files that were actually updated
   if (contractListUpdated) {
