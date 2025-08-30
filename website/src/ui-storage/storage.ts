@@ -26,9 +26,10 @@ function createDbStream<TName extends string, TStore>(
   const openDbRequest = indexedDB.open(dbName, version)
 
   return state(
-    stream(sink => {
+    stream((sink, scheduler) => {
       let db: IDBDatabase | null = null
       let disposed = false
+      const initTime = scheduler.time()
 
       openDbRequest.onupgradeneeded = () => {
         const upgradeDb = openDbRequest.result
@@ -61,6 +62,7 @@ function createDbStream<TName extends string, TStore>(
 
           deleteReq.onsuccess = () => {
             if (disposed) return
+            const time = scheduler.time()
 
             // Reopen with correct schema
             const reopenReq = indexedDB.open(dbName, version)
@@ -78,25 +80,29 @@ function createDbStream<TName extends string, TStore>(
                 return
               }
               db = reopenReq.result
-              sink.event(db)
+              sink.event(time, db)
             }
 
             reopenReq.onerror = () => {
               if (disposed) return
-              sink.error(reopenReq.error || new Error('Failed to recreate database'))
+              sink.error(time, reopenReq.error || new Error('Failed to recreate database'))
             }
           }
 
           deleteReq.onerror = () => {
-            sink.error(deleteReq.error || new Error('Failed to delete database'))
+            const time = scheduler.time()
+
+            sink.error(time, deleteReq.error || new Error('Failed to delete database'))
           }
         } else {
-          sink.event(db)
+          const time = scheduler.time()
+
+          sink.event(time, db)
         }
       }
 
       openDbRequest.onerror = () => {
-        sink.error(openDbRequest.error || new Error('Failed to open database'))
+        sink.error(initTime, openDbRequest.error || new Error('Failed to open database'))
       }
 
       // Cleanup function - close DB connection if subscription is cancelled
@@ -150,7 +156,7 @@ export function read<TKey extends IDBValidKey, TData>(
   key: TKey,
   defaultValue?: TData
 ) {
-  return stream(sink => {
+  return stream((sink, scheduler) => {
     let disposed = false
 
     let tx: IDBTransaction
@@ -160,27 +166,30 @@ export function read<TKey extends IDBValidKey, TData>(
       tx = db.transaction(storeName, 'readonly')
       request = tx.objectStore(storeName).get(key)
     } catch (e) {
+      const time = scheduler.time()
       // Store doesn't exist, return default value
       if (e instanceof DOMException && e.name === 'NotFoundError') {
-        sink.event(defaultValue)
+        sink.event(time, defaultValue)
       }
 
-      sink.error(e)
-      sink.end()
+      sink.error(time, e)
+      sink.end(time)
       return disposeNone
     }
 
     request.onsuccess = () => {
       if (disposed) return
       const result = request.result
+      const time = scheduler.time()
 
-      sink.event(result !== undefined ? result : defaultValue)
-      sink.end()
+      sink.event(time, result !== undefined ? result : defaultValue)
+      sink.end(time)
     }
 
     request.onerror = () => {
       if (disposed) return
-      sink.error(request.error || new Error('Read failed'))
+      const time = scheduler.time()
+      sink.error(time, request.error || new Error('Read failed'))
     }
 
     return disposeWith(() => {
@@ -200,37 +209,40 @@ export function write<TKey extends IDBValidKey, TData>(
 
     const valueDisposable = value.run(
       {
-        event(data) {
+        event(time, data) {
           try {
             const tx = db.transaction(storeName, 'readwrite')
             const request = tx.objectStore(storeName).put(data, key)
 
             request.onsuccess = () => {
               if (disposed) return
-              sink.event(data)
+              const stime = scheduler.time()
+              sink.event(stime, data)
             }
 
             request.onerror = () => {
               if (disposed) return
-              sink.error(request.error || new Error('Write failed'))
+              const stime = scheduler.time()
+              sink.error(stime, request.error || new Error('Write failed'))
             }
 
             tx.onerror = () => {
               if (disposed) return
-              sink.error(tx.error || new Error('Transaction failed'))
+              const stime = scheduler.time()
+              sink.error(stime, tx.error || new Error('Transaction failed'))
             }
           } catch (e) {
             if (disposed) return
-            sink.error(e instanceof Error ? e : new Error('Failed to create write transaction'))
+            sink.error(time, e instanceof Error ? e : new Error('Failed to create write transaction'))
           }
         },
-        end() {
+        end(time) {
           if (disposed) return
-          sink.end()
+          sink.end(time)
         },
-        error(error) {
+        error(time, error) {
           if (disposed) return
-          sink.error(error)
+          sink.error(time, error)
         }
       },
       scheduler

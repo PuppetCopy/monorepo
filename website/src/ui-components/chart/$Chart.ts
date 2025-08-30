@@ -10,7 +10,6 @@ import {
   merge,
   reduce,
   sampleMap,
-  startWith,
   switchMap,
   tap
 } from 'aelea/stream'
@@ -157,27 +156,24 @@ export const $Chart = <TSeriesType extends keyof ISeriesType>({
                   }, appendData)
                 : empty,
               ...priceLineConfigList.map(lineStreamConfig => {
-                return startWith(
-                  null,
-                  reduce(
-                    (prev, params) => {
-                      if (prev && params === null) {
-                        series.removePriceLine(prev)
-                      }
+                return reduce(
+                  (prev, params) => {
+                    if (prev && params === null) {
+                      series.removePriceLine(prev)
+                    }
 
-                      if (params) {
-                        if (prev) {
-                          prev.applyOptions(params)
-                          return prev
-                        }
-                        return series.createPriceLine(params)
+                    if (params) {
+                      if (prev) {
+                        prev.applyOptions(params)
+                        return prev
                       }
+                      return series.createPriceLine(params)
+                    }
 
-                      return null
-                    },
-                    null as IPriceLine | null,
-                    lineStreamConfig
-                  )
+                    return null
+                  },
+                  null as IPriceLine | null,
+                  lineStreamConfig
                 )
               }),
               tap(next => {

@@ -1,4 +1,4 @@
-import { combine, empty, type IStream, map, now, startWith } from 'aelea/stream'
+import { combine, empty, type IStream, map, now, start } from 'aelea/stream'
 import { type IBehavior, multicast, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import {
   $node,
@@ -90,7 +90,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
       const { alert = now(null), txQuery, disabled = now(false) } = config
 
       const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
-      const isRequestPending = startWith(false, isTxPending)
+      const isRequestPending = start(false, isTxPending)
 
       return [
         $ButtonCore({

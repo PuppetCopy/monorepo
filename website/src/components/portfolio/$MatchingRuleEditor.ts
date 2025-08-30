@@ -16,7 +16,7 @@ import {
   now,
   o,
   sampleMap,
-  startWith,
+  start,
   switchMap,
   toStream,
   zipMap
@@ -59,7 +59,7 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
   }
 
   const streams = entries.map(([key, stream]) => {
-    return startWith(defualtState[key], toStream(stream))
+    return start(defualtState[key], toStream(stream))
   })
 
   const zipped = zipMap(
@@ -100,11 +100,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
         expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
       }
 
-      const allowanceRate = model ? startWith(model.allowanceRate, inputAllowance) : inputAllowance
-      const throttleActivity = model
-        ? startWith(model.throttleActivity, changeActivityThrottle)
-        : changeActivityThrottle
-      const expiry = model ? startWith(model.expiry, inputEndDate) : inputEndDate
+      const allowanceRate = model ? start(model.allowanceRate, inputAllowance) : inputAllowance
+      const throttleActivity = model ? start(model.throttleActivity, changeActivityThrottle) : changeActivityThrottle
+      const expiry = model ? start(model.expiry, inputEndDate) : inputEndDate
       const draft = combineForm({ allowanceRate, throttleActivity, expiry }, defaultDraft)
 
       const isSubscribed = model && model.expiry > BigInt(unixTimestampNow())

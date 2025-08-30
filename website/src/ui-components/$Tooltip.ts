@@ -1,4 +1,4 @@
-import { constant, empty, map, skip, skipRepeats, startWith, switchLatest, switchMap, zipMap } from 'aelea/stream'
+import { constant, empty, map, skip, skipRepeats, start, switchLatest, switchMap, zipMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   component,
@@ -68,8 +68,8 @@ export const $Tooltip = ({
               const pointerLeave = isTouchDevice
                 ? skip(1, fromEventTarget(window, 'pointerdown'))
                 : fromEventTarget(target, 'pointerleave')
-              return startWith(true, constant(false, pointerLeave))
-              // return startWith(true, never())
+
+              return start(true, constant(false, pointerLeave))
             }),
             switchLatest,
             skipRepeats

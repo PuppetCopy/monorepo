@@ -1,4 +1,4 @@
-import { empty, type IStream, map, merge, o, startWith } from 'aelea/stream'
+import { empty, type IStream, map, merge, o, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
@@ -55,7 +55,7 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
                   isDisabled => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
-                  startWith(true, disabled)
+                  start(true, disabled)
                 )
               )
             : o()

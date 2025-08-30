@@ -17,10 +17,12 @@ export const watchContractEvent = <const abi extends Abi, eventName extends Cont
       const removeListenerFn = client.watchContractEvent({
         ...params,
         onLogs(logList) {
-          sink.event(logList as any)
+          const time = scheduler.time()
+          sink.event(time, logList as any)
         },
         onError(err) {
-          sink.error(err)
+          const time = scheduler.time()
+          sink.error(time, err)
         }
       } as WatchContractEventParameters)
 

@@ -1,4 +1,4 @@
-import { combine, empty, filterNull, type IStream, map, merge, now, o, startWith, switchMap } from 'aelea/stream'
+import { combine, empty, filterNull, type IStream, map, merge, now, o, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/ui'
 import { designSheet } from 'aelea/ui-components'
@@ -85,7 +85,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
                   isDisabled => {
                     return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                   },
-                  startWith(true, disabled)
+                  start(true, disabled)
                 )
               )
             : o(),
@@ -105,7 +105,7 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
 
                     return null
                   },
-                  combine({ value, focus: startWith(null, focus) })
+                  combine({ value, focus: start(null, focus) })
                 )
               )
             )

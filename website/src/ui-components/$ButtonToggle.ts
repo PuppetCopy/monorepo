@@ -1,4 +1,4 @@
-import { constant, type IOps, type IStream, map, never, startWith, switchLatest } from 'aelea/stream'
+import { constant, type IOps, type IStream, map, never, start, switchLatest } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
@@ -69,7 +69,7 @@ export const $ButtonToggle = <T>({
                   : { color: pallete.foreground }
               }, value)
             )
-          )(switchLatest($$option(startWith(opt, never))))
+          )(switchLatest($$option(start(opt, never))))
         )
       ),
 

@@ -7,7 +7,7 @@ import {
   type IStream,
   map,
   now,
-  startWith,
+  start,
   switchLatest,
   switchMap
 } from 'aelea/stream'
@@ -83,7 +83,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
         return $row(spacing.small, style({ alignItems: 'center', fontSize: '.8rem' }))(
           $spinner,
           $text(
-            startWith(
+            start(
               'Wallet Request...',
               map(() => 'Awaiting confirmation...', fromPromise(c))
             )

@@ -10,19 +10,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
-import {
-  combine,
-  empty,
-  fromPromise,
-  type IStream,
-  joinMap,
-  map,
-  merge,
-  now,
-  op,
-  startWith,
-  switchMap
-} from 'aelea/stream'
+import { combine, empty, fromPromise, type IStream, joinMap, map, merge, now, op, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -100,7 +88,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
       )
       // const isLong = uiStorage.replayWrite(localStore.leaderboard.isLong, switchIsLong)
       const account = uiStorage.replayWrite(localStore.leaderboard.account, filterAccount)
-      const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+      const paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
       return [
         $column(spacing.default)(
