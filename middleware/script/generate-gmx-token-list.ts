@@ -176,14 +176,14 @@ try {
       const existingFile = Bun.file(filePath)
       if (await existingFile.exists()) {
         const existingContent = await existingFile.text()
-        
+
         // Extract existing timestamp
         const timestampMatch = existingContent.match(/Generated on: (.+)/)
         const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
-        
+
         // Generate content with existing timestamp for comparison
         const contentWithOldTimestamp = generateContent(existingTimestamp)
-        
+
         if (existingContent === contentWithOldTimestamp) {
           return false // Content unchanged, no write needed
         }
@@ -191,7 +191,7 @@ try {
     } catch {
       // File doesn't exist or can't be read, proceed with write
     }
-    
+
     // Either file doesn't exist or content has changed - write with new timestamp
     const newContent = generateContent(new Date().toUTCString())
     await Bun.write(filePath, newContent)
@@ -199,8 +199,10 @@ try {
   }
 
   // Write the file only if content has changed
-  const wasUpdated = await writeIfChanged('./src/generated/tokenList.ts', (timestamp) =>
-    `// This file is auto-generated. Do not edit manually.
+  const wasUpdated = await writeIfChanged(
+    './src/generated/tokenList.ts',
+    timestamp =>
+      `// This file is auto-generated. Do not edit manually.
 // Generated on: ${timestamp}
 // Primary source: ${INTERFACE_TOKENS_URL}
 // Enhanced with data from: ${SYNTHETICS_TOKENS_URL}
@@ -218,7 +220,8 @@ ${tokens
   )
   .join(',\n')}
 ] as const
-`)
+`
+  )
 
   // Format the generated file with biome only if it was updated
   if (wasUpdated) {
@@ -227,7 +230,7 @@ ${tokens
   } else {
     console.log(`✅ Token list unchanged (${tokens.length} tokens)`)
   }
-  
+
   // Only show detailed list if content was updated
   if (wasUpdated) {
     console.log('\nGenerated tokens:')

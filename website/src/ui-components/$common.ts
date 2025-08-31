@@ -12,7 +12,7 @@ import {
   now,
   o,
   skipRepeats,
-  startWith,
+  start,
   switchMap
 } from 'aelea/stream'
 import {
@@ -307,7 +307,7 @@ interface ILabeledHintAdjustment extends IHintAdjustment {
 }
 
 export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
-  const displayChange = skipRepeats(map(str => !!str, startWith('', change)))
+  const displayChange = skipRepeats(map(str => !!str, start('', change)))
   const arrowColor = color ?? now(pallete.foreground)
 
   return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
@@ -359,7 +359,7 @@ export const $intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'
 
 export const intermediateText = (querySrc: IStream<Promise<string>>, hint = '-'): IStream<string> => {
   const text = switchMap(res => {
-    return startWith(hint, fromPromise(res))
+    return start(hint, fromPromise(res))
   }, querySrc)
   return text
 }

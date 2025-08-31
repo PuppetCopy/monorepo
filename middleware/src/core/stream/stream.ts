@@ -1,11 +1,11 @@
-import type { IStream } from 'aelea/stream'
-import { curry2, filter, fromPromise, map, periodic } from 'aelea/stream'
-import { stream } from 'aelea/stream-extended'
+import type { IScheduler, ISink, IStream } from 'aelea/stream'
+import { curry2, filter, fromPromise, map, periodic, start } from 'aelea/stream'
+import { multicast, stream } from 'aelea/stream-extended'
 import { countdownFn, unixTimestampNow } from '../date.js'
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 
-export const everySec = map(unixTimestampNow, periodic(1000, null))
+export const everySec = map(unixTimestampNow, start(null, periodic(1000)))
 
 export const countdown = (targetDate: number) => {
   return map(now => countdownFn(targetDate, now), everySec)
@@ -24,28 +24,28 @@ export const endWith: IEndWithCurry = curry2(
       let ended = false
       const sourceDisposable = source.run(
         {
-          event(data) {
-            sink.event(data)
+          event(time, data) {
+            sink.event(time, data)
 
             try {
               if (f(data)) {
-                sink.end()
+                sink.end(time)
                 sourceDisposable[Symbol.dispose]() // Dispose source stream
                 ended = true
               }
             } catch (error) {
-              sink.error(error)
+              sink.error(time, error)
             }
           },
-          error(err) {
+          error(time, err) {
             if (ended) return
 
-            sink.error(err)
+            sink.error(time, err)
           },
-          end() {
+          end(time) {
             if (ended) return
 
-            sink.end()
+            sink.end(time)
           }
         },
         scheduler
@@ -53,3 +53,52 @@ export const endWith: IEndWithCurry = curry2(
       return sourceDisposable
     })
 )
+
+export type Adapter<A> = [(event: A) => void, IStream<A>]
+
+interface ISubscriber<T> {
+  sink: ISink<T>
+  scheduler: IScheduler
+}
+
+export const createAdapter = <T>(): Adapter<T> => {
+  const subscriberList: ISubscriber<T>[] = []
+  const fanOut = new FanoutPortStream(subscriberList)
+  return [a => broadcast(subscriberList, a), multicast(fanOut)]
+}
+
+export class FanoutPortStream<T> implements IStream<T> {
+  constructor(readonly subscriberList: ISubscriber<T>[]) {}
+
+  run(sink: ISink<T>, scheduler: IScheduler): Disposable {
+    const subscriberList = this.subscriberList
+    const subscriber = { sink, scheduler }
+    subscriberList.push(subscriber)
+
+    return {
+      [Symbol.dispose]() {
+        const i = subscriberList.indexOf(subscriber)
+        if (i >= 0) {
+          subscriberList.splice(i, 1)
+        }
+      }
+    }
+  }
+}
+
+const broadcast = <T>(sinks: ISubscriber<T>[], a: T): void => {
+  const subscriberList = sinks.slice()
+
+  for (const subscriber of subscriberList) {
+    tryEvent(a, subscriber)
+  }
+}
+
+function tryEvent<T>(a: T, subscriber: ISubscriber<T>) {
+  const time = subscriber.scheduler.time()
+  try {
+    subscriber.sink.event(time, a)
+  } catch (e) {
+    subscriber.sink.error(time, e as Error)
+  }
+}

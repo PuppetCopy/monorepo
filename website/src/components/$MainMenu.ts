@@ -1,5 +1,5 @@
 import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, o, startWith } from 'aelea/stream'
+import { constant, empty, o, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
@@ -77,7 +77,7 @@ export const $MainMenu = (config: MainMenu) =>
         )
       ]
 
-      const themeState = startWith(theme, changeTheme)
+      const themeState = start(theme, changeTheme)
       const $extraMenuPopover = $Popover({
         $container: $iconCircular,
         $open: constant(

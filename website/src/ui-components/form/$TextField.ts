@@ -1,4 +1,4 @@
-import { combine, empty, type IStream, map, o, startWith, switchMap, toStream } from 'aelea/stream'
+import { combine, empty, type IStream, map, o, start, switchMap, toStream } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $node, $text, attrBehavior, component, type INodeCompose, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -68,7 +68,7 @@ export const $FieldLabeled = ({
 
         return params.hint ? $node($text(params.hint)) : empty
       },
-      combine({ validation: startWith(null, validation), hint: toStream(hint) })
+      combine({ validation: start(null, validation), hint: toStream(hint) })
     )
 
     return [

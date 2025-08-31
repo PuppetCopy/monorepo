@@ -1,8 +1,9 @@
 import { curry2 } from 'aelea/stream'
-import { BASIS_POINTS_DIVISOR } from '../const/common.js'
-import { formatFixed } from './parse.js'
+import type { Address } from 'viem'
+import { BASIS_POINTS_DIVISOR, USD_DECIMALS } from '../const/common.js'
+import { getTokenDescription } from '../gmx/gmxUtils.js'
+import { formatFixed, getTokenDenominator } from './parse.js'
 import type { ITokenDescription } from './types.js'
-import { getTokenAmount } from './utils.js'
 
 export const readableAccountingNumber: Intl.NumberFormatOptions = { maximumFractionDigits: 2, minimumFractionDigits: 2 }
 export const readableLargeNumber: Intl.NumberFormatOptions = { maximumFractionDigits: 0 }
@@ -21,21 +22,25 @@ export const readableUnitAmount = readableNumber({})
 export const readableAccountingAmount = readableNumber(readableAccountingNumber)
 export const readableUSD = readableNumber({})
 export const readablePercentage = (amount: bigint) => `${readableUnitAmount(formatFixed(2, amount))}%`
-export const readableFactorPercentage = (amount: bigint) => `${readableUnitAmount(formatFixed(30, amount) * 100)}%`
+export const readableFactorPercentage = (amount: bigint) =>
+  `${readableUnitAmount(formatFixed(USD_DECIMALS, amount) * 100)}%`
 export const readableLeverage = (a: bigint, b: bigint) =>
   `${b ? readableUnitAmount(formatFixed(4, (a * BASIS_POINTS_DIVISOR) / b)) : 0n}x`
-export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(30, ammount))
-export const readablePnl = (ammount: bigint, decimals = 30) =>
+export const readableUsd = (ammount: bigint) => readableUSD(formatFixed(USD_DECIMALS, ammount))
+export const readableTokenUsd = (
+  token: ITokenDescription | Address,
+  value: bigint,
+  format: Intl.NumberFormatOptions = {}
+) => {
+  const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
+  return readableNumber(format, formatFixed(USD_DECIMALS, value * getTokenDenominator(tokenDescription)))
+}
+export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) =>
   readableNumber({ signDisplay: 'exceptZero' })(formatFixed(decimals, ammount))
-export const readableTokenAmountFromUsdAmount = (decimals: number, price: bigint, amount: bigint) =>
-  readableUnitAmount(formatFixed(decimals, getTokenAmount(price, amount)))
-export const readableTokenUsd = (price: bigint, amount: bigint) => readableUsd(price * amount)
-export const readableTokenAmount = (tokenDesc: ITokenDescription, amount: bigint) =>
-  readableUnitAmount(formatFixed(tokenDesc.decimals, amount))
-export const readableTokenAmountLabel = (tokenDesc: ITokenDescription, amount: bigint) =>
-  `${readableTokenAmount(tokenDesc, amount)} ${tokenDesc.symbol}`
-export const readableTokenPrice = (decimals: number, amount: bigint) =>
-  readableAccountingAmount(formatFixed(30 - decimals, amount))
+export const readableTokenAmountLabel = (token: ITokenDescription | Address, amount: bigint) => {
+  const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
+  return `${readableUnitAmount(formatFixed(tokenDescription.decimals, amount))} ${tokenDescription.symbol}`
+}
 
 const UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte']
 const BYTES_PER_KB = 1000

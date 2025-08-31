@@ -13,7 +13,7 @@ import {
   type IStream,
   map,
   skipRepeatsWith,
-  startWith,
+  start,
   switchLatest,
   switchMap
 } from 'aelea/stream'
@@ -108,7 +108,7 @@ export const $TradeRouteTimeline = ({
                   return empty
                 }
 
-                const pnlCrossHairTimeChange = startWith(
+                const pnlCrossHairTimeChange = start(
                   null,
                   skipRepeatsWith((xsx, xsy) => {
                     return xsx.time === xsy.time

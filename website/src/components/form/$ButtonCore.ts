@@ -1,4 +1,4 @@
-import { constant, filter, map, merge, o, startWith } from 'aelea/stream'
+import { constant, filter, map, merge, o, op, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
@@ -39,14 +39,15 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
         clickTether(nodeEvent('pointerup')),
         disabled
           ? styleBehavior(
-              map(
-                isDisabled => {
+              op(
+                disabled,
+                start(true),
+                map(isDisabled => {
                   return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
-                },
-                startWith(true, disabled)
+                })
               )
             )
-          : (o() as any),
+          : op,
 
         styleBehavior(
           map(active => (active ? { borderColor: pallete.primary } : null), merge(focusStyle, dismissstyle))

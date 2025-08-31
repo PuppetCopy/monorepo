@@ -1,9 +1,4 @@
-import {
-  parseFixed,
-  parseReadableNumber,
-  readableTokenAmount,
-  readableTokenAmountLabel
-} from '@puppet-copy/middleware/core'
+import { parseFixed, parseReadableNumber, readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import {
   combine,
@@ -115,7 +110,7 @@ export const $DepositEditor = (config: {
               label: 'Amount',
               validation: alert,
               value: map(value => {
-                return value ? readableTokenAmount(tokenDescription, value) : ''
+                return value ? readableTokenAmountLabel(tokenDescription, value) : ''
               }, value),
               placeholder: 'Enter amount',
               hint: map(

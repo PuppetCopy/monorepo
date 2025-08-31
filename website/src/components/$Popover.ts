@@ -1,4 +1,4 @@
-import { combine, constant, empty, type IStream, map, merge, op, startWith, switchMap } from 'aelea/stream'
+import { combine, constant, empty, type IStream, map, merge, op, start, switchMap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import {
   $node,
@@ -125,7 +125,7 @@ export const $Popover = ({
                 },
                 combine({
                   targetIntersection,
-                  updateEvent: startWith(null, updateEvents)
+                  updateEvent: start(null, updateEvents)
                 })
               )
             )

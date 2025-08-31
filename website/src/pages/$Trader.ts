@@ -9,7 +9,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import { combine, fromPromise, type IStream, map, startWith, switchMap } from 'aelea/stream'
+import { combine, fromPromise, type IStream, map, start, switchMap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -98,7 +98,7 @@ export const $TraderPage = ({
 
       const pageParams = switchMap(async params => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-        const _paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+        const _paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
         const [routeMetricList, increaseList, decreaseList] = await Promise.all([
           params.routeMetricListQuery,
@@ -250,7 +250,7 @@ export const $TraderPage = ({
 
             switchMap(params => {
               const _startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-              const paging = startWith({ offset: 0, pageSize: 20 }, scrollRequest)
+              const paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
               if (params.routeMetricList.length === 0) {
                 return $column(spacing.small)(

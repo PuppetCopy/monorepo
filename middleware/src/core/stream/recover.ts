@@ -1,20 +1,29 @@
-import { at, continueWith, curry2, fromPromise, type IOps, type IStream, joinMap, now, switchMap } from 'aelea/stream'
+import {
+  at,
+  atWith,
+  continueWith,
+  curry2,
+  fromPromise,
+  type IOps,
+  type IStream,
+  switchLatest,
+  switchMap
+} from 'aelea/stream'
 import { stream } from 'aelea/stream-extended'
 
 export interface IRunPeriodically<T> {
-  actionOp: IOps<void, Promise<T>>
+  actionOp: IOps<number, Promise<T>>
   interval?: number
   startImmediate?: boolean
 }
+
 export const periodicRun = <T>({
   actionOp, //
   interval = 1000,
   startImmediate = true
 }: IRunPeriodically<T>): IStream<T> => {
-  const run = startImmediate
-    ? actionOp(now(undefined)) //
-    : actionOp(at(interval, undefined))
-  const awaitExecution = joinMap(fromPromise, run)
+  const run = actionOp(atWith(startImmediate ? 0 : interval, x => x))
+  const awaitExecution = switchMap(fromPromise, run)
   const runArgs = { actionOp, interval, startImmediate: false }
 
   return continueWith(() => periodicRun<T>(runArgs), awaitExecution)
@@ -22,7 +31,7 @@ export const periodicRun = <T>({
 
 export interface IRecoverConfig<T> {
   recoverTime?: number // Default is 10 minutes
-  recoverWith?: (source: IStream<T>) => IStream<T>
+  recoverWith?: (source: IStream<T>, nextRetryTime: number) => IStream<T>
 
   lastRuntime?: number
 }
@@ -35,13 +44,12 @@ export const recover: IRecoverCurry = curry2((config, source) => {
   const { recoverTime = 10_000, recoverWith, lastRuntime } = config
 
   return stream((sink, scheduler) =>
-    continueWith(() => {
-      const time = scheduler.time()
+    continueWith(time => {
       const timeElapsed = time - (lastRuntime ?? 0)
       const delayTime = recoverTime > timeElapsed ? recoverTime - timeElapsed : 0
 
       // Create fresh recovery on each error to avoid memory accumulation
-      const recoveredSource = recoverWith ? recoverWith(source) : source
+      const recoveredSource = recoverWith ? recoverWith(source, delayTime) : source
 
       // Wrap with recover again, creating a fresh instance each time
       const wrappedSource = recover(
@@ -53,8 +61,12 @@ export const recover: IRecoverCurry = curry2((config, source) => {
         recoveredSource
       )
 
+      const nextStream =
+        delayTime > 0
+          ? switchLatest(at(delayTime, wrappedSource)) //
+          : wrappedSource
       // Delay before retrying
-      return switchMap(() => wrappedSource, at(delayTime, null))
+      return nextStream
     }, source).run(sink, scheduler)
   )
 })

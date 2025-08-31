@@ -1,5 +1,5 @@
 import { getMappedValueFallback } from '@puppet-copy/middleware/core'
-import { combine, constant, empty, type IStream, map, merge, now, startWith, switchLatest } from 'aelea/stream'
+import { combine, constant, empty, type IStream, map, merge, now, start, switchLatest } from 'aelea/stream'
 import { type IBehavior, multicast, type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, type Control, spacing } from 'aelea/ui-components'
@@ -46,7 +46,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
         multicastTxQuery,
         map(a => (a ? ({ status: PromiseStatus.ERROR, error: new Error(a) } as PromiseStateError) : null), alert)
       )
-      const isRequestPending = startWith(
+      const isRequestPending = start(
         false,
         map(s => s.status === PromiseStatus.PENDING, multicastTxQuery)
       )
@@ -124,7 +124,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
               })
 
               if (spend) {
-                const isSpendPending = startWith(
+                const isSpendPending = start(
                   false,
                   map(s => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
                 )

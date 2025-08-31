@@ -1,5 +1,5 @@
 import type { Route } from 'aelea/router'
-import { constant, type IOps, map, merge, o, op, startWith } from 'aelea/stream'
+import { constant, type IOps, map, merge, o, op, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { attr, component, type I$Node, type INode, nodeEvent, style } from 'aelea/ui'
 
@@ -44,7 +44,7 @@ export const $RouterAnchor = ({ url, route, $anchor, anchorOp = o() }: IAnchor) 
           const focus = constant(true, merge(nodeEvent('focus', $anchor), nodeEvent('pointerenter', $anchor)))
           const blur = constant(false, merge(nodeEvent('blur', $anchor), nodeEvent('pointerleave', $anchor)))
 
-          return startWith(false, merge(focus, blur))
+          return start(false, merge(focus, blur))
         }),
         anchorOp
       ),

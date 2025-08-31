@@ -8,7 +8,7 @@ import { wallet } from '../wallet/wallet.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 
 export const $walletProfileDisplay = () => {
-  // const account = accountStatus.connector === undefined ? startWith(accountStatus, account) : account
+  // const account = accountStatus.connector === undefined ? start(accountStatus, account) : account
 
   const [click, clickTether] = behavior()
 
