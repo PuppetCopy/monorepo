@@ -3,13 +3,31 @@ name: Indexer Release
 on:
   push:
     branches: [main]
-    paths:
-      - 'indexer/**'
-      - '.github/workflows/indexer-release.yml'
   workflow_dispatch:
 
 jobs:
+  check-changes:
+    name: Check Indexer Changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: Check if indexer submodule changed
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] || git diff --name-only HEAD~1 HEAD | grep -q '^indexer$'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
   build:
+    needs: check-changes
+    if: needs.check-changes.outputs.changed == 'true'
     name: Build Indexer
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +98,8 @@ jobs:
 
   deploy:
     name: Deploy to Railway
-    needs: build
+    needs: [check-changes, build]
+    if: needs.check-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest
     env:
