@@ -7,7 +7,6 @@ import {
   just,
   map,
   merge,
-  now,
   skip,
   switchLatest,
   switchMap,

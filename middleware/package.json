@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "abitype": "1.0.9",
-    "aelea": "2.5.22",
+    "aelea": "2.5.24",
     "jazzicon": "1.5.0",
     "lightweight-charts": "5.0.8",
     "viem": "2.36.0"

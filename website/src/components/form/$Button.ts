@@ -1,4 +1,4 @@
-import { combine, empty, type IStream, just, map, now, start } from 'aelea/stream'
+import { combine, empty, type IStream, just, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import {
   $node,

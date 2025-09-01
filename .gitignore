@@ -6,3 +6,4 @@ dist
 .claude/
 *.tsbuildinfo
 .tsbuildinfo
+CLAUDE.local.md

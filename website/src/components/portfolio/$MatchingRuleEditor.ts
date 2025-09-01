@@ -14,7 +14,6 @@ import {
   just,
   map,
   merge,
-  now,
   o,
   sampleMap,
   start,
