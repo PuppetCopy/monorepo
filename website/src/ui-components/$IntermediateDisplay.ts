@@ -5,8 +5,8 @@ import {
   fromPromise,
   type IOps,
   type IStream,
+  just,
   map,
-  now,
   start,
   switchLatest,
   switchMap
@@ -74,7 +74,7 @@ export const $IntermediateTx = <TSuccess extends TransactionReceipt>({
       const res = await query
 
       return $row(spacing.small, style({ color: pallete.positive }))(
-        switchLatest($$success(now(res))),
+        switchLatest($$success(just(res))),
         $txHashRef(res.transactionHash, chain)
       )
     }, multicastQuery),

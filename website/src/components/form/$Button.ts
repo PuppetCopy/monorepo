@@ -1,4 +1,4 @@
-import { combine, empty, type IStream, map, now, start } from 'aelea/stream'
+import { combine, empty, type IStream, just, map, now, start } from 'aelea/stream'
 import { type IBehavior, multicast, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import {
   $node,
@@ -87,7 +87,7 @@ export const $Submit = (config: IButtonPrimaryCtx) =>
       [click, clickTether]: IBehavior<PointerEvent, PointerEvent>,
       [_changeWallet, _changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
-      const { alert = now(null), txQuery, disabled = now(false) } = config
+      const { alert = just(null), txQuery, disabled = just(false) } = config
 
       const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
       const isRequestPending = start(false, isTxPending)

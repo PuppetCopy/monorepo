@@ -1,9 +1,9 @@
-import { combineMap, continueWith, fromArray, now } from 'aelea/stream'
+import { combineMap, continueWith, fromIterable, just } from 'aelea/stream'
 import { type I$Slottable, motion, styleInline } from 'aelea/ui'
 
 export function fadeIn($content: I$Slottable) {
-  const fadeIn = motion({ stiffness: 70, damping: 26, precision: 3 }, fromArray([0, 100]))
-  const slideIn = motion({ stiffness: 670, damping: 46, precision: 3 }, fromArray([20, 0]))
+  const fadeIn = motion({ stiffness: 70, damping: 26, precision: 3 }, fromIterable([0, 100]))
+  const slideIn = motion({ stiffness: 670, damping: 46, precision: 3 }, fromIterable([20, 0]))
 
   const animation = combineMap(
     (state, slide) => ({
@@ -15,7 +15,7 @@ export function fadeIn($content: I$Slottable) {
   )
 
   const withEndAnimation = continueWith(() => {
-    return now({ opacity: '', transform: '' })
+    return just({ opacity: '', transform: '' })
   })
 
   return styleInline(withEndAnimation(animation), $content)

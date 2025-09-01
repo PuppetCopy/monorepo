@@ -1,4 +1,4 @@
-import { constant, empty, type IOps, type IStream, map, now, switchLatest, switchMap } from 'aelea/stream'
+import { constant, empty, type IOps, type IStream, just, map, switchLatest, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
@@ -156,13 +156,13 @@ export const $Table = <T>({
           const $items = (Array.isArray(res) ? res : res.page).map(rowData => {
             const $cellDataList = columns.map(col => {
               const $body = col.$bodyCellContainer ?? $bodyCell
-              return $body(switchLatest(col.$bodyCallback(now(rowData))))
+              return $body(switchLatest(col.$bodyCallback(just(rowData))))
             })
 
             return $rowCallback
               ? switchMap(
                   $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
-                  $rowCallback(now(rowData))
+                  $rowCallback(just(rowData))
                 )
               : $rowContainer(gridTemplateColumns)(...$cellDataList)
           })

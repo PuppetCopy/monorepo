@@ -1,13 +1,14 @@
 import {
   at,
-  atWith,
+  constant,
   continueWith,
   curry2,
   fromPromise,
   type IOps,
   type IStream,
   switchLatest,
-  switchMap
+  switchMap,
+  wait
 } from 'aelea/stream'
 import { stream } from 'aelea/stream-extended'
 
@@ -22,7 +23,7 @@ export const periodicRun = <T>({
   interval = 1000,
   startImmediate = true
 }: IRunPeriodically<T>): IStream<T> => {
-  const run = actionOp(atWith(startImmediate ? 0 : interval, x => x))
+  const run = actionOp(wait(startImmediate ? 0 : interval))
   const awaitExecution = switchMap(fromPromise, run)
   const runArgs = { actionOp, interval, startImmediate: false }
 
@@ -50,11 +51,12 @@ export const recover: IRecoverCurry = curry2((config, source) => {
 
       // Create fresh recovery on each error to avoid memory accumulation
       const recoveredSource = recoverWith ? recoverWith(source, delayTime) : source
+      const nextRuntime = time + delayTime
 
       // Wrap with recover again, creating a fresh instance each time
       const wrappedSource = recover(
         {
-          lastRuntime: time + delayTime,
+          lastRuntime: nextRuntime,
           recoverTime,
           recoverWith
         },
@@ -63,7 +65,7 @@ export const recover: IRecoverCurry = curry2((config, source) => {
 
       const nextStream =
         delayTime > 0
-          ? switchLatest(at(delayTime, wrappedSource)) //
+          ? switchLatest(constant(wrappedSource, at(nextRuntime))) //
           : wrappedSource
       // Delay before retrying
       return nextStream

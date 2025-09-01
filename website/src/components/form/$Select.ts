@@ -1,4 +1,4 @@
-import { constant, type IOps, type IStream, now, switchLatest, switchMap, toStream } from 'aelea/stream'
+import { constant, type IOps, type IStream, just, now, switchLatest, switchMap, toStream } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { component, type I$Node, type INode, type INodeCompose, nodeEvent, style } from 'aelea/ui'
 import { $defaultSelectContainer } from './$Dropdown.js'
@@ -18,7 +18,7 @@ export const $Select = <T>({ list, $$option, $container = $defaultSelectContaine
           ..._list.map(item => {
             const selectBehavior = selectTether(nodeEvent('click'), constant(item))
 
-            const $opt = style({ cursor: 'pointer' })(switchLatest($$option(now(item))))
+            const $opt = style({ cursor: 'pointer' })(switchLatest($$option(just(item))))
 
             return selectBehavior($opt)
           })

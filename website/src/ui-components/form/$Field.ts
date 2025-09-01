@@ -1,4 +1,4 @@
-import { combine, empty, filterNull, type IStream, map, merge, now, o, start, switchMap } from 'aelea/stream'
+import { combine, empty, filterNull, type IStream, map, merge, o, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $element, component, type INode, type INodeCompose, nodeEvent, style, styleBehavior } from 'aelea/ui'
 import { designSheet } from 'aelea/ui-components'
@@ -91,8 +91,8 @@ export const $Field = ({ value = empty, disabled, validation = empty, $input = $
             : o(),
 
           switchMap(node =>
-            merge(
-              now(node),
+            start(
+              node,
               filterNull(
                 map(
                   params => {

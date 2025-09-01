@@ -1,5 +1,6 @@
 import { registerSW } from 'virtual:pwa-register'
-import { fromCallback, type IStream } from 'aelea/stream'
+import type { IStream } from 'aelea/stream'
+import { fromCallback } from 'aelea/stream-extended'
 
 export const pwaUpgradeNotification: IStream<() => void> = fromCallback(cb => {
   const reloadCb = registerSW({

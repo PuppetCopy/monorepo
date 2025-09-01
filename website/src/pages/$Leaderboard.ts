@@ -10,7 +10,19 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
-import { combine, empty, fromPromise, type IStream, joinMap, map, merge, now, op, start, switchMap } from 'aelea/stream'
+import {
+  combine,
+  empty,
+  fromPromise,
+  type IStream,
+  joinMap,
+  just,
+  map,
+  merge,
+  op,
+  start,
+  switchMap
+} from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -398,7 +410,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           width: '100%'
                         })(
                           $Baseline({
-                            markers: now(markerList),
+                            markers: just(markerList),
                             chartConfig: {
                               leftPriceScale: {
                                 // autoScale: true,

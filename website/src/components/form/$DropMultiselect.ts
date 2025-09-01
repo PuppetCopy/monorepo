@@ -2,6 +2,7 @@ import {
   constant,
   type IOps,
   type IStream,
+  just,
   map,
   merge,
   now,
@@ -94,7 +95,7 @@ export const $DropMultiSelect = <T>({
             )(
               ...valueList.map(token => {
                 return $optionContainer(
-                  switchLatest($$selectedOption(now(token))),
+                  switchLatest($$selectedOption(just(token))),
                   $icon({
                     $content: $xCross,
                     width: '28px',
