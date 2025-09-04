@@ -1,5 +1,5 @@
 import type { Abi } from 'abitype'
-import { disposeWith, type IStream, propagateErrorTask } from 'aelea/stream'
+import { disposeWith, type IStream, propagateErrorEndTask } from 'aelea/stream'
 import { stream } from 'aelea/stream-extended'
 import type {
   ContractEventName,
@@ -28,7 +28,7 @@ export const watchContractEvent = <const abi extends Abi, eventName extends Cont
 
       return disposeWith(removeListenerFn)
     } catch (err) {
-      return scheduler.asap(propagateErrorTask(sink, err))
+      return scheduler.asap(propagateErrorEndTask(sink, err))
     }
   })
 }

@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
+// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/SequencerRouter.sol/SequencerRouter.json
 
 export default [
@@ -1494,6 +1494,11 @@ export default [
         name: '_receiver',
         type: 'address',
         internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
       }
     ],
     outputs: [
@@ -2233,6 +2238,11 @@ export default [
             name: 'sequencerExecutionFee',
             type: 'uint256',
             internalType: 'uint256'
+          },
+          {
+            name: 'amount',
+            type: 'uint256',
+            internalType: 'uint256'
           }
         ]
       },
@@ -2243,11 +2253,6 @@ export default [
       }
     ],
     outputs: [
-      {
-        name: 'settledBalance',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
       {
         name: 'distributionAmount',
         type: 'uint256',

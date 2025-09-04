@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
+// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/Account.sol/Account.json
 
 export default [
@@ -396,6 +396,11 @@ export default [
         internalType: 'contract IERC20'
       },
       {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      },
+      {
         name: '_gasLimit',
         type: 'uint256',
         internalType: 'uint256'
@@ -512,7 +517,18 @@ export default [
   {
     type: 'error',
     name: 'Account__InsufficientBalance',
-    inputs: []
+    inputs: [
+      {
+        name: 'actualBalance',
+        type: 'uint256',
+        internalType: 'uint256'
+      },
+      {
+        name: 'requiredAmount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ]
   },
   {
     type: 'error',

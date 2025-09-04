@@ -216,20 +216,20 @@ export function write<TKey extends IDBValidKey, TData>(
 
             request.onsuccess = () => {
               if (disposed) return
-              const stime = scheduler.time()
-              sink.event(stime, data)
+              const time = scheduler.time()
+              sink.event(time, data)
             }
 
             request.onerror = () => {
               if (disposed) return
-              const stime = scheduler.time()
-              sink.error(stime, request.error || new Error('Write failed'))
+              const time = scheduler.time()
+              sink.error(time, request.error || new Error('Write failed'))
             }
 
             tx.onerror = () => {
               if (disposed) return
-              const stime = scheduler.time()
-              sink.error(stime, tx.error || new Error('Transaction failed'))
+              const time = scheduler.time()
+              sink.error(time, tx.error || new Error('Transaction failed'))
             }
           } catch (e) {
             if (disposed) return

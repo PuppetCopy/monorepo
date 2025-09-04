@@ -33,7 +33,6 @@ export const EVENT_PARAMS_MAP = {
   Withdraw: parseAbiParameters('address, address, address, uint256, uint256'),
   SetDepositCapList: parseAbiParameters('address[], uint256[]'),
 
-  // Rule.sol events
   SetMatchingRule: parseAbiParameters('(uint256, uint256, uint256), address, address, address, bytes32'),
 
   // Mirror.sol events
