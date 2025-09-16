@@ -1,5 +1,6 @@
 import { erc20Abi } from 'viem'
-import { errorAbi } from '../generated/abi/errorAbi.js'
+import { puppetErrorAbi } from '../generated/abi/puppetErrorAbi.js'
+import { gmxErrorAbi } from '../generated/abi/gmxErrors.js'
 import referralStorageAbi from '../generated/abi/referralStorage.js'
 import { GMX_V2_CONTRACT_MAP } from '../generated/gmxContracts.js'
 import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
@@ -13,7 +14,7 @@ export const CONTRACT = {
   SequencerRouter: {
     address: PUPPET_CONTRACT_MAP.SequencerRouter.address,
     // Combined ABIs for router proxy pattern
-    abi: [...PUPPET_CONTRACT_MAP.SequencerRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...errorAbi]
+    abi: [...PUPPET_CONTRACT_MAP.SequencerRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...puppetErrorAbi]
   },
 
   Dictatorship: PUPPET_CONTRACT_MAP.Dictatorship,
@@ -31,7 +32,7 @@ export const CONTRACT = {
 
   // Custom error ABI
   CustomError: {
-    abi: errorAbi
+    abi: puppetErrorAbi
   },
 
   // GMX contracts from generated file
@@ -45,12 +46,12 @@ export const CONTRACT = {
   },
 
   // GMX V2 contracts
-  GmxReaderV2: GMX_V2_CONTRACT_MAP.GmxReaderV2,
-  GmxExchangeRouter: GMX_V2_CONTRACT_MAP.GmxExchangeRouter,
-  GmxOrderVault: GMX_V2_CONTRACT_MAP.GmxOrderVault,
+  // GmxReaderV2: GMX_V2_CONTRACT_MAP.GmxReaderV2,
+  // GmxExchangeRouter: GMX_V2_CONTRACT_MAP.GmxExchangeRouter,
+  // GmxOrderVault: GMX_V2_CONTRACT_MAP.GmxOrderVault,
   GmxDatastore: GMX_V2_CONTRACT_MAP.GmxDatastore,
   GmxEventEmitter: GMX_V2_CONTRACT_MAP.GmxEventEmitter,
   GmxCustomError: {
-    abi: errorAbi
+    abi: gmxErrorAbi
   }
 } as const

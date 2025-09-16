@@ -103,11 +103,11 @@ async function generateErrorAbi() {
     // Generate the TypeScript export
     const output = `// This file is auto-generated from contracts/src/utils/Error.sol
 
-export const errorAbi = ${JSON.stringify(errors, null, 2).replace(/"(\w+)":/g, '$1:')} as const
+export const puppetErrorAbi = ${JSON.stringify(errors, null, 2).replace(/"(\w+)":/g, '$1:')} as const
 `
 
     // Write to the generated folder
-    await Bun.write('./src/generated/abi/errorAbi.ts', output)
+    await Bun.write('./src/generated/abi/puppetErrorAbi.ts', output)
 
     console.log(`✅ Generated error ABI with ${errors.length} errors`)
   } catch (error) {
@@ -202,7 +202,6 @@ export default ${JSON.stringify(contract.abi, null, 2)} as const
     // Format the generated files with biome
     await Bun.$`bunx @biomejs/biome format --write ./src/generated/puppetContracts.ts`
     await Bun.$`bunx @biomejs/biome format --write ./src/generated/abi/puppet*.ts`
-    await Bun.$`bunx @biomejs/biome format --write ./src/generated/abi/errorAbi.ts`
 
     console.log('✅ Successfully generated Puppet contract list with ABIs and errors')
     console.log('\nGenerated contracts:')

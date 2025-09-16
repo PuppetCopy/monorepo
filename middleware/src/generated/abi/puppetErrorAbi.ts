@@ -1,6 +1,6 @@
 // This file is auto-generated from contracts/src/utils/Error.sol
 
-export const errorAbi = [
+export const puppetErrorAbi = [
   {
     type: 'error',
     name: 'TransferUtils__TokenTransferError',
