@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/Dictatorship.sol/Dictatorship.json
 
 export default [

@@ -1,7 +1,7 @@
 import { erc20Abi } from 'viem'
 import { errorAbi } from '../generated/abi/errorAbi.js'
 import referralStorageAbi from '../generated/abi/referralStorage.js'
-import { GMX_V2_CONTRACT_MAP } from '../generated/contractList.js'
+import { GMX_V2_CONTRACT_MAP } from '../generated/gmxContracts.js'
 import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
 
 export const CONTRACT = {

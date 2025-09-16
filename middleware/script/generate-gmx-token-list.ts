@@ -1,7 +1,7 @@
 const INTERFACE_TOKENS_URL =
   'https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts'
 const SYNTHETICS_TOKENS_URL =
-  'https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts'
+  'https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/main/config/tokens.ts'
 
 // Make this file a module to allow top-level await
 export {}
@@ -171,20 +171,13 @@ try {
   console.log(`✅ Enhanced ${Object.keys(syntheticsTokens).length} tokens with data from GMX Synthetics`)
 
   // Helper function to check if file content has changed
-  async function writeIfChanged(filePath: string, generateContent: (timestamp: string) => string): Promise<boolean> {
+  async function writeIfChanged(filePath: string, newContent: string): Promise<boolean> {
     try {
       const existingFile = Bun.file(filePath)
       if (await existingFile.exists()) {
         const existingContent = await existingFile.text()
 
-        // Extract existing timestamp
-        const timestampMatch = existingContent.match(/Generated on: (.+)/)
-        const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
-
-        // Generate content with existing timestamp for comparison
-        const contentWithOldTimestamp = generateContent(existingTimestamp)
-
-        if (existingContent === contentWithOldTimestamp) {
+        if (existingContent === newContent) {
           return false // Content unchanged, no write needed
         }
       }
@@ -192,18 +185,13 @@ try {
       // File doesn't exist or can't be read, proceed with write
     }
 
-    // Either file doesn't exist or content has changed - write with new timestamp
-    const newContent = generateContent(new Date().toUTCString())
+    // Either file doesn't exist or content has changed - write new content
     await Bun.write(filePath, newContent)
     return true // Content was written
   }
 
   // Write the file only if content has changed
-  const wasUpdated = await writeIfChanged(
-    './src/generated/tokenList.ts',
-    timestamp =>
-      `// This file is auto-generated. Do not edit manually.
-// Generated on: ${timestamp}
+  const tokenListContent = `// This file is auto-generated. Do not edit manually.
 // Primary source: ${INTERFACE_TOKENS_URL}
 // Enhanced with data from: ${SYNTHETICS_TOKENS_URL}
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
@@ -221,7 +209,8 @@ ${tokens
   .join(',\n')}
 ] as const
 `
-  )
+
+  const wasUpdated = await writeIfChanged('./src/generated/tokenList.ts', tokenListContent)
 
   // Format the generated file with biome only if it was updated
   if (wasUpdated) {

@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:11:54 GMT
 // Source: GMX V2 Reader Contract (0x65A6CC451BAfF7e7B4FDAb4157763aB4b6b44D0E) on Arbitrum
 
 export const ARBITRUM_MARKET_LIST = [

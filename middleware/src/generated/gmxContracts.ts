@@ -1,6 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
-// Source: GMX deployment files from GitHub (v2.2-branch)
+// Source: GMX deployment files from GitHub (main branch)
 
 // Import generated ABIs
 import readerv2Abi from './abi/gmxReaderV2.js'
@@ -15,7 +14,7 @@ export const GMX_V2_CONTRACT_MAP = {
     abi: readerv2Abi
   },
   GmxExchangeRouter: {
-    address: '0x7452c558d45f8afC8c83dAe62C3f8A5BE19c71f6',
+    address: '0x87d66368cD08a7Ca42252f5ab44B2fb6d1Fb8d15',
     abi: exchangerouterAbi
   },
   GmxOrderVault: {

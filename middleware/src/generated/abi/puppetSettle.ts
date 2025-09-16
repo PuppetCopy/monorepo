@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/Settle.sol/Settle.json
 
 export default [
@@ -327,7 +326,7 @@ export default [
     ],
     outputs: [
       {
-        name: '_distributionAmount',
+        name: '_distributedAmount',
         type: 'uint256',
         internalType: 'uint256'
       },

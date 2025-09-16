@@ -1,7 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:11:55 GMT
 // Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
-// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
+// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/main/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
 
 export const ARBITRUM_TOKEN_LIST = [
@@ -459,7 +458,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'MORPHO',
     decimals: 18,
     address: '0xF67b2a901D674B443Fa9f6DB2A689B37c07fD4fE',
-    name: 'Morpho'
+    name: 'Morpho',
+    synthetic: true,
+    dataStreamFeedId: '0x0003df1ca5682717315cc4f0db6f3c782eec3f6861f38ba90f5a2383b75404d8',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'NEAR',
@@ -752,7 +754,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'VVV',
     decimals: 18,
     address: '0xB79Eb5BA64A167676694bB41bc1640F95d309a2F',
-    name: 'Venice Token'
+    name: 'Venice Token',
+    synthetic: true,
+    dataStreamFeedId: '0x0003195dde0f669c58fa396bdd60488cbebcf4e0d869905fb79b3ed4b763c7a9',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'WAVAX (Wormhole)',
@@ -789,7 +794,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'WELL',
     decimals: 18,
     address: '0x465A31E5bA29b8EAcC860d499D714a6f07e56E85',
-    name: 'Moonwell'
+    name: 'Moonwell',
+    synthetic: true,
+    dataStreamFeedId: '0x00032074a30ba476c45cf517868fca15c694813dae41fb795e95c10ae0023316',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'WETH',
@@ -823,7 +831,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'WLFI',
     decimals: 18,
     address: '0xC5799ab6E2818fD8d0788dB8D156B0c5db1Bf97b',
-    name: 'World Liberty Financial'
+    name: 'World Liberty Financial',
+    synthetic: true,
+    dataStreamFeedId: '0x000348a0911d971aafb082790ac3b4af7271c5d8d9603b644240442d8656c2d6',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'WSOL (Wormhole)',

@@ -1,5 +1,4 @@
 // This file is auto-generated from contracts/src/utils/Error.sol
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 
 export const errorAbi = [
   {
@@ -444,6 +443,17 @@ export const errorAbi = [
       },
       {
         name: 'requiredFee',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
+    ]
+  },
+  {
+    type: 'error',
+    name: 'Mirror__AllocationNotFullyRedistributed',
+    inputs: [
+      {
+        name: 'remainingAllocation',
         internalType: 'uint256',
         type: 'uint256'
       }

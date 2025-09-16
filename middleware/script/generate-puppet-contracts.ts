@@ -102,7 +102,6 @@ async function generateErrorAbi() {
 
     // Generate the TypeScript export
     const output = `// This file is auto-generated from contracts/src/utils/Error.sol
-// Generated on: ${new Date().toUTCString()}
 
 export const errorAbi = ${JSON.stringify(errors, null, 2).replace(/"(\w+)":/g, '$1:')} as const
 `
@@ -152,7 +151,6 @@ async function generateContracts() {
 
     // Generate TypeScript file
     const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
 // Source: Puppet deployments.json and forge-artifacts
 
 import type { Address } from 'viem'
@@ -186,7 +184,6 @@ ${contracts
         const abiFileName = `puppet${contract.name}`
         const abiFilePath = `./src/generated/abi/${abiFileName}.ts`
         const abiContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
 // Source: forge-artifacts/${contract.name}.sol/${contract.name}.json
 
 export default ${JSON.stringify(contract.abi, null, 2)} as const

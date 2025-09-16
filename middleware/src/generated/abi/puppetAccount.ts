@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/Account.sol/Account.json
 
 export default [
@@ -264,6 +263,29 @@ export default [
   },
   {
     type: 'function',
+    name: 'recoverUnaccountedTokens',
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      },
+      {
+        name: '_receiver',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
     name: 'setBalanceList',
     inputs: [
       {
@@ -440,8 +462,14 @@ export default [
   },
   {
     type: 'function',
-    name: 'unaccountedBalance',
-    inputs: [],
+    name: 'unaccountedTokenBalance',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      }
+    ],
     outputs: [
       {
         name: '',

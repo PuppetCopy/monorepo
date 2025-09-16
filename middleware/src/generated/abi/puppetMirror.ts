@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/Mirror.sol/Mirror.json
 
 export default [
@@ -644,7 +643,7 @@ export default [
   },
   {
     type: 'function',
-    name: 'requestCloseStalledPosition',
+    name: 'requestCloseStalled',
     inputs: [
       {
         name: '_account',
@@ -672,6 +671,16 @@ export default [
             internalType: 'address'
           },
           {
+            name: 'sequencerFeeReceiver',
+            type: 'address',
+            internalType: 'address'
+          },
+          {
+            name: 'reasonEnum',
+            type: 'uint8',
+            internalType: 'uint8'
+          },
+          {
             name: 'isLong',
             type: 'bool',
             internalType: 'bool'
@@ -688,6 +697,11 @@ export default [
           },
           {
             name: 'allocationId',
+            type: 'uint256',
+            internalType: 'uint256'
+          },
+          {
+            name: 'sequencerFee',
             type: 'uint256',
             internalType: 'uint256'
           }
@@ -883,6 +897,17 @@ export default [
       }
     ],
     stateMutability: 'pure'
+  },
+  {
+    type: 'error',
+    name: 'Mirror__AllocationNotFullyRedistributed',
+    inputs: [
+      {
+        name: 'remainingAllocation',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ]
   },
   {
     type: 'error',

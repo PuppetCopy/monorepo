@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 04 Sep 2025 20:12:05 GMT
 // Source: forge-artifacts/TokenRouter.sol/TokenRouter.json
 
 export default [
