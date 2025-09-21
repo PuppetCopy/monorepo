@@ -1,6 +1,6 @@
 import { erc20Abi } from 'viem'
-import { puppetErrorAbi } from '../generated/abi/puppetErrorAbi.js'
 import { gmxErrorAbi } from '../generated/abi/gmxErrors.js'
+import { puppetErrorAbi } from '../generated/abi/puppetErrorAbi.js'
 import referralStorageAbi from '../generated/abi/referralStorage.js'
 import { GMX_V2_CONTRACT_MAP } from '../generated/gmxContracts.js'
 import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
@@ -14,7 +14,12 @@ export const CONTRACT = {
   SequencerRouter: {
     address: PUPPET_CONTRACT_MAP.SequencerRouter.address,
     // Combined ABIs for router proxy pattern
-    abi: [...PUPPET_CONTRACT_MAP.SequencerRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...puppetErrorAbi]
+    abi: [
+      ...PUPPET_CONTRACT_MAP.SequencerRouter.abi,
+      ...PUPPET_CONTRACT_MAP.RouterProxy.abi,
+      ...puppetErrorAbi,
+      ...gmxErrorAbi
+    ]
   },
 
   Dictatorship: PUPPET_CONTRACT_MAP.Dictatorship,

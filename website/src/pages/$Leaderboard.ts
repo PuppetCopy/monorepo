@@ -212,9 +212,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       pnlList: true,
                       pnlTimestampList: true,
                       matchedPuppetList: true,
-                      indexTokenList: true,
-
-                      id: true
+                      indexTokenList: true
                     },
                     with: {
                       traderRouteMetric: {

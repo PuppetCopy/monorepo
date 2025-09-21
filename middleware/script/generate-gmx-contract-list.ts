@@ -68,65 +68,65 @@ async function fetchGmxDeployments(): Promise<DeploymentData> {
 
 async function generateGmxErrors(): Promise<number> {
   console.log('⚠️  Generating GMX error ABI...')
-  
+
   try {
     // Read the Errors.sol file from the cloned repo
     const errorsFile = Bun.file(`${TEMP_DIR}/contracts/error/Errors.sol`)
     const content = await errorsFile.text()
-    
+
     // Parse custom errors from the Solidity file
     const errors: any[] = []
-    
+
     // Match error definitions like: error ErrorName(type1 param1, type2 param2);
     const errorPattern = /error\s+(\w+)\s*\(([^)]*)\)\s*;/g
     let match: RegExpExecArray | null
-    
+
     while ((match = errorPattern.exec(content)) !== null) {
       const errorName = match[1]
       const paramsStr = match[2].trim()
-      
+
       const errorEntry: any = {
         name: errorName,
         type: 'error'
       }
-      
+
       if (paramsStr) {
         const inputs: any[] = []
-        
+
         // Parse parameters - handle both simple and complex types
         const params = paramsStr.split(',').map(p => p.trim())
-        
+
         for (const param of params) {
           if (!param) continue
-          
+
           // Match parameter pattern: type name or just type
           const paramMatch = param.match(/^(.+?)(?:\s+(\w+))?$/)
           if (paramMatch) {
             const [, type, name] = paramMatch
-            
+
             // Map Solidity types to ABI types
             let abiType = type.trim()
-            
+
             // Handle common type mappings
             if (abiType === 'uint') abiType = 'uint256'
             if (abiType === 'int') abiType = 'int256'
-            
+
             const input: any = {
               internalType: abiType,
               type: abiType
             }
-            
+
             if (name) {
               input.name = name
             } else {
               // Generate a name if not provided
               input.name = `param${inputs.length}`
             }
-            
+
             inputs.push(input)
           }
         }
-        
+
         if (inputs.length > 0) {
           errorEntry.inputs = inputs
         } else {
@@ -135,22 +135,22 @@ async function generateGmxErrors(): Promise<number> {
       } else {
         errorEntry.inputs = []
       }
-      
+
       errors.push(errorEntry)
     }
-    
+
     console.log(`✅ Found ${errors.length} GMX custom errors`)
-    
+
     // Sort errors alphabetically
     errors.sort((a, b) => a.name.localeCompare(b.name))
-    
+
     // Write the GMX error ABI file
     const abiContent = `// This file is auto-generated. Do not edit manually.
 // Source: GMX contracts/error/Errors.sol from GitHub (main branch)
 
 export const gmxErrorAbi = ${JSON.stringify(errors, null, 2)} as const
 `
-    
+
     // Helper function to check if file content has changed
     async function writeIfChanged(filePath: string, newContent: string): Promise<boolean> {
       try {
@@ -164,13 +164,13 @@ export const gmxErrorAbi = ${JSON.stringify(errors, null, 2)} as const
       } catch {
         // File doesn't exist or can't be read, proceed with write
       }
-      
+
       await Bun.write(filePath, newContent)
       return true // Content was written
     }
-    
+
     const wasUpdated = await writeIfChanged('./src/generated/abi/gmxErrors.ts', abiContent)
-    
+
     if (wasUpdated) {
       console.log('📝 Generated GMX error ABI file')
       return 1
@@ -187,7 +187,7 @@ export const gmxErrorAbi = ${JSON.stringify(errors, null, 2)} as const
 try {
   // Always fetch from GitHub main branch to ensure we have the latest addresses and ABIs
   const deployments = await fetchGmxDeployments()
-  
+
   // Generate GMX errors while we still have the repo cloned
   let errorFilesUpdated = 0
   try {
@@ -195,10 +195,10 @@ try {
   } catch (error) {
     console.warn('⚠️  Failed to generate GMX errors, continuing with contracts...')
   }
-  
+
   // Clean up temp directory after we're done with it
   await $`rm -rf ${TEMP_DIR}`.catch(() => {})
-  
+
   console.log()
 
   // Load mapped contracts
