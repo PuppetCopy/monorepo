@@ -11,9 +11,9 @@ import {
   combine,
   empty,
   type IStream,
+  just,
   map,
   merge,
-  now,
   o,
   sampleMap,
   start,
@@ -55,7 +55,7 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
   const entries = Object.entries(state) as [keyof A, IStream<A[K]> | A[K]][]
 
   if (entries.length === 0) {
-    return now({} as A)
+    return just({} as A)
   }
 
   const streams = entries.map(([key, stream]) => {
@@ -190,7 +190,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
           $row(style({ placeContent: 'space-between', alignItems: 'center' }))(
             $ButtonSecondary({
               $content: $text('Remove'),
-              disabled: now(!isSubscribed)
+              disabled: just(!isSubscribed)
             })({
               click: clickRemoveTether()
             }),

@@ -1,7 +1,7 @@
 import { MAX_UINT256 } from '@puppet-copy/middleware/const'
 import { BaseError } from 'abitype'
 import { erc20Abi } from 'abitype/abis'
-import { combine, empty, fromPromise, type IStream, map, merge, now, switchLatest, switchMap } from 'aelea/stream'
+import { combine, empty, fromPromise, type IStream, just, map, merge, switchLatest, switchMap } from 'aelea/stream'
 import { type IBehavior, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -107,7 +107,7 @@ export const $ApproveSpend = (config: IApproveSpend) =>
               })
             )
           },
-          combine({ allowance, amount: amount ?? now(MAX_UINT256) })
+          combine({ allowance, amount: amount ?? just(MAX_UINT256) })
         )
       ),
       {

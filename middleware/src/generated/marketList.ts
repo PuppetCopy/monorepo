@@ -1,6 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:31 GMT
-// Source: GMX V2 Reader Contract (0x0537C767cDAC0726c76Bb89e92904fe28fd02fE1) on Arbitrum
+// Source: GMX V2 Reader Contract (0x65A6CC451BAfF7e7B4FDAb4157763aB4b6b44D0E) on Arbitrum
 
 export const ARBITRUM_MARKET_LIST = [
   {
@@ -693,6 +692,13 @@ export const ARBITRUM_MARKET_LIST = [
     marketToken: '0x3f649eab7f4CE4945F125939C64429Be2C5d0cB4',
     indexToken: '0xA1b91fe9FD52141Ff8cac388Ce3F10BFDc1dE79d',
     longToken: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+    shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+    marketType: 'PERP'
+  },
+  {
+    marketToken: '0x6EeE8098dBC106aEde99763FA5F955A5bBc42C50',
+    indexToken: '0x4249F6e0808bEfF7368AaAD3F7A3Fd511F61Ee60',
+    longToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     shortToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
     marketType: 'PERP'
   }

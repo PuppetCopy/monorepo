@@ -1,6 +1,6 @@
 import { type Address, createPublicClient, http } from 'viem'
 import { arbitrum } from 'viem/chains'
-import { GMX_V2_CONTRACT_MAP } from '../src/generated/contractList.js'
+import { GMX_V2_CONTRACT_MAP } from '../src/generated/gmxContracts.js'
 
 // Contract addresses on Arbitrum
 const READER_ADDRESS = GMX_V2_CONTRACT_MAP.GmxReaderV2.address
@@ -69,7 +69,6 @@ try {
 
   // Generate the TypeScript file content
   const fileContent = `// This file is auto-generated. Do not edit manually.
-// Generated on: ${new Date().toUTCString()}
 // Source: GMX V2 Reader Contract (${READER_ADDRESS}) on Arbitrum
 
 export const ARBITRUM_MARKET_LIST = [

@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 // Source: forge-artifacts/SequencerRouter.sol/SequencerRouter.json
 
 export default [
@@ -37,12 +36,12 @@ export default [
         internalType: 'struct SequencerRouter.Config',
         components: [
           {
-            name: 'mirrorBaseGasLimit',
+            name: 'openBaseGasLimit',
             type: 'uint256',
             internalType: 'uint256'
           },
           {
-            name: 'mirrorPerPuppetGasLimit',
+            name: 'openPerPuppetGasLimit',
             type: 'uint256',
             internalType: 'uint256'
           },
@@ -1494,6 +1493,11 @@ export default [
         name: '_receiver',
         type: 'address',
         internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
       }
     ],
     outputs: [
@@ -1516,12 +1520,12 @@ export default [
         internalType: 'struct SequencerRouter.Config',
         components: [
           {
-            name: 'mirrorBaseGasLimit',
+            name: 'openBaseGasLimit',
             type: 'uint256',
             internalType: 'uint256'
           },
           {
-            name: 'mirrorPerPuppetGasLimit',
+            name: 'openPerPuppetGasLimit',
             type: 'uint256',
             internalType: 'uint256'
           },
@@ -1973,7 +1977,7 @@ export default [
   },
   {
     type: 'function',
-    name: 'requestCloseStalledPosition',
+    name: 'requestCloseStalled',
     inputs: [
       {
         name: '_params',
@@ -1996,6 +2000,16 @@ export default [
             internalType: 'address'
           },
           {
+            name: 'sequencerFeeReceiver',
+            type: 'address',
+            internalType: 'address'
+          },
+          {
+            name: 'reasonEnum',
+            type: 'uint8',
+            internalType: 'uint8'
+          },
+          {
             name: 'isLong',
             type: 'bool',
             internalType: 'bool'
@@ -2012,6 +2026,11 @@ export default [
           },
           {
             name: 'allocationId',
+            type: 'uint256',
+            internalType: 'uint256'
+          },
+          {
+            name: 'sequencerFee',
             type: 'uint256',
             internalType: 'uint256'
           }
@@ -2233,6 +2252,11 @@ export default [
             name: 'sequencerExecutionFee',
             type: 'uint256',
             internalType: 'uint256'
+          },
+          {
+            name: 'amount',
+            type: 'uint256',
+            internalType: 'uint256'
           }
         ]
       },
@@ -2243,11 +2267,6 @@ export default [
       }
     ],
     outputs: [
-      {
-        name: 'settledBalance',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
       {
         name: 'distributionAmount',
         type: 'uint256',

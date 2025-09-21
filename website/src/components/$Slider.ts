@@ -1,5 +1,5 @@
 import { invertColor } from '@puppet-copy/middleware/core'
-import { combine, type IStream, join, map, merge, now, sampleMap, until } from 'aelea/stream'
+import { combine, type IStream, join, just, map, op, sampleMap, start, until } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
@@ -57,11 +57,11 @@ export const $sliderDefaultContainer = $column(
 
 export const $Slider = ({
   value,
-  color = now(pallete.primary),
+  color = just(pallete.primary),
   step = 0,
-  disabled = now(false),
-  min = now(0),
-  max = now(1),
+  disabled = just(false),
+  min = just(0),
+  max = just(1),
   $thumb,
   $container = $sliderDefaultContainer
 }: ISliderParams) =>
@@ -94,21 +94,26 @@ export const $Slider = ({
 
                   if (startFromBar) {
                     const initOffsetX = downEvent.layerX || downEvent.offsetX // Firefox uses layerX
-                    const initialOffset = now(Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max))
-                    const moveDelta = map(moveEvent => {
-                      const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
+                    const initialOffset = Math.min(Math.max(downEvent.offsetX / rectWidth, params.min), params.max)
 
-                      moveEvent.preventDefault()
+                    const moveDelta = op(
+                      drag,
+                      map(moveEvent => {
+                        const deltaX = moveEvent.clientX - downEvent.clientX + initOffsetX
 
-                      const val = deltaX / rectWidth
+                        moveEvent.preventDefault()
 
-                      const cVal = Math.min(Math.max(val, params.min), params.max)
-                      const steppedVal = step > 0 ? (cVal / step) * step : cVal
+                        const val = deltaX / rectWidth
 
-                      return steppedVal
-                    }, drag)
+                        const cVal = Math.min(Math.max(val, params.min), params.max)
+                        const steppedVal = step > 0 ? (cVal / step) * step : cVal
 
-                    return merge(initialOffset, moveDelta)
+                        return steppedVal
+                      }),
+                      start(initialOffset)
+                    )
+
+                    return moveDelta
                   }
 
                   return map(moveEvent => {

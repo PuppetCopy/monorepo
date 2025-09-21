@@ -1,7 +1,6 @@
 // This file is auto-generated from contracts/src/utils/Error.sol
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 
-export const errorAbi = [
+export const puppetErrorAbi = [
   {
     type: 'error',
     name: 'TransferUtils__TokenTransferError',
@@ -451,6 +450,17 @@ export const errorAbi = [
   },
   {
     type: 'error',
+    name: 'Mirror__AllocationNotFullyRedistributed',
+    inputs: [
+      {
+        name: 'remainingAllocation',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
+    ]
+  },
+  {
+    type: 'error',
     name: 'Settle__InvalidAllocation',
     inputs: [
       {
@@ -611,7 +621,18 @@ export const errorAbi = [
   {
     type: 'error',
     name: 'Account__InsufficientBalance',
-    inputs: []
+    inputs: [
+      {
+        name: 'actualBalance',
+        internalType: 'uint256',
+        type: 'uint256'
+      },
+      {
+        name: 'requiredAmount',
+        internalType: 'uint256',
+        type: 'uint256'
+      }
+    ]
   },
   {
     type: 'error',

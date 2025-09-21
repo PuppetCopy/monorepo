@@ -1,6 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Mon, 25 Aug 2025 10:19:57 GMT
-// Source: GMX deployment files from GitHub (v2.2-branch)
+// Source: GMX deployment files from GitHub (main branch)
 
 import datastoreAbi from './abi/gmxDatastore.js'
 import eventemitterAbi from './abi/gmxEventEmitter.js'
@@ -15,7 +14,7 @@ export const GMX_V2_CONTRACT_MAP = {
     abi: readerv2Abi
   },
   GmxExchangeRouter: {
-    address: '0x7452c558d45f8afC8c83dAe62C3f8A5BE19c71f6',
+    address: '0x87d66368cD08a7Ca42252f5ab44B2fb6d1Fb8d15',
     abi: exchangerouterAbi
   },
   GmxOrderVault: {

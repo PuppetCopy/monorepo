@@ -1,6 +1,6 @@
 import type { Route } from 'aelea/router'
-import { empty, filterNull, fromCallback, type IStream, map, now, switchMap } from 'aelea/stream'
-import type { IBehavior } from 'aelea/stream-extended'
+import { empty, filterNull, type IStream, just, map, switchMap } from 'aelea/stream'
+import { fromCallback, type IBehavior } from 'aelea/stream-extended'
 import { $element, $node, $text, attr, component, fromEventTarget, type I$Node, style } from 'aelea/ui'
 import { $column, $icon, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
@@ -229,7 +229,7 @@ export const $Home = (_config: ITreasury) =>
                         $node(),
 
                         $ButtonSecondary({
-                          disabled: now(true),
+                          disabled: just(true),
                           $content: $row(spacing.small, style({ alignItems: 'center' }))(
                             $icon({ $content: $puppetLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
                             $text('Download'),

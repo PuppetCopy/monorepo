@@ -1,7 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:18:39 GMT
 // Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
-// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/v2.2-branch/config/tokens.ts
+// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/main/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
 
 export const ARBITRUM_TOKEN_LIST = [
@@ -25,6 +24,15 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0xD9f615A9b820225edbA2d821c4A696a0924051c6'
   },
   {
+    symbol: 'AERO',
+    decimals: 18,
+    address: '0xEcc5eb985Ddbb8335b175b0A2A1144E4c978F1f6',
+    name: 'Aero',
+    synthetic: true,
+    dataStreamFeedId: '0x00038458999fd77d9deece17154ee687193b328cf7a53670501dd8ccad906ff6',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'AI16Z',
     decimals: 9,
     address: '0xBb69bd9dc152C2c0F083507641a46193d2B61EBb',
@@ -46,7 +54,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'ALGO',
     decimals: 6,
     address: '0x72Cd3a21aA7A898028d9501868Fbe6dED0020434',
-    name: 'Algorand'
+    name: 'Algorand',
+    synthetic: true,
+    dataStreamFeedId: '0x0003b864d7f86b46f63afba8359e86436fe57c99dfbbe260848c9caef6565892',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'ANIME',
@@ -130,6 +141,15 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'BRETT',
+    decimals: 18,
+    address: '0x4249F6e0808bEfF7368AaAD3F7A3Fd511F61Ee60',
+    name: 'Brett',
+    synthetic: true,
+    dataStreamFeedId: '0x00033e321855f7cbfa1da803f4b6b0b06fb28d15e1a8d8132accaf8ffdfd81ed',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'BTC',
     decimals: 8,
     address: '0x47904963fc8b2340414262125aF798B9655E58Cd',
@@ -153,7 +173,11 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'CRO',
     decimals: 8,
     address: '0xB7EfE7c7f059E84Ab87A83A169c583Fb4A54fAc3',
-    name: 'Cronos'
+    name: 'Cronos',
+    synthetic: true,
+    dataStreamFeedId: '0x000329810dcc8c4557e19e34d42cbfa3ac7e85ddb465ff22b66abe06f4bbbcbb',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0xea320E4d688B143A3bFBF1b4a5cc4B986fCa086c'
   },
   {
     symbol: 'CRV',
@@ -169,7 +193,11 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'CVX',
     decimals: 18,
     address: '0x3B6f801C0052Dfe0Ac80287D611F31B7c47B9A6b',
-    name: 'Convex Finance'
+    name: 'Convex Finance',
+    synthetic: true,
+    dataStreamFeedId: '0x0003e95ca25588986a3611cf132be9635d86f16636f2f561b932c0087a7f5c34',
+    dataStreamFeedDecimals: 18,
+    priceFeedAddress: '0x851175a919f36c8e30197c09a9A49dA932c2CC00'
   },
   {
     symbol: 'DAI',
@@ -284,7 +312,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'HBAR',
     decimals: 8,
     address: '0xEb2A83b973f4dbB9511D92dd40d2ba4C683f0971',
-    name: 'Hedera'
+    name: 'Hedera',
+    synthetic: true,
+    dataStreamFeedId: '0x000368f5793785d9a20180f5137a05a558b2518ac13e6c77a93b97670da207c9',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'HYPE',
@@ -326,7 +357,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'KAS',
     decimals: 8,
     address: '0x91c6a8F6aFAC036F4ABf1bA55f4E76892E865E4a',
-    name: 'Kaspa'
+    name: 'Kaspa',
+    synthetic: true,
+    dataStreamFeedId: '0x0003c871148642ab1e886f06d203b1c1e7933b51b7e4064ea11529a4262566d3',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'LDO',
@@ -421,6 +455,15 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'MORPHO',
+    decimals: 18,
+    address: '0xF67b2a901D674B443Fa9f6DB2A689B37c07fD4fE',
+    name: 'Morpho',
+    synthetic: true,
+    dataStreamFeedId: '0x0003df1ca5682717315cc4f0db6f3c782eec3f6861f38ba90f5a2383b75404d8',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'NEAR',
     decimals: 24,
     address: '0x1FF7F3EFBb9481Cbd7db4F932cBCD4467144237C',
@@ -434,7 +477,10 @@ export const ARBITRUM_TOKEN_LIST = [
     symbol: 'OKB',
     decimals: 18,
     address: '0xd37F01A3379f052FEF70F63c0Be27931891aa2B9',
-    name: 'OKB'
+    name: 'OKB',
+    synthetic: true,
+    dataStreamFeedId: '0x0003d2d8fef8271831e3245a1d00553e217e4d71a7a1468c7f327173a758c74f',
+    dataStreamFeedDecimals: 18
   },
   {
     symbol: 'OM',
@@ -705,6 +751,15 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'VVV',
+    decimals: 18,
+    address: '0xB79Eb5BA64A167676694bB41bc1640F95d309a2F',
+    name: 'Venice Token',
+    synthetic: true,
+    dataStreamFeedId: '0x0003195dde0f669c58fa396bdd60488cbebcf4e0d869905fb79b3ed4b763c7a9',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'WAVAX (Wormhole)',
     baseSymbol: 'AVAX',
     decimals: 18,
@@ -736,6 +791,15 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0x6ce185860a4963106506C203335A2910413708e9'
   },
   {
+    symbol: 'WELL',
+    decimals: 18,
+    address: '0x465A31E5bA29b8EAcC860d499D714a6f07e56E85',
+    name: 'Moonwell',
+    synthetic: true,
+    dataStreamFeedId: '0x00032074a30ba476c45cf517868fca15c694813dae41fb795e95c10ae0023316',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'WETH',
     baseSymbol: 'ETH',
     decimals: 18,
@@ -761,6 +825,15 @@ export const ARBITRUM_TOKEN_LIST = [
     name: 'WLD',
     synthetic: true,
     dataStreamFeedId: '0x000365f820b0633946b78232bb91a97cf48100c426518e732465c3a050edb9f1',
+    dataStreamFeedDecimals: 18
+  },
+  {
+    symbol: 'WLFI',
+    decimals: 18,
+    address: '0xC5799ab6E2818fD8d0788dB8D156B0c5db1Bf97b',
+    name: 'World Liberty Financial',
+    synthetic: true,
+    dataStreamFeedId: '0x000348a0911d971aafb082790ac3b4af7271c5d8d9603b644240442d8656c2d6',
     dataStreamFeedDecimals: 18
   },
   {

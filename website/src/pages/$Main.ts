@@ -1,7 +1,7 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import { constant, filterNull, type IStream, map, merge, now, switchMap, take, tap, zip } from 'aelea/stream'
+import { constant, filterNull, type IStream, map, merge, start, switchMap, take, tap, zip } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style, styleBehavior } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -27,8 +27,7 @@ import { $PortfolioPage } from './$Portfolio.js'
 import { $TraderPage } from './$Trader.js'
 
 const popStateEvent = fromEventTarget(window, 'popstate')
-const initialLocation = now(document.location)
-const requestRouteChange = merge(initialLocation, popStateEvent)
+const requestRouteChange = start(document.location, popStateEvent)
 const locationChange = map(location => {
   return location
 }, requestRouteChange)

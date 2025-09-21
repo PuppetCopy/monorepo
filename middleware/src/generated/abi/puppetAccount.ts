@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 // Source: forge-artifacts/Account.sol/Account.json
 
 export default [
@@ -264,6 +263,29 @@ export default [
   },
   {
     type: 'function',
+    name: 'recoverUnaccountedTokens',
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      },
+      {
+        name: '_receiver',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
     name: 'setBalanceList',
     inputs: [
       {
@@ -396,6 +418,11 @@ export default [
         internalType: 'contract IERC20'
       },
       {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      },
+      {
         name: '_gasLimit',
         type: 'uint256',
         internalType: 'uint256'
@@ -435,8 +462,14 @@ export default [
   },
   {
     type: 'function',
-    name: 'unaccountedBalance',
-    inputs: [],
+    name: 'unaccountedTokenBalance',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      }
+    ],
     outputs: [
       {
         name: '',
@@ -512,7 +545,18 @@ export default [
   {
     type: 'error',
     name: 'Account__InsufficientBalance',
-    inputs: []
+    inputs: [
+      {
+        name: 'actualBalance',
+        type: 'uint256',
+        internalType: 'uint256'
+      },
+      {
+        name: 'requiredAmount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ]
   },
   {
     type: 'error',

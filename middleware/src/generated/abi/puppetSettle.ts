@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 // Source: forge-artifacts/Settle.sol/Settle.json
 
 export default [
@@ -106,6 +105,11 @@ export default [
         name: '_receiver',
         type: 'address',
         internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
       }
     ],
     outputs: [
@@ -306,6 +310,11 @@ export default [
             name: 'sequencerExecutionFee',
             type: 'uint256',
             internalType: 'uint256'
+          },
+          {
+            name: 'amount',
+            type: 'uint256',
+            internalType: 'uint256'
           }
         ]
       },
@@ -317,12 +326,7 @@ export default [
     ],
     outputs: [
       {
-        name: '_settledAmount',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: '_distributionAmount',
+        name: '_distributedAmount',
         type: 'uint256',
         internalType: 'uint256'
       },
@@ -463,22 +467,6 @@ export default [
     type: 'error',
     name: 'Settle__InvalidSequencerExecutionFeeReceiver',
     inputs: []
-  },
-  {
-    type: 'error',
-    name: 'Settle__NoDustToCollect',
-    inputs: [
-      {
-        name: 'token',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'account',
-        type: 'address',
-        internalType: 'address'
-      }
-    ]
   },
   {
     type: 'error',

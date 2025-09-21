@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 // Source: forge-artifacts/FeeMarketplace.sol/FeeMarketplace.json
 
 export default [

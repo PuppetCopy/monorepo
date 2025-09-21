@@ -147,9 +147,6 @@ export const $tokenIconByAddress = (tokenAddress: Address, size = '24px') => {
 }
 
 export const $puppetList = (puppets?: Address[], click?: IComposeBehavior<INode, string>) => {
-  // const positionMarkPrice = tradeReader.getLatestPrice(now(pos.indexToken))
-  // const cumulativeFee = tradeReader.vault.read('cumulativeFundingRates', pos.collateralToken)
-
   if (!puppets || puppets.length === 0) {
     return $node(style({ fontSize: '.8rem', color: pallete.foreground }))($text('-'))
   }
@@ -342,7 +339,6 @@ export const $openPositionBreakdown = (pos: IPosition) => {
     ),
     $row(style({ placeContent: 'space-between' }))(
       $node(style({ color: pallete.foreground }))($text('Realised Pnl')),
-      // $pnlValue(now(mp.realisedPnl))
       $pnlDisplay(pos.realisedPnlUsd)
     )
   )

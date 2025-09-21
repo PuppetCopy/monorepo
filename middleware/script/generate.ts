@@ -15,12 +15,12 @@ try {
   await $`bun run script/generate-gmx-token-list.ts`
   console.log('✅ Token list generated\n')
 
-  // 3. Generate GMX contract list
-  console.log('📄 Generating GMX contract list...')
+  // 3. Generate GMX contract list and error ABI
+  console.log('📄 Generating GMX contract list and error ABI...')
   await $`bun run script/generate-gmx-contract-list.ts`
-  console.log('✅ Contract list generated\n')
+  console.log('✅ Contract list and GMX errors generated\n')
 
-  // 4. Generate Puppet contracts (includes Error ABI)
+  // 4. Generate Puppet contracts (includes Puppet Error ABI)
   console.log('🔧 Generating Puppet contracts and Error ABI...')
   await $`bun run script/generate-puppet-contracts.ts`
   console.log('✅ Puppet contracts and Error ABI generated\n')

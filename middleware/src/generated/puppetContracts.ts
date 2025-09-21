@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: Thu, 21 Aug 2025 21:16:39 GMT
 // Source: Puppet deployments.json and forge-artifacts
 
 import accountAbi from './abi/puppetAccount.js'
@@ -35,7 +34,7 @@ export const PUPPET_CONTRACT_MAP = {
     abi: routerproxyAbi
   },
   AccountStore: {
-    address: '0xcf0365d4A835B5953096c01F3076f32AD3a0A156',
+    address: '0xc7Fb87E6Eb9bcE66ca32acb01B99cAF70cfE5DB0',
     abi: accountstoreAbi
   },
   FeeMarketplaceStore: {
@@ -47,15 +46,15 @@ export const PUPPET_CONTRACT_MAP = {
     abi: feemarketplaceAbi
   },
   Mirror: {
-    address: '0x36492606D772b58361Ee4435160d0f87f171DEFc',
+    address: '0xDfcfA30D3950ae4E94C869798276A06B167Bd5f1',
     abi: mirrorAbi
   },
   Settle: {
-    address: '0x59229a12F7C81c7515A01BEfC04925534073A156',
+    address: '0x96F9fE6293ac6ED89c16e37177665a4904c3fe9f',
     abi: settleAbi
   },
   SequencerRouter: {
-    address: '0x451271E19f11423BfBf1FAcb50f54768ca9E99bC',
+    address: '0xaF02B24e394d73b62efaB84f4c231D7cE1acCB85',
     abi: sequencerrouterAbi
   },
   UserRouter: {
@@ -63,11 +62,11 @@ export const PUPPET_CONTRACT_MAP = {
     abi: userrouterAbi
   },
   Account: {
-    address: '0x517F50C4b5045bCfB03Fd8DEeFD011275C2e7cDe',
+    address: '0x40Fc327E61c0B55945585FD255FEC42F4C2e833e',
     abi: accountAbi
   },
   Rule: {
-    address: '0x9AED6248B5E23F93940C00cbd866D818aAc1BcB2',
+    address: '0xb7C104b156A2933161a4Cb92B4981858258de649',
     abi: ruleAbi
   }
 } as const

@@ -8,8 +8,8 @@ import {
   type IOps,
   type IStream,
   isStream,
+  just,
   map,
-  now,
   o,
   skipRepeats,
   start,
@@ -308,7 +308,7 @@ interface ILabeledHintAdjustment extends IHintAdjustment {
 
 export const $hintAdjustment = ({ change, color, $val }: IHintAdjustment) => {
   const displayChange = skipRepeats(map(str => !!str, start('', change)))
-  const arrowColor = color ?? now(pallete.foreground)
+  const arrowColor = color ?? just(pallete.foreground)
 
   return $row(spacing.tiny, style({ lineHeight: 1, alignItems: 'center' }))(
     styleBehavior(

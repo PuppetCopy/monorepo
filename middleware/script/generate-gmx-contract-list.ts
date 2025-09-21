@@ -6,7 +6,7 @@ const TEMP_DIR = './temp-gmx-repo'
 // Contract name mappings (deployment name -> our name)
 const CONTRACT_MAPPINGS = {
   Reader: 'GmxReaderV2',
-  Router: 'GmxExchangeRouter',
+  ExchangeRouter: 'GmxExchangeRouter',
   OrderVault: 'GmxOrderVault',
   DataStore: 'GmxDatastore',
   EventEmitter: 'GmxEventEmitter'
@@ -26,16 +26,16 @@ type DeploymentData = {
 }
 
 async function fetchGmxDeployments(): Promise<DeploymentData> {
-  console.log('🔄 Fetching GMX deployments from GitHub (v2.2-branch)...')
+  console.log('🔄 Fetching GMX deployments from GitHub (main branch)...')
 
   try {
-    // Clone the repository (shallow clone for speed, specifically v2.2-branch)
-    console.log('📥 Cloning GMX synthetics repository (v2.2-branch)...')
-    await $`git clone --depth 1 --branch v2.2-branch --sparse ${GMX_REPO_URL} ${TEMP_DIR}`
+    // Clone the repository (shallow clone for speed, specifically main branch)
+    console.log('📥 Cloning GMX synthetics repository (main branch)...')
+    await $`git clone --depth 1 --branch main --sparse ${GMX_REPO_URL} ${TEMP_DIR}`
 
-    // Set up sparse checkout to only get deployments folder
+    // Set up sparse checkout to get deployments and contracts folders
     await $`cd ${TEMP_DIR} && git sparse-checkout init --cone`
-    await $`cd ${TEMP_DIR} && git sparse-checkout set deployments/arbitrum`
+    await $`cd ${TEMP_DIR} && git sparse-checkout set deployments/arbitrum contracts/error`
 
     // Read all deployment files into memory
     console.log('📁 Loading Arbitrum deployments...')
@@ -53,9 +53,6 @@ async function fetchGmxDeployments(): Promise<DeploymentData> {
       deployments[fileName] = data
     }
 
-    // Clean up temp directory
-    await $`rm -rf ${TEMP_DIR}`
-
     console.log(`✅ Successfully loaded ${Object.keys(deployments).length} deployments`)
     return deployments
   } catch (error) {
@@ -69,9 +66,139 @@ async function fetchGmxDeployments(): Promise<DeploymentData> {
   }
 }
 
+async function generateGmxErrors(): Promise<number> {
+  console.log('⚠️  Generating GMX error ABI...')
+
+  try {
+    // Read the Errors.sol file from the cloned repo
+    const errorsFile = Bun.file(`${TEMP_DIR}/contracts/error/Errors.sol`)
+    const content = await errorsFile.text()
+
+    // Parse custom errors from the Solidity file
+    const errors: any[] = []
+
+    // Match error definitions like: error ErrorName(type1 param1, type2 param2);
+    const errorPattern = /error\s+(\w+)\s*\(([^)]*)\)\s*;/g
+    let match: RegExpExecArray | null
+
+    while ((match = errorPattern.exec(content)) !== null) {
+      const errorName = match[1]
+      const paramsStr = match[2].trim()
+
+      const errorEntry: any = {
+        name: errorName,
+        type: 'error'
+      }
+
+      if (paramsStr) {
+        const inputs: any[] = []
+
+        // Parse parameters - handle both simple and complex types
+        const params = paramsStr.split(',').map(p => p.trim())
+
+        for (const param of params) {
+          if (!param) continue
+
+          // Match parameter pattern: type name or just type
+          const paramMatch = param.match(/^(.+?)(?:\s+(\w+))?$/)
+          if (paramMatch) {
+            const [, type, name] = paramMatch
+
+            // Map Solidity types to ABI types
+            let abiType = type.trim()
+
+            // Handle common type mappings
+            if (abiType === 'uint') abiType = 'uint256'
+            if (abiType === 'int') abiType = 'int256'
+
+            const input: any = {
+              internalType: abiType,
+              type: abiType
+            }
+
+            if (name) {
+              input.name = name
+            } else {
+              // Generate a name if not provided
+              input.name = `param${inputs.length}`
+            }
+
+            inputs.push(input)
+          }
+        }
+
+        if (inputs.length > 0) {
+          errorEntry.inputs = inputs
+        } else {
+          errorEntry.inputs = []
+        }
+      } else {
+        errorEntry.inputs = []
+      }
+
+      errors.push(errorEntry)
+    }
+
+    console.log(`✅ Found ${errors.length} GMX custom errors`)
+
+    // Sort errors alphabetically
+    errors.sort((a, b) => a.name.localeCompare(b.name))
+
+    // Write the GMX error ABI file
+    const abiContent = `// This file is auto-generated. Do not edit manually.
+// Source: GMX contracts/error/Errors.sol from GitHub (main branch)
+
+export const gmxErrorAbi = ${JSON.stringify(errors, null, 2)} as const
+`
+
+    // Helper function to check if file content has changed
+    async function writeIfChanged(filePath: string, newContent: string): Promise<boolean> {
+      try {
+        const existingFile = Bun.file(filePath)
+        if (await existingFile.exists()) {
+          const existingContent = await existingFile.text()
+          if (existingContent === newContent) {
+            return false // Content unchanged, no write needed
+          }
+        }
+      } catch {
+        // File doesn't exist or can't be read, proceed with write
+      }
+
+      await Bun.write(filePath, newContent)
+      return true // Content was written
+    }
+
+    const wasUpdated = await writeIfChanged('./src/generated/abi/gmxErrors.ts', abiContent)
+
+    if (wasUpdated) {
+      console.log('📝 Generated GMX error ABI file')
+      return 1
+    } else {
+      console.log('✓ GMX error ABI unchanged')
+      return 0
+    }
+  } catch (error) {
+    console.error('❌ Error generating GMX errors:', error)
+    throw error
+  }
+}
+
 try {
-  // Always fetch from GitHub v2.2-branch to ensure we have the latest addresses and ABIs
+  // Always fetch from GitHub main branch to ensure we have the latest addresses and ABIs
   const deployments = await fetchGmxDeployments()
+
+  // Generate GMX errors while we still have the repo cloned
+  let errorFilesUpdated = 0
+  try {
+    errorFilesUpdated = await generateGmxErrors()
+  } catch (error) {
+    console.warn('⚠️  Failed to generate GMX errors, continuing with contracts...')
+  }
+
+  // Clean up temp directory after we're done with it
+  await $`rm -rf ${TEMP_DIR}`.catch(() => {})
+
   console.log()
 
   // Load mapped contracts
@@ -99,20 +226,13 @@ try {
   console.log(`✅ Loaded ${contracts.length} contracts`)
 
   // Helper function to check if file content has changed
-  async function writeIfChanged(filePath: string, generateContent: (timestamp: string) => string): Promise<boolean> {
+  async function writeIfChanged(filePath: string, newContent: string): Promise<boolean> {
     try {
       const existingFile = Bun.file(filePath)
       if (await existingFile.exists()) {
         const existingContent = await existingFile.text()
 
-        // Extract existing timestamp
-        const timestampMatch = existingContent.match(/Generated on: (.+)/)
-        const existingTimestamp = timestampMatch ? timestampMatch[1] : new Date().toUTCString()
-
-        // Generate content with existing timestamp for comparison
-        const contentWithOldTimestamp = generateContent(existingTimestamp)
-
-        if (existingContent === contentWithOldTimestamp) {
+        if (existingContent === newContent) {
           return false // Content unchanged, no write needed
         }
       }
@@ -120,8 +240,7 @@ try {
       // File doesn't exist or can't be read, proceed with write
     }
 
-    // Either file doesn't exist or content has changed - write with new timestamp
-    const newContent = generateContent(new Date().toUTCString())
+    // Either file doesn't exist or content has changed - write new content
     await Bun.write(filePath, newContent)
     return true // Content was written
   }
@@ -133,16 +252,13 @@ try {
       const abiFileName = `gmx${contract.name.replace('Gmx', '')}`
       const abiFilePath = `./src/generated/abi/${abiFileName}.ts`
 
-      const wasUpdated = await writeIfChanged(
-        abiFilePath,
-        timestamp =>
-          `// This file is auto-generated. Do not edit manually.
-// Generated on: ${timestamp}
-// Source: GMX deployment files from GitHub (v2.2-branch)
+      const abiContent = `// This file is auto-generated. Do not edit manually.
+// Source: GMX deployment files from GitHub (main branch)
 
 export default ${JSON.stringify(contract.abi, null, 2)} as const
 `
-      )
+
+      const wasUpdated = await writeIfChanged(abiFilePath, abiContent)
 
       if (wasUpdated) {
         console.log(`📝 Updated ABI for ${contract.name}`)
@@ -154,12 +270,8 @@ export default ${JSON.stringify(contract.abi, null, 2)} as const
   }
 
   // Write the main contracts file
-  const contractListUpdated = await writeIfChanged(
-    './src/generated/contractList.ts',
-    timestamp =>
-      `// This file is auto-generated. Do not edit manually.
-// Generated on: ${timestamp}
-// Source: GMX deployment files from GitHub (v2.2-branch)
+  const contractListContent = `// This file is auto-generated. Do not edit manually.
+// Source: GMX deployment files from GitHub (main branch)
 
 // Import generated ABIs
 ${contracts
@@ -186,22 +298,24 @@ ${contracts
   .join(',\n')}
 } as const
 `
-  )
+
+  const contractListUpdated = await writeIfChanged('./src/generated/gmxContracts.ts', contractListContent)
 
   // Only format files that were actually updated
   if (contractListUpdated) {
-    await Bun.$`bunx @biomejs/biome format --write ./src/generated/contractList.ts`
+    await Bun.$`bunx @biomejs/biome format --write ./src/generated/gmxContracts.ts`
     console.log('📝 Updated main contract list')
   } else {
     console.log('✓ Main contract list unchanged')
   }
 
-  if (abiFilesUpdated > 0) {
+  if (abiFilesUpdated > 0 || errorFilesUpdated > 0) {
     await Bun.$`bunx @biomejs/biome format --write ./src/generated/abi/gmx*.ts`
   }
 
-  console.log('\n✅ GMX V2 contract generation complete')
+  console.log('\n✅ GMX V2 contract and error generation complete')
   console.log(`   - ${abiFilesUpdated} ABI file(s) updated`)
+  console.log(`   - ${errorFilesUpdated} error file(s) updated`)
   console.log(`   - Main contract list: ${contractListUpdated ? 'updated' : 'unchanged'}`)
 
   if (abiFilesUpdated > 0 || contractListUpdated) {

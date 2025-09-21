@@ -1,4 +1,4 @@
-import { type IOps, map, now, switchLatest, switchMap } from 'aelea/stream'
+import { type IOps, just, map, switchLatest, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -44,7 +44,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
             })
           }
 
-          return switchLatest(config.$$display(now(getAccountStatus as IWalletConnected)))
+          return switchLatest(config.$$display(just(getAccountStatus as IWalletConnected)))
         }, wallet.account)
       ),
 

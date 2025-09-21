@@ -4,9 +4,9 @@ import {
   empty,
   type IOps,
   type IStream,
+  just,
   map,
   merge,
-  now,
   skip,
   switchLatest,
   switchMap,
@@ -159,7 +159,7 @@ export function $Dropdown<T>({
                 ...params.list.map(opt =>
                   $optionContainer(
                     selectTether(nodeEvent('click'), constant(opt)) //
-                  )(switchLatest($$option(now(opt))))
+                  )(switchLatest($$option(just(opt))))
                 )
               )
             },
