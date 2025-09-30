@@ -4,6 +4,12 @@ import { map, op } from 'aelea/stream'
 import { multicast } from 'aelea/stream-extended'
 import type { Address } from 'viem'
 
+// Configuration
+const PRICE_FEED_CONFIG = {
+  UPDATE_INTERVAL_MS: 2500,
+  API_URL: 'https://arbitrum-api.gmxinfra.io/signed_prices/latest'
+} as const
+
 // Arbitrum URL: https://arbitrum-api.gmxinfra.io/signed_prices/latest
 // Avalanche URL: https://avalanche-api.gmxinfra.io/signed_prices/latest
 interface IGmxSignedPriceData {
@@ -34,7 +40,7 @@ interface IGmxSignedPriceData {
 
 async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
   try {
-    const response = await fetch('https://arbitrum-api.gmxinfra.io/signed_prices/latest')
+    const response = await fetch(PRICE_FEED_CONFIG.API_URL)
 
     if (!response.ok) {
       throw new Error(`GMX signed prices API error! status: ${response.status}`)
@@ -52,7 +58,7 @@ async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
 export const latestPriceMap = op(
   periodicRun({
     startImmediate: true,
-    interval: 2500,
+    interval: PRICE_FEED_CONFIG.UPDATE_INTERVAL_MS,
     actionOp: map(async () => {
       const newLocal = await querySignedPrices()
       return groupListMap(newLocal, 'tokenAddress', (item): IOraclePrice => {

@@ -222,9 +222,9 @@ async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
     // forceAtomic: true
   })
 
-  const result = await wallet.getCallsStatus({
-    id: '0x1234567890abcdef'
-  })
+  // const result = await wallet.getCallsStatus({
+  //   id: '0x1234567890abcdef'
+  // })
 
   return call
 }
