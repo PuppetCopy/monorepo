@@ -17,8 +17,8 @@
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
     "@puppet-copy/sql": "workspace:*",
-    "@reown/appkit": "1.8.7",
-    "@reown/appkit-adapter-wagmi": "1.8.7",
+    "@reown/appkit": "1.8.8",
+    "@reown/appkit-adapter-wagmi": "1.8.8",
     "@wagmi/core": "2.21.2",
     "abitype": "1.1.1",
     "aelea": "2.5.28",
