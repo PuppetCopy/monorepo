@@ -247,7 +247,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 ),
                 $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
                 scrollConfig: {
-                  // $container: $defaultVScrollContainer(style({ gap: '2px' })),
                   $loader: style({
                     placeContent: 'center',
                     margin: '0 1px',

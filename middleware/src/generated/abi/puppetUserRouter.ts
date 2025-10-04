@@ -11,7 +11,7 @@ export default [
         internalType: 'contract Account'
       },
       {
-        name: '_ruleContract',
+        name: '_rule',
         type: 'address',
         internalType: 'contract Rule'
       },
@@ -110,7 +110,7 @@ export default [
   },
   {
     type: 'function',
-    name: 'ruleContract',
+    name: 'rule',
     inputs: [],
     outputs: [
       {

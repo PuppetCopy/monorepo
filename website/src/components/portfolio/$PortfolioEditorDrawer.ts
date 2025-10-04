@@ -302,7 +302,6 @@ export const $PortfolioEditorDrawer = ({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async account => {
-                        const routerContractaParams = CONTRACT.UserRouter
                         const tokenRouteContractParams = CONTRACT.TokenRouter
 
                         const callStack: IBatchCall[] = []
@@ -312,6 +311,7 @@ export const $PortfolioEditorDrawer = ({
                             callStack.push(
                               {
                                 to: deposit.token,
+                                abi: erc20Abi,
                                 data: encodeFunctionData({
                                   abi: erc20Abi,
                                   functionName: 'approve',
@@ -319,9 +319,10 @@ export const $PortfolioEditorDrawer = ({
                                 })
                               },
                               {
-                                to: routerContractaParams.address,
+                                to: CONTRACT.UserRouter.address,
+                                abi: CONTRACT.UserRouter.abi,
                                 data: encodeFunctionData({
-                                  ...routerContractaParams,
+                                  abi: CONTRACT.UserRouter.abi,
                                   functionName: 'deposit',
                                   args: [deposit.token, deposit.amount]
                                 })
@@ -329,9 +330,10 @@ export const $PortfolioEditorDrawer = ({
                             )
                           } else {
                             callStack.push({
-                              to: routerContractaParams.address,
+                              to: CONTRACT.UserRouter.address,
+                              abi: CONTRACT.UserRouter.abi,
                               data: encodeFunctionData({
-                                ...routerContractaParams,
+                                abi: CONTRACT.UserRouter.abi,
                                 functionName: 'withdraw',
                                 args: [deposit.token, account.address, deposit.amount]
                               })
@@ -342,9 +344,10 @@ export const $PortfolioEditorDrawer = ({
                         callStack.push(
                           ...params.draftMatchingRuleList.map(matchRule => {
                             return {
-                              to: routerContractaParams.address,
+                              to: CONTRACT.UserRouter.address,
+                              abi: CONTRACT.UserRouter.abi,
                               data: encodeFunctionData({
-                                ...routerContractaParams,
+                                abi: CONTRACT.UserRouter.abi,
                                 functionName: 'setMatchingRule',
                                 args: [
                                   matchRule.collateralToken,

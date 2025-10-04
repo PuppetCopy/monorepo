@@ -900,17 +900,6 @@ export default [
   },
   {
     type: 'error',
-    name: 'Mirror__AllocationNotFullyRedistributed',
-    inputs: [
-      {
-        name: 'remainingAllocation',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ]
-  },
-  {
-    type: 'error',
     name: 'Mirror__ExecutionRequestMissing',
     inputs: [
       {

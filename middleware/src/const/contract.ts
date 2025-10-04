@@ -8,18 +8,13 @@ import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
 export const CONTRACT = {
   // Puppet contracts from generated file
   UserRouter: {
-    address: PUPPET_CONTRACT_MAP.UserRouter.address,
-    abi: PUPPET_CONTRACT_MAP.UserRouter.abi
+    address: PUPPET_CONTRACT_MAP.RouterProxy.address,
+    abi: [...PUPPET_CONTRACT_MAP.UserRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...puppetErrorAbi] as const
   },
   SequencerRouter: {
     address: PUPPET_CONTRACT_MAP.SequencerRouter.address,
     // Combined ABIs for router proxy pattern
-    abi: [
-      ...PUPPET_CONTRACT_MAP.SequencerRouter.abi,
-      ...PUPPET_CONTRACT_MAP.RouterProxy.abi,
-      ...puppetErrorAbi,
-      ...gmxErrorAbi
-    ]
+    abi: [...PUPPET_CONTRACT_MAP.SequencerRouter.abi, ...puppetErrorAbi, ...gmxErrorAbi]
   },
 
   Dictatorship: PUPPET_CONTRACT_MAP.Dictatorship,
