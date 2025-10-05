@@ -7,9 +7,8 @@ import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import type { IWalletConnected, IWriteContractReturn } from '../../wallet/wallet.js'
+import type { IWalletConnected } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
-import { $ApproveSpend, type ISpend } from './$ApproveSpend.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
@@ -20,22 +19,18 @@ export interface ISubmitBar {
   $submitContent: I$Slottable
   $barContent?: I$Node
   disabled?: IStream<boolean>
-
-  spend?: ISpend
 }
 
 export const $SubmitBar = (config: ISubmitBar) =>
   component(
     (
       [submit, submitTether]: IBehavior<PointerEvent, IWalletConnected>,
-      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
-      [approveTokenSpend, approveTokenSpendTether]: IBehavior<IWriteContractReturn>
+      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
       const {
         disabled = just(false),
         alert = just(null),
         txQuery,
-        spend,
         $barContent,
         $container = $row,
         $submitContent
@@ -108,7 +103,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
           $barContent ?? empty,
           $IntermediateConnectButton({
             $$display: map(wallet => {
-              const $primaryActionButton = $ButtonCore({
+              return $ButtonCore({
                 $container: $defaultButtonPrimary(
                   style({
                     position: 'relative',
@@ -122,25 +117,6 @@ export const $SubmitBar = (config: ISubmitBar) =>
               })({
                 click: submitTether(constant(wallet))
               })
-
-              if (spend) {
-                const isSpendPending = start(
-                  false,
-                  map(s => s.status === PromiseStatus.PENDING, promiseState(approveTokenSpend))
-                )
-
-                return $ApproveSpend({
-                  ...spend,
-                  wallet,
-                  txQuery: approveTokenSpend,
-                  $label: spend.$label,
-                  $content: $primaryActionButton,
-                  disabled: map(params => params.isSpendPending, combine({ isSpendPending }))
-                })({
-                  approveTokenSpend: approveTokenSpendTether()
-                })
-              }
-              return $primaryActionButton
             })
           })({
             changeWallet: changeWalletTether()
