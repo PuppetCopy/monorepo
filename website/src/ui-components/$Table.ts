@@ -73,9 +73,9 @@ export const $defaultTableCell = $row(
   spacing.small,
   style({ padding: '6px 0', display: 'flex', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
 )
-export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground }))
+export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground, fontSize: '.8rem' }))
 export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
-export const $defaultTableContainer = $column(spacing.default, style({ flex: 1 }))
+export const $defaultTableContainer = $column(spacing.small, style({ flex: 1 }))
 
 export const $Table = <T>({
   dataSource,
@@ -83,14 +83,12 @@ export const $Table = <T>({
   scrollConfig,
 
   $container = $defaultTableContainer,
-  $headerRowContainer = $defaultTableRowContainer,
+  $rowContainer = $defaultTableRowContainer,
+  $headerRowContainer = $rowContainer,
   $cell = $defaultTableCell,
   $bodyCell = $cell,
   $headerCell = $defaultTableHeaderCell,
-
   $rowCallback,
-
-  $rowContainer = $defaultTableRowContainer,
 
   sortBy,
   $between = empty,

@@ -63,7 +63,7 @@ export const $defaultNoneSelected = $infoLabel(
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    padding: '12px 0 12px 18px'
+    padding: '10px 0 10px 16px'
   })
 )
 export const $DropMultiSelect = <T>({
@@ -113,7 +113,7 @@ export const $DropMultiSelect = <T>({
             )
           }, value),
 
-          $row(style({ alignItems: 'center', cursor: 'pointer', padding: '12px 18px', flex: '1' }))(
+          $row(style({ alignItems: 'center', cursor: 'pointer', padding: '10px 16px', flex: '1' }))(
             $icon({
               $content: $caretDown,
               width: '12px',

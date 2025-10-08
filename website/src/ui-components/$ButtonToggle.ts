@@ -9,7 +9,8 @@ import {
   type INodeCompose,
   nodeEvent,
   style,
-  styleBehavior
+  styleBehavior,
+  stylePseudo
 } from 'aelea/ui'
 import { $row } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -29,7 +30,7 @@ export const $defaulButtonToggleBtn = $row(
     // fontWeight: 'bold',
     flex: 1,
     borderRadius: '20px',
-    padding: '12px 18px',
+    padding: '10px 16px',
     alignItems: 'center',
     border: '1px solid transparent',
     cursor: 'pointer',
@@ -45,8 +46,9 @@ export const $defaulButtonToggleContainer = $node(
     gridAutoColumns: 'minmax(50px, 1fr)',
     borderRadius: '20px',
     border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-    backgroundColor: pallete.background
-  })
+    backgroundColor: pallete.middleground
+  }),
+  stylePseudo(':hover', { borderColor: colorAlpha(pallete.foreground, 0.4) })
 )
 
 export const $ButtonToggle = <T>({
@@ -65,7 +67,7 @@ export const $ButtonToggle = <T>({
             styleBehavior(
               map(selectedOpt => {
                 return selectedOpt === opt
-                  ? { boxShadow: `0px 0px 0 2px ${pallete.primary} inset`, pointerEvents: 'none' }
+                  ? { boxShadow: `0px 0px 0 1px ${pallete.primary} inset`, pointerEvents: 'none' }
                   : { color: pallete.foreground }
               }, value)
             )
