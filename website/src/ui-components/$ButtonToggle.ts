@@ -30,7 +30,7 @@ export const $defaulButtonToggleBtn = $row(
     // fontWeight: 'bold',
     flex: 1,
     borderRadius: '20px',
-    padding: '10px 16px',
+    padding: '10px 12px',
     alignItems: 'center',
     border: '1px solid transparent',
     cursor: 'pointer',

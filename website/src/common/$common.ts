@@ -42,7 +42,7 @@ import { isPositionSettled } from '../utils/utils.js'
 export const $midContainer = $column(
   style({
     margin: '0 auto',
-    maxWidth: '980px',
+    maxWidth: '780px',
     padding: `0 ${isDesktopScreen ? '12px' : '0'} 26px`,
     gap: isDesktopScreen ? '50px' : '50px',
     width: '100%'

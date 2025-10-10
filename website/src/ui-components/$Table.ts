@@ -73,8 +73,10 @@ export const $defaultTableCell = $row(
   spacing.small,
   style({ padding: '6px 0', display: 'flex', minWidth: 0, alignItems: 'center', overflowWrap: 'break-word' })
 )
-export const $defaultTableHeaderCell = $defaultTableCell(style({ alignItems: 'center', color: pallete.foreground, fontSize: '.8rem' }))
-export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
+export const $defaultTableHeaderCell = $defaultTableCell(
+  style({ alignItems: 'center', color: pallete.foreground, fontSize: '.8rem' })
+)
+export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.default : spacing.default)
 export const $defaultTableContainer = $column(spacing.small, style({ flex: 1 }))
 
 export const $Table = <T>({

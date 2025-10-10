@@ -91,11 +91,17 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
               )
             ),
             $container: $defaultMiniButtonSecondary(
-              style({
-                borderRadius: isDesktopScreen ? '100px' : '8px',
-                padding: '0',
-                height: 'auto'
-              }),
+              isDesktopScreen
+                ? style({
+                    borderRadius: '100px',
+                    padding: '0',
+                    height: 'auto'
+                  })
+                : style({
+                    borderRadius: '8px',
+                    padding: '4px 8px',
+                    height: 'auto'
+                  }),
 
               style({
                 borderColor:
