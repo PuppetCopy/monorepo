@@ -40,13 +40,13 @@ export const $LastAtivity = (activityTimeframe: IStream<IntervalTime>) =>
         //   :
         $Dropdown({
           $anchor: $row(
-            $node(style({ whiteSpace: 'nowrap', padding: '12px 0px 12px 18px' }))(
+            $node(style({ whiteSpace: 'nowrap', padding: '10px 0px 10px 12px' }))(
               $row(spacing.tiny)(
                 isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty,
                 $text(map(tf => getMappedValue(activityOptionLabelMap, tf), activityTimeframe))
               )
             ),
-            $row(style({ alignItems: 'center', cursor: 'pointer', padding: '12px 18px', flex: '1' }))(
+            $row(style({ alignItems: 'center', cursor: 'pointer', padding: '0 12px', flex: '1' }))(
               $icon({
                 $content: $caretDown,
                 width: '12px',

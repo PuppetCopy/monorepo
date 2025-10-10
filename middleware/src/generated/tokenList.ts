@@ -363,6 +363,15 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'KTA',
+    decimals: 18,
+    address: '0x96Ee343E36E8642627FAEa235D57a9FEC8a6e34f',
+    name: 'KTA',
+    synthetic: true,
+    dataStreamFeedId: '0x0003007a5c72695f6f389c161d8851c2496ab5fc9b8978b9bf66ff0f3ecd4e6b',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'LDO',
     decimals: 18,
     address: '0x9D678B4Dd38a6E01df8090aEB7974aD71142b05f',
@@ -871,12 +880,30 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedDecimals: 18
   },
   {
+    symbol: 'XPL',
+    decimals: 18,
+    address: '0x2e73bDBee83D91623736D514b0BB41f2afd9C7Fd',
+    name: 'Plasma',
+    synthetic: true,
+    dataStreamFeedId: '0x0003214a4da85e2fed5cdee4f7edb5f1205dec8dffaf0186e7663ddab99e1772',
+    dataStreamFeedDecimals: 18
+  },
+  {
     symbol: 'XRP',
     decimals: 6,
     address: '0xc14e065b0067dE91534e032868f5Ac6ecf2c6868',
     name: 'XRP',
     synthetic: true,
     dataStreamFeedId: '0x0003c16c6aed42294f5cb4741f6e59ba2d728f0eae2eb9e6d3f555808c59fc45',
+    dataStreamFeedDecimals: 18
+  },
+  {
+    symbol: 'ZORA',
+    decimals: 18,
+    address: '0xc5ff0eB026dB972F95DF3dfF04e697d8b660092a',
+    name: 'Zora',
+    synthetic: true,
+    dataStreamFeedId: '0x000318ed7a378324925d265f0dd2908a3802241fed9a3317da12b53ec8ecc399',
     dataStreamFeedDecimals: 18
   },
   {

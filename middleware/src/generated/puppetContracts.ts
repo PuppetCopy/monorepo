@@ -58,7 +58,7 @@ export const PUPPET_CONTRACT_MAP = {
     abi: sequencerrouterAbi
   },
   UserRouter: {
-    address: '0x877b074B4E87EeaD27656a11491D86C9081198a7',
+    address: '0xD65A4bD84Ae0B2434cF539ef5589b2C63a848BCf',
     abi: userrouterAbi
   },
   Account: {

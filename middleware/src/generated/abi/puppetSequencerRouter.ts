@@ -1574,6 +1574,29 @@ export default [
   },
   {
     type: 'function',
+    name: 'recoverUnaccountedTokens',
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      },
+      {
+        name: '_receiver',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
     name: 'refundExecutionFee',
     inputs: [
       {

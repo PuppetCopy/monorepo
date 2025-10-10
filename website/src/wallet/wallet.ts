@@ -4,7 +4,6 @@ import {
   type GetAccountReturnType,
   getAccount,
   getConnectorClient,
-  getWalletClient,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
@@ -16,12 +15,13 @@ import { type IStream, skipRepeatsWith } from 'aelea/stream'
 import { fromCallback, state } from 'aelea/stream-extended'
 import {
   type Abi,
+  type Call,
   type Chain,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
+  decodeFunctionData,
   fallback,
-  type Hex,
   http,
   type ParseEventLogsReturnType,
   type Prettify,
@@ -34,7 +34,7 @@ import {
   webSocket
 } from 'viem'
 import type { Address } from 'viem/accounts'
-import { sendCalls } from 'viem/actions'
+import { estimateGas, sendCalls } from 'viem/actions'
 import { arbitrum } from 'viem/chains'
 
 export type IWalletConnected = {
@@ -161,72 +161,69 @@ async function write<
   }
 }
 
-export type IBatchCall = {
-  to: Address
-  data: Hex
-  value?: bigint | undefined
-}
+export interface IBatchCall extends Call<any, any> {}
 
 async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
   const client = await getConnectorClient(wagmiAdapter.wagmiConfig)
-  const wallet = await getWalletClient(wagmiAdapter.wagmiConfig)
   const address = client.account.address
 
   if (!address) {
     throw new Error('No connected account found')
   }
 
-  // /  const callList = dataList.filter((data) => data !== undefined).map((data): Call => ({ to: address, data }))
-
   if (callList.length === 0) {
     throw new Error('No valid calls to send')
   }
 
-  // const result = await simulateCalls(client, {
-  //   account: client.account,
-  //   calls: callList
-  //   // validation: true,
-  //   // traceTransfers: true,
-  //   // forceAtomic: true
-  // })
+  // Simulate each call before attempting to send
+  for (let i = 0; i < callList.length; i++) {
+    const callParams = callList[i]
+    try {
+      // If ABI is provided, use simulateContract for better error messages
+      if (callParams.abi) {
+        const { functionName, args } = decodeFunctionData({
+          abi: callParams.abi,
+          data: callParams.data
+        })
 
-  // const capabilities = await getCapabilities(wagmiAdapter.wagmiConfig).catch((error) => {
-  //   console.error('Error getting capabilities:', error)
-  //   return null
-  // })
+        await simulateContract(wagmiAdapter.wagmiConfig, {
+          abi: callParams.abi,
+          address: callParams.to,
+          functionName,
+          args: args || [],
+          account: address,
+          value: callParams.value
+        } as any)
+      } else {
+        // Fallback to estimateGas for calls without ABI
+        await estimateGas(client, {
+          account: client.account,
+          to: callParams.to,
+          data: callParams.data,
+          value: callParams.value
+        })
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      throw new Error(`Transaction ${i + 1} of ${callList.length} would fail: ${errorMessage}`)
+    }
+  }
 
-  // if (capabilities === null) {
-  //   for (const call of callList) {
-  //     if (!call) {
-  //       throw new Error('Invalid call: "to" and "data" are required')
-  //     }
+  // Strip ABI from calls for sendCalls (it doesn't need it)
+  const callsForSending = callList.map(({ to, data, value }) => ({
+    to,
+    data,
+    value
+  }))
 
-  //     await sendTransaction(client, {
-  //       account: client.account,
-  //       chain: client.chain,
-  //       data: call.data,
-  //       to: call.to,
-  //       value: call.value
-  //     })
-
-  //     return { id: '' } as SendCallsReturnType
-  //   }
-  // }
-
-  const call = await sendCalls(client, {
+  const result = await sendCalls(client, {
     account: client.account,
-    calls: callList,
-    experimental_fallbackDelay: 1000, // Delay in ms before falling back to legacy transaction
-    version: 'v1',
+    calls: callsForSending,
+    experimental_fallbackDelay: 1000,
     experimental_fallback: true
-    // forceAtomic: true
   })
 
-  // const result = await wallet.getCallsStatus({
-  //   id: '0x1234567890abcdef'
-  // })
-
-  return call
+  return result
 }
 
 export const wallet = {

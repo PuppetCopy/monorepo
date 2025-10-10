@@ -105,18 +105,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
       return [
         $column(spacing.default)(
           $card2(style({ padding: '0', gap: 0 }))(
-            // display: flex
-            // flex-direction: row;
-            // gap: 26px;
-            // flex: 1 1 0%;
-            // padding: 26px;
-            // place-content: center;
-            // flex-wrap: wrap;
-            // align-items: flex-start;
             (isDesktopScreen
-              ? $row(spacing.big, style({ padding: '26px', placeContent: 'space-between', alignItems: 'center' }))
+              ? $row(
+                  spacing.default,
+                  style({ padding: '12px 36px', placeContent: 'space-between', alignItems: 'center' })
+                )
               : $row(
-                  spacing.big,
+                  spacing.default,
                   style({ padding: '12px', placeContent: 'center', flexWrap: 'wrap', alignItems: 'flex-start' })
                 ))(
               $ButtonToggle({
@@ -237,17 +232,16 @@ export const $Leaderboard = (config: ILeaderboard) =>
               type ILeaderboardCellData = ILeaderboardDatasource[number]
 
               return $Table({
-                $headerRowContainer: $defaultTableRowContainer(style({ marginTop: '-10px' })),
+                $headerRowContainer: $defaultTableRowContainer,
                 $container: $defaultTableContainer(
                   style({
                     backgroundColor: pallete.background,
                     borderTop: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                    padding: isDesktopScreen ? '36px' : '14px'
+                    padding: isDesktopScreen ? '36px' : '12px'
                   })
                 ),
-                $cell: $defaultTableCell(style({ padding: '0', height: '70px' })),
+                $cell: $defaultTableCell(style({ padding: '0', height: '60px' })),
                 scrollConfig: {
-                  // $container: $defaultVScrollContainer(style({ gap: '2px' })),
                   $loader: style({
                     placeContent: 'center',
                     margin: '0 1px',
@@ -282,7 +276,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   },
                   {
                     $head: $text('Collateral'),
-                    gridTemplate: isDesktopScreen ? '104px' : '52px',
+                    gridTemplate: isDesktopScreen ? '104px' : '58px',
                     $bodyCallback: map((routeMetric: ILeaderboardCellData) => {
                       return op(
                         userMatchingRuleQuery,
@@ -316,12 +310,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         // },
                         {
                           $head: $text('Traded Tokens'),
-                          gridTemplate: isDesktopScreen ? '210px' : undefined,
+                          gridTemplate: isDesktopScreen ? '120px' : undefined,
                           $bodyCallback: map(pos => {
                             const indexTokenList = pos.metric.indexTokenList
                             const indexTokenListLength = indexTokenList.length
                             return $row(spacing.small)(
-                              ...indexTokenList.slice(0, 4).map((token: Address) => {
+                              ...indexTokenList.slice(0, 3).map((token: Address) => {
                                 const tokenDesc = getTokenDescription(token)
                                 return tokenDesc
                                   ? op(
@@ -332,7 +326,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                               }),
                               indexTokenListLength > 4
                                 ? style({ fontSize: '.8rem', marginLeft: '18px', placeContent: 'center' })(
-                                    $infoLabel($text(`+${indexTokenListLength - 4} more`))
+                                    $infoLabel($text(`+${indexTokenListLength - 3} more`))
                                   )
                                 : empty
                             )
@@ -358,7 +352,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       )
                     ),
                     sortBy: params.screenerFocus,
-                    gridTemplate: isDesktopScreen ? '200px' : undefined,
+                    gridTemplate: isDesktopScreen ? '150px' : undefined,
                     $bodyCallback: map(pos => {
                       const endTime = unixTimestampNow()
                       const startTime = endTime - params.activityTimeframe
