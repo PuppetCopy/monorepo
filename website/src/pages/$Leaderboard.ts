@@ -108,7 +108,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
             (isDesktopScreen
               ? $row(
                   spacing.default,
-                  style({ padding: '12px 36px', placeContent: 'space-between', alignItems: 'center' })
+                  style({ padding: '18px 36px', placeContent: 'space-between', alignItems: 'center' })
                 )
               : $row(
                   spacing.default,

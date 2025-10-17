@@ -1,5 +1,8 @@
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
+import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import { getWalletClient } from '@wagmi/core'
+import type { Route } from 'aelea/router'
 import {
   awaitPromises,
   combine,
@@ -16,18 +19,11 @@ import {
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
-
-// Array utility function (previously from @most/prelude)
-const remove = <T>(index: number, array: T[]): T[] => array.filter((_, i) => i !== index)
-
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { getWalletClient } from '@wagmi/core'
-import type { Route } from 'aelea/router'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { type Address, encodeFunctionData, erc20Abi, type Hex, MethodNotFoundRpcError } from 'viem'
+import { type Address, encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, MethodNotFoundRpcError } from 'viem'
 import {
   $alert,
   $alertIntermediateTooltip,
@@ -419,7 +415,8 @@ export const $PortfolioEditorDrawer = ({
                   return [list]
                 }
 
-                return remove(idx, list)
+                // return remove(idx, list)
+                return list.filter((_, i) => i !== idx)
               },
               draftMatchingRuleList,
               clickRemoveSubsc
@@ -431,3 +428,53 @@ export const $PortfolioEditorDrawer = ({
       ]
     }
   )
+
+// Function to pad the depositor address
+// function padAddress(address: string) {
+//   return `0x000000000000000000000000${address.slice(2)}`
+// }
+
+// // Default depositor if none provided
+// const depositor = depositorAddress
+// const paddedDepositor = padAddress(depositor)
+
+// // Calculate fillDeadline (current time + 30 minutes)
+// const currentTimestamp = Math.floor(Date.now() / 1000)
+// const fillDeadline = currentTimestamp + 30 * 60
+
+// // OrderDataType (constant)
+// const orderDataType = '0x9df4b782e7bbc178b3b93bfe8aafb909e84e39484d7f3c59f400f1b4691f85e2'
+
+// // Define the ABI
+// const viemParams = [
+//   {
+//     type: 'tuple',
+//     components: [
+//       { type: 'address', name: 'inputToken' },
+//       { type: 'uint256', name: 'inputAmount' },
+//       { type: 'address', name: 'outputToken' },
+//       { type: 'uint256', name: 'outputAmount' },
+//       { type: 'uint256', name: 'destinationChainId' },
+//       { type: 'bytes32', name: 'recipient' },
+//       { type: 'address', name: 'exclusiveRelayer' },
+//       { type: 'uint256', name: 'depositNonce' },
+//       { type: 'uint32', name: 'exclusivityPeriod' },
+//       { type: 'bytes', name: 'message' }
+//     ]
+//   }
+// ]
+
+// const orderData = encodeAbiParameters(viemParams, [
+//   {
+//     inputToken: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+//     inputAmount: amount * 10 ** 6,
+//     outputToken: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+//     outputAmount: 9980000,
+//     destinationChainId: 42161,
+//     recipient: paddedDepositor,
+//     exclusiveRelayer: '0x0000000000000000000000000000000000000000',
+//     depositNonce: 0,
+//     exclusivityPeriod: 0,
+//     message: '0x'
+//   }
+// ])

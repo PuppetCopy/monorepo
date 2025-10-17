@@ -9,7 +9,8 @@ export const CONTRACT = {
   // Puppet contracts from generated file
   UserRouter: {
     address: PUPPET_CONTRACT_MAP.RouterProxy.address,
-    abi: [...PUPPET_CONTRACT_MAP.UserRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...puppetErrorAbi] as const
+    abi: [...PUPPET_CONTRACT_MAP.UserRouter.abi, ...PUPPET_CONTRACT_MAP.RouterProxy.abi, ...puppetErrorAbi] as const,
+    chainId: PUPPET_CONTRACT_MAP.UserRouter.chainId
   },
   SequencerRouter: {
     address: PUPPET_CONTRACT_MAP.SequencerRouter.address,
