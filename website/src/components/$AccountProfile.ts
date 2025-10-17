@@ -8,12 +8,14 @@ import { $jazzicon } from '../common/$avatar.js'
 export const $profileDisplay = ({
   $container = $row,
   address,
+  ensName,
   showAddress = true,
   profileSize = 45,
   $labelContainer
 }: {
   $container?: INodeCompose
   address: Address
+  ensName?: string | null
   showAddress?: boolean
   profileSize?: number
   $labelContainer?: INodeCompose
@@ -23,6 +25,7 @@ export const $profileDisplay = ({
     showAddress
       ? $AccountLabel({
           address,
+          ensName,
           $container: $labelContainer
         })
       : empty
@@ -63,15 +66,24 @@ export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
 
 export const $AccountLabel = ({
   address,
+  ensName,
   $container = $column,
   primarySize = 1,
   secondarySize = primarySize * 0.85
 }: {
   address: string
+  ensName?: string | null
   $container?: INodeCompose
   primarySize?: number
   secondarySize?: number
 }) => {
+  // If ENS name exists, display it; otherwise fall back to shortened address
+  if (ensName) {
+    return $container(style({ alignItems: 'baseline', flexDirection: 'row' }))(
+      $node(style({ fontSize: `${primarySize}rem` }))($text(ensName))
+    )
+  }
+
   return $container(style({ alignItems: 'baseline', flexDirection: 'row' }))(
     $node(style({ fontSize: `${secondarySize}rem`, color: pallete.foreground }))($text(`${address.slice(0, 6)}..`)),
     $node(style({ fontSize: `${primarySize}rem` }))($text(address.slice(-4)))

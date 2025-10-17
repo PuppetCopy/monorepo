@@ -346,6 +346,7 @@ export const $openPositionBreakdown = (pos: IPosition) => {
 
 interface ITraderDisplay {
   address: Address
+  ensName?: string | null
   route: router.Route
   puppetList: Address[]
   labelSize?: number
@@ -353,7 +354,7 @@ interface ITraderDisplay {
 }
 export const $TraderDisplay = (config: ITraderDisplay) =>
   component(([click, clickTether]: IBehavior<any, Address>) => {
-    const { route, address, puppetList, labelSize, profileSize } = config
+    const { route, address, ensName, puppetList, labelSize, profileSize } = config
 
     return [
       $Link({
@@ -363,6 +364,7 @@ export const $TraderDisplay = (config: ITraderDisplay) =>
             ? $column(style({ gap: '3px' }))(
                 $AccountLabel({
                   address,
+                  ensName,
                   primarySize: labelSize
                 }),
                 puppetList.length > 0

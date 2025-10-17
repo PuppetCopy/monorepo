@@ -5,6 +5,7 @@ import {
   type GetAccountReturnType,
   getAccount,
   getConnectorClient,
+  getPublicClient,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
@@ -228,6 +229,8 @@ async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
   return result
 }
 
+const publicClient = getPublicClient(wagmiAdapter.wagmiConfig)
+
 export const wallet = {
   wagmiConfig: wagmiAdapter.wagmiConfig,
   read,
@@ -237,5 +240,6 @@ export const wallet = {
   appkit,
   blockChange,
   account,
-  transport
+  transport,
+  publicClient
 }

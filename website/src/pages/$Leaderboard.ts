@@ -51,6 +51,7 @@ import { uiStorage } from '@/ui-storage'
 import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenIcon } from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
+import { resolveEnsNames } from '../logic/ensResolver.js'
 import { sqlClient } from '../common/sqlClient.js'
 import { $SelectCollateralToken } from '../components/$CollateralTokenSelector.js'
 import { $LastAtivity, activityOptionLabelMap } from '../components/$LastActivity.js'
@@ -218,8 +219,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     }
                   })
 
+                  // Resolve ENS names for all accounts in the leaderboard
+                  const addresses = metrictList.map(metric => metric.account)
+                  const ensNamesMap = await resolveEnsNames(addresses)
+
                   const page = metrictList.map(metric => {
-                    return { metric }
+                    const ensName = ensNamesMap.get(metric.account) ?? null
+                    return { metric, ensName }
                   })
                   return { ...filterParams.paging, page }
                 },
@@ -268,6 +274,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return $TraderDisplay({
                         route: config.route,
                         address: pos.metric.account,
+                        ensName: pos.ensName,
                         puppetList: []
                       })({
                         click: routeChangeTether()
