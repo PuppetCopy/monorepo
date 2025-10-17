@@ -23,7 +23,7 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { type Address, encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, MethodNotFoundRpcError } from 'viem'
+import { type Address, encodeFunctionData, erc20Abi, type Hex, MethodNotFoundRpcError } from 'viem'
 import {
   $alert,
   $alertIntermediateTooltip,

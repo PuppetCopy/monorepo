@@ -1,22 +1,20 @@
 // This file is auto-generated. Do not edit manually.
 // Source: Puppet deployments.json and forge-artifacts
 
-import type { Address } from 'viem'
-
+import accountAbi from './abi/puppetAccount.js'
+import accountstoreAbi from './abi/puppetAccountStore.js'
 // Import generated ABIs
 import dictatorshipAbi from './abi/puppetDictatorship.js'
-import puppettokenAbi from './abi/puppetPuppetToken.js'
-import tokenrouterAbi from './abi/puppetTokenRouter.js'
-import routerproxyAbi from './abi/puppetRouterProxy.js'
-import accountstoreAbi from './abi/puppetAccountStore.js'
-import feemarketplacestoreAbi from './abi/puppetFeeMarketplaceStore.js'
 import feemarketplaceAbi from './abi/puppetFeeMarketplace.js'
+import feemarketplacestoreAbi from './abi/puppetFeeMarketplaceStore.js'
 import mirrorAbi from './abi/puppetMirror.js'
-import settleAbi from './abi/puppetSettle.js'
-import sequencerrouterAbi from './abi/puppetSequencerRouter.js'
-import userrouterAbi from './abi/puppetUserRouter.js'
-import accountAbi from './abi/puppetAccount.js'
+import puppettokenAbi from './abi/puppetPuppetToken.js'
+import routerproxyAbi from './abi/puppetRouterProxy.js'
 import ruleAbi from './abi/puppetRule.js'
+import sequencerrouterAbi from './abi/puppetSequencerRouter.js'
+import settleAbi from './abi/puppetSettle.js'
+import tokenrouterAbi from './abi/puppetTokenRouter.js'
+import userrouterAbi from './abi/puppetUserRouter.js'
 
 export const PUPPET_CONTRACT_MAP = {
   Dictatorship: {
