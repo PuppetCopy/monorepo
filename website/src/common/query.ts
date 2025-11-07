@@ -6,8 +6,7 @@ import type { Address } from 'viem/accounts'
 import { getStatus, sqlClient } from './sqlClient'
 
 export const subgraphStatus = periodicRun({
-  startImmediate: true,
-  interval: 2500,
+  interval: 15000,
   actionOp: map(getStatus)
 })
 

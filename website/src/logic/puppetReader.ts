@@ -1,11 +1,12 @@
 import * as PUPPET from '@puppet-copy/middleware/const'
+import { readContract } from '@wagmi/core'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { wallet } from '../wallet/wallet'
 
 const puppetReader: Record<string, (...args: any[]) => any> = {
   getUserBalance: (token: Address, user: Address, contractDefs = PUPPET.CONTRACT) =>
-    wallet.read({
+    readContract(wallet.wagmiConfig, {
       ...contractDefs.Account,
       functionName: 'userBalanceMap',
       args: [token, user]

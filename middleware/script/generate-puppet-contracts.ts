@@ -2,8 +2,8 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-// Define the expected chain ID
-const CHAIN_ID = 42161 // Arbitrum
+// Define the chain IDs to process
+const CHAIN_IDS = [42161] // Arbitrum - add more chain IDs as needed
 
 // Path to contracts directory (relative to middleware)
 const CONTRACTS_PATH = '../contracts'
@@ -16,6 +16,7 @@ const ERROR_SOL_PATH = join(CONTRACTS_PATH, 'src/utils/Error.sol')
 type ContractInfo = {
   name: string
   address: string
+  chainId: number
   abi?: any[]
 }
 
@@ -124,30 +125,31 @@ async function generateContracts() {
     const deploymentsFile = Bun.file(DEPLOYMENTS_PATH)
     const deployments = await deploymentsFile.json()
 
-    if (!deployments[CHAIN_ID]) {
-      throw new Error(`No deployments found for chain ID ${CHAIN_ID}`)
-    }
-
-    const addresses = deployments[CHAIN_ID]
-
-    // Load contract info with ABIs
+    // Load contract info with ABIs from all chains
     const contracts: ContractInfo[] = []
 
-    // Dynamically get all contract names from deployments
-    const contractNames = Object.keys(addresses)
-    console.log(`📋 Found ${contractNames.length} contracts in deployments`)
+    // Process all chain IDs in the deployments file
+    for (const chainIdStr of Object.keys(deployments)) {
+      const chainId = Number(chainIdStr)
+      const addresses = deployments[chainId]
 
-    for (const contractName of contractNames) {
-      const abi = await findAbiFile(contractName)
+      // Dynamically get all contract names from this chain's deployments
+      const contractNames = Object.keys(addresses)
+      console.log(`📋 Found ${contractNames.length} contracts on chain ${chainId}`)
 
-      contracts.push({
-        name: contractName,
-        address: addresses[contractName],
-        abi
-      })
+      for (const contractName of contractNames) {
+        const abi = await findAbiFile(contractName)
+
+        contracts.push({
+          name: contractName,
+          address: addresses[contractName],
+          chainId,
+          abi
+        })
+      }
     }
 
-    console.log(`\n✅ Loaded ${contracts.length} contracts`)
+    console.log(`\n✅ Loaded ${contracts.length} contracts across ${Object.keys(deployments).length} chain(s)`)
 
     // Generate TypeScript file
     const fileContent = `// This file is auto-generated. Do not edit manually.
@@ -167,11 +169,13 @@ ${contracts
     if (contract.abi) {
       return `  ${contract.name}: {
     address: '${contract.address}',
+    chainId: ${contract.chainId},
     abi: ${contract.name.toLowerCase()}Abi
   }`
     }
     return `  ${contract.name}: {
-    address: '${contract.address}'
+    address: '${contract.address}',
+    chainId: ${contract.chainId}
   }`
   })
   .join(',\n')}
@@ -206,7 +210,7 @@ export default ${JSON.stringify(contract.abi, null, 2)} as const
     console.log('✅ Successfully generated Puppet contract list with ABIs and errors')
     console.log('\nGenerated contracts:')
     contracts.forEach(contract => {
-      console.log(`- ${contract.name}: ${contract.address}`)
+      console.log(`- ${contract.name} (Chain ${contract.chainId}): ${contract.address}`)
     })
   } catch (error) {
     console.error('❌ Error generating Puppet contracts:', error)

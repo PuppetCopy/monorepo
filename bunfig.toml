@@ -1,0 +1,19 @@
+# Bun configuration file
+
+[install]
+# Minimum release age for packages (7 days in seconds)
+minimumReleaseAge = 800
+
+# Use isolated installs (Bun 1.3 feature)
+linkBehavior = "isolated"
+
+[test]
+# Enable test coverage
+coverage = true
+
+[run]
+# Automatically install missing packages when running scripts
+autoInstall = true
+
+# Disable telemetry
+telemetry = false

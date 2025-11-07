@@ -1,9 +1,11 @@
 import { createAppKit } from '@reown/appkit'
+import { type AppKitNetwork, arbitrum, base } from '@reown/appkit/networks'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import {
   type GetAccountReturnType,
   getAccount,
   getConnectorClient,
+  getPublicClient,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
@@ -35,7 +37,6 @@ import {
 } from 'viem'
 import type { Address } from 'viem/accounts'
 import { estimateGas, sendCalls } from 'viem/actions'
-import { arbitrum } from 'viem/chains'
 
 export type IWalletConnected = {
   address: Address
@@ -57,7 +58,7 @@ if (!projectId) {
   throw new Error('Missing VITE_WC_PROJECT_ID')
 }
 
-const networks = [arbitrum]
+const networks = [arbitrum, base] as [AppKitNetwork, AppKitNetwork]
 
 const transport = fallback([
   webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
@@ -72,15 +73,17 @@ const wagmiAdapter = new WagmiAdapter({
 
 const appkit = createAppKit({
   adapters: [wagmiAdapter],
-  networks: [arbitrum],
+  networks: networks,
   showWallets: false,
+  enableNetworkSwitch: true,
+  allowUnsupportedChain: true,
   defaultNetwork: arbitrum,
   allWallets: 'ONLY_MOBILE',
   projectId,
   features: {
     connectMethodsOrder: ['wallet', 'social'],
     collapseWallets: false,
-    swaps: false,
+    swaps: true,
     email: false,
     send: false,
     history: false,
@@ -226,7 +229,10 @@ async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
   return result
 }
 
+const publicClient = getPublicClient(wagmiAdapter.wagmiConfig)
+
 export const wallet = {
+  wagmiConfig: wagmiAdapter.wagmiConfig,
   read,
   write,
   writeMany,
@@ -234,5 +240,6 @@ export const wallet = {
   appkit,
   blockChange,
   account,
-  transport
+  transport,
+  publicClient
 }
