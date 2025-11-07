@@ -1,6 +1,7 @@
 import { createAppKit } from '@reown/appkit'
-import { type AppKitNetwork, arbitrum, base } from '@reown/appkit/networks'
+import { arbitrum, base, mainnet } from '@reown/appkit/networks'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { RhinestoneSDK } from '@rhinestone/sdk'
 import {
   type GetAccountReturnType,
   getAccount,
@@ -58,8 +59,6 @@ if (!projectId) {
   throw new Error('Missing VITE_WC_PROJECT_ID')
 }
 
-const networks = [arbitrum, base] as [AppKitNetwork, AppKitNetwork]
-
 const transport = fallback([
   webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
   webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
@@ -68,12 +67,13 @@ const transport = fallback([
 
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks
+  networks: [mainnet, arbitrum, base],
+  transports: { [arbitrum.id]: transport }
 })
 
 const appkit = createAppKit({
   adapters: [wagmiAdapter],
-  networks: networks,
+  networks: [mainnet, arbitrum, base],
   showWallets: false,
   enableNetworkSwitch: true,
   allowUnsupportedChain: true,
@@ -231,6 +231,12 @@ async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
 
 const publicClient = getPublicClient(wagmiAdapter.wagmiConfig)
 
+// Rhinestone SDK - use proxy instead of direct API key
+const rhinestone = new RhinestoneSDK({
+  endpointUrl: '/api/orchestrator',
+  apiKey: 'proxy' // placeholder; the server adds the real key
+})
+
 export const wallet = {
   wagmiConfig: wagmiAdapter.wagmiConfig,
   read,
@@ -241,5 +247,6 @@ export const wallet = {
   blockChange,
   account,
   transport,
-  publicClient
+  publicClient,
+  rhinestone
 }

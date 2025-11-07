@@ -84,78 +84,6 @@ export default [
   },
   {
     type: 'function',
-    name: 'depositCrossChain',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'token',
-        type: 'address',
-        internalType: 'contract IERC20'
-      },
-      {
-        name: 'amount',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'sourceChainId',
-        type: 'uint32',
-        internalType: 'uint32'
-      },
-      {
-        name: 'nonce',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    name: 'depositRecords',
-    inputs: [
-      {
-        name: '',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ],
-    outputs: [
-      {
-        name: 'user',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'token',
-        type: 'address',
-        internalType: 'contract IERC20'
-      },
-      {
-        name: 'amount',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'timestamp',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'processed',
-        type: 'bool',
-        internalType: 'bool'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     name: 'feeMarketplace',
     inputs: [],
     outputs: [
@@ -163,94 +91,6 @@ export default [
         name: '',
         type: 'address',
         internalType: 'contract FeeMarketplace'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    name: 'fill',
-    inputs: [
-      {
-        name: '',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      },
-      {
-        name: 'originData',
-        type: 'bytes',
-        internalType: 'bytes'
-      },
-      {
-        name: '',
-        type: 'bytes',
-        internalType: 'bytes'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    name: 'getDepositRecord',
-    inputs: [
-      {
-        name: 'depositId',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'tuple',
-        internalType: 'struct UserRouter.DepositRecord',
-        components: [
-          {
-            name: 'user',
-            type: 'address',
-            internalType: 'address'
-          },
-          {
-            name: 'token',
-            type: 'address',
-            internalType: 'contract IERC20'
-          },
-          {
-            name: 'amount',
-            type: 'uint256',
-            internalType: 'uint256'
-          },
-          {
-            name: 'timestamp',
-            type: 'uint256',
-            internalType: 'uint256'
-          },
-          {
-            name: 'processed',
-            type: 'bool',
-            internalType: 'bool'
-          }
-        ]
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    name: 'isDepositProcessed',
-    inputs: [
-      {
-        name: 'depositId',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-        internalType: 'bool'
       }
     ],
     stateMutability: 'view'
@@ -270,6 +110,65 @@ export default [
   },
   {
     type: 'function',
+    name: 'processRhinestoneAction',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
+        name: 'action',
+        type: 'uint8',
+        internalType: 'uint8'
+      },
+      {
+        name: 'data',
+        type: 'bytes',
+        internalType: 'bytes'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    name: 'processRhinestoneDeposit',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
+        name: 'token',
+        type: 'address',
+        internalType: 'contract IERC20'
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        internalType: 'uint256'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
+  },
+  {
+    type: 'function',
+    name: 'rhinestoneSettler',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address'
+      }
+    ],
+    stateMutability: 'view'
+  },
+  {
+    type: 'function',
     name: 'rule',
     inputs: [],
     outputs: [
@@ -280,6 +179,19 @@ export default [
       }
     ],
     stateMutability: 'view'
+  },
+  {
+    type: 'function',
+    name: 'setRhinestoneSettler',
+    inputs: [
+      {
+        name: '_rhinestoneSettler',
+        type: 'address',
+        internalType: 'address'
+      }
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable'
   },
   {
     type: 'function',
@@ -346,19 +258,88 @@ export default [
   },
   {
     type: 'event',
-    name: 'CrossChainDepositFulfilled',
+    name: 'Deposit',
     inputs: [
-      {
-        name: 'depositId',
-        type: 'bytes32',
-        indexed: true,
-        internalType: 'bytes32'
-      },
       {
         name: 'user',
         type: 'address',
         indexed: true,
         internalType: 'address'
+      },
+      {
+        name: 'token',
+        type: 'address',
+        indexed: true,
+        internalType: 'contract IERC20'
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256'
+      }
+    ],
+    anonymous: false
+  },
+  {
+    type: 'event',
+    name: 'RhinestoneSettlerUpdated',
+    inputs: [
+      {
+        name: 'oldSettler',
+        type: 'address',
+        indexed: true,
+        internalType: 'address'
+      },
+      {
+        name: 'newSettler',
+        type: 'address',
+        indexed: true,
+        internalType: 'address'
+      }
+    ],
+    anonymous: false
+  },
+  {
+    type: 'event',
+    name: 'RuleSet',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        indexed: true,
+        internalType: 'address'
+      },
+      {
+        name: 'trader',
+        type: 'address',
+        indexed: true,
+        internalType: 'address'
+      },
+      {
+        name: 'mirror',
+        type: 'address',
+        indexed: true,
+        internalType: 'contract Mirror'
+      }
+    ],
+    anonymous: false
+  },
+  {
+    type: 'event',
+    name: 'Withdrawal',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        indexed: true,
+        internalType: 'address'
+      },
+      {
+        name: 'token',
+        type: 'address',
+        indexed: true,
+        internalType: 'contract IERC20'
       },
       {
         name: 'amount',
@@ -373,5 +354,16 @@ export default [
     type: 'error',
     name: 'ReentrancyGuardReentrantCall',
     inputs: []
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+        internalType: 'address'
+      }
+    ]
   }
 ] as const

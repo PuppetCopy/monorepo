@@ -33,12 +33,22 @@ export const readableTokenUsd = (
   format: Intl.NumberFormatOptions = {}
 ) => {
   const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
+
+  if (tokenDescription === null) {
+    throw new Error(`Unknown token: ${token}`)
+  }
+
   return readableNumber(format, formatFixed(USD_DECIMALS, value * getTokenDenominator(tokenDescription)))
 }
 export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) =>
   readableNumber({ signDisplay: 'exceptZero' })(formatFixed(decimals, ammount))
 export const readableTokenAmountLabel = (token: ITokenDescription | Address, amount: bigint) => {
   const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
+
+  if (tokenDescription === null) {
+    throw new Error(`Unknown token: ${token}`)
+  }
+
   return `${readableUnitAmount(formatFixed(tokenDescription.decimals, amount))} ${tokenDescription.symbol}`
 }
 

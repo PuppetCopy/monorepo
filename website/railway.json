@@ -3,21 +3,13 @@
   "build": {
     "builder": "NIXPACKS",
     "nixpacksPlan": {
-      "phases": {
-        "setup": {
-          "nixPkgs": ["bun"]
-        },
-        "install": {
-          "cmds": ["echo 'Skipping install - using pre-built files'"]
-        },
-        "build": {
-          "cmds": ["echo 'Skipping build - using pre-built files'"]
-        }
+      "providers": ["caddy"],
+      "staticAssets": {
+        "/*": "dist"
       }
     }
   },
   "deploy": {
-    "startCommand": "bunx serve@latest dist -s -l $PORT",
     "restartPolicyType": "NEVER"
   }
 }

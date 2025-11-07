@@ -9,12 +9,15 @@
     "og:generate-svg": "node --trace-warnings ./opengraph/index.ts",
     "type-check": "tsc --noEmit"
   },
-  "packageManager": "bun@1.3.0",
+  "packageManager": "bun@1.3.1",
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
     "aelea": "catalog:",
     "og-img": "0.2.1",
     "satori": "0.15.2",
     "satori-html": "0.3.2"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   }
 }
