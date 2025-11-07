@@ -1,71 +1,51 @@
-name: Website Release
+# name: Build Website
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'website/**'
-      - 'middleware/**'
-      - '.github/workflows/website-release.yml'
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - 'website/**'
+#       - 'middleware/**'
+#       - '.github/workflows/website-release.yml'
+#   workflow_dispatch:
 
-jobs:
-  build:
-    name: Build Website
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.GH_PAT }}
+# jobs:
+#   build:
+#     name: Build and Push
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       packages: write
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           submodules: recursive
+#           token: ${{ secrets.GH_PAT }}
       
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.2.20
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
       
-      - name: Install dependencies
-        run: bun install
+#       - name: Log in to Container Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ghcr.io
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build dependencies in parallel
-        run: |
-          bun run middleware:build &
-          cd indexer && bun run build &
-          wait
+#       - name: Build and push
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: .
+#           file: ./website/Dockerfile
+#           push: true
+#           tags: ghcr.io/puppetcopy/website:latest
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
+#           platforms: linux/amd64
       
-      - name: Build website
-        run: |
-          bun run website:build
-      
-      - name: Upload dist folder
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: website-dist
-          path: website/dist
-          retention-days: 1
-          if-no-files-found: error
-
-  deploy:
-    name: Deploy to Railway
-    needs: build
-    runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: website/railway.json
-      
-      - uses: actions/download-artifact@v4
-        with:
-          name: website-dist
-          path: dist
-      
-      - name: Setup deployment
-        run: |
-          cp website/railway.json railway.json
-          ls -la dist/
-      
-      - name: Deploy to Railway
-        run: railway up --service=${{ secrets.RAILWAY_WEBSITE_SERVICE_ID }}
+#       # Optional: Notify when ready to deploy
+#       # - name: Send deploy notification
+#       #   if: success()
+#       #   run: |
+#       #     echo "Website image ready: ghcr.io/puppetcopy/website:latest"
+#       #     # Add webhook/Discord/Slack notification here

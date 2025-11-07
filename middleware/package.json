@@ -28,7 +28,8 @@
     "viem": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "catalog:"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   },
   "homepage": "https://puppet.tech",
   "keywords": [

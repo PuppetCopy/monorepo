@@ -55,9 +55,9 @@ export function validateIdentityName(name: string) {
   }
 }
 
-export function getTokenDescription(token: Address): ITokenDescription {
+export function getTokenDescription(token: Address): ITokenDescription | null {
   const normalizedToken = getAddress(token)
-  return getMappedValueFallback(TOKEN_ADDRESS_DESCRIPTION_MAP, normalizedToken, null) as ITokenDescription
+  return getMappedValueFallback(TOKEN_ADDRESS_DESCRIPTION_MAP, normalizedToken, null)
 }
 
 export function getMarketDescription(market: Address): IMarketDescription {

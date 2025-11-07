@@ -1,4 +1,5 @@
 import { IntervalTime } from '../const/common.js'
+import { unixTimestampNow } from './utils.js'
 
 export declare type Nominal<T, Name extends string> = T & {
   [Symbol.species]: Name
@@ -15,8 +16,6 @@ export function timeTzOffset(ms: number): UTCTimestamp {
 export function unixTimeTzOffset(ms: number): UTCTimestamp {
   return ms as UTCTimestamp
 }
-
-export const unixTimestampNow = () => Math.floor(Date.now() / 1000)
 
 export const readableDate = (timestamp: number, intlOptions: Intl.DateTimeFormatOptions = { dateStyle: 'short' }) =>
   new Date(timestamp * 1000).toLocaleDateString(undefined, intlOptions)
@@ -94,19 +93,4 @@ export function getIntervalBasedOnTimeframe(maxColumns: number, from: number, to
               : IntervalTime.MIN5
 
   return interval
-}
-
-export const timespanPassedSinceInvoke = (timespan: number) => {
-  let lastTimePasses = unixTimestampNow()
-
-  return () => {
-    const nowTime = unixTimestampNow()
-    const delta = nowTime - lastTimePasses
-    if (delta > timespan) {
-      lastTimePasses = nowTime
-      return true
-    }
-
-    return false
-  }
 }

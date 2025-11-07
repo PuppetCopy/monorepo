@@ -5,6 +5,12 @@
 
 export const ARBITRUM_TOKEN_LIST = [
   {
+    symbol: '0G',
+    decimals: 18,
+    address: '0x95c317066CF214b2E6588B2685D949384504F51e',
+    name: '0G'
+  },
+  {
     symbol: 'AAVE',
     decimals: 18,
     address: '0xba5DdD1f9d7F570dc94a51479a000E3BCE967196',
@@ -95,6 +101,12 @@ export const ARBITRUM_TOKEN_LIST = [
     priceFeedAddress: '0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6'
   },
   {
+    symbol: 'ASTER',
+    decimals: 18,
+    address: '0x2aAB60E62f05d17e58dEc982870bfAdc7F4e7ADF',
+    name: 'Aster'
+  },
+  {
     symbol: 'ATOM',
     decimals: 6,
     address: '0x7D7F1765aCbaF847b9A1f7137FE8Ed4931FbfEbA',
@@ -103,6 +115,12 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedId: '0x0003c93d9477344d0f2516c4605008399e6750d492a60ab85a9ecb2e441e87b3',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0xCDA67618e51762235eacA373894F0C79256768fa'
+  },
+  {
+    symbol: 'AVNT',
+    decimals: 18,
+    address: '0xdB58EB7f408EbA2176eCb44A4696292605cCEB39',
+    name: 'Avantis'
   },
   {
     symbol: 'BCH',
@@ -380,6 +398,12 @@ export const ARBITRUM_TOKEN_LIST = [
     dataStreamFeedId: '0x0003fa5285b58655299e2bd92df12b3352209b3e460aea3c170eb9a96c8ceb1c',
     dataStreamFeedDecimals: 18,
     priceFeedAddress: '0xA43A34030088E6510FecCFb77E88ee5e7ed0fE64'
+  },
+  {
+    symbol: 'LINEA',
+    decimals: 18,
+    address: '0xc4017CFe7D7eaBDE63d3252caBF26A286fE2B1E0',
+    name: 'Linea'
   },
   {
     symbol: 'LINK',

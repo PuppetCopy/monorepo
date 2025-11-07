@@ -1,7 +1,8 @@
 import type { IScheduler, ISink, IStream } from 'aelea/stream'
 import { curry2, filter, fromPromise, map, periodic, start } from 'aelea/stream'
 import { multicast, stream } from 'aelea/stream-extended'
-import { countdownFn, unixTimestampNow } from '../date.js'
+import { countdownFn } from '../date.js'
+import { unixTimestampNow } from '../utils.js'
 
 export const mapPromise = <T, R>(mapFn: (x: T) => R, prov: Promise<T>) => fromPromise(prov.then(mapFn))
 

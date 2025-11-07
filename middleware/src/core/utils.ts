@@ -1,6 +1,22 @@
 import type { Address } from 'viem/accounts'
-import { timespanPassedSinceInvoke } from './date.js'
 import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi } from './types.js'
+
+export const unixTimestampNow = () => Math.floor(Date.now() / 1000)
+
+export const timespanPassedSinceInvoke = (timespan: number) => {
+  let lastTimePasses = unixTimestampNow()
+
+  return () => {
+    const nowTime = unixTimestampNow()
+    const delta = nowTime - lastTimePasses
+    if (delta > timespan) {
+      lastTimePasses = nowTime
+      return true
+    }
+
+    return false
+  }
+}
 
 export const ETH_ADDRESS_REGEXP = /^0x[a-fA-F0-9]{40}$/i
 export const TX_HASH_REGEX = /^0x([A-Fa-f0-9]{64})$/i

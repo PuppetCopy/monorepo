@@ -1,115 +1,44 @@
-name: Indexer Release
+name: Build Indexer
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'indexer/**'
+      - 'middleware/**'
+      - '.github/workflows/indexer-release.yml'
   workflow_dispatch:
 
 jobs:
-  check-changes:
-    name: Check Indexer Changes
-    runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.check.outputs.changed }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          
-      - name: Check if indexer submodule changed
-        id: check
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] || git diff --name-only HEAD~1 HEAD | grep -q '^indexer$'; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
   build:
-    needs: check-changes
-    if: needs.check-changes.outputs.changed == 'true'
-    name: Build Indexer
+    name: Build and Push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_PAT }}
       
-      - uses: oven-sh/setup-bun@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
         with:
-          bun-version: 1.2.20
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Install dependencies
-        run: bun install
-      
-      - name: Build middleware
-        run: bun run middleware:build
-      
-      - name: Run indexer codegen
-        run: |
-          cd indexer
-          bun run codegen
-      
-      - name: Prepare deployment artifact
-        if: github.ref == 'refs/heads/main'
-        run: |
-          # Create artifact directory with required files
-          mkdir -p artifact/indexer
-          mkdir -p artifact/middleware/dist
-          
-          # Copy indexer files
-          cp -r indexer/* artifact/indexer/
-          cp indexer/railway.json artifact/indexer/railway.json
-          
-          # Copy middleware dist and package.json
-          cp -r middleware/dist/* artifact/middleware/dist/
-          cp middleware/package.json artifact/middleware/
-          cp middleware/tsconfig.json artifact/middleware/
-          
-          # Create minimal root package.json for workspace resolution
-          cat > artifact/package.json << 'EOF'
-          {
-            "name": "@puppet/monorepo",
-            "private": true,
-            "workspaces": ["indexer", "middleware"]
-          }
-          EOF
-          
-          # Copy bun.lock for dependency installation
-          cp bun.lock artifact/
-          
-          # Copy root tsconfig.base.json that middleware extends
-          cp tsconfig.base.json artifact/
-          
-          # Clean up unnecessary files
-          rm -rf artifact/indexer/node_modules
-          rm -rf artifact/indexer/.ponder
-          rm -rf artifact/indexer/generated
-          
-      - name: Upload build artifacts
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
-          name: indexer-build
-          path: artifact/
-          retention-days: 1
-          if-no-files-found: error
-
-  deploy:
-    name: Deploy to Railway
-    needs: [check-changes, build]
-    if: needs.check-changes.outputs.changed == 'true'
-    runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: indexer-build
-          path: .
-      
-      
-      - name: Deploy to Railway
-        run: railway up --service=${{ secrets.RAILWAY_INDEXER_SERVICE_ID }} --verbose
+          context: .
+          file: ./indexer/Dockerfile
+          push: true
+          tags: ghcr.io/puppetcopy/indexer:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64

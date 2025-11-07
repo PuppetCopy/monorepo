@@ -55,7 +55,21 @@ export default defineConfig({
     }
   },
   server: {
-    port: Number(process.env.PORT) || 3000
+    port: Number(process.env.PORT) || 3000,
+    proxy: {
+      '/api/orchestrator': {
+        target: 'https://orchestrator.rhinestone.dev',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            if (process.env.RHINESTONE_API_KEY) {
+              proxyReq.setHeader('x-api-key', process.env.RHINESTONE_API_KEY)
+            }
+          })
+        }
+      }
+    }
   },
   plugins: [
     tsconfigPaths(),
@@ -64,7 +78,7 @@ export default defineConfig({
 
       strategies: 'injectManifest',
       injectManifest: {
-        maximumFileSizeToCacheInBytes: 3000000,
+        maximumFileSizeToCacheInBytes: 4000000,
         globPatterns: ['**/*.{js,html,woff2}']
       },
       injectRegister: 'auto',

@@ -1,4 +1,5 @@
 import type { Address } from 'viem/accounts'
+import { arbitrum, base } from 'viem/chains'
 
 export enum IntervalTime {
   SEC = 1,
@@ -48,31 +49,13 @@ export const MAX_LOCK_SCHEDULE = IntervalTime.WEEK * 105
 
 export const PUPPET_COLLATERAL_LIST = [ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.NATIVE_TOKEN] as Address[]
 
-// Chain IDs
-export const CHAIN_ID = {
-  ARBITRUM: 42161,
-  BASE: 8453
-} as const
-
-// Token addresses mapped by chain ID
-export const TOKEN_CHAIN: Record<number, Record<Address, { symbol: string; decimals: number }>> = {
-  [CHAIN_ID.ARBITRUM]: {
-    [ARBITRUM_ADDRESS.USDC]: { symbol: 'USDC', decimals: 6 },
-    [ARBITRUM_ADDRESS.NATIVE_TOKEN]: { symbol: 'WETH', decimals: 18 }
-  },
-  [CHAIN_ID.BASE]: {
-    [BASE_ADDRESS.USDC]: { symbol: 'USDC', decimals: 6 },
-    [BASE_ADDRESS.NATIVE_TOKEN]: { symbol: 'WETH', decimals: 18 }
-  }
-} as const
-
 // Cross-chain token mapping: maps tokens between chains by symbol
-export const CROSS_CHAIN_TOKEN_MAP: Record<number, Record<string, Address>> = {
-  [CHAIN_ID.ARBITRUM]: {
+export const CROSS_CHAIN_TOKEN_MAP = {
+  [arbitrum.id]: {
     USDC: ARBITRUM_ADDRESS.USDC,
     WETH: ARBITRUM_ADDRESS.NATIVE_TOKEN
   },
-  [CHAIN_ID.BASE]: {
+  [base.id]: {
     USDC: BASE_ADDRESS.USDC,
     WETH: BASE_ADDRESS.NATIVE_TOKEN
   }
