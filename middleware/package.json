@@ -19,6 +19,11 @@
       "development": "./src/*/index.ts",
       "types": "./dist/types/*/index.d.ts",
       "import": "./dist/esm/*/index.js"
+    },
+    "./const": {
+      "development": "./src/const/index.ts",
+      "types": "./dist/types/const/index.d.ts",
+      "import": "./dist/esm/const/index.js"
     }
   },
   "dependencies": {
