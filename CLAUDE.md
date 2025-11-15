@@ -27,10 +27,11 @@
 
 ### Key Capabilities
 
-**Copy Trading Made Simple**:
-- **Seamless Matching Engine**: Traders operate normally on GMX earning rewards, while investors automatically mirror their positions without traders directly managing funds
-- **Single Deposit, Many Traders**: One vault can copy multiple traders simultaneously - when matched, portions of your deposit mirror different traders' positions
-- **Build a Portfolio, Manage Risk**: Define custom matching rules per trader to protect your capital while proportionally following their trades
+**How Puppet Works**:
+- **Portfolio-Based Matching**: Your single deposit creates a portfolio that can be matched to multiple traders simultaneously. When a trader opens a position, a portion of your available funds automatically creates a mirrored position based on your matching rules
+- **Rule-Based Allocation**: For each trader you follow, you define matching rules (allocation percentage, position limits, collateral ratios, etc.). These rules determine how much of your available funding gets allocated when creating mirrored positions
+- **Dynamic Fund Utilization**: As traders open and close positions, your deposit is dynamically allocated across your portfolio. Each allocation is calculated as a percentage of your latest available funding, ensuring efficient capital usage without over-commitment
+- **Seamless for Traders**: Traders operate normally on GMX without any additional steps - they earn rewards while investors automatically mirror their positions without traders managing anyone's funds
 
 **Platform Features**:
 - **Non-Custodial**: Fully decentralized smart contracts on Arbitrum - traders never control investor funds
@@ -70,9 +71,11 @@ monorepo/
 - **indexer**: Blockchain data indexing (Ponder + Drizzle ORM)
 - **sequencer**: Transaction sequencing service
 - **contracts**: Core smart contracts enabling copy trading functionality:
-  - **Position mirroring** - Automatically replicate trader positions with investor funds
-  - **Matching rules** - Customizable risk management per trader (limits, collateral ratios, etc.)
-  - **Reward distribution** - Token rewards for successful traders
+  - **Portfolio matching engine** - Matches investor deposits to multiple traders, creating mirrored positions based on rule-defined allocation percentages of available funding
+  - **Position mirroring** - Automatically replicates trader positions using calculated portions of investor funds
+  - **Matching rules** - Per-trader configuration for allocation percentage, position limits, collateral ratios, and other risk parameters
+  - **Dynamic allocation** - Calculates position sizes as percentage of latest available funding, adapting to portfolio changes
+  - **Reward distribution** - Token rewards for successful traders based on performance
   - **Non-custodial vaults** - Secure fund management without trader access
   - **GMX integration** - Seamless interaction with GMX V2 perpetuals protocol
 - **docs**: VitePress documentation
