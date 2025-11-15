@@ -28,10 +28,10 @@
 ### Key Capabilities
 
 **How Puppet Works**:
-- **Portfolio-Based Matching**: Your single deposit creates a portfolio that can be matched to multiple traders simultaneously. When a trader opens a position, a portion of your available funds automatically creates a mirrored position based on your matching rules
-- **Rule-Based Allocation**: For each trader you follow, you define matching rules (allocation percentage, position limits, collateral ratios, etc.). These rules determine how much of your available funding gets allocated when creating mirrored positions
-- **Dynamic Fund Utilization**: As traders open and close positions, your deposit is dynamically allocated across your portfolio. Each allocation is calculated as a percentage of your latest available funding, ensuring efficient capital usage without over-commitment
-- **Seamless for Traders**: Traders operate normally on GMX without any additional steps - they earn rewards while investors automatically mirror their positions without traders managing anyone's funds
+- **Portfolio-Based Matching**: Single deposit matched to multiple traders. When traders open positions, mirrored positions are created using portions of available funds based on matching rules
+- **Rule-Based Allocation**: Matching rules (allocation %, position limits, collateral ratios) define fund allocation per trader
+- **Dynamic Fund Utilization**: Position sizes calculated as percentage of latest available funding, adapting to portfolio changes
+- **Seamless for Traders**: Traders operate normally on GMX, earning rewards while positions are automatically mirrored without managing investor funds
 
 **Platform Features**:
 - **Non-Custodial**: Fully decentralized smart contracts on Arbitrum - traders never control investor funds
