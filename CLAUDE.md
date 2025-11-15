@@ -345,17 +345,38 @@ No git hooks configured. Code quality relies on:
 - `IBehavior<T>` - Hot observable with current value
 - Stream operators: `map()`, `filter()`, `combine()`
 
-**Component Pattern**:
+**Component Patterns**:
+
+Components can return DOM nodes or tuples with DOM and behaviors:
+
 ```typescript
 import { component } from '@aelea/core'
 import type { IBehavior } from '@aelea/core'
 
-const $MyComponent = component<[IBehavior<Data>]>(([data, dataTether]) => {
-  // Transform streams
+// Pattern 1: Return DOM only
+const $Display = component<[IBehavior<Data>]>(([data, dataTether]) => {
   const transformed = map(transform, data)
-
-  // Return DOM elements
   return $element(transformed)
+})
+
+// Pattern 2: Return DOM and expose behaviors
+const $Button = component(() => {
+  return [
+    $node,
+    { buttonClick }  // Expose streams to parent
+  ]
+})
+
+// Parent can consume child behaviors
+const $Parent = component(() => {
+  const [$button, buttonBehavior] = $Button()
+
+  // Subscribe to child's exposed streams
+  buttonBehavior.buttonClick(event => {
+    // Handle click
+  })
+
+  return $button
 })
 ```
 
