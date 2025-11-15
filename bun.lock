@@ -14,7 +14,7 @@
         "@puppet-copy/middleware": "workspace:*",
         "drizzle-orm": "catalog:",
         "hono": "4.10.6",
-        "ponder": "catalog:",
+        "ponder": "0.15.2",
         "superjson": "catalog:",
         "viem": "catalog:",
       },
