@@ -26,11 +26,16 @@
 **Puppet** is a decentralized copy trading platform built for perpetual futures trading on GMX V2 (Arbitrum). The platform allows traders to replicate successful trading strategies in a non-custodial manner.
 
 ### Key Capabilities
-- **Copy Trading**: Automated replication of trading positions
-- **Perpetual Futures**: Long/short positions on crypto assets
-- **On-Chain**: Fully decentralized using smart contracts on Arbitrum
-- **Real-Time Indexing**: Blockchain event indexing via Ponder
-- **Portfolio Management**: Track performance, leaderboards, and trader profiles
+
+**Copy Trading Made Simple**:
+- **Seamless Matching Engine**: Traders operate normally on GMX earning rewards, while investors automatically mirror their positions without traders directly managing funds
+- **Single Deposit, Many Traders**: One vault can copy multiple traders simultaneously - when matched, portions of your deposit mirror different traders' positions
+- **Build a Portfolio, Manage Risk**: Define custom matching rules per trader to protect your capital while proportionally following their trades
+
+**Platform Features**:
+- **Non-Custodial**: Fully decentralized smart contracts on Arbitrum - traders never control investor funds
+- **Real-Time Tracking**: Blockchain event indexing for instant position updates and performance metrics
+- **Portfolio Management**: Leaderboards, trader profiles, and comprehensive analytics
 
 ### License
 Dual-licensed under BSL-1.1 and GPL-3.0. Review `LICENSE.md` for complete terms before contributing.
@@ -64,7 +69,12 @@ monorepo/
 - **middleware**: Shared library with contract interfaces, utilities, types
 - **indexer**: Blockchain data indexing (Ponder + Drizzle ORM)
 - **sequencer**: Transaction sequencing service
-- **contracts**: Smart contracts (Solidity)
+- **contracts**: Core smart contracts enabling copy trading functionality:
+  - **Position mirroring** - Automatically replicate trader positions with investor funds
+  - **Matching rules** - Customizable risk management per trader (limits, collateral ratios, etc.)
+  - **Reward distribution** - Token rewards for successful traders
+  - **Non-custodial vaults** - Secure fund management without trader access
+  - **GMX integration** - Seamless interaction with GMX V2 perpetuals protocol
 - **docs**: VitePress documentation
 - **services**: Utility services (OpenGraph, Telegram bot)
 
