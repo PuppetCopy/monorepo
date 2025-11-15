@@ -31,13 +31,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Generate version tag
+        id: version
+        run: |
+          # Generate version from date and short SHA
+          VERSION="v$(date +'%Y%m%d')-${GITHUB_SHA::7}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Generated version: ${VERSION}"
+      
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./indexer/Dockerfile
           push: true
-          tags: ghcr.io/puppetcopy/indexer:latest
+          tags: |
+            ghcr.io/puppetcopy/indexer:latest
+            ghcr.io/puppetcopy/indexer:${{ steps.version.outputs.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
+      
+      - name: Output deployment instructions
+        run: |
+          echo "✅ Image pushed successfully!"
+          echo "📦 Version: ${{ steps.version.outputs.VERSION }}"
+          echo ""
+          echo "To deploy to Akash, update deploy-indexer.yml:"
+          echo "  image: ghcr.io/puppetcopy/indexer:${{ steps.version.outputs.VERSION }}"
