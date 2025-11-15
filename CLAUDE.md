@@ -338,14 +338,33 @@ No git hooks configured. Code quality relies on:
 
 ### Reactive Programming (aelea)
 
-**TLDR**: UI is built with reactive streams. Components receive data as streams (`IStream`/`IBehavior`), transform them with operators (`map`, `filter`, `combine`), and return DOM + exposed behaviors as tuples `[DOMNode, { streams }]`.
+**TLDR**: UI is built with reactive streams. Components are I/O functions: receive state as input streams (`IStream`/`IBehavior`), transform with operators (`map`, `filter`, `combine`), and return `[DOMNode, { outputStreams }]` tuples. Parents own state, children describe changes.
 
-**Key Patterns**:
-- Components use `$` prefix convention
-- Stream-based routing and state management
-- Type-safe behavior tethering: `[stream, tether]: IBehavior<Input, Output>`
-- LocalStorage abstractions in `ui-storage/`
-- In-memory caching with TTL support
+**Component Signature Pattern**:
+```typescript
+const $Component = (config) =>
+  component((
+    [event, eventTether]: IBehavior<INode, EventType>
+  ) => {
+    return [$element, { event }]
+  })
+```
+
+**Critical Patterns**:
+- `$` prefix for UI-producing functions
+- Behaviors as tuple pairs: `[stream, tether]`
+- Tethers wire DOM events: `eventTether(nodeEvent('click'), map(...))`
+- Use `o()` for chaining stream ops, NOT element composition
+- `start(initial, stream)` for default values before async
+- `skipRepeats()` to prevent unnecessary re-renders
+- `switchMap()` for conditional rendering
+- `sampleMap()` to read state at event time
+
+**State Management**:
+- Parents create state with `state()` and wire child outputs back
+- LocalStorage: Type-safe abstractions in `ui-storage/`
+- In-memory: Cache implementations with TTL
+- Stream-based: `replayLatest()` for behavior subjects
 
 **⚠️ Important**: For detailed guidance on writing aelea components, understanding reactive streams, and proper typing patterns, refer to:
 
@@ -354,9 +373,11 @@ No git hooks configured. Code quality relies on:
 This official guide covers:
 - Component function signatures and typing
 - Behavior streams and tethering patterns
-- State management approaches
+- State management approaches (`state()`, `multicast()`)
 - Stream composition and operators
 - Common patterns and gotchas
+- Dynamic lists with `joinMap()` and `switchMap()`
+- Re-render optimization strategies
 
 ---
 
