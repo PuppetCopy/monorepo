@@ -338,76 +338,25 @@ No git hooks configured. Code quality relies on:
 
 ### Reactive Programming (aelea)
 
-**Core Concept**: UI is a function of reactive streams.
+**TLDR**: UI is built with reactive streams. Components receive data as streams (`IStream`/`IBehavior`), transform them with operators (`map`, `filter`, `combine`), and return DOM + exposed behaviors as tuples `[DOMNode, { streams }]`.
 
-**Key Types**:
-- `IStream<T>` - Cold observable
-- `IBehavior<T>` - Hot observable with current value
-- Stream operators: `map()`, `filter()`, `combine()`
+**Key Patterns**:
+- Components use `$` prefix convention
+- Stream-based routing and state management
+- Type-safe behavior tethering: `[stream, tether]: IBehavior<Input, Output>`
+- LocalStorage abstractions in `ui-storage/`
+- In-memory caching with TTL support
 
-**Component Patterns**:
+**⚠️ Important**: For detailed guidance on writing aelea components, understanding reactive streams, and proper typing patterns, refer to:
 
-Components take config as parameters and return `component()` with typed behavior tuples:
+**https://github.com/nissoh/aelea/blob/master/CLAUDE.md**
 
-```typescript
-import { component, nodeEvent } from 'aelea/ui'
-import type { IBehavior } from 'aelea/stream-extended'
-import type { INode } from 'aelea/ui'
-
-// Pattern 1: Component returning DOM and behaviors
-export const $Button = ({ label, disabled }: ButtonConfig) =>
-  component(
-    ([click, clickTether]: IBehavior<INode, MouseEvent>) => {
-      return [
-        $node(
-          clickTether(nodeEvent('click'))
-        )($text(label)),
-        { click }  // Expose click stream
-      ]
-    }
-  )
-
-// Pattern 2: Multiple behavior parameters
-export const $TextField = ({ value }: TextFieldConfig) =>
-  component(
-    (
-      [change, changeTether]: IBehavior<string, string>,
-      [focus, focusTether]: IBehavior<INode, boolean>
-    ) => {
-      return [
-        $input(
-          changeTether(nodeEvent('input'), map(e => e.target.value))
-        ),
-        { change, focus }
-      ]
-    }
-  )
-
-// Pattern 3: Consuming child behaviors
-const [$button, { click }] = $Button({ label: 'Submit' })
-click(event => {
-  // Handle click event
-})
-```
-
-**Key typing notes**:
-- Types declared **inside** function parameters: `IBehavior<InputType, OutputType>`
-- Each behavior is a tuple: `[stream, tether]`
-- Return: `[DOMNode, { namedStreams }]` or just `DOMNode`
-
-### Routing
-
-Stream-based routing with aelea router. Routes are defined as configuration objects mapping paths to components.
-
-### State Management
-
-**LocalStorage**: Type-safe abstractions in `ui-storage/`
-**In-Memory**: Cache implementations with TTL support
-**Reactive**: Stream-based state with `replayLatest()`
-
-### Component Composition
-
-Components use `$` prefix convention. Composed from base UI components into higher-level features.
+This official guide covers:
+- Component function signatures and typing
+- Behavior streams and tethering patterns
+- State management approaches
+- Stream composition and operators
+- Common patterns and gotchas
 
 ---
 
