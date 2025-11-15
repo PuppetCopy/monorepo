@@ -347,38 +347,53 @@ No git hooks configured. Code quality relies on:
 
 **Component Patterns**:
 
-Components can return DOM nodes or tuples with DOM and behaviors:
+Components take config as parameters and return `component()` with typed behavior tuples:
 
 ```typescript
-import { component } from '@aelea/core'
-import type { IBehavior } from '@aelea/core'
+import { component, nodeEvent } from 'aelea/ui'
+import type { IBehavior } from 'aelea/stream-extended'
+import type { INode } from 'aelea/ui'
 
-// Pattern 1: Return DOM only
-const $Display = component<[IBehavior<Data>]>(([data, dataTether]) => {
-  const transformed = map(transform, data)
-  return $element(transformed)
-})
+// Pattern 1: Component returning DOM and behaviors
+export const $Button = ({ label, disabled }: ButtonConfig) =>
+  component(
+    ([click, clickTether]: IBehavior<INode, MouseEvent>) => {
+      return [
+        $node(
+          clickTether(nodeEvent('click'))
+        )($text(label)),
+        { click }  // Expose click stream
+      ]
+    }
+  )
 
-// Pattern 2: Return DOM and expose behaviors
-const $Button = component(() => {
-  return [
-    $node,
-    { buttonClick }  // Expose streams to parent
-  ]
-})
+// Pattern 2: Multiple behavior parameters
+export const $TextField = ({ value }: TextFieldConfig) =>
+  component(
+    (
+      [change, changeTether]: IBehavior<string, string>,
+      [focus, focusTether]: IBehavior<INode, boolean>
+    ) => {
+      return [
+        $input(
+          changeTether(nodeEvent('input'), map(e => e.target.value))
+        ),
+        { change, focus }
+      ]
+    }
+  )
 
-// Parent can consume child behaviors
-const $Parent = component(() => {
-  const [$button, buttonBehavior] = $Button()
-
-  // Subscribe to child's exposed streams
-  buttonBehavior.buttonClick(event => {
-    // Handle click
-  })
-
-  return $button
+// Pattern 3: Consuming child behaviors
+const [$button, { click }] = $Button({ label: 'Submit' })
+click(event => {
+  // Handle click event
 })
 ```
+
+**Key typing notes**:
+- Types declared **inside** function parameters: `IBehavior<InputType, OutputType>`
+- Each behavior is a tuple: `[stream, tether]`
+- Return: `[DOMNode, { namedStreams }]` or just `DOMNode`
 
 ### Routing
 
