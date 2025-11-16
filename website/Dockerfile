@@ -3,36 +3,28 @@ FROM oven/bun:1.3.1-alpine AS builder
 
 WORKDIR /build
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
-
-# Copy workspace root files (context is repository root)
-COPY package.json bun.lock ./
-COPY tsconfig.base.json ./
+# Copy package files for better layer caching
+COPY package.json bun.lock tsconfig.base.json ./
 COPY middleware/package.json middleware/
 COPY indexer/package.json indexer/
 COPY website/package.json website/
-# Create minimal sequencer package.json to satisfy workspace
+# Satisfy workspace requirements
 RUN mkdir sequencer && echo '{"name":"@puppet-copy/sequencer","version":"1.0.0","private":true}' > sequencer/package.json
 
-# Install all dependencies including devDependencies
-RUN bun install --frozen-lockfile --ignore-scripts
+# Install dependencies (ignore optional scripts)
+RUN bun install --ignore-scripts
 
-# Copy source code (including contracts for middleware build)
+# Copy source code
 COPY middleware middleware/
 COPY indexer indexer/
 COPY website website/
 COPY contracts contracts/
 
-# Build middleware first (dependency)
-WORKDIR /build/middleware
-RUN bun run build
+# Build dependencies
+RUN cd middleware && bun run build && \
+    cd ../indexer && bun run build
 
-# Build indexer (website dependency - @puppet-copy/sql)
-WORKDIR /build/indexer
-RUN bun run build
-
-# Build website with production optimizations
+# Build website
 WORKDIR /build/website
 
 # Website environment variables - safe to commit
@@ -44,22 +36,13 @@ ENV VITE__WC_PROJECT_ID=50f28392d528ed7a266e5bd92c22598a \
 
 RUN bun run build
 
-# Production stage - use Caddy for serving
-FROM caddy:2-alpine
+# Production stage
+FROM caddy:2.8-alpine
 
-# Caddy already runs as non-root user (uid 1001)
-# Copy built website with correct ownership
 COPY --from=builder --chown=caddy:caddy /build/website/dist /srv/website/dist
-
-# Copy Caddyfile (Caddy needs read access)
 COPY --from=builder --chown=caddy:caddy /build/website/Caddyfile /etc/caddy/Caddyfile
 
-# Set PORT environment variable default
 ENV PORT=80
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
-
-# Caddy automatically serves using the Caddyfile
-# No CMD needed as base image handles it
