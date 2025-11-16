@@ -31,19 +31,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Get version
+        id: version
+        run: |
+          # Simple incrementing version
+          VERSION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/orgs/PuppetCopy/packages/container/website/versions | \
+            jq -r '.[0].metadata.container.tags[]' | \
+            grep -E '^v[0-9]+$' | \
+            sort -V | tail -1 || echo "v0")
+          
+          # Increment version
+          VERSION_NUM=${VERSION#v}
+          NEW_VERSION="v$((VERSION_NUM + 1))"
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $NEW_VERSION"
+      
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./website/Dockerfile
           push: true
-          tags: ghcr.io/puppetcopy/website:latest
+          tags: |
+            ghcr.io/puppetcopy/website:latest
+            ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      - name: Make image public
-        continue-on-error: true
+      - name: Output version
         run: |
-          echo "✅ Website image pushed: ghcr.io/puppetcopy/website:latest"
-          echo "📝 Update deploy-website.yml with: ghcr.io/puppetcopy/website:latest"
+          echo "✅ Website image pushed: ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}"
+          echo "📝 Update deploy-website.yml with: ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}"
