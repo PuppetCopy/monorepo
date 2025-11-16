@@ -20,7 +20,9 @@ handle /api/sql* {
     header Access-Control-Allow-Origin "https://puppet.tech"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     
-    reverse_proxy https://indexer-internal.puppet.tech {
+    # Strip /api prefix and proxy to indexer's root path
+    uri strip_prefix /api
+    reverse_proxy http://indexer:42069 {
         header_up Host {upstream_hostport}
     }
 }
