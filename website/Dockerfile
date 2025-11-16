@@ -10,8 +10,8 @@ COPY middleware/package.json middleware/
 COPY indexer/package.json indexer/
 COPY website/package.json website/
 
-# Install all dependencies with production optimizations
-RUN bun install --frozen-lockfile --production=false
+# Install all dependencies including devDependencies
+RUN bun install --frozen-lockfile
 
 # Copy source code (including contracts for middleware build)
 COPY middleware middleware/
