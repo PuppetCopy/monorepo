@@ -60,19 +60,19 @@ handle /api/sql* {
 handle {
     root * /srv/website/dist
     
-    @sw {
-        path /service-worker.js
-    }
-    handle @sw {
-        header Cache-Control "no-cache, no-store, must-revalidate"
-        file_server
-    }
-    
     @static {
         path /assets/*
     }
     handle @static {
         header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+    
+    @sw {
+        path /service-worker.js
+    }
+    handle @sw {
+        header Cache-Control "no-cache, no-store, must-revalidate"
         file_server
     }
     
