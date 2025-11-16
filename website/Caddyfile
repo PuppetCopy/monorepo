@@ -21,8 +21,8 @@ handle /api/sql* {
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "Content-Type"
     
-    # Strip /api/sql prefix completely
-    uri strip_prefix /api/sql
+    # Strip /api prefix
+    uri strip_prefix /api
     reverse_proxy https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org {
         header_up Host {upstream_hostport}
         transport http {
