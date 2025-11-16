@@ -22,8 +22,11 @@ handle /api/sql* {
     
     # Strip /api prefix and proxy to indexer's root path
     uri strip_prefix /api
-    reverse_proxy http://indexer:42069 {
+    reverse_proxy https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org {
         header_up Host {upstream_hostport}
+        transport http {
+            tls_insecure_skip_verify
+        }
     }
 }
 
