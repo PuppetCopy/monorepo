@@ -35,7 +35,7 @@ WORKDIR /build/website
 ENV VITE__WC_PROJECT_ID=50f28392d528ed7a266e5bd92c22598a \
     VITE__WC_RPC_URL_42161_1=wss://lb.drpc.org/arbitrum/AsErNuerhkLUk8s5X8ojBS8_1aO7cxUR8IbmIgaNGuYu \
     VITE__WC_RPC_URL_42161_2=wss://arbitrum-one-rpc.publicnode.com \
-    VITE__INDEXR_ENDPOINT=https://indexer-production-1db7.up.railway.app/sql
+    VITE__INDEXR_ENDPOINT=https://api.puppet.tech/sql
 
 RUN bun run build
 

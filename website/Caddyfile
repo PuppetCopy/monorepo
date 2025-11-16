@@ -5,6 +5,26 @@
 
 :{$PORT}
 
+# Global security headers
+header {
+    X-Frame-Options "DENY"
+    X-Content-Type-Options "nosniff"
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "geolocation=(), microphone=(), camera=()"
+}
+
+# Simple proxy to indexer API (via our subdomain)
+handle /api/sql* {
+    # CORS headers
+    header Access-Control-Allow-Origin "https://puppet.tech"
+    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    
+    reverse_proxy https://indexer-internal.puppet.tech {
+        header_up Host {upstream_hostport}
+    }
+}
+
 handle /api/orchestrator/* {
     uri strip_prefix /api/orchestrator
     reverse_proxy https://orchestrator.rhinestone.dev {
