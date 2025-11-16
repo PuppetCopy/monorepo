@@ -58,5 +58,3 @@ jobs:
         run: |
           echo "### ✅ Deployed: \`${{ env.IMAGE }}:${{ env.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Package:** Private (requires credentials in SDL)" >> $GITHUB_STEP_SUMMARY
-          echo "**Next step:** Update deploy-website.yml with new version and deploy to Akash" >> $GITHUB_STEP_SUMMARY

@@ -6,25 +6,48 @@
 
 :{$PORT}
 
-# Global rate limiting
-rate_limit {remote.ip} 100r/m
+rate_limit {
+    zone static_limit {
+        key {remote_host}
+        events 100
+        window 1m
+    }
+}
 
-# Security headers
 header {
     X-Frame-Options "DENY"
     X-Content-Type-Options "nosniff"
     Referrer-Policy "strict-origin-when-cross-origin"
 }
 
-# Proxy to indexer API (higher limit for API)
+handle /api/orchestrator/* {
+    rate_limit {
+        zone orchestrator_limit {
+            key {remote_host}
+            events 300
+            window 1m
+        }
+    }
+    uri strip_prefix /api/orchestrator
+    reverse_proxy https://orchestrator.rhinestone.dev {
+        header_up X-Api-Key {$RHINESTONE_API_KEY}
+        header_up Host orchestrator.rhinestone.dev
+        header_down -Server
+    }
+}
+
 handle /api/sql* {
-    rate_limit {remote.ip} 300r/m
-    # CORS headers (permissive since it's public read-only data)
+    rate_limit {
+        zone api_limit {
+            key {remote_host}
+            events 60
+            window 1m
+        }
+    }
     header Access-Control-Allow-Origin "*"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "Content-Type"
     
-    # Strip /api prefix
     uri strip_prefix /api
     reverse_proxy https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org {
         header_up Host {upstream_hostport}
@@ -34,20 +57,9 @@ handle /api/sql* {
     }
 }
 
-handle /api/orchestrator/* {
-    rate_limit {remote.ip} 60r/m
-    uri strip_prefix /api/orchestrator
-    reverse_proxy https://orchestrator.rhinestone.dev {
-        header_up X-Api-Key {$RHINESTONE_API_KEY}
-        header_up Host orchestrator.rhinestone.dev
-        header_down -Server
-    }
-}
-
 handle {
     root * /srv/website/dist
     
-    # Service worker - no HTTP cache, always fresh
     @sw {
         path /service-worker.js
     }
@@ -56,11 +68,8 @@ handle {
         file_server
     }
     
-    # All other files - short HTTP cache, SW handles real caching
     handle {
-        # Short cache as fallback when SW not available
         header Cache-Control "public, max-age=3600"
-        # Add etag for validation
         header +ETag "{file.sha256}"
         try_files {path} /index.html
         file_server
