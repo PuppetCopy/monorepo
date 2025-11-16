@@ -14,13 +14,14 @@ header {
     Permissions-Policy "geolocation=(), microphone=(), camera=()"
 }
 
-# Simple proxy to indexer API (via our subdomain)
+# Proxy to indexer API  
 handle /api/sql* {
-    # CORS headers
-    header Access-Control-Allow-Origin "https://puppet.tech"
+    # CORS headers (permissive since it's public read-only data)
+    header Access-Control-Allow-Origin "*"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers "Content-Type"
     
-    # Strip /api prefix and proxy to indexer's root path
+    # Strip /api prefix and proxy to indexer
     uri strip_prefix /api
     reverse_proxy https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org {
         header_up Host {upstream_hostport}

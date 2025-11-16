@@ -57,6 +57,12 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT) || 3000,
     proxy: {
+      '/api/sql': {
+        target: 'https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')  // Strip /api prefix
+      },
       '/api/orchestrator': {
         target: 'https://orchestrator.rhinestone.dev',
         changeOrigin: true,
