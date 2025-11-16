@@ -54,12 +54,9 @@ jobs:
           docker push ${{ env.IMAGE }}:$VERSION
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       
-      - name: Publish
+      - name: Publish Summary
         run: |
-          curl -X PATCH \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/orgs/PuppetCopy/packages/container/website" \
-            -d '{"visibility":"public"}' || true
           echo "### ✅ Deployed: \`${{ env.IMAGE }}:${{ env.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "Update deploy-website.yml and deploy to Akash" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Package:** Private (requires credentials in SDL)" >> $GITHUB_STEP_SUMMARY
+          echo "**Next step:** Update deploy-website.yml with new version and deploy to Akash" >> $GITHUB_STEP_SUMMARY
