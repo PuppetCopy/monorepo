@@ -1,4 +1,4 @@
-name: Build Website
+name: Website Release
 
 on:
   push:
@@ -9,58 +9,57 @@ on:
       - '.github/workflows/website-release.yml'
   workflow_dispatch:
 
+env:
+  IMAGE: ghcr.io/puppetcopy/website
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_PAT }}
       
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: oven-sh/setup-bun@v2
       
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Get version
-        id: version
+      - name: Install and Build  
         run: |
-          # Simple incrementing version
-          VERSION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/orgs/PuppetCopy/packages/container/website/versions | \
-            jq -r '.[0].metadata.container.tags[]' | \
-            grep -E '^v[0-9]+$' | \
-            sort -V | tail -1 || echo "v0")
-          
-          # Increment version
-          VERSION_NUM=${VERSION#v}
-          NEW_VERSION="v$((VERSION_NUM + 1))"
-          echo "VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "Building version: $NEW_VERSION"
+          bun install
+          # Build dependencies first
+          bun run middleware:build
+          cd indexer && bun run build && cd ..
+          # Build website
+          bun run website:build
+        env:
+          VITE__WC_PROJECT_ID: ${{ secrets.VITE__WC_PROJECT_ID }}
+          VITE__WC_RPC_URL_42161_1: ${{ secrets.VITE__WC_RPC_URL_42161_1 }}
+          VITE__WC_RPC_URL_42161_2: ${{ secrets.VITE__WC_RPC_URL_42161_2 }}
+          RHINESTONE_API_KEY: ${{ secrets.RHINESTONE_API_KEY }}
       
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./website/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/puppetcopy/website:latest
-            ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}
-          platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      
-      - name: Output version
+      - name: Docker Build and Push
         run: |
-          echo "✅ Website image pushed: ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}"
-          echo "📝 Update deploy-website.yml with: ghcr.io/puppetcopy/website:${{ steps.version.outputs.VERSION }}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          VERSION="v$(date +%Y%m%d)-${GITHUB_SHA::7}"
+          cd website
+          docker build \
+            --build-arg RHINESTONE_API_KEY="${{ secrets.RHINESTONE_API_KEY }}" \
+            -t ${{ env.IMAGE }}:latest \
+            -t ${{ env.IMAGE }}:$VERSION .
+          docker push ${{ env.IMAGE }}:latest
+          docker push ${{ env.IMAGE }}:$VERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      
+      - name: Publish
+        run: |
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/orgs/PuppetCopy/packages/container/website" \
+            -d '{"visibility":"public"}' || true
+          echo "### ✅ Deployed: \`${{ env.IMAGE }}:${{ env.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Update deploy-website.yml and deploy to Akash" >> $GITHUB_STEP_SUMMARY

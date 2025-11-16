@@ -1,21 +1,24 @@
 {
     auto_https off
     admin off
+    order rate_limit before basicauth
 }
 
 :{$PORT}
 
-# Global security headers
+# Global rate limiting
+rate_limit {remote.ip} 100r/m
+
+# Security headers
 header {
     X-Frame-Options "DENY"
     X-Content-Type-Options "nosniff"
-    X-XSS-Protection "1; mode=block"
     Referrer-Policy "strict-origin-when-cross-origin"
-    Permissions-Policy "geolocation=(), microphone=(), camera=()"
 }
 
-# Proxy to indexer API  
+# Proxy to indexer API (higher limit for API)
 handle /api/sql* {
+    rate_limit {remote.ip} 300r/m
     # CORS headers (permissive since it's public read-only data)
     header Access-Control-Allow-Origin "*"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
@@ -32,6 +35,7 @@ handle /api/sql* {
 }
 
 handle /api/orchestrator/* {
+    rate_limit {remote.ip} 60r/m
     uri strip_prefix /api/orchestrator
     reverse_proxy https://orchestrator.rhinestone.dev {
         header_up X-Api-Key {$RHINESTONE_API_KEY}
@@ -42,18 +46,23 @@ handle /api/orchestrator/* {
 
 handle {
     root * /srv/website/dist
-    try_files {path} /index.html
-    file_server {
-        precompressed gzip br
-    }
     
-    @static {
-        path /assets/* *.js *.css *.woff2
-    }
-    header @static Cache-Control "public, max-age=31536000, immutable"
-    
+    # Service worker - no HTTP cache, always fresh
     @sw {
-        path /sw.js /service-worker.js
+        path /service-worker.js
     }
-    header @sw Cache-Control "no-cache, no-store, must-revalidate"
+    handle @sw {
+        header Cache-Control "no-cache, no-store, must-revalidate"
+        file_server
+    }
+    
+    # All other files - short HTTP cache, SW handles real caching
+    handle {
+        # Short cache as fallback when SW not available
+        header Cache-Control "public, max-age=3600"
+        # Add etag for validation
+        header +ETag "{file.sha256}"
+        try_files {path} /index.html
+        file_server
+    }
 }

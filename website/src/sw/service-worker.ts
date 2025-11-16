@@ -18,5 +18,9 @@ if (import.meta.env.DEV) allowlist = [/^\/$/]
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist }))
 
-self.skipWaiting()
-clientsClaim()
+// Don't skip waiting - let new SW wait until all tabs are closed
+// This ensures updates only apply on the next visit
+// self.skipWaiting() - REMOVED
+
+// Don't claim existing clients - let them use old SW
+// clientsClaim() - REMOVED

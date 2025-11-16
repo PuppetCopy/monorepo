@@ -9,7 +9,7 @@ const SITE_CONFIG = {
   __APP_NAME__: 'Puppet',
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
-  __OG_IMAGE__: '/.netlify/functions/og-middlware',
+  __OG_IMAGE__: '/og-image.png',  // TODO: Add static OG image
   __THEME_PRIMARY__: '#870B38',
   __THEME_BACKGROUND__: '#292c37'
 }
@@ -80,7 +80,7 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',  // Auto-update in background, active on next visit
 
       strategies: 'injectManifest',
       injectManifest: {
@@ -114,10 +114,10 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true
+        clientsClaim: false,  // Don't claim clients immediately
+        skipWaiting: false     // Wait for all tabs to close before activating
       },
       mode: 'development',
       devOptions: {
