@@ -3,15 +3,20 @@ FROM oven/bun:1.3.1-alpine AS builder
 
 WORKDIR /build
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
 # Copy workspace root files (context is repository root)
 COPY package.json bun.lock ./
 COPY tsconfig.base.json ./
 COPY middleware/package.json middleware/
 COPY indexer/package.json indexer/
 COPY website/package.json website/
+# Create minimal sequencer package.json to satisfy workspace
+RUN mkdir sequencer && echo '{"name":"@puppet-copy/sequencer","version":"1.0.0","private":true}' > sequencer/package.json
 
 # Install all dependencies including devDependencies
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 # Copy source code (including contracts for middleware build)
 COPY middleware middleware/
