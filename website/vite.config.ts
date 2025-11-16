@@ -18,6 +18,7 @@ const SITE_CONFIG = {
 export default defineConfig({
   build: {
     sourcemap: true,
+    minify: 'esbuild',  // Use esbuild instead of default terser
     rollupOptions: {
       treeshake: 'recommended',
       output: {

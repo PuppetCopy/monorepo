@@ -76,8 +76,15 @@ handle {
         file_server
     }
     
-    handle {
+    @files {
+        path *.js *.css *.json *.png *.jpg *.svg *.woff2 *.ico *.webmanifest
+    }
+    handle @files {
         header Cache-Control "public, max-age=3600"
+        file_server
+    }
+    
+    handle {
         try_files {path} /index.html
         file_server
     }
