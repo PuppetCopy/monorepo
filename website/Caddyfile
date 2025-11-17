@@ -42,18 +42,49 @@ handle /api/orchestrator/* {
 
 handle {
     root * /srv/website/dist
-    try_files {path} /index.html
-    file_server {
-        precompressed gzip br
-    }
     
+    # Serve static files first with proper caching
     @static {
-        path /assets/* *.js *.css *.woff2
+        path /assets/*
     }
-    header @static Cache-Control "public, max-age=31536000, immutable"
+    handle @static {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server {
+            precompressed gzip br
+        }
+    }
     
+    # Service worker needs no-cache for updates
     @sw {
-        path /sw.js /service-worker.js
+        path /service-worker.js
     }
-    header @sw Cache-Control "no-cache, no-store, must-revalidate"
+    handle @sw {
+        header Cache-Control "no-cache, no-store, must-revalidate"
+        file_server
+    }
+    
+    # Manifest for PWA
+    @manifest {
+        path *.webmanifest
+    }
+    handle @manifest {
+        header Cache-Control "public, max-age=3600"
+        header Content-Type "application/manifest+json"
+        file_server
+    }
+    
+    # Other static files
+    @files {
+        path *.js *.css *.json *.woff2 *.ico *.png *.jpg *.svg
+    }
+    handle @files {
+        header Cache-Control "public, max-age=3600"
+        file_server
+    }
+    
+    # SPA fallback - ONLY for actual routes, not files
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
 }

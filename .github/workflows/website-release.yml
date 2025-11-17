@@ -29,11 +29,9 @@ jobs:
       
       - name: Install and Build  
         run: |
-          bun install
-          # Build dependencies first
+          bun install --frozen-lockfile
           bun run middleware:build
-          cd indexer && bun run build && cd ..
-          # Build website
+          bun run indexer:build
           bun run website:build
         env:
           VITE__WC_PROJECT_ID: ${{ secrets.VITE__WC_PROJECT_ID }}
@@ -48,6 +46,7 @@ jobs:
           cd website
           docker build \
             --build-arg RHINESTONE_API_KEY="${{ secrets.RHINESTONE_API_KEY }}" \
+            --cache-from ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:$VERSION .
           docker push ${{ env.IMAGE }}:latest
