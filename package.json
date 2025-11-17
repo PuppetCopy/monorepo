@@ -27,6 +27,7 @@
     "update-deps": "bun run sherif:fix",
     "contracts:build": "cd contracts && bun run build",
     "middleware:build": "cd middleware && bun run build",
+    "indexer:build": "cd indexer && bun run build",
     "docs:build": "cd docs && bun vitepress build",
     "website:build": "cd website && bun run build",
     "audit": "bun audit",
