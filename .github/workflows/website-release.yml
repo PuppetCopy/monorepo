@@ -57,5 +57,4 @@ jobs:
       
       - name: Publish Summary
         run: |
-          echo "### ✅ Deployed: \`${{ env.IMAGE }}:${{ env.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "${{ env.IMAGE }}:${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
