@@ -54,7 +54,7 @@ handle {
         }
     }
     
-    # Service worker needs no-cache for updates
+    # Service worker - must always check for updates
     @sw {
         path /service-worker.js
     }
@@ -63,21 +63,11 @@ handle {
         file_server
     }
     
-    # Manifest for PWA
-    @manifest {
-        path *.webmanifest
+    # Manifest and root-level files (favicon, robots.txt, etc)
+    @rootfiles {
+        path *.webmanifest *.ico *.txt *.xml
     }
-    handle @manifest {
-        header Cache-Control "public, max-age=3600"
-        header Content-Type "application/manifest+json"
-        file_server
-    }
-    
-    # Other static files
-    @files {
-        path *.js *.css *.json *.woff2 *.ico *.png *.jpg *.svg
-    }
-    handle @files {
+    handle @rootfiles {
         header Cache-Control "public, max-age=3600"
         file_server
     }

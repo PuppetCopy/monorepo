@@ -27,10 +27,8 @@ export default defineConfig({
             return 'reown'
           }
 
-          // Web3 related - keep together to avoid circular deps
-          if (id.includes('@wagmi') || id.includes('viem') || id.includes('abitype')) {
-            return 'web3'
-          }
+          // Don't manually chunk web3 packages - let Vite handle them
+          // to avoid platform-specific circular dependency issues
 
           // Skip non-node_modules
           if (!id.includes('node_modules/') && !id.includes('/dist/')) {
