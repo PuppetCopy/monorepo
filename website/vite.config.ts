@@ -9,7 +9,7 @@ const SITE_CONFIG = {
   __APP_NAME__: 'Puppet',
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
-  __OG_IMAGE__: '/og-image.png',  // TODO: Add static OG image
+  __OG_IMAGE__: '/og-image.png', // TODO: Add static OG image
   __THEME_PRIMARY__: '#870B38',
   __THEME_BACKGROUND__: '#292c37'
 }
@@ -18,13 +18,13 @@ const SITE_CONFIG = {
 export default defineConfig({
   build: {
     sourcemap: true,
-    minify: 'esbuild',  // Use esbuild instead of default terser
     rollupOptions: {
       treeshake: 'recommended',
       output: {
         manualChunks(id) {
-          if (id.includes('@reown')) {
-            return 'reown'
+          // Porto wallet SDK - isolate for better caching
+          if (id.includes('porto')) {
+            return 'wallet'
           }
 
           // Don't manually chunk web3 packages - let Vite handle them
@@ -35,11 +35,9 @@ export default defineConfig({
             return undefined
           }
 
-          // // Group all aelea packages together
-          const coreList = ['aelea/', 'middleware/dist', 'indexer/dist', 'ponder']
-
           // // Workspace packages
-          if (coreList.some(core => id.includes(core))) return 'puppet-core'
+          if (['aelea/', 'middleware/dist', 'indexer/dist', 'ponder'].some(core => id.includes(core)))
+            return 'puppet-core'
 
           // // Heavy dependencies that should be isolated
           if (id.includes('lightweight-charts')) return 'charts'
@@ -60,14 +58,14 @@ export default defineConfig({
         target: 'https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')  // Strip /api prefix
+        rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
       },
       '/api/orchestrator': {
         target: 'https://orchestrator.rhinestone.dev',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
-        configure: (proxy, options) => {
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+        configure: proxy => {
+          proxy.on('proxyReq', proxyReq => {
             if (process.env.RHINESTONE_API_KEY) {
               proxyReq.setHeader('x-api-key', process.env.RHINESTONE_API_KEY)
             }
@@ -79,7 +77,7 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     VitePWA({
-      registerType: 'autoUpdate',  // Auto-update in background, active on next visit
+      registerType: 'autoUpdate', // Auto-update in background, active on next visit
 
       strategies: 'injectManifest',
       injectManifest: {
@@ -115,8 +113,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
         cleanupOutdatedCaches: true,
-        clientsClaim: false,  // Don't claim clients immediately
-        skipWaiting: false     // Wait for all tabs to close before activating
+        clientsClaim: false, // Don't claim clients immediately
+        skipWaiting: false // Wait for all tabs to close before activating
       },
       mode: 'development',
       devOptions: {

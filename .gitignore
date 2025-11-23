@@ -2,12 +2,13 @@ node_modules
 .env
 .env*.*
 dist
-.claude/
 *.tsbuildinfo
 .tsbuildinfo
-CLAUDE.local.md
+*.local.md
 
 # Use bun.lockb instead of these
 yarn.lock
 package-lock.json
 pnpm-lock.yaml
+
+deploy-*.yml

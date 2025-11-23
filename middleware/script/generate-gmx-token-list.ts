@@ -1,5 +1,4 @@
-const INTERFACE_TOKENS_URL =
-  'https://raw.githubusercontent.com/gmx-io/gmx-interface/master/sdk/src/configs/tokens.ts'
+const INTERFACE_TOKENS_URL = 'https://raw.githubusercontent.com/gmx-io/gmx-interface/master/sdk/src/configs/tokens.ts'
 const SYNTHETICS_TOKENS_URL = 'https://raw.githubusercontent.com/gmx-io/gmx-synthetics/main/config/tokens.ts'
 
 // Make this file a module to allow top-level await

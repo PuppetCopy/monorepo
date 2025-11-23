@@ -11,7 +11,7 @@ export default [
         internalType: 'contract Account'
       },
       {
-        name: '_rule',
+        name: '_ruleContract',
         type: 'address',
         internalType: 'contract Rule'
       },
@@ -80,7 +80,7 @@ export default [
       }
     ],
     outputs: [],
-    stateMutability: 'payable'
+    stateMutability: 'nonpayable'
   },
   {
     type: 'function',
@@ -110,66 +110,7 @@ export default [
   },
   {
     type: 'function',
-    name: 'processRhinestoneAction',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'action',
-        type: 'uint8',
-        internalType: 'uint8'
-      },
-      {
-        name: 'data',
-        type: 'bytes',
-        internalType: 'bytes'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    name: 'processRhinestoneDeposit',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'token',
-        type: 'address',
-        internalType: 'contract IERC20'
-      },
-      {
-        name: 'amount',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    name: 'rhinestoneSettler',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'address'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    name: 'rule',
+    name: 'ruleContract',
     inputs: [],
     outputs: [
       {
@@ -182,38 +123,20 @@ export default [
   },
   {
     type: 'function',
-    name: 'setRhinestoneSettler',
+    name: 'setMatchingRule',
     inputs: [
       {
-        name: '_rhinestoneSettler',
-        type: 'address',
-        internalType: 'address'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
-  },
-  {
-    type: 'function',
-    name: 'setRule',
-    inputs: [
-      {
-        name: '_mirror',
-        type: 'address',
-        internalType: 'contract Mirror'
-      },
-      {
-        name: '_collateralToken',
+        name: 'collateralToken',
         type: 'address',
         internalType: 'contract IERC20'
       },
       {
-        name: '_trader',
+        name: 'trader',
         type: 'address',
         internalType: 'address'
       },
       {
-        name: '_ruleParams',
+        name: 'ruleParams',
         type: 'tuple',
         internalType: 'struct Rule.RuleParams',
         components: [
@@ -248,6 +171,11 @@ export default [
         internalType: 'contract IERC20'
       },
       {
+        name: 'receiver',
+        type: 'address',
+        internalType: 'address'
+      },
+      {
         name: 'amount',
         type: 'uint256',
         internalType: 'uint256'
@@ -257,113 +185,8 @@ export default [
     stateMutability: 'nonpayable'
   },
   {
-    type: 'event',
-    name: 'Deposit',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      },
-      {
-        name: 'token',
-        type: 'address',
-        indexed: true,
-        internalType: 'contract IERC20'
-      },
-      {
-        name: 'amount',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256'
-      }
-    ],
-    anonymous: false
-  },
-  {
-    type: 'event',
-    name: 'RhinestoneSettlerUpdated',
-    inputs: [
-      {
-        name: 'oldSettler',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      },
-      {
-        name: 'newSettler',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      }
-    ],
-    anonymous: false
-  },
-  {
-    type: 'event',
-    name: 'RuleSet',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      },
-      {
-        name: 'trader',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      },
-      {
-        name: 'mirror',
-        type: 'address',
-        indexed: true,
-        internalType: 'contract Mirror'
-      }
-    ],
-    anonymous: false
-  },
-  {
-    type: 'event',
-    name: 'Withdrawal',
-    inputs: [
-      {
-        name: 'user',
-        type: 'address',
-        indexed: true,
-        internalType: 'address'
-      },
-      {
-        name: 'token',
-        type: 'address',
-        indexed: true,
-        internalType: 'contract IERC20'
-      },
-      {
-        name: 'amount',
-        type: 'uint256',
-        indexed: false,
-        internalType: 'uint256'
-      }
-    ],
-    anonymous: false
-  },
-  {
     type: 'error',
     name: 'ReentrancyGuardReentrantCall',
     inputs: []
-  },
-  {
-    type: 'error',
-    name: 'SafeERC20FailedOperation',
-    inputs: [
-      {
-        name: 'token',
-        type: 'address',
-        internalType: 'address'
-      }
-    ]
   }
 ] as const

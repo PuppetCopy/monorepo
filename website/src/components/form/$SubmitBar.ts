@@ -7,7 +7,7 @@ import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import type { IWalletConnected } from '../../wallet/wallet.js'
+import type { IWalletState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -24,7 +24,7 @@ export interface ISubmitBar {
 export const $SubmitBar = (config: ISubmitBar) =>
   component(
     (
-      [submit, submitTether]: IBehavior<PointerEvent, IWalletConnected>,
+      [submit, submitTether]: IBehavior<PointerEvent, IWalletState>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
       const {

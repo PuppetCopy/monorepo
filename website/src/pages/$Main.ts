@@ -1,14 +1,14 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import { ETH_ADDRESS_REGEXP, getTimeSince, readableUnitAmount, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { ETH_ADDRESS_REGEXP, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import { constant, filterNull, type IStream, map, merge, start, switchMap, take, tap, zip } from 'aelea/stream'
+import { constant, filterNull, type IStream, map, merge, start, switchMap, take, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
-import { $node, $text, $wrapNativeElement, component, fromEventTarget, style, styleBehavior } from 'aelea/ui'
-import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
-import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
+import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
+import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
 import type { Address } from 'viem/accounts'
-import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
+import { $alertPositiveContainer } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
@@ -215,77 +215,77 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           //     )
           //   ),
           // ),
-          $row(
-            spacing.default,
-            style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' })
-          )(
-            $Tooltip({
-              $content: switchMap(
-                params => {
-                  const status = params.subgraphStatus.arbitrum
+          // $row(
+          //   spacing.default,
+          //   style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' })
+          // )(
+          //   $Tooltip({
+          //     $content: switchMap(
+          //       params => {
+          //         const status = params.subgraphStatus.arbitrum
 
-                  if (status.block === null) {
-                    return $column(spacing.tiny)(
-                      $text('Subgraph Status'),
-                      $alertNegativeContainer(
-                        $text('Indexing is currently experiencing issues, please try again later.')
-                      )
-                    )
-                  }
+          //         if (status.block === null) {
+          //           return $column(spacing.tiny)(
+          //             $text('Subgraph Status'),
+          //             $alertNegativeContainer(
+          //               $text('Indexing is currently experiencing issues, please try again later.')
+          //             )
+          //           )
+          //         }
 
-                  const blocksBehind = readableUnitAmount(Number(params.latestBlock) - status.block.number)
-                  const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
+          //         const blocksBehind = readableUnitAmount(Number(params.latestBlock) - status.block.number)
+          //         const timeSince = getTimeSince(new Date(status.block.timestamp || 0).getTime())
 
-                  return $column(spacing.tiny)(
-                    $text('Subgraph Status'),
-                    $column(
-                      $infoLabeledValue('Latest Sync', timeSince),
-                      $infoLabeledValue('blocks behind', blocksBehind)
-                    )
-                  )
-                },
-                zip({ subgraphStatus: subgraphStatus, latestBlock })
-              ),
-              $anchor: $row(
-                style({
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  outlineOffset: '4px',
-                  padding: '6px'
-                }),
-                styleBehavior(
-                  map(color => {
-                    return { backgroundColor: colorAlpha(color, 0.5), outlineColor: color }
-                  }, subgraphStatusColorOnce)
-                )
-              )(
-                $node(
-                  style({
-                    position: 'absolute',
-                    top: 'calc(50% - 20px)',
-                    left: 'calc(50% - 20px)',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(74, 180, 240, 0.12)',
-                    opacity: 0,
-                    animationName: 'signal',
-                    animationDuration: '2s',
-                    animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                  }),
-                  styleBehavior(
-                    map(color => {
-                      return {
-                        backgroundColor: colorAlpha(color, 0.5),
-                        animationIterationCount: color === pallete.negative ? 'infinite' : 1
-                      }
-                    }, subgraphStatusColorOnce)
-                  )
-                )()
-              )
-            })({})
-          ),
+          //         return $column(spacing.tiny)(
+          //           $text('Subgraph Status'),
+          //           $column(
+          //             $infoLabeledValue('Latest Sync', timeSince),
+          //             $infoLabeledValue('blocks behind', blocksBehind)
+          //           )
+          //         )
+          //       },
+          //       zip({ subgraphStatus: subgraphStatus, latestBlock })
+          //     ),
+          //     $anchor: $row(
+          //       style({
+          //         width: '8px',
+          //         height: '8px',
+          //         borderRadius: '50%',
+          //         outlineOffset: '4px',
+          //         padding: '6px'
+          //       }),
+          //       styleBehavior(
+          //         map(color => {
+          //           return { backgroundColor: colorAlpha(color, 0.5), outlineColor: color }
+          //         }, subgraphStatusColorOnce)
+          //       )
+          //     )(
+          //       $node(
+          //         style({
+          //           position: 'absolute',
+          //           top: 'calc(50% - 20px)',
+          //           left: 'calc(50% - 20px)',
+          //           width: '40px',
+          //           height: '40px',
+          //           borderRadius: '50%',
+          //           border: '1px solid rgba(74, 180, 240, 0.12)',
+          //           opacity: 0,
+          //           animationName: 'signal',
+          //           animationDuration: '2s',
+          //           animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          //         }),
+          //         styleBehavior(
+          //           map(color => {
+          //             return {
+          //               backgroundColor: colorAlpha(color, 0.5),
+          //               animationIterationCount: color === pallete.negative ? 'infinite' : 1
+          //             }
+          //           }, subgraphStatusColorOnce)
+          //         )
+          //       )()
+          //     )
+          //   })({})
+          // ),
           contains(rootRoute)(
             $column(
               style({

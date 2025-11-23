@@ -2,12 +2,12 @@ import { type IOps, just, map, switchLatest, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { type IWalletConnected, wallet } from '../wallet/wallet.js'
+import { type IWalletState, wallet } from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
 export interface IConnectWalletPopover {
-  $$display: IOps<IWalletConnected, I$Node>
+  $$display: IOps<IWalletState, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose
 }
@@ -19,7 +19,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
     return [
       $container(
         switchMap(getAccountStatus => {
-          if (getAccountStatus.status === 'connecting' || getAccountStatus.status === 'reconnecting') {
+          if (getAccountStatus.isConnecting) {
             return $node($text('Connecting...'))
           }
 
@@ -35,16 +35,15 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
               )
             })({
               click: changeWalletTether(
-                map(async _xx => {
-                  wallet.appkit.open({})
-
+                map(() => {
+                  wallet.connect()
                   return null
                 })
               )
             })
           }
 
-          return switchLatest(config.$$display(just(getAccountStatus as IWalletConnected)))
+          return switchLatest(config.$$display(just(getAccountStatus)))
         }, wallet.account)
       ),
 

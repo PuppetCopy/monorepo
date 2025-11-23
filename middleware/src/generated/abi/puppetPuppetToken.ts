@@ -15,19 +15,6 @@ export default [
   },
   {
     type: 'function',
-    name: 'DOMAIN_SEPARATOR',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     name: 'allowance',
     inputs: [
       {
@@ -139,49 +126,6 @@ export default [
   },
   {
     type: 'function',
-    name: 'eip712Domain',
-    inputs: [],
-    outputs: [
-      {
-        name: 'fields',
-        type: 'bytes1',
-        internalType: 'bytes1'
-      },
-      {
-        name: 'name',
-        type: 'string',
-        internalType: 'string'
-      },
-      {
-        name: 'version',
-        type: 'string',
-        internalType: 'string'
-      },
-      {
-        name: 'chainId',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'verifyingContract',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'salt',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      },
-      {
-        name: 'extensions',
-        type: 'uint256[]',
-        internalType: 'uint256[]'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
     name: 'name',
     inputs: [],
     outputs: [
@@ -192,68 +136,6 @@ export default [
       }
     ],
     stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    name: 'nonces',
-    inputs: [
-      {
-        name: 'owner',
-        type: 'address',
-        internalType: 'address'
-      }
-    ],
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ],
-    stateMutability: 'view'
-  },
-  {
-    type: 'function',
-    name: 'permit',
-    inputs: [
-      {
-        name: 'owner',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'spender',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'value',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'deadline',
-        type: 'uint256',
-        internalType: 'uint256'
-      },
-      {
-        name: 'v',
-        type: 'uint8',
-        internalType: 'uint8'
-      },
-      {
-        name: 'r',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      },
-      {
-        name: 's',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable'
   },
   {
     type: 'function',
@@ -361,12 +243,6 @@ export default [
   },
   {
     type: 'event',
-    name: 'EIP712DomainChanged',
-    inputs: [],
-    anonymous: false
-  },
-  {
-    type: 'event',
     name: 'Transfer',
     inputs: [
       {
@@ -389,33 +265,6 @@ export default [
       }
     ],
     anonymous: false
-  },
-  {
-    type: 'error',
-    name: 'ECDSAInvalidSignature',
-    inputs: []
-  },
-  {
-    type: 'error',
-    name: 'ECDSAInvalidSignatureLength',
-    inputs: [
-      {
-        name: 'length',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ]
-  },
-  {
-    type: 'error',
-    name: 'ECDSAInvalidSignatureS',
-    inputs: [
-      {
-        name: 's',
-        type: 'bytes32',
-        internalType: 'bytes32'
-      }
-    ]
   },
   {
     type: 'error',
@@ -500,65 +349,6 @@ export default [
         name: 'spender',
         type: 'address',
         internalType: 'address'
-      }
-    ]
-  },
-  {
-    type: 'error',
-    name: 'ERC2612ExpiredSignature',
-    inputs: [
-      {
-        name: 'deadline',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ]
-  },
-  {
-    type: 'error',
-    name: 'ERC2612InvalidSigner',
-    inputs: [
-      {
-        name: 'signer',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'owner',
-        type: 'address',
-        internalType: 'address'
-      }
-    ]
-  },
-  {
-    type: 'error',
-    name: 'InvalidAccountNonce',
-    inputs: [
-      {
-        name: 'account',
-        type: 'address',
-        internalType: 'address'
-      },
-      {
-        name: 'currentNonce',
-        type: 'uint256',
-        internalType: 'uint256'
-      }
-    ]
-  },
-  {
-    type: 'error',
-    name: 'InvalidShortString',
-    inputs: []
-  },
-  {
-    type: 'error',
-    name: 'StringTooLong',
-    inputs: [
-      {
-        name: 'str',
-        type: 'string',
-        internalType: 'string'
       }
     ]
   }

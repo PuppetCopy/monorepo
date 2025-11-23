@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-// Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/refs/heads/master/sdk/src/configs/tokens.ts
-// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/refs/heads/main/config/tokens.ts
+// Primary source: https://raw.githubusercontent.com/gmx-io/gmx-interface/master/sdk/src/configs/tokens.ts
+// Enhanced with data from: https://raw.githubusercontent.com/gmx-io/gmx-synthetics/main/config/tokens.ts
 // Note: Token addresses correspond to indexToken addresses in GMX V2 markets
 
 export const ARBITRUM_TOKEN_LIST = [

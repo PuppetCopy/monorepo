@@ -1,15 +1,14 @@
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { getWalletClient } from '@wagmi/core'
 import type { Route } from 'aelea/router'
 import {
   awaitPromises,
   combine,
   constant,
   empty,
-  fromPromise,
   type IStream,
+  just,
   map,
   merge,
   op,
@@ -38,7 +37,7 @@ import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import { type IBatchCall, type IWalletConnected, wallet } from '../../wallet/wallet.js'
+import { type IBatchCall, type IWalletState, wallet } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
@@ -67,7 +66,7 @@ export const $PortfolioEditorDrawer = ({
 }: IPortfolioEditorDrawer) =>
   component(
     (
-      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletConnected, any>,
+      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletState, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
@@ -260,7 +259,7 @@ export const $PortfolioEditorDrawer = ({
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(
                     op(
-                      fromPromise(getWalletClient(wallet.wagmiAdapter.wagmiConfig)),
+                      just(wallet.publicClient),
                       switchMap(async getWalelt => {
                         // Calculate how many transactions will be needed
                         let txCount = 0
