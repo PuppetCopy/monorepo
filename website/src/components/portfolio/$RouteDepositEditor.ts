@@ -59,7 +59,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         switchMap(async account => {
           if (!account) return 0n
 
-          return puppetReader.getUserBalance(collateralToken, account.address)
+          return puppetReader.getUserBalance(account, collateralToken, account.address)
         }),
         state
       )

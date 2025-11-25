@@ -1,7 +1,18 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import { constant, filterNull, type IStream, map, merge, start, switchMap, take, tap } from 'aelea/stream'
+import {
+  awaitPromises,
+  constant,
+  filterNull,
+  type IStream,
+  map,
+  merge,
+  start,
+  switchMap,
+  take,
+  tap
+} from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -97,7 +108,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
-          address: map(getAccountStatus => getAccountStatus.address, wallet.account)
+          address: map(getAccountStatus => getAccountStatus?.address, awaitPromises(wallet.account))
         })
       )
 

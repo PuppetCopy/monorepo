@@ -13,13 +13,13 @@ import { Dialog, Mode } from 'porto'
 import {
   type Abi,
   type Call,
+  type Chain,
   type ContractEventName,
   type ContractFunctionArgs,
   type ContractFunctionName,
   createPublicClient,
   createWalletClient,
   custom,
-  decodeFunctionData,
   fallback,
   http,
   type ParseEventLogsReturnType,
@@ -27,13 +27,11 @@ import {
   parseEventLogs,
   type ReadContractParameters,
   type ReadContractReturnType,
-  type SendCallsReturnType,
   type TransactionReceipt,
+  type Transport,
   type WalletClient,
   type WriteContractParameters,
-  webSocket,
-  type Transport,
-  type Chain
+  webSocket
 } from 'viem'
 import type { Address } from 'viem/accounts'
 import { arbitrum } from 'viem/chains'
@@ -215,7 +213,7 @@ async function read<
   accountState: IAccountState,
   parameters: ReadContractParameters<TAbi, TFunctionName, TArgs>
 ): Promise<ReadContractReturnType<TAbi, TFunctionName, TArgs>> {
-  return accountState.publicClient.readContract(parameters as any)
+  return accountState.publicClient.readContract(parameters)
 }
 
 export type IWriteContractReturn<

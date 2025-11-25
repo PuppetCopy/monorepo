@@ -8,13 +8,11 @@ import {
   constant,
   empty,
   type IStream,
-  just,
   map,
   merge,
   op,
   sampleMap,
   skipRepeatsWith,
-  switchLatest,
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
@@ -22,16 +20,8 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
-import { type Address, encodeFunctionData, erc20Abi, type Hex, MethodNotFoundRpcError } from 'viem'
-import {
-  $alert,
-  $alertIntermediateTooltip,
-  $check,
-  $infoLabeledValue,
-  $infoTooltip,
-  $target,
-  $xCross
-} from '@/ui-components'
+import { type Address, encodeFunctionData, erc20Abi, type Hex } from 'viem'
+import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
@@ -257,9 +247,7 @@ export const $PortfolioEditorDrawer = ({
                 ),
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
-                  $node(style({ flex: 1, minWidth: 0 }))(
-               
-                  ),
+                  $node(style({ flex: 1, minWidth: 0 }))(),
                   $SubmitBar({
                     $submitContent: $text('Submit'),
                     txQuery: requestChangeSubscription
