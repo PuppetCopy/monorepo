@@ -1,6 +1,7 @@
 import { map, switchMap } from 'aelea/stream'
 import { $node, $text, component, nodeEvent, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
+import { $intermediatePromise } from '@/ui-components'
 import { $seperator2 } from '../pages/common.js'
 import { wallet } from '../wallet/wallet.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
@@ -28,28 +29,29 @@ export const $WalletProfileDisplay = component(
     const openStream = switchMap(() => map(() => $walletConnect, targetClick), wallet.account)
 
     return [
-      switchMap(connection => {
-        if (connection === 'connecting') {
-          return $node($text('Connecting...'))
-        }
+      $intermediatePromise({
+        $loader: $node($text('Connecting...')),
+        $display: map(async connectionQuery => {
+          const connection = await connectionQuery
 
-        if (!connection?.address) {
-          return $Popover({
-            $target,
-            $open: openStream,
-            dismiss: selectConnector
-          })({})
-        }
+          if (!connection) {
+            return $Popover({
+              $target,
+              $open: openStream,
+              dismiss: selectConnector
+            })({})
+          }
 
-        return $row(
-          spacing.small,
-          style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' })
-        )(
-          connection.address
-            ? $profileDisplay({ address: connection.address })
-            : style({ cursor: 'pointer' }, $disconnectedWalletDisplay())
-        )
-      }, wallet.account),
+          return $row(
+            spacing.small,
+            style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' })
+          )(
+            connection.address
+              ? $profileDisplay({ address: connection.address })
+              : style({ cursor: 'pointer' }, $disconnectedWalletDisplay())
+          )
+        }, wallet.account)
+      }),
       {}
     ]
   }

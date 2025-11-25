@@ -1,15 +1,13 @@
-import { RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
+import { type RhinestoneAccount, RhinestoneSDK, type TransactionResult, walletClientToAccount } from '@rhinestone/sdk'
 import {
   type Config,
-  type Connector,
   createConfig,
   type GetConnectionReturnType,
-  getConnection,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
   watchConnection
 } from '@wagmi/core'
-import { type IStream, map, o, op, switchMap } from 'aelea/stream'
+import { awaitPromises, type IStream, map, op, switchMap } from 'aelea/stream'
 import { fromCallback, state } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
@@ -25,6 +23,7 @@ import {
   fallback,
   http,
   type ParseEventLogsReturnType,
+  type PublicClient,
   parseEventLogs,
   type ReadContractParameters,
   type ReadContractReturnType,
@@ -32,7 +31,9 @@ import {
   type TransactionReceipt,
   type WalletClient,
   type WriteContractParameters,
-  webSocket
+  webSocket,
+  type Transport,
+  type Chain
 } from 'viem'
 import type { Address } from 'viem/accounts'
 import { arbitrum } from 'viem/chains'
@@ -43,13 +44,16 @@ if (!import.meta.env.VITE__WC_PROJECT_ID) {
 }
 
 export type IAccountState = {
+  publicClient: PublicClient<Transport, Chain>
   client: WalletClient
   address: Address
-  sdk: RhinestoneSDK
+  account: RhinestoneAccount
 }
 
-// Simple wallet state - either connected with an address or not
-export type IConnectionState = IAccountState | null | 'connecting'
+const rhinestoneSDK = new RhinestoneSDK({
+  apiKey: 'proxy',
+  endpointUrl: `${window.location.origin}/api/orchestrator`
+})
 
 const protoConnector = portoConnector({
   mode: Mode.dialog({
@@ -84,12 +88,6 @@ const transport = fallback([
   http('https://arb1.arbitrum.io/rpc')
 ])
 
-// Create public client for reading blockchain data
-const publicClient = createPublicClient({
-  chain: arbitrum,
-  transport
-})
-
 const connection: IStream<GetConnectionReturnType<typeof wagmiConfig>> = fromCallback(cb => {
   const unsubscribe = watchConnection(wagmiConfig, {
     onChange(conn) {
@@ -109,7 +107,7 @@ const connection: IStream<GetConnectionReturnType<typeof wagmiConfig>> = fromCal
   return unsubscribe
 })
 
-const account: IStream<Promise<IConnectionState>> = op(
+const account: IStream<Promise<IAccountState | null>> = op(
   connection,
   map(async connection => {
     const connector = connection.connector
@@ -122,6 +120,12 @@ const account: IStream<Promise<IConnectionState>> = op(
       return null
     }
 
+    // Create public client for reading blockchain data
+    const publicClient = createPublicClient({
+      chain: arbitrum,
+      transport
+    })
+
     const provider = await connector.getProvider()
 
     const client = createWalletClient({
@@ -130,24 +134,19 @@ const account: IStream<Promise<IConnectionState>> = op(
       transport: custom(provider)
     })
 
-    const rhSdk = new RhinestoneSDK({
-      apiKey: 'proxy',
-      endpointUrl: `${window.location.origin}/api/orchestrator`
-    })
-
     const accountOwner = walletClientToAccount(client)
-    const rhAccount = await rhSdk.createAccount({
+    const rhAccount = await rhinestoneSDK.createAccount({
       owners: {
         type: 'ecdsa',
         accounts: [accountOwner]
       }
     })
-    const addr = rhAccount.getAddress() as Address
 
     const accountState: IAccountState = {
       client,
+      publicClient,
       address: connection.address,
-      sdk: rhSdk
+      account: rhAccount
     }
 
     return accountState
@@ -156,12 +155,22 @@ const account: IStream<Promise<IConnectionState>> = op(
 )
 
 // Block change listener
-const blockChange: IStream<bigint> = fromCallback(cb => {
-  const unwatch = publicClient.watchBlockNumber({
-    onBlockNumber: blockNumber => cb(blockNumber)
+const blockChange: IStream<bigint> = op(
+  account,
+  awaitPromises,
+  switchMap(accountState => {
+    if (!accountState) {
+      throw new Error('No account connected')
+    }
+
+    return fromCallback(cb => {
+      const unwatch = accountState.publicClient.watchBlockNumber({
+        onBlockNumber: blockNumber => cb(blockNumber)
+      })
+      return unwatch
+    })
   })
-  return unwatch
-})
+)
 
 async function connect(preferredConnectorId?: string) {
   try {
@@ -203,9 +212,10 @@ async function read<
   TFunctionName extends ContractFunctionName<TAbi, 'view'>,
   TArgs extends ContractFunctionArgs<TAbi, 'view', TFunctionName>
 >(
+  accountState: IAccountState,
   parameters: ReadContractParameters<TAbi, TFunctionName, TArgs>
 ): Promise<ReadContractReturnType<TAbi, TFunctionName, TArgs>> {
-  return publicClient.readContract(parameters as any)
+  return accountState.publicClient.readContract(parameters as any)
 }
 
 export type IWriteContractReturn<
@@ -230,17 +240,17 @@ async function write<
 ): IWriteContractReturn<TAbi, TEventName> {
   try {
     // Simulate the transaction first
-    const { request } = await publicClient.simulateContract({
+    const { request } = await accountState.publicClient.simulateContract({
       ...writeParams,
       account: accountState.address,
       chain: arbitrum
     } as any)
 
     // Execute the transaction
-    const hash = await walletClient.writeContract(request as any)
+    const hash = await accountState.client.writeContract(request as any)
 
     // Wait for the transaction receipt
-    const transactionReceipt = await publicClient.waitForTransactionReceipt({ hash })
+    const transactionReceipt = await accountState.publicClient.waitForTransactionReceipt({ hash })
 
     // Parse events if eventName is provided
     const events = parseEventLogs({
@@ -259,46 +269,12 @@ async function write<
 export interface IBatchCall extends Call<any, any> {}
 
 // Write many transactions (batch calls)
-async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
-  const walletClient = await getWalletClient()
-  const address = walletClient.account?.address
+async function writeMany(accountState: IAccountState, callList: IBatchCall[]): Promise<TransactionResult> {
+  const client = accountState.publicClient
+  const address = accountState.address
 
   if (callList.length === 0) {
     throw new Error('No valid calls to send')
-  }
-
-  // Simulate each call before attempting to send
-  for (let i = 0; i < callList.length; i++) {
-    const callParams = callList[i]
-    try {
-      // If ABI is provided, use simulateContract for better error messages
-      if (callParams.abi) {
-        const { functionName, args } = decodeFunctionData({
-          abi: callParams.abi,
-          data: callParams.data
-        })
-
-        await publicClient.simulateContract({
-          abi: callParams.abi,
-          address: callParams.to,
-          functionName,
-          args: args || [],
-          account: address,
-          value: callParams.value
-        } as any)
-      } else {
-        // Fallback to estimateGas for calls without ABI
-        await publicClient.estimateGas({
-          account: address,
-          to: callParams.to,
-          data: callParams.data,
-          value: callParams.value
-        })
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      throw new Error(`Transaction ${i + 1} of ${callList.length} would fail: ${errorMessage}`)
-    }
   }
 
   // Strip ABI from calls for sendCalls (it doesn't need it)
@@ -309,14 +285,13 @@ async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
   }))
 
   // Send the batch of calls
-  const result = await walletClient.sendCalls({
-    account: walletClient.account,
+  const result = await accountState.account.sendTransaction({
+    chain: accountState.publicClient.chain,
     calls: callsForSending,
-    experimental_fallbackDelay: 1000,
-    experimental_fallback: true
-  } as any)
+    targetChain: arbitrum
+  })
 
-  return result as SendCallsReturnType
+  return result
 }
 
 export const wallet = {
@@ -328,6 +303,6 @@ export const wallet = {
   connect,
   disconnect,
   transport,
-  publicClient,
+  rhinestoneSDK,
   connectors: wagmiConfig.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }

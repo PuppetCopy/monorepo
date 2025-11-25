@@ -1,14 +1,15 @@
-import { type IOps, just, map, merge, sampleMap, switchLatest, switchMap } from 'aelea/stream'
-import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
-import { $column, $row, spacing } from 'aelea/ui-components'
-import { type IAccountState, type IConnectionState, wallet } from '../wallet/wallet.js'
+import { type IOps, just, map, merge, sampleMap, switchMap } from 'aelea/stream'
+import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
+import { $row, spacing } from 'aelea/ui-components'
+import { $intermediatePromise } from '@/ui-components'
+import { type IAccountState, wallet } from '../wallet/wallet.js'
 import { $Popover } from './$Popover.js'
 import { $WalletConnect } from './$WalletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
 export interface IConnectWalletPopover {
-  $$display: IOps<IConnectionState, I$Node>
+  $$display: IOps<IAccountState | null, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose
 }
@@ -29,36 +30,34 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
       })
 
       return [
-        $Popover({
-          $target: $container(
-            switchMap(getAccountStatus => {
-              if (getAccountStatus === 'connecting') {
-                return $node($text('Connecting...'))
-              }
+        $intermediatePromise({
+          $display: map(async connectionQuery => {
+            const connection = await connectionQuery
 
-              if (!getAccountStatus?.address) {
+            if (!connection) {
+              return $Popover({
+                $target: $container(
+                  $ButtonSecondary({
+                    $content: $row(spacing.default, style({ alignItems: 'center' }))($text('Connect Wallet'))
+                  })({
+                    click: openPopoverTether()
+                  })
+                ),
+                $open: sampleMap(() => $walletConnect, wallet.account, openPopover),
+                dismiss: merge(selectConnector, closePopover)
+              })({})
+            }
+
+            return switchMap(
+              $displayNode => {
                 return $ButtonSecondary({
-                  $content: $row(spacing.default, style({ alignItems: 'center' }))($text('Connect Wallet'))
-                })({
-                  click: openPopoverTether()
-                })
-              }
-
-              return switchLatest(
-                map(
-                  $displayNode => {
-                    return $ButtonSecondary({
-                      $content: $row(spacing.default, style({ alignItems: 'center' }))($displayNode)
-                    })({})
-                  },
-                  config.$$display(just(getAccountStatus))
-                )
-              )
-            }, wallet.account)
-          ),
-          $open: sampleMap(() => $walletConnect, wallet.account, openPopover),
-          dismiss: merge(selectConnector, closePopover)
-        })({}),
+                  $content: $row(spacing.default, style({ alignItems: 'center' }))($displayNode)
+                })({})
+              },
+              config.$$display(just(connection))
+            )
+          }, wallet.account)
+        }),
 
         {}
       ]

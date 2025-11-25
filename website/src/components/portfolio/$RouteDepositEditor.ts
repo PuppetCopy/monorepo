@@ -1,6 +1,6 @@
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
+import { awaitPromises, combine, constant, type IStream, map, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -42,20 +42,26 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         }, draftDepositTokenList)
       )
 
-      const walletBalance = state(
+      const walletBalance = op(
+        wallet.account,
+        awaitPromises,
         switchMap(async wallet => {
-          if (!wallet.address) return 0n
+          if (!wallet) return 0n
 
           return tokenBalanceOf(collateralToken, wallet.address)
-        }, wallet.account)
+        }),
+        state
       )
 
-      const depositBalance = state(
+      const depositBalance = op(
+        wallet.account,
+        awaitPromises,
         switchMap(async account => {
-          if (!account.address) return 0n
+          if (!account) return 0n
 
           return puppetReader.getUserBalance(collateralToken, account.address)
-        }, wallet.account)
+        }),
+        state
       )
 
       const collateralTokenDescription = getTokenDescription(collateralToken)

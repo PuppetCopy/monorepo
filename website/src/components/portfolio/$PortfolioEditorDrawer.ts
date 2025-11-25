@@ -258,64 +258,7 @@ export const $PortfolioEditorDrawer = ({
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(
-                    op(
-                      just(wallet.publicClient),
-                      switchMap(async getWalelt => {
-                        // Calculate how many transactions will be needed
-                        let txCount = 0
-                        let approveCount = 0
-
-                        // Count approve transactions needed
-                        for (const deposit of params.draftDepositTokenList) {
-                          if (deposit.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
-                            approveCount++ // Each deposit needs an approve
-                          }
-                        }
-
-                        txCount += approveCount // Approve transactions
-
-                        // Check if we have any UserRouter operations (deposits, withdrawals, or rules)
-                        const hasUserRouterOps =
-                          params.draftDepositTokenList.length > 0 || params.draftMatchingRuleList.length > 0
-
-                        if (hasUserRouterOps) {
-                          txCount += 1 // All UserRouter operations are batched in one multicall
-                        }
-
-                        try {
-                          const capabilities = (getWalelt as any).getCapabilities
-                            ? await (getWalelt as any).getCapabilities()
-                            : null
-                          if (capabilities) {
-                            return $text(
-                              ...Object.values(capabilities as Record<string, { name: string }>)
-                                .map((cap: { name: string }) => cap.name)
-                                .join(', ')
-                            )
-                          }
-                          return empty
-                        } catch (error) {
-                          // Only show tooltip if there are multiple transactions
-                          if (error instanceof MethodNotFoundRpcError && txCount > 1) {
-                            return $row(
-                              $alertIntermediateTooltip(
-                                $text(`Will confirm each action separately: ${txCount} approvals needed`),
-                                $text(
-                                  'Your wallet will ask you to confirm each action separately because your wallet does not support batching yet (future improvement). \n\nMore about EIP-5792: https://eips.ethereum.org/EIPS/eip-5792'
-                                )
-                              )
-                            )
-                          }
-
-                          if (error instanceof MethodNotFoundRpcError) {
-                            return empty // Single transaction, no need for tooltip
-                          }
-
-                          return $row($alert($text('Wallet does not support capabilities')))
-                        }
-                      }),
-                      switchLatest
-                    )
+               
                   ),
                   $SubmitBar({
                     $submitContent: $text('Submit'),
@@ -397,7 +340,7 @@ export const $PortfolioEditorDrawer = ({
                           })
                         }
 
-                        return wallet.writeMany(callStack)
+                        return wallet.writeMany(account, callStack)
                       })
                     )
                   })

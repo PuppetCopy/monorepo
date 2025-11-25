@@ -9,7 +9,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { combine, constant, empty, filterNull, type IStream, map } from 'aelea/stream'
+import { awaitPromises, combine, constant, empty, filterNull, type IStream, map } from 'aelea/stream'
 import { type IBehavior, multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -56,12 +56,11 @@ export const $PortfolioPage = ({
       const positionLinkMapQuery = multicast(
         map(
           async params => {
-            const address = params.wallet.address
-
-            if (address === undefined) {
+            if (!params.wallet) {
               return null
             }
 
+            const address = params.wallet.address
             const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
             const result = await sqlClient.query.puppetLink.findMany({
@@ -136,7 +135,7 @@ export const $PortfolioPage = ({
 
             return groupManyList(result, 'traderMatchingKey')
           },
-          combine({ activityTimeframe, collateralTokenList, wallet: wallet.account })
+          combine({ activityTimeframe, collateralTokenList, wallet: awaitPromises(wallet.account) })
         )
       )
 
