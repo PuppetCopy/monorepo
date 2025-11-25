@@ -3,6 +3,7 @@ import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } f
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
 import type { Address, Hex } from 'viem'
+import type { ValueOf } from '../utils/types.js'
 
 export interface IComponentPageParams {}
 
@@ -25,16 +26,18 @@ export interface IEarningsPlan {
   scheduleFactor: number
 }
 
-export enum ITradeFocusMode {
-  collateral,
-  size
-}
+export const TRADE_FOCUS_MODE = {
+  COLLATERAL: 'collateral',
+  SIZE: 'size'
+} as const
+export type ITradeFocusMode = ValueOf<typeof TRADE_FOCUS_MODE>
 
-export enum IWalletTab {
-  TRADER = 'Trader',
-  PUPPET = 'Puppet',
-  EARN = 'Earn'
-}
+export const WALLET_TAB = {
+  TRADER: 'Trader',
+  PUPPET: 'Puppet',
+  EARN: 'Earn'
+} as const
+export type IWalletTab = ValueOf<typeof WALLET_TAB>
 
 export type IPosition = {
   key: Hex

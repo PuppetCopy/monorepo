@@ -26,11 +26,10 @@
     "jazzicon": "1.5.0",
     "lightweight-charts": "catalog:",
     "mersenne-twister": "1.1.0",
-    "mipd": "0.0.7",
     "ponder": "catalog:",
     "porto": "0.2.37",
-    "viem": "2.39.3",
-    "wagmi": "3"
+    "viem": "catalog:",
+    "wagmi": "3.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

@@ -3,7 +3,7 @@ import type { ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import { arbitrum } from 'viem/chains'
 import type { ISortBy } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import { IWalletTab } from '../pages/types.js'
+import { WALLET_TAB } from '../pages/types.js'
 
 export const localStore = uiStorage.createStoreDefinition('root', 8, {
   global: {
@@ -23,7 +23,7 @@ export const localStore = uiStorage.createStoreDefinition('root', 8, {
     account: undefined as string | undefined
   },
   wallet: {
-    selectedTab: IWalletTab.PUPPET
+    selectedTab: WALLET_TAB.PUPPET
   },
   earnings: {
     cashout: false,

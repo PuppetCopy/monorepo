@@ -157,7 +157,7 @@ export function accountSettledPositionListSummary(
     seed.realisedRoi += next.realisedRoi
     seed.roi += next.roi
 
-    next.pnlList.forEach((pnl, idx) => {
+    next.pnlList.forEach((pnl: bigint, idx: number) => {
       seed.lossCount += pnl < 0n ? 1 : 0
       seed.winCount += pnl > 0n ? 1 : 0
 

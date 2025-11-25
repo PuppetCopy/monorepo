@@ -6,7 +6,7 @@ import { TOKEN_ADDRESS_DESCRIPTION_MAP } from '../const/token.js'
 import { factor, toBasisPoints } from '../core/math.js'
 import { formatFixed } from '../core/parse.js'
 import type { IMarketDescription, ITokenDescription } from '../core/types.js'
-import { easeInExpo, getMappedValue, getMappedValueFallback } from '../core/utils.js'
+import { easeInExpo, getMappedValue } from '../core/utils.js'
 import { ARBITRUM_MARKET_LIST } from '../generated/marketList.js'
 import { MARKET_ADDRESS_DESCRIPTION_MAP } from './market.js'
 
@@ -55,9 +55,9 @@ export function validateIdentityName(name: string) {
   }
 }
 
-export function getTokenDescription(token: Address): ITokenDescription | null {
+export function getTokenDescription(token: Address): ITokenDescription {
   const normalizedToken = getAddress(token)
-  return getMappedValueFallback(TOKEN_ADDRESS_DESCRIPTION_MAP, normalizedToken, null)
+  return getMappedValue(TOKEN_ADDRESS_DESCRIPTION_MAP, normalizedToken)
 }
 
 export function getMarketDescription(market: Address): IMarketDescription {

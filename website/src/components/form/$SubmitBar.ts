@@ -2,12 +2,12 @@ import { getMappedValueFallback } from '@puppet-copy/middleware/core'
 import { combine, constant, empty, type IStream, just, map, merge, start, switchLatest } from 'aelea/stream'
 import { type IBehavior, multicast, type PromiseStateError, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
-import { $row, type Control, spacing } from 'aelea/ui-components'
+import { $row, spacing } from 'aelea/ui-components'
 import type { EIP6963ProviderDetail } from 'mipd'
 import { BaseError, ContractFunctionRevertedError, type GetCallsStatusReturnType } from 'viem'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import type { IWalletState } from '../../wallet/wallet.js'
+import type { IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -24,7 +24,7 @@ export interface ISubmitBar {
 export const $SubmitBar = (config: ISubmitBar) =>
   component(
     (
-      [submit, submitTether]: IBehavior<PointerEvent, IWalletState>,
+      [submit, submitTether]: IBehavior<PointerEvent, IAccountState>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>
     ) => {
       const {
@@ -127,7 +127,3 @@ export const $SubmitBar = (config: ISubmitBar) =>
       ]
     }
   )
-
-interface IButtonCircular extends Control {
-  $iconPath: I$Node<SVGPathElement>
-}

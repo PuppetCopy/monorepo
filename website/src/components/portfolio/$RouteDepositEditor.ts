@@ -14,7 +14,7 @@ import type { IComponentPageParams } from '../../pages/types.js'
 import { wallet } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { $DepositEditor, DepositEditorAction, type IDepositEditorDraft } from './$DepositEditor.js'
+import { $DepositEditor, DEPOSIT_EDITOR_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
 
 interface IRouteDepositEditor extends IComponentPageParams {
   collateralToken: Address
@@ -34,7 +34,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
           const match = list.find(ct => ct.token === collateralToken)
           return (
             match ?? {
-              action: DepositEditorAction.DEPOSIT,
+              action: DEPOSIT_EDITOR_ACTION.DEPOSIT,
               token: collateralToken,
               amount: 0n
             }
@@ -81,19 +81,23 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
                 $labeledhintAdjustment({
                   color: map(
                     c =>
-                      c ? (c.action === DepositEditorAction.DEPOSIT ? pallete.positive : pallete.negative) : undefined,
+                      c
+                        ? c.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
+                          ? pallete.positive
+                          : pallete.negative
+                        : undefined,
                     model
                   ),
                   change: map(params => {
                     if (!params.model) return ''
 
-                    if (params.model.action === DepositEditorAction.DEPOSIT) {
+                    if (params.model.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
                       if (params.model.amount === 0n) return ''
                     }
 
                     return readableTokenAmountLabel(
                       collateralTokenDescription,
-                      params.model.action === DepositEditorAction.DEPOSIT
+                      params.model.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
                         ? params.model.amount + params.depositBalance
                         : params.depositBalance - params.model.amount
                     )

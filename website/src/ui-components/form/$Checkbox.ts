@@ -39,7 +39,9 @@ export const $Checkbox = ({ value, disabled, label }: Checkbox) =>
         layoutSheet.stretch,
         checkTether(
           nodeEvent('change'),
-          map(evt => (<HTMLInputElement>evt.target).checked)
+          map((evt: Event & { target: HTMLInputElement }) => {
+            return evt.target.checked
+          })
         ),
         attr({ type: 'checkbox' }),
         attrBehavior(map(checked => ({ checked: checked ? true : null }), value)),

@@ -1,14 +1,16 @@
+import { RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
 import {
+  type Config,
   type Connector,
   createConfig,
-  getAccount,
+  type GetConnectionReturnType,
+  getConnection,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
-  watchAccount
+  watchConnection
 } from '@wagmi/core'
-import type { IStream } from 'aelea/stream'
+import { type IStream, map, o, op, switchMap } from 'aelea/stream'
 import { fromCallback, state } from 'aelea/stream-extended'
-import type { Porto, Provider } from 'porto'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
@@ -34,50 +36,47 @@ import {
 } from 'viem'
 import type { Address } from 'viem/accounts'
 import { arbitrum } from 'viem/chains'
-import { porto as portoConnector } from 'wagmi/connectors'
+import { porto as portoConnector, walletConnect as walletConnectConnector } from 'wagmi/connectors'
 
-// Simple wallet state - either connected with an address or not
-export type IWalletState = {
-  address: Address | undefined
-  isConnecting: boolean
+if (!import.meta.env.VITE__WC_PROJECT_ID) {
+  throw new Error('Missing WalletConnect Project ID in environment variables')
 }
 
-// Wagmi configuration with Porto connector
-const portoConnectorFn = portoConnector({
+export type IAccountState = {
+  client: WalletClient
+  address: Address
+  sdk: RhinestoneSDK
+}
+
+// Simple wallet state - either connected with an address or not
+export type IConnectionState = IAccountState | null | 'connecting'
+
+const protoConnector = portoConnector({
   mode: Mode.dialog({
     renderer: Dialog.popup()
   })
 })
 
-const wagmiConfig = createConfig({
+export const wagmiConfig: Config = createConfig({
   chains: [arbitrum],
-  connectors: [portoConnectorFn],
+  connectors: [
+    protoConnector,
+
+    walletConnectConnector({
+      projectId: import.meta.env.VITE__WC_PROJECT_ID,
+      metadata: {
+        name: 'Puppet',
+        description: 'Puppet copy trading',
+        url: 'https://puppet.tech',
+        icons: ['https://puppet.tech/favicon.png']
+      },
+      showQrModal: true
+    })
+  ],
   transports: {
     [arbitrum.id]: http('https://arb1.arbitrum.io/rpc')
   }
 })
-
-type PortoConnector = Connector & { getPortoInstance: () => Promise<Porto.Porto> }
-
-function isPortoConnector(connector: Connector): connector is PortoConnector {
-  return 'getPortoInstance' in connector
-}
-
-const portoConnectorInstance = wagmiConfig.connectors.find(isPortoConnector)
-
-if (!portoConnectorInstance) {
-  throw new Error('Porto connector is not configured')
-}
-
-function getPortoInstance() {
-  return portoConnectorInstance!.getPortoInstance()
-}
-
-async function getPortoProvider() {
-  const porto = await getPortoInstance()
-  return porto.provider
-}
-
 // Transport configuration for reading blockchain data
 const transport = fallback([
   webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
@@ -91,124 +90,70 @@ const publicClient = createPublicClient({
   transport
 })
 
-// Create wallet client that will be updated when connected
-let walletClient: WalletClient | null = null
-let portoProviderPromise: Promise<Provider> | null = null
-
-async function resolvePortoProvider() {
-  portoProviderPromise ??= getPortoProvider()
-  return portoProviderPromise
-}
-
-async function syncWalletClient(account: Address | undefined) {
-  if (!account) {
-    walletClient = null
-    return
-  }
-
-  const provider = await resolvePortoProvider()
-  walletClient = createWalletClient({
-    account,
-    chain: arbitrum,
-    transport: custom(provider)
-  })
-}
-
-// Simple account state
-let currentAccount: Address | undefined
-let isConnecting = false
-
-// Store callback for updating the stream
-let updateAccountStream: ((state: IWalletState) => void) | null = null
-
-// Create account stream for reactive updates
-const accountEvent: IStream<IWalletState> = fromCallback(cb => {
-  // Store the callback so we can use it in connect/disconnect functions
-  updateAccountStream = cb
-
-  // Watch Wagmi account changes
-  const unsubscribe = watchAccount(wagmiConfig, {
-    onChange(account) {
-      console.log('Wagmi account changed:', account)
-      currentAccount = account.address
-      void syncWalletClient(account.address)
-      cb({ address: currentAccount, isConnecting: account.isConnecting ?? false })
+const connection: IStream<GetConnectionReturnType<typeof wagmiConfig>> = fromCallback(cb => {
+  const unsubscribe = watchConnection(wagmiConfig, {
+    onChange(conn) {
+      cb(conn)
     }
   })
 
-  // Get initial account state from Wagmi
-  const initialAccount = getAccount(wagmiConfig)
-  currentAccount = initialAccount.address
-  isConnecting = initialAccount.isConnecting ?? false
+  // const initialConnection = getConnection(wagmiConfig)
+  // currentConnection = {
+  //   address: (initialConnection as any)?.accounts?.[0],
+  //   connectorName: initialConnection?.connector?.name,
+  //   status: initialConnection?.status ?? 'disconnected',
+  //   connector: initialConnection?.connector ?? null
+  // }
+  // cb(currentConnection)
 
-  // Initial state
-  cb({ address: currentAccount, isConnecting })
-
-  // Check for existing connection on load via Wagmi
-  if (currentAccount) {
-    void syncWalletClient(currentAccount).then(() => {
-      console.log('Restored wallet connection:', currentAccount)
-    })
-  }
-
-  let removePortoListeners: (() => void) | undefined
-
-  void (async () => {
-    const provider = await resolvePortoProvider()
-
-    const handleAccountsChanged = (accounts: readonly Address[]) => {
-      console.log('Accounts changed:', accounts)
-
-      if (accounts.length > 0) {
-        currentAccount = accounts[0]
-        void syncWalletClient(accounts[0])
-      } else {
-        currentAccount = undefined
-        walletClient = null
-      }
-
-      cb({ address: currentAccount, isConnecting: false })
-    }
-
-    const handleChainChanged = (chainId: string) => {
-      console.log('Chain changed:', chainId)
-      // Could handle chain switching here if needed
-    }
-
-    const handleDisconnect = () => {
-      console.log('Wallet disconnected')
-      currentAccount = undefined
-      walletClient = null
-      cb({ address: currentAccount, isConnecting: false })
-    }
-
-    const handleConnect = (info: any) => {
-      console.log('Wallet connected event:', info)
-    }
-
-    provider.on?.('accountsChanged', handleAccountsChanged as any)
-    provider.on?.('chainChanged', handleChainChanged as any)
-    provider.on?.('disconnect', handleDisconnect as any)
-    provider.on?.('connect', handleConnect as any)
-
-    removePortoListeners = () => {
-      provider.removeListener?.('accountsChanged', handleAccountsChanged as any)
-      provider.removeListener?.('chainChanged', handleChainChanged as any)
-      provider.removeListener?.('disconnect', handleDisconnect as any)
-      provider.removeListener?.('connect', handleConnect as any)
-    }
-  })()
-
-  return () => {
-    // Cleanup listeners if needed
-    updateAccountStream = null
-    unsubscribe()
-    removePortoListeners?.()
-  }
+  return unsubscribe
 })
 
-// Create state stream
-const account: IStream<IWalletState> = state(accountEvent)
+const account: IStream<Promise<IConnectionState>> = op(
+  connection,
+  map(async connection => {
+    const connector = connection.connector
+
+    if (connection.status === 'connecting') {
+      return 'connecting' as const
+    }
+
+    if (!connector || !connection.address) {
+      return null
+    }
+
+    const provider = await connector.getProvider()
+
+    const client = createWalletClient({
+      account: connection.address,
+      chain: arbitrum,
+      transport: custom(provider)
+    })
+
+    const rhSdk = new RhinestoneSDK({
+      apiKey: 'proxy',
+      endpointUrl: `${window.location.origin}/api/orchestrator`
+    })
+
+    const accountOwner = walletClientToAccount(client)
+    const rhAccount = await rhSdk.createAccount({
+      owners: {
+        type: 'ecdsa',
+        accounts: [accountOwner]
+      }
+    })
+    const addr = rhAccount.getAddress() as Address
+
+    const accountState: IAccountState = {
+      client,
+      address: connection.address,
+      sdk: rhSdk
+    }
+
+    return accountState
+  }),
+  state
+)
 
 // Block change listener
 const blockChange: IStream<bigint> = fromCallback(cb => {
@@ -218,60 +163,22 @@ const blockChange: IStream<bigint> = fromCallback(cb => {
   return unwatch
 })
 
-// Connect wallet function using Wagmi with Porto connector
-async function connect() {
+async function connect(preferredConnectorId?: string) {
   try {
-    console.log('Starting wallet connection via Wagmi...')
-    isConnecting = true
+    const targetConnector =
+      wagmiConfig.connectors.find(connector => connector.id === preferredConnectorId) ?? wagmiConfig.connectors[0]
 
-    // Update UI to show connecting state
-    if (updateAccountStream) {
-      updateAccountStream({ address: currentAccount, isConnecting: true })
+    if (!targetConnector) {
+      throw new Error('No wallet connector is configured')
     }
 
-    if (!portoConnectorInstance) {
-      throw new Error('Porto connector is not configured')
-    }
-
-    // Use Wagmi connect with Porto connector
     const result = await wagmiConnect(wagmiConfig, {
-      connector: portoConnectorInstance
+      connector: targetConnector
     })
 
-    console.log('Wagmi connection result:', result)
-
-    if (result.accounts && result.accounts.length > 0) {
-      currentAccount = result.accounts[0]
-
-      // Create wallet client with Porto provider
-      await syncWalletClient(currentAccount)
-
-      // Update UI to show connected state
-      isConnecting = false
-      if (updateAccountStream) {
-        updateAccountStream({ address: currentAccount, isConnecting: false })
-      }
-
-      console.log('Wallet connected successfully via Wagmi:', currentAccount)
-      return result.accounts
-    }
-
-    // If no accounts returned, reset state
-    isConnecting = false
-    if (updateAccountStream) {
-      updateAccountStream({ address: currentAccount, isConnecting: false })
-    }
-
-    return []
+    return result.accounts ?? []
   } catch (error: any) {
     console.log('Connection error:', error)
-
-    isConnecting = false
-
-    // Update UI to show disconnected state
-    if (updateAccountStream) {
-      updateAccountStream({ address: currentAccount, isConnecting: false })
-    }
 
     // Check if user rejected the request (this is normal, not an error)
     if (error?.message?.includes('user rejected') || error?.message?.includes('User rejected')) {
@@ -287,23 +194,7 @@ async function connect() {
 
 // Disconnect wallet function using Wagmi
 async function disconnect() {
-  try {
-    // Use Wagmi disconnect
-    await wagmiDisconnect(wagmiConfig)
-
-    // Clear the state
-    currentAccount = undefined
-    walletClient = null
-
-    // Update UI to show disconnected state
-    if (updateAccountStream) {
-      updateAccountStream({ address: undefined, isConnecting: false })
-    }
-
-    console.log('Wallet disconnected')
-  } catch (error) {
-    console.error('Failed to disconnect wallet:', error)
-  }
+  await wagmiDisconnect(wagmiConfig)
 }
 
 // Read contract function
@@ -332,19 +223,16 @@ async function write<
   TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>,
   TEventName extends ContractEventName<TAbi> | ContractEventName<TAbi>[] | undefined = undefined
 >(
+  accountState: IAccountState,
   writeParams: Omit<WriteContractParameters<TAbi, TFunctionName, TArgs>, 'account' | 'chain'> & {
     eventName?: TEventName
   }
 ): IWriteContractReturn<TAbi, TEventName> {
   try {
-    if (!walletClient) {
-      throw new Error('Wallet not connected')
-    }
-
     // Simulate the transaction first
     const { request } = await publicClient.simulateContract({
       ...writeParams,
-      account: walletClient.account,
+      account: accountState.address,
       chain: arbitrum
     } as any)
 
@@ -372,15 +260,8 @@ export interface IBatchCall extends Call<any, any> {}
 
 // Write many transactions (batch calls)
 async function writeMany(callList: IBatchCall[]): Promise<SendCallsReturnType> {
-  if (!walletClient) {
-    throw new Error('Wallet not connected')
-  }
-
+  const walletClient = await getWalletClient()
   const address = walletClient.account?.address
-
-  if (!address) {
-    throw new Error('No connected account found')
-  }
 
   if (callList.length === 0) {
     throw new Error('No valid calls to send')
@@ -442,10 +323,11 @@ export const wallet = {
   read,
   write,
   writeMany,
-  connect,
-  disconnect,
   blockChange,
   account,
+  connect,
+  disconnect,
   transport,
-  publicClient
+  publicClient,
+  connectors: wagmiConfig.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }

@@ -37,11 +37,11 @@ import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import { type IBatchCall, type IWalletState, wallet } from '../../wallet/wallet.js'
+import { type IAccountState, type IBatchCall, wallet } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
-import { DepositEditorAction } from './$DepositEditor.js'
+import { DEPOSIT_EDITOR_ACTION } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteDepositEditor } from './$RouteDepositEditor.js'
 
@@ -66,7 +66,7 @@ export const $PortfolioEditorDrawer = ({
 }: IPortfolioEditorDrawer) =>
   component(
     (
-      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IWalletState, any>,
+      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IAccountState, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
       [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
@@ -267,7 +267,7 @@ export const $PortfolioEditorDrawer = ({
 
                         // Count approve transactions needed
                         for (const deposit of params.draftDepositTokenList) {
-                          if (deposit.action === DepositEditorAction.DEPOSIT) {
+                          if (deposit.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
                             approveCount++ // Each deposit needs an approve
                           }
                         }
@@ -283,11 +283,13 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         try {
-                          const capabilities = await getWalelt.getCapabilities()
+                          const capabilities = (getWalelt as any).getCapabilities
+                            ? await (getWalelt as any).getCapabilities()
+                            : null
                           if (capabilities) {
                             return $text(
-                              ...Object.values(capabilities)
-                                .map(cap => cap.name)
+                              ...Object.values(capabilities as Record<string, { name: string }>)
+                                .map((cap: { name: string }) => cap.name)
                                 .join(', ')
                             )
                           }
@@ -322,12 +324,16 @@ export const $PortfolioEditorDrawer = ({
                     changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async account => {
+                        if (!account?.address) {
+                          throw new Error('No connected account')
+                        }
+
                         const tokenRouteContractParams = CONTRACT.TokenRouter
                         const callStack: IBatchCall[] = []
                         const userRouterCalls: Hex[] = [] // Collect UserRouter calls for multicall
 
                         for (const deposit of params.draftDepositTokenList) {
-                          if (deposit.action === DepositEditorAction.DEPOSIT) {
+                          if (deposit.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
                             // Approve call goes to the callStack directly
                             callStack.push({
                               to: deposit.token,

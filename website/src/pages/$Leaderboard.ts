@@ -384,7 +384,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                       const markerList: IMarker[] = []
 
-                      if (pos.metric.traderRouteMetric.crossOpenSizeInUsd > 0n) {
+                      const crossOpenSizeInUsd = (pos.metric.traderRouteMetric as any)?.crossOpenSizeInUsd ?? 0n
+
+                      if (crossOpenSizeInUsd > 0n) {
                         markerList.push({
                           position: 'inBar',
                           color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
@@ -469,7 +471,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   }
                 ] as TableColumn<ILeaderboardCellData>[]
               })({
-                sortBy: sortByChangeTether(),
+                sortBy: sortByChangeTether() as any,
                 scrollRequest: scrollRequestTether()
               })
             }, combine({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList, indexTokenList }))

@@ -19,12 +19,14 @@ import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $ButtonToggle, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
+import type { ValueOf } from '@/utils/types.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
-export enum DepositEditorAction {
-  DEPOSIT,
-  WITHDRAW
-}
+export const DEPOSIT_EDITOR_ACTION = {
+  DEPOSIT: 'deposit',
+  WITHDRAW: 'withdraw'
+} as const
+export type DepositEditorAction = ValueOf<typeof DEPOSIT_EDITOR_ACTION>
 
 export interface IDepositEditorDraft {
   action: DepositEditorAction
@@ -59,7 +61,7 @@ export const $DepositEditor = (config: {
           changeDepositMode
         ),
         switchMap(action => {
-          return action === DepositEditorAction.DEPOSIT ? config.walletBalance : config.depositBalance
+          return action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? config.walletBalance : config.depositBalance
         })
       )
 
@@ -74,11 +76,11 @@ export const $DepositEditor = (config: {
 
       const alert = merge(
         map(params => {
-          if (params.action === DepositEditorAction.DEPOSIT && params.value > params.maxAmount) {
+          if (params.action === DEPOSIT_EDITOR_ACTION.DEPOSIT && params.value > params.maxAmount) {
             return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
           }
 
-          if (params.action === DepositEditorAction.WITHDRAW && params.value > params.maxAmount) {
+          if (params.action === DEPOSIT_EDITOR_ACTION.WITHDRAW && params.value > params.maxAmount) {
             return `Exceeds deposit balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
           }
 
@@ -95,10 +97,10 @@ export const $DepositEditor = (config: {
         $column(spacing.default, style({ minWidth: '230px' }))(
           $ButtonToggle({
             $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
-            optionList: [DepositEditorAction.DEPOSIT, DepositEditorAction.WITHDRAW],
+            optionList: [DEPOSIT_EDITOR_ACTION.DEPOSIT, DEPOSIT_EDITOR_ACTION.WITHDRAW],
             value: action,
             $$option: map(action => {
-              const label = action === DepositEditorAction.DEPOSIT ? 'Deposit' : 'Withdraw'
+              const label = action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? 'Deposit' : 'Withdraw'
               return $node(style({ width: '100px', textAlign: 'center' }))($text(label))
             })
           })({
@@ -115,7 +117,7 @@ export const $DepositEditor = (config: {
               placeholder: 'Enter amount',
               hint: map(
                 params => {
-                  return `${params.action === DepositEditorAction.DEPOSIT ? 'Wallet' : 'Deposit'} Balance: ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
+                  return `${params.action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? 'Wallet' : 'Deposit'} Balance: ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
                 },
                 combine({
                   maxAmount,

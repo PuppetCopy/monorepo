@@ -35,18 +35,6 @@ export const $card2 = $column(
 export const $seperator = $node(style({ color: pallete.foreground, pointerEvents: 'none' }))($text('|'))
 export const $responsiveFlex = isDesktopScreen ? $row(spacing.default) : $column(spacing.small, style({ flex: 1 }))
 
-function convertMsToGoogleCalendarDate(ms: Date) {
-  const date = new Date(ms)
-  const year = date.getUTCFullYear()
-  const month = `0${date.getUTCMonth() + 1}`.slice(-2)
-  const day = `0${date.getUTCDate()}`.slice(-2)
-  const hours = `0${date.getUTCHours()}`.slice(-2)
-  const minutes = `0${date.getUTCMinutes()}`.slice(-2)
-  const seconds = `0${date.getUTCSeconds()}`.slice(-2)
-
-  return `${year}${month}${day}T${hours}${minutes}${seconds}Z`
-}
-
 export const $labeledDivider = (label: string | I$Node, displayIcon = true) => {
   return $row(spacing.default, style({ placeContent: 'center', alignItems: 'center' }))(
     $column(style({ flex: 1, borderBottom: `1px solid ${colorAlpha(pallete.foreground, 0.2)}` }))(),

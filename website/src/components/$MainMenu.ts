@@ -21,7 +21,7 @@ import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/types.js'
 import { $Popover } from './$Popover.js'
 import { $ThemePicker } from './$ThemePicker.js'
-import { $walletProfileDisplay } from './$WalletProfileDisplay.js'
+import { $WalletProfileDisplay } from './$WalletProfileDisplay.js'
 import { $ButtonSecondary } from './form/$Button.js'
 
 interface MainMenu extends IPageParams {
@@ -142,7 +142,7 @@ export const $MainMenu = (config: MainMenu) =>
               route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
               // anchorOp: style({  }),
               url: '/portfolio',
-              $content: $walletProfileDisplay()
+              $content: $WalletProfileDisplay({})
             })({
               click: routeChangeTether()
             })
