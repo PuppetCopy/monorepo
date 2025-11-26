@@ -86,12 +86,11 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     VitePWA({
-      registerType: 'autoUpdate', // Auto-update in background, active on next visit
-
+      registerType: 'prompt',
       strategies: 'injectManifest',
       injectManifest: {
         maximumFileSizeToCacheInBytes: 4000000,
-        globPatterns: ['**/*.{js,html,woff2}']
+        globPatterns: ['**/*.{js,html,png,svg,ico,woff2}']
       },
       injectRegister: 'auto',
       srcDir: 'src/sw',

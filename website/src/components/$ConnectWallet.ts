@@ -1,4 +1,4 @@
-import { type IOps, join, just, map, merge, sampleMap } from 'aelea/stream'
+import { type IOps, join, just, map, sampleMap } from 'aelea/stream'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { $intermediatePromise } from '@/ui-components'
@@ -15,10 +15,7 @@ export interface IConnectWalletPopover {
 }
 
 export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
-  component((
-    [selectConnector, selectConnectorTether],
-    [openPopover, openPopoverTether]
-  ) => {
+  component(([selectConnector, selectConnectorTether], [openPopover, openPopoverTether]) => {
     const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
 
     const $walletConnect = $WalletConnect({

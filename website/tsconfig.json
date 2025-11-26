@@ -20,7 +20,8 @@
     "noUncheckedSideEffectImports": true,
     "lib": [
       "ESNext",
-      "DOM"
+      "DOM",
+      "WebWorker"
     ],
     "types": [
       "vite/client",

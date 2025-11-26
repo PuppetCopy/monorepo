@@ -1,20 +1,9 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import { ETH_ADDRESS_REGEXP, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import {
-  awaitPromises,
-  constant,
-  filterNull,
-  type IStream,
-  map,
-  merge,
-  start,
-  switchMap,
-  take,
-  tap
-} from 'aelea/stream'
+import { awaitPromises, type IStream, map, merge, start, switchMap, take, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
-import { $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
+import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { EIP6963ProviderDetail } from 'mipd'
@@ -122,16 +111,41 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           style({
             color: pallete.message,
             fill: pallete.message,
-            // position: 'relative',
-            // backgroundImage: `radial-gradient(570% 71% at 50% 15vh, ${pallete.background} 0px, ${pallete.horizon} 100%)`,
             backgroundColor: pallete.horizon,
             fontSize: isDesktopScreen ? '16px' : '14px',
-            // fontSize: isDesktopScreen ? '1.15rem' : '1rem',
             fontWeight: 400
-            // flexDirection: 'row',
           }),
           isMobileScreen ? style({ userSelect: 'none' }) : style({})
         )(
+          switchMap(cb => {
+            return fadeIn(
+              $alertPositiveContainer(
+                style({
+                  backgroundColor: pallete.horizon,
+                  margin: '12px',
+                  placeSelf: 'center',
+                  border: `1px solid ${pallete.foreground}`,
+                  borderRadius: '14px',
+                  gap: '10px',
+                  alignItems: 'center',
+                  padding: '12px 16px',
+                  maxWidth: '460px'
+                })
+              )(
+                $column(spacing.tiny)(
+                  $node(style({ fontWeight: 700 }))($text('New version available')),
+                  $node(style({ color: pallete.foreground }))($text('Reload to switch to the new version.'))
+                ),
+                $ButtonSecondary({
+                  $container: $defaultMiniButtonSecondary,
+                  $content: $text('Reload')
+                })({
+                  click: clickUpdateVersionTether(tap(cb))
+                })
+              )
+            )
+          }, pwaUpgradeNotification),
+
           $MainMenu({ route: rootRoute })({
             routeChange: changeRouteTether(),
             changeWallet: changeWalletTether()
@@ -297,6 +311,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           //     )
           //   })({})
           // ),
+
           contains(rootRoute)(
             $column(
               style({
@@ -322,22 +337,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 changeDepositTokenList: changeDepositTokenListTether()
               })
             )
-          ),
-          switchMap(cb => {
-            return fadeIn(
-              $alertPositiveContainer(style({ backgroundColor: pallete.horizon }))(
-                filterNull(constant(null, clickUpdateVersion)) as IStream<never>,
-
-                $text('New version Available'),
-                $ButtonSecondary({
-                  $container: $defaultMiniButtonSecondary,
-                  $content: $text('Update')
-                })({
-                  click: clickUpdateVersionTether(tap(cb))
-                })
-              )
-            )
-          }, pwaUpgradeNotification)
+          )
         )
       ]
     }

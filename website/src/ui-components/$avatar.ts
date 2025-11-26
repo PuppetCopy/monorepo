@@ -1,21 +1,12 @@
 import { map } from 'aelea/stream'
 import { $wrapNativeElement, style } from 'aelea/ui'
-import { buildJazziconShapes } from '../common/jazzicon.js'
-
-function createJazziconElement(address: string): HTMLElement {
-  const wrapper = document.createElement('div')
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-  svg.setAttribute('viewBox', '0 0 100 100')
-  svg.innerHTML = buildJazziconShapes(address)
-  wrapper.appendChild(svg)
-  return wrapper
-}
+import { createJazziconSvg } from '../common/$avatar.js'
 
 export function $jazzicon(address: string, size = '24px') {
-  const el: HTMLElement = createJazziconElement(address)
+  const wrapper = document.createElement('div')
+  wrapper.appendChild(createJazziconSvg(address))
 
-  return $wrapNativeElement(el)(
+  return $wrapNativeElement(wrapper)(
     map(node => {
       const el: HTMLElement = node.element
       const svg = el.querySelector('svg')

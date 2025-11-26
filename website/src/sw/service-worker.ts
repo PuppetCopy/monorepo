@@ -1,7 +1,8 @@
+import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 
-declare let self: ServiceWorkerGlobalScope
+declare const self: ServiceWorkerGlobalScope & typeof globalThis
 
 // self.__WB_MANIFEST is the default injection point
 precacheAndRoute(self.__WB_MANIFEST)
@@ -16,9 +17,12 @@ if (import.meta.env.DEV) allowlist = [/^\/$/]
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist }))
 
-// Don't skip waiting - let new SW wait until all tabs are closed
-// This ensures updates only apply on the next visit
-// self.skipWaiting() - REMOVED
+// Auto update: activate immediately and take control of existing clients
+clientsClaim()
 
-// Don't claim existing clients - let them use old SW
-// clientsClaim() - REMOVED
+// Let the client decide when to promote a waiting SW (via registerSW.reloadCb)
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
