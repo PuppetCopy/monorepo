@@ -127,7 +127,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                           width: '18px',
                           viewBox: '0 0 32 32'
                         }),
-                    $text(option === 'roi' ? 'Performance' : 'Profit & Loss22')
+                    $text(option === 'roi' ? 'Performance' : 'Profit & Loss')
                   )
                 })
               })({
