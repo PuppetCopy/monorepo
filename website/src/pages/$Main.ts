@@ -1,7 +1,7 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import { ETH_ADDRESS_REGEXP, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { ETH_ADDRESS_REGEXP, ignoreAll, unixTimestampNow } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
-import { awaitPromises, type IStream, map, merge, start, switchMap, take, tap } from 'aelea/stream'
+import { awaitPromises, map, merge, start, switchMap, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -88,12 +88,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           timestampDelta > 60 ? pallete.negative : timestampDelta > 10 ? pallete.indeterminate : pallete.positive
         return color
       }, subgraphStatus)
-      const subgraphStatusColorOnce = take(1, subgraphBeaconStatusColor)
-
-      const latestBlock: IStream<bigint> = merge(
-        // fromPromise(useBlockNumber().promise),
-        wallet.blockChange
-      )
 
       const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
@@ -134,7 +128,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )(
                 $column(spacing.tiny)(
                   $node(style({ fontWeight: 700 }))($text('New version available')),
-                  $node(style({ color: pallete.foreground }))($text('Reload to switch to the new version.'))
+                  $node(style({ color: pallete.foreground }))($text('Reload to switch to the new version.')),
+                  ignoreAll(clickUpdateVersion)
                 ),
                 $ButtonSecondary({
                   $container: $defaultMiniButtonSecondary,
