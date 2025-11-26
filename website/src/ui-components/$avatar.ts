@@ -1,11 +1,19 @@
 import { map } from 'aelea/stream'
 import { $wrapNativeElement, style } from 'aelea/ui'
-// @ts-expect-error
-import jazzicon from 'jazzicon'
+import { buildJazziconShapes } from '../common/jazzicon.js'
+
+function createJazziconElement(address: string): HTMLElement {
+  const wrapper = document.createElement('div')
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+  svg.setAttribute('viewBox', '0 0 100 100')
+  svg.innerHTML = buildJazziconShapes(address)
+  wrapper.appendChild(svg)
+  return wrapper
+}
 
 export function $jazzicon(address: string, size = '24px') {
-  const cnt = Number.parseInt(address.slice(2, 10), 16)
-  const el: HTMLElement = jazzicon(Number.parseInt(size, 10), cnt)
+  const el: HTMLElement = createJazziconElement(address)
 
   return $wrapNativeElement(el)(
     map(node => {
