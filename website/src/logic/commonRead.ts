@@ -1,12 +1,11 @@
 import { erc20Abi } from 'abitype/abis'
 import type { Address } from 'viem'
-import { wallet } from '../wallet/wallet'
+import { type IAccountState, wallet } from '../wallet/wallet'
 
-export async function tokenBalanceOf(token: Address, target: Address): Promise<bigint> {
-  return wallet.read({
+export const tokenBalanceOf = (account: IAccountState, token: Address, target: Address) =>
+  wallet.read(account, {
     address: token,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: [target]
   })
-}

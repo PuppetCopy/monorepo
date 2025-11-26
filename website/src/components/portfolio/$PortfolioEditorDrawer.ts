@@ -1,5 +1,6 @@
 import { CONTRACT } from '@puppet-copy/middleware/const'
-import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
+import { getDuration, readableDate, readablePercentage, readableTokenAmountLabel } from '@puppet-copy/middleware/core'
+import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import type { Route } from 'aelea/router'
 import {
@@ -13,6 +14,7 @@ import {
   op,
   sampleMap,
   skipRepeatsWith,
+  switchLatest,
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
@@ -27,7 +29,7 @@ import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import { type IAccountState, type IBatchCall, wallet } from '../../wallet/wallet.js'
+import { executeIntentAfterFunding, type IAccountState, type IBatchCall, wallet } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
@@ -77,6 +79,12 @@ export const $PortfolioEditorDrawer = ({
             if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
               return empty
             }
+
+            const depositSummary = params.draftDepositTokenList.reduce((acc, deposit) => {
+              const current = acc.get(deposit.token) ?? 0n
+              acc.set(deposit.token, current + deposit.amount)
+              return acc
+            }, new Map<Address, bigint>())
 
             const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
             const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
@@ -248,6 +256,23 @@ export const $PortfolioEditorDrawer = ({
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(),
+                  depositSummary.size > 0
+                    ? switchLatest(
+                        map((account: IAccountState | null) => {
+                          if (!account) return $node()
+
+                          const [token, amount] = depositSummary.entries().next().value as [Address, bigint]
+                          const tokenDesc = getTokenDescription(token)
+                          const readableAmount = readableTokenAmountLabel(tokenDesc, amount)
+                          const smartAccount = account.account.getAddress() as Address
+
+                          return $column(spacing.tiny, style({ textAlign: 'right', fontSize: '.85rem' }))(
+                            $text(`Fund required: ${readableAmount}`),
+                            $text(`Send to smart account: ${smartAccount}`)
+                          )
+                        }, awaitPromises(wallet.account))
+                      )
+                    : $node(),
                   $SubmitBar({
                     $submitContent: $text('Submit'),
                     txQuery: requestChangeSubscription
@@ -262,9 +287,13 @@ export const $PortfolioEditorDrawer = ({
                         const tokenRouteContractParams = CONTRACT.TokenRouter
                         const callStack: IBatchCall[] = []
                         const userRouterCalls: Hex[] = [] // Collect UserRouter calls for multicall
+                        const depositByToken = new Map<Address, bigint>()
 
                         for (const deposit of params.draftDepositTokenList) {
                           if (deposit.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
+                            const current = depositByToken.get(deposit.token) ?? 0n
+                            depositByToken.set(deposit.token, current + deposit.amount)
+
                             // Approve call goes to the callStack directly
                             callStack.push({
                               to: deposit.token,
@@ -328,7 +357,23 @@ export const $PortfolioEditorDrawer = ({
                           })
                         }
 
-                        return wallet.writeMany(account, callStack)
+                        const depositTokens = Array.from(depositByToken.entries())
+                        if (depositTokens.length === 0) {
+                          return wallet.writeMany(account, callStack)
+                        }
+
+                        if (depositTokens.length > 1) {
+                          throw new Error('Multiple deposit tokens are not yet supported in 1-click flow')
+                        }
+
+                        const [fundingToken, fundingAmount] = depositTokens[0]
+
+                        return executeIntentAfterFunding(account, {
+                          fundingToken,
+                          fundingAmount,
+                          calls: callStack,
+                          tokenRequests: [{ address: fundingToken, amount: fundingAmount }]
+                        })
                       })
                     )
                   })

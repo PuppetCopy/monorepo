@@ -17,8 +17,7 @@
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
     "@puppet-copy/sql": "workspace:*",
-    "@rhinestone/sdk": "1.0.33",
-    "@tanstack/react-query": "^5.90.10",
+    "@rhinestone/sdk": "1.0.34",
     "@wagmi/core": "3.0.0",
     "abitype": "catalog:",
     "aelea": "catalog:",

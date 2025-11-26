@@ -1,6 +1,7 @@
+import * as PUPPET from '@puppet-copy/middleware/const'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { awaitPromises, combine, constant, type IStream, map, op, sampleMap, switchMap } from 'aelea/stream'
+import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -9,7 +10,6 @@ import type { Address } from 'viem/accounts'
 import { $infoLabel, $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
 import { tokenBalanceOf } from '../../logic/commonRead.js'
-import puppetReader from '../../logic/puppetReader.js'
 import type { IComponentPageParams } from '../../pages/types.js'
 import { wallet } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
@@ -42,26 +42,26 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         }, draftDepositTokenList)
       )
 
-      const walletBalance = op(
-        wallet.account,
-        awaitPromises,
-        switchMap(async wallet => {
-          if (!wallet) return 0n
-
-          return tokenBalanceOf(collateralToken, wallet.address)
-        }),
-        state
-      )
-
-      const depositBalance = op(
-        wallet.account,
-        awaitPromises,
-        switchMap(async account => {
+      const walletBalance: IStream<bigint> = state(
+        switchMap(async accountPromise => {
+          const account = await accountPromise
           if (!account) return 0n
 
-          return puppetReader.getUserBalance(account, collateralToken, account.address)
-        }),
-        state
+          return tokenBalanceOf(account, collateralToken, account.address)
+        }, wallet.account)
+      )
+
+      const depositBalance: IStream<bigint> = state(
+        switchMap(async accountPromise => {
+          const account = await accountPromise
+          if (!account) return 0n
+
+          return wallet.read(account, {
+            ...PUPPET.CONTRACT.Account,
+            functionName: 'userBalanceMap',
+            args: [collateralToken, account.address]
+          })
+        }, wallet.account)
       )
 
       const collateralTokenDescription = getTokenDescription(collateralToken)

@@ -1,7 +1,11 @@
 import replace from '@rollup/plugin-replace'
+import dotenv from 'dotenv'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths' // Import the plugin
+
+dotenv.config({ path: '.env.local', override: true })
+dotenv.config()
 
 const SITE_CONFIG = {
   __WEBSITE__: 'https://puppet.house',
@@ -15,6 +19,10 @@ const SITE_CONFIG = {
 }
 
 // https://vitejs.dev/config/
+if (!process.env.RHINESTONE_API_KEY) {
+  throw new Error('RHINESTONE_API_KEY is required for dev proxy to Orchestrator')
+}
+
 export default defineConfig({
   build: {
     sourcemap: true,
@@ -55,7 +63,7 @@ export default defineConfig({
     port: Number(process.env.PORT) || 3000,
     proxy: {
       '/api/sql': {
-        target: 'https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org',
+        target: process.env.VITE_SQL_PROXY_URL || 'https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org',
         changeOrigin: true,
         secure: false,
         rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
@@ -66,8 +74,9 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
         configure: proxy => {
           proxy.on('proxyReq', proxyReq => {
-            if (process.env.RHINESTONE_API_KEY) {
-              proxyReq.setHeader('x-api-key', process.env.RHINESTONE_API_KEY)
+            const apiKey = process.env.RHINESTONE_API_KEY
+            if (apiKey) {
+              proxyReq.setHeader('x-api-key', apiKey)
             }
           })
         }
