@@ -19,6 +19,7 @@
     "@puppet-copy/sql": "workspace:*",
     "@rhinestone/sdk": "1.0.34",
     "@wagmi/core": "3.0.0",
+    "@walletconnect/ethereum-provider": "~2.21.1",
     "abitype": "catalog:",
     "aelea": "catalog:",
     "color": "5.0.3",
@@ -41,6 +42,7 @@
     "workbox-core": "7.4.0",
     "workbox-precaching": "7.4.0",
     "workbox-routing": "7.4.0",
+    "workbox-expiration": "7.4.0",
     "workbox-strategies": "7.4.0",
     "workbox-window": "7.4.0"
   },

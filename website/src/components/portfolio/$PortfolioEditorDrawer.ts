@@ -1,7 +1,7 @@
 import { CONTRACT } from '@puppet-copy/middleware/const'
-import { getDuration, readableDate, readablePercentage, readableTokenAmountLabel } from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { CallInput } from '@rhinestone/sdk'
 import type { Route } from 'aelea/router'
 import {
   awaitPromises,
@@ -14,22 +14,21 @@ import {
   op,
   sampleMap,
   skipRepeatsWith,
-  switchLatest,
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { EIP6963ProviderDetail } from 'mipd'
 import { type Address, encodeFunctionData, erc20Abi, type Hex } from 'viem'
+import { arbitrum } from 'viem/chains'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import { executeIntentAfterFunding, type IAccountState, type IBatchCall, wallet } from '../../wallet/wallet.js'
+import { type IAccountState, wallet } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import type { IDepositEditorDraft } from './$DepositEditor.js'
@@ -61,7 +60,6 @@ export const $PortfolioEditorDrawer = ({
       [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IAccountState, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
-      [changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
       [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
@@ -256,28 +254,21 @@ export const $PortfolioEditorDrawer = ({
 
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(),
-                  depositSummary.size > 0
-                    ? switchLatest(
-                        map((account: IAccountState | null) => {
-                          if (!account) return $node()
-
-                          const [token, amount] = depositSummary.entries().next().value as [Address, bigint]
-                          const tokenDesc = getTokenDescription(token)
-                          const readableAmount = readableTokenAmountLabel(tokenDesc, amount)
-                          const smartAccount = account.account.getAddress() as Address
-
-                          return $column(spacing.tiny, style({ textAlign: 'right', fontSize: '.85rem' }))(
-                            $text(`Fund required: ${readableAmount}`),
-                            $text(`Send to smart account: ${smartAccount}`)
-                          )
-                        }, awaitPromises(wallet.account))
-                      )
-                    : $node(),
                   $SubmitBar({
                     $submitContent: $text('Submit'),
-                    txQuery: requestChangeSubscription
+                    txQuery: requestChangeSubscription,
+                    alert: op(
+                      wallet.account,
+                      awaitPromises,
+                      map(account => {
+                        if (depositSummary.size > 0) return null
+                        if (!account) return null
+
+                        const hasPortfolio = (account.portfolio?.length ?? 0) > 0
+                        return hasPortfolio ? null : 'Deposit funds to your subaccount to proceed'
+                      })
+                    )
                   })({
-                    changeWallet: changeWalletTether(),
                     submit: requestChangeSubscriptionTether(
                       map(async account => {
                         if (!account?.address) {
@@ -285,7 +276,7 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         const tokenRouteContractParams = CONTRACT.TokenRouter
-                        const callStack: IBatchCall[] = []
+                        const calls: CallInput[] = []
                         const userRouterCalls: Hex[] = [] // Collect UserRouter calls for multicall
                         const depositByToken = new Map<Address, bigint>()
 
@@ -295,9 +286,8 @@ export const $PortfolioEditorDrawer = ({
                             depositByToken.set(deposit.token, current + deposit.amount)
 
                             // Approve call goes to the callStack directly
-                            callStack.push({
+                            calls.push({
                               to: deposit.token,
-                              abi: erc20Abi,
                               data: encodeFunctionData({
                                 abi: erc20Abi,
                                 functionName: 'approve',
@@ -344,36 +334,60 @@ export const $PortfolioEditorDrawer = ({
                           )
                         })
 
-                        // If we have UserRouter calls, batch them with multicall
+                        // If we have UserRouter calls, push them individually (smart account can batch)
                         if (userRouterCalls.length > 0) {
-                          callStack.push({
-                            to: CONTRACT.UserRouter.address,
-                            abi: CONTRACT.UserRouter.abi,
-                            data: encodeFunctionData({
-                              abi: CONTRACT.UserRouter.abi,
-                              functionName: 'multicall',
-                              args: [userRouterCalls]
-                            })
-                          })
+                          calls.push(
+                            ...userRouterCalls.map(data => ({
+                              to: CONTRACT.UserRouter.address,
+                              data
+                            }))
+                          )
                         }
 
-                        const depositTokens = Array.from(depositByToken.entries())
+                        const depositTokens = Array.from(depositByToken.entries()).filter(([, amount]) => amount > 0n)
                         if (depositTokens.length === 0) {
-                          return wallet.writeMany(account, callStack)
+                          return account.subAccount.sendTransaction({
+                            targetChain: wallet.publicClient.chain,
+                            calls
+                          }) as any
                         }
 
-                        if (depositTokens.length > 1) {
-                          throw new Error('Multiple deposit tokens are not yet supported in 1-click flow')
-                        }
+                        // Pre-fund subaccount via wallet_sendCalls (EIP-5792), then execute intent
+                        const subAccount = account.subAccount.getAddress()
+                        const fundingCalls = depositTokens.map(([token, amount]) => ({
+                          to: token,
+                          data: encodeFunctionData({
+                            abi: erc20Abi,
+                            functionName: 'transfer',
+                            args: [subAccount, amount]
+                          })
+                        }))
 
-                        const [fundingToken, fundingAmount] = depositTokens[0]
-
-                        return executeIntentAfterFunding(account, {
-                          fundingToken,
-                          fundingAmount,
-                          calls: callStack,
-                          tokenRequests: [{ address: fundingToken, amount: fundingAmount }]
+                        const fundingTx = await account.client.sendCalls({
+                          account: account.address,
+                          chain: wallet.publicClient.chain,
+                          calls: fundingCalls,
+                          experimental_fallback: true
                         })
+
+                        let status = await account.client.getCallsStatus({ id: (fundingTx as any).id })
+                        let attempts = 0
+                        while (status.status === 'pending' && attempts < 60) {
+                          await new Promise(resolve => setTimeout(resolve, 2000))
+                          status = await account.client.getCallsStatus({ id: (fundingTx as any).id })
+                          attempts++
+                        }
+                        if (status.status !== 'success') {
+                          throw new Error('Funding transaction failed or timed out')
+                        }
+
+                        const transaction = await account.subAccount.sendTransaction({
+                          targetChain: arbitrum,
+                          calls
+                        })
+
+                        const txStatus = account.subAccount.waitForExecution(transaction)
+                        return txStatus
                       })
                     )
                   })
@@ -386,7 +400,6 @@ export const $PortfolioEditorDrawer = ({
 
         {
           routeChange,
-          changeWallet,
           changeMatchRuleList: merge(
             sampleMap(
               (list, subsc) => {

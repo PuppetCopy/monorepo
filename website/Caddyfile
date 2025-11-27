@@ -32,11 +32,18 @@ handle /api/sql* {
 }
 
 handle /api/orchestrator/* {
+    @orchestratorMethods {
+        method GET POST PUT DELETE
+    }
     uri strip_prefix /api/orchestrator
-    reverse_proxy https://orchestrator.rhinestone.dev {
+    reverse_proxy @orchestratorMethods https://v1.orchestrator.rhinestone.dev {
         header_up X-Api-Key {$RHINESTONE_API_KEY}
-        header_up Host orchestrator.rhinestone.dev
+        header_up Host v1.orchestrator.rhinestone.dev
+        header_up Accept-Encoding identity
+        header_up Accept application/json
+        header_up Content-Type application/json
         header_down -Server
+        header_down -Content-Encoding
     }
 }
 

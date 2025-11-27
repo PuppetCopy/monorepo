@@ -15,7 +15,6 @@ import {
 } from 'aelea/ui'
 import { $row, type Control } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { EIP6963ProviderDetail } from 'mipd'
 import { $icon } from '@/ui-components'
 import { $ButtonCore, $defaultButtonCore, type IButtonCore } from './$ButtonCore.js'
 
@@ -82,61 +81,56 @@ export interface IButtonPrimaryCtx extends Omit<IButtonCore, '$container'> {
 }
 
 export const $Submit = (config: IButtonPrimaryCtx) =>
-  component(
-    (
-      [click, clickTether]: IBehavior<PointerEvent, PointerEvent>,
-      [_changeWallet, _changeWalletTether]: IBehavior<EIP6963ProviderDetail>
-    ) => {
-      const { alert = just(null), txQuery, disabled = just(false) } = config
+  component(([click, clickTether]: IBehavior<PointerEvent, PointerEvent>) => {
+    const { alert = just(null), txQuery, disabled = just(false) } = config
 
-      const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
-      const isRequestPending = start(false, isTxPending)
+    const isTxPending = map(s => s.status === PromiseStatus.PENDING, promiseState(txQuery))
+    const isRequestPending = start(false, isTxPending)
 
-      return [
-        $ButtonCore({
-          $container: $defaultButtonPrimary(
+    return [
+      $ButtonCore({
+        $container: $defaultButtonPrimary(
+          style({
+            position: 'relative',
+            overflow: 'hidden'
+          })
+        ),
+        disabled: map(params => {
+          return params.alert !== null || params.disabled || params.isRequestPending
+        }, combine({ disabled, isRequestPending, alert })),
+        $content: $row(
+          $node(
             style({
-              position: 'relative',
-              overflow: 'hidden'
-            })
-          ),
-          disabled: map(params => {
-            return params.alert !== null || params.disabled || params.isRequestPending
-          }, combine({ disabled, isRequestPending, alert })),
-          $content: $row(
-            $node(
-              style({
-                inset: 0,
-                width: '200%',
-                visibility: 'hidden',
-                animation: 'borderRotate .75s linear infinite',
-                position: 'absolute',
-                background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
-              }),
-              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
-            )(),
-            $node(
-              style({
-                inset: '2px',
-                position: 'absolute',
-                visibility: 'hidden',
-                background: colorAlpha(pallete.background, 0.9),
-                borderRadius: '30px'
-              }),
-              styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
-            )(),
-            style({ position: 'relative' })(config.$content)
-          )
-        })({
-          click: clickTether()
-        }),
+              inset: 0,
+              width: '200%',
+              visibility: 'hidden',
+              animation: 'borderRotate .75s linear infinite',
+              position: 'absolute',
+              background: `linear-gradient(115deg, ${pallete.negative}, ${pallete.primary}, ${pallete.positive}, ${pallete.primary}) 0% 0% / 50% 100%`
+            }),
+            styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+          )(),
+          $node(
+            style({
+              inset: '2px',
+              position: 'absolute',
+              visibility: 'hidden',
+              background: colorAlpha(pallete.background, 0.9),
+              borderRadius: '30px'
+            }),
+            styleInline(map(isDisabled => ({ visibility: isDisabled ? 'visible' : 'hidden' }), isRequestPending))
+          )(),
+          style({ position: 'relative' })(config.$content)
+        )
+      })({
+        click: clickTether()
+      }),
 
-        {
-          click: multicast(click)
-        }
-      ]
-    }
-  )
+      {
+        click: multicast(click)
+      }
+    ]
+  })
 
 interface IButtonCircular extends Control {
   $iconPath: I$Node<SVGPathElement>

@@ -56,7 +56,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
           const account = await accountPromise
           if (!account) return 0n
 
-          return wallet.read(account, {
+          return wallet.read({
             ...PUPPET.CONTRACT.Account,
             functionName: 'userBalanceMap',
             args: [collateralToken, account.address]
@@ -83,7 +83,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
             $route(collateralTokenDescription),
             $row(spacing.default)(
               $row(spacing.small, style({ alignItems: 'center' }))(
-                $infoLabel($text('Balance')),
+                $infoLabel($text('Deposit')),
                 $labeledhintAdjustment({
                   color: map(
                     c =>
@@ -117,7 +117,7 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               ),
               $ButtonSecondary({
                 $container: $defaultMiniButtonSecondary,
-                $content: $text('Change')
+                $content: $text('Update')
               })({
                 click: popDepositEdtiorTether()
               })

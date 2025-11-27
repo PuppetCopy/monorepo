@@ -95,7 +95,7 @@ export const $alertIntermediateSpinnerContainer = (...$content: I$Node[]) =>
     style({
       minWidth: 0,
       maxWidth: '100%',
-      borderRadius: '100px',
+      borderRadius: 'inherit',
       alignItems: 'center',
       padding: '9px 12px',
       position: 'relative',
@@ -116,8 +116,8 @@ export const $alertIntermediateSpinnerContainer = (...$content: I$Node[]) =>
       style({
         inset: '1px',
         position: 'absolute',
-        background: colorAlpha(pallete.background, 0.9),
-        borderRadius: '100px'
+        background: colorAlpha(pallete.background, 0.7),
+        borderRadius: 'inherit'
       })
     )(),
     ...$content

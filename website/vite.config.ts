@@ -18,7 +18,6 @@ const SITE_CONFIG = {
   __THEME_BACKGROUND__: '#292c37'
 }
 
-// https://vitejs.dev/config/
 if (!process.env.RHINESTONE_API_KEY) {
   throw new Error('RHINESTONE_API_KEY is required for dev proxy to Orchestrator')
 }
@@ -69,15 +68,17 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
       },
       '/api/orchestrator': {
-        target: 'https://orchestrator.rhinestone.dev',
+        target: 'https://v1.orchestrator.rhinestone.dev',
         changeOrigin: true,
+        secure: true,
         rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
         configure: proxy => {
           proxy.on('proxyReq', proxyReq => {
-            const apiKey = process.env.RHINESTONE_API_KEY
-            if (apiKey) {
-              proxyReq.setHeader('x-api-key', apiKey)
-            }
+            // Set required headers for Rhinestone API
+            proxyReq.setHeader('Content-Type', 'application/json')
+            proxyReq.setHeader('x-api-key', process.env.RHINESTONE_API_KEY!)
+            proxyReq.setHeader('Accept', 'application/json')
+            proxyReq.setHeader('Accept-Encoding', 'identity')
           })
         }
       }

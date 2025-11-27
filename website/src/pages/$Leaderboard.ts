@@ -58,7 +58,7 @@ import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$Match
 import { $RouteEditor } from '../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../components/table/$TableColumn.js'
 import { localStore } from '../const/localStore.js'
-import { resolveEnsNames } from '../logic/ensResolver.js'
+import { resolveEnsName } from '../logic/ensResolver.js'
 import { $seperator2 } from './common.js'
 import type { IPageFilterParams, IPageParams } from './types.js'
 
@@ -219,14 +219,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     }
                   })
 
-                  // Resolve ENS names for all accounts in the leaderboard
-                  const addresses = metrictList.map(metric => metric.account)
-                  const ensNamesMap = await resolveEnsNames(addresses)
-
-                  const page = metrictList.map(metric => {
-                    const ensName = ensNamesMap.get(metric.account) ?? null
-                    return { metric, ensName }
-                  })
+                  const page = metrictList.map(metric => ({ metric }))
                   return { ...filterParams.paging, page }
                 },
                 combine({
@@ -274,7 +267,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return $TraderDisplay({
                         route: config.route,
                         address: pos.metric.account,
-                        ensName: pos.ensName,
+                        ensNameStream: fromPromise(resolveEnsName(pos.metric.account as Address)),
                         puppetList: []
                       })({
                         click: routeChangeTether()

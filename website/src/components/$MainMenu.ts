@@ -14,7 +14,6 @@ import {
 } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
-import type { EIP6963ProviderDetail } from 'mipd'
 import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@/ui-components'
 import { $RouterAnchor } from '@/ui-router'
 import { $puppetLogo } from '../common/$icons.js'
@@ -33,7 +32,6 @@ export const $MainMenu = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [changeWallet, _changeWalletTether]: IBehavior<any, EIP6963ProviderDetail | null>,
       [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
     ) => {
       const { route } = config
@@ -155,8 +153,7 @@ export const $MainMenu = (config: MainMenu) =>
         ),
 
         {
-          routeChange,
-          changeWallet
+          routeChange
         }
       ]
     }

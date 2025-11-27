@@ -1,7 +1,7 @@
 import { empty } from 'aelea/stream'
 import { $node, $text, type INodeCompose, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $jazzicon } from '../common/$avatar.js'
 
@@ -46,13 +46,11 @@ export const $profileAvatar = ({ address, size = isDesktopScreen ? 50 : 36 }: { 
 }
 
 export const $disconnectedWalletDisplay = ($container = $row, size = 50) => {
-  const $wrapper = $node(style({ width: `${size}px`, aspectRatio: '1 / 1', borderRadius: '50%' }))
-
   return $container(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
-    $wrapper(
+    $node(style({ width: `${size}px`, aspectRatio: '1 / 1', borderRadius: '50%' }))(
       style({
         display: 'flex',
-        border: `1px solid ${pallete.foreground}`,
+        border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
         placeContent: 'center',
         alignItems: 'center'
       })

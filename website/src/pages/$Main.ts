@@ -6,7 +6,6 @@ import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import type { EIP6963ProviderDetail } from 'mipd'
 import type { Address } from 'viem/accounts'
 import { $alertPositiveContainer } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
@@ -45,8 +44,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
-
-      [_changeWallet, changeWalletTether]: IBehavior<EIP6963ProviderDetail>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
@@ -142,8 +139,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           }, pwaUpgradeNotification),
 
           $MainMenu({ route: rootRoute })({
-            routeChange: changeRouteTether(),
-            changeWallet: changeWalletTether()
+            routeChange: changeRouteTether()
           }),
 
           router.match(rootRoute)(
@@ -327,7 +323,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 draftMatchingRuleList
               })({
                 routeChange: changeRouteTether(),
-                changeWallet: changeWalletTether(),
                 changeMatchRuleList: changeMatchRuleListTether(),
                 changeDepositTokenList: changeDepositTokenListTether()
               })

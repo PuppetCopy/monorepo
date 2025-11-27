@@ -1,6 +1,8 @@
 import { clientsClaim } from 'workbox-core'
+import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { StaleWhileRevalidate } from 'workbox-strategies'
 
 declare const self: ServiceWorkerGlobalScope & typeof globalThis
 
@@ -16,6 +18,23 @@ if (import.meta.env.DEV) allowlist = [/^\/$/]
 
 // to allow work offline
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist }))
+
+// Cache portfolio responses for 10 minutes to reduce orchestrator load
+registerRoute(
+  ({ url, request }) =>
+    request.method === 'GET' &&
+    url.pathname.startsWith('/api/orchestrator/accounts/') &&
+    url.pathname.endsWith('/portfolio'),
+  new StaleWhileRevalidate({
+    cacheName: 'portfolio-cache',
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 60 * 10,
+        purgeOnQuotaError: true
+      })
+    ]
+  })
+)
 
 // Auto update: activate immediately and take control of existing clients
 clientsClaim()
