@@ -19,7 +19,7 @@
     "@puppet-copy/sql": "workspace:*",
     "@rhinestone/sdk": "1.0.34",
     "@wagmi/core": "3.0.0",
-    "@walletconnect/ethereum-provider": "~2.21.1",
+    "@walletconnect/ethereum-provider": "~2.23.0",
     "abitype": "catalog:",
     "aelea": "catalog:",
     "color": "5.0.3",
@@ -28,7 +28,7 @@
     "ponder": "catalog:",
     "porto": "0.2.37",
     "viem": "catalog:",
-    "wagmi": "3.0.1"
+    "wagmi": "3.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",
@@ -37,7 +37,7 @@
     "rimraf": "6.1.2",
     "typescript": "catalog:",
     "vite": "7.2.4",
-    "vite-plugin-pwa": "1.1.0",
+    "vite-plugin-pwa": "1.2.0",
     "vite-tsconfig-paths": "5.1.4",
     "workbox-core": "7.4.0",
     "workbox-precaching": "7.4.0",

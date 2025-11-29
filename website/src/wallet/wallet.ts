@@ -1,9 +1,13 @@
-import { type RhinestoneAccount, RhinestoneSDK, type TransactionResult, walletClientToAccount } from '@rhinestone/sdk'
+import { ADDRESS_ZERO } from '@puppet-copy/middleware/const'
+import { groupList } from '@puppet-copy/middleware/core'
+import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
 import {
   type Config,
   createConfig,
   type GetConnectionReturnType,
   getConnection,
+  type ReadContractParameters,
+  readContract,
   reconnect,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
@@ -11,85 +15,52 @@ import {
   watchConnection
 } from '@wagmi/core'
 import { erc20Abi } from 'abitype/abis'
-import { awaitPromises, type IStream, map, op, switchMap } from 'aelea/stream'
+import { type IStream, map, op } from 'aelea/stream'
 import { fromCallback, state } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
-  type Call,
   type ContractFunctionArgs,
   type ContractFunctionName,
-  createPublicClient,
   fallback,
   formatUnits,
   http,
-  type ReadContractParameters,
   type ReadContractReturnType,
   type WalletClient,
-  type WriteContractParameters,
   webSocket
 } from 'viem'
 import type { Address } from 'viem/accounts'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { arbitrum } from 'viem/chains'
-import { porto as portoConnector, walletConnect as walletConnectConnector } from 'wagmi/connectors'
+import { getBalance } from 'viem/actions'
+import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
+import { porto as portoConnector } from 'wagmi/connectors'
 
 if (!import.meta.env.VITE__WC_PROJECT_ID) {
   throw new Error('Missing WalletConnect Project ID in environment variables')
 }
 
 export type IAccountState = {
-  client: WalletClient
+  walletClient: WalletClient
   address: Address
   subAccount: RhinestoneAccount
   portfolio: RhinestonePortfolioToken[]
 }
 
-export type DepositPlan = {
-  companionAddress: Address
-  fundTransfer: {
-    token: Address
-    amount: bigint
-    to: Address
-  }
-  intentRequest: {
-    targetChain: number
-    tokenAddress: Address
-    amount: bigint
-    recipient: Address
-  }
-  signerPrivateKey: `0x${string}`
-}
-
-export type DepositQuoteParams = {
-  destinationChainId: number
-  tokenAddress: Address
-  amount: bigint
-  userAddress: Address
-  apiKey?: string
-  baseUrl?: string
-  sponsorSettings?: {
-    gasSponsored?: boolean
-    bridgeFeesSponsored?: boolean
-    swapFeesSponsored?: boolean
-  }
-  accountAccessList?: {
-    chainIds?: number[]
-    tokens?: (Address | string)[]
-    chainTokens?: Record<number, (Address | string)[]>
-  }
-}
-
-export type DepositQuoteResponse = {
-  intentOp: unknown
-  intentCost?: unknown
-  tokenRequirements?: Record<string, any>
-  [key: string]: unknown
-}
+// Transport configuration for reading blockchain data
+const arbitrumTransport = fallback([
+  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
+  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
+  http('https://arb1.arbitrum.io/rpc')
+])
 
 const rhinestoneSDK = new RhinestoneSDK({
   apiKey: 'proxy',
-  endpointUrl: `${window.location.origin}/api/orchestrator`
+  endpointUrl: `${window.location.origin}/api/orchestrator`,
+  provider: {
+    type: 'custom',
+    urls: {
+      [arbitrum.id]: import.meta.env.VITE__WC_RPC_URL_42161_1
+    }
+  }
 })
 
 const protoConnector = portoConnector({
@@ -98,47 +69,45 @@ const protoConnector = portoConnector({
   })
 })
 
-export const wagmiConfig: Config = createConfig({
-  chains: [arbitrum],
-  connectors: [
-    protoConnector,
+export const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
+export const chainMap = groupList(chainList, 'id')
 
-    walletConnectConnector({
-      projectId: import.meta.env.VITE__WC_PROJECT_ID,
-      metadata: {
-        name: 'Puppet',
-        description: 'Puppet copy trading',
-        url: 'https://puppet.tech',
-        icons: ['https://puppet.tech/favicon.png']
-      },
-      showQrModal: true
-    })
+export const wagmi: Config = createConfig({
+  chains: chainList,
+  connectors: [
+    protoConnector
+    // walletConnectConnector({
+    //   projectId: import.meta.env.VITE__WC_PROJECT_ID,
+    //   metadata: {
+    //     name: 'Puppet',
+    //     description: 'Puppet copy trading',
+    //     url: 'https://puppet.tech',
+    //     icons: ['https://puppet.tech/favicon.png']
+    //   },
+    //   showQrModal: true
+    // })
   ],
   transports: {
-    [arbitrum.id]: http('https://arb1.arbitrum.io/rpc')
+    [arbitrum.id]: arbitrumTransport,
+    [mainnet.id]: http(mainnet.rpcUrls.default.http[0]),
+    [base.id]: http(base.rpcUrls.default.http[0]),
+    [optimism.id]: http(optimism.rpcUrls.default.http[0]),
+    [polygon.id]: http(polygon.rpcUrls.default.http[0])
   }
 })
 
 // Auto Reconnect to last used wallet
-reconnect(wagmiConfig)
+// reconnect(wagmi)
 
-// Transport configuration for reading blockchain data
-const transport = fallback([
-  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
-  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
-  http('https://arb1.arbitrum.io/rpc')
-])
-
-export const publicClient = createPublicClient({
-  chain: arbitrum,
-  transport
+export const publicClient = wagmi.getClient({
+  chainId: arbitrum.id
 })
 
-const connection: IStream<GetConnectionReturnType<typeof wagmiConfig>> = fromCallback(cb => {
-  const currentConnection = getConnection(wagmiConfig)
+const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {
+  const currentConnection = getConnection(wagmi)
   cb(currentConnection)
 
-  const unsubscribe = watchConnection(wagmiConfig, {
+  const unsubscribe = watchConnection(wagmi, {
     onChange(conn) {
       cb(conn)
     }
@@ -149,83 +118,55 @@ const connection: IStream<GetConnectionReturnType<typeof wagmiConfig>> = fromCal
 
 const account: IStream<Promise<IAccountState | null>> = op(
   connection,
-  map(connection => {
+  map(async connection => {
     if (connection.status === 'connecting') {
-      return Promise.resolve(null)
+      // wait until connected
+      await new Promise<void>(resolve => {})
     }
 
-    return (async () => {
-      const connector = connection.connector
-
-      if (!connector || !connection.address) {
+    try {
+      if (connection.status !== 'connected') {
         return null
       }
 
-      try {
-        const walletClient =
-          (await (connector as any).getWalletClient?.({ chainId: connection.chainId })) ??
-          (await wagmiGetWalletClient(wagmiConfig, { chainId: connection.chainId }))
+      const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
 
-        if (!walletClient) {
-          throw new Error('No wallet client available from connector')
+      const address = walletClient.account.address
+      const accountOwner = walletClientToAccount(walletClient)
+      const subAccount = await rhinestoneSDK.createAccount({
+        owners: {
+          type: 'ecdsa',
+          accounts: [accountOwner]
         }
+      })
+      const portfolio = await fetchRhinestonePortfolio(subAccount)
 
-        const address = walletClient.account.address as Address
-        const client = walletClient as WalletClient
-        const accountOwner = walletClientToAccount(client)
-        const subAccount = await rhinestoneSDK.createAccount({
-          owners: {
-            type: 'ecdsa',
-            accounts: [accountOwner]
-          }
-        })
-        const portfolio = await fetchRhinestonePortfolio(subAccount)
-
-        const accountState: IAccountState = {
-          client,
-          address,
-          subAccount,
-          portfolio
-        }
-
-        return accountState
-      } catch (error) {
-        console.warn('Wallet connection failed, resetting to null state', error)
-        return null
+      const accountState: IAccountState = {
+        address,
+        walletClient,
+        subAccount,
+        portfolio
       }
-    })()
+
+      return accountState
+    } catch (error) {
+      console.error('Failed to get account state:', error)
+      return null
+    }
   }),
   state
-)
-
-// Block change listener
-const blockChange: IStream<bigint> = op(
-  account,
-  awaitPromises,
-  switchMap(accountState => {
-    if (!accountState) {
-      throw new Error('No account connected')
-    }
-
-    return fromCallback(cb => {
-      const unwatch = publicClient.watchBlockNumber({
-        onBlockNumber: blockNumber => cb(blockNumber)
-      })
-      return unwatch
-    })
-  })
 )
 
 async function connect(preferredConnectorId?: string) {
   try {
     const targetConnector =
-      wagmiConfig.connectors.find(connector => connector.id === preferredConnectorId) ?? wagmiConfig.connectors[0]
+      wagmi.connectors.find(connector => connector.id === preferredConnectorId) ?? wagmi.connectors[0]
 
     if (!targetConnector) {
       throw new Error('No wallet connector is configured')
     }
 
-    const result = await wagmiConnect(wagmiConfig, {
+    const result = await wagmiConnect(wagmi, {
       connector: targetConnector
     })
 
@@ -247,60 +188,32 @@ async function connect(preferredConnectorId?: string) {
 
 // Disconnect wallet function using Wagmi
 async function disconnect() {
-  await wagmiDisconnect(wagmiConfig)
+  await wagmiDisconnect(wagmi)
 }
 
 // Read contract function
 async function read<
-  TAbi extends Abi,
-  TFunctionName extends ContractFunctionName<TAbi, 'view'>,
-  TArgs extends ContractFunctionArgs<TAbi, 'view', TFunctionName>
+  const abi extends Abi,
+  functionName extends ContractFunctionName<abi, 'pure' | 'view'>,
+  args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>
 >(
-  parameters: ReadContractParameters<TAbi, TFunctionName, TArgs>
-): Promise<ReadContractReturnType<TAbi, TFunctionName, TArgs>> {
-  return publicClient.readContract(parameters as any)
+  parameters: ReadContractParameters<abi, functionName, args>
+): Promise<ReadContractReturnType<abi, functionName, args>> {
+  return readContract(wagmi, parameters)
 }
 
-export type IWriteContractReturn = Promise<TransactionResult>
-
-// Write contract function
-async function write<
-  const TAbi extends Abi,
-  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'>,
-  TArgs extends ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
->(
-  accountState: IAccountState,
-  writeParams: Omit<WriteContractParameters<TAbi, TFunctionName, TArgs>, 'account' | 'chain'>
-): IWriteContractReturn {
-  try {
-    const { request } = await publicClient.simulateContract({
-      ...writeParams,
-      account: accountState.address,
-      chain: publicClient.chain
-    } as any)
-
-    const req = request as any
-    const calls = [
-      {
-        to: req.to as Address,
-        data: req.data,
-        value: req.value
-      }
-    ]
-
-    const result = await accountState.subAccount.sendTransaction({
-      targetChain: (publicClient.chain as any)?.id ?? arbitrum.id,
-      calls
-    })
-
-    return result as TransactionResult
-  } catch (error) {
-    console.error('Write contract error:', error)
-    throw error
+async function getTokenBalance(tokenAddress: Address, owner: Address, chainId: number): Promise<bigint> {
+  if (tokenAddress === ADDRESS_ZERO) {
+    return getBalance(wagmi.getClient({ chainId }), { address: owner })
   }
+  return read({
+    address: tokenAddress,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [owner],
+    chainId
+  })
 }
-
-export interface IBatchCall extends Call<any, any> {}
 
 type RhinestonePortfolioChain = {
   chainId: number
@@ -313,7 +226,7 @@ type RhinestonePortfolioChain = {
   formattedUnlockedBalance: string
 }
 
-export type RhinestonePortfolioToken = {
+type RhinestonePortfolioToken = {
   symbol: string
   totalBalance: string
   lockedBalance: string
@@ -322,7 +235,7 @@ export type RhinestonePortfolioToken = {
   chains: RhinestonePortfolioChain[]
 }
 
-export const fetchRhinestonePortfolio = async (
+const fetchRhinestonePortfolio = async (
   rhinestoneAccount?: RhinestoneAccount | null
 ): Promise<RhinestonePortfolioToken[]> => {
   if (!rhinestoneAccount) return []
@@ -377,203 +290,13 @@ export const fetchRhinestonePortfolio = async (
     .filter((token): token is RhinestonePortfolioToken => Boolean(token))
 }
 
-export const requestDepositQuote = async (params: DepositQuoteParams): Promise<DepositQuoteResponse> => {
-  const baseUrl = params.baseUrl ?? `${window.location.origin}/api/orchestrator`
-  const endpoint = `${baseUrl}/intents/route`
-
-  const body: Record<string, any> = {
-    destinationChainId: params.destinationChainId,
-    tokenRequests: [
-      {
-        tokenAddress: params.tokenAddress,
-        amount: params.amount.toString()
-      }
-    ],
-    account: {
-      address: params.userAddress,
-      accountType: 'EOA'
-    }
-  }
-
-  if (params.sponsorSettings) {
-    body.options = { sponsorSettings: params.sponsorSettings }
-  }
-
-  if (params.accountAccessList) {
-    const { chainIds, tokens, chainTokens } = params.accountAccessList
-    const access: Record<string, any> = {}
-    if (chainIds?.length) access.chainIds = chainIds
-    if (tokens?.length) access.tokens = tokens
-    if (chainTokens && Object.keys(chainTokens).length) access.chainTokens = chainTokens
-    if (Object.keys(access).length) {
-      body.accountAccessList = access
-    }
-  }
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(params.apiKey ? { 'x-api-key': params.apiKey } : {})
-    },
-    body: JSON.stringify(body)
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch deposit quote: ${response.statusText}`)
-  }
-
-  return (await response.json()) as DepositQuoteResponse
-}
-
-export const getDepositQuote = (args: {
-  destinationChainId: number
-  tokenAddress: Address
-  amount: bigint
-  userAddress: Address
-  apiKey?: string
-  baseUrl?: string
-}) =>
-  requestDepositQuote({
-    destinationChainId: args.destinationChainId,
-    tokenAddress: args.tokenAddress,
-    amount: args.amount,
-    userAddress: args.userAddress,
-    apiKey: args.apiKey,
-    baseUrl: args.baseUrl
-  })
-
-export const createCompanionAccount = async (
-  ownerAddress: Address,
-  signerPrivateKey?: `0x${string}`
-): Promise<{ account: RhinestoneAccount; signerPrivateKey: `0x${string}` }> => {
-  const signerPk = signerPrivateKey ?? generatePrivateKey()
-  const signerAccount = privateKeyToAccount(signerPk)
-
-  const ownerAccount = {
-    address: ownerAddress,
-    type: 'json-rpc',
-    async signMessage() {
-      throw new Error('Read-only owner account')
-    },
-    async signTransaction() {
-      throw new Error('Read-only owner account')
-    },
-    async signTypedData() {
-      throw new Error('Read-only owner account')
-    }
-  } as any
-
-  const account = await rhinestoneSDK.createAccount({
-    owners: {
-      type: 'ecdsa',
-      accounts: [ownerAccount, signerAccount]
-    }
-  })
-
-  return { account, signerPrivateKey: signerPk }
-}
-
-export const buildDepositPlan = async (params: {
-  destinationChainId: number
-  tokenAddress: Address
-  amount: bigint
-  recipient: Address
-  ownerAddress: Address
-}): Promise<DepositPlan> => {
-  const { account, signerPrivateKey } = await createCompanionAccount(params.ownerAddress)
-
-  return {
-    companionAddress: account.getAddress() as Address,
-    fundTransfer: {
-      token: params.tokenAddress,
-      amount: params.amount,
-      to: account.getAddress() as Address
-    },
-    intentRequest: {
-      targetChain: params.destinationChainId,
-      tokenAddress: params.tokenAddress,
-      amount: params.amount,
-      recipient: params.recipient
-    },
-    signerPrivateKey
-  }
-}
-
-export const waitForFunding = async (
-  accountState: IAccountState,
-  tokens: Array<{ address: Address; minAmount: bigint }>,
-  options?: { pollMs?: number; maxAttempts?: number }
-): Promise<boolean> => {
-  const pollMs = options?.pollMs ?? 2000
-  const maxAttempts = options?.maxAttempts ?? 60
-  const subAccount = accountState.subAccount.getAddress() as Address
-
-  for (let i = 0; i < maxAttempts; i++) {
-    try {
-      const balances = await Promise.all(
-        tokens.map(token =>
-          publicClient.readContract({
-            address: token.address,
-            abi: erc20Abi,
-            functionName: 'balanceOf',
-            args: [subAccount]
-          })
-        )
-      )
-
-      const allFunded = balances.every((bal, idx) => bal >= tokens[idx].minAmount)
-      if (allFunded) {
-        return true
-      }
-    } catch (error) {
-      console.error('Funding check failed', error)
-    }
-
-    await new Promise(resolve => setTimeout(resolve, pollMs))
-  }
-
-  return false
-}
-
-// Write many transactions (batch calls)
-async function writeMany(accountState: IAccountState, callList: IBatchCall[]): Promise<TransactionResult> {
-  if (callList.length === 0) {
-    throw new Error('No valid calls to send')
-  }
-
-  // Strip ABI from calls for sendCalls (it doesn't need it)
-  const callsForSending = callList.map(({ to, data, value }) => ({
-    to,
-    data,
-    value
-  }))
-
-  // Send the batch of calls
-  const result = await accountState.subAccount.sendTransaction({
-    chain: publicClient.chain,
-    calls: callsForSending,
-    targetChain: arbitrum
-  })
-
-  return result
-}
-
 export const wallet = {
   read,
-  write,
-  writeMany,
-  blockChange,
+  getTokenBalance,
   account,
   connect,
   disconnect,
-  transport,
   publicClient,
-  rhinestoneSDK,
-  fetchRhinestonePortfolio,
-  requestDepositQuote,
-  buildDepositPlan,
-  waitForFunding,
-  connectors: wagmiConfig.connectors.map(connector => ({ id: connector.id, name: connector.name }))
+  wagmi,
+  connectors: wagmi.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }

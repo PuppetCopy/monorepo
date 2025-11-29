@@ -64,6 +64,13 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         }, wallet.account)
       )
 
+      const address: IStream<Address | null> = state(
+        switchMap(async accountPromise => {
+          const account = await accountPromise
+          return account?.address ?? null
+        }, wallet.account)
+      )
+
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
       return [
@@ -73,7 +80,8 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               walletBalance,
               depositBalance,
               model,
-              token: collateralToken
+              token: collateralToken,
+              address
             })({
               changeModel: changeModelTether()
             }),
@@ -117,7 +125,8 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               ),
               $ButtonSecondary({
                 $container: $defaultMiniButtonSecondary,
-                $content: $text('Update')
+                $content: $text('Update'),
+                disabled: map(acc => acc === null, address)
               })({
                 click: popDepositEdtiorTether()
               })

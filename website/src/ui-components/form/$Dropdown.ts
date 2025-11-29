@@ -69,7 +69,6 @@ export const $defaulMultiselectDropContainer = $node(
     alignItems: 'center',
     display: 'grid',
     gridAutoFlow: 'column',
-    // gridAutoColumns: 'minmax(50px, 1fr)',
     borderRadius: '20px',
     border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
     backgroundColor: pallete.middleground
@@ -92,9 +91,7 @@ export interface IDropdown<T> {
 export function $Dropdown<T>({
   $anchor,
   optionList,
-
   closeOnSelect = true,
-
   $container = $defaulMultiselectDropContainer,
   $dropListContainer = $defaultDropListContainer,
   $$option = map(<T>(o: T) => $node($text(String(o)))),
@@ -157,9 +154,9 @@ export function $Dropdown<T>({
                 })
               )(
                 ...params.list.map(opt =>
-                  $optionContainer(
-                    selectTether(nodeEvent('click'), constant(opt)) //
-                  )(switchLatest($$option(just(opt))))
+                  $optionContainer(selectTether(nodeEvent('click'), constant(opt)))(
+                    switchLatest($$option(just(opt))) //
+                  )
                 )
               )
             },

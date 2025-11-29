@@ -1,4 +1,5 @@
 import { map } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { wallet } from '../wallet/wallet.js'
@@ -11,7 +12,7 @@ interface IWalletConnectProps {
 }
 
 export const $WalletConnect = ({ connectors }: IWalletConnectProps) =>
-  component(([connect, connectTether]) => {
+  component(([connect, connectTether]: IBehavior<PointerEvent, string>) => {
     const connectorList = connectors.length > 0 ? connectors : [{ id: 'default', name: 'Connect' }]
 
     return [

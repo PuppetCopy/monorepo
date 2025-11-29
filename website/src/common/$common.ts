@@ -7,6 +7,7 @@ import {
   readableLeverage,
   readablePercentage,
   readablePnl,
+  readableTokenAmount,
   readableUsd,
   toBasisPoints
 } from '@puppet-copy/middleware/core'
@@ -123,6 +124,13 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
     }),
     viewBox: '0 0 32 32'
   })
+}
+
+export const $tokenIconWithAmount = (tokenDesc: ITokenDescription, amount: IStream<bigint>, size = '18px') => {
+  return $row(spacing.small, style({ alignItems: 'center' }))(
+    $text(map(bal => readableTokenAmount(tokenDesc, bal), amount)),
+    $tokenIcon(tokenDesc, size)
+  )
 }
 
 export const $tokenIconByAddress = (tokenAddress: Address, size = '24px') => {

@@ -34,14 +34,14 @@
     "outdated": "bun outdated --recursive"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.7",
+    "@biomejs/biome": "2.3.8",
     "sherif": "1.9.0"
   },
   "catalog": {
     "viem": "2.40.3",
     "aelea": "2.5.31",
     "abitype": "1.2.0",
-    "superjson": "2.2.5",
+    "superjson": "2.2.6",
     "lightweight-charts": "5.0.9",
     "ponder": "0.15.12",
     "typescript": "^5.9.2",

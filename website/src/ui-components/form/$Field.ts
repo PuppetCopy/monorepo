@@ -7,19 +7,6 @@ import { dismissOp, interactionOp } from './common.js'
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-export declare enum InputType {
-  TEXT = 'text',
-  NUMBER = 'number',
-  SEARCH = 'search',
-  PASSWORD = 'password',
-  BUTTON = 'button',
-  CHECKBOX = 'checkbox',
-  COLOR = 'color',
-  DATE = 'date',
-  TEL = 'tel',
-  URL = 'url',
-  HIDDEN = 'hidden'
-}
 export interface Control {
   disabled?: IStream<boolean>
 }

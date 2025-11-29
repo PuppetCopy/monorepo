@@ -1,26 +1,41 @@
 import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, o, start } from 'aelea/stream'
+import { constant, empty, map, o, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
   $node,
+  $text,
   attr,
   component,
   type I$Node,
+  type INode,
   type INodeCompose,
   type ISlottable,
   nodeEvent,
-  style
+  style,
+  stylePseudo
 } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
-import { $anchor, $gitbook, $github, $icon, $moreDots, $twitter } from '@/ui-components'
+import { $seperator2 } from 'src/pages/common.js'
+import { wallet } from 'src/wallet/wallet.js'
+import {
+  $alertIntermediateSpinnerContainer,
+  $anchor,
+  $gitbook,
+  $github,
+  $icon,
+  $intermediatePromise,
+  $moreDots,
+  $twitter
+} from '@/ui-components'
 import { $RouterAnchor } from '@/ui-router'
 import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/types.js'
+import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 import { $Popover } from './$Popover.js'
 import { $ThemePicker } from './$ThemePicker.js'
-import { $WalletProfileDisplay } from './$WalletProfileDisplay.js'
+import { $WalletConnect } from './$WalletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
 
 interface MainMenu extends IPageParams {
@@ -32,7 +47,9 @@ export const $MainMenu = (config: MainMenu) =>
     (
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
-      [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>
+      [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>,
+      [selectConnector, selectConnectorTether]: IBehavior<string>, //
+      [targetClick, targetClickTether]: IBehavior<INode, PointerEvent>
     ) => {
       const { route } = config
 
@@ -108,6 +125,25 @@ export const $MainMenu = (config: MainMenu) =>
         })
       })({})
 
+      const $target = $row(
+        spacing.small,
+        style({
+          borderRadius: '50px',
+          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
+          alignItems: 'center',
+          paddingRight: '16px',
+          cursor: 'pointer'
+        }),
+        stylePseudo(':hover', {
+          border: `1px solid ${pallete.foreground}`
+        }),
+        targetClickTether(nodeEvent('pointerdown'))
+      )(
+        $disconnectedWalletDisplay(),
+        $seperator2,
+        $column(style({ fontSize: '.8rem' }))($text('Click to'), style({ fontWeight: 'bold' })($node($text('Connect'))))
+      )
+
       return [
         $row(
           spacing.default,
@@ -135,14 +171,59 @@ export const $MainMenu = (config: MainMenu) =>
           ),
 
           $row(style({ flex: 1, alignItems: 'center', placeContent: 'center' }))(
-            $pageLink({
-              $container: $anchor(spacing.big, style({ padding: 0 })),
-              route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
-              // anchorOp: style({  }),
-              url: '/portfolio',
-              $content: $WalletProfileDisplay({})
-            })({
-              click: routeChangeTether()
+            $intermediatePromise({
+              $loader: $node(style({ position: 'relative', display: 'inline-flex', borderRadius: '999px' }))(
+                style({ position: 'relative', borderRadius: 'inherit' })($target),
+                style({
+                  position: 'absolute',
+                  inset: '0px',
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                  borderRadius: 'inherit'
+                })(
+                  style({ width: '100%', height: '100%', borderRadius: 'inherit', overflow: 'hidden' })(
+                    $alertIntermediateSpinnerContainer()
+                  )
+                )
+              ),
+              $display: map(async connectionQuery => {
+                const connection = await connectionQuery
+
+                if (!connection) {
+                  return $Popover({
+                    $target,
+                    $open: map(event => {
+                      // event.stopImmediatePropagation()
+                      // event.preventDefault()
+                      return $WalletConnect({
+                        connectors: wallet.connectors
+                      })({
+                        connect: selectConnectorTether()
+                      })
+                    }, targetClick),
+                    dismiss: selectConnector
+                  })({})
+                }
+
+                return $pageLink({
+                  $container: $anchor(spacing.big, style({ padding: 0 })),
+                  route: route.create({ fragment: 'wallet', title: 'Portfolio' }),
+                  // anchorOp: style({  }),
+                  url: '/portfolio',
+                  $content: $row(
+                    spacing.small,
+                    style({ alignItems: 'center', pointerEvents: 'none', paddingRight: '16px' })
+                  )(
+                    connection.address
+                      ? $profileDisplay({ address: connection.address })
+                      : style({ cursor: 'pointer' }, $disconnectedWalletDisplay())
+                  )
+                })({
+                  click: routeChangeTether()
+                })
+              }, wallet.account)
             })
           ),
 

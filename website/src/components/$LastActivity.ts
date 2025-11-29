@@ -1,11 +1,10 @@
 import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet-copy/middleware/const'
 import { getMappedValue } from '@puppet-copy/middleware/core'
-import { empty, type IStream, map } from 'aelea/stream'
+import { type IStream, map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $row, isDesktopScreen, spacing } from 'aelea/ui-components'
-import { $caretDown, $icon, $infoLabel } from '@/ui-components'
-import { $Dropdown } from './form/$Dropdown'
+import { $DropSelect } from '@/ui-components'
 
 export const activityOptionLabelMap = {
   [IntervalTime.DAY]: '24 Hours',
@@ -22,46 +21,12 @@ export const $LastAtivity = (activityTimeframe: IStream<IntervalTime>) =>
         spacing.default,
         style({ alignItems: 'center' })
       )(
-        // $infoTooltipLabel('Open and Settled position filtered from the time they were opened', 'Last Activity:'),
-        // isDesktopScreen
-        // isDesktopScreen
-        //   ? $ButtonToggle({
-        //       value: activityTimeframe,
-        //       optionList: lastActivityOptionList.map((option) => option.value),
-        //       $$option: map((value) => {
-        //         return $row(
-        //           spacing.small,
-        //           style({ alignItems: 'center' })
-        //         )($text(lastActivityOptionList.find((option) => option.value === value)?.label!))
-        //       })
-        //     })({
-        //       select: changeActivityTimeframeTether()
-        //     })
-        //   :
-        $Dropdown({
-          $anchor: $row(
-            $node(style({ whiteSpace: 'nowrap', padding: '10px 0px 10px 12px' }))(
-              $row(spacing.tiny)(
-                isDesktopScreen ? $infoLabel($text('Last Activity:')) : empty,
-                $text(map(tf => getMappedValue(activityOptionLabelMap, tf), activityTimeframe))
-              )
-            ),
-            $row(style({ alignItems: 'center', cursor: 'pointer', padding: '0 12px', flex: '1' }))(
-              $icon({
-                $content: $caretDown,
-                width: '12px',
-                svgOps: style({ minWidth: '12px', margin: '2px 1px 0' }),
-                viewBox: '0 0 32 32'
-              })
-            )
-          ),
+        $DropSelect({
+          value: activityTimeframe,
           optionList: PLATFORM_STAT_INTERVAL,
-          $$option: map(option => {
-            return $node($text(activityOptionLabelMap[option]))
-          })
-        })({
-          select: changeActivityTimeframeTether()
-        })
+          label: isDesktopScreen ? 'Last Activity:' : undefined,
+          $$option: map(tf => $node($text(getMappedValue(activityOptionLabelMap, tf))))
+        })({ select: changeActivityTimeframeTether() })
       ),
       { changeActivityTimeframe }
     ]

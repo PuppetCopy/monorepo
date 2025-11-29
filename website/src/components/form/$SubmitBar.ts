@@ -3,7 +3,7 @@ import { combine, constant, empty, type IStream, just, map, op, start, switchMap
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { BaseError, ContractFunctionRevertedError, type Hex } from 'viem'
+import { BaseError, ContractFunctionRevertedError } from 'viem'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
 import type { IAccountState } from '../../wallet/wallet.js'
@@ -11,22 +11,15 @@ import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
-export interface TransactionStatus {
-  fill?: {
-    hash: Hex | undefined
-    chainId: number
-  }
-  claims?: {
-    hash: Hex | undefined
-    chainId: number
-  }[]
-  status?: 'pending' | 'success' | 'failed' | 'error'
-  receipts?: Array<{ transactionHash?: string | undefined }>
-  error?: unknown
+export interface TransactionResult {
+  type: 'intent'
+  id: bigint
+  sourceChains?: number[]
+  targetChain: number
 }
 
 export interface ISubmitBar {
-  txQuery: IStream<Promise<TransactionStatus>>
+  txQuery: IStream<Promise<TransactionResult>>
   alert?: IStream<string | null>
   $container?: INodeCompose
   $submitContent: I$Slottable
@@ -61,7 +54,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
 
       const requestState = params.multicastTxQuery as {
         status: PromiseStatus
-        value: TransactionStatus
+        value: TransactionResult
         error: unknown
       } | null
 
@@ -102,38 +95,17 @@ export const $SubmitBar = (config: ISubmitBar) =>
         )
       }
 
-      const value = requestState.value
-      const hasStatus = typeof value === 'object' && value !== null && 'status' in value
-      const status = hasStatus ? (value as TransactionStatus).status : undefined
-      const fillHashes = (value as TransactionStatus).fill?.hash ? [(value as TransactionStatus).fill?.hash] : []
-      const claimHashes = (value as TransactionStatus).claims?.map(claim => claim.hash).filter(Boolean) ?? []
-      const receiptHashes =
-        (value as TransactionStatus).receipts?.map(receipt => receipt.transactionHash).filter(Boolean) ?? []
-      const allHashes = [...receiptHashes, ...fillHashes, ...claimHashes].filter(Boolean)
-
-      if (status === 'success' || allHashes.length > 0) {
+      const value = requestState.value as TransactionResult | null
+      if (value?.id) {
         return $alertPositiveTooltip(
           $row(spacing.small)(
-            $text('Transaction confirmed'),
-
-            ...allHashes.map(hash =>
-              $txHashRef(hash as string) ? $node($text(hash as string)) : $node($text((hash as string) || ''))
-            )
+            $text('Intent submitted'), //
+            $txHashRef(value.id.toString())
           )
         )
       }
 
-      return $alertTooltip(
-        $node(
-          $text(
-            status === 'pending'
-              ? 'Awaiting execution'
-              : status === 'failed' || status === 'error'
-                ? 'Transaction failed'
-                : 'Transaction submitted'
-          )
-        )
-      )
+      return $spinnerTooltip($node($text('Awaiting execution')))
     }, submitState)
 
     return [

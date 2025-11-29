@@ -21,7 +21,6 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type Address, encodeFunctionData, erc20Abi, type Hex } from 'viem'
-import { arbitrum } from 'viem/chains'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
@@ -345,14 +344,7 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         const depositTokens = Array.from(depositByToken.entries()).filter(([, amount]) => amount > 0n)
-                        if (depositTokens.length === 0) {
-                          return account.subAccount.sendTransaction({
-                            targetChain: wallet.publicClient.chain,
-                            calls
-                          }) as any
-                        }
-
-                        // Pre-fund subaccount via wallet_sendCalls (EIP-5792), then execute intent
+                        // Simplest path: pre-fund the subaccount, then execute without tokenRequests
                         const subAccount = account.subAccount.getAddress()
                         const fundingCalls = depositTokens.map(([token, amount]) => ({
                           to: token,
@@ -363,31 +355,29 @@ export const $PortfolioEditorDrawer = ({
                           })
                         }))
 
-                        const fundingTx = await account.client.sendCalls({
-                          account: account.address,
-                          chain: wallet.publicClient.chain,
-                          calls: fundingCalls,
-                          experimental_fallback: true
-                        })
+                        if (fundingCalls.length > 0) {
+                          const fundingTx = await account.walletClient.sendCalls({
+                            account: account.address,
+                            chain: account.walletClient.chain ?? wallet.publicClient.chain,
+                            calls: fundingCalls,
+                            forceAtomic: true
+                          })
 
-                        let status = await account.client.getCallsStatus({ id: (fundingTx as any).id })
-                        let attempts = 0
-                        while (status.status === 'pending' && attempts < 60) {
-                          await new Promise(resolve => setTimeout(resolve, 2000))
-                          status = await account.client.getCallsStatus({ id: (fundingTx as any).id })
-                          attempts++
-                        }
-                        if (status.status !== 'success') {
-                          throw new Error('Funding transaction failed or timed out')
+                          const status = await account.walletClient.waitForCallsStatus({
+                            id: fundingTx.id,
+                            throwOnFailure: true
+                          })
+                          if (status.status !== 'success') {
+                            throw new Error('Funding transaction did not succeed')
+                          }
                         }
 
-                        const transaction = await account.subAccount.sendTransaction({
-                          targetChain: arbitrum,
+                        const tx = await account.subAccount.sendTransaction({
+                          targetChain: wallet.publicClient.chain,
                           calls
                         })
 
-                        const txStatus = account.subAccount.waitForExecution(transaction)
-                        return txStatus
+                        return tx
                       })
                     )
                   })

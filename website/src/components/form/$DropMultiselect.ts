@@ -15,8 +15,7 @@ import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { $caretDown, $icon, $infoLabel, $xCross } from '@/ui-components'
-import { $Dropdown, $defaulMultiselectDropContainer } from './$Dropdown'
+import { $caretDown, $Dropdown, $defaulMultiselectDropContainer, $icon, $infoLabel, $xCross } from '@/ui-components'
 
 // Array utility functions (previously from @most/prelude)
 const append = <T>(item: T, array: T[]): T[] => [...array, item]

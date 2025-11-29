@@ -26,12 +26,11 @@ import { $element, $node, $text, attr, component, style, stylePseudo } from 'ael
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { theme } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import { $Checkbox, $FieldLabeled } from '@/ui-components'
+import { $Checkbox, $Dropdown, $FieldLabeled } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
 import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
-import { $Dropdown } from '../form/$Dropdown.js'
 
 export type ISetMatchingRuleEditorDraft = Omit<ISetMatchingRule, 'id'>
 
