@@ -39,6 +39,7 @@ jobs:
           VITE__WC_PROJECT_ID: ${{ secrets.VITE__WC_PROJECT_ID }}
           VITE__WC_RPC_URL_42161_1: ${{ secrets.VITE__WC_RPC_URL_42161_1 }}
           VITE__WC_RPC_URL_42161_2: ${{ secrets.VITE__WC_RPC_URL_42161_2 }}
+          VITE_RPC_KEY: ${{ secrets.VITE_RPC_KEY }}
           RHINESTONE_API_KEY: ${{ secrets.RHINESTONE_API_KEY }}
       
       - name: Docker Build and Push
