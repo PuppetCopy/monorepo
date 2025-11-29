@@ -62,7 +62,7 @@ export const $defaultDropListContainer = $column(
   })
 )
 
-export const $defaulMultiselectDropContainer = $node(
+export const $defaultMultiselectDropContainer = $node(
   style({
     cursor: 'pointer',
     position: 'relative',
@@ -92,7 +92,7 @@ export function $Dropdown<T>({
   $anchor,
   optionList,
   closeOnSelect = true,
-  $container = $defaulMultiselectDropContainer,
+  $container = $defaultMultiselectDropContainer,
   $dropListContainer = $defaultDropListContainer,
   $$option = map(<T>(o: T) => $node($text(String(o)))),
   $optionContainer = $defaultOptionContainer

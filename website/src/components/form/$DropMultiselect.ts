@@ -15,7 +15,7 @@ import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { $caretDown, $Dropdown, $defaulMultiselectDropContainer, $icon, $infoLabel, $xCross } from '@/ui-components'
+import { $caretDown, $Dropdown, $defaultMultiselectDropContainer, $icon, $infoLabel, $xCross } from '@/ui-components'
 
 // Array utility functions (previously from @most/prelude)
 const append = <T>(item: T, array: T[]): T[] => [...array, item]
@@ -73,7 +73,7 @@ export const $DropMultiSelect = <T>({
   $noneSelected = $defaultNoneSelected($text('None selected')),
   $$selectedOption = map(item => $defaultDropMultiSelectOption($text(String(item)))),
   $$option = map(item => $defaultDropMultiSelectOption($text(String(item)))),
-  $container = $defaulMultiselectDropContainer,
+  $container = $defaultMultiselectDropContainer,
   $dropListContainer,
   $optionContainer = $defaultOptionContainer,
   validation = constant(null)
