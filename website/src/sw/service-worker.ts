@@ -16,8 +16,13 @@ let allowlist: RegExp[] | undefined
 // in dev mode, we disable precaching to avoid caching issues
 if (import.meta.env.DEV) allowlist = [/^\/$/]
 
-// to allow work offline
-registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist }))
+// to allow work offline - exclude /assets/ from SPA fallback
+registerRoute(
+  new NavigationRoute(createHandlerBoundToURL('index.html'), {
+    allowlist,
+    denylist: [/^\/assets\//]
+  })
+)
 
 // Cache portfolio responses for 10 minutes to reduce orchestrator load
 registerRoute(

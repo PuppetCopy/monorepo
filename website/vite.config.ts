@@ -127,7 +127,7 @@ export default defineConfig({
       },
       mode: 'development',
       devOptions: {
-        enabled: false,
+        enabled: !!process.env.VITE_PWA_DEV,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module'

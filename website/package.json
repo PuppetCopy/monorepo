@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:pwa": "VITE_PWA_DEV=true vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",
     "build": "vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
@@ -28,7 +29,8 @@
     "ponder": "catalog:",
     "porto": "0.2.37",
     "viem": "catalog:",
-    "wagmi": "3.0.2"
+    "wagmi": "3.0.2",
+    "@wagmi/connectors": "7.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

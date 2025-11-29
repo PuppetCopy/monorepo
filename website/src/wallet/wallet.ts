@@ -1,6 +1,7 @@
-import { ADDRESS_ZERO } from '@puppet-copy/middleware/const'
+import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
 import { groupList } from '@puppet-copy/middleware/core'
 import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
+import { porto } from '@wagmi/connectors'
 import {
   type Config,
   createConfig,
@@ -31,17 +32,40 @@ import {
 import type { Address } from 'viem/accounts'
 import { getBalance } from 'viem/actions'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
-import { porto as portoConnector } from 'wagmi/connectors'
 
-// if (!import.meta.env.VITE__WC_PROJECT_ID) {
-//   throw new Error('Missing WalletConnect Project ID in environment variables')
-// }
+type ChainBalance = { chainId: number; balance: bigint }
+
+type WalletPortfolio = {
+  ETH: ChainBalance[]
+  USDC: ChainBalance[]
+}
+
+type RhinestonePortfolioChain = {
+  chainId: number
+  chainName: string
+  balance: string
+  formattedBalance: string
+  lockedBalance: string
+  unlockedBalance: string
+  formattedLockedBalance: string
+  formattedUnlockedBalance: string
+}
+
+type RhinestonePortfolioToken = {
+  symbol: string
+  totalBalance: string
+  lockedBalance: string
+  unlockedBalance: string
+  decimals: number
+  chains: RhinestonePortfolioChain[]
+}
 
 type IAccountState = {
   walletClient: WalletClient
   address: Address
   subAccount: RhinestoneAccount
   portfolio: RhinestonePortfolioToken[]
+  walletPortfolio: WalletPortfolio
 }
 
 // Transport configuration for reading blockchain data
@@ -56,29 +80,17 @@ const rhinestoneSDK = new RhinestoneSDK({
   }
 })
 
-const protoConnector = portoConnector({
-  mode: Mode.dialog({
-    renderer: Dialog.popup()
-  })
-})
-
 const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
 const chainMap = groupList(chainList, 'id')
 
 const wagmi: Config = createConfig({
   chains: chainList,
   connectors: [
-    protoConnector
-    // walletConnectConnector({
-    //   projectId: import.meta.env.VITE__WC_PROJECT_ID,
-    //   metadata: {
-    //     name: 'Puppet',
-    //     description: 'Puppet copy trading',
-    //     url: 'https://puppet.tech',
-    //     icons: ['https://puppet.tech/favicon.png']
-    //   },
-    //   showQrModal: true
-    // })
+    porto({
+      mode: Mode.dialog({
+        renderer: Dialog.popup()
+      })
+    })
   ],
   transports: {
     [arbitrum.id]: fallback([
@@ -91,13 +103,6 @@ const wagmi: Config = createConfig({
     [optimism.id]: http(optimism.rpcUrls.default.http[0]),
     [polygon.id]: http(polygon.rpcUrls.default.http[0])
   }
-})
-
-// Auto Reconnect to last used wallet
-// reconnect(wagmi)
-
-const publicClient = wagmi.getClient({
-  chainId: arbitrum.id
 })
 
 const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {
@@ -136,13 +141,21 @@ const account: IStream<Promise<IAccountState | null>> = op(
           accounts: [accountOwner]
         }
       })
-      const portfolio = await fetchRhinestonePortfolio(subAccount)
+      const [portfolio, ethBalances, usdcBalances] = await Promise.all([
+        fetchRhinestonePortfolio(subAccount),
+        getMultichainBalances('ETH', address),
+        getMultichainBalances('USDC', address)
+      ])
 
       const accountState: IAccountState = {
         address,
         walletClient,
         subAccount,
-        portfolio
+        portfolio,
+        walletPortfolio: {
+          ETH: ethBalances,
+          USDC: usdcBalances
+        }
       }
 
       return accountState
@@ -212,24 +225,28 @@ async function getTokenBalance(tokenAddress: Address, owner: Address, chainId: n
   })
 }
 
-type RhinestonePortfolioChain = {
-  chainId: number
-  chainName: string
-  balance: string
-  formattedBalance: string
-  lockedBalance: string
-  unlockedBalance: string
-  formattedLockedBalance: string
-  formattedUnlockedBalance: string
-}
+async function getMultichainBalances(
+  symbol: keyof (typeof CROSS_CHAIN_TOKEN_MAP)[keyof typeof CROSS_CHAIN_TOKEN_MAP],
+  owner: Address
+): Promise<ChainBalance[]> {
+  const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T | null> =>
+    Promise.race([promise, new Promise<null>(resolve => setTimeout(() => resolve(null), ms))])
 
-type RhinestonePortfolioToken = {
-  symbol: string
-  totalBalance: string
-  lockedBalance: string
-  unlockedBalance: string
-  decimals: number
-  chains: RhinestonePortfolioChain[]
+  const results = await Promise.all(
+    chainList.map(async chain => {
+      const tokenMap = CROSS_CHAIN_TOKEN_MAP[chain.id as keyof typeof CROSS_CHAIN_TOKEN_MAP]
+      const tokenAddress = tokenMap?.[symbol]
+      if (!tokenAddress) return { chainId: chain.id, balance: 0n }
+
+      try {
+        const balance = await withTimeout(getTokenBalance(tokenAddress, owner, chain.id), 5000)
+        return { chainId: chain.id, balance: balance ?? 0n }
+      } catch {
+        return { chainId: chain.id, balance: 0n }
+      }
+    })
+  )
+  return results.filter(r => r.balance > 0n)
 }
 
 const fetchRhinestonePortfolio = async (
@@ -287,9 +304,12 @@ const fetchRhinestonePortfolio = async (
     .filter((token): token is RhinestonePortfolioToken => Boolean(token))
 }
 
+const publicClient = wagmi.getClient({ chainId: arbitrum.id })
+
 const wallet = {
   read,
   getTokenBalance,
+  getMultichainBalances,
   account,
   connect,
   disconnect,
@@ -300,5 +320,5 @@ const wallet = {
   connectors: wagmi.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }
 
-export type { IAccountState }
+export type { IAccountState, ChainBalance }
 export default wallet
