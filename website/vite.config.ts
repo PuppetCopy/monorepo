@@ -18,8 +18,9 @@ const SITE_CONFIG = {
   __THEME_BACKGROUND__: '#292c37'
 }
 
-if (!process.env.RHINESTONE_API_KEY) {
-  throw new Error('RHINESTONE_API_KEY is required for dev proxy to Orchestrator')
+const REQUIRED_ENV = ['RHINESTONE_API_KEY', 'VITE_RPC_KEY'] as const
+for (const key of REQUIRED_ENV) {
+  if (!process.env[key]) throw new Error(`${key} is required`)
 }
 
 export default defineConfig({
