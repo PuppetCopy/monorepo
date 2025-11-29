@@ -1,8 +1,6 @@
 import { clientsClaim } from 'workbox-core'
-import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { StaleWhileRevalidate } from 'workbox-strategies'
 
 declare const self: ServiceWorkerGlobalScope & typeof globalThis
 
@@ -24,22 +22,37 @@ registerRoute(
   })
 )
 
-// Cache portfolio responses for 10 minutes to reduce orchestrator load
-registerRoute(
-  ({ url, request }) =>
-    request.method === 'GET' &&
-    url.pathname.startsWith('/api/orchestrator/accounts/') &&
-    url.pathname.endsWith('/portfolio'),
-  new StaleWhileRevalidate({
-    cacheName: 'portfolio-cache',
-    plugins: [
-      new ExpirationPlugin({
-        maxAgeSeconds: 60 * 10,
-        purgeOnQuotaError: true
-      })
-    ]
-  })
-)
+// Cache all /api/ requests indefinitely - add &refresh=true to force fresh fetch
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url)
+  if (!url.pathname.startsWith('/api/')) return
+
+  const forceRefresh = url.searchParams.get('refresh') === 'true'
+  url.searchParams.delete('refresh')
+
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open('api-cache')
+
+      let cacheKey: Request
+      if (event.request.method === 'POST') {
+        const body = await event.request.clone().text()
+        cacheKey = new Request(`${url.href}#${encodeURIComponent(body)}`)
+      } else {
+        cacheKey = new Request(url.href)
+      }
+
+      if (!forceRefresh) {
+        const cached = await cache.match(cacheKey)
+        if (cached) return cached
+      }
+
+      const response = await fetch(event.request)
+      cache.put(cacheKey, response.clone())
+      return response
+    })()
+  )
+})
 
 // Auto update: activate immediately and take control of existing clients
 clientsClaim()

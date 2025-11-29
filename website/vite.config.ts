@@ -13,7 +13,7 @@ const SITE_CONFIG = {
   __APP_NAME__: 'Puppet',
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
   __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
-  __OG_IMAGE__: '/og-image.png', // TODO: Add static OG image
+  __OG_IMAGE__: '/assets/og-image.png',
   __THEME_PRIMARY__: '#870B38',
   __THEME_BACKGROUND__: '#292c37'
 }
@@ -74,13 +74,18 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
         configure: proxy => {
           proxy.on('proxyReq', proxyReq => {
-            // Set required headers for Rhinestone API
             proxyReq.setHeader('Content-Type', 'application/json')
             proxyReq.setHeader('x-api-key', process.env.RHINESTONE_API_KEY!)
             proxyReq.setHeader('Accept', 'application/json')
             proxyReq.setHeader('Accept-Encoding', 'identity')
           })
         }
+      },
+      '/api/rpc': {
+        target: 'https://lb.drpc.org',
+        changeOrigin: true,
+        secure: true,
+        rewrite: path => path.replace(/^\/api\/rpc/, '/ogrpc')
       }
     }
   },
@@ -91,7 +96,7 @@ export default defineConfig({
       strategies: 'injectManifest',
       injectManifest: {
         maximumFileSizeToCacheInBytes: 4000000,
-        globPatterns: ['**/*.{js,html,png,svg,ico,woff2}']
+        globPatterns: ['**/*.{js,html,svg,ico,woff2}']
       },
       injectRegister: 'auto',
       srcDir: 'src/sw',
@@ -107,8 +112,8 @@ export default defineConfig({
         theme_color: SITE_CONFIG.__THEME_BACKGROUND__,
         background_color: SITE_CONFIG.__THEME_BACKGROUND__,
         lang: 'en',
-        // start_url: '/',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait-primary',
         categories: ['Copy Trading', 'Decentralized Perpetual Exchange', 'DeFi'],
         screenshots: [
@@ -120,12 +125,11 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,ico,woff2}'],
         cleanupOutdatedCaches: true,
         clientsClaim: false, // Don't claim clients immediately
         skipWaiting: false // Wait for all tabs to close before activating
       },
-      mode: 'development',
       devOptions: {
         enabled: !!process.env.VITE_PWA_DEV,
         navigateFallback: 'index.html',

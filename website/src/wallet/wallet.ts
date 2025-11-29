@@ -20,8 +20,10 @@ import { fromCallback, state } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
+  type Chain,
   type ContractFunctionArgs,
   type ContractFunctionName,
+  createPublicClient,
   fallback,
   formatUnits,
   http,
@@ -30,15 +32,9 @@ import {
   webSocket
 } from 'viem'
 import type { Address } from 'viem/accounts'
-import { getBalance } from 'viem/actions'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 type ChainBalance = { chainId: number; balance: bigint }
-
-type WalletPortfolio = {
-  ETH: ChainBalance[]
-  USDC: ChainBalance[]
-}
 
 type RhinestonePortfolioChain = {
   chainId: number
@@ -65,23 +61,38 @@ type IAccountState = {
   address: Address
   subAccount: RhinestoneAccount
   portfolio: RhinestonePortfolioToken[]
-  walletPortfolio: WalletPortfolio
 }
 
 // Transport configuration for reading blockchain data
 const rhinestoneSDK = new RhinestoneSDK({
   apiKey: 'proxy',
-  endpointUrl: `${window.location.origin}/api/orchestrator`,
-  provider: {
-    type: 'custom',
-    urls: {
-      [arbitrum.id]: import.meta.env.VITE__WC_RPC_URL_42161_1
-    }
-  }
+  endpointUrl: `${window.location.origin}/api/orchestrator`
+  // provider: {
+  //   type: 'custom',
+  //   urls: {
+  //     [arbitrum.id]: import.meta.env.VITE__WC_RPC_URL_42161_1
+  //   }
+  // }
 })
+const DRPC_KEY = import.meta.env.VITE_RPC_KEY
+if (!DRPC_KEY) throw new Error('VITE_RPC_KEY is required')
 
 const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
 const chainMap = groupList(chainList, 'id')
+
+const DRPC_NETWORK_MAP: Record<number, string> = {
+  [mainnet.id]: 'ethereum',
+  [arbitrum.id]: 'arbitrum',
+  [optimism.id]: 'optimism',
+  [base.id]: 'base',
+  [polygon.id]: 'polygon'
+}
+
+function getDrpcUrl(chain: Chain, refresh = false): string {
+  const network = DRPC_NETWORK_MAP[chain.id]
+  if (!network) throw new Error(`Unsupported chain: ${chain.id}`)
+  return `/api/rpc?network=${network}&dkey=${DRPC_KEY}${refresh ? '&refresh=true' : ''}`
+}
 
 const wagmi: Config = createConfig({
   chains: chainList,
@@ -141,21 +152,13 @@ const account: IStream<Promise<IAccountState | null>> = op(
           accounts: [accountOwner]
         }
       })
-      const [portfolio, ethBalances, usdcBalances] = await Promise.all([
-        fetchRhinestonePortfolio(subAccount),
-        getMultichainBalances('ETH', address),
-        getMultichainBalances('USDC', address)
-      ])
+      const portfolio = await fetchRhinestonePortfolio(subAccount)
 
       const accountState: IAccountState = {
         address,
         walletClient,
         subAccount,
-        portfolio,
-        walletPortfolio: {
-          ETH: ethBalances,
-          USDC: usdcBalances
-        }
+        portfolio
       }
 
       return accountState
@@ -212,26 +215,39 @@ async function read<
   return readContract(wagmi, parameters)
 }
 
-async function getTokenBalance(tokenAddress: Address, owner: Address, chainId: number): Promise<bigint> {
+async function getTokenBalanceFromClient(
+  tokenAddress: Address,
+  owner: Address,
+  client: { getBalance: (args: { address: Address }) => Promise<bigint>; readContract: (args: any) => Promise<any> }
+): Promise<bigint> {
   if (tokenAddress === ADDRESS_ZERO) {
-    return getBalance(wagmi.getClient({ chainId }), { address: owner })
+    return client.getBalance({ address: owner })
   }
-  return read({
+  return client.readContract({
     address: tokenAddress,
     abi: erc20Abi,
     functionName: 'balanceOf',
-    args: [owner],
-    chainId
+    args: [owner]
   })
+}
+
+async function getTokenBalance(tokenAddress: Address, owner: Address, chainId: number, refresh = false): Promise<bigint> {
+  const chain = chainList.find(c => c.id === chainId)
+  if (!chain) throw new Error(`Unsupported chain: ${chainId}`)
+
+  const client = createPublicClient({
+    chain,
+    transport: http(getDrpcUrl(chain, refresh))
+  })
+
+  return getTokenBalanceFromClient(tokenAddress, owner, client)
 }
 
 async function getMultichainBalances(
   symbol: keyof (typeof CROSS_CHAIN_TOKEN_MAP)[keyof typeof CROSS_CHAIN_TOKEN_MAP],
-  owner: Address
+  owner: Address,
+  refresh = false
 ): Promise<ChainBalance[]> {
-  const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T | null> =>
-    Promise.race([promise, new Promise<null>(resolve => setTimeout(() => resolve(null), ms))])
-
   const results = await Promise.all(
     chainList.map(async chain => {
       const tokenMap = CROSS_CHAIN_TOKEN_MAP[chain.id as keyof typeof CROSS_CHAIN_TOKEN_MAP]
@@ -239,8 +255,8 @@ async function getMultichainBalances(
       if (!tokenAddress) return { chainId: chain.id, balance: 0n }
 
       try {
-        const balance = await withTimeout(getTokenBalance(tokenAddress, owner, chain.id), 5000)
-        return { chainId: chain.id, balance: balance ?? 0n }
+        const balance = await getTokenBalance(tokenAddress, owner, chain.id, refresh)
+        return { chainId: chain.id, balance }
       } catch {
         return { chainId: chain.id, balance: 0n }
       }

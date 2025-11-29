@@ -47,11 +47,12 @@ export interface IDepositEditorDraft {
 }
 
 export const $DepositEditor = (config: {
-  walletBalance: IStream<bigint> //
-  depositBalance: IStream<bigint> //
+  walletBalance: IStream<bigint>
+  depositBalance: IStream<bigint>
   model: IStream<IDepositEditorDraft>
   token: Address
   address: IStream<Address | null>
+  refreshBalances?: IStream<any>
   validation?: IOps<bigint, string | null>
 }) =>
   component(
@@ -64,8 +65,15 @@ export const $DepositEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
+      const fetchTrigger = merge(
+        map(address => ({ address, refresh: false }), config.address),
+        config.refreshBalances
+          ? switchMap(async () => ({ address: await config.address, refresh: true }), config.refreshBalances)
+          : empty()
+      )
+
       const chainBalanceMap = state(
-        switchMap(async address => {
+        switchMap(async ({ address, refresh }) => {
           const balances: Record<number, bigint> = {}
           if (!address) return balances
           await Promise.all(
@@ -76,11 +84,11 @@ export const $DepositEditor = (config: {
                 null
               )
               if (!tokenAddress) return
-              balances[chain.id] = await wallet.getTokenBalance(tokenAddress, address, chain.id)
+              balances[chain.id] = await wallet.getTokenBalance(tokenAddress, address, chain.id, refresh)
             })
           )
           return balances
-        }, config.address)
+        }, fetchTrigger)
       )
 
       const chainSelection = state(merge(just(getChainId(wallet.wagmi)), selectChain))
