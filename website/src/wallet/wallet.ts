@@ -8,7 +8,6 @@ import {
   getConnection,
   type ReadContractParameters,
   readContract,
-  reconnect,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
   getWalletClient as wagmiGetWalletClient,
@@ -34,11 +33,11 @@ import { getBalance } from 'viem/actions'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 import { porto as portoConnector } from 'wagmi/connectors'
 
-if (!import.meta.env.VITE__WC_PROJECT_ID) {
-  throw new Error('Missing WalletConnect Project ID in environment variables')
-}
+// if (!import.meta.env.VITE__WC_PROJECT_ID) {
+//   throw new Error('Missing WalletConnect Project ID in environment variables')
+// }
 
-export type IAccountState = {
+type IAccountState = {
   walletClient: WalletClient
   address: Address
   subAccount: RhinestoneAccount
@@ -46,12 +45,6 @@ export type IAccountState = {
 }
 
 // Transport configuration for reading blockchain data
-const arbitrumTransport = fallback([
-  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
-  webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
-  http('https://arb1.arbitrum.io/rpc')
-])
-
 const rhinestoneSDK = new RhinestoneSDK({
   apiKey: 'proxy',
   endpointUrl: `${window.location.origin}/api/orchestrator`,
@@ -69,10 +62,10 @@ const protoConnector = portoConnector({
   })
 })
 
-export const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
-export const chainMap = groupList(chainList, 'id')
+const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
+const chainMap = groupList(chainList, 'id')
 
-export const wagmi: Config = createConfig({
+const wagmi: Config = createConfig({
   chains: chainList,
   connectors: [
     protoConnector
@@ -88,7 +81,11 @@ export const wagmi: Config = createConfig({
     // })
   ],
   transports: {
-    [arbitrum.id]: arbitrumTransport,
+    [arbitrum.id]: fallback([
+      webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
+      webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
+      http('https://arb1.arbitrum.io/rpc')
+    ]),
     [mainnet.id]: http(mainnet.rpcUrls.default.http[0]),
     [base.id]: http(base.rpcUrls.default.http[0]),
     [optimism.id]: http(optimism.rpcUrls.default.http[0]),
@@ -99,7 +96,7 @@ export const wagmi: Config = createConfig({
 // Auto Reconnect to last used wallet
 // reconnect(wagmi)
 
-export const publicClient = wagmi.getClient({
+const publicClient = wagmi.getClient({
   chainId: arbitrum.id
 })
 
@@ -290,7 +287,7 @@ const fetchRhinestonePortfolio = async (
     .filter((token): token is RhinestonePortfolioToken => Boolean(token))
 }
 
-export const wallet = {
+const wallet = {
   read,
   getTokenBalance,
   account,
@@ -298,5 +295,10 @@ export const wallet = {
   disconnect,
   publicClient,
   wagmi,
+  chainList,
+  chainMap,
   connectors: wagmi.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }
+
+export type { IAccountState }
+export default wallet

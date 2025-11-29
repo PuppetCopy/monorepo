@@ -20,7 +20,7 @@ import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditor
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
-import { wallet } from '../wallet/wallet.js'
+import wallet from '../wallet/wallet.js'
 import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
 import { $TraderPage } from './$Trader.js'

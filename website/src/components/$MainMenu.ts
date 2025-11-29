@@ -18,7 +18,7 @@ import {
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import { $seperator2 } from 'src/pages/common.js'
-import { wallet } from 'src/wallet/wallet.js'
+import wallet from 'src/wallet/wallet.js'
 import {
   $alertIntermediateSpinnerContainer,
   $anchor,

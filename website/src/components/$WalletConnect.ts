@@ -2,7 +2,7 @@ import { map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
-import { wallet } from '../wallet/wallet.js'
+import wallet from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 
 type ConnectorOption = { id: string; name: string }

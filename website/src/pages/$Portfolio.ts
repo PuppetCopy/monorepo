@@ -27,7 +27,7 @@ import { $ButtonCircular, $ButtonSecondary, $defaultButtonCircularContainer } fr
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
 import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
 import { $RouteDepositEditor } from '../components/portfolio/$RouteDepositEditor.js'
-import { wallet } from '../wallet/wallet.js'
+import wallet from '../wallet/wallet.js'
 import { $seperator2 } from './common.js'
 import type { IPageFilterParams } from './types.js'
 

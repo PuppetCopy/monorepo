@@ -31,7 +31,7 @@ import type { Address } from 'viem/accounts'
 import { $ButtonToggle, $DropSelect, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
 import type { ValueOf } from '@/utils/types.js'
 import { $tokenIconWithAmount } from '../../common/$common.js'
-import { chainList, chainMap, wallet } from '../../wallet/wallet.js'
+import wallet from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
 export const DEPOSIT_EDITOR_ACTION = {
@@ -69,7 +69,7 @@ export const $DepositEditor = (config: {
           const balances: Record<number, bigint> = {}
           if (!address) return balances
           await Promise.all(
-            chainList.map(async chain => {
+            wallet.chainList.map(async chain => {
               const tokenAddress = getMappedValueFallback(
                 CROSS_CHAIN_TOKEN_MAP[chain.id],
                 tokenDescription.symbol,
@@ -149,11 +149,11 @@ export const $DepositEditor = (config: {
           )(
             $DropSelect({
               value: chainSelection,
-              optionList: chainList.map(chain => chain.id),
+              optionList: wallet.chainList.map(chain => chain.id),
               label: 'Network',
               placeholder: 'Select',
               $$option: map(id => {
-                const chain = getMappedValueFallback(chainMap, id, null)
+                const chain = getMappedValueFallback(wallet.chainMap, id, null)
                 const balance = map(balances => balances[id] ?? 0n, chainBalanceMap)
                 return $row(spacing.small, style({ alignItems: 'center', flex: 1, justifyContent: 'space-between' }))(
                   $node($text(chain?.name ?? String(id))),
