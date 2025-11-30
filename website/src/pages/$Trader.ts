@@ -27,6 +27,7 @@ import {
   type IQuantumScrollPage,
   type ISortBy
 } from '@/ui-components'
+import { $RouterAnchor } from '@/ui-router'
 import { $heading2 } from '../common/$text.js'
 import { $card, $card2 } from '../common/elements/$common.js'
 import { sqlClient } from '../common/sqlClient.js'
@@ -39,11 +40,13 @@ import { $seperator2, accountSettledPositionListSummary, aggregatePositionList }
 import type { IPageFilterParams } from './types.js'
 
 interface ITraderPage extends IPageFilterParams {
+  route: import('aelea/router').Route
   userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
 export const $TraderPage = ({
+  route,
   activityTimeframe,
   collateralTokenList,
   indexTokenList,
@@ -148,7 +151,11 @@ export const $TraderPage = ({
         $column(spacing.small)(
           $node(),
           $row(spacing.tiny, style({ alignItems: 'center', paddingLeft: '20px', fontSize: '.8rem' }))(
-            $node(style({ color: pallete.foreground }))($text('Leaderboard')),
+            $RouterAnchor({
+              url: '/',
+              route,
+              $anchor: $anchor(attr({ href: '/' }))($text('Leaderboard'))
+            })({ click: changeRouteTether() }),
             $node(
               $icon({
                 $content: $arrowRight,

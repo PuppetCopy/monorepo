@@ -166,6 +166,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $TraderPage({
+                  route: leaderboardRoute,
                   userMatchingRuleQuery,
                   activityTimeframe,
                   collateralTokenList,
