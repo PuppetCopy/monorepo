@@ -84,7 +84,7 @@ export default defineConfig({
         rewrite: path => {
           const url = new URL(path, 'http://localhost')
           const network = url.searchParams.get('network')
-          return `?network=${network}`
+          return `/${network}/${process.env.RPC_KEY}`
         }
       }
     }

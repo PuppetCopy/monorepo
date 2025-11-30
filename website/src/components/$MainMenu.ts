@@ -164,7 +164,7 @@ export const $MainMenu = (config: MainMenu) =>
             $RouterAnchor({
               url: '/',
               route: route,
-              $anchor: $element('a')(attr({ 'aria-label': 'Home' }), $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
+              $anchor: $element('a')(attr({ 'aria-label': 'Home' }))($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
             })({
               click: routeChangeTether()
             })
@@ -194,9 +194,7 @@ export const $MainMenu = (config: MainMenu) =>
                 if (!connection) {
                   return $Popover({
                     $target,
-                    $open: map(event => {
-                      // event.stopImmediatePropagation()
-                      // event.preventDefault()
+                    $open: map(() => {
                       return $WalletConnect({
                         connectors: wallet.connectors
                       })({

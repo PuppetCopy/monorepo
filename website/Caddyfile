@@ -32,7 +32,8 @@ handle /api/sql* {
 }
 
 handle /api/rpc {
-    reverse_proxy {$RPC_URL}?network={query.network} {
+    rewrite * /{query.network}/{$RPC_KEY}
+    reverse_proxy {$RPC_URL} {
         header_up Host {upstream_hostport}
     }
 }
