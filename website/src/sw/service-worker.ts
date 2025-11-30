@@ -54,6 +54,11 @@ self.addEventListener('fetch', event => {
   )
 })
 
+// Clear api-cache on new service worker activation
+self.addEventListener('activate', async () => {
+  await caches.delete('api-cache')
+})
+
 // Auto update: activate immediately and take control of existing clients
 clientsClaim()
 

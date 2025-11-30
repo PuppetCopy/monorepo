@@ -16,15 +16,6 @@ export interface ITreasury {
 const styleEl = document.createElement('style')
 document.getElementsByTagName('head')[0].appendChild(styleEl)
 
-function _createAnimationKeyframe(keyframes: string) {
-  const animationId = `anim${(Math.random() + 1).toString(36).substring(7)}`
-
-  const kframes = `@keyframes ${animationId} {${keyframes}}`
-  styleEl.innerHTML = `${styleEl.innerHTML}${kframes}`
-
-  return animationId
-}
-
 const installUserChoice: IStream<any> = fromCallback(cb => {
   return window.addEventListener('beforeinstallprompt', cb)
 })

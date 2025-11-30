@@ -27,6 +27,7 @@ import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
+import { fadeIn } from '../../transitions/enter.js'
 import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
@@ -62,83 +63,84 @@ export const $PortfolioEditorDrawer = ({
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
       [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
-      const openDrawerState = skipRepeatsWith((prev, next) => {
-        return (
-          prev.draftMatchingRuleList === next.draftMatchingRuleList &&
-          prev.draftDepositTokenList === next.draftDepositTokenList
-        )
-      }, combine({ draftMatchingRuleList, draftDepositTokenList, userMatchingRuleQuery }))
+      const drawerState = combine({ draftMatchingRuleList, draftDepositTokenList, userMatchingRuleQuery })
 
-      return [
-        op(
-          openDrawerState,
-          switchMap(params => {
-            if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
-              return empty
-            }
+      const hasContent = op(
+        drawerState,
+        map(params => params.draftMatchingRuleList.length > 0 || params.draftDepositTokenList.length > 0),
+        skipRepeatsWith((a, b) => a === b)
+      )
 
-            const depositSummary = params.draftDepositTokenList.reduce((acc, deposit) => {
-              const current = acc.get(deposit.token) ?? 0n
-              acc.set(deposit.token, current + deposit.amount)
-              return acc
-            }, new Map<Address, bigint>())
+      const $drawerContent = $card2(
+        style({
+          border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
+          padding: '12px 0',
+          borderBottom: 'none',
+          borderRadius: '20px 20px 0 0'
+        })
+      )(
+        $column(isDesktopScreen ? spacing.default : spacing.small)(
+          $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
+            $heading3($text('Portfolio Changes')),
+            $infoTooltip(
+              $text(
+                'The following rules will apply to these traders in your portfolio. \nvisit Profile to view your portfolio'
+              )
+            ),
 
-            const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
-            const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
-              const collateralToken = 'action' in item ? item.token : item.collateralToken
-              const existingRoute = acc.find(route => route.collateralToken === collateralToken)
+            $node(style({ flex: 1 }))(),
 
-              if (existingRoute) {
-                if ('throttleActivity' in item) {
-                  existingRoute.matchingRuleList.push(item)
-                } else if ('token' in item) {
-                  existingRoute.deposit = item
-                }
-              } else {
-                const newDraft: IPortfolioRoute = {
-                  collateralToken,
-                  deposit: null,
-                  matchingRuleList: []
-                }
+            $ButtonCircular({
+              $iconPath: $xCross
+            })({
+              click: clickCloseTether()
+            })
+          ),
 
-                if ('throttleActivity' in item) {
-                  newDraft.matchingRuleList.push(item)
-                } else if ('token' in item) {
-                  newDraft.deposit = item
-                }
-
-                acc.push(newDraft)
+          op(
+            drawerState,
+            switchMap(params => {
+              if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
+                return empty
               }
 
-              return acc
-            }, [])
+              const depositSummary = params.draftDepositTokenList.reduce((acc, deposit) => {
+                const current = acc.get(deposit.token) ?? 0n
+                acc.set(deposit.token, current + deposit.amount)
+                return acc
+              }, new Map<Address, bigint>())
 
-            return $card2(
-              style({
-                border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                padding: '12px 0',
-                borderBottom: 'none',
-                borderRadius: '20px 20px 0 0'
-              })
-            )(
-              $column(isDesktopScreen ? spacing.default : spacing.small)(
-                $row(spacing.small, style({ alignItems: 'center', padding: '0 24px' }))(
-                  $heading3($text('Portfolio Changes')),
-                  $infoTooltip(
-                    $text(
-                      'The following rules will apply to these traders in your portfolio. \nvisit Profile to view your portfolio'
-                    )
-                  ),
+              const updateList = [...params.draftMatchingRuleList, ...params.draftDepositTokenList]
+              const portfolioRouteList: IPortfolioRoute[] = updateList.reduce((acc: IPortfolioRoute[], item) => {
+                const collateralToken = 'action' in item ? item.token : item.collateralToken
+                const existingRoute = acc.find(route => route.collateralToken === collateralToken)
 
-                  $node(style({ flex: 1 }))(),
+                if (existingRoute) {
+                  if ('throttleActivity' in item) {
+                    existingRoute.matchingRuleList.push(item)
+                  } else if ('token' in item) {
+                    existingRoute.deposit = item
+                  }
+                } else {
+                  const newDraft: IPortfolioRoute = {
+                    collateralToken,
+                    deposit: null,
+                    matchingRuleList: []
+                  }
 
-                  $ButtonCircular({
-                    $iconPath: $xCross
-                  })({
-                    click: clickCloseTether()
-                  })
-                ),
+                  if ('throttleActivity' in item) {
+                    newDraft.matchingRuleList.push(item)
+                  } else if ('token' in item) {
+                    newDraft.deposit = item
+                  }
 
+                  acc.push(newDraft)
+                }
+
+                return acc
+              }, [])
+
+              return $column(spacing.default)(
                 op(
                   userMatchingRuleQuery,
                   awaitPromises,
@@ -276,7 +278,7 @@ export const $PortfolioEditorDrawer = ({
 
                         const tokenRouteContractParams = CONTRACT.TokenRouter
                         const calls: CallInput[] = []
-                        const userRouterCalls: Hex[] = [] // Collect UserRouter calls for multicall
+                        const userRouterCalls: Hex[] = []
                         const depositByToken = new Map<Address, bigint>()
 
                         for (const deposit of params.draftDepositTokenList) {
@@ -284,7 +286,6 @@ export const $PortfolioEditorDrawer = ({
                             const current = depositByToken.get(deposit.token) ?? 0n
                             depositByToken.set(deposit.token, current + deposit.amount)
 
-                            // Approve call goes to the callStack directly
                             calls.push({
                               to: deposit.token,
                               data: encodeFunctionData({
@@ -294,7 +295,6 @@ export const $PortfolioEditorDrawer = ({
                               })
                             })
 
-                            // Deposit call will be batched in multicall
                             userRouterCalls.push(
                               encodeFunctionData({
                                 abi: CONTRACT.UserRouter.abi,
@@ -303,7 +303,6 @@ export const $PortfolioEditorDrawer = ({
                               })
                             )
                           } else {
-                            // Withdraw call will be batched in multicall
                             userRouterCalls.push(
                               encodeFunctionData({
                                 abi: CONTRACT.UserRouter.abi,
@@ -314,7 +313,6 @@ export const $PortfolioEditorDrawer = ({
                           }
                         }
 
-                        // Add setMatchingRule calls to be batched
                         params.draftMatchingRuleList.forEach(matchRule => {
                           userRouterCalls.push(
                             encodeFunctionData({
@@ -333,7 +331,6 @@ export const $PortfolioEditorDrawer = ({
                           )
                         })
 
-                        // If we have UserRouter calls, push them individually (smart account can batch)
                         if (userRouterCalls.length > 0) {
                           calls.push(
                             ...userRouterCalls.map(data => ({
@@ -344,7 +341,6 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         const depositTokens = Array.from(depositByToken.entries()).filter(([, amount]) => amount > 0n)
-                        // Simplest path: pre-fund the subaccount, then execute without tokenRequests
                         const subAccount = account.subAccount.getAddress()
                         const fundingCalls = depositTokens.map(([token, amount]) => ({
                           to: token,
@@ -383,9 +379,18 @@ export const $PortfolioEditorDrawer = ({
                   })
                 )
               )
-            )
+            })
+          )
+        )
+      )
+
+      return [
+        op(
+          hasContent,
+          switchMap(open => {
+            if (!open) return empty
+            return fadeIn($drawerContent)
           })
-          // fadeIn
         ),
 
         {
@@ -399,7 +404,6 @@ export const $PortfolioEditorDrawer = ({
                   return [list]
                 }
 
-                // return remove(idx, list)
                 return list.filter((_, i) => i !== idx)
               },
               draftMatchingRuleList,

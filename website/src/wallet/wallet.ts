@@ -28,8 +28,7 @@ import {
   formatUnits,
   http,
   type ReadContractReturnType,
-  type WalletClient,
-  webSocket
+  type WalletClient
 } from 'viem'
 import type { Address } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
@@ -67,16 +66,7 @@ type IAccountState = {
 const rhinestoneSDK = new RhinestoneSDK({
   apiKey: 'proxy',
   endpointUrl: `${window.location.origin}/api/orchestrator`
-  // provider: {
-  //   type: 'custom',
-  //   urls: {
-  //     [arbitrum.id]: import.meta.env.VITE__WC_RPC_URL_42161_1
-  //   }
-  // }
 })
-const DRPC_KEY = import.meta.env.VITE_RPC_KEY
-if (!DRPC_KEY) throw new Error('VITE_RPC_KEY is required')
-
 const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
 const chainMap = groupList(chainList, 'id')
 
@@ -91,7 +81,7 @@ const DRPC_NETWORK_MAP: Record<number, string> = {
 function getDrpcUrl(chain: Chain, refresh = false): string {
   const network = DRPC_NETWORK_MAP[chain.id]
   if (!network) throw new Error(`Unsupported chain: ${chain.id}`)
-  return `/api/rpc?network=${network}&dkey=${DRPC_KEY}${refresh ? '&refresh=true' : ''}`
+  return `/api/rpc?network=${network}${refresh ? '&refresh=true' : ''}`
 }
 
 const wagmi: Config = createConfig({
@@ -104,15 +94,11 @@ const wagmi: Config = createConfig({
     })
   ],
   transports: {
-    [arbitrum.id]: fallback([
-      webSocket(import.meta.env.VITE__WC_RPC_URL_42161_1, {}),
-      webSocket(import.meta.env.VITE__WC_RPC_URL_42161_2, {}),
-      http('https://arb1.arbitrum.io/rpc')
-    ]),
-    [mainnet.id]: http(mainnet.rpcUrls.default.http[0]),
-    [base.id]: http(base.rpcUrls.default.http[0]),
-    [optimism.id]: http(optimism.rpcUrls.default.http[0]),
-    [polygon.id]: http(polygon.rpcUrls.default.http[0])
+    [arbitrum.id]: fallback([http('/api/rpc?network=arbitrum'), http(arbitrum.rpcUrls.default.http[0])]),
+    [mainnet.id]: fallback([http('/api/rpc?network=ethereum'), http(mainnet.rpcUrls.default.http[0])]),
+    [base.id]: fallback([http('/api/rpc?network=base'), http(base.rpcUrls.default.http[0])]),
+    [optimism.id]: fallback([http('/api/rpc?network=optimism'), http(optimism.rpcUrls.default.http[0])]),
+    [polygon.id]: fallback([http('/api/rpc?network=polygon'), http(polygon.rpcUrls.default.http[0])])
   }
 })
 
@@ -231,7 +217,12 @@ async function getTokenBalanceFromClient(
   })
 }
 
-async function getTokenBalance(tokenAddress: Address, owner: Address, chainId: number, refresh = false): Promise<bigint> {
+async function getTokenBalance(
+  tokenAddress: Address,
+  owner: Address,
+  chainId: number,
+  refresh = false
+): Promise<bigint> {
   const chain = chainList.find(c => c.id === chainId)
   if (!chain) throw new Error(`Unsupported chain: ${chainId}`)
 

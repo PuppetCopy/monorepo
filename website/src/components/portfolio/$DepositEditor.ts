@@ -69,7 +69,7 @@ export const $DepositEditor = (config: {
         map(address => ({ address, refresh: false }), config.address),
         config.refreshBalances
           ? switchMap(async () => ({ address: await config.address, refresh: true }), config.refreshBalances)
-          : empty()
+          : empty
       )
 
       const chainBalanceMap = state(
@@ -98,14 +98,16 @@ export const $DepositEditor = (config: {
         changeDepositMode
       )
 
+      const selectedChainBalance = op(
+        combine({ chainSelection, chainBalanceMap }),
+        map(({ chainSelection, chainBalanceMap }) => chainBalanceMap[chainSelection] ?? 0n)
+      )
+
       const maxAmount = op(
-        merge(
-          map(model => model.action, config.model),
-          changeDepositMode
-        ),
-        switchMap(action => {
-          return action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? config.walletBalance : config.depositBalance
-        })
+        combine({ action, selectedChainBalance, depositBalance: config.depositBalance }),
+        map(({ action, selectedChainBalance, depositBalance }) =>
+          action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? selectedChainBalance : depositBalance
+        )
       )
 
       const inputMaxAmount = sample(maxAmount, clickMax)

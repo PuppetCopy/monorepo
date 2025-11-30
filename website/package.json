@@ -3,8 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:pwa": "VITE_PWA_DEV=true vite",
+    "dev": "VITE_PWA_DEV=true vite",
     "dev:generate-pwa-assets": "pwa-assets-generator",
     "build": "vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",

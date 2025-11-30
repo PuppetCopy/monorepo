@@ -35,12 +35,6 @@ jobs:
           bun run middleware:build
           bun run indexer:build
           bun run website:build
-        env:
-          VITE__WC_PROJECT_ID: ${{ secrets.VITE__WC_PROJECT_ID }}
-          VITE__WC_RPC_URL_42161_1: ${{ secrets.VITE__WC_RPC_URL_42161_1 }}
-          VITE__WC_RPC_URL_42161_2: ${{ secrets.VITE__WC_RPC_URL_42161_2 }}
-          VITE_RPC_KEY: ${{ secrets.VITE_RPC_KEY }}
-          RHINESTONE_API_KEY: ${{ secrets.RHINESTONE_API_KEY }}
       
       - name: Docker Build and Push
         run: |
@@ -48,7 +42,6 @@ jobs:
           VERSION="v$(date +%Y%m%d)-${GITHUB_SHA::7}"
           cd website
           docker build \
-            --build-arg RHINESTONE_API_KEY="${{ secrets.RHINESTONE_API_KEY }}" \
             --cache-from ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:$VERSION .

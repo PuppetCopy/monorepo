@@ -23,11 +23,17 @@ handle /api/sql* {
     
     # Strip /api prefix
     uri strip_prefix /api
-    reverse_proxy https://5jlt2hi0lte0h8n5pegrtoh72g.ingress.akash-palmito.org {
+    reverse_proxy {$INDEXER_URL} {
         header_up Host {upstream_hostport}
         transport http {
             tls_insecure_skip_verify
         }
+    }
+}
+
+handle /api/rpc {
+    reverse_proxy {$RPC_URL}?network={query.network} {
+        header_up Host {upstream_hostport}
     }
 }
 
@@ -37,8 +43,8 @@ handle /api/orchestrator/* {
     }
     uri strip_prefix /api/orchestrator
     reverse_proxy @orchestratorMethods https://v1.orchestrator.rhinestone.dev {
-        header_up X-Api-Key {$RHINESTONE_API_KEY}
-        header_up Host v1.orchestrator.rhinestone.dev
+        header_up X-Api-Key {$ORCHESTRATOR_API_KEY}
+        header_up Host {upstream_hostport}
         header_up Accept-Encoding identity
         header_up Accept application/json
         header_up Content-Type application/json

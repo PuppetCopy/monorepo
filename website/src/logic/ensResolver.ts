@@ -2,10 +2,6 @@ import { type Address, createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import { normalize } from 'viem/ens'
 
-const DRPC_KEY = import.meta.env.VITE_RPC_KEY
-if (!DRPC_KEY) throw new Error('VITE_RPC_KEY is required')
-
-// Create a dedicated mainnet client for ENS resolution
 const ensClient = createPublicClient({
   chain: mainnet,
   batch: {
@@ -14,7 +10,7 @@ const ensClient = createPublicClient({
       wait: 50
     }
   },
-  transport: http(`/api/rpc?network=ethereum&dkey=${DRPC_KEY}`)
+  transport: http('/api/rpc?network=ethereum')
 })
 
 // In-memory cache for ENS names
