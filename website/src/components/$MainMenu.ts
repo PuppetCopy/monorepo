@@ -81,13 +81,13 @@ export const $MainMenu = (config: MainMenu) =>
       )
 
       const $socialLinkList = [
-        $iconAnchor(attr({ href: 'https://docs.puppet.tech' }))(
+        $iconAnchor(attr({ href: 'https://docs.puppet.tech', 'aria-label': 'Documentation' }))(
           $icon({ $content: $gitbook, width: '22px', viewBox: '0 0 32 32' })
         ),
-        $iconAnchor(attr({ href: 'https://twitter.com/PuppetCopy' }))(
+        $iconAnchor(attr({ href: 'https://twitter.com/PuppetCopy', 'aria-label': 'Twitter' }))(
           $icon({ $content: $twitter, width: '22px', viewBox: '0 0 24 24' })
         ),
-        $iconAnchor(attr({ href: 'https://github.com/PuppetCopy/monorepo' }))(
+        $iconAnchor(attr({ href: 'https://github.com/PuppetCopy/monorepo', 'aria-label': 'GitHub' }))(
           $icon({ $content: $github, width: '22px', viewBox: '0 0 32 32' })
         )
       ]
@@ -164,7 +164,7 @@ export const $MainMenu = (config: MainMenu) =>
             $RouterAnchor({
               url: '/',
               route: route,
-              $anchor: $element('a')($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
+              $anchor: $element('a')(attr({ 'aria-label': 'Home' }), $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
             })({
               click: routeChangeTether()
             })
