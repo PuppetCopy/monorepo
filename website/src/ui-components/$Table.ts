@@ -18,8 +18,6 @@ import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$
 
 export type TablePageResponse<T> = IQuantumScrollPage & {
   page: T[]
-  hasMore?: boolean
-  isLoading?: boolean
 }
 
 export interface TableOption<T> {
@@ -155,6 +153,7 @@ export const $Table = <T>({
       const normalizedDataSource = map(async resPromise => {
         const res = await resPromise
         const pageItems = Array.isArray(res) ? res : res.page
+
         const $items = pageItems.map(rowData => {
           const $cellDataList = columns.map(col => {
             const $body = col.$bodyCellContainer ?? $bodyCell
@@ -173,20 +172,14 @@ export const $Table = <T>({
           return {
             $items,
             offset: 0,
-            pageSize: $items.length,
-            hasMore: false,
-            isLoading: false
+            pageSize: $items.length
           }
         }
-
-        const hasMore = (res as any).hasMore
 
         return {
           $items,
           offset: res.offset,
-          pageSize: res.pageSize,
-          hasMore: hasMore === undefined ? false : Boolean(hasMore),
-          isLoading: Boolean((res as any).isLoading)
+          pageSize: res.pageSize
         }
       }, dataSource)
 
