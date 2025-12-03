@@ -268,11 +268,15 @@ export const $TraderPage = ({
 
               return $column(spacing.big)(
                 ...params.routeMetricList.map(routeMetric => {
-                  const dataSource = map(pageParams => {
-                    return pagingQuery(
+                  const dataSource = map(async pageParams => {
+                    const result = pagingQuery(
                       { ...pageParams.paging, ...pageParams.sortBy },
                       params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
+                    return {
+                      ...result,
+                      hasMore: result.page.length === pageParams.paging.pageSize
+                    }
                   }, combine({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(

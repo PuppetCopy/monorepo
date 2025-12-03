@@ -18,12 +18,14 @@ import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$
 
 export type TablePageResponse<T> = IQuantumScrollPage & {
   page: T[]
+  hasMore?: boolean
+  isLoading?: boolean
 }
 
 export interface TableOption<T> {
   columns: TableColumn<T>[]
   gridTemplateColumns?: string
-  dataSource: IStream<TablePageResponse<T> | T[]>
+  dataSource: IStream<Promise<TablePageResponse<T> | T[]>>
 
   $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
@@ -150,31 +152,47 @@ export const $Table = <T>({
         })
       )
 
-      const $body = $QuantumScroll({
-        ...scrollConfig,
-        dataSource: map(res => {
-          const $items = (Array.isArray(res) ? res : res.page).map(rowData => {
-            const $cellDataList = columns.map(col => {
-              const $body = col.$bodyCellContainer ?? $bodyCell
-              return $body(switchLatest(col.$bodyCallback(just(rowData))))
-            })
-
-            return $rowCallback
-              ? switchMap(
-                  $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
-                  $rowCallback(just(rowData))
-                )
-              : $rowContainer(gridTemplateColumns)(...$cellDataList)
+      const normalizedDataSource = map(async resPromise => {
+        const res = await resPromise
+        const pageItems = Array.isArray(res) ? res : res.page
+        const $items = pageItems.map(rowData => {
+          const $cellDataList = columns.map(col => {
+            const $body = col.$bodyCellContainer ?? $bodyCell
+            return $body(switchLatest(col.$bodyCallback(just(rowData))))
           })
 
-          if (Array.isArray(res)) return $items
+          return $rowCallback
+            ? switchMap(
+                $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
+                $rowCallback(just(rowData))
+              )
+            : $rowContainer(gridTemplateColumns)(...$cellDataList)
+        })
 
+        if (Array.isArray(res)) {
           return {
             $items,
-            offset: res.offset,
-            pageSize: res.pageSize
+            offset: 0,
+            pageSize: $items.length,
+            hasMore: false,
+            isLoading: false
           }
-        }, dataSource)
+        }
+
+        const hasMore = (res as any).hasMore
+
+        return {
+          $items,
+          offset: res.offset,
+          pageSize: res.pageSize,
+          hasMore: hasMore === undefined ? false : Boolean(hasMore),
+          isLoading: Boolean((res as any).isLoading)
+        }
+      }, dataSource)
+
+      const $body = $QuantumScroll({
+        ...scrollConfig,
+        dataSource: normalizedDataSource
       })({
         scrollRequest: scrollRequestTether()
       })

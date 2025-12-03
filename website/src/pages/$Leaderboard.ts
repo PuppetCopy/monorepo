@@ -165,68 +165,63 @@ export const $Leaderboard = (config: ILeaderboard) =>
               const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
               // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
-              const dataSource = switchMap(
-                async filterParams => {
-                  const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
-                    where: (t, f) => {
-                      return f.and(
-                        f.eq(t.interval, params.activityTimeframe),
-                        params.account ? f.ilike(t.account, params.account) : undefined,
-                        // params.isLong !== undefined
-                        //   ? params.isLong
-                        //     ? f.gte(t.longShortRatio, 5000n)
-                        //     : f.lte(t.longShortRatio, 5000n)
-                        //   : undefined,
-                        // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                        params.collateralTokenList.length > 0
-                          ? f.inArray(t.collateralToken, params.collateralTokenList)
-                          : undefined,
-                        params.indexTokenList.length > 0
-                          ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
-                          : undefined,
-                        f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
-                      )
-                    },
-                    limit: filterParams.paging.pageSize,
-                    offset: filterParams.paging.offset,
-                    orderBy: params.sortBy
-                      ? params.sortBy.direction === 'asc'
-                        ? asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
-                        : desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
-                      : undefined,
-                    columns: {
-                      account: true,
-                      collateralToken: true,
+              const dataSource = map(async filterParams => {
+                const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
+                  where: (t, f) => {
+                    return f.and(
+                      f.eq(t.interval, params.activityTimeframe),
+                      params.account ? f.ilike(t.account, params.account) : undefined,
+                      // params.isLong !== undefined
+                      //   ? params.isLong
+                      //     ? f.gte(t.longShortRatio, 5000n)
+                      //     : f.lte(t.longShortRatio, 5000n)
+                      //   : undefined,
+                      // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                      params.collateralTokenList.length > 0
+                        ? f.inArray(t.collateralToken, params.collateralTokenList)
+                        : undefined,
+                      params.indexTokenList.length > 0
+                        ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
+                        : undefined,
+                      f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
+                    )
+                  },
+                  limit: filterParams.paging.pageSize,
+                  offset: filterParams.paging.offset,
+                  orderBy: params.sortBy
+                    ? params.sortBy.direction === 'asc'
+                      ? asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                      : desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                    : undefined,
+                  columns: {
+                    account: true,
+                    collateralToken: true,
 
-                      sizeUsd: true,
-                      collateralUsd: true,
-                      longShortRatio: true,
-                      pnl: true,
-                      roi: true,
+                    sizeUsd: true,
+                    collateralUsd: true,
+                    longShortRatio: true,
+                    pnl: true,
+                    roi: true,
 
-                      pnlList: true,
-                      pnlTimestampList: true,
-                      matchedPuppetList: true,
-                      indexTokenList: true
-                    },
-                    with: {
-                      traderRouteMetric: {
-                        columns: {
-                          crossOpenSizeInUsd: true
-                        }
+                    pnlList: true,
+                    pnlTimestampList: true,
+                    matchedPuppetList: true,
+                    indexTokenList: true
+                  },
+                  with: {
+                    traderRouteMetric: {
+                      columns: {
+                        crossOpenSizeInUsd: true
                       }
                     }
-                  })
-
-                  const page = metrictList.map(metric => ({ metric }))
-                  return { ...filterParams.paging, page }
-                },
-                combine({
-                  paging
+                  }
                 })
-              )
 
-              type ILeaderboardDatasource = InferStream<typeof dataSource>['page']
+                const page = metrictList.map(metric => ({ metric }))
+                return { ...filterParams.paging, page, hasMore: metrictList.length === filterParams.paging.pageSize }
+              }, combine({ paging }))
+
+              type ILeaderboardDatasource = Awaited<InferStream<typeof dataSource>>['page']
               type ILeaderboardCellData = ILeaderboardDatasource[number]
 
               return $Table({
@@ -246,7 +241,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     background: pallete.background,
                     flexDirection: 'row-reverse',
                     padding: '16px 0'
-                  })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
+                  })($spinner)
                 },
                 // $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })),
                 // $rowContainer: $defaultTableRowContainer(

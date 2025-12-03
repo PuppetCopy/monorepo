@@ -1,8 +1,8 @@
-import { constant, filter, type IStream, join, map, merge, until } from 'aelea/stream'
+import { empty, filter, type IStream, join, joinMap, just, map, merge, until } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $custom, $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $column, observer, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { $intermediatePromise, $spinner } from './$IntermediateDisplay.js'
 
 export type IQuantumScrollPage = {
   pageSize: number
@@ -11,19 +11,18 @@ export type IQuantumScrollPage = {
 
 export type IScrollPagable = IQuantumScrollPage & {
   $items: I$Node[]
+  hasMore?: boolean
+  isLoading?: boolean
 }
 
 export interface QuantumScroll {
   insertAscending?: boolean
-  dataSource: IStream<IScrollPagable>
+  dataSource: IStream<Promise<IScrollPagable>>
   $container?: INodeCompose
   $loader?: I$Node
   $emptyMessage?: I$Node
 }
 
-export const $defaultVScrollLoader = $node(style({ color: pallete.foreground, padding: '3px 10px' }))(
-  $text('loading...')
-)
 export const $defaultVScrollContainer = $column(spacing.default)
 const $defaultEmptyMessage = $column(spacing.default, style({ padding: '20px' }))($text('No items to display'))
 
@@ -31,46 +30,56 @@ export const $QuantumScroll = ({
   dataSource,
   $container = $defaultVScrollContainer,
   $emptyMessage = $defaultEmptyMessage,
-  $loader = $defaultVScrollLoader,
+  $loader = $spinner,
   insertAscending = false
-  // scrollRequest = empty
 }: QuantumScroll) =>
   component(([nextScrollRequest, nextScrollRequestTether]: IBehavior<any, IQuantumScrollPage>) => {
-    const $itemLoader = map(nextResponse => {
-      const itemCount = Array.isArray(nextResponse) ? nextResponse.length : nextResponse.$items.length
-
-      if (itemCount === 0) {
-        return $emptyMessage
-      }
-
-      if (Array.isArray(nextResponse)) {
-        return merge(...nextResponse)
-      }
-
-      const hasMoreItems = nextResponse.pageSize === itemCount
-
-      const $observerloader = $custom('observer')(
-        nextScrollRequestTether(
-          observer.intersection({ threshold: 1 }),
-          filter(([entry]) => {
-            return entry.isIntersecting === true
-          }),
-          constant({ offset: nextResponse.offset + nextResponse.pageSize, pageSize: nextResponse.pageSize })
-        )
-      )($loader)
-
-      const $items = hasMoreItems
-        ? [...nextResponse.$items, until(nextScrollRequest, $observerloader)]
-        : nextResponse.$items
-
-      return merge(...$items)
-    }, dataSource)
-
     return [
-      $container(map(node => ({ ...node, insertAscending })))(join($itemLoader)),
+      $container(map(node => ({ ...node, insertAscending })))(
+        joinMap(dataPromise => {
+          return $intermediatePromise({
+            $loader,
+            $display: just(
+              dataPromise.then(response => {
+                const { $items, pageSize, offset } = response
+                const itemCount = $items.length
 
-      {
-        scrollRequest: nextScrollRequest
-      }
+                const hasMore = itemCount === pageSize && itemCount > 0
+                const nextOffset = offset + pageSize
+
+                // Empty state on first page
+                if (offset === 0 && itemCount === 0) {
+                  return $emptyMessage
+                }
+
+                // No items in this page
+                if (itemCount === 0) {
+                  return empty
+                }
+
+                // Return items + observer if more pages
+                if (!hasMore) {
+                  return merge(...$items)
+                }
+
+                return merge(
+                  ...$items,
+                  until(
+                    nextScrollRequest,
+                    $custom('observer')(
+                      nextScrollRequestTether(
+                        observer.intersection({ threshold: 0.25, rootMargin: '200px 0px 200px 0px' }),
+                        filter(([entry]) => entry.isIntersecting),
+                        map(() => ({ offset: nextOffset, pageSize }))
+                      )
+                    )($node(style({ height: '12px', width: '100%' }))())
+                  )
+                )
+              })
+            )
+          })
+        }, dataSource)
+      ),
+      { scrollRequest: nextScrollRequest }
     ]
   })

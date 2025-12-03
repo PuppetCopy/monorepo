@@ -14,7 +14,7 @@ import {
 import { multicast, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Chain, TransactionReceipt } from 'viem'
 import { $alert, $alertTooltip, $txHashRef } from './$common.js'
 
@@ -22,9 +22,21 @@ export const $spinner = $node(
   style({
     margin: 'auto',
     placeSelf: 'center',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    animation: 'rotate 0.55s linear infinite',
+    borderStyle: 'dotted',
+    borderWidth: '2px',
+    borderColor: `${colorAlpha(pallete.foreground, 0.5)} transparent ${colorAlpha(pallete.foreground, 0.5)} transparent`,
+    borderRadius: '50%',
+    aspectRatio: '1 / 1',
+    height: '10px',
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    transformOrigin: '50% 50%',
+    lineHeight: 0,
+    flexShrink: 0
   })
-)($text('Loading...'))
+)()
 
 export interface I$IntermediatPromise<_T> {
   clean?: IStream<any>
@@ -36,7 +48,22 @@ export interface I$IntermediatPromise<_T> {
 
 export const $intermediatePromise = <T>({
   $loader = $spinner,
-  $$fail = res => style({ placeSelf: 'center', margin: 'auto' })($alert($node($text(res.message)))),
+  $$fail = res => {
+    const message =
+      typeof res === 'string'
+        ? res
+        : (res as any)?.message
+          ? String((res as any).message)
+          : (() => {
+              try {
+                return JSON.stringify(res)
+              } catch {
+                return 'Unknown error'
+              }
+            })()
+
+    return style({ placeSelf: 'center', margin: 'auto' })($alertTooltip($text(message)))
+  },
   $display
 }: I$IntermediatPromise<T>) =>
   switchMap(state => {

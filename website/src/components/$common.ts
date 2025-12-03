@@ -25,7 +25,7 @@ export const $CardTable = <T>(config: TableOption<T>) => {
         background: pallete.background,
         flexDirection: 'row-reverse',
         padding: '16px 0'
-      })($infoLabeledValue('Loading', style({ margin: '' })($spinner)))
+      })($spinner)
     },
     $headerRowContainer: $defaultTableRowContainer(
       style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
