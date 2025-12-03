@@ -1,17 +1,6 @@
-import { type Address, createPublicClient, http } from 'viem'
-import { mainnet } from 'viem/chains'
+import type { Address } from 'viem'
 import { normalize } from 'viem/ens'
-
-const ensClient = createPublicClient({
-  chain: mainnet,
-  batch: {
-    multicall: {
-      batchSize: 50,
-      wait: 50
-    }
-  },
-  transport: http('/api/rpc?network=ethereum')
-})
+import { getMainnetPublicClient } from '../wallet/wallet'
 
 // In-memory cache for ENS names
 // Map<Address, string | null> - null means we tried but found no ENS name
@@ -30,6 +19,10 @@ export async function resolveEnsName(address: Address): Promise<string | null> {
 
   try {
     // Use viem's getEnsName for reverse resolution
+    const ensClient = getMainnetPublicClient()
+    if (!ensClient) {
+      throw new Error('Failed to get mainnet client')
+    }
     const ensName = await ensClient.getEnsName({
       address: address as `0x${string}`
     })
@@ -74,6 +67,10 @@ export async function resolveEnsNames(addresses: Address[]): Promise<Map<Address
 export async function resolveEnsAddress(name: string): Promise<Address | null> {
   try {
     const normalizedName = normalize(name)
+    const ensClient = getMainnetPublicClient()
+    if (!ensClient) {
+      throw new Error('Failed to get mainnet client')
+    }
     const address = await ensClient.getEnsAddress({
       name: normalizedName
     })

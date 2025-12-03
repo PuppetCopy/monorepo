@@ -3,23 +3,27 @@ import { combine, constant, empty, type IStream, just, map, op, start, switchMap
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { BaseError, ContractFunctionRevertedError } from 'viem'
+import { BaseError, ContractFunctionRevertedError, type Hex } from 'viem'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import type { IAccountState } from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
-export interface TransactionResult {
-  type: 'intent'
-  id: bigint
-  sourceChains?: number[]
-  targetChain: number
+export interface TransactionStatus {
+  fill: {
+    hash: Hex | undefined
+    chainId: number
+  }
+  claims: {
+    hash: Hex | undefined
+    chainId: number
+  }[]
 }
 
 export interface ISubmitBar {
-  txQuery: IStream<Promise<TransactionResult>>
+  txQuery: IStream<Promise<TransactionStatus>>
   alert?: IStream<string | null>
   $container?: INodeCompose
   $submitContent: I$Slottable
@@ -54,7 +58,7 @@ export const $SubmitBar = (config: ISubmitBar) =>
 
       const requestState = params.multicastTxQuery as {
         status: PromiseStatus
-        value: TransactionResult
+        value: TransactionStatus
         error: unknown
       } | null
 
@@ -95,14 +99,34 @@ export const $SubmitBar = (config: ISubmitBar) =>
         )
       }
 
-      const value = requestState.value as TransactionResult | null
-      if (value?.id) {
-        return $alertPositiveTooltip(
-          $row(spacing.small)(
-            $text('Intent submitted'), //
-            $txHashRef(value.id.toString())
+      const value = requestState.value as TransactionStatus | null
+      if (value) {
+        const txRefs: I$Node[] = []
+
+        if (value.fill.hash) {
+          const chain = getMappedValueFallback(wallet.chainMap, value.fill.chainId, undefined)
+          txRefs.push($txHashRef(value.fill.hash, chain ?? undefined))
+        }
+
+        for (const claim of value.claims) {
+          if (claim.hash) {
+            const chain = getMappedValueFallback(wallet.chainMap, claim.chainId, undefined)
+            txRefs.push($txHashRef(claim.hash, chain ?? undefined))
+          }
+        }
+
+        if (txRefs.length > 0) {
+          return $alertPositiveTooltip(
+            $row(spacing.small)(
+              $text('Transaction executed'), //
+              ...txRefs
+            )
           )
-        )
+        }
+      }
+
+      if (value) {
+        return $alertPositiveTooltip($row(spacing.small)($text('Transaction executed')))
       }
 
       return $spinnerTooltip($node($text('Awaiting execution')))

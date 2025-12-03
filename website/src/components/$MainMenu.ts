@@ -164,7 +164,9 @@ export const $MainMenu = (config: MainMenu) =>
             $RouterAnchor({
               url: '/',
               route: route,
-              $anchor: $element('a')(attr({ 'aria-label': 'Home' }))($icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' }))
+              $anchor: $element('a')(attr({ 'aria-label': 'Home' }))(
+                $icon({ $content: $puppetLogo, width: '45px', viewBox: '0 0 32 32' })
+              )
             })({
               click: routeChangeTether()
             })

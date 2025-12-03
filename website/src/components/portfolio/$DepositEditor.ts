@@ -68,7 +68,7 @@ export const $DepositEditor = (config: {
       const fetchTrigger = merge(
         map(address => ({ address, refresh: false }), config.address),
         config.refreshBalances
-          ? switchMap(async () => ({ address: await config.address, refresh: true }), config.refreshBalances)
+          ? switchMap(async () => ({ address: config.address, refresh: true }), config.refreshBalances)
           : empty
       )
 

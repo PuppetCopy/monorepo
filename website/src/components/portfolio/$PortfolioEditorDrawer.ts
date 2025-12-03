@@ -21,6 +21,7 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type Address, encodeFunctionData, erc20Abi, type Hex } from 'viem'
+import { arbitrum } from 'viem/chains'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
@@ -354,8 +355,9 @@ export const $PortfolioEditorDrawer = ({
                         if (fundingCalls.length > 0) {
                           const fundingTx = await account.walletClient.sendCalls({
                             account: account.address,
-                            chain: account.walletClient.chain ?? wallet.publicClient.chain,
+                            chain: account.walletClient.chain,
                             calls: fundingCalls,
+                            experimental_fallback: true,
                             forceAtomic: true
                           })
 
@@ -363,17 +365,30 @@ export const $PortfolioEditorDrawer = ({
                             id: fundingTx.id,
                             throwOnFailure: true
                           })
+
                           if (status.status !== 'success') {
                             throw new Error('Funding transaction did not succeed')
                           }
                         }
 
                         const tx = await account.subAccount.sendTransaction({
+                          chain: arbitrum,
                           targetChain: wallet.publicClient.chain,
-                          calls
+                          calls,
+                          tokenRequests: depositTokens.map(([token, amount]) => ({
+                            address: token,
+                            amount
+                          })),
+                          signers: {
+                            type: 'owner',
+                            kind: 'ecdsa',
+                            accounts: [account.companionSigner]
+                          }
                         })
 
-                        return tx
+                        const transactionResult = await account.subAccount.waitForExecution(tx)
+
+                        return transactionResult
                       })
                     )
                   })

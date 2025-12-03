@@ -27,6 +27,16 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url)
   if (!url.pathname.startsWith('/api/')) return
 
+  // Do not cache orchestrator stateful endpoints
+  const noCachePaths = [
+    '/api/orchestrator/intent-operations',
+    '/api/orchestrator/intent-operation',
+    '/api/orchestrator/intents'
+  ]
+  const isNoCache =
+    noCachePaths.some(path => url.pathname.startsWith(path)) || url.pathname.startsWith('/api/orchestrator/accounts')
+  if (isNoCache) return
+
   const forceRefresh = url.searchParams.get('refresh') === 'true'
   url.searchParams.delete('refresh')
 
@@ -35,12 +45,12 @@ self.addEventListener('fetch', event => {
       const cache = await caches.open('api-cache')
 
       let cacheKey: Request
-      if (event.request.method === 'POST') {
-        const body = await event.request.clone().text()
-        cacheKey = new Request(`${url.href}#${encodeURIComponent(body)}`)
-      } else {
-        cacheKey = new Request(url.href)
-      }
+      // if (event.request.method === 'POST') {
+      //   const body = await event.request.clone().text()
+      //   cacheKey = new Request(`${url.href}#${encodeURIComponent(body)}`)
+      // } else {
+      cacheKey = new Request(url.href)
+      // }
 
       if (!forceRefresh) {
         const cached = await cache.match(cacheKey)

@@ -1,12 +1,13 @@
 import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
 import { groupList } from '@puppet-copy/middleware/core'
-import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
+import { type RhinestoneAccount, RhinestoneSDK } from '@rhinestone/sdk'
 import { porto } from '@wagmi/connectors'
 import {
   type Config,
   createConfig,
   type GetConnectionReturnType,
   getConnection,
+  getPublicClient,
   type ReadContractParameters,
   readContract,
   connect as wagmiConnect,
@@ -20,17 +21,18 @@ import { fromCallback, state } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
-  type Chain,
   type ContractFunctionArgs,
   type ContractFunctionName,
   createPublicClient,
   fallback,
   formatUnits,
+  type Hex,
   http,
+  keccak256,
   type ReadContractReturnType,
   type WalletClient
 } from 'viem'
-import type { Address } from 'viem/accounts'
+import { type Address, type PrivateKeyAccount, privateKeyToAccount, toAccount } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 type ChainBalance = { chainId: number; balance: bigint }
@@ -58,6 +60,7 @@ type RhinestonePortfolioToken = {
 type IAccountState = {
   walletClient: WalletClient
   address: Address
+  companionSigner: PrivateKeyAccount
   subAccount: RhinestoneAccount
   portfolio: RhinestonePortfolioToken[]
 }
@@ -70,7 +73,7 @@ const rhinestoneSDK = new RhinestoneSDK({
 const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
 const chainMap = groupList(chainList, 'id')
 
-const DRPC_NETWORK_MAP: Record<number, string> = {
+const CHAIN_NETWORK: Record<number, string> = {
   [mainnet.id]: 'ethereum',
   [arbitrum.id]: 'arbitrum',
   [optimism.id]: 'optimism',
@@ -78,11 +81,7 @@ const DRPC_NETWORK_MAP: Record<number, string> = {
   [polygon.id]: 'polygon'
 }
 
-function getDrpcUrl(chain: Chain, refresh = false): string {
-  const network = DRPC_NETWORK_MAP[chain.id]
-  if (!network) throw new Error(`Unsupported chain: ${chain.id}`)
-  return `/api/rpc?network=${network}${refresh ? '&refresh=true' : ''}`
-}
+const COMPANION_SIGNER_STORAGE_PREFIX = 'rhinestone:companion:signer:'
 
 const wagmi: Config = createConfig({
   chains: chainList,
@@ -118,34 +117,103 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
 const account: IStream<Promise<IAccountState | null>> = op(
   connection,
   map(async connection => {
-    if (connection.status === 'connecting') {
-      // wait until connected
-      await new Promise<void>(resolve => {})
-    }
-
     try {
       if (connection.status !== 'connected') {
         return null
       }
 
       const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
-
       const address = walletClient.account.address
-      const accountOwner = walletClientToAccount(walletClient)
+      const ownerAccount = toAccount({
+        address,
+        signMessage: async ({ message }) => {
+          throw new Error('User signer is not available in the companion account flow')
+        },
+        signTransaction: async transaction => {
+          throw new Error('User signer is not available in the companion account flow')
+        },
+        signTypedData: async params => {
+          throw new Error('User signer is not available in the companion account flow')
+        }
+      })
+      const storageKey = `${COMPANION_SIGNER_STORAGE_PREFIX}${address.toLowerCase()}`
+
+      // 1. Try to load from storage first
+      let privateKey: Hex | null = null
+      try {
+        privateKey = localStorage.getItem(storageKey) as Hex | null
+      } catch (error) {
+        console.warn('Unable to read stored companion signer:', error)
+      }
+
+      // 2. If not in storage, derive from signature (will prompt once)
+      if (!privateKey) {
+        try {
+          const message = `ephemeral-signer:${address}:one-click-deposit:v1`
+          const signature = await walletClient.signMessage({
+            account: walletClient.account,
+            message
+          })
+          privateKey = keccak256(signature) as Hex
+
+          try {
+            localStorage.setItem(storageKey, privateKey)
+          } catch (error) {
+            console.warn('Unable to persist companion signer:', error)
+          }
+        } catch (error: any) {
+          const msg = error?.message ?? ''
+          if (msg.includes('user rejected') || msg.includes('User rejected')) {
+            console.log('User cancelled companion signer setup')
+          } else {
+            console.error('Failed to setup companion signer:', error)
+          }
+          return null
+        }
+      }
+
+      // 3. Create the actual signer account
+      let companionSigner: PrivateKeyAccount | null = null
+      try {
+        companionSigner = privateKeyToAccount(privateKey as Hex)
+      } catch (error) {
+        console.warn('Stored companion signer was invalid; clearing cached key.', error)
+        try {
+          localStorage.removeItem(storageKey)
+        } catch (clearError) {
+          console.warn('Unable to clear invalid companion signer:', clearError)
+        }
+        return null
+      }
+
       const subAccount = await rhinestoneSDK.createAccount({
         owners: {
           type: 'ecdsa',
-          accounts: [accountOwner]
+          accounts: [ownerAccount, companionSigner]
         }
       })
+
+      console.log(companionSigner.address)
+      console.log(address)
+      console.log(subAccount.getAddress())
+
       const portfolio = await fetchRhinestonePortfolio(subAccount)
 
       const accountState: IAccountState = {
         address,
         walletClient,
+        companionSigner,
         subAccount,
         portfolio
       }
+
+      console.info('Account state updated:', {
+        address: accountState.address,
+        companionSignerAddress: accountState.companionSigner.address,
+        subAccount,
+        subAccountAddress: subAccount.getAddress(),
+        portfolio: accountState.portfolio
+      })
 
       return accountState
     } catch (error) {
@@ -158,11 +226,17 @@ const account: IStream<Promise<IAccountState | null>> = op(
 
 async function connect(preferredConnectorId?: string) {
   try {
+    const current = getConnection(wagmi)
     const targetConnector =
       wagmi.connectors.find(connector => connector.id === preferredConnectorId) ?? wagmi.connectors[0]
 
     if (!targetConnector) {
       throw new Error('No wallet connector is configured')
+    }
+
+    if (current.status === 'connected') {
+      const addresses = (current as any).addresses ?? ((current as any).address ? [(current as any).address] : [])
+      return addresses as Address[]
     }
 
     const result = await wagmiConnect(wagmi, {
@@ -221,14 +295,27 @@ async function getTokenBalance(
   tokenAddress: Address,
   owner: Address,
   chainId: number,
-  refresh = false
+  refresh = true
 ): Promise<bigint> {
   const chain = chainList.find(c => c.id === chainId)
   if (!chain) throw new Error(`Unsupported chain: ${chainId}`)
 
+  const network = CHAIN_NETWORK[chainId]
+  if (!network) throw new Error(`Unsupported network: ${chainId}`)
+
+  const rpcUrl = (() => {
+    const url = new URL('/api/rpc', window.location.origin)
+    url.searchParams.set('network', network)
+    // service worker expects refresh=true to bypass API cache
+    if (refresh) {
+      url.searchParams.set('refresh', 'true')
+    }
+    return url.toString()
+  })()
+
   const client = createPublicClient({
     chain,
-    transport: http(getDrpcUrl(chain, refresh))
+    transport: http(rpcUrl)
   })
 
   return getTokenBalanceFromClient(tokenAddress, owner, client)
@@ -236,8 +323,7 @@ async function getTokenBalance(
 
 async function getMultichainBalances(
   symbol: keyof (typeof CROSS_CHAIN_TOKEN_MAP)[keyof typeof CROSS_CHAIN_TOKEN_MAP],
-  owner: Address,
-  refresh = false
+  owner: Address
 ): Promise<ChainBalance[]> {
   const results = await Promise.all(
     chainList.map(async chain => {
@@ -246,7 +332,7 @@ async function getMultichainBalances(
       if (!tokenAddress) return { chainId: chain.id, balance: 0n }
 
       try {
-        const balance = await getTokenBalance(tokenAddress, owner, chain.id, refresh)
+        const balance = await getTokenBalance(tokenAddress, owner, chain.id)
         return { chainId: chain.id, balance }
       } catch {
         return { chainId: chain.id, balance: 0n }
@@ -325,6 +411,10 @@ const wallet = {
   chainList,
   chainMap,
   connectors: wagmi.connectors.map(connector => ({ id: connector.id, name: connector.name }))
+}
+
+export function getMainnetPublicClient() {
+  return getPublicClient(wagmi, { chainId: mainnet.id })
 }
 
 export type { IAccountState, ChainBalance }

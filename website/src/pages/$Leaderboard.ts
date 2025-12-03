@@ -58,7 +58,6 @@ import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$Match
 import { $RouteEditor } from '../components/portfolio/$RouteEditor.js'
 import { $tableHeader } from '../components/table/$TableColumn.js'
 import { localStore } from '../const/localStore.js'
-import { resolveEnsName } from '../logic/ensResolver.js'
 import { $seperator2 } from './common.js'
 import type { IPageFilterParams, IPageParams } from './types.js'
 
@@ -267,7 +266,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return $TraderDisplay({
                         route: config.route,
                         address: pos.metric.account,
-                        ensNameStream: fromPromise(resolveEnsName(pos.metric.account as Address)),
+                        // ensNameStream: fromPromise(resolveEnsName(pos.metric.account as Address)),
                         puppetList: []
                       })({
                         click: routeChangeTether()

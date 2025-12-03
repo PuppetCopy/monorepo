@@ -1,7 +1,7 @@
 import * as PUPPET from '@puppet-copy/middleware/const'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, type IStream, map, sampleMap, switchMap } from 'aelea/stream'
+import { combine, constant, type IStream, map, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -29,7 +29,8 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
     ) => {
       const { draftDepositTokenList, collateralToken } = config
 
-      const model = state(
+      const model = op(
+        draftDepositTokenList,
         map(list => {
           const match = list.find(ct => ct.token === collateralToken)
           return (
@@ -39,36 +40,46 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
               amount: 0n
             }
           )
-        }, draftDepositTokenList)
+        }),
+        state
       )
 
-      const walletBalance: IStream<bigint> = state(
+      const walletBalance = op(
+        wallet.account,
         switchMap(async accountPromise => {
           const account = await accountPromise
           if (!account) return 0n
 
+          // Display the connected EOA balance for context
           return tokenBalanceOf(account, collateralToken, account.address)
-        }, wallet.account)
+        }),
+        state
       )
 
-      const depositBalance: IStream<bigint> = state(
+      const depositBalance = op(
+        wallet.account,
         switchMap(async accountPromise => {
           const account = await accountPromise
           if (!account) return 0n
 
-          return wallet.read({
+          const readResult = await wallet.read({
             ...PUPPET.CONTRACT.Account,
             functionName: 'userBalanceMap',
-            args: [collateralToken, account.address]
+            args: [collateralToken, account.companionSigner.address]
           })
-        }, wallet.account)
+
+          return readResult
+        }),
+        state
       )
 
-      const address: IStream<Address | null> = state(
+      const address: IStream<Address | null> = op(
+        wallet.account,
         switchMap(async accountPromise => {
           const account = await accountPromise
-          return account?.address ?? null
-        }, wallet.account)
+          return account?.companionSigner.address ?? null
+        }),
+        state
       )
 
       const collateralTokenDescription = getTokenDescription(collateralToken)
