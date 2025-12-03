@@ -218,7 +218,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 })
 
                 const page = metrictList.map(metric => ({ metric }))
-                return { ...filterParams.paging, page, hasMore: metrictList.length === filterParams.paging.pageSize }
+                return { ...filterParams.paging, page }
               }, combine({ paging }))
 
               type ILeaderboardDatasource = Awaited<InferStream<typeof dataSource>>['page']

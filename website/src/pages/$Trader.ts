@@ -24,6 +24,7 @@ import {
   $infoLabel,
   $intermediateText,
   $Table,
+  $spinner,
   type IQuantumScrollPage,
   type ISortBy
 } from '@/ui-components'
@@ -273,10 +274,7 @@ export const $TraderPage = ({
                       { ...pageParams.paging, ...pageParams.sortBy },
                       params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                     )
-                    return {
-                      ...result,
-                      hasMore: result.page.length === pageParams.paging.pageSize
-                    }
+                    return result
                   }, combine({ sortBy, paging }))
                   const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
                   return $column(
@@ -305,6 +303,7 @@ export const $TraderPage = ({
                       $Table({
                         dataSource,
                         sortBy: params.sortBy,
+                        scrollConfig: { $loader: $spinner },
                         columns: [
                           ...(isDesktopScreen ? [timeColumn] : []),
                           entryColumn,

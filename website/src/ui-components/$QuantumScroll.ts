@@ -1,4 +1,4 @@
-import { empty, filter, type IStream, join, joinMap, just, map, merge, until } from 'aelea/stream'
+import { empty, filter, type Fn, type IStream, join, joinMap, just, map, merge, until } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $custom, $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $column, observer, spacing } from 'aelea/ui-components'
@@ -21,6 +21,7 @@ export interface QuantumScroll {
   $container?: INodeCompose
   $loader?: I$Node
   $emptyMessage?: I$Node
+  $$fail?: Fn<Error, I$Node>
 }
 
 export const $defaultVScrollContainer = $column(spacing.default)
@@ -31,6 +32,7 @@ export const $QuantumScroll = ({
   $container = $defaultVScrollContainer,
   $emptyMessage = $defaultEmptyMessage,
   $loader = $spinner,
+  $$fail,
   insertAscending = false
 }: QuantumScroll) =>
   component(([nextScrollRequest, nextScrollRequestTether]: IBehavior<any, IQuantumScrollPage>) => {
@@ -39,6 +41,7 @@ export const $QuantumScroll = ({
         joinMap(dataPromise => {
           return $intermediatePromise({
             $loader,
+            $$fail,
             $display: just(
               dataPromise.then(response => {
                 const { $items, pageSize, offset } = response
