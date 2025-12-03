@@ -5,7 +5,6 @@ import {
   $defaultTableCell,
   $defaultTableRowContainer,
   $defaultVScrollContainer,
-  $infoLabeledValue,
   $spinner,
   $Table,
   type TableOption

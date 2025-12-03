@@ -23,8 +23,8 @@ import {
   $icon,
   $infoLabel,
   $intermediateText,
-  $Table,
   $spinner,
+  $Table,
   type IQuantumScrollPage,
   type ISortBy
 } from '@/ui-components'

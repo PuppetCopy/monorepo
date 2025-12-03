@@ -38,7 +38,6 @@ import {
   $defaultTableRowContainer,
   $icon,
   $infoLabel,
-  $infoLabeledValue,
   $spinner,
   $Table,
   type IMarker,
