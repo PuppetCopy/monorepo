@@ -3,6 +3,7 @@ import type { IBehavior } from 'aelea/stream-extended'
 import {
   $node,
   $svg,
+  $text,
   attr,
   component,
   type I$Node,
@@ -14,7 +15,12 @@ import {
 } from 'aelea/ui'
 import { $column, $icon, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { $QuantumScroll, type IQuantumScrollPage, type QuantumScroll } from './$QuantumScroll.js'
+import {
+  $defaultVScrollContainer,
+  $QuantumScroll,
+  type IQuantumScrollPage,
+  type QuantumScroll
+} from './$QuantumScroll.js'
 
 export type TablePageResponse<T> = IQuantumScrollPage & {
   page: T[]
@@ -23,7 +29,7 @@ export type TablePageResponse<T> = IQuantumScrollPage & {
 export interface TableOption<T> {
   columns: TableColumn<T>[]
   gridTemplateColumns?: string
-  dataSource: IStream<Promise<TablePageResponse<T> | T[]>>
+  dataSource: IStream<Promise<TablePageResponse<T> | T[]>> | T[]
 
   $between?: I$Node
   scrollConfig?: Omit<QuantumScroll, 'dataSource'>
@@ -105,6 +111,10 @@ export const $Table = <T>({
         display: 'grid',
         gridTemplateColumns: columns.map(col => col.gridTemplate || '1fr').join(' ')
       })
+      const $bodyContainer = (scrollConfig?.$container ?? $defaultVScrollContainer) as INodeCompose
+      const $emptyMessage =
+        (scrollConfig?.$emptyMessage as I$Node | undefined) ??
+        $column(spacing.default, style({ padding: '20px' }))($text('No items to display'))
 
       const $header = $headerRowContainer(gridTemplateColumns)(
         ...columns.map(col => {
@@ -150,48 +160,51 @@ export const $Table = <T>({
         })
       )
 
-      const normalizedDataSource = map(async resPromise => {
-        const res = await resPromise
-        const pageItems = Array.isArray(res) ? res : res.page
-
-        const $items = pageItems.map(rowData => {
-          const $cellDataList = columns.map(col => {
-            const $body = col.$bodyCellContainer ?? $bodyCell
-            return $body(switchLatest(col.$bodyCallback(just(rowData))))
-          })
-
-          return $rowCallback
-            ? switchMap(
-                $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
-                $rowCallback(just(rowData))
-              )
-            : $rowContainer(gridTemplateColumns)(...$cellDataList)
+      const renderRow = (rowData: T) => {
+        const $cellDataList = columns.map(col => {
+          const $body = col.$bodyCellContainer ?? $bodyCell
+          return $body(switchLatest(col.$bodyCallback(just(rowData))))
         })
 
-        if (Array.isArray(res)) {
-          return {
-            $items,
-            offset: 0,
-            pageSize: $items.length
-          }
-        }
+        return $rowCallback
+          ? switchMap(
+              $customRowContainer => $customRowContainer(gridTemplateColumns)(...$cellDataList),
+              $rowCallback(just(rowData))
+            )
+          : $rowContainer(gridTemplateColumns)(...$cellDataList)
+      }
 
-        return {
-          $items,
-          offset: res.offset,
-          pageSize: res.pageSize
-        }
-      }, dataSource)
+      const bodyNode = Array.isArray(dataSource)
+        ? dataSource.length === 0
+          ? $emptyMessage
+          : $bodyContainer(...dataSource.map(renderRow))
+        : $QuantumScroll({
+            ...scrollConfig,
+            dataSource: map(async resPromise => {
+              const res = await resPromise
+              const pageItems = Array.isArray(res) ? res : res.page
+              const $items = pageItems.map(renderRow)
 
-      const $body = $QuantumScroll({
-        ...scrollConfig,
-        dataSource: normalizedDataSource
-      })({
-        scrollRequest: scrollRequestTether()
-      })
+              if (Array.isArray(res)) {
+                return {
+                  $items,
+                  offset: 0,
+                  pageSize: $items.length
+                }
+              }
+
+              return {
+                $items,
+                offset: res.offset,
+                pageSize: res.pageSize
+              }
+            }, dataSource)
+          })({
+            scrollRequest: scrollRequestTether()
+          })
 
       return [
-        $container($header, $between, $body),
+        $container($header, $between, bodyNode),
 
         {
           scrollRequest,

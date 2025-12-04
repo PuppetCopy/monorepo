@@ -7,17 +7,12 @@ import { $intermediatePromise, $spinner } from './$IntermediateDisplay.js'
 export type IQuantumScrollPage = {
   pageSize: number
   offset: number
-}
-
-export type IScrollPagable = IQuantumScrollPage & {
   $items: I$Node[]
-  hasMore?: boolean
-  isLoading?: boolean
 }
 
 export interface QuantumScroll {
   insertAscending?: boolean
-  dataSource: IStream<Promise<IScrollPagable>>
+  dataSource: IStream<Promise<IQuantumScrollPage>>
   $container?: INodeCompose
   $loader?: I$Node
   $emptyMessage?: I$Node
