@@ -1,22 +1,23 @@
 import * as PUPPET from '@puppet-copy/middleware/const'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, type IStream, map, op, sampleMap, switchMap } from 'aelea/stream'
+import { type IStream, just, map, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $text, component, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
-import { $infoLabel, $labeledhintAdjustment } from '@/ui-components'
+import { $infoLabel, $intermediatePromise, $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
 import { tokenBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import wallet from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $DepositEditor, DEPOSIT_EDITOR_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
 
 interface IRouteDepositEditor extends IComponentPageParams {
+  walletAddress?: Address
   collateralToken: Address
   draftDepositTokenList: IStream<IDepositEditorDraft[]>
 }
@@ -24,7 +25,7 @@ interface IRouteDepositEditor extends IComponentPageParams {
 export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
   component(
     (
-      [popDepositEdtior, popDepositEdtiorTether]: IBehavior<any>,
+      [popDepositEdtior, popDepositEdtiorTether]: IBehavior<any, IAccountState>,
       [changeModel, changeModelTether]: IBehavior<IDepositEditorDraft>
     ) => {
       const { draftDepositTokenList, collateralToken } = config
@@ -44,105 +45,98 @@ export const $RouteDepositEditor = (config: IRouteDepositEditor) =>
         state
       )
 
-      const walletBalance = op(
-        wallet.account,
-        switchMap(async accountPromise => {
-          const account = await accountPromise
-          if (!account) return 0n
-
-          // Display the connected EOA balance for context
-          return tokenBalanceOf(account, collateralToken, account.address)
-        }),
-        state
-      )
-
-      const depositBalance = op(
-        wallet.account,
-        switchMap(async accountPromise => {
-          const account = await accountPromise
-          if (!account) return 0n
-
-          const readResult = await wallet.read({
-            ...PUPPET.CONTRACT.Account,
-            functionName: 'userBalanceMap',
-            args: [collateralToken, account.companionSigner.address]
-          })
-
-          return readResult
-        }),
-        state
-      )
-
-      const address: IStream<Address | null> = op(
-        wallet.account,
-        switchMap(async accountPromise => {
-          const account = await accountPromise
-          return account?.companionSigner.address ?? null
-        }),
-        state
-      )
-
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
       return [
         $Popover({
-          $open: constant(
-            $DepositEditor({
-              walletBalance,
-              depositBalance,
-              model,
-              token: collateralToken,
-              address
-            })({
-              changeModel: changeModelTether()
-            }),
-            popDepositEdtior
-          ),
-          $target: $row(spacing.big, style({ padding: '6px 0' }))(
-            $route(collateralTokenDescription),
-            $row(spacing.default)(
-              $row(spacing.small, style({ alignItems: 'center' }))(
-                $infoLabel($text('Deposit')),
-                $labeledhintAdjustment({
-                  color: map(
-                    c =>
-                      c
-                        ? c.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
-                          ? pallete.positive
-                          : pallete.negative
-                        : undefined,
-                    model
-                  ),
-                  change: map(params => {
-                    if (!params.model) return ''
+          $open: op(
+            popDepositEdtior,
+            map(account => {
+              const walletBalance = op(
+                just(account),
+                switchMap(async acc => tokenBalanceOf(acc, collateralToken, acc.address)),
+                state
+              )
 
-                    if (params.model.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
-                      if (params.model.amount === 0n) return ''
-                    }
+              const depositBalance = op(
+                just(account),
+                switchMap(async acc => {
+                  const readResult = await wallet.read({
+                    ...PUPPET.CONTRACT.Account,
+                    functionName: 'userBalanceMap',
+                    args: [collateralToken, acc.subAccount.getAddress()]
+                  })
+                  return readResult
+                }),
+                state
+              )
 
-                    return readableTokenAmountLabel(
-                      collateralTokenDescription,
-                      params.model.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
-                        ? params.model.amount + params.depositBalance
-                        : params.depositBalance - params.model.amount
-                    )
-                  }, combine({ depositBalance, model })),
-                  $val: $text(
-                    map(amount => {
-                      return readableTokenAmountLabel(collateralTokenDescription, amount)
-                    }, depositBalance)
-                  )
-                })
-              ),
-              $ButtonSecondary({
-                $container: $defaultMiniButtonSecondary,
-                $content: $text('Update'),
-                disabled: map(acc => acc === null, address)
+              return $DepositEditor({
+                walletBalance,
+                depositBalance,
+                model,
+                token: collateralToken,
+                account
               })({
-                click: popDepositEdtiorTether()
+                changeModel: changeModelTether()
               })
-            )
+            })
           ),
+          $target: $intermediatePromise({
+            $display: map(async accountQuery => {
+              const account = await accountQuery
+
+              const depositBalance = account
+                ? await wallet.read({
+                    ...PUPPET.CONTRACT.Account,
+                    functionName: 'userBalanceMap',
+                    args: [collateralToken, account.subAccount.getAddress()]
+                  })
+                : 0n
+
+              return $row(spacing.big, style({ padding: '6px 0' }))(
+                $route(collateralTokenDescription),
+                $row(spacing.default)(
+                  $row(spacing.small, style({ alignItems: 'center' }))(
+                    $infoLabel($text('Deposit')),
+                    $labeledhintAdjustment({
+                      color: map(
+                        c =>
+                          c
+                            ? c.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
+                              ? pallete.positive
+                              : pallete.negative
+                            : undefined,
+                        model
+                      ),
+                      change: map(m => {
+                        if (!m) return ''
+
+                        if (m.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
+                          if (m.amount === 0n) return ''
+                        }
+
+                        return readableTokenAmountLabel(
+                          collateralTokenDescription,
+                          m.action === DEPOSIT_EDITOR_ACTION.DEPOSIT
+                            ? m.amount + depositBalance
+                            : depositBalance - m.amount
+                        )
+                      }, model),
+                      $val: $text(readableTokenAmountLabel(collateralTokenDescription, depositBalance))
+                    })
+                  ),
+                  $ButtonSecondary({
+                    $container: $defaultMiniButtonSecondary,
+                    $content: $text('Update'),
+                    disabled: just(!account)
+                  })({
+                    click: popDepositEdtiorTether(map(() => account))
+                  })
+                )
+              )
+            }, wallet.account)
+          }),
           dismiss: changeModel
         })({}),
 

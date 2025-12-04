@@ -7,7 +7,6 @@ import {
   readableUsd,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
 import { combine, fromPromise, type IStream, map, start, switchMap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
@@ -22,6 +21,7 @@ import {
   $external,
   $icon,
   $infoLabel,
+  $intermediatePromise,
   $intermediateText,
   $spinner,
   $Table,
@@ -100,11 +100,10 @@ export const $TraderPage = ({
         }, routeMetricListQuery)
       )
 
-      const pageParams = switchMap(async params => {
+      const pageParams = map(params => {
         const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-        const _paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
-        const [routeMetricList, increaseList, decreaseList] = await Promise.all([
+        const pageQuery = Promise.all([
           params.routeMetricListQuery,
           sqlClient.query.positionIncrease.findMany({
             where: (t, f) =>
@@ -136,16 +135,11 @@ export const $TraderPage = ({
           })
         ])
 
-        const openPositionList = aggregatePositionList([...increaseList, ...decreaseList])
+        return pageQuery.then(([routeMetricList, increaseList, decreaseList]) => {
+          const openPositionList = aggregatePositionList([...increaseList, ...decreaseList])
 
-        //   if (list.length === 0) {
-        //     return $column(spacing.small)(
-        //       $text('No active positions found'),
-        //       $infoLabel('Try changing the timeframe or selecting a different trade route')
-        //     )
-        //   }
-
-        return { ...params, routeMetricList, increaseList, decreaseList, openPositionList }
+          return { ...params, routeMetricList, increaseList, decreaseList, openPositionList }
+        })
       }, combine({ sortBy, activityTimeframe, collateralTokenList, routeMetricListQuery }))
 
       return [
@@ -256,70 +250,72 @@ export const $TraderPage = ({
               )
             ),
 
-            switchMap(params => {
-              const _startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
-              const paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
+            $intermediatePromise({
+              $loader: $spinner,
+              $display: map(async paramsQuery => {
+                const params = await paramsQuery
+                const paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
-              if (params.routeMetricList.length === 0) {
-                return $column(spacing.small)(
-                  $text('No activity to display'),
-                  $infoLabel($text('Try adjusting filters like Activity timeframe or collateral tokens'))
-                )
-              }
-
-              return $column(spacing.big)(
-                ...params.routeMetricList.map(routeMetric => {
-                  const dataSource = map(async pageParams => {
-                    const result = pagingQuery(
-                      { ...pageParams.paging, ...pageParams.sortBy },
-                      params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
-                    )
-                    return result
-                  }, combine({ sortBy, paging }))
-                  const _collateralTokenDescription = getTokenDescription(routeMetric.collateralToken)
-                  return $column(
-                    // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
-
-                    switchMap(
-                      list => {
-                        return $RouteEditor({
-                          displayCollateralTokenSymbol: true,
-                          collateralToken: routeMetric.collateralToken,
-                          traderMatchedPuppetList: routeMetric.matchedPuppetList,
-                          userMatchingRuleList: [],
-                          draftMatchingRuleList,
-                          trader: routeMetric.account,
-                          $container: $defaultTraderMatchRouteEditorContainer(
-                            style({ marginLeft: '-12px', paddingBottom: '12px' })
-                          )
-                        })({
-                          changeMatchRuleList: changeMatchRuleListTether()
-                        })
-                      },
-                      switchMap(promise => fromPromise(promise), userMatchingRuleQuery)
-                    ),
-                    $row(
-                      style({ marginRight: '26px' })($seperator2),
-                      $Table({
-                        dataSource,
-                        sortBy: params.sortBy,
-                        scrollConfig: { $loader: $spinner },
-                        columns: [
-                          ...(isDesktopScreen ? [timeColumn] : []),
-                          entryColumn,
-                          ...(isDesktopScreen ? [puppetsColumn(changeRouteTether)] : []),
-                          sizeColumn(),
-                          pnlColumn()
-                        ]
-                      })({
-                        // sortBy: sortByChangeTether(),
-                        scrollRequest: scrollRequestTether()
-                      })
-                    )
+                if (params.routeMetricList.length === 0) {
+                  return $column(spacing.small)(
+                    $text('No activity to display'),
+                    $infoLabel($text('Try adjusting filters like Activity timeframe or collateral tokens'))
                   )
-                })
-              )
-            }, pageParams)
+                }
+
+                return $column(spacing.big)(
+                  ...params.routeMetricList.map(routeMetric => {
+                    const dataSource = map(async pageParams => {
+                      const result = pagingQuery(
+                        { ...pageParams.paging, ...pageParams.sortBy },
+                        params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
+                      )
+                      return result
+                    }, combine({ sortBy, paging }))
+                    return $column(
+                      // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
+
+                      switchMap(
+                        list => {
+                          return $RouteEditor({
+                            displayCollateralTokenSymbol: true,
+                            collateralToken: routeMetric.collateralToken,
+                            traderMatchedPuppetList: routeMetric.matchedPuppetList,
+                            userMatchingRuleList: [],
+                            draftMatchingRuleList,
+                            trader: routeMetric.account,
+                            $container: $defaultTraderMatchRouteEditorContainer(
+                              style({ marginLeft: '-12px', paddingBottom: '12px' })
+                            )
+                          })({
+                            changeMatchRuleList: changeMatchRuleListTether()
+                          })
+                        },
+                        switchMap(promise => fromPromise(promise), userMatchingRuleQuery)
+                      ),
+                      $row(
+                        style({ marginRight: '26px' })($seperator2),
+                        $Table({
+                          dataSource,
+                          sortBy: params.sortBy,
+                          scrollConfig: { $loader: $spinner },
+                          columns: [
+                            ...(isDesktopScreen ? [timeColumn] : []),
+                            entryColumn,
+                            ...(isDesktopScreen ? [puppetsColumn(changeRouteTether)] : []),
+                            sizeColumn(),
+                            pnlColumn()
+                          ]
+                        })({
+                          // sortBy: sortByChangeTether(),
+                          scrollRequest: scrollRequestTether()
+                        })
+                      )
+                    )
+                  })
+                )
+              }, pageParams)
+            })
           )
         ),
         { changeRoute, changeActivityTimeframe, selectCollateralTokenList, selectIndexTokenList, changeMatchRuleList }

@@ -27,14 +27,13 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url)
   if (!url.pathname.startsWith('/api/')) return
 
-  // Do not cache orchestrator stateful endpoints
+  // Do not cache orchestrator stateful endpoints (write operations)
   const noCachePaths = [
     '/api/orchestrator/intent-operations',
     '/api/orchestrator/intent-operation',
     '/api/orchestrator/intents'
   ]
-  const isNoCache =
-    noCachePaths.some(path => url.pathname.startsWith(path)) || url.pathname.startsWith('/api/orchestrator/accounts')
+  const isNoCache = noCachePaths.some(path => url.pathname.startsWith(path))
   if (isNoCache) return
 
   const forceRefresh = url.searchParams.get('refresh') === 'true'
@@ -58,7 +57,36 @@ self.addEventListener('fetch', event => {
       }
 
       const response = await fetch(event.request)
-      cache.put(cacheKey, response.clone())
+
+      // Only cache successful responses (200-299 status codes)
+      if (response.ok) {
+        // For JSON-RPC responses, check for actual errors before caching
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          const clonedResponse = response.clone()
+          try {
+            const json = await clonedResponse.json()
+            // Only skip caching if there's an explicit error
+            // Don't cache JSON-RPC errors or contract execution failures
+            const hasRpcError = json.error !== undefined && json.error !== null
+            const hasRevertError =
+              json.result &&
+              typeof json.result === 'object' &&
+              'error' in json.result &&
+              json.result.error !== undefined &&
+              json.result.error !== null
+
+            if (!hasRpcError && !hasRevertError) {
+              cache.put(cacheKey, response.clone())
+            }
+          } catch {
+            // If we can't parse JSON, cache anyway (not an RPC response)
+            cache.put(cacheKey, response.clone())
+          }
+        } else {
+          cache.put(cacheKey, response.clone())
+        }
+      }
+
       return response
     })()
   )

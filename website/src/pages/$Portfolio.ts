@@ -10,7 +10,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { awaitPromises, combine, constant, empty, filterNull, type IStream, map, tap } from 'aelea/stream'
+import { awaitPromises, combine, constant, empty, filterNull, type IStream, map, op, tap } from 'aelea/stream'
 import { type IBehavior, multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -55,90 +55,88 @@ export const $PortfolioPage = ({
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, Address>,
       [clickDisconnect, clickDisconnectTether]: IBehavior<any>
     ) => {
-      const positionLinkMapQuery = multicast(
-        map(
-          async params => {
-            if (!params.wallet) {
-              return null
-            }
+      const positionLinkMapQuery = op(
+        combine({ activityTimeframe, collateralTokenList, wallet: awaitPromises(wallet.account) }),
+        map(async params => {
+          if (!params.wallet) {
+            return null
+          }
 
-            const address = params.wallet.address
-            const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+          const address = params.wallet.address
+          const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
-            const result = await sqlClient.query.puppetLink.findMany({
-              where: (t, f) =>
-                f.and(
-                  f.eq(t.puppet, address),
-                  f.gte(t.createdAt, startActivityTimeframe),
-                  params.collateralTokenList.length > 0
-                    ? f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
-                    : undefined
-                ),
-              columns: {
-                traderMatchingKey: true,
-                callParamsTrader: true,
-                callParamsCollateralToken: true,
-                allocationAddress: true,
-                createdAt: true,
-                amount: true,
-                createdTxHash: true
-              },
-              with: {
-                mirrorLink: {
-                  columns: {
-                    callParamsTrader: true,
-                    sizeDelta: true,
-                    requestKey: true,
-                    traderTargetLeverage: true,
-                    callParamsIsLong: true,
-                    callParamsMarket: true
+          const result = await sqlClient.query.puppetLink.findMany({
+            where: (t, f) =>
+              f.and(
+                f.eq(t.puppet, address),
+                f.gte(t.createdAt, startActivityTimeframe),
+                params.collateralTokenList.length > 0
+                  ? f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
+                  : undefined
+              ),
+            columns: {
+              traderMatchingKey: true,
+              callParamsTrader: true,
+              callParamsCollateralToken: true,
+              allocationAddress: true,
+              createdAt: true,
+              amount: true,
+              createdTxHash: true
+            },
+            with: {
+              mirrorLink: {
+                columns: {
+                  callParamsTrader: true,
+                  sizeDelta: true,
+                  requestKey: true,
+                  traderTargetLeverage: true,
+                  callParamsIsLong: true,
+                  callParamsMarket: true
+                },
+                with: {
+                  executeList: {
+                    columns: {
+                      positionSize: true,
+                      transactionHash: true,
+                      traderSize: true,
+                      traderCollateral: true
+                      // traderTargetLeverage: true // TODO: Field no longer exists in schema
+                    }
                   },
-                  with: {
-                    executeList: {
-                      columns: {
-                        positionSize: true,
-                        transactionHash: true,
-                        traderSize: true,
-                        traderCollateral: true
-                        // traderTargetLeverage: true // TODO: Field no longer exists in schema
-                      }
-                    },
-                    liquidate: {
-                      columns: {
-                        transactionHash: true,
-                        blockTimestamp: true
-                      }
-                    },
-                    puppetLinkList: {
-                      columns: {
-                        amount: true,
-                        puppet: true
-                      }
-                    },
-                    requestAdjustList: {
-                      columns: {
-                        sizeDelta: true
-                      }
-                    },
-                    settleList: {
-                      columns: {
-                        settledAmount: true,
-                        distributionAmount: true,
-                        platformFeeAmount: true,
-                        puppetBalanceList: true,
-                        transactionHash: true,
-                        blockTimestamp: true
-                      }
+                  liquidate: {
+                    columns: {
+                      transactionHash: true,
+                      blockTimestamp: true
+                    }
+                  },
+                  puppetLinkList: {
+                    columns: {
+                      amount: true,
+                      puppet: true
+                    }
+                  },
+                  requestAdjustList: {
+                    columns: {
+                      sizeDelta: true
+                    }
+                  },
+                  settleList: {
+                    columns: {
+                      settledAmount: true,
+                      distributionAmount: true,
+                      platformFeeAmount: true,
+                      puppetBalanceList: true,
+                      transactionHash: true,
+                      blockTimestamp: true
                     }
                   }
                 }
               }
-            })
+            }
+          })
 
-            return groupManyList(result, 'traderMatchingKey')
-          },
-          combine({ activityTimeframe, collateralTokenList, wallet: awaitPromises(wallet.account) })
-        )
+          return groupManyList(result, 'traderMatchingKey')
+        })
       )
 
       const stateParams = multicast(

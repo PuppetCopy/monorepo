@@ -7,7 +7,6 @@ import {
   readableTokenAmountLabel
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { getChainId } from '@wagmi/core'
 import {
   combine,
   constant,
@@ -31,7 +30,7 @@ import type { Address } from 'viem/accounts'
 import { $ButtonToggle, $DropSelect, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
 import type { ValueOf } from '@/utils/types.js'
 import { $tokenIconWithAmount } from '../../common/$common.js'
-import wallet from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
 export const DEPOSIT_EDITOR_ACTION = {
@@ -51,7 +50,7 @@ export const $DepositEditor = (config: {
   depositBalance: IStream<bigint>
   model: IStream<IDepositEditorDraft>
   token: Address
-  address: IStream<Address | null>
+  account: IAccountState
   refreshBalances?: IStream<any>
   validation?: IOps<bigint, string | null>
 }) =>
@@ -65,17 +64,11 @@ export const $DepositEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
-      const fetchTrigger = merge(
-        map(address => ({ address, refresh: false }), config.address),
-        config.refreshBalances
-          ? switchMap(async () => ({ address: config.address, refresh: true }), config.refreshBalances)
-          : empty
-      )
-
-      const chainBalanceMap = state(
-        switchMap(async ({ address, refresh }) => {
+      const chainBalanceMap = op(
+        config.refreshBalances ?? just(null),
+        switchMap(async () => {
           const balances: Record<number, bigint> = {}
-          if (!address) return balances
+
           await Promise.all(
             wallet.chainList.map(async chain => {
               const tokenAddress = getMappedValueFallback(
@@ -84,23 +77,24 @@ export const $DepositEditor = (config: {
                 null
               )
               if (!tokenAddress) return
-              balances[chain.id] = await wallet.getTokenBalance(tokenAddress, address, chain.id, refresh)
+              balances[chain.id] = await wallet.getTokenBalance(tokenAddress, config.account.address, chain.id, true)
             })
           )
           return balances
-        }, fetchTrigger)
+        }),
+        state
       )
 
-      const chainSelection = state(merge(just(getChainId(wallet.wagmi)), selectChain))
+      const chainSelection = state(selectChain, config.account.walletClient.chain.id)
+
+      const selectedChainBalance = op(
+        combine({ chainBalanceMap, chainSelection }),
+        map(({ chainBalanceMap, chainSelection }) => chainBalanceMap[chainSelection] ?? 0n)
+      )
 
       const action = merge(
         map(model => model.action, config.model),
         changeDepositMode
-      )
-
-      const selectedChainBalance = op(
-        combine({ chainSelection, chainBalanceMap }),
-        map(({ chainSelection, chainBalanceMap }) => chainBalanceMap[chainSelection] ?? 0n)
       )
 
       const maxAmount = op(
@@ -212,7 +206,11 @@ export const $DepositEditor = (config: {
             $ButtonSecondary({
               disabled: map(
                 params => params.alert !== null || params.model?.amount === params.value,
-                combine({ alert, value, model: config.model })
+                combine({
+                  alert,
+                  value,
+                  model: config.model
+                })
               ),
               $content: $text('Save')
             })({

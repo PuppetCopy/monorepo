@@ -21,6 +21,7 @@ import { fromCallback, state } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
+  type Chain,
   type ContractFunctionArgs,
   type ContractFunctionName,
   createPublicClient,
@@ -30,6 +31,7 @@ import {
   http,
   keccak256,
   type ReadContractReturnType,
+  type Transport,
   type WalletClient
 } from 'viem'
 import { type Address, type PrivateKeyAccount, privateKeyToAccount, toAccount } from 'viem/accounts'
@@ -58,7 +60,7 @@ type RhinestonePortfolioToken = {
 }
 
 type IAccountState = {
-  walletClient: WalletClient
+  walletClient: WalletClient<Transport, Chain>
   address: Address
   companionSigner: PrivateKeyAccount
   subAccount: RhinestoneAccount
@@ -83,15 +85,16 @@ const CHAIN_NETWORK: Record<number, string> = {
 
 const COMPANION_SIGNER_STORAGE_PREFIX = 'rhinestone:companion:signer:'
 
+const portoConnector = porto({
+  chains: chainList,
+  mode: Mode.dialog({
+    renderer: Dialog.popup()
+  })
+})
+
 const wagmi: Config = createConfig({
   chains: chainList,
-  connectors: [
-    porto({
-      mode: Mode.dialog({
-        renderer: Dialog.popup()
-      })
-    })
-  ],
+  connectors: [portoConnector],
   transports: {
     [arbitrum.id]: fallback([http('/api/rpc?network=arbitrum'), http(arbitrum.rpcUrls.default.http[0])]),
     [mainnet.id]: fallback([http('/api/rpc?network=ethereum'), http(mainnet.rpcUrls.default.http[0])]),
