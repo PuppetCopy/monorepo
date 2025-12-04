@@ -107,7 +107,7 @@ export const $tokenLabeled = (indexDescription: ITokenDescription) => {
   )
 }
 
-export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
+export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px', color = pallete.message) => {
   const $token = getMappedValueFallback($tokenIconMap, tokenDesc.symbol, $unknown)
 
   if (!$token) {
@@ -117,7 +117,7 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
   return $icon({
     $content: $token,
     svgOps: style({
-      fill: pallete.message,
+      fill: color,
       width: size,
       height: size,
       borderRadius: '50%'
@@ -126,10 +126,15 @@ export const $tokenIcon = (tokenDesc: ITokenDescription, size = '32px') => {
   })
 }
 
-export const $tokenIconWithAmount = (tokenDesc: ITokenDescription, amount: IStream<bigint>, size = '18px') => {
+export const $tokenIconWithAmount = (
+  tokenDesc: ITokenDescription,
+  amount: bigint,
+  size = '18px',
+  color = pallete.message
+) => {
   return $row(spacing.small, style({ alignItems: 'center' }))(
-    $text(map(bal => readableTokenAmount(tokenDesc, bal), amount)),
-    $tokenIcon(tokenDesc, size)
+    $tokenIcon(tokenDesc, size, color),
+    $text(readableTokenAmount(tokenDesc, amount))
   )
 }
 

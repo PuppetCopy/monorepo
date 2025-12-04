@@ -196,10 +196,6 @@ const account: IStream<Promise<IAccountState | null>> = op(
         }
       })
 
-      console.log(companionSigner.address)
-      console.log(address)
-      console.log(subAccount.getAddress())
-
       const portfolio = await fetchRhinestonePortfolio(subAccount)
 
       const accountState: IAccountState = {

@@ -1,4 +1,4 @@
-import { type IOps, type IStream, just, map, switchLatest, toStream } from 'aelea/stream'
+import { type IOps, type IStream, isStream, just, map, switchLatest, switchMap, toStream } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -12,6 +12,7 @@ export const $defaultDropSelectContainer = $row(
   style({
     alignItems: 'center',
     cursor: 'pointer',
+    placeContent: 'space-between',
     padding: '8px 12px',
     gap: '10px',
     borderRadius: '14px',
@@ -22,47 +23,39 @@ export const $defaultDropSelectContainer = $row(
 export interface IDropSelect<T> {
   value: IStream<T>
   optionList: IStream<readonly T[]> | readonly T[]
-  label?: string
-  placeholder?: string
+  label?: string | IStream<string>
   $container?: INodeCompose
   $valueLabel?: IOps<T, ReturnType<typeof $node>>
   $$option?: IOps<T, ReturnType<typeof $node>>
 }
 
-export const $DropSelect = <T>(config: IDropSelect<T>) =>
+export const $DropSelect = <T>({
+  value,
+  optionList,
+  label,
+  $container = $defaultDropSelectContainer,
+  $$option = map((val: T) => $node($text(String(val)))),
+  $valueLabel = $$option
+}: IDropSelect<T>) =>
   component(([select, selectTether]: IBehavior<T>) => {
-    const {
-      value,
-      optionList,
-      label,
-      placeholder = 'Select',
-      $container = $defaultDropSelectContainer,
-      $$option = map((val: T) => $node($text(String(val)))),
-      $valueLabel = $$option
-    } = config
+    const labelStream = label ? (isStream(label) ? label : just(label)) : null
 
     return [
       $Dropdown({
         optionList,
         $$option,
         $anchor: $container(
-          label ? $infoLabel($text(label)) : $node(),
-          $node(style({ flex: 1, whiteSpace: 'nowrap' }))(
-            switchLatest(
-              map(current => {
-                if (current === null || current === undefined) {
-                  return $node($text(placeholder))
-                }
-                return switchLatest($valueLabel(just(current as T)))
-              }, toStream(value))
-            )
-          ),
-          $icon({
-            $content: $caretDown,
-            width: '12px',
-            svgOps: style({ minWidth: '12px', margin: '2px 1px 0' }),
-            viewBox: '0 0 32 32'
-          })
+          labelStream ? switchLatest(map(text => $infoLabel($text(text)), labelStream)) : $node(),
+          $row(spacing.small)(
+            switchLatest($valueLabel(toStream(value))),
+            $icon({
+              $content: $caretDown,
+              width: '12px',
+              fill: pallete.foreground,
+              svgOps: style({ minWidth: '12px' }),
+              viewBox: '0 0 32 32'
+            })
+          )
         )
       })({
         select: selectTether()

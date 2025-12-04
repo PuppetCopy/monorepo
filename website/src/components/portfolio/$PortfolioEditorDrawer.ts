@@ -32,21 +32,23 @@ import { fadeIn } from '../../transitions/enter.js'
 import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
-import type { IDepositEditorDraft } from './$DepositEditor.js'
-import { DEPOSIT_EDITOR_ACTION } from './$DepositEditor.js'
+import { BALANCE_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
-import { $RouteDepositEditor } from './$RouteDepositEditor.js'
+import { $RouteBalanceEditor } from './$RouteBalanceEditor.js'
+import type { IWithdrawEditorDraft } from './$WithdrawEditor.js'
+
+type BalanceDraft = IDepositEditorDraft | IWithdrawEditorDraft
 
 interface IPortfolioRoute {
   collateralToken: Address
-  deposit: IDepositEditorDraft | null
+  balanceDraft: BalanceDraft | null
   matchingRuleList: ISetMatchingRuleEditorDraft[]
 }
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   route: Route
   userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
-  draftDepositTokenList: IStream<IDepositEditorDraft[]>
+  draftDepositTokenList: IStream<BalanceDraft[]>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
@@ -61,7 +63,7 @@ export const $PortfolioEditorDrawer = ({
       [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IAccountState, any>,
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>,
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
       [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
       const drawerState = combine({ draftMatchingRuleList, draftDepositTokenList, userMatchingRuleQuery })
@@ -119,20 +121,20 @@ export const $PortfolioEditorDrawer = ({
                 if (existingRoute) {
                   if ('throttleActivity' in item) {
                     existingRoute.matchingRuleList.push(item)
-                  } else if ('token' in item) {
-                    existingRoute.deposit = item
+                  } else if ('action' in item) {
+                    existingRoute.balanceDraft = item
                   }
                 } else {
                   const newDraft: IPortfolioRoute = {
                     collateralToken,
-                    deposit: null,
+                    balanceDraft: null,
                     matchingRuleList: []
                   }
 
                   if ('throttleActivity' in item) {
                     newDraft.matchingRuleList.push(item)
-                  } else if ('token' in item) {
-                    newDraft.deposit = item
+                  } else if ('action' in item) {
+                    newDraft.balanceDraft = item
                   }
 
                   acc.push(newDraft)
@@ -158,7 +160,7 @@ export const $PortfolioEditorDrawer = ({
                       ...portfolioRouteList.map(portfolioRoute => {
                         return $column(style({ paddingLeft: '16px' }))(
                           $row(
-                            $RouteDepositEditor({
+                            $RouteBalanceEditor({
                               collateralToken: portfolioRoute.collateralToken,
                               draftDepositTokenList: draftDepositTokenList
                             })({
@@ -282,17 +284,17 @@ export const $PortfolioEditorDrawer = ({
                         const userRouterCalls: Hex[] = []
                         const depositByToken = new Map<Address, bigint>()
 
-                        for (const deposit of params.draftDepositTokenList) {
-                          if (deposit.action === DEPOSIT_EDITOR_ACTION.DEPOSIT) {
-                            const current = depositByToken.get(deposit.token) ?? 0n
-                            depositByToken.set(deposit.token, current + deposit.amount)
+                        for (const draft of params.draftDepositTokenList) {
+                          if (draft.action === BALANCE_ACTION.DEPOSIT) {
+                            const current = depositByToken.get(draft.token) ?? 0n
+                            depositByToken.set(draft.token, current + draft.amount)
 
                             calls.push({
-                              to: deposit.token,
+                              to: draft.token,
                               data: encodeFunctionData({
                                 abi: erc20Abi,
                                 functionName: 'approve',
-                                args: [tokenRouteContractParams.address, deposit.amount]
+                                args: [tokenRouteContractParams.address, draft.amount]
                               })
                             })
 
@@ -300,7 +302,7 @@ export const $PortfolioEditorDrawer = ({
                               encodeFunctionData({
                                 abi: CONTRACT.UserRouter.abi,
                                 functionName: 'deposit',
-                                args: [deposit.token, deposit.amount]
+                                args: [draft.token, draft.amount]
                               })
                             )
                           } else {
@@ -308,7 +310,7 @@ export const $PortfolioEditorDrawer = ({
                               encodeFunctionData({
                                 abi: CONTRACT.UserRouter.abi,
                                 functionName: 'withdraw',
-                                args: [deposit.token, account.address, deposit.amount]
+                                args: [draft.token, account.address, draft.amount]
                               })
                             )
                           }

@@ -27,6 +27,9 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url)
   if (!url.pathname.startsWith('/api/')) return
 
+  // Do not cache POST requests (they are typically state-changing)
+  if (event.request.method !== 'GET') return
+
   // Do not cache orchestrator stateful endpoints (write operations)
   const noCachePaths = [
     '/api/orchestrator/intent-operations',
@@ -62,9 +65,12 @@ self.addEventListener('fetch', event => {
       if (response.ok) {
         // For JSON-RPC responses, check for actual errors before caching
         if (response.headers.get('content-type')?.includes('application/json')) {
-          const clonedResponse = response.clone()
+          // Clone the response for inspection and for caching
+          const inspectionClone = response.clone()
+          const cacheClone = response.clone()
+
           try {
-            const json = await clonedResponse.json()
+            const json = await inspectionClone.json()
             // Only skip caching if there's an explicit error
             // Don't cache JSON-RPC errors or contract execution failures
             const hasRpcError = json.error !== undefined && json.error !== null
@@ -76,11 +82,11 @@ self.addEventListener('fetch', event => {
               json.result.error !== null
 
             if (!hasRpcError && !hasRevertError) {
-              cache.put(cacheKey, response.clone())
+              cache.put(cacheKey, cacheClone)
             }
           } catch {
             // If we can't parse JSON, cache anyway (not an RPC response)
-            cache.put(cacheKey, response.clone())
+            cache.put(cacheKey, cacheClone)
           }
         } else {
           cache.put(cacheKey, response.clone())

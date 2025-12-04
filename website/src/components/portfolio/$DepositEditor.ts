@@ -19,6 +19,7 @@ import {
   op,
   sample,
   sampleMap,
+  switchLatest,
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
@@ -27,20 +28,21 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
-import { $ButtonToggle, $DropSelect, $defaulButtonToggleContainer, $FieldLabeled } from '@/ui-components'
+import { $DropSelect, $defaultDropSelectContainer, $FieldLabeled } from '@/ui-components'
 import type { ValueOf } from '@/utils/types.js'
 import { $tokenIconWithAmount } from '../../common/$common.js'
 import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
-export const DEPOSIT_EDITOR_ACTION = {
+export const BALANCE_ACTION = {
   DEPOSIT: 'deposit',
   WITHDRAW: 'withdraw'
 } as const
-export type DepositEditorAction = ValueOf<typeof DEPOSIT_EDITOR_ACTION>
+
+export type BalanceAction = ValueOf<typeof BALANCE_ACTION>
 
 export interface IDepositEditorDraft {
-  action: DepositEditorAction
+  action: typeof BALANCE_ACTION.DEPOSIT
   token: Address
   amount: bigint
 }
@@ -51,21 +53,19 @@ export const $DepositEditor = (config: {
   model: IStream<IDepositEditorDraft>
   token: Address
   account: IAccountState
-  refreshBalances?: IStream<any>
   validation?: IOps<bigint, string | null>
 }) =>
   component(
     (
       [clickMax, clickMaxTether]: IBehavior<PointerEvent>,
       [inputAmount, inputAmountTether]: IBehavior<string, bigint>,
-      [changeDepositMode, changeDepositModeTether]: IBehavior<DepositEditorAction>,
       [clickSave, clickSaveTether]: IBehavior<PointerEvent>,
       [selectChain, selectChainTether]: IBehavior<number>
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
       const chainBalanceMap = op(
-        config.refreshBalances ?? just(null),
+        just(null),
         switchMap(async () => {
           const balances: Record<number, bigint> = {}
 
@@ -89,39 +89,25 @@ export const $DepositEditor = (config: {
 
       const selectedChainBalance = op(
         combine({ chainBalanceMap, chainSelection }),
-        map(({ chainBalanceMap, chainSelection }) => chainBalanceMap[chainSelection] ?? 0n)
+        map(({ chainBalanceMap, chainSelection }) => {
+          return chainBalanceMap[chainSelection] ?? 0n
+        }),
+        state
       )
 
-      const action = merge(
-        map(model => model.action, config.model),
-        changeDepositMode
-      )
-
-      const maxAmount = op(
-        combine({ action, selectedChainBalance, depositBalance: config.depositBalance }),
-        map(({ action, selectedChainBalance, depositBalance }) =>
-          action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? selectedChainBalance : depositBalance
-        )
-      )
-
-      const inputMaxAmount = sample(maxAmount, clickMax)
+      const inputMaxAmount = sample(selectedChainBalance, clickMax)
 
       const value = merge(
         inputMaxAmount,
         inputAmount,
-        constant(0n, changeDepositMode),
         constant(0n, selectChain),
         map(model => model.amount, config.model)
       )
 
       const alert = merge(
         map(params => {
-          if (params.action === DEPOSIT_EDITOR_ACTION.DEPOSIT && params.value > params.maxAmount) {
-            return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
-          }
-
-          if (params.action === DEPOSIT_EDITOR_ACTION.WITHDRAW && params.value > params.maxAmount) {
-            return `Exceeds deposit balance of ${readableTokenAmountLabel(tokenDescription, params.maxAmount)}`
+          if (params.value > params.selectedChainBalance) {
+            return `Exceeds wallet balance of ${readableTokenAmountLabel(tokenDescription, params.selectedChainBalance)}`
           }
 
           if (params.value < 0n) {
@@ -129,45 +115,35 @@ export const $DepositEditor = (config: {
           }
 
           return null
-        }, combine({ maxAmount, value, action })),
+        }, combine({ selectedChainBalance, value })),
         config.validation ? config.validation(value) : empty
       )
 
       return [
         $column(spacing.default, style({ minWidth: '230px' }))(
-          $ButtonToggle({
-            $container: $defaulButtonToggleContainer(style({ placeSelf: 'center' })),
-            optionList: [DEPOSIT_EDITOR_ACTION.DEPOSIT, DEPOSIT_EDITOR_ACTION.WITHDRAW],
-            value: action,
-            $$option: map(action => {
-              const label = action === DEPOSIT_EDITOR_ACTION.DEPOSIT ? 'Deposit' : 'Withdraw'
-              return $node(style({ width: '100px', textAlign: 'center' }))($text(label))
-            })
+          $DropSelect({
+            value: chainSelection,
+            optionList: wallet.chainList.map(chain => chain.id),
+            label: map(id => {
+              const chain = getMappedValueFallback(wallet.chainMap, id, null)
+              return chain?.name ?? String(id)
+            }, chainSelection),
+            $container: $defaultDropSelectContainer(style({ flex: 1, justifyContent: 'space-between' })),
+            $valueLabel: map(id => {
+              const balance = map(balances => balances[id] ?? 0n, chainBalanceMap)
+              return switchLatest(map(bal => $node($text(readableTokenAmountLabel(tokenDescription, bal))), balance))
+            }),
+            $$option: sampleMap((balances, id) => {
+              const chain = getMappedValueFallback(wallet.chainMap, id, null)
+              const balance = balances[id] ?? 0n
+              return $row(spacing.small, style({ alignItems: 'center', flex: 1, justifyContent: 'space-between' }))(
+                $node($text(chain?.name ?? String(id))),
+                $tokenIconWithAmount(tokenDescription, balance)
+              )
+            }, chainBalanceMap)
           })({
-            select: changeDepositModeTether()
+            select: selectChainTether()
           }),
-
-          $row(
-            spacing.small,
-            style({ alignItems: 'center' })
-          )(
-            $DropSelect({
-              value: chainSelection,
-              optionList: wallet.chainList.map(chain => chain.id),
-              label: 'Network',
-              placeholder: 'Select',
-              $$option: map(id => {
-                const chain = getMappedValueFallback(wallet.chainMap, id, null)
-                const balance = map(balances => balances[id] ?? 0n, chainBalanceMap)
-                return $row(spacing.small, style({ alignItems: 'center', flex: 1, justifyContent: 'space-between' }))(
-                  $node($text(chain?.name ?? String(id))),
-                  $tokenIconWithAmount(tokenDescription, balance)
-                )
-              })
-            })({
-              select: selectChainTether()
-            })
-          ),
 
           $row(spacing.small, style({ position: 'relative' }))(
             $FieldLabeled({
@@ -220,22 +196,16 @@ export const $DepositEditor = (config: {
         ),
 
         {
-          changeModel: merge(
-            sampleMap(
-              (params): IDepositEditorDraft => {
-                return {
-                  action: params.action,
-                  token: config.token,
-                  amount: params.value
-                }
-              },
-              combine({
-                value,
-                action
-              }),
-              clickSave
-            )
-            // constant(0n, changeDepositMode)
+          changeModel: sampleMap(
+            (value): IDepositEditorDraft => {
+              return {
+                action: BALANCE_ACTION.DEPOSIT,
+                token: config.token,
+                amount: value
+              }
+            },
+            value,
+            clickSave
           )
         }
       ]

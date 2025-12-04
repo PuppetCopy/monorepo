@@ -126,19 +126,15 @@ export function $Dropdown<T>({
                 styleInline(
                   zipMap(
                     ([targetRect], [contentRect]) => {
-                      const { bottom, right, left } = targetRect.intersectionRect
-                      const { width } = contentRect.boundingClientRect
-
-                      const rootWidth = targetRect.rootBounds?.width || 0
+                      const { bottom, right, left, width: targetWidth } = targetRect.intersectionRect
 
                       const bottomSpcace = window.innerHeight - bottom
                       const goDown = bottomSpcace > bottom
-                      const placedWidth = left + width
-                      const leftOffset = placedWidth > rootWidth ? rootWidth - placedWidth - 20 : 0
 
                       return {
                         [goDown ? 'top' : 'bottom']: 'calc(100% + 5px)',
-                        left: `${leftOffset}px`,
+                        left: '0',
+                        width: `${targetWidth}px`,
                         visibility: 'visible'
                       }
                     },

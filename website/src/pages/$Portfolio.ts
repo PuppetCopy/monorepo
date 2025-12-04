@@ -26,7 +26,7 @@ import { $Popover } from '../components/$Popover.js'
 import { $ButtonCircular, $ButtonSecondary, $defaultButtonCircularContainer } from '../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
 import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
-import { $RouteDepositEditor } from '../components/portfolio/$RouteDepositEditor.js'
+import { $RouteBalanceEditor } from '../components/portfolio/$RouteBalanceEditor.js'
 import wallet from '../wallet/wallet.js'
 import { $seperator2 } from './common.js'
 import type { IPageFilterParams } from './types.js'
@@ -258,7 +258,7 @@ export const $PortfolioPage = ({
                         spacing.big
                         // style({ padding: '6px 0' })
                       )(
-                        $RouteDepositEditor({
+                        $RouteBalanceEditor({
                           draftDepositTokenList,
                           collateralToken
                         })({
