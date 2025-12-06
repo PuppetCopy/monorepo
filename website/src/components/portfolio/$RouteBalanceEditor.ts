@@ -1,17 +1,18 @@
 import * as PUPPET from '@puppet-copy/middleware/const'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
+import { combine, constant, fromPromise, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
+import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $intermediatePromise, $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
 import { tokenBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/types.js'
-import wallet, { type IAccountState } from '../../wallet/wallet.js'
+import wallet from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import { $DepositEditor, BALANCE_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
@@ -59,7 +60,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
             return await wallet.read({
               ...PUPPET.CONTRACT.Account,
               functionName: 'userBalanceMap',
-              args: [collateralToken, account.subAccount.getAddress()]
+              args: [collateralToken, account.subaccountAddress]
             })
           } catch (error) {
             console.warn('Failed to read deposit balance for target, account may not be initialized:', error)
@@ -95,7 +96,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
               popEditor,
               map(action => {
                 if (!account) {
-                  return $text('No account connected')
+                  return $node($text('No account connected'))
                 }
 
                 const depositBal = op(
@@ -105,7 +106,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
                       const readResult = await wallet.read({
                         ...PUPPET.CONTRACT.Account,
                         functionName: 'userBalanceMap',
-                        args: [collateralToken, a.subAccount.getAddress()]
+                        args: [collateralToken, a.subaccountAddress]
                       })
                       return readResult
                     } catch (error) {
@@ -117,14 +118,8 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
                 )
 
                 if (action === BALANCE_ACTION.DEPOSIT) {
-                  const walletBalance = op(
-                    just(account),
-                    switchMap(async a => tokenBalanceOf(a, collateralToken, a.address)),
-                    state
-                  )
-
                   return $DepositEditor({
-                    walletBalance,
+                    walletBalance: fromPromise(tokenBalanceOf(account.address, collateralToken)),
                     depositBalance: depositBal,
                     model: op(
                       balanceModel,
@@ -193,7 +188,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
           changeDepositTokenList: merge(
             sampleMap(
               (changeList, draft) => {
-                const existingIndex = changeList.findIndex(ct => ct.token === collateralToken)
+                const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
 
                 if (existingIndex !== -1) {
                   changeList[existingIndex] = draft
@@ -207,7 +202,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
             ),
             sampleMap(
               (changeList, draft) => {
-                const existingIndex = changeList.findIndex(ct => ct.token === collateralToken)
+                const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
 
                 if (existingIndex !== -1) {
                   changeList[existingIndex] = draft

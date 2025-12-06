@@ -6,6 +6,7 @@ import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
+import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $alertPositiveContainer } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
@@ -88,12 +89,22 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
-          address: map(getAccountStatus => getAccountStatus?.address, awaitPromises(wallet.account))
+          address: map(getAccountStatus => getAccountStatus?.subaccountAddress, awaitPromises(wallet.account))
         })
       )
 
       const draftMatchingRuleList = state(changeMatchRuleList, [])
-      const draftDepositTokenList = state(changeDepositTokenList, [])
+      const draftDepositTokenList = state(
+        map(list => {
+          // Deduplicate by token address using normalized addresses
+          const deduped = list.reduce((acc, draft) => {
+            acc.set(getAddress(draft.token), draft)
+            return acc
+          }, new Map())
+          return Array.from(deduped.values())
+        }, changeDepositTokenList),
+        []
+      )
 
       return [
         $wrapNativeElement(document.body)(

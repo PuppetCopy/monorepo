@@ -45,6 +45,7 @@ export interface IDepositEditorDraft {
   action: typeof BALANCE_ACTION.DEPOSIT
   token: Address
   amount: bigint
+  chainId: number
 }
 
 export const $DepositEditor = (config: {
@@ -85,7 +86,7 @@ export const $DepositEditor = (config: {
         state
       )
 
-      const chainSelection = state(selectChain, config.account.walletClient.chain.id)
+      const chainSelection = state(selectChain, config.account.walletClient.chain?.id ?? wallet.chainList[0].id)
 
       const selectedChainBalance = op(
         combine({ chainBalanceMap, chainSelection }),
@@ -197,14 +198,15 @@ export const $DepositEditor = (config: {
 
         {
           changeModel: sampleMap(
-            (value): IDepositEditorDraft => {
+            ({ value, chainId }): IDepositEditorDraft => {
               return {
                 action: BALANCE_ACTION.DEPOSIT,
                 token: config.token,
-                amount: value
+                amount: value,
+                chainId
               }
             },
-            value,
+            combine({ value, chainId: chainSelection }),
             clickSave
           )
         }

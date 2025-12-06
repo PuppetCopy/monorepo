@@ -45,7 +45,8 @@ export const $Popover = ({
   component(
     (
       [overlayClick, overlayClickTether]: IBehavior<INode, false>,
-      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
+      [targetIntersection, targetIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>,
+      [contentIntersection, contentIntersectionTether]: IBehavior<INode, IntersectionObserverEntry[]>
     ) => {
       const dismissEvent = merge(overlayClick, dismiss)
 
@@ -88,28 +89,37 @@ export const $Popover = ({
         return merge(
           $contentContainer(
             style({ position: 'fixed', zIndex: 3456 }),
+            contentIntersectionTether(observer.intersection()),
             styleInline(
               map(
                 params => {
-                  const [entry] = params.targetIntersection
+                  const [targetEntry] = params.targetIntersection
+                  const [contentEntry] = params.contentIntersection
 
                   // Store target element for scroll updates
-                  if (entry.target) {
-                    targetElement = entry.target
+                  if (targetEntry?.target) {
+                    targetElement = targetEntry.target
                   }
 
                   // Use stored element or entry
-                  const el = params.updateEvent ? targetElement : entry.target
+                  const el = params.updateEvent ? targetElement : targetEntry?.target
                   if (!el) return { visibility: 'hidden' }
+
+                  // Wait for content to be measured before positioning
+                  if (!contentEntry?.boundingClientRect.width) {
+                    return { visibility: 'hidden' }
+                  }
 
                   const rect = el.getBoundingClientRect()
                   const bottomSpace = window.innerHeight - rect.bottom
                   const topSpace = rect.top
                   const goDown = bottomSpace > 200 || bottomSpace > topSpace
 
+                  // Get actual popover width
+                  const popoverWidth = contentEntry.boundingClientRect.width
+
                   // Center horizontally on the element
                   const centerX = rect.left + rect.width / 2
-                  const popoverWidth = 400 // Estimated width
                   const left = Math.max(
                     spacing,
                     Math.min(centerX - popoverWidth / 2, window.innerWidth - popoverWidth - spacing)
@@ -119,12 +129,12 @@ export const $Popover = ({
                     top: `${goDown ? rect.bottom + spacing : rect.top - spacing}px`,
                     left: `${left}px`,
                     transform: `translate(0, ${goDown ? '0' : '-100%'})`,
-                    maxWidth: `${Math.min(400, window.innerWidth - spacing * 2)}px`,
                     visibility: 'visible'
                   }
                 },
                 combine({
                   targetIntersection,
+                  contentIntersection,
                   updateEvent: start(null, updateEvents)
                 })
               )

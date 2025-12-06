@@ -1,4 +1,4 @@
-import { type IOps, join, just, map, merge, sampleMap } from 'aelea/stream'
+import { constant, type IOps, join, just, map, merge, sampleMap } from 'aelea/stream'
 import { $node, $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { $alertIntermediateSpinnerContainer, $intermediatePromise } from '@/ui-components'
@@ -9,7 +9,7 @@ import { $ButtonSecondary } from './form/$Button.js'
 import type { IButtonCore } from './form/$ButtonCore.js'
 
 export interface IConnectWalletPopover {
-  $$display: IOps<IAccountState | null, I$Node>
+  $$display: IOps<IAccountState, I$Node>
   primaryButtonConfig?: Partial<IButtonCore>
   $container?: INodeCompose
 }
@@ -56,12 +56,10 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
       )
     )
 
-    const connectingPlaceholder = map(() => new Promise<I$Node>(() => {}), selectConnector)
-
     return [
       $intermediatePromise({
         $display: merge(
-          connectingPlaceholder,
+          constant(Promise.resolve(), selectConnector),
           map(async connectionQuery => {
             const connection = await connectionQuery
 

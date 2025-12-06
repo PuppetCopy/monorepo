@@ -1,4 +1,4 @@
-import { type IOps, type IStream, isStream, just, map, switchLatest, switchMap, toStream } from 'aelea/stream'
+import { type IOps, type IStream, isStream, just, map, switchLatest, toStream } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'

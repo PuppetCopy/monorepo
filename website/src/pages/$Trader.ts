@@ -270,7 +270,7 @@ export const $TraderPage = ({
                         { ...pageParams.paging, ...pageParams.sortBy },
                         params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
                       )
-                      return result
+                      return { ...result, $items: result.page }
                     }, combine({ sortBy, paging }))
                     return $column(
                       // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
@@ -296,7 +296,7 @@ export const $TraderPage = ({
                       $row(
                         style({ marginRight: '26px' })($seperator2),
                         $Table({
-                          dataSource,
+                          dataSource: dataSource as any,
                           sortBy: params.sortBy,
                           scrollConfig: { $loader: $spinner },
                           columns: [

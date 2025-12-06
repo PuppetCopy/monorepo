@@ -217,7 +217,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 })
 
                 const page = metrictList.map(metric => ({ metric }))
-                return { ...filterParams.paging, page }
+                return { ...filterParams.paging, page, $items: page }
               }, combine({ paging }))
 
               type ILeaderboardDatasource = Awaited<InferStream<typeof dataSource>>['page']
@@ -251,7 +251,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 //   style({ margin: '0 1px' })
                 // ),
                 sortBy: params.sortBy as any,
-                dataSource,
+                dataSource: dataSource as any,
                 columns: [
                   {
                     $head: $text('Trader'),

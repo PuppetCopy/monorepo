@@ -23,10 +23,10 @@ export const $spinner = $node(
     margin: 'auto',
     placeSelf: 'center',
     alignSelf: 'center',
-    animation: 'rotate 0.55s linear infinite',
+    animation: 'rotate 0.7s cubic-bezier(0.68, -0.35, 0.265, 1.35) infinite',
     borderStyle: 'dotted',
-    borderWidth: '2px',
-    borderColor: `${colorAlpha(pallete.foreground, 0.5)} transparent ${colorAlpha(pallete.foreground, 0.5)} transparent`,
+    borderWidth: '3px',
+    borderColor: `${pallete.foreground} transparent ${colorAlpha(pallete.foreground, 0.3)} transparent`,
     borderRadius: '50%',
     aspectRatio: '1 / 1',
     minHeight: '40px',
@@ -36,7 +36,8 @@ export const $spinner = $node(
     display: 'inline-block',
     transformOrigin: '50% 50%',
     lineHeight: 0,
-    flexShrink: 0
+    flexShrink: 0,
+    willChange: 'transform'
   })
 )()
 

@@ -1,15 +1,18 @@
 import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
-import { groupList } from '@puppet-copy/middleware/core'
+import { groupList, readableAddress } from '@puppet-copy/middleware/core'
 import { type RhinestoneAccount, RhinestoneSDK } from '@rhinestone/sdk'
 import { porto } from '@wagmi/connectors'
 import {
   type Config,
   createConfig,
+  createStorage,
   type GetConnectionReturnType,
   getConnection,
+  getConnections,
   getPublicClient,
   type ReadContractParameters,
   readContract,
+  reconnect,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
   getWalletClient as wagmiGetWalletClient,
@@ -26,7 +29,6 @@ import {
   type ContractFunctionName,
   createPublicClient,
   fallback,
-  formatUnits,
   type Hex,
   http,
   keccak256,
@@ -34,37 +36,103 @@ import {
   type Transport,
   type WalletClient
 } from 'viem'
-import { type Address, type PrivateKeyAccount, privateKeyToAccount, toAccount } from 'viem/accounts'
+import { type Address, type LocalAccount, privateKeyToAccount, toAccount } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 type ChainBalance = { chainId: number; balance: bigint }
 
-type RhinestonePortfolioChain = {
-  chainId: number
-  chainName: string
-  balance: string
-  formattedBalance: string
-  lockedBalance: string
-  unlockedBalance: string
-  formattedLockedBalance: string
-  formattedUnlockedBalance: string
+// Storage key for persisted addresses
+const ACCOUNT_ADDRESSES_KEY = 'accountAddresses'
+
+// Helper to create owner account wrapper (user's main wallet address)
+// This account throws errors on signing - only the companion signer should sign
+function createOwnerAccount(address: Address): LocalAccount {
+  return toAccount({
+    address,
+    signMessage: async () => {
+      throw new Error('User signer is not available in the companion account flow')
+    },
+    signTransaction: async () => {
+      throw new Error('User signer is not available in the companion account flow')
+    },
+    signTypedData: async () => {
+      throw new Error('User signer is not available in the companion account flow')
+    }
+  })
 }
 
-type RhinestonePortfolioToken = {
-  symbol: string
-  totalBalance: string
-  lockedBalance: string
-  unlockedBalance: string
-  decimals: number
-  chains: RhinestonePortfolioChain[]
+// Derive companion signer from wallet signature (deterministic)
+// This is called on-demand when user performs an action (deposit/withdraw/trade)
+// The companion signer is NEVER stored - it exists only in memory during the action
+async function signAndDeriveCompanionSigner(
+  walletClient: WalletClient<Transport, Chain>
+): Promise<{ signature: Hex; companionSigner: LocalAccount }> {
+  if (!walletClient.account) {
+    throw new Error('Wallet client has no account')
+  }
+
+  const address = walletClient.account.address
+
+  // Prompt user to sign message
+  const message = `Approve action for ${readableAddress(address)}\n\nBy signing, I approve the terms and conditions.`
+  const signature = await walletClient.signMessage({
+    account: walletClient.account,
+    message
+  })
+
+  // Derive companion signer private key from signature (deterministic)
+  const privateKey = keccak256(signature) as Hex
+  const companionSigner = privateKeyToAccount(privateKey)
+
+  return { signature, companionSigner }
 }
 
+// Restore keys when user needs to perform an action
+// Re-requests signature and derives companion signer
+async function restoreAccountKeys(account: IAccountState): Promise<IAccountState> {
+  // Already have keys in memory
+  if (account.companionSigner && account.subAccount) {
+    return account
+  }
+
+  // Request signature and derive companion signer
+  const { companionSigner } = await signAndDeriveCompanionSigner(account.walletClient)
+
+  // Recreate subaccount with owner + companion signer
+  const subAccount = await rhinestoneSDK.createAccount({
+    owners: {
+      type: 'ecdsa',
+      accounts: [createOwnerAccount(account.address), companionSigner]
+    }
+  })
+
+  console.info('Keys restored to memory:', {
+    companionSignerAddress: companionSigner.address,
+    subaccountAddress: subAccount.getAddress()
+  })
+
+  // Return updated account state with keys in memory
+  return {
+    ...account,
+    companionSigner,
+    subAccount
+  }
+}
+
+// Account state - supports view mode and action mode
+// View mode: has addresses but no keys - can query data but not execute transactions
+// Action mode: has keys in memory - can execute transactions
+// Note: Addresses are ALWAYS present (required for queries). If user hasn't completed
+// initial setup, we return null instead of an incomplete account state.
 type IAccountState = {
   walletClient: WalletClient<Transport, Chain>
   address: Address
-  companionSigner: PrivateKeyAccount
-  subAccount: RhinestoneAccount
-  portfolio: RhinestonePortfolioToken[]
+  companionSigner: LocalAccount | null // Keys in memory during session
+  companionSignerAddress: Address // Always present - needed for queries
+  subAccount: RhinestoneAccount | null
+  subaccountAddress: Address // Always present - needed for queries
+  portfolio: Awaited<ReturnType<RhinestoneAccount['getPortfolio']>> | null
+  supportsSendCalls: boolean // Can use batch transactions for efficiency
 }
 
 // Transport configuration for reading blockchain data
@@ -83,8 +151,6 @@ const CHAIN_NETWORK: Record<number, string> = {
   [polygon.id]: 'polygon'
 }
 
-const COMPANION_SIGNER_STORAGE_PREFIX = 'rhinestone:companion:signer:'
-
 const portoConnector = porto({
   chains: chainList,
   mode: Mode.dialog({
@@ -95,6 +161,7 @@ const portoConnector = porto({
 const wagmi: Config = createConfig({
   chains: chainList,
   connectors: [portoConnector],
+  storage: createStorage({ storage: localStorage }),
   transports: {
     [arbitrum.id]: fallback([http('/api/rpc?network=arbitrum'), http(arbitrum.rpcUrls.default.http[0])]),
     [mainnet.id]: fallback([http('/api/rpc?network=ethereum'), http(mainnet.rpcUrls.default.http[0])]),
@@ -105,8 +172,20 @@ const wagmi: Config = createConfig({
 })
 
 const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {
-  const currentConnection = getConnection(wagmi)
-  cb(currentConnection)
+  // Restore Porto connection on page load (injected wallets handle reconnection automatically)
+  const storedConnections = getConnections(wagmi)
+  const hasPortoConnection = storedConnections.some(conn => conn.connector.id === 'xyz.ithaca.porto')
+
+  const init = async () => {
+    if (hasPortoConnection) {
+      await reconnect(wagmi, { connectors: [portoConnector] })
+    }
+
+    const currentConnection = getConnection(wagmi)
+    cb(currentConnection)
+  }
+
+  init()
 
   const unsubscribe = watchConnection(wagmi, {
     onChange(conn) {
@@ -121,97 +200,113 @@ const account: IStream<Promise<IAccountState | null>> = op(
   connection,
   map(async connection => {
     try {
-      if (connection.status !== 'connected') {
+      if (connection.status !== 'connected' || !connection.connector) {
         return null
       }
 
       const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
       const address = walletClient.account.address
-      const ownerAccount = toAccount({
-        address,
-        signMessage: async ({ message }) => {
-          throw new Error('User signer is not available in the companion account flow')
-        },
-        signTransaction: async transaction => {
-          throw new Error('User signer is not available in the companion account flow')
-        },
-        signTypedData: async params => {
-          throw new Error('User signer is not available in the companion account flow')
-        }
-      })
-      const storageKey = `${COMPANION_SIGNER_STORAGE_PREFIX}${address.toLowerCase()}`
 
-      // 1. Try to load from storage first
-      let privateKey: Hex | null = null
+      // Check if wallet supports EIP-5792 sendCalls for efficiency optimization
+      let supportsSendCalls = false
       try {
-        privateKey = localStorage.getItem(storageKey) as Hex | null
+        if (typeof walletClient.getCapabilities === 'function') {
+          const capabilities = await walletClient.getCapabilities({ account: address })
+
+          // Check if any chain has atomic batch support
+          supportsSendCalls = Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
+        }
       } catch (error) {
-        console.warn('Unable to read stored companion signer:', error)
+        console.warn('Failed to check wallet capabilities, assuming no sendCalls support:', error)
       }
 
-      // 2. If not in storage, derive from signature (will prompt once)
-      if (!privateKey) {
-        try {
-          const message = `ephemeral-signer:${address}:one-click-deposit:v1`
-          const signature = await walletClient.signMessage({
-            account: walletClient.account,
-            message
-          })
-          privateKey = keccak256(signature) as Hex
+      // Check if we have stored addresses for this wallet (addresses only, not keys!)
+      const storedData = localStorage.getItem(ACCOUNT_ADDRESSES_KEY)
+      const storedAddresses: Record<string, { companionSignerAddress: string; subaccountAddress: string }> = storedData
+        ? JSON.parse(storedData)
+        : {}
+      const savedAccount = storedAddresses[address]
 
-          try {
-            localStorage.setItem(storageKey, privateKey)
-          } catch (error) {
-            console.warn('Unable to persist companion signer:', error)
-          }
-        } catch (error: any) {
-          const msg = error?.message ?? ''
-          if (msg.includes('user rejected') || msg.includes('User rejected')) {
-            console.log('User cancelled companion signer setup')
-          } else {
-            console.error('Failed to setup companion signer:', error)
-          }
-          return null
+      if (savedAccount) {
+        // View mode with stored addresses - can query but not execute
+        const portfolio = await getPortfolio(savedAccount.subaccountAddress as Address)
+
+        const accountState: IAccountState = {
+          address,
+          walletClient,
+          companionSigner: null, // Keys not in memory yet
+          companionSignerAddress: savedAccount.companionSignerAddress as Address,
+          subAccount: null, // Will be recreated when needed
+          subaccountAddress: savedAccount.subaccountAddress as Address,
+          portfolio,
+          supportsSendCalls
         }
+
+        console.info('Account connected (view mode with stored addresses):', {
+          address: accountState.address,
+          companionSignerAddress: accountState.companionSignerAddress,
+          subaccountAddress: accountState.subaccountAddress,
+          supportsSendCalls: accountState.supportsSendCalls
+        })
+
+        return accountState
       }
 
-      // 3. Create the actual signer account
-      let companionSigner: PrivateKeyAccount | null = null
+      // First time - request signature to create companion + subaccount
+      // If user rejects, we cannot proceed (need addresses for view mode)
+      let companionSigner: LocalAccount
       try {
-        companionSigner = privateKeyToAccount(privateKey as Hex)
-      } catch (error) {
-        console.warn('Stored companion signer was invalid; clearing cached key.', error)
-        try {
-          localStorage.removeItem(storageKey)
-        } catch (clearError) {
-          console.warn('Unable to clear invalid companion signer:', clearError)
+        const result = await signAndDeriveCompanionSigner(walletClient)
+        companionSigner = result.companionSigner
+      } catch (error: any) {
+        const msg = error?.message ?? ''
+        if (msg.includes('user rejected') || msg.includes('User rejected')) {
+          console.log('User cancelled initial setup - cannot proceed without addresses')
+        } else {
+          console.error('Failed to get signature for initial setup:', error)
         }
         return null
       }
 
+      // Create subaccount with owner + companion signer
       const subAccount = await rhinestoneSDK.createAccount({
         owners: {
           type: 'ecdsa',
-          accounts: [ownerAccount, companionSigner]
+          accounts: [createOwnerAccount(address), companionSigner]
         }
       })
 
-      const portfolio = await fetchRhinestonePortfolio(subAccount)
+      const subaccountAddress = subAccount.getAddress()
+      const portfolio = await getPortfolio(subaccountAddress)
+
+      // Store addresses (not keys!) to localStorage
+      localStorage.setItem(
+        ACCOUNT_ADDRESSES_KEY,
+        JSON.stringify({
+          ...storedAddresses,
+          [address]: {
+            companionSignerAddress: companionSigner.address,
+            subaccountAddress
+          }
+        })
+      )
 
       const accountState: IAccountState = {
         address,
         walletClient,
-        companionSigner,
+        companionSigner, // Keys in memory for this session
+        companionSignerAddress: companionSigner.address,
         subAccount,
-        portfolio
+        subaccountAddress,
+        portfolio,
+        supportsSendCalls
       }
 
-      console.info('Account state updated:', {
+      console.info('Account created (action mode):', {
         address: accountState.address,
-        companionSignerAddress: accountState.companionSigner.address,
-        subAccount,
-        subAccountAddress: subAccount.getAddress(),
-        portfolio: accountState.portfolio
+        companionSignerAddress: accountState.companionSignerAddress,
+        subaccountAddress: accountState.subaccountAddress,
+        supportsSendCalls: accountState.supportsSendCalls
       })
 
       return accountState
@@ -341,59 +436,82 @@ async function getMultichainBalances(
   return results.filter(r => r.balance > 0n)
 }
 
-const fetchRhinestonePortfolio = async (
-  rhinestoneAccount?: RhinestoneAccount | null
-): Promise<RhinestonePortfolioToken[]> => {
-  if (!rhinestoneAccount) return []
+async function getPortfolio(subAccountAddress: Address, refresh = false) {
+  const url = new URL(`/api/orchestrator/accounts/${subAccountAddress}/portfolio`, window.location.origin)
+  // service worker expects refresh=true to bypass API cache
+  if (refresh) {
+    url.searchParams.set('refresh', 'true')
+  }
 
-  const portfolio = await rhinestoneAccount.getPortfolio()
+  const response = await fetch(url.toString())
 
-  return portfolio
-    .map(token => {
-      const totalLocked = BigInt(token.balances?.locked || 0)
-      const totalUnlocked = BigInt(token.balances?.unlocked || 0)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch portfolio: ${response.statusText}`)
+  }
 
-      const formattedAvailable = formatUnits(totalUnlocked, token.decimals)
-      const formattedLocked = formatUnits(totalLocked, token.decimals)
-      const formattedUnlocked = formatUnits(totalUnlocked, token.decimals)
+  const data = await response.json()
+  return data.portfolio as Awaited<ReturnType<RhinestoneAccount['getPortfolio']>>
+}
 
-      const chains: RhinestonePortfolioChain[] = (token.chains || [])
-        .map(chain => {
-          const locked = BigInt((chain as any).locked || 0)
-          const unlocked = BigInt((chain as any).unlocked || 0)
-          const chainId = Number((chain as any).chain ?? (chain as any).chainId ?? 0)
+type IntentCostParams = {
+  destinationChainId: number
+  tokenRequests: Array<{ address: Address; amount: bigint }>
+  account: { address: Address }
+  destinationExecutions?: Array<{ to: Address; data: Hex; value?: bigint }>
+  destinationGasUnits?: number
+  accountAccessList?: any
+  recipient?: { address: Address }
+  options?: {
+    topupCompact?: boolean
+    settlementLayers?: number[]
+    sponsorSettings?: any
+    feeToken?: Address
+  }
+}
 
-          return {
-            chainId,
-            chainName: String((chain as any).chainName ?? `Chain ${chainId || 'Unknown'}`),
-            balance: unlocked.toString(),
-            formattedBalance: formatUnits(unlocked, token.decimals),
-            lockedBalance: locked.toString(),
-            unlockedBalance: unlocked.toString(),
-            formattedLockedBalance: formatUnits(locked, token.decimals),
-            formattedUnlockedBalance: formatUnits(unlocked, token.decimals)
-          }
-        })
-        .filter(
-          chain => BigInt(chain.balance) > 0n || BigInt(chain.lockedBalance) > 0n || BigInt(chain.unlockedBalance) > 0n
-        )
+type IntentCostResponse = {
+  hasFulfilledAll: boolean
+  tokensSpent?: {
+    locked: string
+    unlocked: string
+  }
+  tokensReceived?: Array<{
+    targetAmount: string
+    fee: string
+    fulfilled: boolean
+  }>
+  sponsorFee?: {
+    relayerFee: string
+    rhinestoneFee: string
+  }
+  tokenShortfall?: Array<{
+    symbol: string
+    decimals: number
+    amount: string
+  }>
+  totalTokenShortfallInUSD?: number
+}
 
-      const hasBalance = totalUnlocked > 0n || totalLocked > 0n || chains.length > 0
+async function getIntentCost(params: IntentCostParams, refresh = false): Promise<IntentCostResponse> {
+  const url = new URL('/api/orchestrator/intents/cost', window.location.origin)
+  // service worker expects refresh=true to bypass API cache
+  if (refresh) {
+    url.searchParams.set('refresh', 'true')
+  }
 
-      if (!hasBalance) {
-        return null
-      }
+  const response = await fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(params)
+  })
 
-      return {
-        symbol: token.symbol,
-        totalBalance: formattedAvailable,
-        lockedBalance: formattedLocked,
-        unlockedBalance: formattedUnlocked,
-        decimals: token.decimals,
-        chains
-      }
-    })
-    .filter((token): token is RhinestonePortfolioToken => Boolean(token))
+  if (!response.ok) {
+    throw new Error(`Failed to fetch intent cost: ${response.statusText}`)
+  }
+
+  return response.json()
 }
 
 const publicClient = wagmi.getClient({ chainId: arbitrum.id })
@@ -402,6 +520,8 @@ const wallet = {
   read,
   getTokenBalance,
   getMultichainBalances,
+  getPortfolio,
+  getIntentCost,
   account,
   connect,
   disconnect,
@@ -409,6 +529,7 @@ const wallet = {
   wagmi,
   chainList,
   chainMap,
+  rhinestoneSDK,
   connectors: wagmi.connectors.map(connector => ({ id: connector.id, name: connector.name }))
 }
 
@@ -417,4 +538,5 @@ export function getMainnetPublicClient() {
 }
 
 export type { IAccountState, ChainBalance }
+export { signAndDeriveCompanionSigner, restoreAccountKeys }
 export default wallet

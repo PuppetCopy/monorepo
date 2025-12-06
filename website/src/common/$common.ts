@@ -18,7 +18,7 @@ import {
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
 import type * as router from 'aelea/router'
-import { empty, filterNull, type IStream, map, skipRepeats, start, switchLatest, toStream } from 'aelea/stream'
+import { empty, filterNull, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
 import type { IBehavior, IComposeBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type INode, nodeEvent, style, styleInline } from 'aelea/ui'
 import { $column, $row, $seperator, isDesktopScreen, layoutSheet, spacing } from 'aelea/ui-components'
@@ -369,45 +369,35 @@ interface ITraderDisplay {
 export const $TraderDisplay = (config: ITraderDisplay) =>
   component(([click, clickTether]: IBehavior<any, Address>) => {
     const { route, address, ensName, ensNameStream, puppetList, labelSize, profileSize } = config
-    const displayName = start(ensName ?? null, ensNameStream ?? empty)
 
     return [
-      switchLatest(
-        map(
-          resolvedEns =>
-            $Link({
-              $content: $row(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
-                $profileAvatar({ address, size: profileSize }),
-                labelSize === undefined || labelSize > 0
-                  ? $column(style({ gap: '3px' }))(
-                      $AccountLabel({
-                        address,
-                        ensName: resolvedEns,
-                        primarySize: labelSize
+      $Link({
+        $content: $row(spacing.small, style({ alignItems: 'center', textDecoration: 'none' }))(
+          $profileAvatar({ address, size: profileSize }),
+          labelSize === undefined || labelSize > 0
+            ? $column(style({ gap: '3px' }))(
+                $AccountLabel({
+                  address,
+                  primarySize: labelSize
+                }),
+                puppetList.length > 0
+                  ? $row(style({ alignItems: 'center' }))(
+                      ...puppetList.map(puppet => {
+                        return style({ marginRight: '-12px', border: '2px solid black' })(
+                          $profileAvatar({ address: puppet, size: 25 })
+                        )
                       }),
-                      puppetList.length > 0
-                        ? $row(style({ alignItems: 'center' }))(
-                            ...puppetList.map(puppet => {
-                              return style({ marginRight: '-12px', border: '2px solid black' })(
-                                $profileAvatar({ address: puppet, size: 25 })
-                              )
-                            }),
-                            $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.8rem' }))(
-                              $text(`${puppetList.length}`)
-                            )
-                          )
-                        : $row(style({ alignItems: 'center' }))(
-                            $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
-                          )
+                      $node(style({ gap: '8px', marginLeft: '16px', fontSize: '.8rem' }))($text(`${puppetList.length}`))
                     )
-                  : empty
-              ),
-              route: route.create({ fragment: 'baseRoute' }),
-              url: `/${WALLET_TAB.TRADER.toLowerCase()}/${address}`
-            })({ click: clickTether() }),
-          displayName
-        )
-      ),
+                  : $row(style({ alignItems: 'center' }))(
+                      $node(style({ color: pallete.foreground, fontSize: '.8rem' }))($text('0 puppets'))
+                    )
+              )
+            : empty
+        ),
+        route: route.create({ fragment: 'baseRoute' }),
+        url: `/${WALLET_TAB.TRADER.toLowerCase()}/${address}`
+      })({ click: clickTether() }),
 
       { click }
     ]
