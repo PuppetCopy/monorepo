@@ -106,9 +106,7 @@ export function $Dropdown<T>({
     ) => {
       const openTrigger = constant(true, openMenu)
       const windowClick = switchLatest(map(_open => take(1, skip(1, fromEventTarget(window, 'click'))), openTrigger))
-
       const closeTrigger = constant(false, merge(windowClick, closeOnSelect ? select : empty))
-
       const isOpen = merge(closeTrigger, openTrigger)
 
       return [

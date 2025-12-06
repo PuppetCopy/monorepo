@@ -1,14 +1,9 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
-import { getClosestNumber, groupManyList, periodicRun, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { getClosestNumber, groupManyList, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
-import { getStatus, sqlClient } from './sqlClient'
-
-export const subgraphStatus = periodicRun({
-  interval: 15000,
-  actionOp: map(getStatus)
-})
+import { sqlClient } from './sqlClient'
 
 export type StateParams<T> = {
   [P in keyof T]: IStream<T[P]>
@@ -53,30 +48,7 @@ export function queryUserMatchingRuleList(
     }
 
     const metrictList = await sqlClient.query.setMatchingRule.findMany({
-      where: (t, f) =>
-        f.and(
-          f.eq(t.puppet, address)
-          // filterParams.account ? f.ilike(t.account, filterParams.account) : undefined,
-          // // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-          // f.gte(t.lastUpdatedTimestamp, startActivityTimeframeTimeSlot)
-        )
-      // limit: filterParams.paging.pageSize,
-      // offset: filterParams.paging.offset,
-      // orderBy: filterParams.sortBy
-      //   ? filterParams.sortBy.direction === 'asc'
-      //     ? asc(schema.traderRouteMetric[filterParams.sortBy.selector])
-      //     : desc(schema.traderRouteMetric[filterParams.sortBy.selector])
-      //   : undefined,
-      // columns: {
-      //   allowanceRate: true,
-      //   collateralToken: true,
-      //   expiry: true,
-      //   id: true,
-      //   traderMatchingKey: true,
-      //   puppet: true,
-      //   trader: true,
-      //   throttleActivity: true
-      // }
+      where: (t, f) => f.eq(t.puppet, address)
     })
 
     return metrictList

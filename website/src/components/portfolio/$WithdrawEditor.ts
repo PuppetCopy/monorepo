@@ -14,13 +14,7 @@ import type { Address } from 'viem/accounts'
 import { $FieldLabeled } from '@/ui-components'
 import type { IAccountState } from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { BALANCE_ACTION } from './$DepositEditor.js'
-
-export interface IWithdrawEditorDraft {
-  action: typeof BALANCE_ACTION.WITHDRAW
-  token: Address
-  amount: bigint
-}
+import { BALANCE_ACTION, type IWithdrawEditorDraft } from './$DepositEditor.js'
 
 export const $WithdrawEditor = (config: {
   depositBalance: IStream<bigint>

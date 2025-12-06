@@ -42,7 +42,7 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 type ChainBalance = { chainId: number; balance: bigint }
 
 // Storage key for persisted addresses
-const ACCOUNT_ADDRESSES_KEY = 'accountAddresses'
+const ACCOUNT_ADDRESSES_KEY = 'accountAddresses:'
 
 // Helper to create owner account wrapper (user's main wallet address)
 // This account throws errors on signing - only the companion signer should sign
@@ -151,6 +151,16 @@ const CHAIN_NETWORK: Record<number, string> = {
   [polygon.id]: 'polygon'
 }
 
+function createApiUrl(path: string, params?: Record<string, string>): string {
+  const url = new URL(path, window.location.origin)
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.set(key, value)
+    }
+  }
+  return url.toString()
+}
+
 const portoConnector = porto({
   chains: chainList,
   mode: Mode.dialog({
@@ -199,38 +209,40 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
 const account: IStream<Promise<IAccountState | null>> = op(
   connection,
   map(async connection => {
+    if (connection.status !== 'connected' || !connection.connector) {
+      return null
+    }
+
+    const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
+    const address = walletClient.account.address
+
+    // Check if wallet supports EIP-5792 sendCalls for efficiency optimization
+    let supportsSendCalls = false
     try {
-      if (connection.status !== 'connected' || !connection.connector) {
-        return null
+      if (typeof walletClient.getCapabilities === 'function') {
+        const capabilities = await walletClient.getCapabilities({ account: address })
+        supportsSendCalls = Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
       }
+    } catch (error) {
+      console.warn('Failed to check wallet capabilities, assuming no sendCalls support:', error)
+    }
 
-      const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
-      const address = walletClient.account.address
+    // Check for stored addresses (addresses only, not keys!)
+    const storedData = localStorage.getItem(ACCOUNT_ADDRESSES_KEY + address)
+    const savedAccount = storedData ? JSON.parse(storedData) : null
 
-      // Check if wallet supports EIP-5792 sendCalls for efficiency optimization
-      let supportsSendCalls = false
-      try {
-        if (typeof walletClient.getCapabilities === 'function') {
-          const capabilities = await walletClient.getCapabilities({ account: address })
+    return { walletClient, address, supportsSendCalls, savedAccount }
+  }),
+  map(async prepDataPromise => {
+    const prepData = await prepDataPromise
+    if (!prepData) return null
 
-          // Check if any chain has atomic batch support
-          supportsSendCalls = Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
-        }
-      } catch (error) {
-        console.warn('Failed to check wallet capabilities, assuming no sendCalls support:', error)
-      }
+    const { walletClient, address, supportsSendCalls, savedAccount } = prepData
 
-      // Check if we have stored addresses for this wallet (addresses only, not keys!)
-      const storedData = localStorage.getItem(ACCOUNT_ADDRESSES_KEY)
-      const storedAddresses: Record<string, { companionSignerAddress: string; subaccountAddress: string }> = storedData
-        ? JSON.parse(storedData)
-        : {}
-      const savedAccount = storedAddresses[address]
-
+    try {
       if (savedAccount) {
         // View mode with stored addresses - can query but not execute
-        const portfolio = await getPortfolio(savedAccount.subaccountAddress as Address)
-
+        // Portfolio is fetched on-demand when needed (not on connect)
         const accountState: IAccountState = {
           address,
           walletClient,
@@ -238,7 +250,7 @@ const account: IStream<Promise<IAccountState | null>> = op(
           companionSignerAddress: savedAccount.companionSignerAddress as Address,
           subAccount: null, // Will be recreated when needed
           subaccountAddress: savedAccount.subaccountAddress as Address,
-          portfolio,
+          portfolio: null, // Lazy-loaded when needed
           supportsSendCalls
         }
 
@@ -277,17 +289,13 @@ const account: IStream<Promise<IAccountState | null>> = op(
       })
 
       const subaccountAddress = subAccount.getAddress()
-      const portfolio = await getPortfolio(subaccountAddress)
 
       // Store addresses (not keys!) to localStorage
       localStorage.setItem(
-        ACCOUNT_ADDRESSES_KEY,
+        ACCOUNT_ADDRESSES_KEY + address,
         JSON.stringify({
-          ...storedAddresses,
-          [address]: {
-            companionSignerAddress: companionSigner.address,
-            subaccountAddress
-          }
+          companionSignerAddress: companionSigner.address,
+          subaccountAddress
         })
       )
 
@@ -298,7 +306,7 @@ const account: IStream<Promise<IAccountState | null>> = op(
         companionSignerAddress: companionSigner.address,
         subAccount,
         subaccountAddress,
-        portfolio,
+        portfolio: null, // Lazy-loaded when needed (empty for new accounts anyway)
         supportsSendCalls
       }
 
@@ -397,15 +405,10 @@ async function getTokenBalance(
   const network = CHAIN_NETWORK[chainId]
   if (!network) throw new Error(`Unsupported network: ${chainId}`)
 
-  const rpcUrl = (() => {
-    const url = new URL('/api/rpc', window.location.origin)
-    url.searchParams.set('network', network)
-    // service worker expects refresh=true to bypass API cache
-    if (refresh) {
-      url.searchParams.set('refresh', 'true')
-    }
-    return url.toString()
-  })()
+  const rpcUrl = createApiUrl('/api/rpc', {
+    network,
+    ...(refresh && { refresh: 'true' })
+  })
 
   const client = createPublicClient({
     chain,
@@ -437,13 +440,11 @@ async function getMultichainBalances(
 }
 
 async function getPortfolio(subAccountAddress: Address, refresh = false) {
-  const url = new URL(`/api/orchestrator/accounts/${subAccountAddress}/portfolio`, window.location.origin)
-  // service worker expects refresh=true to bypass API cache
-  if (refresh) {
-    url.searchParams.set('refresh', 'true')
-  }
+  const url = createApiUrl(`/api/orchestrator/accounts/${subAccountAddress}/portfolio`, {
+    ...(refresh && { refresh: 'true' })
+  })
 
-  const response = await fetch(url.toString())
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch portfolio: ${response.statusText}`)
@@ -493,13 +494,11 @@ type IntentCostResponse = {
 }
 
 async function getIntentCost(params: IntentCostParams, refresh = false): Promise<IntentCostResponse> {
-  const url = new URL('/api/orchestrator/intents/cost', window.location.origin)
-  // service worker expects refresh=true to bypass API cache
-  if (refresh) {
-    url.searchParams.set('refresh', 'true')
-  }
+  const url = createApiUrl('/api/orchestrator/intents/cost', {
+    ...(refresh && { refresh: 'true' })
+  })
 
-  const response = await fetch(url.toString(), {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

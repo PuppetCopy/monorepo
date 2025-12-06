@@ -24,6 +24,7 @@ export interface IDropSelect<T> {
   value: IStream<T>
   optionList: IStream<readonly T[]> | readonly T[]
   label?: string | IStream<string>
+  $label?: IStream<ReturnType<typeof $node>>
   $container?: INodeCompose
   $valueLabel?: IOps<T, ReturnType<typeof $node>>
   $$option?: IOps<T, ReturnType<typeof $node>>
@@ -33,6 +34,7 @@ export const $DropSelect = <T>({
   value,
   optionList,
   label,
+  $label,
   $container = $defaultDropSelectContainer,
   $$option = map((val: T) => $node($text(String(val)))),
   $valueLabel = $$option
@@ -45,7 +47,7 @@ export const $DropSelect = <T>({
         optionList,
         $$option,
         $anchor: $container(
-          labelStream ? switchLatest(map(text => $infoLabel($text(text)), labelStream)) : $node(),
+          $label ? switchLatest($label) : labelStream ? switchLatest(map(text => $infoLabel($text(text)), labelStream)) : $node(),
           $row(spacing.small)(
             switchLatest($valueLabel(toStream(value))),
             $icon({

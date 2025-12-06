@@ -10,15 +10,18 @@ import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $intermediatePromise, $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
-import { tokenBalanceOf } from '../../logic/commonRead.js'
 import type { IComponentPageParams } from '../../pages/types.js'
 import wallet from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { $DepositEditor, BALANCE_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
-import { $WithdrawEditor, type IWithdrawEditorDraft } from './$WithdrawEditor.js'
-
-type BalanceDraft = IDepositEditorDraft | IWithdrawEditorDraft
+import {
+  $DepositEditor,
+  BALANCE_ACTION,
+  type BalanceDraft,
+  type IDepositEditorDraft,
+  type IWithdrawEditorDraft
+} from './$DepositEditor.js'
+import { $WithdrawEditor } from './$WithdrawEditor.js'
 
 interface IRouteBalanceEditor extends IComponentPageParams {
   walletAddress?: Address
@@ -119,12 +122,8 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
                 if (action === BALANCE_ACTION.DEPOSIT) {
                   return $DepositEditor({
-                    walletBalance: fromPromise(tokenBalanceOf(account.address, collateralToken)),
                     depositBalance: depositBal,
-                    model: op(
-                      balanceModel,
-                      map(m => m as IDepositEditorDraft)
-                    ),
+                    model: balanceModel,
                     token: collateralToken,
                     account
                   })({
@@ -181,39 +180,22 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
         }, wallet.account)
       })
 
+      const updateDraftList = (changeList: BalanceDraft[], draft: BalanceDraft) => {
+        const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
+        if (existingIndex !== -1) {
+          changeList[existingIndex] = draft
+          return [...changeList]
+        }
+        return [...changeList, draft]
+      }
+
       return [
         targetDisplay,
 
         {
           changeDepositTokenList: merge(
-            sampleMap(
-              (changeList, draft) => {
-                const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
-
-                if (existingIndex !== -1) {
-                  changeList[existingIndex] = draft
-                  return [...changeList]
-                }
-
-                return [...changeList, draft]
-              },
-              draftDepositTokenList,
-              changeDeposit
-            ),
-            sampleMap(
-              (changeList, draft) => {
-                const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
-
-                if (existingIndex !== -1) {
-                  changeList[existingIndex] = draft
-                  return [...changeList]
-                }
-
-                return [...changeList, draft]
-              },
-              draftDepositTokenList,
-              changeWithdraw
-            )
+            sampleMap(updateDraftList, draftDepositTokenList, changeDeposit),
+            sampleMap(updateDraftList, draftDepositTokenList, changeWithdraw)
           )
         }
       ]

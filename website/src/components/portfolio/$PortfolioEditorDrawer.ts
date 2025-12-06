@@ -35,12 +35,9 @@ import { fadeIn } from '../../transitions/enter.js'
 import wallet, { type IAccountState, restoreAccountKeys } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
-import { BALANCE_ACTION, type IDepositEditorDraft } from './$DepositEditor.js'
+import { BALANCE_ACTION, type BalanceDraft, type IDepositEditorDraft } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteBalanceEditor } from './$RouteBalanceEditor.js'
-import type { IWithdrawEditorDraft } from './$WithdrawEditor.js'
-
-type BalanceDraft = IDepositEditorDraft | IWithdrawEditorDraft
 
 interface IPortfolioRoute {
   collateralToken: Address
@@ -436,8 +433,14 @@ export const $PortfolioEditorDrawer = ({
                         // If there are deposits, allow submission
                         if (deposits.length > 0) return null
 
-                        const hasPortfolio = (resolvedAccount.portfolio?.length ?? 0) > 0
-                        return hasPortfolio ? null : 'Deposit funds to proceed'
+                        // Check if user has existing portfolio balances
+                        try {
+                          const portfolio = await wallet.getPortfolio(resolvedAccount.subaccountAddress)
+                          const hasPortfolio = (portfolio?.length ?? 0) > 0
+                          return hasPortfolio ? null : 'Deposit funds to proceed'
+                        } catch {
+                          return 'Deposit funds to proceed'
+                        }
                       })
                     )
                   })({

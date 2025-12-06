@@ -12,10 +12,10 @@ import { $alertPositiveContainer } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
-import { queryUserMatchingRuleList, subgraphStatus } from '../common/query.js'
+import { queryUserMatchingRuleList } from '../common/query.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
-import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
+import type { BalanceDraft } from '../components/portfolio/$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
 import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
@@ -47,7 +47,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<IDepositEditorDraft[]>
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>
     ) => {
       // walletConnectAppkit.getIsConnectedState()
 
@@ -78,14 +78,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         selectCollateralTokenList
       )
       const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
-
-      const subgraphBeaconStatusColor = map(status => {
-        const timestampDelta = unixTimestampNow() - new Date(status.arbitrum?.block?.number || 0).getTime()
-
-        const color =
-          timestampDelta > 60 ? pallete.negative : timestampDelta > 10 ? pallete.indeterminate : pallete.positive
-        return color
-      }, subgraphStatus)
 
       const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
