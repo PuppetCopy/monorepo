@@ -67,7 +67,9 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
         if (!cached) {
           const tokenMap = CROSS_CHAIN_TOKEN_MAP[chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
           const tokenAddress = getMappedValueFallback(tokenMap, tokenDescription.symbol, null)
-          cached = tokenAddress ? wallet.getTokenBalance(tokenAddress, account.address, chainId, true) : Promise.resolve(0n)
+          cached = tokenAddress
+            ? wallet.getTokenBalance(tokenAddress, account.address, chainId, true)
+            : Promise.resolve(0n)
           chainBalanceCache.set(chainId, cached)
         }
         return cached
@@ -110,7 +112,8 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
               chainSelection
             ),
             $container: $defaultDropSelectContainer(style({ flex: 1, justifyContent: 'space-between' })),
-            $valueLabel: () => map(balance => $node($text(readableTokenAmountLabel(tokenDescription, balance))), selectedChainBalance),
+            $valueLabel: () =>
+              map(balance => $node($text(readableTokenAmountLabel(tokenDescription, balance))), selectedChainBalance),
             $$option: switchMap(async id => {
               const chain = getMappedValue(wallet.chainMap, id)
               const balance = await getChainBalance(id)

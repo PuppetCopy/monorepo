@@ -1,5 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import { ETH_ADDRESS_REGEXP, ignoreAll, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { ETH_ADDRESS_REGEXP, ignoreAll } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
 import { awaitPromises, map, merge, start, switchMap, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'

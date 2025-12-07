@@ -94,10 +94,14 @@ export const $Tooltip = ({
               styleInline(
                 zipMap(
                   ([contentRect], [targetRect]) => {
-                    const screenWidth = targetRect.rootBounds?.width ?? window.innerWidth
-                    const targetBound = targetRect.intersectionRect
+                    // Use getBoundingClientRect for accurate viewport-relative positioning
+                    // intersectionRect can be stale/incorrect when inside fixed-positioned containers
+                    const targetEl = targetRect.target as HTMLElement
+                    const targetBound = targetEl.getBoundingClientRect()
+
+                    const screenWidth = window.innerWidth
                     const bottomSpace = window.innerHeight - targetBound.bottom
-                    const goDown = bottomSpace > targetBound.bottom
+                    const goDown = bottomSpace > targetBound.top
 
                     // clamp width to screen minus both side‑spacings
                     const maxWidth = screenWidth

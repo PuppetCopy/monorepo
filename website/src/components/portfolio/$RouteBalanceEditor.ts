@@ -1,7 +1,7 @@
 import * as PUPPET from '@puppet-copy/middleware/const'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import { combine, constant, fromPromise, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
+import { combine, constant, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -122,7 +122,6 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
                 if (action === BALANCE_ACTION.DEPOSIT) {
                   return $DepositEditor({
-                    depositBalance: depositBal,
                     model: balanceModel,
                     token: collateralToken,
                     account

@@ -1,6 +1,12 @@
+import { getPublicClient } from '@wagmi/core'
+import wallet from 'src/wallet/wallet'
 import type { Address } from 'viem'
 import { normalize } from 'viem/ens'
-import { getMainnetPublicClient } from '../wallet/wallet'
+import { mainnet } from 'wagmi/chains'
+
+export function getMainnetPublicClient() {
+  return getPublicClient(wallet.wagmi, { chainId: mainnet.id })
+}
 
 // In-memory cache for ENS names
 // Map<Address, string | null> - null means we tried but found no ENS name

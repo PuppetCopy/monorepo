@@ -17,7 +17,8 @@
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
     "@puppet-copy/sql": "workspace:*",
-    "@rhinestone/sdk": "1.0.34",
+    "@rhinestone/sdk": "1.0.35",
+    "@wagmi/connectors": "7.0.2",
     "@wagmi/core": "3.0.0",
     "@walletconnect/ethereum-provider": "~2.23.0",
     "abitype": "catalog:",
@@ -28,8 +29,7 @@
     "ponder": "catalog:",
     "porto": "0.2.37",
     "viem": "catalog:",
-    "wagmi": "3.0.2",
-    "@wagmi/connectors": "7.0.2"
+    "wagmi": "3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

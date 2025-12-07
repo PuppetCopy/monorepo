@@ -1,7 +1,6 @@
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import type { CallInput } from '@rhinestone/sdk'
 import type { Route } from 'aelea/router'
 import {
   awaitPromises,
@@ -32,12 +31,89 @@ import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
 import { fadeIn } from '../../transitions/enter.js'
-import wallet, { type IAccountState, restoreAccountKeys } from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SubmitBar } from '../form/$SubmitBar.js'
 import { BALANCE_ACTION, type BalanceDraft, type IDepositEditorDraft } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteBalanceEditor } from './$RouteBalanceEditor.js'
+
+interface PortfolioDraftCalls {
+  depositTokens: Map<Address, bigint>
+  calls: Array<{ to: Address; data: Hex }>
+  userRouterCalls: Hex[]
+}
+
+function buildPortfolioCalls(
+  depositList: BalanceDraft[],
+  matchingRuleList: ISetMatchingRuleEditorDraft[],
+  withdrawRecipient: Address
+): PortfolioDraftCalls {
+  const depositTokens = new Map<Address, bigint>()
+  const calls: Array<{ to: Address; data: Hex }> = []
+  const userRouterCalls: Hex[] = []
+
+  for (const draft of depositList) {
+    if (draft.action === BALANCE_ACTION.DEPOSIT) {
+      const current = depositTokens.get(draft.token) ?? 0n
+      depositTokens.set(draft.token, current + draft.amount)
+
+      calls.push({
+        to: draft.token,
+        data: encodeFunctionData({
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [CONTRACT.TokenRouter.address, draft.amount]
+        })
+      })
+
+      userRouterCalls.push(
+        encodeFunctionData({
+          abi: CONTRACT.UserRouter.abi,
+          functionName: 'deposit',
+          args: [draft.token, draft.amount]
+        })
+      )
+    } else {
+      userRouterCalls.push(
+        encodeFunctionData({
+          abi: CONTRACT.UserRouter.abi,
+          functionName: 'withdraw',
+          args: [draft.token, withdrawRecipient, draft.amount]
+        })
+      )
+    }
+  }
+
+  for (const matchRule of matchingRuleList) {
+    userRouterCalls.push(
+      encodeFunctionData({
+        abi: CONTRACT.UserRouter.abi,
+        functionName: 'setMatchingRule',
+        args: [
+          matchRule.collateralToken,
+          matchRule.trader,
+          {
+            allowanceRate: matchRule.allowanceRate,
+            throttleActivity: matchRule.throttleActivity,
+            expiry: matchRule.expiry
+          }
+        ]
+      })
+    )
+  }
+
+  if (userRouterCalls.length > 0) {
+    calls.push(
+      ...userRouterCalls.map(data => ({
+        to: CONTRACT.UserRouter.address,
+        data
+      }))
+    )
+  }
+
+  return { depositTokens, calls, userRouterCalls }
+}
 
 interface IPortfolioRoute {
   collateralToken: Address
@@ -75,8 +151,6 @@ export const $PortfolioEditorDrawer = ({
         filter(state => state !== null && 'value' in state && state.value !== null),
         map(() => null)
       )
-
-      const txState = start(null, promiseState(multicastTxQuery))
 
       const hasContent = op(
         drawerState,
@@ -274,79 +348,17 @@ export const $PortfolioEditorDrawer = ({
                       }
 
                       try {
-                        const depositTokens = new Map<Address, bigint>()
-                        const calls: Array<{ to: Address; data: Hex }> = []
-                        const userRouterCalls: Hex[] = []
-
-                        for (const draft of params.depositList) {
-                          if (draft.action === BALANCE_ACTION.DEPOSIT) {
-                            const current = depositTokens.get(draft.token) ?? 0n
-                            depositTokens.set(draft.token, current + draft.amount)
-
-                            calls.push({
-                              to: draft.token,
-                              data: encodeFunctionData({
-                                abi: erc20Abi,
-                                functionName: 'approve',
-                                args: [CONTRACT.TokenRouter.address, draft.amount]
-                              })
-                            })
-
-                            userRouterCalls.push(
-                              encodeFunctionData({
-                                abi: CONTRACT.UserRouter.abi,
-                                functionName: 'deposit',
-                                args: [draft.token, draft.amount]
-                              })
-                            )
-                          } else {
-                            userRouterCalls.push(
-                              encodeFunctionData({
-                                abi: CONTRACT.UserRouter.abi,
-                                functionName: 'withdraw',
-                                args: [draft.token, resolvedAccount.address, draft.amount]
-                              })
-                            )
-                          }
-                        }
-
-                        params.matchingRuleList.forEach(matchRule => {
-                          userRouterCalls.push(
-                            encodeFunctionData({
-                              abi: CONTRACT.UserRouter.abi,
-                              functionName: 'setMatchingRule',
-                              args: [
-                                matchRule.collateralToken,
-                                matchRule.trader,
-                                {
-                                  allowanceRate: matchRule.allowanceRate,
-                                  throttleActivity: matchRule.throttleActivity,
-                                  expiry: matchRule.expiry
-                                }
-                              ]
-                            })
-                          )
-                        })
-
-                        if (userRouterCalls.length > 0) {
-                          calls.push(
-                            ...userRouterCalls.map(data => ({
-                              to: CONTRACT.UserRouter.address,
-                              data
-                            }))
-                          )
-                        }
+                        const { depositTokens, calls } = buildPortfolioCalls(
+                          params.depositList,
+                          params.matchingRuleList,
+                          resolvedAccount.address
+                        )
 
                         const tokenRequests = Array.from(depositTokens.entries())
                           .filter(([, amount]) => amount > 0n)
-                          .map(([token, amount]) => ({ address: token, amount }))
+                          .map(([tokenAddress, amount]) => ({ tokenAddress, amount }))
 
-                        if (tokenRequests.length === 0) {
-                          return empty
-                        }
-
-                        const sourceChainId = params.depositList.find(d => d.action === BALANCE_ACTION.DEPOSIT)?.chainId
-                        if (!sourceChainId) {
+                        if (calls.length === 0) {
                           return empty
                         }
 
@@ -354,45 +366,23 @@ export const $PortfolioEditorDrawer = ({
                         const cost = await wallet.getIntentCost(
                           {
                             destinationChainId: arbitrum.id,
+                            destinationExecutions: calls.map(c => ({ to: c.to, data: c.data, value: '0' })),
                             tokenRequests,
-                            account: { address: resolvedAccount.subaccountAddress }
+                            account: {
+                              address: resolvedAccount.subaccountAddress,
+                              accountType: 'ERC7579',
+                              setupOps: []
+                            },
+                            accountAccessList: { chainIds: [arbitrum.id] },
+                            options: { topupCompact: false }
                           },
                           true
                         )
 
-                        if (!cost.hasFulfilledAll && cost.totalTokenShortfallInUSD) {
-                          return $row(
-                            spacing.small,
-                            style({
-                              padding: '12px 24px',
-                              backgroundColor: colorAlpha(pallete.negative, 0.1),
-                              borderRadius: '8px',
-                              margin: '0 24px'
-                            })
-                          )(
-                            $infoTooltip(
-                              $text(`Insufficient balance. Shortfall: $${cost.totalTokenShortfallInUSD.toFixed(2)}`)
-                            )
-                          )
-                        }
+                        const fee = cost.totalTokenShortfallInUSD ?? 0
 
-                        const totalFee =
-                          cost.sponsorFee?.relayerFee && cost.sponsorFee?.rhinestoneFee
-                            ? (BigInt(cost.sponsorFee.relayerFee) + BigInt(cost.sponsorFee.rhinestoneFee)).toString()
-                            : '0'
-
-                        return $row(
-                          spacing.small,
-                          style({
-                            padding: '12px 24px',
-                            fontSize: '.85rem',
-                            color: colorAlpha(pallete.foreground, 0.7)
-                          })
-                        )(
-                          $node($text('Estimated fee: ')),
-                          $node(style({ fontWeight: 'bold', color: pallete.foreground }))(
-                            $text(totalFee === '0' ? 'Free' : `$${(Number(totalFee) / 1e6).toFixed(4)}`)
-                          )
+                        return $node(style({ fontSize: '.85rem', color: colorAlpha(pallete.foreground, 0.7) }))(
+                          $text(fee === 0 ? '' : `Gas: $${fee.toFixed(2)}`)
                         )
                       } catch (error) {
                         console.error('Failed to fetch intent cost:', error)
@@ -415,110 +405,55 @@ export const $PortfolioEditorDrawer = ({
                     alert: op(
                       combine({ account: wallet.account, depositList: draftDepositTokenList }),
                       switchMap(async ({ account, depositList }) => {
-                        const resolvedAccount = await account
-                        if (!resolvedAccount) return null
-
-                        // Validate all deposits use the same source chain
-                        const deposits = depositList.filter(
-                          (draft: BalanceDraft): draft is IDepositEditorDraft => draft.action === BALANCE_ACTION.DEPOSIT
-                        )
-
-                        if (deposits.length > 1) {
-                          const chainIds = new Set(deposits.map((d: IDepositEditorDraft) => d.chainId))
-                          if (chainIds.size > 1) {
-                            return 'All deposits must be from the same chain'
-                          }
-                        }
-
-                        // If there are deposits, allow submission
-                        if (deposits.length > 0) return null
-
-                        // Check if user has existing portfolio balances
                         try {
-                          const portfolio = await wallet.getPortfolio(resolvedAccount.subaccountAddress)
-                          const hasPortfolio = (portfolio?.length ?? 0) > 0
-                          return hasPortfolio ? null : 'Deposit funds to proceed'
-                        } catch {
-                          return 'Deposit funds to proceed'
+                          const resolvedAccount = await account
+                          if (!resolvedAccount) return null
+
+                          // Validate all deposits use the same source chain
+                          const deposits = depositList.filter(
+                            (draft: BalanceDraft): draft is IDepositEditorDraft =>
+                              draft.action === BALANCE_ACTION.DEPOSIT
+                          )
+
+                          if (deposits.length > 1) {
+                            const chainIds = new Set(deposits.map((d: IDepositEditorDraft) => d.chainId))
+                            if (chainIds.size > 1) {
+                              return 'All deposits must be from the same chain'
+                            }
+                          }
+
+                          // If there are deposits, allow submission
+                          if (deposits.length > 0) return null
+
+                          // Check if user has existing portfolio balances
+                          try {
+                            const portfolio = await wallet.getPortfolio(resolvedAccount.subaccountAddress)
+                            const hasPortfolio = (portfolio?.length ?? 0) > 0
+                            return hasPortfolio ? null : 'Deposit funds to proceed'
+                          } catch {
+                            return 'Deposit funds to proceed'
+                          }
+                        } catch (error) {
+                          console.error('Alert validation error:', error)
+                          return null
                         }
                       })
                     )
                   })({
                     submit: requestChangeSubscriptionTether(
                       map(async account => {
-                        if (!account?.address) {
+                        if (!account) {
                           throw new Error('No connected account')
                         }
 
-                        // Restore keys to memory if in view mode (prompts signature)
-                        const activeAccount = await restoreAccountKeys(account)
-
-                        const tokenRouteContractParams = CONTRACT.TokenRouter
-                        const calls: CallInput[] = []
-                        const userRouterCalls: Hex[] = []
-                        const depositByToken = new Map<Address, bigint>()
-
-                        for (const draft of params.draftDepositTokenList) {
-                          if (draft.action === BALANCE_ACTION.DEPOSIT) {
-                            const current = depositByToken.get(draft.token) ?? 0n
-                            depositByToken.set(draft.token, current + draft.amount)
-
-                            calls.push({
-                              to: draft.token,
-                              data: encodeFunctionData({
-                                abi: erc20Abi,
-                                functionName: 'approve',
-                                args: [tokenRouteContractParams.address, draft.amount]
-                              })
-                            })
-
-                            userRouterCalls.push(
-                              encodeFunctionData({
-                                abi: CONTRACT.UserRouter.abi,
-                                functionName: 'deposit',
-                                args: [draft.token, draft.amount]
-                              })
-                            )
-                          } else {
-                            userRouterCalls.push(
-                              encodeFunctionData({
-                                abi: CONTRACT.UserRouter.abi,
-                                functionName: 'withdraw',
-                                args: [draft.token, activeAccount.address, draft.amount]
-                              })
-                            )
-                          }
-                        }
-
-                        params.draftMatchingRuleList.forEach(matchRule => {
-                          userRouterCalls.push(
-                            encodeFunctionData({
-                              abi: CONTRACT.UserRouter.abi,
-                              functionName: 'setMatchingRule',
-                              args: [
-                                matchRule.collateralToken,
-                                matchRule.trader,
-                                {
-                                  allowanceRate: matchRule.allowanceRate,
-                                  throttleActivity: matchRule.throttleActivity,
-                                  expiry: matchRule.expiry
-                                }
-                              ]
-                            })
-                          )
-                        })
-
-                        if (userRouterCalls.length > 0) {
-                          calls.push(
-                            ...userRouterCalls.map(data => ({
-                              to: CONTRACT.UserRouter.address,
-                              data
-                            }))
-                          )
-                        }
+                        const { depositTokens: depositByToken, calls } = buildPortfolioCalls(
+                          params.draftDepositTokenList,
+                          params.draftMatchingRuleList,
+                          account.address
+                        )
 
                         const depositTokens = Array.from(depositByToken.entries()).filter(([, amount]) => amount > 0n)
-                        const subAccount = activeAccount.subaccountAddress
+                        const subAccount = account.subaccountAddress
 
                         // Step 1: Fund subaccount (only if deposits exist)
                         let sourceChain: Chain = wallet.publicClient.chain
@@ -543,15 +478,15 @@ export const $PortfolioEditorDrawer = ({
                             })
                           }))
 
-                          const fundingTx = await activeAccount.walletClient.sendCalls({
-                            account: activeAccount.address,
+                          const fundingTx = await account.walletClient.sendCalls({
+                            account: account.address,
                             chain: sourceChain,
                             calls: fundingCalls,
                             experimental_fallback: true,
                             forceAtomic: true
                           })
 
-                          await activeAccount.walletClient.waitForCallsStatus({
+                          await account.walletClient.waitForCallsStatus({
                             id: fundingTx.id,
                             throwOnFailure: true
                           })
@@ -566,14 +501,12 @@ export const $PortfolioEditorDrawer = ({
                             const hasExpectedBalances = depositTokens.every(([token, expectedAmount]) => {
                               const normalizedToken = getAddress(token)
                               const portfolioToken = portfolio.find(t =>
-                                (t as any).tokenChainBalance?.some(
-                                  (c: any) => getAddress(c.tokenAddress) === normalizedToken
-                                )
+                                t.tokenChainBalance?.some(c => getAddress(c.tokenAddress) === normalizedToken)
                               )
 
                               if (!portfolioToken) return false
 
-                              const totalBalance = BigInt(portfolioToken.balances.unlocked || 0)
+                              const totalBalance = BigInt(portfolioToken.balance?.unlocked || 0)
                               return totalBalance >= expectedAmount
                             })
 
@@ -591,25 +524,17 @@ export const $PortfolioEditorDrawer = ({
                         }
 
                         // Step 2: Execute operations via subaccount
-                        if (!activeAccount.subAccount || !activeAccount.companionSigner) {
-                          throw new Error('Account keys not available')
-                        }
-                        const tx = await activeAccount.subAccount.sendTransaction({
+                        const tx = await account.subAccount.sendTransaction({
                           chain: arbitrum,
                           targetChain: sourceChain,
                           calls,
                           tokenRequests: depositTokens.map(([token, amount]) => ({
                             address: token,
                             amount
-                          })),
-                          signers: {
-                            type: 'owner',
-                            kind: 'ecdsa',
-                            accounts: [activeAccount.companionSigner]
-                          }
+                          }))
                         })
 
-                        const transactionResult = await activeAccount.subAccount.waitForExecution(tx)
+                        const transactionResult = await account.subAccount.waitForExecution(tx)
 
                         return transactionResult
                       })

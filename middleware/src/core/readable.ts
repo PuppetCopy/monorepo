@@ -42,7 +42,11 @@ export const readableTokenUsd = (
 }
 export const readablePnl = (ammount: bigint, decimals = USD_DECIMALS) =>
   readableNumber({ signDisplay: 'exceptZero' })(formatFixed(decimals, ammount))
-export const readableTokenAmount = (token: ITokenDescription | Address, amount: bigint) => {
+export const readableTokenAmount = (token: ITokenDescription | Address | number, amount: bigint) => {
+  if (typeof token === 'number') {
+    return readableUnitAmount(formatFixed(token, amount))
+  }
+
   const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
 
   if (tokenDescription === null) {
@@ -51,14 +55,19 @@ export const readableTokenAmount = (token: ITokenDescription | Address, amount: 
 
   return readableUnitAmount(formatFixed(tokenDescription.decimals, amount))
 }
-export const readableTokenAmountLabel = (token: ITokenDescription | Address, amount: bigint) => {
-  const tokenDescription = typeof token === 'string' ? getTokenDescription(token) : token
-
-  if (tokenDescription === null) {
-    throw new Error(`Unknown token: ${token}`)
+export const readableTokenAmountLabel = (
+  token: ITokenDescription | Address | { decimals: number; symbol: string },
+  amount: bigint
+) => {
+  if (typeof token === 'string') {
+    const tokenDescription = getTokenDescription(token)
+    if (tokenDescription === null) {
+      throw new Error(`Unknown token: ${token}`)
+    }
+    return `${readableTokenAmount(tokenDescription.decimals, amount)} ${tokenDescription.symbol}`
   }
 
-  return `${readableTokenAmount(tokenDescription, amount)} ${tokenDescription.symbol}`
+  return `${readableTokenAmount(token.decimals, amount)} ${token.symbol}`
 }
 
 const UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte']

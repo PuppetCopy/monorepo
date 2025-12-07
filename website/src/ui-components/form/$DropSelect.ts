@@ -47,7 +47,11 @@ export const $DropSelect = <T>({
         optionList,
         $$option,
         $anchor: $container(
-          $label ? switchLatest($label) : labelStream ? switchLatest(map(text => $infoLabel($text(text)), labelStream)) : $node(),
+          $label
+            ? switchLatest($label)
+            : labelStream
+              ? switchLatest(map(text => $infoLabel($text(text)), labelStream))
+              : $node(),
           $row(spacing.small)(
             switchLatest($valueLabel(toStream(value))),
             $icon({
