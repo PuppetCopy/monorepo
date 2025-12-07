@@ -34,7 +34,6 @@ import { $puppetLogo } from '../common/$icons.js'
 import type { IPageParams } from '../pages/types.js'
 import { $disconnectedWalletDisplay, $profileDisplay } from './$AccountProfile.js'
 import { $Popover } from './$Popover.js'
-import { $SubaccountRecoveryIndicator } from './$SubaccountRecovery.js'
 import { $ThemePicker } from './$ThemePicker.js'
 import { $WalletConnect } from './$WalletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
@@ -209,7 +208,6 @@ export const $MainMenu = (config: MainMenu) =>
                 }
 
                 return $row(spacing.small, style({ alignItems: 'center' }))(
-                  $SubaccountRecoveryIndicator({ account: connection })({}),
                   $pageLink({
                     $container: $anchor(spacing.big, style({ padding: 0 })),
                     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),

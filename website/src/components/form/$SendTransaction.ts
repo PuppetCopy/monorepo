@@ -1,9 +1,10 @@
 import { getMappedValueFallback } from '@puppet-copy/middleware/core'
-import { combine, constant, empty, type IStream, just, map, op, start, switchMap } from 'aelea/stream'
+import { constant, empty, map, op, start, switchMap } from 'aelea/stream'
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
-import { $node, $text, component, type I$Node, type I$Slottable, type INodeCompose, style } from 'aelea/ui'
+import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { BaseError, ContractFunctionRevertedError } from 'viem'
+import { type Address, BaseError, type Chain, ContractFunctionRevertedError, type Hex } from 'viem'
+import { arbitrum } from 'viem/chains'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
 import type { IAccountState } from '../../wallet/wallet.js'
@@ -11,32 +12,45 @@ import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
-export interface ISubmitBar<T = unknown> {
-  txQuery: IStream<Promise<T>>
-  alert?: IStream<string | null>
-  $container?: INodeCompose
-  $submitContent: I$Slottable
-  $barContent?: I$Node
-  disabled?: IStream<boolean>
+type Call = { to: Address; data: Hex; value?: bigint }
+
+export interface ISendTransaction {
+  getCalls: (account: IAccountState) => Call[] | Promise<Call[]>
+  chain?: Chain
+  $content?: I$Slottable
 }
 
-export const $SubmitBar = <T>(config: ISubmitBar<T>) =>
+export const $SendTransaction = ({ getCalls, chain = arbitrum, $content = $text('Submit') }: ISendTransaction) =>
   component(([submit, submitTether]: IBehavior<PointerEvent, IAccountState>) => {
-    const {
-      disabled = just(false),
-      alert = just(null),
-      txQuery,
-      $barContent,
-      $container = $row,
-      $submitContent
-    } = config
+    const txQuery = op(
+      submit,
+      map(async account => {
+        const calls = await getCalls(account)
+
+        if (calls.length === 0) {
+          throw new Error('No operations to execute')
+        }
+
+        const tx = await account.walletClient.sendCalls({
+          account: account.address,
+          chain,
+          calls,
+          experimental_fallback: true,
+          forceAtomic: true
+        })
+
+        return account.walletClient.waitForCallsStatus({
+          id: tx.id,
+          throwOnFailure: true
+        })
+      })
+    )
 
     const txState = op(start(null, promiseState(txQuery)), state)
 
-    const $alert = op(
-      combine({ txState, alert, disabled }),
-      switchMap(({ txState: requestState, alert: alertMsg }) => {
-        if (alertMsg) return $alertTooltip($node($text(alertMsg)))
+    const $status = op(
+      txState,
+      switchMap(requestState => {
         if (!requestState) return empty
 
         if (requestState.status === PromiseStatus.PENDING) {
@@ -70,21 +84,17 @@ export const $SubmitBar = <T>(config: ISubmitBar<T>) =>
       })
     )
 
-    const isDisabled = op(
-      combine({ txState, alert, disabled }),
-      map(({ txState, alert, disabled }) => Boolean(alert || disabled || txState?.status === PromiseStatus.PENDING))
-    )
+    const isDisabled = map(s => s?.status === PromiseStatus.PENDING, txState)
 
     return [
-      $container(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
-        $alert,
-        $barContent ?? empty,
+      $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
+        $status,
         $IntermediateConnectButton({
           $$display: map(wallet =>
             $ButtonCore({
               $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
               disabled: isDisabled,
-              $content: $submitContent
+              $content
             })({
               click: submitTether(constant(wallet))
             })

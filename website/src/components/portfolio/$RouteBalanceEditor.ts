@@ -63,7 +63,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
             return await wallet.read({
               ...PUPPET.CONTRACT.Account,
               functionName: 'userBalanceMap',
-              args: [collateralToken, account.subaccountAddress]
+              args: [collateralToken, account.address]
             })
           } catch (error) {
             console.warn('Failed to read deposit balance for target, account may not be initialized:', error)
@@ -109,7 +109,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
                       const readResult = await wallet.read({
                         ...PUPPET.CONTRACT.Account,
                         functionName: 'userBalanceMap',
-                        args: [collateralToken, a.subaccountAddress]
+                        args: [collateralToken, a.address]
                       })
                       return readResult
                     } catch (error) {

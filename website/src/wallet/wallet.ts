@@ -1,12 +1,5 @@
 import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
 import { groupList } from '@puppet-copy/middleware/core'
-import {
-  type IntentCost,
-  type IntentInput,
-  type RhinestoneAccount,
-  RhinestoneSDK,
-  walletClientToAccount
-} from '@rhinestone/sdk'
 import { porto } from '@wagmi/connectors'
 import {
   type Config,
@@ -34,7 +27,6 @@ import {
   type ContractFunctionName,
   createPublicClient,
   fallback,
-  getAddress,
   http,
   type ReadContractReturnType,
   type Transport,
@@ -45,30 +37,10 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 type ChainBalance = { chainId: number; balance: bigint }
 
-type PortfolioTokenBalance = {
-  tokenAddress: Address
-  chainId: number
-  balance: { locked: bigint; unlocked: bigint }
-}
-
-type PortfolioItem = {
-  tokenName: string
-  tokenDecimals: number
-  balance: { locked: bigint; unlocked: bigint }
-  tokenChainBalance: PortfolioTokenBalance[]
-}
-
 type IAccountState = {
   walletClient: WalletClient<Transport, Chain>
   address: Address
-  subAccount: RhinestoneAccount
-  subaccountAddress: Address
 }
-
-const rhinestoneSDK = new RhinestoneSDK({
-  apiKey: 'proxy',
-  endpointUrl: `${window.location.origin}/api/orchestrator`
-})
 
 const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
 type SupportedChainId = (typeof chainList)[number]['id']
@@ -133,21 +105,9 @@ const account: IStream<Promise<IAccountState | null>> = op(
     const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
     const address = walletClient.account.address
 
-    const subAccount = await rhinestoneSDK.createAccount({
-      owners: {
-        type: 'ecdsa',
-        accounts: [walletClientToAccount(walletClient)]
-      }
-    })
+    console.info('Account ready:', { address })
 
-    const subaccountAddress = subAccount.getAddress()
-
-    // Preload portfolio (cached by API)
-    getPortfolio(subaccountAddress).catch(() => {})
-
-    console.info('Account ready:', { address, subaccountAddress })
-
-    return { walletClient, address, subAccount, subaccountAddress }
+    return { walletClient, address }
   }),
   state
 )
@@ -231,81 +191,12 @@ async function getMultichainBalances(
   return results.filter(r => r.balance > 0n)
 }
 
-async function getPortfolio(subAccountAddress: Address, refresh = false): Promise<PortfolioItem[]> {
-  const url = new URL(`/api/orchestrator/accounts/${subAccountAddress}/portfolio`, window.location.origin)
-  if (refresh) url.searchParams.set('refresh', 'true')
-
-  const response = await fetch(url)
-  if (!response.ok) throw new Error(`Failed to fetch portfolio: ${response.statusText}`)
-
-  const data = await response.json()
-  const rawPortfolio = data.portfolio as Array<{
-    tokenName: string
-    tokenDecimals: number
-    balance: { locked: string; unlocked: string }
-    tokenChainBalance: Array<{
-      tokenAddress: string
-      chainId: number
-      balance: { locked: string; unlocked: string }
-    }>
-  }>
-
-  // Parse string balances to bigints
-  const parseBalance = (bal: { locked: string; unlocked: string }) => ({
-    locked: bal?.locked ? BigInt(bal.locked) : 0n,
-    unlocked: bal?.unlocked ? BigInt(bal.unlocked) : 0n
-  })
-
-  return rawPortfolio.map(item => ({
-    tokenName: item.tokenName,
-    tokenDecimals: item.tokenDecimals,
-    balance: parseBalance(item.balance),
-    tokenChainBalance: item.tokenChainBalance.map(tcb => ({
-      tokenAddress: getAddress(tcb.tokenAddress),
-      chainId: tcb.chainId,
-      balance: parseBalance(tcb.balance)
-    }))
-  }))
-}
-
-type IntentCostResponse = IntentCost & {
-  totalTokenShortfallInUSD?: number
-  tokenShortfall?: Array<{
-    tokenAddress: Address
-    destinationAmount: string
-    amountSpent: string
-    fee: string
-    tokenSymbol: string
-    tokenDecimals: number
-  }>
-}
-
-async function getIntentCost(params: IntentInput, refresh = false): Promise<IntentCostResponse> {
-  const url = new URL('/api/orchestrator/intents/cost', window.location.origin)
-  if (refresh) url.searchParams.set('refresh', 'true')
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params, (_, v) => (typeof v === 'bigint' ? v.toString() : v))
-  })
-
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => '')
-    throw new Error(`Failed to fetch intent cost: ${response.statusText}${errorBody ? ` - ${errorBody}` : ''}`)
-  }
-
-  return response.json()
-}
-
 const publicClient = wagmi.getClient({ chainId: arbitrum.id })
 
 const wallet = {
   read,
   getTokenBalance,
   getMultichainBalances,
-  getPortfolio,
-  getIntentCost,
   account,
   connect,
   disconnect,
@@ -313,9 +204,8 @@ const wallet = {
   wagmi,
   chainList,
   chainMap,
-  rhinestoneSDK,
   connectors: wagmi.connectors.map(c => ({ id: c.id, name: c.name }))
 }
 
-export type { IAccountState, ChainBalance, SupportedChainId, PortfolioItem }
+export type { IAccountState, ChainBalance, SupportedChainId }
 export default wallet

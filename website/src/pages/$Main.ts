@@ -81,7 +81,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const userMatchingRuleQuery = state(
         queryUserMatchingRuleList({
-          address: map(getAccountStatus => getAccountStatus?.subaccountAddress, awaitPromises(wallet.account))
+          address: map(getAccountStatus => getAccountStatus?.address, awaitPromises(wallet.account))
         })
       )
 
