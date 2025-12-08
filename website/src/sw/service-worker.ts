@@ -46,13 +46,14 @@ self.addEventListener('fetch', event => {
     (async () => {
       const cache = await caches.open('api-cache')
 
-      let cacheKey: Request
-      // if (event.request.method === 'POST') {
-      //   const body = await event.request.clone().text()
-      //   cacheKey = new Request(`${url.href}#${encodeURIComponent(body)}`)
-      // } else {
-      cacheKey = new Request(url.href)
-      // }
+      // Normalize SQL queries to create stable cache keys
+      // Remove timestamps to avoid cache bloat - queries with same structure share one cache entry
+      // Work with the full URL string to handle encoded parameters
+      let cacheKeyUrl = url.href
+      // Replace all unix timestamps (10-13 digits) with a placeholder
+      cacheKeyUrl = cacheKeyUrl.replace(/\d{10,13}/g, '0')
+
+      const cacheKey = new Request(cacheKeyUrl)
 
       if (!forceRefresh) {
         const cached = await cache.match(cacheKey)

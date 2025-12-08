@@ -8,7 +8,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
-import { combine, fromPromise, type IStream, map, start, switchMap } from 'aelea/stream'
+import { combine, type IStream, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -275,24 +275,17 @@ export const $TraderPage = ({
                     return $column(
                       // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
-                      switchMap(
-                        list => {
-                          return $RouteEditor({
-                            displayCollateralTokenSymbol: true,
-                            collateralToken: routeMetric.collateralToken,
-                            traderMatchedPuppetList: routeMetric.matchedPuppetList,
-                            userMatchingRuleList: [],
-                            draftMatchingRuleList,
-                            trader: routeMetric.account,
-                            $container: $defaultTraderMatchRouteEditorContainer(
-                              style({ marginLeft: '-12px', paddingBottom: '12px' })
-                            )
-                          })({
-                            changeMatchRuleList: changeMatchRuleListTether()
-                          })
-                        },
-                        switchMap(promise => fromPromise(promise), userMatchingRuleQuery)
-                      ),
+                      $RouteEditor({
+                        collateralToken: routeMetric.collateralToken,
+                        userMatchingRuleQuery,
+                        draftMatchingRuleList,
+                        trader: routeMetric.account,
+                        $container: $defaultTraderMatchRouteEditorContainer(
+                          style({ marginLeft: '-12px', paddingBottom: '12px' })
+                        )
+                      })({
+                        changeMatchRuleList: changeMatchRuleListTether()
+                      }),
                       $row(
                         style({ marginRight: '26px' })($seperator2),
                         $Table({

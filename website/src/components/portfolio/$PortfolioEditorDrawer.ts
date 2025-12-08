@@ -56,11 +56,10 @@ export const $PortfolioEditorDrawer = ({
   component(
     (
       [account, accountTether]: IBehavior<IAccountState>,
-      [clickClose, clickCloseTether]: IBehavior<any>,
-      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
+      [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
+      [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
-      [routeChange, routeChangeTether]: IBehavior<string, string>,
-      [txSuccess, txSuccessTether]: IBehavior<null>
+      [routeChange, routeChangeTether]: IBehavior<string, string>
     ) => {
       const hasContent = op(
         combine({ draftMatchingRuleList, draftDepositTokenList }),
@@ -305,8 +304,7 @@ export const $PortfolioEditorDrawer = ({
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
             $node(style({ flex: 1, minWidth: 0 }))(),
             $SendTransaction({ operations })({
-              account: accountTether(),
-              success: txSuccessTether()
+              account: accountTether()
             })
           )
         )
@@ -337,10 +335,9 @@ export const $PortfolioEditorDrawer = ({
               draftMatchingRuleList,
               clickRemoveSubsc
             ),
-            constant([], clickClose),
-            constant([], txSuccess)
+            constant([], clickClose)
           ),
-          changeDepositTokenList: merge(changeDepositTokenList, constant([], clickClose), constant([], txSuccess))
+          changeDepositTokenList: merge(changeDepositTokenList, constant([], clickClose))
         }
       ]
     }

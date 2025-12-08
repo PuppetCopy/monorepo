@@ -1,11 +1,10 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { empty, type IStream, map } from 'aelea/stream'
+import { awaitPromises, empty, type IStream, map, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
-import { $text, component, type INodeCompose, style } from 'aelea/ui'
+import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $caretDown, $icon } from '@/ui-components'
 import { $tokenIconByAddress } from '../../common/$common.js'
@@ -17,10 +16,8 @@ import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from './$Matchi
 
 interface ITraderMatchingRouteEditor {
   trader: Address
-  traderMatchedPuppetList: Hex[]
-  userMatchingRuleList: ISetMatchingRule[]
+  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
   collateralToken: Address
-  displayCollateralTokenSymbol?: boolean
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
   $container?: INodeCompose
 }
@@ -30,7 +27,7 @@ export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style
 export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
   component(
     (
-      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<any, ISetMatchingRule | undefined>,
+      [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<PointerEvent>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
       const traderMatchingKey = getTraderMatchingKey(config.collateralToken, config.trader)
@@ -40,29 +37,41 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         draftMatchingRuleList,
         trader,
         collateralToken,
-        traderMatchedPuppetList,
-        userMatchingRuleList,
-        displayCollateralTokenSymbol = false
+        userMatchingRuleQuery
       } = config
 
-      const matchingRule = userMatchingRuleList.length
-        ? userMatchingRuleList.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
-        : undefined
+      const matchingRule = map(list => {
+        return list.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+      }, awaitPromises(userMatchingRuleQuery))
+
+      const borderColorStyle = map(
+        rule =>
+          rule && rule.expiry > unixTimestampNow()
+            ? { borderColor: pallete.primary }
+            : { borderColor: colorAlpha(pallete.foreground, 0.25) },
+        matchingRule
+      )
 
       return [
         $Popover({
           $container,
-          $open: map(() => {
-            return $MatchingRuleEditor({
-              draftMatchingRuleList,
-              model: matchingRule,
-              traderMatchingKey,
-              collateralToken,
-              trader
-            })({
-              changeMatchRuleList: changeMatchRuleListTether()
-            })
-          }, popRouteSubscriptionEditor),
+          $open: switchMap(
+            () =>
+              map(
+                rule =>
+                  $MatchingRuleEditor({
+                    draftMatchingRuleList,
+                    model: rule,
+                    traderMatchingKey,
+                    collateralToken,
+                    trader
+                  })({
+                    changeMatchRuleList: changeMatchRuleListTether()
+                  }),
+                matchingRule
+              ),
+            popRouteSubscriptionEditor
+          ),
           dismiss: changeMatchRuleList,
           $target: $ButtonSecondary({
             $content: $responsiveFlex(style({ alignItems: 'center', gap: isDesktopScreen ? '6px' : '4px' }))(
@@ -102,13 +111,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
                     padding: '4px 8px',
                     height: 'auto'
                   }),
-
-              style({
-                borderColor:
-                  matchingRule && matchingRule.expiry > unixTimestampNow()
-                    ? pallete.primary
-                    : colorAlpha(pallete.foreground, 0.25)
-              })
+              styleBehavior(borderColorStyle)
             )
           })({
             click: popRouteSubscriptionEditorTether()

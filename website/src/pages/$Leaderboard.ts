@@ -10,19 +10,7 @@ import {
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
-import {
-  combine,
-  empty,
-  fromPromise,
-  type IStream,
-  joinMap,
-  just,
-  map,
-  merge,
-  op,
-  start,
-  switchMap
-} from 'aelea/stream'
+import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -271,21 +259,14 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $head: $text('Collateral'),
                     gridTemplate: isDesktopScreen ? '104px' : '58px',
                     $bodyCallback: map((routeMetric: ILeaderboardCellData) => {
-                      return op(
+                      return $RouteEditor({
+                        draftMatchingRuleList,
+                        collateralToken: routeMetric.metric.collateralToken,
                         userMatchingRuleQuery,
-                        joinMap(fromPromise),
-                        switchMap(list => {
-                          return $RouteEditor({
-                            draftMatchingRuleList,
-                            collateralToken: routeMetric.metric.collateralToken,
-                            traderMatchedPuppetList: routeMetric.metric.matchedPuppetList,
-                            userMatchingRuleList: list,
-                            trader: routeMetric.metric.account
-                          })({
-                            changeMatchRuleList: changeMatchRuleListTether()
-                          })
-                        })
-                      )
+                        trader: routeMetric.metric.account
+                      })({
+                        changeMatchRuleList: changeMatchRuleListTether()
+                      })
                     })
                   },
                   ...((isDesktopScreen

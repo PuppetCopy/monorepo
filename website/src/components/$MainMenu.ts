@@ -18,7 +18,7 @@ import {
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import { $seperator2 } from 'src/pages/common.js'
-import wallet from 'src/wallet/wallet.js'
+import wallet, { type IAccountState } from 'src/wallet/wallet.js'
 import {
   $alertIntermediateSpinnerContainer,
   $anchor,
@@ -48,7 +48,7 @@ export const $MainMenu = (config: MainMenu) =>
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
       [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>,
-      [selectConnector, selectConnectorTether]: IBehavior<string>, //
+      [selectConnector, selectConnectorTether]: IBehavior<IAccountState>, //
       [targetClick, targetClickTether]: IBehavior<INode, PointerEvent>
     ) => {
       const { route } = config
@@ -197,9 +197,7 @@ export const $MainMenu = (config: MainMenu) =>
                   return $Popover({
                     $target,
                     $open: map(() => {
-                      return $WalletConnect({
-                        connectors: wallet.connectors
-                      })({
+                      return $WalletConnect()({
                         connect: selectConnectorTether()
                       })
                     }, targetClick),

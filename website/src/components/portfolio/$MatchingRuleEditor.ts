@@ -79,12 +79,12 @@ export function combineForm<A, K extends keyof A = keyof A>(state: InputStatePar
 export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
   component(
     (
-      [inputAllowance, inputAllowanceTether]: IBehavior<any, bigint>,
+      [inputAllowance, inputAllowanceTether]: IBehavior<string | number, bigint>,
       [inputEndDate, inputEndDateTether]: IBehavior<string, bigint>,
       [changeActivityThrottle, changeActivityThrottleTether]: IBehavior<number, bigint>,
-      [clickRemove, clickRemoveTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
+      [clickRemove, clickRemoveTether]: IBehavior<PointerEvent>,
       [changeAdvancedRouteEditorEnabled, changeAdvancedRouteEditorEnabledTether]: IBehavior<boolean>,
-      [save, saveTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>
+      [save, saveTether]: IBehavior<PointerEvent>
     ) => {
       const advancedRouteEditorEnabled = uiStorage.replayWrite(
         localStore.ruleEditor.advancedRouteEditorEnabled,
@@ -117,7 +117,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
             labelWidth: 150,
             hint: '% Taken from deposited balance every match. lower values reduces risk and allow greater monitoring'
           })({
-            change: inputAllowanceTether(map(x => parseBps(x / 100)))
+            change: inputAllowanceTether(map(x => parseBps(Number(x) / 100)))
           }),
 
           style({ margin: '10px 0' })(

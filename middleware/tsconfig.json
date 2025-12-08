@@ -6,7 +6,6 @@
   "compilerOptions": {
     "outDir": "dist/esm",
     "rootDir": "./src",
-    "declaration": true,
     "declarationDir": "dist/types"
   }
 }

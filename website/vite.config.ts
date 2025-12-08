@@ -63,6 +63,12 @@ export default defineConfig({
         secure: true,
         rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
       },
+      '/api/indexer': {
+        target: process.env.INDEXER_URL,
+        changeOrigin: true,
+        secure: true,
+        rewrite: path => path.replace(/^\/api\/indexer/, '') // Strip /api/indexer prefix
+      },
       '/api/orchestrator': {
         target: 'https://v1.orchestrator.rhinestone.dev',
         changeOrigin: true,
@@ -131,7 +137,7 @@ export default defineConfig({
         skipWaiting: false // Wait for all tabs to close before activating
       },
       devOptions: {
-        enabled: !!process.env.VITE_PWA_DEV,
+        enabled: !!process.env.PWA_DEV,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module'

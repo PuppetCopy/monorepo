@@ -2,7 +2,10 @@ import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middlew
 import { getClosestNumber, groupManyList, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
+import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
+import { getAddresses } from 'viem/actions'
+import type { IAccountState } from '../wallet/wallet.js'
 import { sqlClient } from './sqlClient'
 
 export type StateParams<T> = {
@@ -37,20 +40,19 @@ export function queryPricefeed(
 }
 
 export function queryUserMatchingRuleList(
-  queryParams: StateParams<{
-    address: Address | undefined
-  }>
+  accountQuery: IStream<Promise<IAccountState | null>>
 ): IStream<Promise<ISetMatchingRule[]>> {
-  return map(async params => {
-    const address = params.address
-    if (address === undefined) {
-      return []
+  return map(async query => {
+    const account = await query
+    if (!account) return []
+
+    if (account.address !== getAddress(account.address)) {
+      throw new Error('Invalid account address')
     }
 
-    const metrictList = await sqlClient.query.setMatchingRule.findMany({
-      where: (t, f) => f.eq(t.puppet, address)
+    const newLocal = await sqlClient.query.setMatchingRule.findMany({
+      // where: (t, f) => f.eq(t.puppet, account.address)
     })
-
-    return metrictList
-  }, combine(queryParams))
+    return newLocal
+  }, accountQuery)
 }

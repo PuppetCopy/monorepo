@@ -7,6 +7,8 @@
     "incremental": true,
     // tsBuildInfoFile configured per package to avoid conflicts
     "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     // Performance optimizations for IntelliSense
     "disableSourceOfProjectReferenceRedirect": false,
     "disableSolutionSearching": false,

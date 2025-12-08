@@ -1,10 +1,21 @@
-import { createClient, getStatus as getSqlStatus } from '@puppet-copy/sql/client'
+import { createClient } from '@puppet-copy/sql/client'
 
 // Always use the API proxy endpoint
 const baseUrl = '/api/sql'
 
 export const sqlClient = createClient(baseUrl)
 
-export async function getStatus() {
-  return getSqlStatus(baseUrl)
+export interface IndexerStatus {
+  arbitrum: {
+    id: number
+    block: {
+      number: number
+      timestamp: number
+    } | null
+  }
+}
+
+export async function getStatus(): Promise<IndexerStatus> {
+  const response = await fetch('/api/indexer/status')
+  return response.json()
 }
