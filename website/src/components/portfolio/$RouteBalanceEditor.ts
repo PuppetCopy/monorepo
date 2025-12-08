@@ -41,7 +41,8 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
       const balanceModel = op(
         draftDepositTokenList,
         map(list => {
-          const match = list.find(ct => ct.token === collateralToken)
+          const normalizedCollateral = getAddress(collateralToken)
+          const match = list.find(ct => getAddress(ct.token) === normalizedCollateral)
           return (match ?? {
             action: BALANCE_ACTION.DEPOSIT,
             token: collateralToken,
@@ -180,7 +181,8 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
       })
 
       const updateDraftList = (changeList: BalanceDraft[], draft: BalanceDraft) => {
-        const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === getAddress(collateralToken))
+        const normalizedToken = getAddress(draft.token)
+        const existingIndex = changeList.findIndex(ct => getAddress(ct.token) === normalizedToken)
         if (existingIndex !== -1) {
           changeList[existingIndex] = draft
           return [...changeList]

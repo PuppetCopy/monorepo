@@ -3,7 +3,17 @@ import { constant, empty, map, op, start, switchMap } from 'aelea/stream'
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { type Address, BaseError, type Chain, ContractFunctionRevertedError, type Hex } from 'viem'
+import {
+  type Abi,
+  type Address,
+  BaseError,
+  type Chain,
+  type ContractFunctionArgs,
+  ContractFunctionRevertedError,
+  type ContractFunctionName,
+  encodeFunctionData,
+  type Hex
+} from 'viem'
 import { arbitrum } from 'viem/chains'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
@@ -12,37 +22,115 @@ import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
-type Call = { to: Address; data: Hex; value?: bigint }
+export type ContractCall<
+  TAbi extends Abi = Abi,
+  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'> = ContractFunctionName<
+    TAbi,
+    'nonpayable' | 'payable'
+  >
+> = {
+  to: Address
+  abi: TAbi
+  functionName: TFunctionName
+  args: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
+  value?: bigint
+}
+
+type RawCall = { to: Address; data: Hex; value?: bigint }
+
+function encodeCall(call: ContractCall): RawCall {
+  return {
+    to: call.to,
+    data: encodeFunctionData({
+      abi: call.abi,
+      functionName: call.functionName,
+      args: call.args
+    }),
+    value: call.value
+  }
+}
+
+async function checkSendCallsSupport(walletClient: IAccountState['walletClient'], address: Address): Promise<boolean> {
+  try {
+    if (typeof walletClient.getCapabilities === 'function') {
+      const capabilities = await walletClient.getCapabilities({ account: address })
+      return Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
+    }
+  } catch {
+    // Wallet doesn't support capability checking
+  }
+  return false
+}
+
+async function executeSequentially(
+  walletClient: IAccountState['walletClient'],
+  address: Address,
+  chain: Chain,
+  calls: RawCall[]
+): Promise<Hex> {
+  let lastHash: Hex | undefined
+
+  for (const call of calls) {
+    const hash = await walletClient.sendTransaction({
+      account: address,
+      chain,
+      to: call.to,
+      data: call.data,
+      value: call.value
+    })
+
+    // Wait for each transaction to be mined before sending the next
+    const publicClient = walletClient.extend(() => ({}))
+    await (publicClient as any).waitForTransactionReceipt({ hash })
+
+    lastHash = hash
+  }
+
+  if (!lastHash) throw new Error('No transactions executed')
+  return lastHash
+}
 
 export interface ISendTransaction {
-  getCalls: (account: IAccountState) => Call[] | Promise<Call[]>
+  getOperations: (account: IAccountState) => ContractCall[] | Promise<ContractCall[]>
   chain?: Chain
   $content?: I$Slottable
 }
 
-export const $SendTransaction = ({ getCalls, chain = arbitrum, $content = $text('Submit') }: ISendTransaction) =>
+export const $SendTransaction = ({
+  getOperations,
+  chain = arbitrum,
+  $content = $text('Submit')
+}: ISendTransaction) =>
   component(([submit, submitTether]: IBehavior<PointerEvent, IAccountState>) => {
     const txQuery = op(
       submit,
       map(async account => {
-        const calls = await getCalls(account)
+        const operations = await getOperations(account)
 
-        if (calls.length === 0) {
+        if (operations.length === 0) {
           throw new Error('No operations to execute')
         }
 
-        const tx = await account.walletClient.sendCalls({
-          account: account.address,
-          chain,
-          calls,
-          experimental_fallback: true,
-          forceAtomic: true
-        })
+        const calls = operations.map(encodeCall)
+        const supportsSendCalls = await checkSendCallsSupport(account.walletClient, account.address)
 
-        return account.walletClient.waitForCallsStatus({
-          id: tx.id,
-          throwOnFailure: true
-        })
+        if (supportsSendCalls) {
+          const tx = await account.walletClient.sendCalls({
+            account: account.address,
+            chain,
+            calls,
+            experimental_fallback: true,
+            forceAtomic: true
+          })
+
+          return account.walletClient.waitForCallsStatus({
+            id: tx.id,
+            throwOnFailure: true
+          })
+        }
+
+        // Fallback: execute transactions sequentially
+        return executeSequentially(account.walletClient, account.address, chain, calls)
       })
     )
 

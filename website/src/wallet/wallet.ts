@@ -42,7 +42,13 @@ type IAccountState = {
   address: Address
 }
 
-const chainList = [mainnet, base, optimism, arbitrum, polygon] as const
+const chainList = [
+  // mainnet, //
+  // base,
+  // optimism,
+  arbitrum
+  // polygon
+] as const
 type SupportedChainId = (typeof chainList)[number]['id']
 const chainMap = groupList(chainList, 'id')
 
@@ -59,17 +65,18 @@ const portoConnector = porto({
   mode: Mode.dialog({ renderer: Dialog.popup() })
 })
 
+const transports = Object.fromEntries(
+  chainList.map(chain => [
+    chain.id,
+    fallback([http(`/api/rpc?network=${CHAIN_NETWORK[chain.id]}`), http(chain.rpcUrls.default.http[0])])
+  ])
+) as Record<SupportedChainId, Transport>
+
 const wagmi: Config = createConfig({
   chains: chainList,
   connectors: [portoConnector],
   storage: createStorage({ storage: localStorage }),
-  transports: {
-    [arbitrum.id]: fallback([http('/api/rpc?network=arbitrum'), http(arbitrum.rpcUrls.default.http[0])]),
-    [mainnet.id]: fallback([http('/api/rpc?network=ethereum'), http(mainnet.rpcUrls.default.http[0])]),
-    [base.id]: fallback([http('/api/rpc?network=base'), http(base.rpcUrls.default.http[0])]),
-    [optimism.id]: fallback([http('/api/rpc?network=optimism'), http(optimism.rpcUrls.default.http[0])]),
-    [polygon.id]: fallback([http('/api/rpc?network=polygon'), http(polygon.rpcUrls.default.http[0])])
-  }
+  transports
 })
 
 const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {

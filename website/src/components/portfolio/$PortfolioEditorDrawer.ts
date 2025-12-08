@@ -22,7 +22,7 @@ import { multicast, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type Address, encodeFunctionData, erc20Abi, getAddress, type Hex } from 'viem'
+import { type Address, erc20Abi, getAddress } from 'viem'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
@@ -32,7 +32,7 @@ import type { IComponentPageParams } from '../../pages/types.js'
 import { fadeIn } from '../../transitions/enter.js'
 import type { IAccountState } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
-import { $SendTransaction } from '../form/$SendTransaction.js'
+import { $SendTransaction, type ContractCall } from '../form/$SendTransaction.js'
 import { BALANCE_ACTION, type BalanceDraft } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteBalanceEditor } from './$RouteBalanceEditor.js'
@@ -261,59 +261,53 @@ export const $PortfolioEditorDrawer = ({
                 $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
                   $node(style({ flex: 1, minWidth: 0 }))(),
                   $SendTransaction({
-                    getCalls: account => {
-                      const calls: Array<{ to: Address; data: Hex }> = []
+                    getOperations: account => {
+                      const operations: ContractCall[] = []
 
+                      // Balance operations (deposits/withdrawals) - must complete before matching rules
                       for (const draft of params.draftDepositTokenList) {
                         if (draft.action === BALANCE_ACTION.DEPOSIT) {
-                          calls.push({
+                          operations.push({
                             to: draft.token,
-                            data: encodeFunctionData({
-                              abi: erc20Abi,
-                              functionName: 'approve',
-                              args: [CONTRACT.TokenRouter.address, draft.amount]
-                            })
+                            abi: erc20Abi,
+                            functionName: 'approve',
+                            args: [CONTRACT.TokenRouter.address, draft.amount]
                           })
-                          calls.push({
+                          operations.push({
                             to: CONTRACT.UserRouter.address,
-                            data: encodeFunctionData({
-                              abi: CONTRACT.UserRouter.abi,
-                              functionName: 'deposit',
-                              args: [draft.token, draft.amount]
-                            })
+                            abi: CONTRACT.UserRouter.abi,
+                            functionName: 'deposit',
+                            args: [draft.token, draft.amount]
                           })
                         } else {
-                          calls.push({
+                          operations.push({
                             to: CONTRACT.UserRouter.address,
-                            data: encodeFunctionData({
-                              abi: CONTRACT.UserRouter.abi,
-                              functionName: 'withdraw',
-                              args: [draft.token, account.address, draft.amount]
-                            })
+                            abi: CONTRACT.UserRouter.abi,
+                            functionName: 'withdraw',
+                            args: [draft.token, account.address, draft.amount]
                           })
                         }
                       }
 
+                      // Matching rules - applied after deposits are complete
                       for (const rule of params.draftMatchingRuleList) {
-                        calls.push({
+                        operations.push({
                           to: CONTRACT.UserRouter.address,
-                          data: encodeFunctionData({
-                            abi: CONTRACT.UserRouter.abi,
-                            functionName: 'setMatchingRule',
-                            args: [
-                              rule.collateralToken,
-                              rule.trader,
-                              {
-                                allowanceRate: rule.allowanceRate,
-                                throttleActivity: rule.throttleActivity,
-                                expiry: rule.expiry
-                              }
-                            ]
-                          })
+                          abi: CONTRACT.UserRouter.abi,
+                          functionName: 'setMatchingRule',
+                          args: [
+                            rule.collateralToken,
+                            rule.trader,
+                            {
+                              allowanceRate: rule.allowanceRate,
+                              throttleActivity: rule.throttleActivity,
+                              expiry: rule.expiry
+                            }
+                          ]
                         })
                       }
 
-                      return calls
+                      return operations
                     }
                   })({
                     submit: requestChangeSubscriptionTether()

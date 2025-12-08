@@ -92,7 +92,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           const deduped = list.reduce((acc, draft) => {
             acc.set(getAddress(draft.token), draft)
             return acc
-          }, new Map())
+          }, new Map<Address, BalanceDraft>())
           return Array.from(deduped.values())
         }, changeDepositTokenList),
         []
