@@ -129,8 +129,8 @@ async function connect(preferredConnectorId?: string): Promise<IAccountState | n
 
   if (!targetConnector) throw new Error('No wallet connector configured')
 
-  // Already connected - return current wallet client
-  if (current.status === 'connected') {
+  // Already connected with same connector - return current wallet client
+  if (current.status === 'connected' && current.connector?.id === targetConnector.id) {
     const client = await wagmiGetWalletClient(wagmi, { chainId: current.chainId })
     return { client, address: client.account.address }
   }
@@ -152,7 +152,10 @@ async function connect(preferredConnectorId?: string): Promise<IAccountState | n
 }
 
 async function disconnect() {
-  await wagmiDisconnect(wagmi)
+  const current = getConnection(wagmi)
+  if (current.connector) {
+    await wagmiDisconnect(wagmi, { connector: current.connector })
+  }
 }
 
 async function read<

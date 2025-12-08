@@ -10,7 +10,7 @@ import {
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { awaitPromises, combine, constant, empty, filterNull, type IStream, map, op, tap } from 'aelea/stream'
+import { awaitPromises, combine, constant, empty, filterNull, type IStream, map, op, switchMap, tap } from 'aelea/stream'
 import { type IBehavior, multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
@@ -166,18 +166,20 @@ export const $PortfolioPage = ({
 
       return [
         $column(spacing.default)(
-          $row(
-            spacing.small,
-            style({ alignItems: 'center', placeContent: 'center', justifyContent: 'center', flex: 1 })
-          )(
-            ignoreAll(clickDisconnect),
-            $ButtonSecondary({
-              // $container: $defaultButtonCircularContainer(style({ alignSelf: 'flex-end' })),
-              $content: $text('Disconnect')
-            })({
-              click: clickDisconnectTether(tap(wallet.disconnect))
-            })
-          ),
+          switchMap(account => {
+            if (!account) return empty
+            return $row(
+              spacing.small,
+              style({ alignItems: 'center', placeContent: 'center', justifyContent: 'center', flex: 1 })
+            )(
+              ignoreAll(clickDisconnect),
+              $ButtonSecondary({
+                $content: $text('Disconnect')
+              })({
+                click: clickDisconnectTether(tap(wallet.disconnect))
+              })
+            )
+          }, awaitPromises(wallet.account)),
           $card(spacing.big, style({ flex: 1, width: '100%' }))(
             $card2(
               style({

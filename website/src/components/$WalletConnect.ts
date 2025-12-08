@@ -11,7 +11,7 @@ export const $WalletConnect = () =>
 
     return [
       $column(spacing.small)(
-        ...connectors.map(connector =>
+        ...connectors.reverse().map(connector =>
           $ButtonSecondary({
             $content: $row(spacing.small)($text(connector.name || 'Connect Wallet'))
           })({
