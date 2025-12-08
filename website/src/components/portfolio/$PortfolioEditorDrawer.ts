@@ -7,18 +7,15 @@ import {
   combine,
   constant,
   empty,
-  filter,
   type IStream,
   map,
   merge,
   op,
   sampleMap,
   skipRepeatsWith,
-  start,
   switchMap
 } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
-import { multicast, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
@@ -58,26 +55,70 @@ export const $PortfolioEditorDrawer = ({
 }: IPortfolioEditorDrawer) =>
   component(
     (
-      [requestChangeSubscription, requestChangeSubscriptionTether]: IBehavior<IAccountState, any>,
+      [account, accountTether]: IBehavior<IAccountState>,
       [clickClose, clickCloseTether]: IBehavior<any>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<any, ISetMatchingRuleEditorDraft>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
-      [routeChange, routeChangeTether]: IBehavior<string, string>
+      [routeChange, routeChangeTether]: IBehavior<string, string>,
+      [txSuccess, txSuccessTether]: IBehavior<null>
     ) => {
-      const multicastTxQuery = multicast(requestChangeSubscription)
-
-      const drawerState = combine({ draftMatchingRuleList, draftDepositTokenList, userMatchingRuleQuery })
-
-      const txSuccess = op(
-        start(null, promiseState(multicastTxQuery)),
-        filter(state => state !== null && 'value' in state && state.value !== null),
-        map(() => null)
-      )
-
       const hasContent = op(
-        drawerState,
+        combine({ draftMatchingRuleList, draftDepositTokenList }),
         map(params => params.draftMatchingRuleList.length > 0 || params.draftDepositTokenList.length > 0),
         skipRepeatsWith((a, b) => a === b)
+      )
+
+      // Operations stream for $SendTransaction - defined outside switchMap to avoid re-renders
+      const operations = op(
+        combine({ draftDepositTokenList, draftMatchingRuleList, account }),
+        map(params => {
+          const ops: ContractCall[] = []
+
+          // Balance operations (deposits/withdrawals) - must complete before matching rules
+          for (const draft of params.draftDepositTokenList) {
+            if (draft.action === BALANCE_ACTION.DEPOSIT) {
+              ops.push({
+                to: draft.token,
+                abi: erc20Abi,
+                functionName: 'approve',
+                args: [CONTRACT.TokenRouter.address, draft.amount]
+              })
+              ops.push({
+                to: CONTRACT.UserRouter.address,
+                abi: CONTRACT.UserRouter.abi,
+                functionName: 'deposit',
+                args: [draft.token, draft.amount]
+              })
+            } else {
+              ops.push({
+                to: CONTRACT.UserRouter.address,
+                abi: CONTRACT.UserRouter.abi,
+                functionName: 'withdraw',
+                args: [draft.token, params.account.address, draft.amount]
+              })
+            }
+          }
+
+          // Matching rules - applied after deposits are complete
+          for (const rule of params.draftMatchingRuleList) {
+            ops.push({
+              to: CONTRACT.UserRouter.address,
+              abi: CONTRACT.UserRouter.abi,
+              functionName: 'setMatchingRule',
+              args: [
+                rule.collateralToken,
+                rule.trader,
+                {
+                  allowanceRate: rule.allowanceRate,
+                  throttleActivity: rule.throttleActivity,
+                  expiry: rule.expiry
+                }
+              ]
+            })
+          }
+
+          return ops
+        })
       )
 
       const $drawerContent = $card2(
@@ -107,7 +148,7 @@ export const $PortfolioEditorDrawer = ({
           ),
 
           op(
-            drawerState,
+            combine({ draftMatchingRuleList, draftDepositTokenList, userMatchingRuleQuery }),
             switchMap(params => {
               if (params.draftMatchingRuleList.length === 0 && params.draftDepositTokenList.length === 0) {
                 return empty
@@ -256,64 +297,16 @@ export const $PortfolioEditorDrawer = ({
                       })
                     )
                   })
-                ),
-
-                $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
-                  $node(style({ flex: 1, minWidth: 0 }))(),
-                  $SendTransaction({
-                    getOperations: account => {
-                      const operations: ContractCall[] = []
-
-                      // Balance operations (deposits/withdrawals) - must complete before matching rules
-                      for (const draft of params.draftDepositTokenList) {
-                        if (draft.action === BALANCE_ACTION.DEPOSIT) {
-                          operations.push({
-                            to: draft.token,
-                            abi: erc20Abi,
-                            functionName: 'approve',
-                            args: [CONTRACT.TokenRouter.address, draft.amount]
-                          })
-                          operations.push({
-                            to: CONTRACT.UserRouter.address,
-                            abi: CONTRACT.UserRouter.abi,
-                            functionName: 'deposit',
-                            args: [draft.token, draft.amount]
-                          })
-                        } else {
-                          operations.push({
-                            to: CONTRACT.UserRouter.address,
-                            abi: CONTRACT.UserRouter.abi,
-                            functionName: 'withdraw',
-                            args: [draft.token, account.address, draft.amount]
-                          })
-                        }
-                      }
-
-                      // Matching rules - applied after deposits are complete
-                      for (const rule of params.draftMatchingRuleList) {
-                        operations.push({
-                          to: CONTRACT.UserRouter.address,
-                          abi: CONTRACT.UserRouter.abi,
-                          functionName: 'setMatchingRule',
-                          args: [
-                            rule.collateralToken,
-                            rule.trader,
-                            {
-                              allowanceRate: rule.allowanceRate,
-                              throttleActivity: rule.throttleActivity,
-                              expiry: rule.expiry
-                            }
-                          ]
-                        })
-                      }
-
-                      return operations
-                    }
-                  })({
-                    submit: requestChangeSubscriptionTether()
-                  })
                 )
               )
+            })
+          ),
+
+          $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
+            $node(style({ flex: 1, minWidth: 0 }))(),
+            $SendTransaction({ operations })({
+              account: accountTether(),
+              success: txSuccessTether()
             })
           )
         )

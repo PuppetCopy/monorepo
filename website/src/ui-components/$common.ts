@@ -140,9 +140,9 @@ export const $alertTooltip = ($tooltip: I$Slottable, $content: I$Slottable = $to
   })({})
 }
 
-export const $alertPositiveTooltip = ($tooltip: I$Slottable, $content: I$Slottable = $tooltip) => {
+export const $alertPositiveTooltip = ($content: I$Slottable, $tooltip: I$Slottable = $content) => {
   return $Tooltip({
-    $content,
+    $content: $tooltip,
     // $dropContainer: $defaultDropContainer,
     $anchor: $alertPositiveContainer(
       $icon({ $content: $alertIcon, viewBox: '0 0 24 24', width: '18px', svgOps: style({ minWidth: '18px' }) }),

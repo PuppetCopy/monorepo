@@ -207,7 +207,10 @@ export const $MainMenu = (config: MainMenu) =>
                   })({})
                 }
 
-                return $row(spacing.small, style({ alignItems: 'center' }))(
+                return $row(
+                  spacing.small,
+                  style({ alignItems: 'center' })
+                )(
                   $pageLink({
                     $container: $anchor(spacing.big, style({ padding: 0 })),
                     route: route.create({ fragment: 'wallet', title: 'Portfolio' }),

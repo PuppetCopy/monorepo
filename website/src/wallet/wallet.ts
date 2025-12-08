@@ -1,6 +1,6 @@
 import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
 import { groupList } from '@puppet-copy/middleware/core'
-import { porto } from '@wagmi/connectors'
+import { porto, walletConnect } from '@wagmi/connectors'
 import {
   type Config,
   createConfig,
@@ -38,7 +38,7 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 type ChainBalance = { chainId: number; balance: bigint }
 
 type IAccountState = {
-  walletClient: WalletClient<Transport, Chain>
+  client: WalletClient<Transport, Chain>
   address: Address
 }
 
@@ -60,6 +60,10 @@ const CHAIN_NETWORK: Record<number, string> = {
   [polygon.id]: 'polygon'
 }
 
+const walletConnectConnector = walletConnect({
+  projectId: 'b81521b9a6d17b1d070aa5899c2fdcfe'
+})
+
 const portoConnector = porto({
   chains: chainList,
   mode: Mode.dialog({ renderer: Dialog.popup() })
@@ -74,7 +78,11 @@ const transports = Object.fromEntries(
 
 const wagmi: Config = createConfig({
   chains: chainList,
-  connectors: [portoConnector],
+  connectors: [
+    // injected()
+    walletConnectConnector, //
+    portoConnector
+  ],
   storage: createStorage({ storage: localStorage }),
   transports
 })
@@ -83,25 +91,15 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
   const storedConnections = getConnections(wagmi)
   const hasPortoConnection = storedConnections.some(conn => conn.connector.id === 'xyz.ithaca.porto')
 
-  const init = async () => {
-    if (hasPortoConnection) {
-      await reconnect(wagmi, { connectors: [portoConnector] })
-    }
+  if (hasPortoConnection) {
+    // Porto reconnect triggers watchConnection.onChange, no need to call cb manually
+    reconnect(wagmi, { connectors: [portoConnector] }).catch(console.warn)
+  } else {
+    // For other wallets, emit initial connection state
     cb(getConnection(wagmi))
   }
 
-  init()
-  return watchConnection(wagmi, {
-    onChange: conn => {
-      try {
-        cb(conn)
-      } catch (error) {
-        // Porto connector can throw during disconnect state transitions
-        console.warn('Connection change error (likely Porto disconnect):', error)
-        cb(getConnection(wagmi))
-      }
-    }
-  })
+  return watchConnection(wagmi, { onChange: cb })
 })
 
 const account: IStream<Promise<IAccountState | null>> = op(
@@ -109,33 +107,47 @@ const account: IStream<Promise<IAccountState | null>> = op(
   map(async connection => {
     if (connection.status !== 'connected' || !connection.connector) return null
 
-    const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
-    const address = walletClient.account.address
+    try {
+      const client = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
+      const address = client.account.address
 
-    console.info('Account ready:', { address })
+      console.info('Account ready:', { address })
 
-    return { walletClient, address }
+      return { client, address }
+    } catch (error) {
+      // Connector may be in transitional state during disconnect
+      console.warn('Failed to get wallet client:', error)
+      return null
+    }
   }),
   state
 )
 
-async function connect(preferredConnectorId?: string) {
+async function connect(preferredConnectorId?: string): Promise<IAccountState | null> {
   const current = getConnection(wagmi)
   const targetConnector = wagmi.connectors.find(c => c.id === preferredConnectorId) ?? wagmi.connectors[0]
 
   if (!targetConnector) throw new Error('No wallet connector configured')
-  if (current.status === 'connected') return [...current.addresses]
+
+  // Already connected - return current wallet client
+  if (current.status === 'connected') {
+    const client = await wagmiGetWalletClient(wagmi, { chainId: current.chainId })
+    return { client, address: client.account.address }
+  }
 
   try {
     const result = await wagmiConnect(wagmi, { connector: targetConnector })
-    return result.accounts ?? []
+    if (!result.accounts?.length) return null
+
+    const client = await wagmiGetWalletClient(wagmi, { chainId: result.chainId })
+    return { client, address: client.account.address }
   } catch (error: any) {
     if (error?.message?.includes('rejected')) {
       console.log('User cancelled wallet connection')
-      return []
+      return null
     }
     console.error('Failed to connect:', error)
-    return []
+    return null
   }
 }
 

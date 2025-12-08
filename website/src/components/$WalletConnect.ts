@@ -1,31 +1,24 @@
-import { map } from 'aelea/stream'
+import { awaitPromises, filterNull, map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
-import wallet from '../wallet/wallet.js'
+import wallet, { type IAccountState } from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 
-type ConnectorOption = { id: string; name: string }
-
-interface IWalletConnectProps {
-  connectors: ConnectorOption[]
-}
-
-export const $WalletConnect = ({ connectors }: IWalletConnectProps) =>
-  component(([connect, connectTether]: IBehavior<PointerEvent, string>) => {
-    const connectorList = connectors.length > 0 ? connectors : [{ id: 'default', name: 'Connect' }]
+export const $WalletConnect = () =>
+  component(([connect, connectTether]: IBehavior<PointerEvent, IAccountState>) => {
+    const connectors = wallet.connectors.length > 0 ? wallet.connectors : [{ id: 'default', name: 'Connect' }]
 
     return [
       $column(spacing.small)(
-        ...connectorList.map(connector =>
+        ...connectors.map(connector =>
           $ButtonSecondary({
             $content: $row(spacing.small)($text(connector.name || 'Connect Wallet'))
           })({
             click: connectTether(
-              map(() => {
-                void wallet.connect(connector.id)
-                return connector.id
-              })
+              map(() => wallet.connect(connector.id)),
+              awaitPromises,
+              filterNull
             )
           })
         )

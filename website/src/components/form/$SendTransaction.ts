@@ -1,26 +1,34 @@
 import { getMappedValueFallback } from '@puppet-copy/middleware/core'
-import { constant, empty, map, op, start, switchMap } from 'aelea/stream'
+import { awaitPromises, combine, empty, filter, type IStream, map, merge, op, sample, switchMap } from 'aelea/stream'
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'
-import { $row, spacing } from 'aelea/ui-components'
+import { $column, $row, spacing } from 'aelea/ui-components'
 import {
   type Abi,
   type Address,
   BaseError,
   type Chain,
   type ContractFunctionArgs,
-  ContractFunctionRevertedError,
   type ContractFunctionName,
+  ContractFunctionRevertedError,
   encodeFunctionData,
   type Hex
 } from 'viem'
 import { arbitrum } from 'viem/chains'
-import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip } from '@/ui-components'
+import {
+  $alertIntermediateTooltip,
+  $alertPositiveTooltip,
+  $alertTooltip,
+  $spinnerTooltip,
+  $txHashRef
+} from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import type { IAccountState } from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
+
+type TxResult = { hashes: Hex[]; chain: Chain }
 
 export type ContractCall<
   TAbi extends Abi = Abi,
@@ -50,145 +58,162 @@ function encodeCall(call: ContractCall): RawCall {
   }
 }
 
-async function checkSendCallsSupport(walletClient: IAccountState['walletClient'], address: Address): Promise<boolean> {
-  try {
-    if (typeof walletClient.getCapabilities === 'function') {
-      const capabilities = await walletClient.getCapabilities({ account: address })
-      return Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
-    }
-  } catch {
-    // Wallet doesn't support capability checking
-  }
-  return false
-}
-
-async function executeSequentially(
-  walletClient: IAccountState['walletClient'],
-  address: Address,
-  chain: Chain,
-  calls: RawCall[]
-): Promise<Hex> {
-  let lastHash: Hex | undefined
-
-  for (const call of calls) {
-    const hash = await walletClient.sendTransaction({
-      account: address,
-      chain,
-      to: call.to,
-      data: call.data,
-      value: call.value
-    })
-
-    // Wait for each transaction to be mined before sending the next
-    const publicClient = walletClient.extend(() => ({}))
-    await (publicClient as any).waitForTransactionReceipt({ hash })
-
-    lastHash = hash
-  }
-
-  if (!lastHash) throw new Error('No transactions executed')
-  return lastHash
-}
-
 export interface ISendTransaction {
-  getOperations: (account: IAccountState) => ContractCall[] | Promise<ContractCall[]>
+  operations: IStream<ContractCall[]>
   chain?: Chain
   $content?: I$Slottable
 }
 
 export const $SendTransaction = ({
-  getOperations,
+  operations, //
   chain = arbitrum,
   $content = $text('Submit')
 }: ISendTransaction) =>
-  component(([submit, submitTether]: IBehavior<PointerEvent, IAccountState>) => {
-    const txQuery = op(
-      submit,
-      map(async account => {
-        const operations = await getOperations(account)
+  component(
+    (
+      [submit, submitTether]: IBehavior<PointerEvent>, //
+      [accountChange, accountChangeTether]: IBehavior<IAccountState>
+    ) => {
+      const account = op(
+        merge(accountChange, awaitPromises(wallet.account)),
+        filter((a): a is IAccountState => a !== null)
+      )
 
-        if (operations.length === 0) {
-          throw new Error('No operations to execute')
-        }
-
-        const calls = operations.map(encodeCall)
-        const supportsSendCalls = await checkSendCallsSupport(account.walletClient, account.address)
-
-        if (supportsSendCalls) {
-          const tx = await account.walletClient.sendCalls({
-            account: account.address,
-            chain,
-            calls,
-            experimental_fallback: true,
-            forceAtomic: true
-          })
-
-          return account.walletClient.waitForCallsStatus({
-            id: tx.id,
-            throwOnFailure: true
-          })
-        }
-
-        // Fallback: execute transactions sequentially
-        return executeSequentially(account.walletClient, account.address, chain, calls)
-      })
-    )
-
-    const txState = op(start(null, promiseState(txQuery)), state)
-
-    const $status = op(
-      txState,
-      switchMap(requestState => {
-        if (!requestState) return empty
-
-        if (requestState.status === PromiseStatus.PENDING) {
-          return $spinnerTooltip($node($text('Awaiting confirmation')))
-        }
-
-        if (requestState.status === PromiseStatus.ERROR) {
-          const err = requestState.error
-          let message: string | undefined
-
-          if (err instanceof BaseError) {
-            const revertError = err.walk(e => e instanceof ContractFunctionRevertedError)
-            if (revertError instanceof ContractFunctionRevertedError) {
-              message = revertError.data ? getContractErrorMessage(revertError.data) : err.shortMessage || err.message
+      // Check if wallet supports batched transactions (null = not connected yet)
+      const supportsBatching = state(
+        op(
+          account,
+          map(async params => {
+            try {
+              if (typeof params.client.getCapabilities === 'function') {
+                const capabilities = await params.client.getCapabilities({ account: params.address })
+                return Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
+              }
+            } catch {
+              // Wallet doesn't support capability checking
             }
+            return false
+          }),
+          awaitPromises
+        ),
+        null as boolean | null
+      )
+
+      const txQuery = op(
+        sample(combine({ operations, account }), submit),
+        map(async params => {
+          if (params.operations.length === 0) {
+            throw new Error('No operations to execute')
           }
 
-          const errorRecord = err && typeof err === 'object' ? (err as unknown as Record<string, unknown>) : {}
-          const errorMessage = String(
-            message || getMappedValueFallback(errorRecord, 'shortMessage', errorRecord.message) || 'Transaction failed'
-          )
+          const calls = params.operations.map(encodeCall)
 
-          return $alertTooltip($text(errorMessage))
-        }
+          const result = await params.account.client.sendCalls({
+            account: params.account.address,
+            chain,
+            calls,
+            experimental_fallback: true
+          })
 
-        if (requestState.value) {
-          return $alertPositiveTooltip($text('Transaction executed'))
-        }
+          const status = await params.account.client.waitForCallsStatus({
+            id: result.id,
+            throwOnFailure: true
+          })
 
-        return $spinnerTooltip($node($text('Awaiting execution')))
-      })
-    )
+          // Extract hashes from all receipts
+          const hashes = status.receipts?.map(r => r.transactionHash).filter((h): h is Hex => !!h) ?? []
+          if (hashes.length === 0) {
+            throw new Error('No transaction hashes in receipts')
+          }
 
-    const isDisabled = map(s => s?.status === PromiseStatus.PENDING, txState)
+          return { hashes, chain } as TxResult
+        })
+      )
 
-    return [
-      $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
-        $status,
-        $IntermediateConnectButton({
-          $$display: map(wallet =>
-            $ButtonCore({
-              $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
-              disabled: isDisabled,
-              $content
-            })({
-              click: submitTether(constant(wallet))
-            })
-          )
-        })({})
-      ),
-      { submit }
-    ]
-  })
+      const txState = state(promiseState(txQuery), null)
+
+      const $status = op(
+        combine({ supportsBatching, operations, txState }),
+        switchMap(params => {
+          // Show tx status when there's an active transaction
+          if (params.txState !== null) {
+            if (params.txState.status === PromiseStatus.PENDING) {
+              return $spinnerTooltip($node($text('Awaiting confirmation')))
+            }
+
+            if (params.txState.status === PromiseStatus.ERROR) {
+              const err = params.txState.error
+              let message: string | undefined
+
+              if (err instanceof BaseError) {
+                const revertError = err.walk(e => e instanceof ContractFunctionRevertedError)
+                if (revertError instanceof ContractFunctionRevertedError) {
+                  message = revertError.data
+                    ? getContractErrorMessage(revertError.data)
+                    : err.shortMessage || err.message
+                }
+              }
+
+              const errorRecord = err && typeof err === 'object' ? (err as unknown as Record<string, unknown>) : {}
+              const errorMessage = String(
+                message ||
+                  getMappedValueFallback(errorRecord, 'shortMessage', errorRecord.message) ||
+                  'Transaction failed'
+              )
+
+              return $alertTooltip($text(errorMessage))
+            }
+
+            if (params.txState.value) {
+              const { hashes, chain: txChain } = params.txState.value
+              return $alertPositiveTooltip(
+                $text('Success'),
+                $column(spacing.small)(...hashes.map(hash => $txHashRef(hash, txChain)))
+              )
+            }
+
+            return $spinnerTooltip($node($text('Awaiting execution')))
+          }
+
+          // Show EOA warning when wallet doesn't support batching
+          // null = not connected yet, true = supports batching, false = EOA
+          if (params.supportsBatching === false && params.operations.length > 1) {
+            return $alertIntermediateTooltip(
+              $text(`${params.operations.length} signatures required`),
+              $text('Your wallet does not support batched transactions yet')
+            )
+          }
+
+          return empty
+        })
+      )
+
+      const isDisabled = map(s => s?.status === PromiseStatus.PENDING, txState)
+
+      const success = op(
+        txState,
+        filter(s => s !== null && 'value' in s && s.value !== null),
+        map(() => null as null)
+      )
+
+      return [
+        $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
+          $status,
+          $IntermediateConnectButton({
+            $$display: map(() =>
+              $ButtonCore({
+                $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
+                disabled: isDisabled,
+                $content
+              })({
+                click: submitTether()
+              })
+            )
+          })({
+            connect: accountChangeTether()
+          })
+        ),
+        { account, success }
+      ]
+    }
+  )
