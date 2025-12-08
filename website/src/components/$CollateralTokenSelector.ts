@@ -21,7 +21,7 @@ export const $SelectCollateralToken = ({ selectedList }: ISelectCollateralToken)
           return $tokenLabeled(getTokenDescription(tr))
         }),
         $$selectedOption: map(tr => {
-          return $tokenIcon(getTokenDescription(tr))
+          return $tokenIcon(getTokenDescription(tr), '28px')
         }),
         value: selectedList,
         optionList: map(list => PUPPET_COLLATERAL_LIST.filter(item => list.indexOf(item) === -1), selectedList)

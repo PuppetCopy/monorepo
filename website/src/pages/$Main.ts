@@ -1,11 +1,5 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
-import {
-  ETH_ADDRESS_REGEXP,
-  getTimeAgo,
-  ignoreAll,
-  readableUnitAmount,
-  unixTimestampNow
-} from '@puppet-copy/middleware/core'
+import { ETH_ADDRESS_REGEXP, getTimeAgo, ignoreAll, readableUnitAmount } from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
 import { awaitPromises, map, merge, periodic, start, switchMap, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
@@ -55,7 +49,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>
+      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
+      [txSuccess, txSuccessTether]: IBehavior<null>
     ) => {
       // walletConnectAppkit.getIsConnectedState()
 
@@ -87,7 +82,9 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
       const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
 
-      const userMatchingRuleQuery = state(queryUserMatchingRuleList(wallet.account))
+      const userMatchingRuleQuery = state(
+        queryUserMatchingRuleList(switchMap(() => wallet.account, merge(wallet.account, txSuccess)))
+      )
 
       const indexerStatus = state(awaitPromises(map(() => getStatus(), start(0, periodic(IntervalTime.MIN * 1000)))))
 
@@ -289,7 +286,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               })({
                 routeChange: changeRouteTether(),
                 changeMatchRuleList: changeMatchRuleListTether(),
-                changeDepositTokenList: changeDepositTokenListTether()
+                changeDepositTokenList: changeDepositTokenListTether(),
+                txSuccess: txSuccessTether()
               })
             )
           )

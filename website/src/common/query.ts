@@ -2,7 +2,6 @@ import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middlew
 import { getClosestNumber, groupManyList, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
-import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import type { IAccountState } from '../wallet/wallet.js'
 import { sqlClient } from './sqlClient'
@@ -45,13 +44,8 @@ export function queryUserMatchingRuleList(
     const account = await query
     if (!account) return []
 
-    if (account.address !== getAddress(account.address)) {
-      throw new Error('Invalid account address')
-    }
-
-    const newLocal = await sqlClient.query.setMatchingRule.findMany({
-      // where: (t, f) => f.eq(t.puppet, account.address)
+    return sqlClient.query.setMatchingRule.findMany({
+      where: (t, f) => f.eq(t.puppet, account.address)
     })
-    return newLocal
   }, accountQuery)
 }

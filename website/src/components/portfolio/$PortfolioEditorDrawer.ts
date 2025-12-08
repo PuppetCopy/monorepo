@@ -56,6 +56,7 @@ export const $PortfolioEditorDrawer = ({
   component(
     (
       [account, accountTether]: IBehavior<IAccountState>,
+      [txSuccess, txSuccessTether]: IBehavior<null>,
       [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
@@ -216,8 +217,8 @@ export const $PortfolioEditorDrawer = ({
                               style({ flex: 1, padding: '8px 0 18px' })
                             )(
                               ...portfolioRoute.matchingRuleList.map(modSubsc => {
-                                const userMatchingRule = (userMatchingRuleList as ISetMatchingRule[]).find(
-                                  (rule: ISetMatchingRule) =>
+                                const userMatchingRule = userMatchingRuleList.find(
+                                  rule =>
                                     rule.collateralToken === portfolioRoute.collateralToken &&
                                     rule.trader === modSubsc.trader
                                 )
@@ -304,7 +305,8 @@ export const $PortfolioEditorDrawer = ({
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
             $node(style({ flex: 1, minWidth: 0 }))(),
             $SendTransaction({ operations })({
-              account: accountTether()
+              account: accountTether(),
+              success: txSuccessTether()
             })
           )
         )
@@ -321,6 +323,7 @@ export const $PortfolioEditorDrawer = ({
 
         {
           routeChange,
+          txSuccess,
           changeMatchRuleList: merge(
             sampleMap(
               (list, subsc) => {
@@ -335,9 +338,10 @@ export const $PortfolioEditorDrawer = ({
               draftMatchingRuleList,
               clickRemoveSubsc
             ),
-            constant([], clickClose)
+            constant([], clickClose),
+            constant([], txSuccess)
           ),
-          changeDepositTokenList: merge(changeDepositTokenList, constant([], clickClose))
+          changeDepositTokenList: merge(changeDepositTokenList, constant([], clickClose), constant([], txSuccess))
         }
       ]
     }

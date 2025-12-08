@@ -69,13 +69,6 @@ const portoConnector = porto({
   mode: Mode.dialog({ renderer: Dialog.popup() })
 })
 
-const transports = Object.fromEntries(
-  chainList.map(chain => [
-    chain.id,
-    fallback([http(`/api/rpc?network=${CHAIN_NETWORK[chain.id]}`), http(chain.rpcUrls.default.http[0])])
-  ])
-) as Record<SupportedChainId, Transport>
-
 const wagmi: Config = createConfig({
   chains: chainList,
   connectors: [
@@ -84,7 +77,17 @@ const wagmi: Config = createConfig({
     portoConnector
   ],
   storage: createStorage({ storage: localStorage }),
-  transports
+  transports: Object.fromEntries(
+    chainList.map(chain => {
+      return [
+        chain.id,
+        fallback([
+          http(`/api/rpc?network=${CHAIN_NETWORK[chain.id]}`), //
+          http(chain.rpcUrls.default.http[0])
+        ])
+      ]
+    })
+  ) as any
 })
 
 const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {
@@ -229,5 +232,5 @@ const wallet = {
   connectors: wagmi.connectors.map(c => ({ id: c.id, name: c.name }))
 }
 
-export type { IAccountState, ChainBalance, SupportedChainId }
+export type { IAccountState, ChainBalance }
 export default wallet

@@ -69,6 +69,7 @@ export const $defaultMultiselectDropContainer = $node(
     alignItems: 'center',
     display: 'grid',
     gridAutoFlow: 'column',
+    minHeight: '40px',
     borderRadius: '20px',
     border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
     backgroundColor: pallete.middleground

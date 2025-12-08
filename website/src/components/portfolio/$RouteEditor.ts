@@ -1,6 +1,6 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { awaitPromises, combine, empty, type IStream, map, op, switchMap } from 'aelea/stream'
+import { awaitPromises, combine, empty, type IStream, map, op, sample } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -59,22 +59,18 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       return [
         $Popover({
           $container,
-          $open: switchMap(
-            () =>
-              map(
-                rule =>
-                  $MatchingRuleEditor({
-                    draftMatchingRuleList,
-                    model: rule,
-                    traderMatchingKey,
-                    collateralToken,
-                    trader
-                  })({
-                    changeMatchRuleList: changeMatchRuleListTether()
-                  }),
-                matchingRule
-              ),
-            popRouteSubscriptionEditor
+          $open: map(
+            rule =>
+              $MatchingRuleEditor({
+                draftMatchingRuleList,
+                model: rule,
+                traderMatchingKey,
+                collateralToken,
+                trader
+              })({
+                changeMatchRuleList: changeMatchRuleListTether()
+              }),
+            sample(matchingRule, popRouteSubscriptionEditor)
           ),
           dismiss: changeMatchRuleList,
           $target: $ButtonSecondary({

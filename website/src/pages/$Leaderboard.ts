@@ -120,14 +120,9 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 select: changeScreenerFocusTether()
               }),
 
-              $row(
-                // $SelectIndexToken({ selectedList: indexTokenList })({
-                //   changeIndexTokenList: selectIndexTokenListTether()
-                // }),
-                $SelectCollateralToken({ selectedList: collateralTokenList })({
-                  changeCollateralTokenList: selectCollateralTokenListTether()
-                })
-              ),
+              $SelectCollateralToken({ selectedList: collateralTokenList })({
+                changeCollateralTokenList: selectCollateralTokenListTether()
+              }),
 
               $LastAtivity(activityTimeframe)({
                 changeActivityTimeframe: changeActivityTimeframeTether()
