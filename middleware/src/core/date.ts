@@ -64,7 +64,7 @@ export function getDuration(time: number | bigint, threshold = IntervalTime.MONT
   return durationString.trim() || none
 }
 
-export function getTimeSince(time: number, suffix = 'ago') {
+export function getTimeAgo(time: number, suffix = 'ago') {
   const timeDelta = unixTimestampNow() - time
   const interval = intervals.find(i => i.seconds < timeDelta)
 

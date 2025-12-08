@@ -74,6 +74,8 @@ jobs:
           tags: |
             ghcr.io/puppetcopy/indexer:latest
             ghcr.io/puppetcopy/indexer:${{ steps.version.outputs.VERSION }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64

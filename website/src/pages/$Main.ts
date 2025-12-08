@@ -1,19 +1,26 @@
 import { IntervalTime } from '@puppet-copy/middleware/const'
-import { ETH_ADDRESS_REGEXP, getTimeSince, ignoreAll } from '@puppet-copy/middleware/core'
+import {
+  ETH_ADDRESS_REGEXP,
+  getTimeAgo,
+  ignoreAll,
+  readableUnitAmount,
+  unixTimestampNow
+} from '@puppet-copy/middleware/core'
 import * as router from 'aelea/router'
 import { awaitPromises, map, merge, periodic, start, switchMap, tap } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import { $heading3 } from 'src/common/$text.js'
 import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
-import { getStatus } from '../common/sqlClient.js'
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryUserMatchingRuleList } from '../common/query.js'
+import { getStatus } from '../common/sqlClient.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { BalanceDraft } from '../components/portfolio/$DepositEditor.js'
@@ -213,10 +220,15 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
               return $Tooltip({
                 $content: block
-                  ? $column(spacing.tiny)(
-                      $text('Indexer Status'),
-                      $column(spacing.small)(
-                        $infoLabeledValue('Last Sync', getTimeSince(block.timestamp))
+                  ? $column(spacing.small)(
+                      $heading3($text('Indexer Status')),
+                      $node(),
+                      $column(spacing.tiny)(
+                        $infoLabeledValue(
+                          'Updated',
+                          switchMap(() => $text(getTimeAgo(block.timestamp)), start(0, periodic(1000)))
+                        ),
+                        $infoLabeledValue('Block', readableUnitAmount(block.number))
                       )
                     )
                   : $column(spacing.tiny)(

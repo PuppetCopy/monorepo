@@ -1,6 +1,6 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { awaitPromises, empty, type IStream, map, switchMap } from 'aelea/stream'
+import { awaitPromises, combine, empty, type IStream, map, op, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -11,7 +11,8 @@ import { $tokenIconByAddress } from '../../common/$common.js'
 import { $responsiveFlex } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import { $Popover } from '../$Popover.js'
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
+import { $ButtonSecondary } from '../form/$Button.js'
+import { $defaultButtonCore } from '../form/$ButtonCore.js'
 import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 
 interface ITraderMatchingRouteEditor {
@@ -44,12 +45,15 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         return list.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
       }, awaitPromises(userMatchingRuleQuery))
 
-      const borderColorStyle = map(
-        rule =>
-          rule && rule.expiry > unixTimestampNow()
-            ? { borderColor: pallete.primary }
-            : { borderColor: colorAlpha(pallete.foreground, 0.25) },
-        matchingRule
+      const borderColorStyle = op(
+        combine({ rule: matchingRule, draftList: draftMatchingRuleList }),
+        map(params => {
+          const hasDraft = params.draftList.some(draft => draft.traderMatchingKey === traderMatchingKey)
+          const hasActiveRule = params.rule && params.rule.expiry > unixTimestampNow()
+          if (hasDraft) return { borderColor: `${pallete.indeterminate} !important` }
+          if (hasActiveRule) return { borderColor: `${pallete.primary} !important` }
+          return null
+        })
       )
 
       return [
@@ -99,7 +103,19 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
                   : empty
               )
             ),
-            $container: $defaultMiniButtonSecondary(
+            $container: $defaultButtonCore(
+              style({
+                color: pallete.message,
+                whiteSpace: 'nowrap',
+                fill: 'white',
+                borderStyle: 'solid',
+                alignSelf: 'center',
+                fontSize: '.8rem',
+                backgroundColor: pallete.background,
+                fontWeight: 'bold',
+                borderWidth: '1px',
+                borderColor: colorAlpha(pallete.foreground, 0.25)
+              }),
               isDesktopScreen
                 ? style({
                     borderRadius: '100px',

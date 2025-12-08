@@ -63,11 +63,11 @@ export default defineConfig({
         secure: true,
         rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
       },
-      '/api/indexer': {
+      '/api/status': {
         target: process.env.INDEXER_URL,
         changeOrigin: true,
         secure: true,
-        rewrite: path => path.replace(/^\/api\/indexer/, '') // Strip /api/indexer prefix
+        rewrite: () => '/status'
       },
       '/api/orchestrator': {
         target: 'https://v1.orchestrator.rhinestone.dev',

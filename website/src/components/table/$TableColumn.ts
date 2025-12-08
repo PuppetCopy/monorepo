@@ -1,6 +1,6 @@
 import {
   getMappedValueFallback,
-  getTimeSince,
+  getTimeAgo,
   readableDate,
   readablePercentage,
   toBasisPoints
@@ -121,7 +121,7 @@ export const timeColumn: TableColumn<IPosition> = {
   $bodyCallback: map(pos => {
     return pos.lastUpdate.sizeInUsd === 0n
       ? $column(spacing.tiny)(
-          $text(getTimeSince(pos.lastUpdateTimestamp)),
+          $text(getTimeAgo(pos.lastUpdateTimestamp)),
           $row(spacing.small)($node(style({ fontSize: '.8rem' }))($text(readableDate(pos.lastUpdateTimestamp))))
         )
       : empty

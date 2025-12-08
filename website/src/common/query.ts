@@ -4,7 +4,6 @@ import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
-import { getAddresses } from 'viem/actions'
 import type { IAccountState } from '../wallet/wallet.js'
 import { sqlClient } from './sqlClient'
 

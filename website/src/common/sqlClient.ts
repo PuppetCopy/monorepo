@@ -16,6 +16,6 @@ export interface IndexerStatus {
 }
 
 export async function getStatus(): Promise<IndexerStatus> {
-  const response = await fetch('/api/indexer/status')
+  const response = await fetch('/api/status')
   return response.json()
 }
