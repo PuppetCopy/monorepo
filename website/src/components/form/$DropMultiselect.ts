@@ -14,7 +14,7 @@ import {
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INode, type INodeCompose, nodeEvent, style, stylePseudo } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $caretDown, $Dropdown, $defaultMultiselectDropContainer, $icon, $infoLabel, $xCross } from '@/ui-components'
 
 // Array utility functions (previously from @most/prelude)
@@ -81,7 +81,7 @@ export const $DropMultiSelect = <T>({
   component(([select, selectTether]: IBehavior<T>, [pluck, pluckTether]: IBehavior<INode, T>) => {
     return [
       $Dropdown({
-        $anchor: $row(style({ display: 'flex', flexDirection: 'row', position: 'relative' }))(
+        $anchor: $row(style({ display: 'flex', flexDirection: 'row', position: 'relative', gap: '8px', alignItems: 'center' }))(
           switchMap(valueList => {
             if (!valueList.length) {
               return $noneSelected
@@ -112,11 +112,21 @@ export const $DropMultiSelect = <T>({
             )
           }, value),
 
-          $row(style({ alignItems: 'center', cursor: 'pointer', padding: '0 12px', flex: '1' }))(
+          $row(
+            style({
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              border: `1px solid ${colorAlpha(pallete.foreground, 0.15)}`
+            })
+          )(
             $icon({
               $content: $caretDown,
               width: '12px',
-              svgOps: style({ minWidth: '12px', margin: '2px 1px 0' }),
+              svgOps: style({ minWidth: '12px' }),
               viewBox: '0 0 32 32'
             })
           )

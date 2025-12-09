@@ -13,7 +13,7 @@ export const METHOD_HASHES_MAP = {
   // Mirror.sol
   RequestOpen: keccak256(toHex('RequestOpen')),
   RequestAdjust: keccak256(toHex('RequestAdjust')),
-  RequestCloseStalledPosition: keccak256(toHex('RequestCloseStalledPosition')),
+  RequestCloseStalled: keccak256(toHex('RequestCloseStalled')),
   Execute: keccak256(toHex('Execute')),
   Liquidate: keccak256(toHex('Liquidate')),
 
@@ -42,7 +42,7 @@ export const EVENT_PARAMS_MAP = {
   RequestAdjust: parseAbiParameters(
     '(address, bytes32, address, address, address, bool, bool, uint256, uint256, uint256, uint256, uint256, uint256, uint256), address, bytes32, bytes32, bytes32, bool, uint256, uint256, uint256, uint256, uint256[]'
   ),
-  RequestCloseStalledPosition: parseAbiParameters(
+  RequestCloseStalled: parseAbiParameters(
     '(address, address, address, bool, uint256, uint256, uint256), address, bytes32, bytes32'
   ),
   Execute: parseAbiParameters('address, bytes32, bool, bool, uint256, uint256, uint256'),
@@ -72,8 +72,8 @@ export const EVENT_DECODER_MAP = {
   // Mirror.sol decoders
   [METHOD_HASHES_MAP.RequestOpen]: (data: Hex) => decodeAbiParameters(EVENT_PARAMS_MAP.RequestOpen, data),
   [METHOD_HASHES_MAP.RequestAdjust]: (data: Hex) => decodeAbiParameters(EVENT_PARAMS_MAP.RequestAdjust, data),
-  [METHOD_HASHES_MAP.RequestCloseStalledPosition]: (data: Hex) =>
-    decodeAbiParameters(EVENT_PARAMS_MAP.RequestCloseStalledPosition, data),
+  [METHOD_HASHES_MAP.RequestCloseStalled]: (data: Hex) =>
+    decodeAbiParameters(EVENT_PARAMS_MAP.RequestCloseStalled, data),
   [METHOD_HASHES_MAP.Execute]: (data: Hex) => decodeAbiParameters(EVENT_PARAMS_MAP.Execute, data),
   [METHOD_HASHES_MAP.Liquidate]: (data: Hex) => decodeAbiParameters(EVENT_PARAMS_MAP.Liquidate, data),
 

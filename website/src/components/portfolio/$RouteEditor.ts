@@ -1,6 +1,6 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
 import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
-import { awaitPromises, combine, empty, type IStream, map, op, sample } from 'aelea/stream'
+import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
 import { $row, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
@@ -41,9 +41,16 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         userMatchingRuleQuery
       } = config
 
-      const matchingRule = map(list => {
-        return list.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
-      }, awaitPromises(userMatchingRuleQuery))
+      const matchingRule = op(
+        userMatchingRuleQuery,
+        map(async listQuery => {
+          const list = await listQuery
+          const match = list.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+
+          return match
+        }),
+        awaitPromises
+      )
 
       const borderColorStyle = op(
         combine({ rule: matchingRule, draftList: draftMatchingRuleList }),
@@ -59,18 +66,19 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       return [
         $Popover({
           $container,
-          $open: map(
-            rule =>
-              $MatchingRuleEditor({
+          $open: op(
+            popRouteSubscriptionEditor,
+            sampleMap(match => {
+              return $MatchingRuleEditor({
                 draftMatchingRuleList,
-                model: rule,
+                model: match,
                 traderMatchingKey,
                 collateralToken,
                 trader
               })({
                 changeMatchRuleList: changeMatchRuleListTether()
-              }),
-            sample(matchingRule, popRouteSubscriptionEditor)
+              })
+            }, matchingRule)
           ),
           dismiss: changeMatchRuleList,
           $target: $ButtonSecondary({

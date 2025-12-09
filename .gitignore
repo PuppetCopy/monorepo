@@ -4,7 +4,7 @@ node_modules
 dist
 *.tsbuildinfo
 .tsbuildinfo
-*.local.md
+*.local.*
 
 # Use bun.lockb instead of these
 yarn.lock

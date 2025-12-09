@@ -68,13 +68,8 @@ export const $defaultMultiselectDropContainer = $node(
     position: 'relative',
     alignItems: 'center',
     display: 'grid',
-    gridAutoFlow: 'column',
-    minHeight: '40px',
-    borderRadius: '20px',
-    border: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-    backgroundColor: pallete.middleground
-  }),
-  stylePseudo(':hover', { borderColor: colorAlpha(pallete.foreground, 0.4) })
+    gridAutoFlow: 'column'
+  })
 )
 
 export interface IDropdown<T> {

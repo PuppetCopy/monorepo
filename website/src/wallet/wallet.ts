@@ -60,8 +60,10 @@ const CHAIN_NETWORK: Record<number, string> = {
   [polygon.id]: 'polygon'
 }
 
+const WALLETCONNECT_PROJECT_ID = 'b81521b9a6d17b1d070aa5899c2fdcfe'
+
 const walletConnectConnector = walletConnect({
-  projectId: 'b81521b9a6d17b1d070aa5899c2fdcfe'
+  projectId: WALLETCONNECT_PROJECT_ID
 })
 
 const portoConnector = porto({
@@ -229,7 +231,7 @@ const wallet = {
   wagmi,
   chainList,
   chainMap,
-  connectors: wagmi.connectors.map(c => ({ id: c.id, name: c.name }))
+  walletConnectProjectId: WALLETCONNECT_PROJECT_ID
 }
 
 export type { IAccountState, ChainBalance }

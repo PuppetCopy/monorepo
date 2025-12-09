@@ -180,7 +180,9 @@ export const $SendTransaction = ({
           if (params.supportsBatching === false && params.operations.length > 1) {
             return $alertIntermediateTooltip(
               $text(`${params.operations.length} signatures required`),
-              $text('Your wallet does not support batched transactions yet')
+              $text(
+                'Your wallet does not support batched transactions yet. You will need to sign each transaction separately.'
+              )
             )
           }
 
