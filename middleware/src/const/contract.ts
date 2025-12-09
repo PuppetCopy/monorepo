@@ -1,9 +1,7 @@
+import { PUPPET_CONTRACT_MAP, puppetErrorAbi } from '@puppet/contracts'
+import { GMX_V2_CONTRACT_MAP, gmxErrorAbi } from '@puppet/contracts/gmx'
 import { erc20Abi } from 'viem'
-import { gmxErrorAbi } from '../generated/abi/gmxErrors.js'
-import { puppetErrorAbi } from '../generated/abi/puppetErrorAbi.js'
 import referralStorageAbi from '../generated/abi/referralStorage.js'
-import { GMX_V2_CONTRACT_MAP } from '../generated/gmxContracts.js'
-import { PUPPET_CONTRACT_MAP } from '../generated/puppetContracts.js'
 
 export const CONTRACT = {
   // Puppet contracts from generated file

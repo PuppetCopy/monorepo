@@ -1,3 +1,4 @@
+import { ARBITRUM_MARKET_LIST } from '@puppet/contracts/gmx'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { encodeAbiParameters, getAddress, keccak256, parseAbiParameters, toBytes } from 'viem/utils'
@@ -7,7 +8,6 @@ import { factor, toBasisPoints } from '../core/math.js'
 import { formatFixed } from '../core/parse.js'
 import type { IMarketDescription, ITokenDescription } from '../core/types.js'
 import { easeInExpo, getMappedValue } from '../core/utils.js'
-import { ARBITRUM_MARKET_LIST } from '../generated/marketList.js'
 import { MARKET_ADDRESS_DESCRIPTION_MAP } from './market.js'
 
 export function getPnL(isLong: boolean, entryPrice: bigint, priceChange: bigint, size: bigint) {

@@ -8,8 +8,7 @@
   "scripts": {
     "build": "bun run build:clean && bun run tsc -b",
     "build:clean": "rm -rf dist",
-    "tsc:check": "tsc --noEmit",
-    "generate": "bun run script/generate.ts"
+    "tsc:check": "tsc --noEmit"
   },
   "files": [
     "dist"
@@ -21,6 +20,7 @@
     }
   },
   "dependencies": {
+    "@puppet/contracts": "workspace:*",
     "abitype": "catalog:",
     "aelea": "catalog:",
     "lightweight-charts": "catalog:",

@@ -1,7 +1,7 @@
+import { ARBITRUM_TOKEN_LIST } from '@puppet/contracts/gmx'
 import type { Address } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 import { groupList } from '../core/utils.js'
-import { ARBITRUM_TOKEN_LIST } from '../generated/tokenList.js'
 import { ARBITRUM_ADDRESS, BASE_ADDRESS, ETHEREUM_ADDRESS, OPTIMISM_ADDRESS, POLYGON_ADDRESS } from './address.js'
 import { ADDRESS_ZERO } from './common.js'
 import { CONTRACT } from './contract.js'

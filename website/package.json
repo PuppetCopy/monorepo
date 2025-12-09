@@ -17,7 +17,6 @@
   "dependencies": {
     "@puppet-copy/middleware": "workspace:*",
     "@puppet-copy/sql": "workspace:*",
-    "@rhinestone/sdk": "1.0.35",
     "@wagmi/connectors": "7.0.2",
     "@wagmi/core": "3.0.0",
     "@walletconnect/ethereum-provider": "~2.23.0",

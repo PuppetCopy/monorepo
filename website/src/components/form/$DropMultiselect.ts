@@ -81,7 +81,9 @@ export const $DropMultiSelect = <T>({
   component(([select, selectTether]: IBehavior<T>, [pluck, pluckTether]: IBehavior<INode, T>) => {
     return [
       $Dropdown({
-        $anchor: $row(style({ display: 'flex', flexDirection: 'row', position: 'relative', gap: '8px', alignItems: 'center' }))(
+        $anchor: $row(
+          style({ display: 'flex', flexDirection: 'row', position: 'relative', gap: '8px', alignItems: 'center' })
+        )(
           switchMap(valueList => {
             if (!valueList.length) {
               return $noneSelected
