@@ -43,6 +43,7 @@ jobs:
       - name: Install and Build
         run: |
           bun install --frozen-lockfile
+          rm -rf ~/.svm
           bun run build
 
       - name: Docker Build and Push
