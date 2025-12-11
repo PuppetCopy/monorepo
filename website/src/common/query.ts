@@ -1,5 +1,5 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
-import { getClosestNumber, groupManyList, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { getClosestNumber, getUnixTimestamp, groupManyList } from '@puppet-copy/middleware/core'
 import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
@@ -27,7 +27,7 @@ export function queryPricefeed(
       where: (t, f) =>
         f.and(
           f.eq(t.interval, getClosestNumber(PRICEFEED_INTERVAL_LIST, params.activityTimeframe / estTickAmout)),
-          f.gte(t.slotTime, unixTimestampNow() - params.activityTimeframe),
+          f.gte(t.slotTime, getUnixTimestamp() - params.activityTimeframe),
           params.tokenList ? f.inArray(t.token, params.tokenList) : undefined
         )
     })

@@ -1,4 +1,4 @@
-import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
+import { getTraderMatchingKey, getUnixTimestamp } from '@puppet-copy/middleware/core'
 import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
@@ -56,7 +56,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         combine({ rule: matchingRule, draftList: draftMatchingRuleList }),
         map(params => {
           const hasDraft = params.draftList.some(draft => draft.traderMatchingKey === traderMatchingKey)
-          const hasActiveRule = params.rule && params.rule.expiry > unixTimestampNow()
+          const hasActiveRule = params.rule && params.rule.expiry > getUnixTimestamp()
           if (hasDraft) return { borderColor: `${pallete.indeterminate} !important` }
           if (hasActiveRule) return { borderColor: `${pallete.primary} !important` }
           return null

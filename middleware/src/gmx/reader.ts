@@ -1,14 +1,14 @@
 import { GMX_V2_CONTRACT_MAP } from '@puppet/contracts/gmx'
 import type { Hex, PublicClient } from 'viem'
 import { readContract } from 'viem/actions'
-import { getPositionCollateralAmountKey, getPositionSizeInUsdKey } from '../gmx/gmxUtils.js'
+import { getPositionCollateralAmountKey, getPositionSizeKey } from '../gmx/gmxUtils.js'
 
-export async function getTraderSize(client: PublicClient, positionKey: Hex) {
+export async function getPositionSize(client: PublicClient, positionKey: Hex) {
   return readContract(client, {
     address: GMX_V2_CONTRACT_MAP.GmxDatastore.address,
     abi: GMX_V2_CONTRACT_MAP.GmxDatastore.abi,
     functionName: 'getUint',
-    args: [getPositionSizeInUsdKey(positionKey)]
+    args: [getPositionSizeKey(positionKey)]
   })
 }
 

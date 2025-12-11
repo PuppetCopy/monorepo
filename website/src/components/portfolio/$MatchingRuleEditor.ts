@@ -3,8 +3,8 @@ import {
   formatFixed,
   getDuration,
   getTraderMatchingKey,
-  parseBps,
-  unixTimestampNow
+  getUnixTimestamp,
+  parseBps
 } from '@puppet-copy/middleware/core'
 import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import {
@@ -96,7 +96,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       const defaultDraft = {
         allowanceRate: 1000n,
         throttleActivity: BigInt(IntervalTime.HR),
-        expiry: BigInt(unixTimestampNow() + IntervalTime.YEAR)
+        expiry: BigInt(getUnixTimestamp() + IntervalTime.YEAR)
       }
 
       const allowanceRate = model ? start(model.allowanceRate, inputAllowance) : inputAllowance
@@ -104,7 +104,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
       const expiry = model ? start(model.expiry, inputEndDate) : inputEndDate
       const draft = combineForm({ allowanceRate, throttleActivity, expiry }, defaultDraft)
 
-      const isSubscribed = model && model.expiry > BigInt(unixTimestampNow())
+      const isSubscribed = model && model.expiry > BigInt(getUnixTimestamp())
 
       return [
         $column(spacing.default, style({ maxWidth: '350px' }))(

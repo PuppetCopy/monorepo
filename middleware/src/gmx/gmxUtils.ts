@@ -88,7 +88,7 @@ export function getPositionKey(account: Address, market: Address, collateralToke
   return hashData(['address', 'address', 'address', 'bool'], [account, market, collateralToken, isLong])
 }
 
-export function getPositionSizeInUsdKey(positionKey: Hex) {
+export function getPositionSizeKey(positionKey: Hex) {
   return keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'string' }], [positionKey, 'SIZE_IN_USD']))
 }
 export function getPositionCollateralAmountKey(positionKey: Hex) {

@@ -1,13 +1,13 @@
 import type { Address } from 'viem/accounts'
 import type { IRequestPagePositionApi, IRequestSortApi, IResponsePageApi } from './types.js'
 
-export const unixTimestampNow = () => Math.floor(Date.now() / 1000)
+export const getUnixTimestamp = () => Math.floor(Date.now() / 1000)
 
 export const timespanPassedSinceInvoke = (timespan: number) => {
-  let lastTimePasses = unixTimestampNow()
+  let lastTimePasses = getUnixTimestamp()
 
   return () => {
-    const nowTime = unixTimestampNow()
+    const nowTime = getUnixTimestamp()
     const delta = nowTime - lastTimePasses
     if (delta > timespan) {
       lastTimePasses = nowTime

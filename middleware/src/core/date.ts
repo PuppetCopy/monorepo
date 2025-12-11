@@ -1,5 +1,5 @@
 import { IntervalTime } from '../const/common.js'
-import { unixTimestampNow } from './utils.js'
+import { getUnixTimestamp } from './utils.js'
 
 export declare type Nominal<T, Name extends string> = T & {
   [Symbol.species]: Name
@@ -65,7 +65,7 @@ export function getDuration(time: number | bigint, threshold = IntervalTime.MONT
 }
 
 export function getTimeAgo(time: number, suffix = 'ago') {
-  const timeDelta = unixTimestampNow() - time
+  const timeDelta = getUnixTimestamp() - time
   const interval = intervals.find(i => i.seconds < timeDelta)
 
   if (!interval) {

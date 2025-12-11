@@ -2,11 +2,11 @@ import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middlewa
 import {
   getDuration,
   getTraderMatchingKey,
+  getUnixTimestamp,
   groupManyList,
   ignoreAll,
   readableDate,
-  readablePercentage,
-  unixTimestampNow
+  readablePercentage
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISubscribeRule } from '@puppet-copy/sql/schema'
@@ -77,7 +77,7 @@ export const $PortfolioPage = ({
           }
 
           const address = params.wallet.address
-          const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+          const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
           const result = await sqlClient.query.position.findMany({
             where: (t, f) =>

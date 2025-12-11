@@ -1,4 +1,4 @@
-import { unixTimestampNow } from '@puppet-copy/middleware/core'
+import { getUnixTimestamp } from '@puppet-copy/middleware/core'
 import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
@@ -12,7 +12,7 @@ export const $seperator2 = style(
 )
 
 function positionLatestTimestamp(position: IPosition): number {
-  return position.lastUpdate.sizeInUsd === 0n ? unixTimestampNow() : position.lastUpdateTimestamp
+  return position.lastUpdate.sizeInUsd === 0n ? getUnixTimestamp() : position.lastUpdateTimestamp
 }
 
 export function aggregatePositionList(list: (IGmxPositionIncrease | IGmxPositionDecrease)[]): IPosition[] {

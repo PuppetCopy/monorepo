@@ -1,11 +1,11 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
 import {
   getDebankProfileUrl,
+  getUnixTimestamp,
   pagingQuery,
   readableAddress,
   readableLeverage,
-  readableUsd,
-  unixTimestampNow
+  readableUsd
 } from '@puppet-copy/middleware/core'
 import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map, start } from 'aelea/stream'
@@ -71,7 +71,7 @@ export const $TraderPage = ({
 
       const routeMetricListQuery = multicast(
         map(async params => {
-          const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+          const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
           const routeMetricList = await sqlClient.query.traderRouteLatestMetric.findMany({
             where: (t, f) =>
@@ -101,7 +101,7 @@ export const $TraderPage = ({
       )
 
       const pageParams = map(params => {
-        const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+        const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
         const pageQuery = Promise.all([
           params.routeMetricListQuery,

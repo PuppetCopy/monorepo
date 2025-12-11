@@ -3,9 +3,9 @@ import {
   fillTimeline,
   formatFixed,
   getMappedValue,
+  getUnixTimestamp,
   type InferStream,
-  readablePnl,
-  unixTimestampNow
+  readablePnl
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
@@ -144,7 +144,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
             ),
             switchMap(params => {
               // const interval = IntervalTime.MIN
-              const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
+              const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
               // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = map(async filterParams => {
@@ -323,7 +323,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     sortBy: params.screenerFocus,
                     gridTemplate: isDesktopScreen ? '150px' : undefined,
                     $bodyCallback: map(pos => {
-                      const endTime = unixTimestampNow()
+                      const endTime = getUnixTimestamp()
                       const startTime = endTime - params.activityTimeframe
                       const sourceList = [
                         { value: 0n, time: startTime },
@@ -352,13 +352,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         markerList.push({
                           position: 'inBar',
                           color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
-                          time: unixTimestampNow() as Time,
+                          time: getUnixTimestamp() as Time,
                           shape: 'circle'
                         })
                         markerList.push({
                           position: 'inBar',
                           color: colorAlpha(pos.metric.pnl > 0 ? pallete.positive : pallete.negative, 0.25),
-                          time: unixTimestampNow() as Time,
+                          time: getUnixTimestamp() as Time,
                           size: 2.25,
                           shape: 'circle'
                         })

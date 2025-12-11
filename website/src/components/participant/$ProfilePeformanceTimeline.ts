@@ -2,9 +2,9 @@ import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
 import {
   fillTimeline,
   formatFixed,
+  getUnixTimestamp,
   parseReadableNumber,
-  readableUnitAmount,
-  unixTimestampNow
+  readableUnitAmount
 } from '@puppet-copy/middleware/core'
 import {
   combine,
@@ -53,7 +53,7 @@ export const $TradeRouteTimeline = ({
           return []
         }
 
-        const endTime = unixTimestampNow()
+        const endTime = getUnixTimestamp()
         const startTime = endTime - params.activityTimeframe
         const sourceList = [
           { value: 0n, time: startTime, traderMatchingKey: pos.pnlTimeline[0].traderMatchingKey },
@@ -174,7 +174,7 @@ export const $TradeRouteTimeline = ({
                 //   return {
                 //     position: 'inBar',
                 //     color: pnl < 0n ? pallete.negative : pallete.positive,
-                //     time: unixTimestampNow() as Time,
+                //     time: getUnixTimestamp() as Time,
                 //     size: 1.5,
                 //     shape: 'circle'
                 //   }
@@ -222,7 +222,7 @@ export const $TradeRouteTimeline = ({
                   },
                   // appendData: aggregate((prev, next) => {
                   //   const marketPrice = formatFixed(next.indexTokenPrice, 30)
-                  //   const timeNow = unixTimestampNow()
+                  //   const timeNow = getUnixTimestamp()
                   //   const prevTimeSlot = Math.floor(prev.time as number / tf)
                   //   const nextTimeSlot = Math.floor(timeNow / tf)
                   //   const time = nextTimeSlot * tf as Time
