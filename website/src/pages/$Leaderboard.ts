@@ -8,7 +8,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import type { ISetMatchingRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import * as schema from '@puppet-copy/sql/schema'
 import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
@@ -49,7 +49,7 @@ import { $seperator2 } from './common.js'
 import type { IPageFilterParams, IPageParams } from './types.js'
 
 interface ILeaderboard extends IPageFilterParams, IPageParams {
-  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 

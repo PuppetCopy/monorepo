@@ -6,7 +6,7 @@ import {
   parseBps,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import {
   combine,
   empty,
@@ -32,10 +32,10 @@ import { $labeledDivider } from '../../common/elements/$common.js'
 import { localStore } from '../../const/localStore.js'
 import { $ButtonSecondary } from '../form/$Button.js'
 
-export type ISetMatchingRuleEditorDraft = Omit<ISetMatchingRule, 'id'>
+export type ISetMatchingRuleEditorDraft = Omit<ISubscribeRule, 'id' | 'blockTimestamp' | 'transactionHash'>
 
 export type IMatchRuleEditor = {
-  model?: ISetMatchingRule
+  model?: ISubscribeRule
   traderMatchingKey: Hex
   collateralToken: Address
   trader: Address

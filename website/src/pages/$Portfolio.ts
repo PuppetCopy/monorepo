@@ -9,7 +9,7 @@ import {
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import {
   awaitPromises,
   combine,
@@ -47,7 +47,7 @@ import type { IPageFilterParams } from './types.js'
 interface IWalletPuppet extends IPageFilterParams {
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
   draftDepositTokenList: IStream<IDepositEditorDraft[]>
-  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
 }
 
 export const $PortfolioPage = ({
@@ -79,67 +79,50 @@ export const $PortfolioPage = ({
           const address = params.wallet.address
           const startActivityTimeframe = unixTimestampNow() - params.activityTimeframe
 
-          const result = await sqlClient.query.puppetLink.findMany({
+          const result = await sqlClient.query.position.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.puppet, address),
                 f.gte(t.createdAt, startActivityTimeframe),
                 params.collateralTokenList.length > 0
-                  ? f.inArray(t.callParamsCollateralToken, params.collateralTokenList)
+                  ? f.inArray(t.collateralToken, params.collateralTokenList)
                   : undefined
               ),
             columns: {
               traderMatchingKey: true,
-              callParamsTrader: true,
-              callParamsCollateralToken: true,
+              trader: true,
+              collateralToken: true,
               allocationAddress: true,
               createdAt: true,
               amount: true,
               createdTxHash: true
             },
             with: {
-              mirrorLink: {
+              mirror__Match: {
                 columns: {
-                  callParamsTrader: true,
+                  trader: true,
                   sizeDelta: true,
                   requestKey: true,
-                  traderTargetLeverage: true,
-                  callParamsIsLong: true,
-                  callParamsMarket: true
+                  isLong: true,
+                  market: true
                 },
                 with: {
-                  executeList: {
-                    columns: {
-                      positionSize: true,
-                      transactionHash: true,
-                      traderSize: true,
-                      traderCollateral: true
-                      // traderTargetLeverage: true // TODO: Field no longer exists in schema
-                    }
-                  },
-                  liquidate: {
-                    columns: {
-                      transactionHash: true,
-                      blockTimestamp: true
-                    }
-                  },
-                  puppetLinkList: {
+                  positionList: {
                     columns: {
                       amount: true,
                       puppet: true
                     }
                   },
-                  requestAdjustList: {
+                  mirror__AdjustList: {
                     columns: {
                       sizeDelta: true
                     }
                   },
-                  settleList: {
+                  settle__SettleList: {
                     columns: {
-                      settledAmount: true,
-                      distributionAmount: true,
+                      distributedAmount: true,
                       platformFeeAmount: true,
-                      puppetBalanceList: true,
+                      nextBalanceList: true,
                       transactionHash: true,
                       blockTimestamp: true
                     }

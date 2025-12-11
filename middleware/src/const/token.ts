@@ -1,3 +1,4 @@
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { ARBITRUM_TOKEN_LIST } from '@puppet/contracts/gmx'
 import type { Address } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
@@ -25,7 +26,7 @@ export const TOKEN_DESCRIPTION_LIST = [
 
   // Puppet token
   {
-    address: CONTRACT.PuppetToken.address,
+    address: PUPPET_CONTRACT_MAP.PuppetToken.address,
     decimals: 18,
     name: 'Puppet',
     symbol: 'PUPPET'

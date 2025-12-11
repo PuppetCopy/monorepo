@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'middleware/**'
+      - 'bun.lock'
       - '.github/workflows/indexer-release.yml'
   workflow_dispatch:
 

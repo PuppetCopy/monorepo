@@ -1,6 +1,6 @@
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import type { Address } from 'abitype'
 import { concat, encodePacked, getAddress, type Hex, keccak256, slice, toBytes } from 'viem'
-import { CONTRACT } from '../const/contract.js'
 
 export function getTraderMatchingKey(collateralToken: Address, trader: Address) {
   return keccak256(encodePacked(['address', 'address'], [collateralToken, trader]))
@@ -43,7 +43,9 @@ export function initCodeHash(implementation: Address): Hex {
 export function getAllocationAdderess(allocationStoreImplementationHash: Hex, allocationKey: Hex): Address {
   return getAddress(
     slice(
-      keccak256(concat([toBytes('0xff'), CONTRACT.Mirror.address, allocationKey, allocationStoreImplementationHash])),
+      keccak256(
+        concat([toBytes('0xff'), PUPPET_CONTRACT_MAP.Mirror.address, allocationKey, allocationStoreImplementationHash])
+      ),
       12
     )
   )

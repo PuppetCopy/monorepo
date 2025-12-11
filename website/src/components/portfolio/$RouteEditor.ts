@@ -1,5 +1,5 @@
 import { getTraderMatchingKey, unixTimestampNow } from '@puppet-copy/middleware/core'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
@@ -17,7 +17,7 @@ import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from './$Matchi
 
 interface ITraderMatchingRouteEditor {
   trader: Address
-  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   collateralToken: Address
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
   $container?: INodeCompose

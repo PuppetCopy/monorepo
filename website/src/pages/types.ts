@@ -1,5 +1,5 @@
 import type { IntervalTime } from '@puppet-copy/middleware/const'
-import type { IPositionDecrease, IPositionIncrease, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
 import type { Address, Hex } from 'viem'
@@ -65,12 +65,12 @@ export type IPosition = {
   settledTimestamp: number
 
   puppetList: Address[]
-  increaseList: IPositionIncrease[]
-  decreaseList: IPositionDecrease[]
+  increaseList: IGmxPositionIncrease[]
+  decreaseList: IGmxPositionDecrease[]
 
-  collateralList: IPositionDecrease[]
+  collateralList: IGmxPositionDecrease[]
 
-  lastUpdate: IPositionIncrease | IPositionDecrease
+  lastUpdate: IGmxPositionIncrease | IGmxPositionDecrease
 }
 
 export type IRoute = {

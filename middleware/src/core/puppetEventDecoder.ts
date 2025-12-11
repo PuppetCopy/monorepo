@@ -12,22 +12,22 @@ export const EVENT_DECODER_MAP = {
     decodeAbiParameters(CONTRACT_EVENT_MAP.Account.Withdraw.args, data),
   [CONTRACT_EVENT_MAP.Account.SetDepositCapList.hash]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Account.SetDepositCapList.args, data),
+  [CONTRACT_EVENT_MAP.Account.UnaccountedBalance.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Account.UnaccountedBalance.args, data),
+  [CONTRACT_EVENT_MAP.Account.RecoverUnaccountedTokens.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Account.RecoverUnaccountedTokens.args, data),
 
   // Rule.sol decoders
-  [CONTRACT_EVENT_MAP.Rule.SetMatchingRule.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Rule.SetMatchingRule.args, data),
+  [CONTRACT_EVENT_MAP.Subscribe.Rule.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Subscribe.Rule.args, data),
 
   // Mirror.sol decoders
-  [CONTRACT_EVENT_MAP.Mirror.RequestOpen.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.RequestOpen.args, data),
-  [CONTRACT_EVENT_MAP.Mirror.RequestAdjust.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.RequestAdjust.args, data),
-  [CONTRACT_EVENT_MAP.Mirror.RequestCloseStalled.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.RequestCloseStalled.args, data),
-  [CONTRACT_EVENT_MAP.Mirror.Execute.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.Execute.args, data),
-  [CONTRACT_EVENT_MAP.Mirror.Liquidate.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.Liquidate.args, data),
+  [CONTRACT_EVENT_MAP.Mirror.Match.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.Match.args, data),
+  [CONTRACT_EVENT_MAP.Mirror.Adjust.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.Adjust.args, data),
+  [CONTRACT_EVENT_MAP.Mirror.Close.hash]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Mirror.Close.args, data),
 
   // Settle.sol decoders
   [CONTRACT_EVENT_MAP.Settle.Settle.hash]: (data: Hex) =>
@@ -37,9 +37,5 @@ export const EVENT_DECODER_MAP = {
   [CONTRACT_EVENT_MAP.Settle.CollectPlatformFees.hash]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Settle.CollectPlatformFees.args, data),
   [CONTRACT_EVENT_MAP.Settle.SetTokenDustThreshold.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Settle.SetTokenDustThreshold.args, data),
-
-  // SequencerRouter.sol decoders
-  [CONTRACT_EVENT_MAP.SequencerRouter.RefundExecutionFee.hash]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.SequencerRouter.RefundExecutionFee.args, data)
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Settle.SetTokenDustThreshold.args, data)
 } as const

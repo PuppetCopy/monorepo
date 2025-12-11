@@ -18,8 +18,8 @@ export function factor(a: bigint, b: bigint): bigint {
   return a ? (a * FLOAT_PRECISION) / b : 0n
 }
 
-export function applyFactor(value: bigint, factorn: bigint): bigint {
-  return (value * factorn) / FLOAT_PRECISION
+export function applyFactor(factor: bigint, value: bigint): bigint {
+  return (value * factor) / FLOAT_PRECISION
 }
 
 export function toBasisPoints(numerator: bigint, denominator: bigint) {

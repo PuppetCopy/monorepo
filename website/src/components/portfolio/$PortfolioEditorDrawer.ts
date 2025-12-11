@@ -1,6 +1,7 @@
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { CONTRACT } from '@puppet-copy/middleware/const'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import type { Route } from 'aelea/router'
 import {
   awaitPromises,
@@ -42,7 +43,7 @@ interface IPortfolioRoute {
 
 interface IPortfolioEditorDrawer extends IComponentPageParams {
   route: Route
-  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   draftDepositTokenList: IStream<BalanceDraft[]>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
@@ -81,7 +82,7 @@ export const $PortfolioEditorDrawer = ({
                 to: draft.token,
                 abi: erc20Abi,
                 functionName: 'approve',
-                args: [CONTRACT.TokenRouter.address, draft.amount]
+                args: [PUPPET_CONTRACT_MAP.TokenRouter.address, draft.amount]
               })
               ops.push({
                 to: CONTRACT.UserRouter.address,

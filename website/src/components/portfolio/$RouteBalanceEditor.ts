@@ -1,4 +1,4 @@
-import * as PUPPET from '@puppet-copy/middleware/const'
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
 import { getTokenDescription } from '@puppet-copy/middleware/gmx'
 import { combine, constant, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
@@ -62,7 +62,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
           try {
             return await wallet.read({
-              ...PUPPET.CONTRACT.Account,
+              ...PUPPET_CONTRACT_MAP.Account,
               functionName: 'userBalanceMap',
               args: [collateralToken, account.address]
             })
@@ -108,7 +108,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
                   switchMap(async a => {
                     try {
                       const readResult = await wallet.read({
-                        ...PUPPET.CONTRACT.Account,
+                        ...PUPPET_CONTRACT_MAP.Account,
                         functionName: 'userBalanceMap',
                         args: [collateralToken, a.address]
                       })

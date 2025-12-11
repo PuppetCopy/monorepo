@@ -13,7 +13,7 @@ import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $T
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
-import { queryUserMatchingRuleList } from '../common/query.js'
+import { queryUserSubscribeRuleList } from '../common/query.js'
 import { getStatus } from '../common/sqlClient.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
@@ -83,7 +83,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
 
       const userMatchingRuleQuery = state(
-        queryUserMatchingRuleList(switchMap(() => wallet.account, merge(wallet.account, txSuccess)))
+        queryUserSubscribeRuleList(switchMap(() => wallet.account, merge(wallet.account, txSuccess)))
       )
 
       const indexerStatus = state(awaitPromises(map(() => getStatus(), start(0, periodic(IntervalTime.MIN * 1000)))))

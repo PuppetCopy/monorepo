@@ -15,6 +15,7 @@
     "start": "serve dist -s -l $PORT"
   },
   "dependencies": {
+    "@puppet/contracts": "workspace:*",
     "@puppet-copy/middleware": "workspace:*",
     "@puppet-copy/sql": "workspace:*",
     "@wagmi/connectors": "7.0.2",

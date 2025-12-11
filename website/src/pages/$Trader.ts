@@ -7,7 +7,7 @@ import {
   readableUsd,
   unixTimestampNow
 } from '@puppet-copy/middleware/core'
-import { type ISetMatchingRule, positionIncrease } from '@puppet-copy/sql/schema'
+import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
@@ -42,7 +42,7 @@ import type { IPageFilterParams } from './types.js'
 
 interface ITraderPage extends IPageFilterParams {
   route: import('aelea/router').Route
-  userMatchingRuleQuery: IStream<Promise<ISetMatchingRule[]>>
+  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
@@ -105,7 +105,7 @@ export const $TraderPage = ({
 
         const pageQuery = Promise.all([
           params.routeMetricListQuery,
-          sqlClient.query.positionIncrease.findMany({
+          sqlClient.query.gmx__PositionIncrease.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.account, account),
@@ -115,12 +115,12 @@ export const $TraderPage = ({
                 f.gt(t.blockTimestamp, startActivityTimeframe)
               ),
 
-            orderBy: asc(positionIncrease.blockTimestamp),
+            orderBy: asc(gmx__PositionIncrease.blockTimestamp),
             with: {
               feeCollected: true
             }
           }),
-          sqlClient.query.positionDecrease.findMany({
+          sqlClient.query.gmx__PositionDecrease.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.account, account),

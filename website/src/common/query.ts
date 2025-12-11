@@ -1,6 +1,6 @@
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet-copy/middleware/const'
 import { getClosestNumber, groupManyList, unixTimestampNow } from '@puppet-copy/middleware/core'
-import type { ISetMatchingRule } from '@puppet-copy/sql/schema'
+import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import type { IAccountState } from '../wallet/wallet.js'
@@ -18,7 +18,7 @@ export function queryPricefeed(
   estTickAmout = 10
 ) {
   return map(async params => {
-    const priceList = await sqlClient.query.priceCandle.findMany({
+    const priceList = await sqlClient.query.gmx__PriceCandle.findMany({
       columns: {
         c: true,
         slotTime: true,
@@ -37,15 +37,15 @@ export function queryPricefeed(
   }, combine(queryParams))
 }
 
-export function queryUserMatchingRuleList(
+export function queryUserSubscribeRuleList(
   accountQuery: IStream<Promise<IAccountState | null>>
-): IStream<Promise<ISetMatchingRule[]>> {
+): IStream<Promise<ISubscribeRule[]>> {
   return map(async query => {
     const account = await query
     if (!account) return []
 
-    return sqlClient.query.setMatchingRule.findMany({
-      where: (t, f) => f.eq(t.puppet, account.address)
+    return sqlClient.query.subscribe__Rule.findMany({
+      where: (t, f) => f.eq(t.user, account.address)
     })
   }, accountQuery)
 }

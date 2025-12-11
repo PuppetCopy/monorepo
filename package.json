@@ -43,7 +43,7 @@
   "catalog": {
     "viem": "2.41.2",
     "aelea": "2.5.31",
-    "abitype": "1.2.1",
+    "abitype": "1.2.2",
     "superjson": "2.2.6",
     "lightweight-charts": "5.0.9",
     "ponder": "0.15.16",
