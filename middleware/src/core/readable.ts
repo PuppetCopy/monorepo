@@ -1,7 +1,7 @@
 import { curry2 } from 'aelea/stream'
 import type { Address } from 'viem'
 import { BASIS_POINTS_DIVISOR, USD_DECIMALS } from '../const/common.js'
-import { getTokenDescription } from '../gmx/gmxUtils.js'
+import { getTokenDescription } from '../gmx/market.js'
 import { formatFixed, getTokenDenominator } from './parse.js'
 import type { ITokenDescription } from './types.js'
 

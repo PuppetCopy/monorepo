@@ -1,6 +1,10 @@
 import { FLOAT_PRECISION } from '../const/common.js'
 import { abs, delta } from '../core/math.js'
-import type { IMinMax } from './types.js'
+
+export interface IMinMax {
+  min: bigint
+  max: bigint
+}
 
 export function getPriceImpactUsd(
   currentLongUsd: bigint,

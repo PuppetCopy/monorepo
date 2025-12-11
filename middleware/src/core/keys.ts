@@ -20,9 +20,7 @@ export function getTraderMatchingKey(collateralToken: Address, trader: Address) 
 }
 
 export function getAllocationKey(puppetList: Address[], traderMatchingKey: Hex, allocationId: bigint) {
-  return keccak256(
-    encodePacked(ALLOCATION_KEY_TYPES, [puppetList, traderMatchingKey, allocationId])
-  )
+  return keccak256(encodePacked(ALLOCATION_KEY_TYPES, [puppetList, traderMatchingKey, allocationId]))
 }
 
 /**
