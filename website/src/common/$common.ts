@@ -12,8 +12,8 @@ import {
   toBasisPoints
 } from '@puppet-copy/middleware/core'
 import {
+  getLiquidationPrice,
   getPositionPnlUsd,
-  getRoughLiquidationPrice,
   getTokenDescription,
   liquidationWeight
 } from '@puppet-copy/middleware/gmx'
@@ -253,6 +253,9 @@ export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   return $node(style({ fontSize: '.8rem' }))($text(roi))
 }
 
+// Default minCollateralFactor (1% = 1e28 with 30 decimals)
+const DEFAULT_MIN_COLLATERAL_FACTOR = 10n ** 28n
+
 export function $liquidationSeparator(
   isLong: boolean,
   sizeUsd: bigint,
@@ -262,7 +265,14 @@ export function $liquidationSeparator(
 ) {
   const liqWeight = map(price => {
     const collateralUsd = price * collateralAmount
-    const liquidationPrice = getRoughLiquidationPrice(isLong, sizeUsd, sizeInTokens, collateralUsd, collateralAmount)
+    const liquidationPrice = getLiquidationPrice(
+      isLong,
+      sizeUsd,
+      sizeInTokens,
+      collateralUsd,
+      0n,
+      DEFAULT_MIN_COLLATERAL_FACTOR
+    )
 
     return liquidationWeight(isLong, liquidationPrice, price)
   }, markPrice)
