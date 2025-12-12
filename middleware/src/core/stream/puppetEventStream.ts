@@ -1,21 +1,25 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { CONTRACT_EVENT_MAP } from '@puppet/contracts/events'
-import { filterNull, map, op } from 'aelea/stream'
+import { filterNull, type IStream, map, op } from 'aelea/stream'
 import { multicast, spreadArray } from 'aelea/stream-extended'
-import { decodeAbiParameters, type PublicClient } from 'viem'
+import { type AbiParameter, type DecodeAbiParametersReturnType, decodeAbiParameters, type PublicClient } from 'viem'
 import { watchContractEvent } from './web3.js'
 
-function createFilteredStream(client: PublicClient, methodHash: `0x${string}`, args: readonly unknown[]) {
+function createFilteredStream<const T extends readonly AbiParameter[]>(
+  client: PublicClient,
+  methodHash: `0x${string}`,
+  args: T
+): IStream<DecodeAbiParametersReturnType<T>> {
   return op(
     watchContractEvent(client, {
       abi: PUPPET_CONTRACT_MAP.Dictatorship.abi,
       address: PUPPET_CONTRACT_MAP.Dictatorship.address,
-      eventName: 'PuppetEventLog',
+      eventName: 'PuppetEventLog'
     }),
     spreadArray,
     map(log => {
       if (log.args.method !== methodHash) return null
-      return decodeAbiParameters(args as Parameters<typeof decodeAbiParameters>[0], log.args.data)
+      return decodeAbiParameters(args, log.args.data)
     }),
     filterNull,
     multicast

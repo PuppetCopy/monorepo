@@ -4,7 +4,7 @@
 [submodule "indexer"]
 	path = indexer
 	url = https://github.com/PuppetCopy/indexer.git
-[submodule "sequencer"]
-	path = sequencer
-	url = https://github.com/PuppetCopy/sequencer.git
+[submodule "matchmaker"]
+	path = matchmaker
+	url = https://github.com/PuppetCopy/matchmaker.git
   
