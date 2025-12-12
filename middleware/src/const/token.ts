@@ -1,11 +1,10 @@
-import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import { EXTERNAL_CONTRACT, PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { ARBITRUM_TOKEN_LIST } from '@puppet/contracts/gmx'
 import type { Address } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 import { groupList } from '../core/utils.js'
 import { ARBITRUM_ADDRESS, BASE_ADDRESS, ETHEREUM_ADDRESS, OPTIMISM_ADDRESS, POLYGON_ADDRESS } from './address.js'
 import { ADDRESS_ZERO } from './common.js'
-import { CONTRACT } from './contract.js'
 
 export const TOKEN_DESCRIPTION_LIST = [
   ...ARBITRUM_TOKEN_LIST,
@@ -18,7 +17,7 @@ export const TOKEN_DESCRIPTION_LIST = [
   },
 
   {
-    address: CONTRACT.GMX.address,
+    address: EXTERNAL_CONTRACT.GMX.address,
     decimals: 18,
     name: 'GMX',
     symbol: 'GMX'

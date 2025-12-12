@@ -1,5 +1,4 @@
-import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { CONTRACT } from '@puppet-copy/middleware/const'
+import { CONTRACT, PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { getDuration, readableDate, readablePercentage } from '@puppet-copy/middleware/core'
 import type { ISubscribeRule } from '@puppet-copy/sql/schema'
 import type { Route } from 'aelea/router'
