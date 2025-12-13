@@ -1,7 +1,7 @@
 {
-  "name": "@puppet-copy/middleware",
+  "name": "@puppet/sdk",
   "license": "BSL-1.1 and MIT",
-  "description": "Copytrading middleware",
+  "description": "Copytrading SDK",
   "version": "0.9.0",
   "type": "module",
   "sideEffects": false,
@@ -34,7 +34,7 @@
   "keywords": [
     "puppet",
     "puppetCopy",
-    "puppet-middleware",
+    "puppet-sdk",
     "copytrading",
     "eth",
     "ethereum",

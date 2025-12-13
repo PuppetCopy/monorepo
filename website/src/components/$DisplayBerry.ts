@@ -1,4 +1,4 @@
-import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet-copy/middleware/gbc'
+import { berryPartsToSvg, type IBerryDisplayTupleMap } from '@puppet/sdk/gbc'
 import { tap } from 'aelea/stream'
 import { $svg, attr } from 'aelea/ui'
 

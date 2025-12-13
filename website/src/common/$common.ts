@@ -10,13 +10,13 @@ import {
   readableTokenAmount,
   readableUsd,
   toBasisPoints
-} from '@puppet-copy/middleware/core'
+} from '@puppet/sdk/core'
 import {
   getLiquidationPrice,
   getPositionPnlUsd,
   getTokenDescription,
   liquidationWeight
-} from '@puppet-copy/middleware/gmx'
+} from '@puppet/sdk/gmx'
 import type * as router from 'aelea/router'
 import { empty, filterNull, type IStream, map, skipRepeats, toStream } from 'aelea/stream'
 import type { IBehavior, IComposeBehavior } from 'aelea/stream-extended'

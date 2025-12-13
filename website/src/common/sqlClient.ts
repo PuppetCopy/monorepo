@@ -1,4 +1,4 @@
-import { createClient } from '@puppet-copy/sql/client'
+import { createClient } from '@puppet/sql/client'
 
 // Always use the API proxy endpoint
 const baseUrl = '/api/sql'

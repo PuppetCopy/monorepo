@@ -46,8 +46,8 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           VERSION="v$(date +%Y%m%d)-${GITHUB_SHA::7}"
-          cd website
           docker build \
+            -f website/Dockerfile \
             --cache-from ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:latest \
             -t ${{ env.IMAGE }}:$VERSION .

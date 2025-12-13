@@ -1,5 +1,5 @@
-import { groupListMap, periodicRun } from '@puppet-copy/middleware/core'
-import type { IGmxOraclePrice } from '@puppet-copy/sql/schema'
+import { groupListMap, periodicRun } from '@puppet/sdk/core'
+import type { IGmxOraclePrice } from '@puppet/sql/schema'
 import { map, op } from 'aelea/stream'
 import { multicast } from 'aelea/stream-extended'
 import type { Address } from 'viem'

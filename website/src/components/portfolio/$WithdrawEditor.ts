@@ -3,8 +3,8 @@ import {
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel
-} from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+} from '@puppet/sdk/core'
+import { getTokenDescription } from '@puppet/sdk/gmx'
 import { combine, constant, empty, type IOps, type IStream, map, merge, sample } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'

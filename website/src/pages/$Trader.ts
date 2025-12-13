@@ -1,4 +1,4 @@
-import type { IntervalTime } from '@puppet-copy/middleware/const'
+import type { IntervalTime } from '@puppet/sdk/const'
 import {
   getDebankProfileUrl,
   getUnixTimestamp,
@@ -6,8 +6,8 @@ import {
   readableAddress,
   readableLeverage,
   readableUsd
-} from '@puppet-copy/middleware/core'
-import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet-copy/sql/schema'
+} from '@puppet/sdk/core'
+import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet/sql/schema'
 import { combine, type IStream, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'

@@ -1,5 +1,5 @@
-import { IntervalTime } from '@puppet-copy/middleware/const'
-import type { ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
+import { IntervalTime } from '@puppet/sdk/const'
+import type { ITraderRouteLatestMetric } from '@puppet/sql/schema'
 import { arbitrum } from 'viem/chains'
 import type { ISortBy } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'

@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@puppet/contracts": "workspace:*",
-    "@puppet-copy/middleware": "workspace:*",
-    "@puppet-copy/sql": "workspace:*",
+    "@puppet/sdk": "workspace:*",
+    "@puppet/sql": "workspace:*",
     "@wagmi/connectors": "7.0.2",
     "@wagmi/core": "3.0.0",
     "abitype": "catalog:",

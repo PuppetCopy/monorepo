@@ -1,4 +1,4 @@
-import { readableLeverage, readableUsd } from '@puppet-copy/middleware/core'
+import { readableLeverage, readableUsd } from '@puppet/sdk/core'
 import { combine, type IStream, map } from 'aelea/stream'
 import { multicast } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'

@@ -1,12 +1,12 @@
-import { IntervalTime } from '@puppet-copy/middleware/const'
+import { IntervalTime } from '@puppet/sdk/const'
 import {
   formatFixed,
   getDuration,
   getTraderMatchingKey,
   getUnixTimestamp,
   parseBps
-} from '@puppet-copy/middleware/core'
-import type { ISubscribeRule } from '@puppet-copy/sql/schema'
+} from '@puppet/sdk/core'
+import type { ISubscribeRule } from '@puppet/sql/schema'
 import {
   combine,
   empty,

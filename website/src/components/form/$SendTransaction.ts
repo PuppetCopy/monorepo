@@ -1,4 +1,4 @@
-import { getMappedValueFallback } from '@puppet-copy/middleware/core'
+import { getMappedValueFallback } from '@puppet/sdk/core'
 import { awaitPromises, combine, empty, filter, type IStream, map, merge, op, sample, switchMap } from 'aelea/stream'
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'

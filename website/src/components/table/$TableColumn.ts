@@ -4,8 +4,8 @@ import {
   readableDate,
   readablePercentage,
   toBasisPoints
-} from '@puppet-copy/middleware/core'
-import { getPositionPnlUsd } from '@puppet-copy/middleware/gmx'
+} from '@puppet/sdk/core'
+import { getPositionPnlUsd } from '@puppet/sdk/gmx'
 import { empty, filterNull, map, skipRepeats, switchMap, toStream } from 'aelea/stream'
 import type { IComposeBehavior } from 'aelea/stream-extended'
 import { $node, $text, type INode, style } from 'aelea/ui'

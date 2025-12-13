@@ -1,4 +1,4 @@
-import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet-copy/middleware/const'
+import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet/sdk/const'
 import {
   getDuration,
   getTraderMatchingKey,
@@ -7,9 +7,9 @@ import {
   ignoreAll,
   readableDate,
   readablePercentage
-} from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import type { ISubscribeRule } from '@puppet-copy/sql/schema'
+} from '@puppet/sdk/core'
+import { getTokenDescription } from '@puppet/sdk/gmx'
+import type { ISubscribeRule } from '@puppet/sql/schema'
 import {
   awaitPromises,
   combine,

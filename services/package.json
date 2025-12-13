@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@puppet-copy/middleware": "workspace:*",
+    "@puppet/sdk": "workspace:*",
     "aelea": "catalog:",
     "og-img": "0.2.1",
     "satori": "0.15.2",

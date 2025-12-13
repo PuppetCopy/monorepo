@@ -70,7 +70,7 @@
   },
   "references": [
     {
-      "path": "../middleware"
+      "path": "../sdk"
     }
   ],
   "include": [

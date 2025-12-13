@@ -1,5 +1,5 @@
-import { TOKEN_DESCRIPTION_LIST } from '@puppet-copy/middleware/const'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { TOKEN_DESCRIPTION_LIST } from '@puppet/sdk/const'
+import { getTokenDescription } from '@puppet/sdk/gmx'
 import { type IStream, map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component } from 'aelea/ui'

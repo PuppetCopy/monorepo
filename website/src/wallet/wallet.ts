@@ -1,5 +1,5 @@
-import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
-import { groupList } from '@puppet-copy/middleware/core'
+import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
+import { groupList } from '@puppet/sdk/core'
 import { porto, walletConnect } from '@wagmi/connectors'
 import {
   type Config,

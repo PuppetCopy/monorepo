@@ -1,6 +1,6 @@
-import type { ITokenDescription } from '@puppet-copy/middleware/core'
-import { getExplorerUrl, getMappedValue, readableHash } from '@puppet-copy/middleware/core'
-import { getMarketDescription, getTokenDescription } from '@puppet-copy/middleware/gmx'
+import type { ITokenDescription } from '@puppet/sdk/core'
+import { getExplorerUrl, getMappedValue, readableHash } from '@puppet/sdk/core'
+import { getMarketDescription, getTokenDescription } from '@puppet/sdk/gmx'
 import {
   combine,
   empty,

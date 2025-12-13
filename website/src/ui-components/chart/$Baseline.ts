@@ -1,4 +1,4 @@
-import { readableUnitAmount } from '@puppet-copy/middleware/core'
+import { readableUnitAmount } from '@puppet/sdk/core'
 import type { IStream } from 'aelea/stream'
 import { pallete } from 'aelea/ui-components-theme'
 import {

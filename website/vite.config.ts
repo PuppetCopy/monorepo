@@ -39,7 +39,7 @@ export default defineConfig({
           }
 
           // // Workspace packages
-          if (['aelea/', 'middleware/dist', 'indexer/dist', 'ponder'].some(core => id.includes(core)))
+          if (['aelea/', 'sdk/dist', 'indexer/dist', 'ponder'].some(core => id.includes(core)))
             return 'puppet-core'
 
           // // Heavy dependencies that should be isolated

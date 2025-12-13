@@ -1,4 +1,4 @@
-import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
+import { type IntervalTime, USD_DECIMALS } from '@puppet/sdk/const'
 import {
   fillTimeline,
   formatFixed,
@@ -6,10 +6,10 @@ import {
   getUnixTimestamp,
   type InferStream,
   readablePnl
-} from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
-import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet-copy/sql/schema'
-import * as schema from '@puppet-copy/sql/schema'
+} from '@puppet/sdk/core'
+import { getTokenDescription } from '@puppet/sdk/gmx'
+import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet/sql/schema'
+import * as schema from '@puppet/sql/schema'
 import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'

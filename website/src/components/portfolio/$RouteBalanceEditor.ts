@@ -1,6 +1,6 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { readableTokenAmountLabel } from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+import { readableTokenAmountLabel } from '@puppet/sdk/core'
+import { getTokenDescription } from '@puppet/sdk/gmx'
 import { combine, constant, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'

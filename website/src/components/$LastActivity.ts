@@ -1,5 +1,5 @@
-import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet-copy/middleware/const'
-import { getMappedValue } from '@puppet-copy/middleware/core'
+import { IntervalTime, PLATFORM_STAT_INTERVAL } from '@puppet/sdk/const'
+import { getMappedValue } from '@puppet/sdk/core'
 import { type IStream, map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'

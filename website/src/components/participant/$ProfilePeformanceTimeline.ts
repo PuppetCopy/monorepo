@@ -1,11 +1,11 @@
-import { type IntervalTime, USD_DECIMALS } from '@puppet-copy/middleware/const'
+import { type IntervalTime, USD_DECIMALS } from '@puppet/sdk/const'
 import {
   fillTimeline,
   formatFixed,
   getUnixTimestamp,
   parseReadableNumber,
   readableUnitAmount
-} from '@puppet-copy/middleware/core'
+} from '@puppet/sdk/core'
 import {
   combine,
   empty,

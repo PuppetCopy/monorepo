@@ -1,4 +1,4 @@
-import { CROSS_CHAIN_TOKEN_MAP } from '@puppet-copy/middleware/const'
+import { CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import {
   getMappedValue,
   getMappedValueFallback,
@@ -6,8 +6,8 @@ import {
   parseReadableNumber,
   readableTokenAmount,
   readableTokenAmountLabel
-} from '@puppet-copy/middleware/core'
-import { getTokenDescription } from '@puppet-copy/middleware/gmx'
+} from '@puppet/sdk/core'
+import { getTokenDescription } from '@puppet/sdk/gmx'
 import { combine, constant, type IStream, map, merge, op, sample, sampleMap, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { multicast, state } from 'aelea/stream-extended'
