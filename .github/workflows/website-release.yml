@@ -40,7 +40,7 @@ jobs:
 
       - name: Install and Build
         run: |
-          bun install --frozen-lockfile --production
+          bun install --frozen-lockfile
           bun run build
 
       - name: Docker Build and Push
