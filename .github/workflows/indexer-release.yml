@@ -1,89 +1,64 @@
-name: Build Indexer
+name: Indexer Release
 
 on:
   push:
     branches: [main]
     paths:
-      - 'middleware/**'
+      - 'indexer/**'
+      - 'contracts/**'
+      - 'sdk/**'
+      - 'bun.lock'
       - '.github/workflows/indexer-release.yml'
   workflow_dispatch:
 
+env:
+  IMAGE: ghcr.io/puppetcopy/indexer
+
 jobs:
-  build:
-    name: Build and Push
+  deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Need write to create tags
+      contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0  # Fetch all tags</      
-      
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
+
+      - uses: oven-sh/setup-bun@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Generate version tag
-        id: version
-        run: |
-          # Get the latest tag from GitHub
-          LATEST_TAG=$(git ls-remote --tags origin | grep -o 'refs/tags/indexer-v[0-9]*\.[0-9]*\.[0-9]*' | sort -V | tail -n1 | sed 's/refs\/tags\/indexer-//')
-          
-          # If no tag exists, start with v1.0.0
-          if [ -z "$LATEST_TAG" ]; then
-            VERSION="v1.0.0"
-          else
-            # Parse the version numbers
-            VERSION_WITHOUT_V=${LATEST_TAG#v}
-            MAJOR=$(echo $VERSION_WITHOUT_V | cut -d. -f1)
-            MINOR=$(echo $VERSION_WITHOUT_V | cut -d. -f2)
-            PATCH=$(echo $VERSION_WITHOUT_V | cut -d. -f3)
-            
-            # Increment patch version
-            PATCH=$((PATCH + 1))
-            VERSION="v${MAJOR}.${MINOR}.${PATCH}"
-          fi
-          
-          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Generated version: ${VERSION}"
-          
-          # Create and push the tag
-          git tag "indexer-${VERSION}"
-          git push origin "indexer-${VERSION}"
-      
-      - name: Build and push
-        uses: docker/build-push-action@v5
+          bun-version: 1.3.4
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
         with:
-          context: .
-          file: ./indexer/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/puppetcopy/indexer:latest
-            ghcr.io/puppetcopy/indexer:${{ steps.version.outputs.VERSION }}
-          build-args: |
-            VERSION=${{ steps.version.outputs.VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
-      
-      - name: Output deployment instructions
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
+
+      - name: Install and Build
         run: |
-          echo "✅ Image pushed successfully!"
-          echo "📦 Version: ${{ steps.version.outputs.VERSION }}"
-          echo ""
-          echo "To deploy to Akash, update deploy-indexer.yml:"
-          echo "  image: ghcr.io/puppetcopy/indexer:${{ steps.version.outputs.VERSION }}"
+          bun install --frozen-lockfile
+          bun run contracts:build
+          bun run sdk:build
+          bun run indexer:build
+          cd indexer && bun run codegen
+
+      - name: Docker Build and Push
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          VERSION="v$(date +%Y%m%d)-${GITHUB_SHA::7}"
+          docker build \
+            -f indexer/Dockerfile \
+            --build-arg VERSION=$VERSION \
+            -t ${{ env.IMAGE }}:latest \
+            -t ${{ env.IMAGE }}:$VERSION .
+          docker push ${{ env.IMAGE }}:latest
+          docker push ${{ env.IMAGE }}:$VERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Publish Summary
+        run: |
+          echo "${{ env.IMAGE }}:${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
