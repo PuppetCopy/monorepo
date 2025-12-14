@@ -1,9 +1,4 @@
-import {
-  parseFixed,
-  parseReadableNumber,
-  readableTokenAmount,
-  readableTokenAmountLabel
-} from '@puppet/sdk/core'
+import { parseFixed, parseReadableNumber, readableTokenAmount, readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
 import { combine, constant, empty, type IOps, type IStream, map, merge, sample } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'

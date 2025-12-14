@@ -39,8 +39,7 @@ export default defineConfig({
           }
 
           // // Workspace packages
-          if (['aelea/', 'sdk/dist', 'indexer/dist', 'ponder'].some(core => id.includes(core)))
-            return 'puppet-core'
+          if (['aelea/', 'sdk/dist', 'indexer/dist', 'ponder'].some(core => id.includes(core))) return 'puppet-core'
 
           // // Heavy dependencies that should be isolated
           if (id.includes('lightweight-charts')) return 'charts'
