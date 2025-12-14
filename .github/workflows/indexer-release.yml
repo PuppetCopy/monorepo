@@ -46,10 +46,10 @@ jobs:
           bun run indexer:build
           cd indexer && bun run codegen
 
-      - name: Prune to production dependencies
+      - name: Reinstall with copyfile backend
         run: |
           rm -rf node_modules
-          bun install --frozen-lockfile --production --backend=copyfile
+          bun install --frozen-lockfile --backend=copyfile
 
       - name: Resolve workspace symlinks for standalone indexer
         run: |
