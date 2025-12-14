@@ -5,9 +5,9 @@ on:
     branches: [main]
     paths:
       - 'website/**'
-      - 'bun.lock'
       - 'middleware/**'
       - 'contracts/**'
+      - 'bun.lock'
       - '.github/workflows/website-release.yml'
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
 
       - name: Install and Build
         run: |
-          bun install --frozen-lockfile
+          bun install --frozen-lockfile --production
           bun run build
 
       - name: Docker Build and Push

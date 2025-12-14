@@ -68,20 +68,7 @@ export default defineConfig({
         secure: true,
         rewrite: () => '/status'
       },
-      '/api/orchestrator': {
-        target: 'https://v1.orchestrator.rhinestone.dev',
-        changeOrigin: true,
-        secure: true,
-        rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
-        configure: proxy => {
-          proxy.on('proxyReq', proxyReq => {
-            proxyReq.setHeader('Content-Type', 'application/json')
-            proxyReq.setHeader('X-Api-Key', process.env.ORCHESTRATOR_API_KEY!)
-            proxyReq.setHeader('Accept', 'application/json')
-            proxyReq.setHeader('Accept-Encoding', 'identity')
-          })
-        }
-      },
+
       '/api/rpc': {
         target: process.env.RPC_URL,
         changeOrigin: true,
@@ -120,7 +107,7 @@ export default defineConfig({
         display: 'standalone',
         display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait-primary',
-        categories: ['Copy Trading', 'Decentralized Perpetual Exchange', 'DeFi'],
+        categories: ['Copy Trading', 'DeFi'],
         screenshots: [
           { src: 'assets/screenshot/narrow1.png', type: 'image/png', sizes: '828x1792', form_factor: 'narrow' },
           { src: 'assets/screenshot/narrow2.png', type: 'image/png', sizes: '828x1792', form_factor: 'narrow' },
@@ -129,14 +116,10 @@ export default defineConfig({
           { src: 'assets/screenshot/wide2.png', type: 'image/png', sizes: '3260x1692', form_factor: 'wide' }
         ]
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,ico,woff2,png}'],
-        cleanupOutdatedCaches: true,
-        clientsClaim: false, // Don't claim clients immediately
-        skipWaiting: false // Wait for all tabs to close before activating
-      },
+      // Note: workbox options are not used with injectManifest strategy
+      // Service worker lifecycle is controlled in src/sw/service-worker.ts
       devOptions: {
-        enabled: !!process.env.PWA_DEV,
+        enabled: !!process.env.VITE_PWA_DEV,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module'

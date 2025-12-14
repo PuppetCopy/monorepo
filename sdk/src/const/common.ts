@@ -39,9 +39,9 @@ export const PRICEFEED_INTERVAL_LIST = [
 ] as const
 
 export const PLATFORM_STAT_INTERVAL = [
-  // IntervalTime.DAY,
-  IntervalTime.WEEK
-  // IntervalTime.MONTH,
-  // IntervalTime.QUARTER,
-  // IntervalTime.YEAR
+  IntervalTime.DAY,
+  IntervalTime.WEEK,
+  IntervalTime.MONTH,
+  IntervalTime.QUARTER,
+  IntervalTime.YEAR
 ] as const

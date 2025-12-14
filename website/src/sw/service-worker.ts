@@ -22,7 +22,7 @@ registerRoute(
   })
 )
 
-// Cache all /api/ requests indefinitely - add &refresh=true to force fresh fetch
+// Cache /api/ GET requests - add &refresh=true to force fresh fetch
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url)
   if (!url.pathname.startsWith('/api/')) return
@@ -32,9 +32,8 @@ self.addEventListener('fetch', event => {
 
   // Do not cache orchestrator stateful endpoints (write operations)
   const noCachePaths = [
-    '/api/orchestrator/intent-operations',
-    '/api/orchestrator/intent-operation',
-    '/api/orchestrator/intents'
+    '/api/status',
+    '/api/sql'
   ]
   const isNoCache = noCachePaths.some(path => url.pathname.startsWith(path))
   if (isNoCache) return
@@ -45,15 +44,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     (async () => {
       const cache = await caches.open('api-cache')
-
-      // Normalize SQL queries to create stable cache keys
-      // Remove timestamps to avoid cache bloat - queries with same structure share one cache entry
-      // Work with the full URL string to handle encoded parameters
-      let cacheKeyUrl = url.href
-      // Replace all unix timestamps (10-13 digits) with a placeholder
-      cacheKeyUrl = cacheKeyUrl.replace(/\d{10,13}/g, '0')
-
-      const cacheKey = new Request(cacheKeyUrl)
+      const cacheKey = new Request(url.href)
 
       if (!forceRefresh) {
         const cached = await cache.match(cacheKey)

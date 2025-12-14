@@ -12,12 +12,29 @@ header {
     X-XSS-Protection "1; mode=block"
     Referrer-Policy "strict-origin-when-cross-origin"
     Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 }
 
 # Proxy to indexer API
 handle /api/sql* {
-    # CORS headers (permissive since it's public read-only data)
-    header Access-Control-Allow-Origin "*"
+    # Handle CORS preflight
+    @options method OPTIONS
+    handle @options {
+        header Access-Control-Allow-Origin "https://puppet.tech"
+        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        header Access-Control-Allow-Headers "Content-Type"
+        respond 204
+    }
+
+    # Block requests not originating from the site
+    @notFromSite {
+        not header Referer https://puppet.tech*
+        not header Referer https://www.puppet.tech*
+    }
+    respond @notFromSite "Forbidden" 403
+
+    # Restrict CORS to our domain only
+    header Access-Control-Allow-Origin "https://puppet.tech"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "Content-Type"
 
@@ -43,31 +60,28 @@ handle /api/status {
 }
 
 handle /api/rpc {
+    # Block requests not originating from the site
+    @notFromSite {
+        not header Referer https://puppet.tech*
+        not header Referer https://www.puppet.tech*
+    }
+    respond @notFromSite "Forbidden" 403
+
     rewrite * /{query.network}/{$RPC_KEY}
     reverse_proxy {$RPC_URL} {
         header_up Host {upstream_hostport}
     }
 }
 
-handle /api/orchestrator/* {
-    @orchestratorMethods {
-        method GET POST PUT DELETE
-    }
-    uri strip_prefix /api/orchestrator
-    reverse_proxy @orchestratorMethods https://v1.orchestrator.rhinestone.dev {
-        header_up X-Api-Key {$ORCHESTRATOR_API_KEY}
-        header_up Host {upstream_hostport}
-        header_up Accept-Encoding identity
-        header_up Accept application/json
-        header_up Content-Type application/json
-        header_down -Server
-        header_down -Content-Encoding
-    }
+# Health check endpoint
+handle /health {
+    respond "OK" 200
 }
 
 handle {
     root * /srv/website/dist
-    
+    encode gzip
+
     # Serve static files first with proper caching
     @static {
         path /assets/*
@@ -78,7 +92,7 @@ handle {
             precompressed gzip br
         }
     }
-    
+
     # Service worker - must always check for updates
     @sw {
         path /service-worker.js
@@ -87,7 +101,7 @@ handle {
         header Cache-Control "no-cache, no-store, must-revalidate"
         file_server
     }
-    
+
     # Manifest and root-level files (favicon, robots.txt, etc)
     @rootfiles {
         path *.webmanifest *.ico *.txt *.xml
@@ -96,7 +110,7 @@ handle {
         header Cache-Control "public, max-age=3600"
         file_server
     }
-    
+
     # SPA fallback - ONLY for actual routes, not files
     handle {
         try_files {path} /index.html
