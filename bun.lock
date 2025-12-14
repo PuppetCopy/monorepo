@@ -121,6 +121,9 @@
       },
     },
   },
+  "overrides": {
+    "drizzle-orm": "0.41.0",
+  },
   "catalog": {
     "@types/bun": "1.3.4",
     "abitype": "1.2.2",
