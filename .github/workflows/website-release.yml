@@ -4,10 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      # - 'website/**'
-      # - 'middleware/**'
-      # - 'contracts/**'
-      # - '.github/workflows/website-release.yml'
+      - 'website/**'
+      - 'bun.lock'
+      - 'middleware/**'
+      - 'contracts/**'
+      - '.github/workflows/website-release.yml'
   workflow_dispatch:
 
 env:

@@ -4,9 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      # - 'middleware/**'
-      # - 'bun.lock'
-      # - '.github/workflows/indexer-release.yml'
+      - 'middleware/**'
+      - '.github/workflows/indexer-release.yml'
   workflow_dispatch:
 
 jobs:
