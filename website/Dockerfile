@@ -1,7 +1,7 @@
 FROM caddy:2.8-alpine
 
-COPY dist /srv/website/dist
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY website/dist /srv/website/dist
+COPY website/Caddyfile /etc/caddy/Caddyfile
 
 ENV PORT=80
 
