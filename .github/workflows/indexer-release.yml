@@ -46,21 +46,6 @@ jobs:
           bun run indexer:build
           cd indexer && bun run codegen
 
-      - name: Reinstall with copyfile backend
-        run: |
-          rm -rf node_modules
-          bun install --frozen-lockfile --backend=copyfile
-
-      - name: Resolve workspace symlinks for standalone indexer
-        run: |
-          rm indexer/node_modules/@puppet/sdk
-          cp -r sdk indexer/node_modules/@puppet/sdk
-          rm -rf indexer/node_modules/@puppet/sdk/node_modules
-          rm indexer/node_modules/@puppet/contracts
-          mkdir -p indexer/node_modules/@puppet/contracts
-          cp -r contracts/dist indexer/node_modules/@puppet/contracts/
-          cp contracts/package.json indexer/node_modules/@puppet/contracts/
-
       - name: Docker Build and Push
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

@@ -1,7 +1,7 @@
-# Build outputs
-build
-*/build
-**/build
+# Build outputs (exclude root build dirs, but not node_modules)
+/build
+/*/build
+!/node_modules
 
 # Logs
 *.log
