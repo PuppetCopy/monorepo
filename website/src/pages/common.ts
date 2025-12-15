@@ -1,5 +1,5 @@
+import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/database/schema'
 import { getUnixTimestamp } from '@puppet/sdk/core'
-import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/sql/schema'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'

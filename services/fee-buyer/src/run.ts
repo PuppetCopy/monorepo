@@ -1,7 +1,7 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import * as sql from '@puppet/database/client'
+import * as schema from '@puppet/database/schema'
 import { ARBITRUM_ADDRESS } from '@puppet/sdk/const'
-import { desc, live } from '@puppet/sql/client'
-import * as schema from '@puppet/sql/schema'
 import { awaitPromises, createDefaultScheduler, map, op, tap } from 'aelea/stream'
 import { createPublicClient, createWalletClient, formatUnits, type Hex, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -25,9 +25,14 @@ const walletClient = createWalletClient({
 
 const FEE_TOKENS = [ARBITRUM_ADDRESS.WETH, ARBITRUM_ADDRESS.USDC, ARBITRUM_ADDRESS.USDT]
 
-const depositStream = live(process.env.INDEXER_ENDPOINT, db =>
-  db.select().from(schema.feeMarketplace__Deposit).orderBy(desc(schema.feeMarketplace__Deposit.blockTimestamp)).limit(1)
-)
+const depositStream = sql.live(process.env.INDEXER_ENDPOINT, db => {
+  const newLocal = db
+    .select()
+    .from(schema.feeMarketplace__Deposit)
+    .orderBy(sql.filter.desc(schema.feeMarketplace__Deposit.blockTimestamp))
+    .limit(1)
+  return newLocal
+})
 
 op(
   depositStream,

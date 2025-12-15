@@ -1,3 +1,4 @@
+import type { ISubscribeRule } from '@puppet/database/schema'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet/sdk/const'
 import {
   getDuration,
@@ -9,7 +10,6 @@ import {
   readablePercentage
 } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import type { ISubscribeRule } from '@puppet/sql/schema'
 import {
   awaitPromises,
   combine,

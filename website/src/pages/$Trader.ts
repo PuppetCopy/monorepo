@@ -1,3 +1,5 @@
+import * as sql from '@puppet/database/client'
+import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet/database/schema'
 import type { IntervalTime } from '@puppet/sdk/const'
 import {
   getDebankProfileUrl,
@@ -7,13 +9,11 @@ import {
   readableLeverage,
   readableUsd
 } from '@puppet/sdk/core'
-import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet/sql/schema'
 import { combine, type IStream, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { asc } from 'ponder'
 import type { Address } from 'viem/accounts'
 import {
   $anchor,
@@ -115,7 +115,7 @@ export const $TraderPage = ({
                 f.gt(t.blockTimestamp, startActivityTimeframe)
               ),
 
-            orderBy: asc(gmx__PositionIncrease.blockTimestamp),
+            orderBy: sql.filter.asc(gmx__PositionIncrease.blockTimestamp),
             with: {
               feeCollected: true
             }

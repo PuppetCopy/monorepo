@@ -1,5 +1,5 @@
+import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/database/schema'
 import type { IntervalTime } from '@puppet/sdk/const'
-import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/sql/schema'
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
 import type { Address, Hex } from 'viem'

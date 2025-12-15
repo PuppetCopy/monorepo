@@ -1,6 +1,6 @@
+import type { ISubscribeRule } from '@puppet/database/schema'
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet/sdk/const'
 import { getClosestNumber, getUnixTimestamp, groupManyList } from '@puppet/sdk/core'
-import type { ISubscribeRule } from '@puppet/sql/schema'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
 import type { IAccountState } from '../wallet/wallet.js'

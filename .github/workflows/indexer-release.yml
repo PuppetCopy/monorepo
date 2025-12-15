@@ -4,9 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'indexer/**'
-      - 'contracts/**'
-      - 'sdk/**'
       - 'bun.lock'
       - '.github/workflows/indexer-release.yml'
   workflow_dispatch:

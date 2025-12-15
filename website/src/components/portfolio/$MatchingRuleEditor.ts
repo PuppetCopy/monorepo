@@ -1,6 +1,6 @@
+import type { ISubscribeRule } from '@puppet/database/schema'
 import { IntervalTime } from '@puppet/sdk/const'
 import { formatFixed, getDuration, getTraderMatchingKey, getUnixTimestamp, parseBps } from '@puppet/sdk/core'
-import type { ISubscribeRule } from '@puppet/sql/schema'
 import {
   combine,
   empty,

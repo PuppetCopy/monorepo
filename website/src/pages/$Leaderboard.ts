@@ -1,3 +1,6 @@
+import * as sql from '@puppet/database/client'
+import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet/database/schema'
+import * as schema from '@puppet/database/schema'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/sdk/const'
 import {
   fillTimeline,
@@ -8,15 +11,12 @@ import {
   readablePnl
 } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet/sql/schema'
-import * as schema from '@puppet/sql/schema'
 import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type BaselineData, LineType, type Time } from 'lightweight-charts'
-import { asc, desc } from 'ponder'
 import type { Address } from 'viem/accounts'
 import {
   $Baseline,
@@ -148,33 +148,37 @@ export const $Leaderboard = (config: ILeaderboard) =>
               // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = map(async filterParams => {
+                const t = schema.traderRouteLatestMetric
+
+                const filter = sql.filter.and(
+                  sql.filter.eq(t.interval, params.activityTimeframe),
+                  params.account ? sql.filter.ilike(t.account, params.account) : undefined,
+                  // params.isLong !== undefined
+                  //   ? params.isLong
+                  //     ? filter.gte(t.longShortRatio, 5000n)
+                  //     : filter.lte(t.longShortRatio, 5000n)
+                  //   : undefined,
+                  // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
+                  params.collateralTokenList.length > 0
+                    ? sql.filter.inArray(t.collateralToken, params.collateralTokenList)
+                    : undefined,
+                  params.indexTokenList.length > 0
+                    ? sql.filter
+                        .sql`${t.indexTokenList} && ARRAY[${sql.filter.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
+                    : undefined,
+                  sql.filter.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
+                )
+                const orderBy = params.sortBy
+                  ? params.sortBy.direction === 'asc'
+                    ? sql.filter.asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                    : sql.filter.desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                  : undefined
+
                 const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
-                  where: (t, f) => {
-                    return f.and(
-                      f.eq(t.interval, params.activityTimeframe),
-                      params.account ? f.ilike(t.account, params.account) : undefined,
-                      // params.isLong !== undefined
-                      //   ? params.isLong
-                      //     ? f.gte(t.longShortRatio, 5000n)
-                      //     : f.lte(t.longShortRatio, 5000n)
-                      //   : undefined,
-                      // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                      params.collateralTokenList.length > 0
-                        ? f.inArray(t.collateralToken, params.collateralTokenList)
-                        : undefined,
-                      params.indexTokenList.length > 0
-                        ? f.sql`${t.indexTokenList} && ARRAY[${f.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
-                        : undefined,
-                      f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
-                    )
-                  },
+                  where: filter,
                   limit: filterParams.paging.pageSize,
                   offset: filterParams.paging.offset,
-                  orderBy: params.sortBy
-                    ? params.sortBy.direction === 'asc'
-                      ? asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
-                      : desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
-                    : undefined,
+                  orderBy: orderBy,
                   columns: {
                     account: true,
                     collateralToken: true,

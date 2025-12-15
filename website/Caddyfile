@@ -44,6 +44,8 @@ handle /api/sql* {
         header_up Host {upstream_hostport}
         transport http {
             tls_insecure_skip_verify
+            read_timeout 120s
+            write_timeout 120s
         }
     }
 }

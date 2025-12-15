@@ -62,13 +62,6 @@ export default defineConfig({
         secure: true,
         rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
       },
-      '/api/status': {
-        target: process.env.INDEXER_URL,
-        changeOrigin: true,
-        secure: true,
-        rewrite: () => '/status'
-      },
-
       '/api/rpc': {
         target: process.env.RPC_URL,
         changeOrigin: true,

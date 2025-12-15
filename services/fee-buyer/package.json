@@ -12,7 +12,7 @@
   "dependencies": {
     "@puppet/sdk": "workspace:*",
     "@puppet/contracts": "workspace:*",
-    "@puppet/sql": "workspace:*",
+    "@puppet/database": "workspace:*",
     "aelea": "catalog:",
     "viem": "catalog:"
   },

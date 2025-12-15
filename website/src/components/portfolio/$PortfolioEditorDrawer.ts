@@ -1,6 +1,6 @@
 import { CONTRACT, PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import type { ISubscribeRule } from '@puppet/database/schema'
 import { getDuration, readableDate, readablePercentage } from '@puppet/sdk/core'
-import type { ISubscribeRule } from '@puppet/sql/schema'
 import type { Route } from 'aelea/router'
 import {
   awaitPromises,

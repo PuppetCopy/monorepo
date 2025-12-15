@@ -1,5 +1,5 @@
+import type { ISubscribeRule } from '@puppet/database/schema'
 import { getTraderMatchingKey, getUnixTimestamp } from '@puppet/sdk/core'
-import type { ISubscribeRule } from '@puppet/sql/schema'
 import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
