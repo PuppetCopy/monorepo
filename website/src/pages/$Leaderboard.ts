@@ -170,8 +170,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 )
                 const orderBy = params.sortBy
                   ? params.sortBy.direction === 'asc'
-                    ? sql.filter.asc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
-                    : sql.filter.desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
+                    ? sql.filter.asc(schema.traderRouteLatestMetric[params.sortBy.selector])
+                    : sql.filter.desc(schema.traderRouteLatestMetric[params.sortBy.selector])
                   : undefined
 
                 const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({

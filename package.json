@@ -17,8 +17,7 @@
     "website",
     "sdk",
     "indexer",
-    "matchmaker",
-    "services/fee-buyer"
+    "matchmaker"
   ],
   "scripts": {
     "sherif": "sherif",
@@ -46,14 +45,10 @@
     "aelea": "2.5.31",
     "abitype": "1.2.3",
     "superjson": "2.2.6",
-    "lightweight-charts": "5.0.9",
-    "ponder": "0.15.17",
+    "lightweight-charts": "5.1.0",
     "typescript": "^5.9.2",
     "@types/bun": "1.3.4",
     "dotenv": "17.2.3",
-    "drizzle-orm": "0.41.0"
-  },
-  "overrides": {
     "drizzle-orm": "0.41.0"
   }
 }

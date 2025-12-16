@@ -84,7 +84,7 @@ export const $TraderPage = ({
                   ? f.inArray(t.collateralToken, params.collateralTokenList)
                   : undefined,
                 f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
-              ),
+              )
           })
 
           return routeMetricList
