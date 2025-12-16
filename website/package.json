@@ -3,16 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "VITE_PWA_DEV=true vite",
-    "dev:generate-pwa-assets": "pwa-assets-generator",
-    "build": "vite build",
+    "dev": "VITE_PWA_DEV=true bun --bun vite",
+    "dev:generate-pwa-assets": "bun --bun pwa-assets-generator",
+    "build": "bun --bun vite build",
     "clean": "bun run clean:rimraf && tsc -build --clean",
     "clean:rimraf": "rimraf dist && tsc -build --clean",
-    "preview": "vite preview",
+    "preview": "bun --bun vite preview",
     "build:tsc:all": "bun --filter '*' build:tsc",
     "build:clean:all": "bun --filter '*' clean:tsc",
     "tsc:check": "tsc --noEmit",
-    "start": "serve dist -s -l $PORT"
+    "start": "bun --bun serve dist -s -l $PORT"
   },
   "dependencies": {
     "@puppet/contracts": "workspace:*",
