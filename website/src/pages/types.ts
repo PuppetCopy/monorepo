@@ -85,7 +85,6 @@ export interface ITraderRouteMetricSummary
     | 'id'
     | 'pnlList'
     | 'pnlTimestampList'
-    | 'traderRouteMetric'
     | 'lastUpdatedTimestamp'
     | 'interval'
     | 'indexTokenList'

@@ -30,12 +30,12 @@ export const $PuppetSummary = (config: IAccountSummary) =>
         // Return empty summary for now
         return {
           account: puppet || account,
-          settledSizeInUsd: 0n,
-          settledSizeLongInUsd: 0n,
-          settledCollateralInUsd: 0n,
-          sizeUsd: 0n,
-          collateralUsd: 0n,
-          longUsd: 0n,
+          sizeInUsd: 0n,
+          sizeLongInUsd: 0n,
+          collateralInUsd: 0n,
+          openSizeInUsd: 0n,
+          openCollateralInUsd: 0n,
+          openSizeLongInUsd: 0n,
           longShortRatio: 0n,
           pnl: 0n,
           realisedPnl: 0n,

@@ -85,9 +85,6 @@ export const $TraderPage = ({
                   : undefined,
                 f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
               ),
-            with: {
-              traderRouteMetric: true
-            }
           })
 
           return routeMetricList
@@ -230,7 +227,8 @@ export const $TraderPage = ({
                     $intermediateText(
                       map(async summaryQuery => {
                         const summary = await summaryQuery
-                        return readableUsd(summary.sizeUsd)
+                        const totalSize = summary.sizeInUsd + summary.openSizeInUsd
+                        return readableUsd(totalSize)
                       }, metricsQuery)
                     )
                   ),
@@ -241,7 +239,9 @@ export const $TraderPage = ({
                     $intermediateText(
                       map(async summaryQuery => {
                         const summary = await summaryQuery
-                        return readableLeverage(summary.sizeUsd, summary.collateralUsd)
+                        const totalSize = summary.sizeInUsd + summary.openSizeInUsd
+                        const totalCollateral = summary.collateralInUsd + summary.openCollateralInUsd
+                        return readableLeverage(totalSize, totalCollateral)
                       }, metricsQuery)
                     )
                   ),

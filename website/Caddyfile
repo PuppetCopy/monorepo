@@ -44,7 +44,7 @@ handle /api/indexer/* {
 handle /api/status {
     header Access-Control-Allow-Origin "*"
     rewrite * /status
-    reverse_proxy {$INDEXER_URL} {
+    reverse_proxy {$INDEXER_ENDPOINT} {
         header_up Host {upstream_hostport}
         transport http {
             tls_insecure_skip_verify

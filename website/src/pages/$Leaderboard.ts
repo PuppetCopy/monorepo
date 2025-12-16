@@ -174,8 +174,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     : sql.filter.desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
                   : undefined
 
-                await sqlClient.query.traderRouteMetric.findMany({})
-
                 const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
                   where: filter,
                   limit: filterParams.paging.pageSize,
@@ -185,8 +183,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     account: true,
                     collateralToken: true,
 
-                    sizeUsd: true,
-                    collateralUsd: true,
+                    sizeInUsd: true,
+                    collateralInUsd: true,
+                    openSizeInUsd: true,
+                    openCollateralInUsd: true,
                     longShortRatio: true,
                     pnl: true,
                     roi: true,
@@ -195,13 +195,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     pnlTimestampList: true,
                     matchedPuppetList: true,
                     indexTokenList: true
-                  },
-                  with: {
-                    traderRouteMetric: {
-                      columns: {
-                        crossOpenSizeInUsd: true
-                      }
-                    }
                   }
                 })
 
@@ -309,11 +302,13 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         },
                         {
                           $head: $tableHeader('Volume', 'Leverage'),
-                          sortBy: 'sizeUsd',
+                          sortBy: 'sizeInUsd',
                           // $headerCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
                           // $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
                           $bodyCallback: map(pos => {
-                            return $size(pos.metric.sizeUsd, pos.metric.collateralUsd)
+                            const totalSize = pos.metric.sizeInUsd + pos.metric.openSizeInUsd
+                            const totalCollateral = pos.metric.collateralInUsd + pos.metric.openCollateralInUsd
+                            return $size(totalSize, totalCollateral)
                           })
                         }
                       ]
@@ -352,7 +347,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
 
                       const markerList: IMarker[] = []
 
-                      const crossOpenSizeInUsd = (pos.metric.traderRouteMetric as any)?.crossOpenSizeInUsd ?? 0n
+                      const crossOpenSizeInUsd = pos.metric.openSizeInUsd
 
                       if (crossOpenSizeInUsd > 0n) {
                         markerList.push({

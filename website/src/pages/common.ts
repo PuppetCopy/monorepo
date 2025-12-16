@@ -118,13 +118,13 @@ export function accountSettledPositionListSummary(
   const seedAccountSummary: ITraderRouteMetricSummary = {
     account,
 
-    settledSizeInUsd: 0n,
-    settledSizeLongInUsd: 0n,
-    settledCollateralInUsd: 0n,
+    sizeInUsd: 0n,
+    sizeLongInUsd: 0n,
+    collateralInUsd: 0n,
 
-    sizeUsd: 0n,
-    collateralUsd: 0n,
-    longUsd: 0n,
+    openSizeInUsd: 0n,
+    openCollateralInUsd: 0n,
+    openSizeLongInUsd: 0n,
     longShortRatio: 0n,
     pnl: 0n,
     realisedPnl: 0n,
@@ -143,13 +143,13 @@ export function accountSettledPositionListSummary(
   }
 
   const summary = metricList.reduce((seed, next, _idx): ITraderRouteMetricSummary => {
-    seed.settledSizeInUsd += next.settledSizeInUsd
-    seed.settledSizeLongInUsd += next.settledSizeLongInUsd
-    seed.settledCollateralInUsd += next.settledCollateralInUsd
+    seed.sizeInUsd += next.sizeInUsd
+    seed.sizeLongInUsd += next.sizeLongInUsd
+    seed.collateralInUsd += next.collateralInUsd
 
-    seed.sizeUsd += next.sizeUsd
-    seed.collateralUsd += next.collateralUsd
-    seed.longUsd += next.longUsd
+    seed.openSizeInUsd += next.openSizeInUsd
+    seed.openCollateralInUsd += next.openCollateralInUsd
+    seed.openSizeLongInUsd += next.openSizeLongInUsd
     seed.longShortRatio += next.longShortRatio
 
     seed.pnl += next.pnl
@@ -164,7 +164,7 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        traderMatchingKey: next.traderRouteMetric.traderMatchingKey
+        traderMatchingKey: next.traderMatchingKey
       })
     })
 
