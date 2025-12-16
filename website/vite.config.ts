@@ -56,12 +56,6 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT) || 3000,
     proxy: {
-      '/api/sql': {
-        target: process.env.INDEXER_URL,
-        changeOrigin: true,
-        secure: true,
-        rewrite: path => path.replace(/^\/api/, '') // Strip /api prefix
-      },
       '/api/rpc': {
         target: process.env.RPC_URL,
         changeOrigin: true,
@@ -71,6 +65,12 @@ export default defineConfig({
           const network = url.searchParams.get('network')
           return `/${network}/${process.env.RPC_KEY}`
         }
+      },
+      '/api/indexer': {
+        target: process.env.INDEXER_ENDPOINT,
+        changeOrigin: true,
+        secure: true,
+        rewrite: path => path.replace(/^\/api\/indexer/, '')
       }
     }
   },

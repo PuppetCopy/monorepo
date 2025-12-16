@@ -15,32 +15,23 @@ header {
     Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 }
 
-# Proxy to indexer API
-handle /api/sql* {
-    # Handle CORS preflight
-    @options method OPTIONS
-    handle @options {
-        header Access-Control-Allow-Origin "https://puppet.tech"
-        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-        header Access-Control-Allow-Headers "Content-Type"
-        respond 204
-    }
+# Indexer API proxy (/api/indexer/* → /*)
+handle /api/indexer/* {
+    header Access-Control-Allow-Origin "https://puppet.tech"
+    header Access-Control-Allow-Methods "GET, OPTIONS"
+    header Access-Control-Allow-Headers "Content-Type"
 
-    # Block requests not originating from the site
+    @options method OPTIONS
+    respond @options 204
+
     @notFromSite {
         not header Referer https://puppet.tech*
         not header Referer https://www.puppet.tech*
     }
     respond @notFromSite "Forbidden" 403
 
-    # Restrict CORS to our domain only
-    header Access-Control-Allow-Origin "https://puppet.tech"
-    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    header Access-Control-Allow-Headers "Content-Type"
-
-    # Strip /api prefix
-    uri strip_prefix /api
-    reverse_proxy {$INDEXER_URL} {
+    uri strip_prefix /api/indexer
+    reverse_proxy {$INDEXER_ENDPOINT} {
         header_up Host {upstream_hostport}
         transport http {
             tls_insecure_skip_verify
@@ -62,7 +53,6 @@ handle /api/status {
 }
 
 handle /api/rpc {
-    # Block requests not originating from the site
     @notFromSite {
         not header Referer https://puppet.tech*
         not header Referer https://www.puppet.tech*

@@ -31,7 +31,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return
 
   // Do not cache orchestrator stateful endpoints (write operations)
-  const noCachePaths = ['/api/status', '/api/sql']
+  const noCachePaths = ['/api/indexer/status', '/api/indexer/sql/db']
   const isNoCache = noCachePaths.some(path => url.pathname.startsWith(path))
   if (isNoCache) return
 

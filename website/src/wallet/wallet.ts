@@ -49,7 +49,7 @@ const chainList = [
   arbitrum
   // polygon
 ] as const
-type SupportedChainId = (typeof chainList)[number]['id']
+
 const chainMap = groupList(chainList, 'id')
 
 const CHAIN_NETWORK: Record<number, string> = {

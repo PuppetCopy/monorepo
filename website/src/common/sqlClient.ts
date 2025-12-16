@@ -1,10 +1,8 @@
 import { createClient, getStatus as getSqlStatus } from '@puppet/database/client'
 
-// Always use the API proxy endpoint
-const baseUrl = '/api/sql'
-
-export const sqlClient = createClient(baseUrl)
+// Indexer API (proxy strips /api/indexer prefix)
+export const sqlClient = createClient('/api/indexer/sql')
 
 export async function getStatus() {
-  return getSqlStatus(baseUrl)
+  return getSqlStatus('/api/indexer')
 }

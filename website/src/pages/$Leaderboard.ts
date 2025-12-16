@@ -174,6 +174,8 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     : sql.filter.desc((schema.traderRouteLatestMetric as any)[params.sortBy.selector])
                   : undefined
 
+                await sqlClient.query.traderRouteMetric.findMany({})
+
                 const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
                   where: filter,
                   limit: filterParams.paging.pageSize,
