@@ -211,7 +211,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   style({
                     backgroundColor: pallete.background,
                     borderTop: `1px solid ${colorAlpha(pallete.foreground, 0.2)}`,
-                    padding: isDesktopScreen ? '36px' : '12px'
+                    padding: isDesktopScreen ? '24px 36px 36px' : '12px'
                   })
                 ),
                 $cell: $defaultTableCell(style({ padding: '0', height: '60px' })),

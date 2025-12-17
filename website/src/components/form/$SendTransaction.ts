@@ -3,17 +3,7 @@ import { awaitPromises, combine, empty, filter, type IStream, map, merge, op, sa
 import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
-import {
-  type Abi,
-  type Address,
-  BaseError,
-  type Chain,
-  type ContractFunctionArgs,
-  type ContractFunctionName,
-  ContractFunctionRevertedError,
-  encodeFunctionData,
-  type Hex
-} from 'viem'
+import { type Address, BaseError, type Chain, ContractFunctionRevertedError, type Hex } from 'viem'
 import { arbitrum } from 'viem/chains'
 import {
   $alertIntermediateTooltip,
@@ -30,32 +20,10 @@ import { $ButtonCore } from './$ButtonCore.js'
 
 type TxResult = { hashes: Hex[]; chain: Chain }
 
-export type ContractCall<
-  TAbi extends Abi = Abi,
-  TFunctionName extends ContractFunctionName<TAbi, 'nonpayable' | 'payable'> = ContractFunctionName<
-    TAbi,
-    'nonpayable' | 'payable'
-  >
-> = {
+export type ContractCall = {
   to: Address
-  abi: TAbi
-  functionName: TFunctionName
-  args: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>
+  data: Hex
   value?: bigint
-}
-
-type RawCall = { to: Address; data: Hex; value?: bigint }
-
-function encodeCall(call: ContractCall): RawCall {
-  return {
-    to: call.to,
-    data: encodeFunctionData({
-      abi: call.abi,
-      functionName: call.functionName,
-      args: call.args
-    }),
-    value: call.value
-  }
 }
 
 export interface ISendTransaction {
@@ -106,7 +74,7 @@ export const $SendTransaction = ({
             throw new Error('No operations to execute')
           }
 
-          const calls = params.operations.map(encodeCall)
+          const calls = params.operations
 
           const result = await params.account.client.sendCalls({
             account: params.account.address,

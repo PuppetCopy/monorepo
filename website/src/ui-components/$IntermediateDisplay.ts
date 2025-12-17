@@ -49,22 +49,36 @@ export interface I$IntermediatPromise<_T> {
   $loader?: I$Node
 }
 
+function parseErrorMessage(res: unknown): string {
+  const raw =
+    typeof res === 'string'
+      ? res
+      : (res as any)?.message
+        ? String((res as any).message)
+        : (() => {
+            try {
+              return JSON.stringify(res)
+            } catch {
+              return 'Unknown error'
+            }
+          })()
+
+  // Detect HTML response (e.g., 503 error pages)
+  if (raw.includes('<html') || raw.includes('<!DOCTYPE')) {
+    // Try to extract title or h1 content
+    const titleMatch = raw.match(/<title>([^<]+)<\/title>/i)
+    const h1Match = raw.match(/<h1>([^<]+)<\/h1>/i)
+    const extracted = titleMatch?.[1] || h1Match?.[1] || 'Service Unavailable'
+    return extracted.trim()
+  }
+
+  return raw
+}
+
 export const $intermediatePromise = <T>({
   $loader = $spinner,
   $$fail = res => {
-    const message =
-      typeof res === 'string'
-        ? res
-        : (res as any)?.message
-          ? String((res as any).message)
-          : (() => {
-              try {
-                return JSON.stringify(res)
-              } catch {
-                return 'Unknown error'
-              }
-            })()
-
+    const message = parseErrorMessage(res)
     return style({ placeSelf: 'center', margin: 'auto' })($alertTooltip($text(message)))
   },
   $display

@@ -83,7 +83,7 @@ export const $defaultTableHeaderCell = $defaultTableCell(
   style({ alignItems: 'center', color: pallete.foreground, fontSize: '.8rem' })
 )
 export const $defaultTableRowContainer = $node(isDesktopScreen ? spacing.big : spacing.default)
-export const $defaultTableContainer = $column(spacing.small, style({ flex: 1 }))
+export const $defaultTableContainer = $column(spacing.default, style({ flex: 1 }))
 
 export const $Table = <T>({
   dataSource,

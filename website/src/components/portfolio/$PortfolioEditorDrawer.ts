@@ -19,7 +19,7 @@ import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type Address, erc20Abi, getAddress } from 'viem'
+import { type Address, encodeFunctionData, erc20Abi, getAddress } from 'viem'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
 import { $TraderDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
@@ -79,22 +79,28 @@ export const $PortfolioEditorDrawer = ({
             if (draft.action === BALANCE_ACTION.DEPOSIT) {
               ops.push({
                 to: draft.token,
-                abi: erc20Abi,
-                functionName: 'approve',
-                args: [PUPPET_CONTRACT_MAP.TokenRouter.address, draft.amount]
+                data: encodeFunctionData({
+                  abi: erc20Abi,
+                  functionName: 'approve',
+                  args: [PUPPET_CONTRACT_MAP.TokenRouter.address, draft.amount]
+                })
               })
               ops.push({
                 to: CONTRACT.UserRouter.address,
-                abi: CONTRACT.UserRouter.abi,
-                functionName: 'deposit',
-                args: [draft.token, draft.amount]
+                data: encodeFunctionData({
+                  abi: CONTRACT.UserRouter.abi,
+                  functionName: 'deposit',
+                  args: [draft.token, draft.amount]
+                })
               })
             } else {
               ops.push({
                 to: CONTRACT.UserRouter.address,
-                abi: CONTRACT.UserRouter.abi,
-                functionName: 'withdraw',
-                args: [draft.token, params.account.address, draft.amount]
+                data: encodeFunctionData({
+                  abi: CONTRACT.UserRouter.abi,
+                  functionName: 'withdraw',
+                  args: [draft.token, params.account.address, draft.amount]
+                })
               })
             }
           }
@@ -103,17 +109,19 @@ export const $PortfolioEditorDrawer = ({
           for (const rule of params.draftMatchingRuleList) {
             ops.push({
               to: CONTRACT.UserRouter.address,
-              abi: CONTRACT.UserRouter.abi,
-              functionName: 'setMatchingRule',
-              args: [
-                rule.collateralToken,
-                rule.trader,
-                {
-                  allowanceRate: rule.allowanceRate,
-                  throttleActivity: rule.throttleActivity,
-                  expiry: rule.expiry
-                }
-              ]
+              data: encodeFunctionData({
+                abi: CONTRACT.UserRouter.abi,
+                functionName: 'setRule',
+                args: [
+                  rule.collateralToken,
+                  rule.trader,
+                  {
+                    allowanceRate: rule.allowanceRate,
+                    throttleActivity: rule.throttleActivity,
+                    expiry: rule.expiry
+                  }
+                ]
+              })
             })
           }
 
