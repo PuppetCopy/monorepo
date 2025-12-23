@@ -1,11 +1,12 @@
 import type { Connector } from '@wagmi/core'
-import { awaitPromises, filterNull, map } from 'aelea/stream'
+import { awaitPromises, filter, map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $text, attr, component, style } from 'aelea/ui'
 import { $column, $icon, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
+import type { Address } from 'viem'
 import { $walletConnectLogo } from '../common/$icons.js'
-import wallet, { type IAccountState } from '../wallet/wallet.js'
+import wallet from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import { $defaultButtonCore } from './form/$ButtonCore.js'
 
@@ -60,7 +61,7 @@ const $walletIcon = (connector: Connector) => {
 }
 
 export const $WalletConnect = () =>
-  component(([connect, connectTether]: IBehavior<PointerEvent, IAccountState>) => {
+  component(([connect, connectTether]: IBehavior<PointerEvent, Address[]>) => {
     const connectors = wallet.wagmi.connectors.slice().reverse()
 
     return [
@@ -86,7 +87,7 @@ export const $WalletConnect = () =>
             click: connectTether(
               map(() => wallet.connect(connector.id)),
               awaitPromises,
-              filterNull
+              filter(addresses => addresses.length > 0)
             )
           })
         )

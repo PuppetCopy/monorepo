@@ -18,7 +18,8 @@ import {
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import { $seperator2 } from 'src/pages/common.js'
-import wallet, { type IAccountState } from 'src/wallet/wallet.js'
+import wallet from 'src/wallet/wallet.js'
+import type { Address } from 'viem'
 import {
   $alertIntermediateSpinnerContainer,
   $anchor,
@@ -48,7 +49,7 @@ export const $MainMenu = (config: MainMenu) =>
       [routeChange, routeChangeTether]: IBehavior<string, string>,
       [clickPopoverClaim, clickPopoverClaimTether]: IBehavior<any, any>,
       [changeTheme, changeThemeTether]: IBehavior<ISlottable, Theme>,
-      [selectConnector, selectConnectorTether]: IBehavior<IAccountState>, //
+      [selectConnector, selectConnectorTether]: IBehavior<Address[]>, //
       [targetClick, targetClickTether]: IBehavior<INode, PointerEvent>
     ) => {
       const { route } = config

@@ -38,7 +38,8 @@
       "vite/client",
       "vite-plugin-pwa/vanillajs",
       "vite-plugin-pwa/info",
-      "vite-plugin-pwa/pwa-assets"
+      "vite-plugin-pwa/pwa-assets",
+      "chrome"
     ],
     /* Bundler mode */
     "isolatedModules": true,

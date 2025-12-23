@@ -38,17 +38,11 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 type ChainBalance = { chainId: number; balance: bigint }
 
 type IAccountState = {
-  client: WalletClient<Transport, Chain>
+  walletClient: WalletClient<Transport, Chain>
   address: Address
 }
 
-const chainList = [
-  // mainnet, //
-  // base,
-  // optimism,
-  arbitrum
-  // polygon
-] as const
+const chainList = [arbitrum] as const
 
 const chainMap = groupList(chainList, 'id')
 
@@ -73,22 +67,13 @@ const portoConnector = porto({
 
 const wagmi: Config = createConfig({
   chains: chainList,
-  connectors: [
-    // injected()
-    walletConnectConnector, //
-    portoConnector
-  ],
+  connectors: [walletConnectConnector, portoConnector],
   storage: createStorage({ storage: localStorage }),
   transports: Object.fromEntries(
-    chainList.map(chain => {
-      return [
-        chain.id,
-        fallback([
-          http(`/api/rpc?network=${CHAIN_NETWORK[chain.id]}`), //
-          http(chain.rpcUrls.default.http[0])
-        ])
-      ]
-    })
+    chainList.map(chain => [
+      chain.id,
+      fallback([http(`/api/rpc?network=${CHAIN_NETWORK[chain.id]}`), http(chain.rpcUrls.default.http[0])])
+    ])
   ) as any
 })
 
@@ -97,10 +82,8 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
   const hasPortoConnection = storedConnections.some(conn => conn.connector.id === 'xyz.ithaca.porto')
 
   if (hasPortoConnection) {
-    // Porto reconnect triggers watchConnection.onChange, no need to call cb manually
     reconnect(wagmi, { connectors: [portoConnector] }).catch(console.warn)
   } else {
-    // For other wallets, emit initial connection state
     cb(getConnection(wagmi))
   }
 
@@ -113,14 +96,9 @@ const account: IStream<Promise<IAccountState | null>> = op(
     if (connection.status !== 'connected' || !connection.connector) return null
 
     try {
-      const client = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
-      const address = client.account.address
-
-      console.info('Account ready:', { address })
-
-      return { client, address }
+      const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
+      return { walletClient, address: walletClient.account.address }
     } catch (error) {
-      // Connector may be in transitional state during disconnect
       console.warn('Failed to get wallet client:', error)
       return null
     }
@@ -128,31 +106,27 @@ const account: IStream<Promise<IAccountState | null>> = op(
   state
 )
 
-async function connect(preferredConnectorId?: string): Promise<IAccountState | null> {
-  const current = getConnection(wagmi)
-  const targetConnector = wagmi.connectors.find(c => c.id === preferredConnectorId) ?? wagmi.connectors[0]
-
-  if (!targetConnector) throw new Error('No wallet connector configured')
-
-  // Already connected with same connector - return current wallet client
-  if (current.status === 'connected' && current.connector?.id === targetConnector.id) {
-    const client = await wagmiGetWalletClient(wagmi, { chainId: current.chainId })
-    return { client, address: client.account.address }
-  }
-
+async function connect(preferredConnectorId?: string): Promise<Address[]> {
   try {
-    const result = await wagmiConnect(wagmi, { connector: targetConnector })
-    if (!result.accounts?.length) return null
+    const current = getConnection(wagmi)
+    const targetConnector = wagmi.connectors.find(c => c.id === preferredConnectorId) ?? wagmi.connectors[0]
 
-    const client = await wagmiGetWalletClient(wagmi, { chainId: result.chainId })
-    return { client, address: client.account.address }
+    if (!targetConnector) throw new Error('No wallet connector configured')
+
+    if (current.status === 'connected' && current.connector?.id === targetConnector.id) {
+      const addresses = (current as any).addresses ?? ((current as any).address ? [(current as any).address] : [])
+      return addresses as Address[]
+    }
+
+    const result = await wagmiConnect(wagmi, { connector: targetConnector })
+    return [...(result.accounts ?? [])]
   } catch (error: any) {
-    if (error?.message?.includes('rejected')) {
+    if (error?.message?.includes('rejected') || error?.message?.includes('User rejected')) {
       console.log('User cancelled wallet connection')
-      return null
+      return []
     }
     console.error('Failed to connect:', error)
-    return null
+    return []
   }
 }
 

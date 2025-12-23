@@ -27,6 +27,7 @@ import wallet from '../wallet/wallet.js'
 import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
 import { $TraderPage } from './$Trader.js'
+import { $WalletPage } from './$Wallet.js'
 
 const popStateEvent = fromEventTarget(window, 'popstate')
 const requestRouteChange = start(document.location, popStateEvent)
@@ -74,6 +75,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         fragment: ETH_ADDRESS_REGEXP
       })
       const portfolioRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
+      const walletRoute = rootRoute.create({ fragment: 'wallet', title: 'Wallet' })
 
       const activityTimeframe = uiStorage.replayWrite(localStore.global.activityTimeframe, changeActivityTimeframe)
       const collateralTokenList = uiStorage.replayWrite(
@@ -208,6 +210,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             )
           ),
+          contains(walletRoute)($midContainer(fadeIn($WalletPage()({})))),
           $row(style({ position: 'fixed', zIndex: 100, right: '16px', bottom: '16px' }))(
             switchMap(status => {
               const block = status?.arbitrum?.block

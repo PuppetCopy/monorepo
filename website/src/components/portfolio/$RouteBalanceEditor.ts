@@ -1,27 +1,21 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import { combine, constant, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
+import { combine, type IStream, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
-import { $node, $text, component, type I$Node, style } from 'aelea/ui'
-import { $row, spacing } from 'aelea/ui-components'
-import { pallete } from 'aelea/ui-components-theme'
+import { component } from 'aelea/ui'
 import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
-import { $intermediatePromise, $labeledhintAdjustment } from '@/ui-components'
-import { $route } from '../../common/$common.js'
+import { $intermediatePromise } from '@/ui-components'
 import type { IComponentPageParams } from '../../pages/types.js'
 import wallet from '../../wallet/wallet.js'
-import { $Popover } from '../$Popover.js'
-import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 import {
-  $DepositEditor,
   BALANCE_ACTION,
   type BalanceDraft,
   type IDepositEditorDraft,
   type IWithdrawEditorDraft
 } from './$DepositEditor.js'
-import { $WithdrawEditor } from './$WithdrawEditor.js'
+import { $TokenBalanceEditor } from './$TokenBalanceEditor.js'
 
 interface IRouteBalanceEditor extends IComponentPageParams {
   walletAddress?: Address
@@ -32,7 +26,6 @@ interface IRouteBalanceEditor extends IComponentPageParams {
 export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
   component(
     (
-      [popEditor, popEditorTether]: IBehavior<PointerEvent, 'deposit' | 'withdraw'>,
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
@@ -95,88 +88,28 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
         $display: map(async accountQuery => {
           const account = await accountQuery
 
-          return $Popover({
-            $open: op(
-              popEditor,
-              map(action => {
-                if (!account) {
-                  return $node($text('No account connected'))
-                }
+          if (!account) {
+            return $TokenBalanceEditor({
+              token: collateralToken,
+              balance: depositBalanceStream,
+              account: account!
+            })({
+              changeDeposit: changeDepositTether(),
+              changeWithdraw: changeWithdrawTether()
+            })
+          }
 
-                const depositBal = op(
-                  just(account),
-                  switchMap(async a => {
-                    try {
-                      const readResult = await wallet.read({
-                        ...PUPPET_CONTRACT_MAP.Account,
-                        functionName: 'userBalanceMap',
-                        args: [collateralToken, a.address]
-                      })
-                      return readResult
-                    } catch (error) {
-                      console.warn('Failed to read deposit balance, account may not be initialized:', error)
-                      return 0n
-                    }
-                  }),
-                  state
-                )
-
-                if (action === BALANCE_ACTION.DEPOSIT) {
-                  return $DepositEditor({
-                    model: balanceModel,
-                    token: collateralToken,
-                    account
-                  })({
-                    changeModel: changeDepositTether()
-                  })
-                } else {
-                  return $WithdrawEditor({
-                    depositBalance: depositBal,
-                    token: collateralToken,
-                    account
-                  })({
-                    withdraw: changeWithdrawTether()
-                  })
-                }
-              })
-            ),
-            $target: $row(spacing.big, style({ padding: '6px 0' }))(
-              $route(collateralTokenDescription),
-              switchMap((balance): I$Node => {
-                return $row(spacing.small, style({ alignItems: 'center' }))(
-                  $labeledhintAdjustment({
-                    color: map(
-                      draft =>
-                        draft
-                          ? draft.action === BALANCE_ACTION.DEPOSIT
-                            ? pallete.positive
-                            : pallete.negative
-                          : undefined,
-                      balanceModel
-                    ),
-                    change: adjustmentChangeStream,
-                    $val: $text(readableTokenAmountLabel(collateralTokenDescription, balance))
-                  }),
-                  $node(),
-                  $ButtonSecondary({
-                    $container: $defaultMiniButtonSecondary,
-                    $content: $text('Deposit'),
-                    disabled: just(!account)
-                  })({
-                    click: popEditorTether(constant(BALANCE_ACTION.DEPOSIT))
-                  }),
-                  $ButtonSecondary({
-                    $container: $defaultMiniButtonSecondary,
-                    $content: $text('Withdraw'),
-                    disabled: just(!account || balance === 0n)
-                  })({
-                    click: popEditorTether(constant(BALANCE_ACTION.WITHDRAW))
-                  })
-                )
-              }, depositBalanceStream)
-            ),
-            dismiss: merge(changeDeposit, changeWithdraw)
-          })({})
+          return $TokenBalanceEditor({
+            token: collateralToken,
+            balance: depositBalanceStream,
+            account,
+            model: balanceModel,
+            adjustmentChange: adjustmentChangeStream,
+            withdrawBalance: depositBalanceStream
+          })({
+            changeDeposit: changeDepositTether(),
+            changeWithdraw: changeWithdrawTether()
+          })
         }, wallet.account)
       })
 

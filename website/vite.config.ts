@@ -2,7 +2,7 @@ import replace from '@rollup/plugin-replace'
 import dotenv from 'dotenv'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import tsconfigPaths from 'vite-tsconfig-paths' // Import the plugin
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 dotenv.config({ path: '.env.local', override: true })
 dotenv.config()

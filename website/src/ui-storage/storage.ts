@@ -23,10 +23,12 @@ function createDbStream<TName extends string, TStore>(
   storeDefinitions: TStore
 ): IStream<IDBDatabase> {
   const storeNames = Object.keys(storeDefinitions as any)
-  const openDbRequest = indexedDB.open(dbName, version)
 
   return state(
     stream((sink, scheduler) => {
+      // Open database INSIDE stream factory to avoid race condition
+      // where onsuccess fires before handlers are attached
+      const openDbRequest = indexedDB.open(dbName, version)
       let db: IDBDatabase | null = null
       let disposed = false
       const initTime = scheduler.time()
@@ -170,10 +172,11 @@ export function read<TKey extends IDBValidKey, TData>(
       // Store doesn't exist, return default value
       if (e instanceof DOMException && e.name === 'NotFoundError') {
         sink.event(time, defaultValue)
+        sink.end(time)
+        return disposeNone
       }
 
       sink.error(time, e)
-      sink.end(time)
       return disposeNone
     }
 
@@ -209,7 +212,7 @@ export function write<TKey extends IDBValidKey, TData>(
 
     const valueDisposable = value.run(
       {
-        event(time, data) {
+        event(_time, data) {
           try {
             const tx = db.transaction(storeName, 'readwrite')
             const request = tx.objectStore(storeName).put(data, key)
@@ -233,7 +236,7 @@ export function write<TKey extends IDBValidKey, TData>(
             }
           } catch (e) {
             if (disposed) return
-            sink.error(time, e instanceof Error ? e : new Error('Failed to create write transaction'))
+            sink.error(scheduler.time(), e instanceof Error ? e : new Error('Failed to create write transaction'))
           }
         },
         end(time) {

@@ -58,7 +58,7 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
       [selectChain, selectChainTether]: IBehavior<number>
     ) => {
       const tokenDescription = getTokenDescription(token)
-      const chainSelection = state(selectChain, account.client.chain.id)
+      const chainSelection = state(selectChain, account.walletClient.chain!.id)
 
       // Cache balance per chain - single RPC call shared across all usages
       const chainBalanceCache = new Map<number, Promise<bigint>>()

@@ -2,6 +2,7 @@ import { awaitPromises, type IOps, join, just, map, merge, switchMap } from 'ael
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
+import type { Address } from 'viem'
 import wallet, { type IAccountState } from '../wallet/wallet.js'
 import { $Popover } from './$Popover.js'
 import { $WalletConnect } from './$WalletConnect.js'
@@ -15,7 +16,7 @@ export interface IConnectWalletPopover {
 export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
   component(
     (
-      [connect, connectTether]: IBehavior<IAccountState>, //
+      [connect, connectTether]: IBehavior<Address[]>, //
       [openPopover, openPopoverTether]: IBehavior<PointerEvent>
     ) => {
       const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))

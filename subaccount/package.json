@@ -1,0 +1,21 @@
+{
+  "name": "@puppet/wallet",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun run build.ts",
+    "build:prod": "bun run build.ts --production",
+    "dev": "bun run build.ts --watch",
+    "tsc:check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "viem": "catalog:"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/bun": "catalog:",
+    "@types/chrome": "catalog:",
+    "typescript": "catalog:"
+  }
+}

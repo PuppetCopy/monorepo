@@ -42,18 +42,22 @@ export function createWithdrawStream(client: PublicClient) {
   )
 }
 
+export function createAllocateStream(client: PublicClient) {
+  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Allocate.hash, CONTRACT_EVENT_MAP.Allocation.Allocate.args)
+}
+
+export function createUtilizeStream(client: PublicClient) {
+  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Utilize.hash, CONTRACT_EVENT_MAP.Allocation.Utilize.args)
+}
+
 export function createSettleStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Settle.Settle.hash, CONTRACT_EVENT_MAP.Settle.Settle.args)
+  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Settle.hash, CONTRACT_EVENT_MAP.Allocation.Settle.args)
 }
 
-export function createRequestMatchStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Mirror.Match.hash, CONTRACT_EVENT_MAP.Mirror.Match.args)
+export function createRealizeStream(client: PublicClient) {
+  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Realize.hash, CONTRACT_EVENT_MAP.Allocation.Realize.args)
 }
 
-export function createRequestAdjustStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Mirror.Adjust.hash, CONTRACT_EVENT_MAP.Mirror.Adjust.args)
-}
-
-export function createRequestCloseStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Mirror.Close.hash, CONTRACT_EVENT_MAP.Mirror.Close.args)
+export function createAllocationWithdrawStream(client: PublicClient) {
+  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Withdraw.hash, CONTRACT_EVENT_MAP.Allocation.Withdraw.args)
 }

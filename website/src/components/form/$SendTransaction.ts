@@ -40,10 +40,14 @@ export const $SendTransaction = ({
   component(
     (
       [submit, submitTether]: IBehavior<PointerEvent>, //
-      [accountChange, accountChangeTether]: IBehavior<IAccountState>
+      [accountChange, accountChangeTether]: IBehavior<Address[]>
     ) => {
+      // accountChange triggers refresh of wallet.account
       const account = op(
-        merge(accountChange, awaitPromises(wallet.account)),
+        merge(
+          map(() => null, accountChange), // trigger refresh on connect
+          awaitPromises(wallet.account)
+        ),
         filter((a): a is IAccountState => a !== null)
       )
 
@@ -53,9 +57,9 @@ export const $SendTransaction = ({
           account,
           map(async params => {
             try {
-              if (typeof params.client.getCapabilities === 'function') {
-                const capabilities = await params.client.getCapabilities({ account: params.address })
-                return Object.values(capabilities).some(chainCaps => chainCaps?.atomicBatch?.supported === true)
+              if (typeof params.walletClient.getCapabilities === 'function') {
+                const capabilities = await params.walletClient.getCapabilities({ account: params.address })
+                return Object.values(capabilities).some((chainCaps: any) => chainCaps?.atomicBatch?.supported === true)
               }
             } catch {
               // Wallet doesn't support capability checking
@@ -76,20 +80,20 @@ export const $SendTransaction = ({
 
           const calls = params.operations
 
-          const result = await params.account.client.sendCalls({
+          const result = await params.account.walletClient.sendCalls({
             account: params.account.address,
             chain,
             calls,
             experimental_fallback: true
           })
 
-          const status = await params.account.client.waitForCallsStatus({
-            id: result.id,
+          const status = await params.account.walletClient.waitForCallsStatus({
+            id: result.id as string,
             throwOnFailure: true
           })
 
           // Extract hashes from all receipts
-          const hashes = status.receipts?.map(r => r.transactionHash).filter((h): h is Hex => !!h) ?? []
+          const hashes = status.receipts?.map((r: any) => r.transactionHash).filter((h: any): h is Hex => !!h) ?? []
           if (hashes.length === 0) {
             throw new Error('No transaction hashes in receipts')
           }
