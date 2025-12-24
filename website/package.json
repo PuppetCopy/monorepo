@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@puppet/contracts": "workspace:*",
-    "@puppet/sdk": "workspace:*",
     "@puppet/database": "workspace:*",
+    "@puppet/sdk": "workspace:*",
     "@rhinestone/sdk": "1.0.40",
     "@wagmi/connectors": "7.0.2",
     "@wagmi/core": "3.0.0",
@@ -31,11 +31,11 @@
     "wagmi": "3.1.0"
   },
   "devDependencies": {
-    "@types/chrome": "catalog:",
+    "@ponder/client": "0.15.17",
     "@rollup/plugin-replace": "6.0.3",
+    "@types/chrome": "catalog:",
     "@vite-pwa/assets-generator": "1.0.2",
     "dotenv": "catalog:",
-    "@ponder/client": "0.15.17",
     "rimraf": "6.1.2",
     "typescript": "catalog:",
     "vite": "7.3.0",

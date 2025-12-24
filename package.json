@@ -17,8 +17,7 @@
     "website",
     "sdk",
     "indexer",
-    "matchmaker",
-    "wallet"
+    "subaccount"
   ],
   "scripts": {
     "sherif": "sherif",
