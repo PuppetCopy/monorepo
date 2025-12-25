@@ -5,15 +5,9 @@ import { $node, $text, component, type I$Slottable, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { type Address, BaseError, type Chain, ContractFunctionRevertedError, type Hex } from 'viem'
 import { arbitrum } from 'viem/chains'
-import {
-  $alertIntermediateTooltip,
-  $alertPositiveTooltip,
-  $alertTooltip,
-  $spinnerTooltip,
-  $txHashRef
-} from '@/ui-components'
+import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import wallet, { type IAccountState } from '../../wallet/wallet.js'
+import wallet, { type ISubaccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -42,60 +36,45 @@ export const $SendTransaction = ({
       [submit, submitTether]: IBehavior<PointerEvent>, //
       [accountChange, accountChangeTether]: IBehavior<Address[]>
     ) => {
-      // accountChange triggers refresh of wallet.account
-      const account = op(
+      // Get subaccount with rhinestone account for transaction execution
+      const subaccountState = op(
         merge(
           map(() => null, accountChange), // trigger refresh on connect
-          awaitPromises(wallet.account)
+          awaitPromises(wallet.subaccount)
         ),
-        filter((a): a is IAccountState => a !== null)
-      )
-
-      // Check if wallet supports batched transactions (null = not connected yet)
-      const supportsBatching = state(
-        op(
-          account,
-          map(async params => {
-            try {
-              if (typeof params.walletClient.getCapabilities === 'function') {
-                const capabilities = await params.walletClient.getCapabilities({ account: params.address })
-                return Object.values(capabilities).some((chainCaps: any) => chainCaps?.atomicBatch?.supported === true)
-              }
-            } catch {
-              // Wallet doesn't support capability checking
-            }
-            return false
-          }),
-          awaitPromises
-        ),
-        null as boolean | null
+        filter((s): s is NonNullable<ISubaccountState> => s !== null)
       )
 
       const txQuery = op(
-        sample(combine({ operations, account }), submit),
+        sample(combine({ operations, subaccountState }), submit),
         map(async params => {
           if (params.operations.length === 0) {
             throw new Error('No operations to execute')
           }
 
-          const calls = params.operations
+          // Convert ContractCall[] to Rhinestone calls format
+          const calls = params.operations.map(op => ({
+            to: op.to,
+            data: op.data,
+            value: op.value ?? 0n
+          }))
 
-          const result = await params.account.walletClient.sendCalls({
-            account: params.account.address,
+          // Execute through rhinestone subaccount
+          const result = await params.subaccountState.rhinestoneAccount.sendTransaction({
             chain,
-            calls,
-            experimental_fallback: true
+            calls
           })
 
-          const status = await params.account.walletClient.waitForCallsStatus({
-            id: result.id as string,
-            throwOnFailure: true
-          })
+          // Wait for execution to complete
+          const receipt = await params.subaccountState.rhinestoneAccount.waitForExecution(result)
 
-          // Extract hashes from all receipts
-          const hashes = status.receipts?.map((r: any) => r.transactionHash).filter((h: any): h is Hex => !!h) ?? []
-          if (hashes.length === 0) {
-            throw new Error('No transaction hashes in receipts')
+          // Extract transaction hash from result
+          const hashes: Hex[] = []
+          if ('transactionHash' in receipt && receipt.transactionHash) {
+            hashes.push(receipt.transactionHash as Hex)
+          }
+          if (hashes.length === 0 && 'receipt' in receipt && (receipt as any).receipt?.transactionHash) {
+            hashes.push((receipt as any).receipt.transactionHash)
           }
 
           return { hashes, chain } as TxResult
@@ -105,7 +84,7 @@ export const $SendTransaction = ({
       const txState = state(promiseState(txQuery), null)
 
       const $status = op(
-        combine({ supportsBatching, operations, txState }),
+        combine({ operations, txState }),
         switchMap(params => {
           // Show tx status when there's an active transaction
           if (params.txState !== null) {
@@ -147,17 +126,6 @@ export const $SendTransaction = ({
             return $spinnerTooltip($node($text('Awaiting execution')))
           }
 
-          // Show EOA warning when wallet doesn't support batching
-          // null = not connected yet, true = supports batching, false = EOA
-          if (params.supportsBatching === false && params.operations.length > 1) {
-            return $alertIntermediateTooltip(
-              $text(`${params.operations.length} signatures required`),
-              $text(
-                'Your wallet does not support batched transactions yet. You will need to sign each transaction separately.'
-              )
-            )
-          }
-
           return empty
         })
       )
@@ -187,7 +155,7 @@ export const $SendTransaction = ({
             connect: accountChangeTether()
           })
         ),
-        { account, success }
+        { subaccountState, success }
       ]
     }
   )

@@ -1,4 +1,4 @@
-import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/database/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease, IMasterRouteLatestMetric } from '@puppet/database/schema'
 import type { IntervalTime } from '@puppet/sdk/const'
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
@@ -33,7 +33,7 @@ export const TRADE_FOCUS_MODE = {
 export type ITradeFocusMode = ValueOf<typeof TRADE_FOCUS_MODE>
 
 export const WALLET_TAB = {
-  TRADER: 'Trader',
+  TRADER: 'Master',
   PUPPET: 'Puppet',
   EARN: 'Earn'
 } as const
@@ -77,11 +77,11 @@ export type IRoute = {
   account: string
 }
 
-export interface ITraderRouteMetricSummary
+export interface IMasterRouteMetricSummary
   extends Omit<
-    ITraderRouteLatestMetric,
+    IMasterRouteLatestMetric,
     | 'collateralToken'
-    | 'traderMatchingKey'
+    | 'masterMatchingKey'
     | 'id'
     | 'pnlList'
     | 'pnlTimestampList'
@@ -92,6 +92,6 @@ export interface ITraderRouteMetricSummary
   > {
   winCount: number
   lossCount: number
-  pnlTimeline: { time: number; value: bigint; traderMatchingKey: Hex }[]
+  pnlTimeline: { time: number; value: bigint; masterMatchingKey: Hex }[]
   indexTokenList: Address[]
 }

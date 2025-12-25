@@ -12,7 +12,7 @@ const SITE_CONFIG = {
   __TWITTER_ID__: '@PuppetCopy',
   __APP_NAME__: 'Puppet',
   __APP_DESC_SHORT__: 'Puppet - Copy Trading',
-  __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best traders with investors',
+  __APP_DESC_LONG__: 'Copy Trading Protocol - Matching the best masters with investors',
   __OG_IMAGE__: '/assets/og-image.png',
   __THEME_PRIMARY__: '#870B38',
   __THEME_BACKGROUND__: '#292c37'

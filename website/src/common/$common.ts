@@ -223,6 +223,34 @@ export const $roiDisplay = (roiSrc: IStream<bigint> | bigint, bold = true) => {
   return $node(colorStyle, style({ fontWeight: bold ? 'bold' : 'normal' }))($text(display))
 }
 
+export const $drawdownDisplay = (maxDrawdown: bigint) => {
+  // maxDrawdown is in basis points (2500 = 25%)
+  const percentage = Number(maxDrawdown) / 100
+  const color =
+    maxDrawdown > 2000n ? pallete.negative : maxDrawdown > 1000n ? pallete.indeterminate : pallete.foreground
+  return $node(style({ color }))($text(`${percentage.toFixed(1)}%`))
+}
+
+export const $sharpeDisplay = (sharpeRatio: bigint) => {
+  // sharpeRatio is scaled x100 (150 = 1.5)
+  const ratio = Number(sharpeRatio) / 100
+  const color = sharpeRatio > 100n ? pallete.positive : sharpeRatio < 0n ? pallete.negative : pallete.foreground
+  return $node(style({ color }))($text(ratio.toFixed(2)))
+}
+
+export const $winRateDisplay = (wins: number, losses: number) => {
+  const total = wins + losses
+  if (total === 0) return $node(style({ color: pallete.foreground }))($text('-'))
+
+  const rate = (wins / total) * 100
+  const color = rate >= 50 ? pallete.positive : pallete.negative
+
+  return $column(spacing.tiny)(
+    $node(style({ color, fontWeight: 'bold' }))($text(`${rate.toFixed(0)}%`)),
+    $node(style({ fontSize: '.75rem', color: pallete.foreground }))($text(`${wins}W / ${losses}L`))
+  )
+}
+
 export const $positionRoi = (pos: IPosition, _puppet?: Address) => {
   const indexToken = pos.indexToken
   const lstIncrease = lst(pos.increaseList)
@@ -362,7 +390,7 @@ export const $openPositionBreakdown = (pos: IPosition) => {
   )
 }
 
-interface ITraderDisplay {
+interface IMasterDisplay {
   address: Address
   ensName?: string | null
   ensNameStream?: IStream<string | null>
@@ -371,7 +399,7 @@ interface ITraderDisplay {
   labelSize?: number
   profileSize?: number
 }
-export const $TraderDisplay = (config: ITraderDisplay) =>
+export const $MasterDisplay = (config: IMasterDisplay) =>
   component(([click, clickTether]: IBehavior<any, Address>) => {
     const { route, address, ensName, ensNameStream, puppetList, labelSize, profileSize } = config
 

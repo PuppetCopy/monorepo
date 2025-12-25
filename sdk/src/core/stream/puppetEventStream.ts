@@ -26,38 +26,34 @@ function createFilteredStream<const T extends readonly AbiParameter[]>(
   )
 }
 
-export function createSubscribeRuleStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Subscribe.Rule.hash, CONTRACT_EVENT_MAP.Subscribe.Rule.args)
-}
-
-export function createDepositStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Account.Deposit.hash, CONTRACT_EVENT_MAP.Account.Deposit.args)
-}
-
-export function createWithdrawStream(client: PublicClient) {
+export function createActionStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Account.Withdraw.hash,
-    CONTRACT_EVENT_MAP.Account.Withdraw.args
+    CONTRACT_EVENT_MAP.Allocation.Action.hash,
+    CONTRACT_EVENT_MAP.Allocation.Action.args
   )
 }
 
 export function createAllocateStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Allocate.hash, CONTRACT_EVENT_MAP.Allocation.Allocate.args)
-}
-
-export function createUtilizeStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Utilize.hash, CONTRACT_EVENT_MAP.Allocation.Utilize.args)
+  return createFilteredStream(
+    client,
+    CONTRACT_EVENT_MAP.Allocation.Allocate.hash,
+    CONTRACT_EVENT_MAP.Allocation.Allocate.args
+  )
 }
 
 export function createSettleStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Settle.hash, CONTRACT_EVENT_MAP.Allocation.Settle.args)
-}
-
-export function createRealizeStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Realize.hash, CONTRACT_EVENT_MAP.Allocation.Realize.args)
+  return createFilteredStream(
+    client,
+    CONTRACT_EVENT_MAP.Allocation.Settle.hash,
+    CONTRACT_EVENT_MAP.Allocation.Settle.args
+  )
 }
 
 export function createAllocationWithdrawStream(client: PublicClient) {
-  return createFilteredStream(client, CONTRACT_EVENT_MAP.Allocation.Withdraw.hash, CONTRACT_EVENT_MAP.Allocation.Withdraw.args)
+  return createFilteredStream(
+    client,
+    CONTRACT_EVENT_MAP.Allocation.Withdraw.hash,
+    CONTRACT_EVENT_MAP.Allocation.Withdraw.args
+  )
 }

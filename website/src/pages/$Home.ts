@@ -86,7 +86,7 @@ export const $Home = (_config: ITreasury) =>
                       loop: '',
                       autoplay: ''
                     })
-                  )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))())
+                  )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-masters.mp4' }))())
                 )
               )
             ),
@@ -106,15 +106,15 @@ export const $Home = (_config: ITreasury) =>
                     whiteSpace: 'pre-wrap',
                     letterSpacing: '2px'
                   })
-                )($text('Matching top Traders\nwith Investors'))
+                )($text('Matching top Masters\nwith Investors'))
               ),
               $column(spacing.small, style({ maxWidth: '624px' }))(
                 $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
-                  $text('Traders seamlessly earn more doing what they do best')
+                  $text('Masters seamlessly earn more doing what they do best')
                 ),
                 $node(style({ whiteSpace: 'pre-wrap', textAlign: 'center', maxWidth: '878px' }))(
                   $text(
-                    'Puppets (Investors) effortlessly pick and choose top traders to copy based by their performance and strategy to build a winning Portfolio'
+                    'Puppets (Investors) effortlessly pick and choose top masters to copy based by their performance and strategy to build a winning Portfolio'
                   )
                 )
               ),
@@ -170,7 +170,7 @@ export const $Home = (_config: ITreasury) =>
                   //     $ButtonSecondary({
                   //       $content: $row(spacing.small, style({ alignItems: 'center' }))(
                   //         $icon({ $content: $gmxLogo, width: '24px', height: '24px', viewBox: '0 0 32 32' }),
-                  //         $text('Trader'),
+                  //         $text('Master'),
                   //         $node(
                   //           styleInline(map(move => {
                   //             const shalf = document.body.clientWidth / 2
@@ -281,12 +281,12 @@ export const $Home = (_config: ITreasury) =>
 
           $snapSection(style({ margin: '0 auto', maxWidth: '1240px', flexDirection: 'row', gap: '70px' }))(
             $column(spacing.default, style({ flex: 1 }))(
-              $heading1($text('Pick Top Traders to Copy')),
+              $heading1($text('Pick Top Masters to Copy')),
               $text(
-                'Explore the leaderboard to find traders. pick ones you like. define rules to better protect your deposit.'
+                'Explore the leaderboard to find masters. pick ones you like. define rules to better protect your deposit.'
               ),
               $text(
-                'every time each trader open or maintain a position, a percentage of your deposit is used to copy the position.'
+                'every time each master open or maintain a position, a percentage of your deposit is used to copy the position.'
               )
             ),
             $row(style({ flex: 1 }))(
@@ -299,15 +299,15 @@ export const $Home = (_config: ITreasury) =>
                     loop: '',
                     autoplay: ''
                   })
-                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-traders.mp4' }))())
+                )($element('source')(attr({ type: 'video/mp4', src: 'assets/video/leaderboard-pick-masters.mp4' }))())
               )
             )
           ),
 
           $snapSection(style({ margin: '0 auto', maxWidth: '1240px', flexDirection: 'row', gap: '70px' }))(
             $column(spacing.default, style({ flex: 1 }))(
-              $heading1($text('Traders Earn More')),
-              $text('Traders earn more by having more puppets copying their trades.'),
+              $heading1($text('Masters Earn More')),
+              $text('Masters earn more by having more puppets copying their trades.'),
               $text(
                 'Trading done seamlessly with their own funds and without directly knowing or managing puppets funds.'
               )
@@ -330,22 +330,22 @@ export const $Home = (_config: ITreasury) =>
           //       $snapSection(
 
           //         $column(style({ textAlign: 'center' }))(
-          //           $text(style({ fontWeight: 'bold', fontSize: isDesktopScreen ? '2.5em' : '1.85rem' }))('Matching top Traders with Investors'),
+          //           $text(style({ fontWeight: 'bold', fontSize: isDesktopScreen ? '2.5em' : '1.85rem' }))('Matching top Masters with Investors'),
           //         ),
           //         $text(style({ whiteSpace: 'pre-wrap', maxWidth: '878px' }))(` A Copy Trading Platform for Simplified and Reduced-Risk-Managed Portfolio
 
           // Puppet, is a Copy Trading platform built on top of the GMX leveraging trading platform. It offers investors, known as Puppets, the opportunity to actively manage their portfolios by copying the trades of multiple high-performing traders, all with a single deposit. This reduces risk and streamlines the investment process. Puppet is a key component of the GBC ecosystem and can be accessed at https://blueberry.club/ until perfected and released fully with it's own tokenomics and revenue flywheel on https://puppet.tech/.
 
-          // Puppet is designed for two types of participants: Traders and Puppets.
+          // Puppet is designed for two types of participants: Masters and Puppets.
 
-          // Traders execute trades using their own collateral, inheriting the same risks as trading on GMX to have seamless experience. They are not responsible for managing Puppets' funds directly and may be unaware of the funds copying their trades. When traders generate profits, they receive a fraction of the Puppets profits. Each trader has a public profile page displaying their historical performance and social circle.
+          // Masters execute trades using their own collateral, inheriting the same risks as trading on GMX to have seamless experience. They are not responsible for managing Puppets' funds directly and may be unaware of the funds copying their trades. When masters generate profits, they receive a fraction of the Puppets profits. Each master has a public profile page displaying their historical performance and social circle.
 
           // Puppets actively manage their portfolios by:
 
-          // Utilizing the leaderboard to find traders. Puppets have access to a platform-wide trading activity overview, complete with historical and track record screenings. This allows them to choose traders whose strategies are likely to yield profits.
-          // Depositing funds into routed pools based on intent (e.g., [ETH => ETH-long], [USDC => ETH-short]) and assigning traders to use these funds. When a trader opens a trade, a configurable tiny percentage is used to maintain a copied position pool. The goal is to have multiple traders utilizing the same intended pools.
-          // Maintaining a high-performance portfolio. Puppets can view each trader's historical performance graph in their portfolio, which helps them avoid underperforming traders over time.
-          // Projects like https://gmx.house/ and https://blueberry.club/app/trade are integral parts of Puppet. To make it work, an active community of traders is essential. The GBC Foundation plans to roll out GBC Trading soon to maintain an active trader community, offering a better user experience and higher trading discounts to incentivize traders to switch from gmx.io to the new interface.`),
+          // Utilizing the leaderboard to find masters. Puppets have access to a platform-wide trading activity overview, complete with historical and track record screenings. This allows them to choose masters whose strategies are likely to yield profits.
+          // Depositing funds into routed pools based on intent (e.g., [ETH => ETH-long], [USDC => ETH-short]) and assigning masters to use these funds. When a master opens a trade, a configurable tiny percentage is used to maintain a copied position pool. The goal is to have multiple masters utilizing the same intended pools.
+          // Maintaining a high-performance portfolio. Puppets can view each master's historical performance graph in their portfolio, which helps them avoid underperforming masters over time.
+          // Projects like https://gmx.house/ and https://blueberry.club/app/trade are integral parts of Puppet. To make it work, an active community of masters is essential. The GBC Foundation plans to roll out GBC Trading soon to maintain an active master community, offering a better user experience and higher trading discounts to incentivize masters to switch from gmx.io to the new interface.`),
 
           //         $node(),
 

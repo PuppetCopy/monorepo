@@ -1,10 +1,10 @@
-import type { IGmxPositionDecrease, IGmxPositionIncrease, ITraderRouteLatestMetric } from '@puppet/database/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease, IMasterRouteLatestMetric } from '@puppet/database/schema'
 import { getUnixTimestamp } from '@puppet/sdk/core'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IPosition, ITraderRouteMetricSummary } from './types'
+import type { IMasterRouteMetricSummary, IPosition } from './types'
 
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
@@ -113,9 +113,9 @@ export function aggregatePositionList(list: (IGmxPositionIncrease | IGmxPosition
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: ITraderRouteLatestMetric[]
-): ITraderRouteMetricSummary {
-  const seedAccountSummary: ITraderRouteMetricSummary = {
+  metricList: IMasterRouteLatestMetric[]
+): IMasterRouteMetricSummary {
+  const seedAccountSummary: IMasterRouteMetricSummary = {
     account,
 
     sizeInUsd: 0n,
@@ -142,7 +142,7 @@ export function accountSettledPositionListSummary(
     indexTokenList: []
   }
 
-  const summary = metricList.reduce((seed, next, _idx): ITraderRouteMetricSummary => {
+  const summary = metricList.reduce((seed, next, _idx): IMasterRouteMetricSummary => {
     seed.sizeInUsd += next.sizeInUsd
     seed.sizeLongInUsd += next.sizeLongInUsd
     seed.collateralInUsd += next.collateralInUsd
@@ -164,7 +164,7 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        traderMatchingKey: next.traderMatchingKey
+        masterMatchingKey: next.masterMatchingKey
       })
     })
 

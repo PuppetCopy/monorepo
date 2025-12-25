@@ -1,5 +1,5 @@
 import * as sql from '@puppet/database/client'
-import type { ISubscribeRule, ITraderRouteLatestMetric } from '@puppet/database/schema'
+import type { IMasterRouteLatestMetric, ISubscribeRule } from '@puppet/database/schema'
 import * as schema from '@puppet/database/schema'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/sdk/const'
 import {
@@ -8,7 +8,8 @@ import {
   getMappedValue,
   getUnixTimestamp,
   type InferStream,
-  readablePnl
+  readablePnl,
+  readableUsd
 } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
 import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
@@ -35,7 +36,16 @@ import {
   type TableColumn
 } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import { $pnlDisplay, $roiDisplay, $size, $TraderDisplay, $tokenIcon } from '../common/$common.js'
+import {
+  $drawdownDisplay,
+  $MasterDisplay,
+  $pnlDisplay,
+  $roiDisplay,
+  $sharpeDisplay,
+  $size,
+  $tokenIcon,
+  $winRateDisplay
+} from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
 import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
 import { sqlClient } from '../common/sqlClient.js'
@@ -57,7 +67,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<ITraderRouteLatestMetric>>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<IMasterRouteLatestMetric>>,
       [changeScreenerFocus, changeScreenerFocusTether]: IBehavior<'roi' | 'pnl'>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
@@ -148,7 +158,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
               // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = map(async filterParams => {
-                const t = schema.traderRouteLatestMetric
+                const t = schema.masterRouteLatestMetric
 
                 const filter = sql.filter.and(
                   sql.filter.eq(t.interval, params.activityTimeframe),
@@ -170,11 +180,11 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 )
                 const orderBy = params.sortBy
                   ? params.sortBy.direction === 'asc'
-                    ? sql.filter.asc(schema.traderRouteLatestMetric[params.sortBy.selector])
-                    : sql.filter.desc(schema.traderRouteLatestMetric[params.sortBy.selector])
+                    ? sql.filter.asc(schema.masterRouteLatestMetric[params.sortBy.selector])
+                    : sql.filter.desc(schema.masterRouteLatestMetric[params.sortBy.selector])
                   : undefined
 
-                const metrictList = await sqlClient.query.traderRouteLatestMetric.findMany({
+                const metrictList = await sqlClient.query.masterRouteLatestMetric.findMany({
                   where: filter,
                   limit: filterParams.paging.pageSize,
                   offset: filterParams.paging.offset,
@@ -190,6 +200,12 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     longShortRatio: true,
                     pnl: true,
                     roi: true,
+
+                    allocatedVolume: true,
+                    maxDrawdown: true,
+                    sharpeRatio: true,
+                    winCount: true,
+                    lossCount: true,
 
                     pnlList: true,
                     pnlTimestampList: true,
@@ -236,10 +252,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 dataSource: dataSource as any,
                 columns: [
                   {
-                    $head: $text('Trader'),
+                    $head: $text('Master'),
                     gridTemplate: isDesktopScreen ? '149px' : '136px',
                     $bodyCallback: map(pos => {
-                      return $TraderDisplay({
+                      return $MasterDisplay({
                         route: config.route,
                         address: pos.metric.account,
                         // ensNameStream: fromPromise(resolveEnsName(pos.metric.account as Address)),
@@ -257,7 +273,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                         draftMatchingRuleList,
                         collateralToken: routeMetric.metric.collateralToken,
                         userMatchingRuleQuery,
-                        trader: routeMetric.metric.account
+                        master: routeMetric.metric.account
                       })({
                         changeMatchRuleList: changeMatchRuleListTether()
                       })
@@ -309,6 +325,34 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             const totalSize = pos.metric.sizeInUsd + pos.metric.openSizeInUsd
                             const totalCollateral = pos.metric.collateralInUsd + pos.metric.openCollateralInUsd
                             return $size(totalSize, totalCollateral)
+                          })
+                        },
+                        {
+                          $head: $text('Allocated'),
+                          sortBy: 'allocatedVolume',
+                          gridTemplate: '90px',
+                          $bodyCallback: map((pos: ILeaderboardCellData) => {
+                            return $text(readableUsd(pos.metric.allocatedVolume))
+                          })
+                        },
+                        {
+                          $head: $text('Win Rate'),
+                          gridTemplate: '80px',
+                          columnOp: style({ alignItems: 'center', placeContent: 'center' }),
+                          $bodyCallback: map((pos: ILeaderboardCellData) => {
+                            return $winRateDisplay(pos.metric.winCount, pos.metric.lossCount)
+                          })
+                        },
+                        {
+                          $head: $tableHeader('Max DD', 'Sharpe'),
+                          sortBy: 'maxDrawdown',
+                          gridTemplate: '80px',
+                          $bodyCallback: map((pos: ILeaderboardCellData) => {
+                            return $column(spacing.tiny)(
+                              $drawdownDisplay(pos.metric.maxDrawdown),
+                              $seperator2,
+                              $sharpeDisplay(pos.metric.sharpeRatio)
+                            )
                           })
                         }
                       ]

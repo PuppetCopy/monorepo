@@ -18,17 +18,17 @@
     "@puppet/contracts": "workspace:*",
     "@puppet/database": "workspace:*",
     "@puppet/sdk": "workspace:*",
-    "@rhinestone/sdk": "1.0.40",
-    "@wagmi/connectors": "7.0.2",
-    "@wagmi/core": "3.0.0",
+    "@rhinestone/module-sdk": "0.4.0",
+    "@rhinestone/sdk": "1.0.42",
+    "@wagmi/connectors": "7.0.5",
+    "@wagmi/core": "3.0.1",
     "abitype": "catalog:",
     "aelea": "catalog:",
     "color": "5.0.3",
     "lightweight-charts": "catalog:",
     "mersenne-twister": "1.1.0",
     "porto": "0.2.37",
-    "viem": "catalog:",
-    "wagmi": "3.1.0"
+    "viem": "catalog:"
   },
   "devDependencies": {
     "@ponder/client": "0.15.17",

@@ -1,5 +1,5 @@
 import type { ISubscribeRule } from '@puppet/database/schema'
-import { getTraderMatchingKey, getUnixTimestamp } from '@puppet/sdk/core'
+import { getMasterMatchingKey, getUnixTimestamp } from '@puppet/sdk/core'
 import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type INodeCompose, style, styleBehavior } from 'aelea/ui'
@@ -15,28 +15,28 @@ import { $ButtonSecondary } from '../form/$Button.js'
 import { $defaultButtonCore } from '../form/$ButtonCore.js'
 import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 
-interface ITraderMatchingRouteEditor {
-  trader: Address
+interface IMasterMatchingRouteEditor {
+  master: Address
   userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   collateralToken: Address
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
   $container?: INodeCompose
 }
 
-export const $defaultTraderMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
+export const $defaultMasterMatchRouteEditorContainer = $row(spacing.small, style({ alignItems: 'center' }))
 
-export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
+export const $RouteEditor = (config: IMasterMatchingRouteEditor) =>
   component(
     (
       [popRouteSubscriptionEditor, popRouteSubscriptionEditorTether]: IBehavior<PointerEvent>,
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
     ) => {
-      const traderMatchingKey = getTraderMatchingKey(config.collateralToken, config.trader)
+      const masterMatchingKey = getMasterMatchingKey(config.collateralToken, config.master)
 
       const {
-        $container = $defaultTraderMatchRouteEditorContainer,
+        $container = $defaultMasterMatchRouteEditorContainer,
         draftMatchingRuleList,
-        trader,
+        master,
         collateralToken,
         userMatchingRuleQuery
       } = config
@@ -45,7 +45,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
         userMatchingRuleQuery,
         map(async listQuery => {
           const list = await listQuery
-          const match = list.find(mr => getTraderMatchingKey(mr.collateralToken, mr.trader) === traderMatchingKey)
+          const match = list.find(mr => getMasterMatchingKey(mr.collateralToken, mr.master) === masterMatchingKey)
 
           return match
         }),
@@ -55,7 +55,7 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
       const borderColorStyle = op(
         combine({ rule: matchingRule, draftList: draftMatchingRuleList }),
         map(params => {
-          const hasDraft = params.draftList.some(draft => draft.traderMatchingKey === traderMatchingKey)
+          const hasDraft = params.draftList.some(draft => draft.masterMatchingKey === masterMatchingKey)
           const hasActiveRule = params.rule && params.rule.expiry > getUnixTimestamp()
           if (hasDraft) return { borderColor: `${pallete.indeterminate} !important` }
           if (hasActiveRule) return { borderColor: `${pallete.primary} !important` }
@@ -72,9 +72,9 @@ export const $RouteEditor = (config: ITraderMatchingRouteEditor) =>
               return $MatchingRuleEditor({
                 draftMatchingRuleList,
                 model: match,
-                traderMatchingKey,
+                masterMatchingKey,
                 collateralToken,
-                trader
+                master
               })({
                 changeMatchRuleList: changeMatchRuleListTether()
               })

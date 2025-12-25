@@ -7,7 +7,7 @@ import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { intermediateText } from '@/ui-components'
 import { $heading2 } from '../../common/$text.js'
-import type { IPosition, ITraderRouteMetricSummary } from '../../pages/types.js'
+import type { IMasterRouteMetricSummary, IPosition } from '../../pages/types.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
@@ -24,7 +24,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
       map(async params => {
         const allPositions = await params.positionListQuery
 
-        // TODO: Fix this - accountSettledPositionListSummary expects ITraderRouteLatestMetric, not IPosition[]
+        // TODO: Fix this - accountSettledPositionListSummary expects IMasterRouteLatestMetric, not IPosition[]
         // return accountSettledPositionListSummary(puppet || account, allPositions)
 
         // Return empty summary for now
@@ -46,7 +46,7 @@ export const $PuppetSummary = (config: IAccountSummary) =>
           pnlTimeline: [],
           matchedPuppetList: [],
           indexTokenList: []
-        } as ITraderRouteMetricSummary
+        } as IMasterRouteMetricSummary
       }, combine({ positionListQuery }))
     )
 

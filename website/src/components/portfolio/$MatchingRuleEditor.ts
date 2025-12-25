@@ -1,6 +1,6 @@
 import type { ISubscribeRule } from '@puppet/database/schema'
 import { IntervalTime } from '@puppet/sdk/const'
-import { formatFixed, getDuration, getTraderMatchingKey, getUnixTimestamp, parseBps } from '@puppet/sdk/core'
+import { formatFixed, getDuration, getMasterMatchingKey, getUnixTimestamp, parseBps } from '@puppet/sdk/core'
 import {
   combine,
   empty,
@@ -30,9 +30,9 @@ export type ISetMatchingRuleEditorDraft = Omit<ISubscribeRule, 'id' | 'blockTime
 
 export type IMatchRuleEditor = {
   model?: ISubscribeRule
-  traderMatchingKey: Hex
+  masterMatchingKey: Hex
   collateralToken: Address
-  trader: Address
+  master: Address
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
@@ -85,7 +85,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
         changeAdvancedRouteEditorEnabled
       )
 
-      const { model, traderMatchingKey, draftMatchingRuleList, collateralToken, trader } = config
+      const { model, masterMatchingKey, draftMatchingRuleList, collateralToken, master } = config
 
       const defaultDraft = {
         allowanceRate: 1000n,
@@ -102,7 +102,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
 
       return [
         $column(spacing.default, style({ maxWidth: '350px' }))(
-          $text('The following rules will apply to this trader whenever he opens and maintain a position'),
+          $text('The following rules will apply to this master whenever he opens and maintain a position'),
 
           $FieldLabeled({
             label: 'Allocate %',
@@ -202,7 +202,7 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
             sampleMap(
               params => {
                 const modelIndex = params.draftMatchingRuleList.findIndex(
-                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
+                  x => getMasterMatchingKey(x.collateralToken, x.master) === masterMatchingKey
                 )
                 const model = modelIndex > -1 ? params.draftMatchingRuleList[modelIndex] : undefined
 
@@ -219,9 +219,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                 return [
                   ...params.draftMatchingRuleList,
                   {
-                    traderMatchingKey,
+                    masterMatchingKey,
                     collateralToken,
-                    trader,
+                    master,
                     ...params.draft
                   }
                 ]
@@ -232,12 +232,12 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
             sampleMap(
               params => {
                 const match = params.draftMatchingRuleList.find(
-                  x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
+                  x => getMasterMatchingKey(x.collateralToken, x.master) === masterMatchingKey
                 )
 
                 if (match) {
                   const modelIndex = params.draftMatchingRuleList.findIndex(
-                    x => getTraderMatchingKey(x.collateralToken, x.trader) === traderMatchingKey
+                    x => getMasterMatchingKey(x.collateralToken, x.master) === masterMatchingKey
                   )
                   params.draftMatchingRuleList[modelIndex] = {
                     ...match,
@@ -250,9 +250,9 @@ export const $MatchingRuleEditor = (config: IMatchRuleEditor) =>
                 return [
                   ...params.draftMatchingRuleList,
                   {
-                    traderMatchingKey,
+                    masterMatchingKey,
                     collateralToken,
-                    trader,
+                    master,
                     ...params.draft,
                     expiry: 0n
                   }

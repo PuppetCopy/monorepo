@@ -32,28 +32,28 @@ import { $RouterAnchor } from '@/ui-router'
 import { $heading2 } from '../common/$text.js'
 import { $card, $card2 } from '../common/elements/$common.js'
 import { sqlClient } from '../common/sqlClient.js'
-import { $TradeRouteTimeline } from '../components/participant/$ProfilePeformanceTimeline.js'
+import { $MasterRouteTimeline } from '../components/participant/$ProfilePeformanceTimeline.js'
 import { $metricLabel, $metricRow } from '../components/participant/$Summary.js'
 import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
-import { $defaultTraderMatchRouteEditorContainer, $RouteEditor } from '../components/portfolio/$RouteEditor.js'
+import { $defaultMasterMatchRouteEditorContainer, $RouteEditor } from '../components/portfolio/$RouteEditor.js'
 import { entryColumn, pnlColumn, puppetsColumn, sizeColumn, timeColumn } from '../components/table/$TableColumn.js'
 import { $seperator2, accountSettledPositionListSummary, aggregatePositionList } from './common'
 import type { IPageFilterParams } from './types.js'
 
-interface ITraderPage extends IPageFilterParams {
+interface IMasterPage extends IPageFilterParams {
   route: import('aelea/router').Route
   userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
   draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
 }
 
-export const $TraderPage = ({
+export const $MasterPage = ({
   route,
   activityTimeframe,
   collateralTokenList,
   indexTokenList,
   userMatchingRuleQuery,
   draftMatchingRuleList
-}: ITraderPage) =>
+}: IMasterPage) =>
   component(
     (
       [changeRoute, changeRouteTether]: IBehavior<any, string>,
@@ -73,7 +73,7 @@ export const $TraderPage = ({
         map(async params => {
           const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
-          const routeMetricList = await sqlClient.query.traderRouteLatestMetric.findMany({
+          const routeMetricList = await sqlClient.query.masterRouteLatestMetric.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.account, account),
@@ -155,7 +155,7 @@ export const $TraderPage = ({
                 width: '8px'
               })
             ),
-            $node(style({ color: pallete.foreground }))($text('Trader')),
+            $node(style({ color: pallete.foreground }))($text('Master')),
             $node(
               $icon({
                 $content: $arrowRight,
@@ -186,7 +186,7 @@ export const $TraderPage = ({
                 margin: isDesktopScreen ? '-36px -36px 0' : '-12px -12px 0px'
               })
             )(
-              $TradeRouteTimeline({
+              $MasterRouteTimeline({
                 activityTimeframe,
                 collateralTokenList,
                 indexTokenList,
@@ -279,8 +279,8 @@ export const $TraderPage = ({
                         collateralToken: routeMetric.collateralToken,
                         userMatchingRuleQuery,
                         draftMatchingRuleList,
-                        trader: routeMetric.account,
-                        $container: $defaultTraderMatchRouteEditorContainer(
+                        master: routeMetric.account,
+                        $container: $defaultMasterMatchRouteEditorContainer(
                           style({ marginLeft: '-12px', paddingBottom: '12px' })
                         )
                       })({

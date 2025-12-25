@@ -1,4 +1,4 @@
-import { EXTERNAL_CONTRACT, PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { ARBITRUM_TOKEN_LIST } from '@puppet/contracts/gmx'
 import type { Address } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
@@ -14,13 +14,6 @@ export const TOKEN_DESCRIPTION_LIST = [
     decimals: 0,
     name: '-',
     symbol: '-'
-  },
-
-  {
-    address: EXTERNAL_CONTRACT.GMX.address,
-    decimals: 18,
-    name: 'GMX',
-    symbol: 'GMX'
   },
 
   // Puppet token

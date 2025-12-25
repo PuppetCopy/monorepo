@@ -55,7 +55,7 @@ async function querySignedPrices(): Promise<IGmxSignedPriceData[]> {
 }
 
 // Signed Prices from GMX API
-// Lazy-loaded: only starts fetching when subscribed to (e.g., viewing positions/traders)
+// Lazy-loaded: only starts fetching when subscribed to (e.g., viewing positions/masters)
 export const latestPriceMap = op(
   periodicRun({
     startImmediate: false, // Don't fetch on page load - only when needed

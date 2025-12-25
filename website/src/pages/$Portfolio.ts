@@ -2,7 +2,7 @@ import type { ISubscribeRule } from '@puppet/database/schema'
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet/sdk/const'
 import {
   getDuration,
-  getTraderMatchingKey,
+  getMasterMatchingKey,
   getUnixTimestamp,
   groupManyList,
   ignoreAll,
@@ -89,8 +89,8 @@ export const $PortfolioPage = ({
                   : undefined
               ),
             columns: {
-              traderMatchingKey: true,
-              trader: true,
+              masterMatchingKey: true,
+              master: true,
               collateralToken: true,
               allocationAddress: true,
               createdAt: true,
@@ -100,7 +100,7 @@ export const $PortfolioPage = ({
             with: {
               mirror__Match: {
                 columns: {
-                  trader: true,
+                  master: true,
                   sizeDelta: true,
                   requestKey: true,
                   isLong: true,
@@ -132,7 +132,7 @@ export const $PortfolioPage = ({
             }
           })
 
-          return groupManyList(result, 'traderMatchingKey')
+          return groupManyList(result, 'masterMatchingKey')
         })
       )
 
@@ -295,24 +295,24 @@ export const $PortfolioPage = ({
                                   )
                                 : empty,
                               ...matchingRuleListForToken.map(rule => {
-                                const traderMatchingKey = getTraderMatchingKey(collateralToken, rule.trader)
+                                const masterMatchingKey = getMasterMatchingKey(collateralToken, rule.master)
 
-                                const mirrorLinkList = positionMap?.[traderMatchingKey] || []
+                                const mirrorLinkList = positionMap?.[masterMatchingKey] || []
 
                                 return $column(
                                   $Popover({
                                     $open: filterNull(
-                                      map(trader => {
-                                        if (trader !== rule.trader) {
+                                      map(master => {
+                                        if (master !== rule.master) {
                                           return null
                                         }
 
                                         return $MatchingRuleEditor({
                                           draftMatchingRuleList,
                                           model: rule,
-                                          traderMatchingKey,
+                                          masterMatchingKey,
                                           collateralToken,
-                                          trader: rule.trader
+                                          master: rule.master
                                         })({
                                           changeMatchRuleList: changeMatchRuleListTether()
                                         })
@@ -333,10 +333,10 @@ export const $PortfolioPage = ({
                                           })
                                         )
                                       })({
-                                        click: popRouteSubscriptionEditorTether(constant(rule.trader))
+                                        click: popRouteSubscriptionEditorTether(constant(rule.master))
                                       }),
                                       $profileDisplay({
-                                        address: rule.trader
+                                        address: rule.master
                                       }),
                                       $responsiveFlex(spacing.default, style({ flex: 1 }))(
                                         $infoLabeledValue(
@@ -353,7 +353,7 @@ export const $PortfolioPage = ({
                                   })({}),
                                   $text(
                                     `(${mirrorLinkList.length}) ${getTokenDescription(collateralToken).name} - ${
-                                      rule.trader
+                                      rule.master
                                     }`
                                   )
                                 )

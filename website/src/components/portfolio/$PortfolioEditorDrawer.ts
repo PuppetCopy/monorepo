@@ -1,4 +1,4 @@
-import { CONTRACT, PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import type { ISubscribeRule } from '@puppet/database/schema'
 import { getDuration, readableDate, readablePercentage } from '@puppet/sdk/core'
 import type { Route } from 'aelea/router'
@@ -20,19 +20,25 @@ import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type Address, encodeFunctionData, erc20Abi, getAddress } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { $check, $infoLabeledValue, $infoTooltip, $target, $xCross } from '@/ui-components'
-import { $TraderDisplay } from '../../common/$common.js'
+import { $MasterDisplay } from '../../common/$common.js'
 import { $heading3 } from '../../common/$text.js'
 import { $card2 } from '../../common/elements/$common.js'
 import { $seperator2 } from '../../pages/common.js'
 import type { IComponentPageParams } from '../../pages/types.js'
 import { fadeIn } from '../../transitions/enter.js'
-import type { IAccountState } from '../../wallet/wallet.js'
+import { buildEnableSessionCall, type PuppetPolicyConfig } from '../../wallet/session.js'
+import type { ISubaccountState } from '../../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 import { $SendTransaction, type ContractCall } from '../form/$SendTransaction.js'
 import { BALANCE_ACTION, type BalanceDraft } from './$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from './$MatchingRuleEditor.js'
 import { $RouteBalanceEditor } from './$RouteBalanceEditor.js'
+
+// Session key for the puppet system relayer - this would typically come from config
+const PUPPET_RELAYER_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001' as const
+const puppetRelayerAccount = privateKeyToAccount(PUPPET_RELAYER_PRIVATE_KEY)
 
 interface IPortfolioRoute {
   collateralToken: Address
@@ -55,7 +61,7 @@ export const $PortfolioEditorDrawer = ({
 }: IPortfolioEditorDrawer) =>
   component(
     (
-      [account, accountTether]: IBehavior<IAccountState>,
+      [subaccountState, subaccountStateTether]: IBehavior<NonNullable<ISubaccountState>>,
       [txSuccess, txSuccessTether]: IBehavior<null>,
       [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>,
@@ -70,8 +76,8 @@ export const $PortfolioEditorDrawer = ({
 
       // Operations stream for $SendTransaction - defined outside switchMap to avoid re-renders
       const operations = op(
-        combine({ draftDepositTokenList, draftMatchingRuleList, account }),
-        map(params => {
+        combine({ draftDepositTokenList, draftMatchingRuleList, subaccountState }),
+        map(async params => {
           const ops: ContractCall[] = []
 
           // Balance operations (deposits/withdrawals) - must complete before matching rules
@@ -82,51 +88,59 @@ export const $PortfolioEditorDrawer = ({
                 data: encodeFunctionData({
                   abi: erc20Abi,
                   functionName: 'approve',
-                  args: [PUPPET_CONTRACT_MAP.TokenRouter.address, draft.amount]
+                  args: [PUPPET_CONTRACT_MAP.UserRouter.address, draft.amount]
                 })
               })
               ops.push({
-                to: CONTRACT.UserRouter.address,
+                to: PUPPET_CONTRACT_MAP.UserRouter.address,
                 data: encodeFunctionData({
-                  abi: CONTRACT.UserRouter.abi,
+                  abi: PUPPET_CONTRACT_MAP.UserRouter.abi,
                   functionName: 'deposit',
                   args: [draft.token, draft.amount]
                 })
               })
             } else {
               ops.push({
-                to: CONTRACT.UserRouter.address,
+                to: PUPPET_CONTRACT_MAP.UserRouter.address,
                 data: encodeFunctionData({
-                  abi: CONTRACT.UserRouter.abi,
+                  abi: PUPPET_CONTRACT_MAP.UserRouter.abi,
                   functionName: 'withdraw',
-                  args: [draft.token, params.account.address, draft.amount]
+                  args: [draft.token, params.subaccountState.ownerAddress, draft.amount]
                 })
               })
             }
           }
 
-          // Matching rules - applied after deposits are complete
+          // Session policies - enable sessions for each matching rule
+          // Each rule creates a session that allows the relayer to execute transfers
+          // with the specified policy constraints (allowance rate, throttle, recipient)
           for (const rule of params.draftMatchingRuleList) {
+            // Skip removal operations (expiry === 0n) - TODO: implement session removal
+            if (rule.expiry === 0n) continue
+
+            const policyConfig: PuppetPolicyConfig = {
+              allowanceRate: Number(rule.allowanceRate),
+              throttlePeriod: Number(rule.throttleActivity),
+              allowedRecipients: [rule.master], // Allow transfers to the master
+              collateralToken: rule.collateralToken
+            }
+
+            const sessionOwner = {
+              type: 'ecdsa' as const,
+              accounts: [puppetRelayerAccount]
+            }
+
+            // Build the session enable call
+            const enableCall = await buildEnableSessionCall(sessionOwner, policyConfig)
             ops.push({
-              to: CONTRACT.UserRouter.address,
-              data: encodeFunctionData({
-                abi: CONTRACT.UserRouter.abi,
-                functionName: 'setRule',
-                args: [
-                  rule.collateralToken,
-                  rule.trader,
-                  {
-                    allowanceRate: rule.allowanceRate,
-                    throttleActivity: rule.throttleActivity,
-                    expiry: rule.expiry
-                  }
-                ]
-              })
+              to: enableCall.to,
+              data: enableCall.data
             })
           }
 
           return ops
-        })
+        }),
+        awaitPromises
       )
 
       const $drawerContent = $card2(
@@ -142,7 +156,7 @@ export const $PortfolioEditorDrawer = ({
             $heading3($text('Portfolio Changes')),
             $infoTooltip(
               $text(
-                'The following rules will apply to these traders in your portfolio. \nvisit Profile to view your portfolio'
+                'The following rules will apply to these masters in your portfolio. \nvisit Profile to view your portfolio'
               )
             ),
 
@@ -228,7 +242,7 @@ export const $PortfolioEditorDrawer = ({
                                 const userMatchingRule = userMatchingRuleList.find(
                                   rule =>
                                     rule.collateralToken === portfolioRoute.collateralToken &&
-                                    rule.trader === modSubsc.trader
+                                    rule.master === modSubsc.master
                                 )
 
                                 const iconColorParams = userMatchingRule
@@ -276,10 +290,10 @@ export const $PortfolioEditorDrawer = ({
                                     })
                                   )($text(iconColorParams.label)),
 
-                                  $TraderDisplay({
+                                  $MasterDisplay({
                                     labelSize: isDesktopScreen ? 1 : 0,
                                     route,
-                                    address: modSubsc.trader,
+                                    address: modSubsc.master,
                                     puppetList: []
                                   })({
                                     click: routeChangeTether()
@@ -313,7 +327,7 @@ export const $PortfolioEditorDrawer = ({
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
             $node(style({ flex: 1, minWidth: 0 }))(),
             $SendTransaction({ operations })({
-              account: accountTether(),
+              subaccountState: subaccountStateTether(),
               success: txSuccessTether()
             })
           )

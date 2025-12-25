@@ -1,5 +1,7 @@
 {
   "solidity.formatter": "forge",
+  "solidity.packageDefaultDependenciesContractsDirectory": "contracts/src",
+  "solidity.packageDefaultDependenciesDirectory": "contracts/lib",
   "[svg]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

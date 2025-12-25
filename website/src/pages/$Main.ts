@@ -26,7 +26,7 @@ import { fadeIn } from '../transitions/enter.js'
 import wallet from '../wallet/wallet.js'
 import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
-import { $TraderPage } from './$Trader.js'
+import { $MasterPage } from './$Trader.js'
 import { $WalletPage } from './$Wallet.js'
 
 const popStateEvent = fromEventTarget(window, 'popstate')
@@ -70,8 +70,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       // const appRoute = rootRoute.create({ fragment: 'app', title: '' })
 
       const leaderboardRoute = rootRoute.create({ fragment: 'leaderboard' })
-      const traderRoute = rootRoute.create({ fragment: 'trader' }).create({
-        title: 'Trader',
+      const masterRoute = rootRoute.create({ fragment: 'master' }).create({
+        title: 'Master',
         fragment: ETH_ADDRESS_REGEXP
       })
       const portfolioRoute = rootRoute.create({ fragment: 'portfolio', title: 'Portfolio' })
@@ -170,10 +170,10 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
               )
             )
           ),
-          contains(traderRoute)(
+          contains(masterRoute)(
             $midContainer(
               fadeIn(
-                $TraderPage({
+                $MasterPage({
                   route: leaderboardRoute,
                   userMatchingRuleQuery,
                   activityTimeframe,

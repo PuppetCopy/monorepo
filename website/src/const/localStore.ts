@@ -1,4 +1,4 @@
-import type { ITraderRouteLatestMetric } from '@puppet/database/schema'
+import type { IMasterRouteLatestMetric } from '@puppet/database/schema'
 import { IntervalTime } from '@puppet/sdk/const'
 import { arbitrum } from 'viem/chains'
 import type { ISortBy } from '@/ui-components'
@@ -17,7 +17,7 @@ export const localStore = uiStorage.createStoreDefinition('root', 8, {
     advancedRouteEditorEnabled: false
   },
   leaderboard: {
-    sortBy: { direction: 'desc', selector: 'pnl' } as ISortBy<ITraderRouteLatestMetric>,
+    sortBy: { direction: 'desc', selector: 'pnl' } as ISortBy<IMasterRouteLatestMetric>,
     focus: 'pnl',
     isLong: undefined as boolean | undefined,
     account: undefined as string | undefined
