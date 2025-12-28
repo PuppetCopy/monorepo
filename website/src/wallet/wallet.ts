@@ -1,6 +1,6 @@
 import { ADDRESS_ZERO, BYTES32_ONE, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { groupList } from '@puppet/sdk/core'
-import { type RhinestoneAccount, RhinestoneSDK } from '@rhinestone/sdk'
+import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
 import { porto, walletConnect } from '@wagmi/connectors'
 import {
   type Config,
@@ -28,19 +28,26 @@ import {
   type ContractFunctionName,
   createPublicClient,
   fallback,
+  type Hex,
   http,
+  keccak256,
   type ReadContractReturnType,
   type Transport,
+  toBytes,
   type WalletClient
 } from 'viem'
-import { type Address, privateKeyToAccount, toAccount } from 'viem/accounts'
+import { type Address, privateKeyToAccount, type toAccount } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 type ChainBalance = { chainId: number; balance: bigint }
 
+type SubaccountSigner = ReturnType<typeof toAccount>
+
 type IAccountState = {
   walletClient: WalletClient<Transport, Chain>
   address: Address
+  // signer: SubaccountSigner
+  rhinestoneAccount: RhinestoneAccount
 }
 
 const chainList = [arbitrum] as const
@@ -118,6 +125,43 @@ const extensionDetected =
         .catch(() => false)
     : Promise.resolve(false)
 
+// Session signers - derived from signature, stored in memory only (per account)
+type DerivedSigner = ReturnType<typeof privateKeyToAccount>
+const derivedSigners = new Map<Address, DerivedSigner>()
+
+const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
+
+Sign this message to authorize your trading session.
+
+This signature will not cost any gas and does not grant access to your funds.`
+
+async function getOrDeriveSigner(
+  walletClient: WalletClient<Transport, Chain>,
+  address: Address
+): Promise<DerivedSigner> {
+  const existing = derivedSigners.get(address)
+  if (existing) return existing
+
+  const signature = await walletClient.signMessage({
+    message: SIGNER_DERIVATION_MESSAGE,
+    account: address
+  })
+
+  const privateKey = keccak256(toBytes(signature)) as Hex
+  const signer = privateKeyToAccount(privateKey)
+  derivedSigners.set(address, signer)
+
+  return signer
+}
+
+function clearSigner(address?: Address): void {
+  if (address) {
+    derivedSigners.delete(address)
+  } else {
+    derivedSigners.clear()
+  }
+}
+
 const CHAIN_NETWORK: Record<number, string> = {
   [mainnet.id]: 'ethereum',
   [arbitrum.id]: 'arbitrum',
@@ -175,36 +219,36 @@ const account: IStream<Promise<IAccountState | null>> = op(
       return null
     }
   }),
-  state
-)
-
-// Subaccount stream - initializes in background when account connects
-type ISubaccountState = {
-  ownerAddress: Address
-  subaccountAddress: Address
-  rhinestoneAccount: RhinestoneAccount
-} | null
-
-const subaccount: IStream<Promise<ISubaccountState>> = op(
-  account,
   map(async accountPromise => {
     const acc = await accountPromise
     if (!acc) return null
 
-    // Create the Rhinestone account (deterministic - same owners = same address)
-    const ownerAccount = toAccount({
-      address: acc.address,
-      signMessage: async ({ message }) => acc.walletClient.signMessage({ message, account: acc.address }),
-      signTransaction: async () => {
-        throw new Error('Use sendTransaction instead')
-      },
-      signTypedData: async params => acc.walletClient.signTypedData({ ...params, account: acc.address } as any)
-    })
+    const account = walletClientToAccount(acc.walletClient)
+
+    // Lazy signer - derives from signature when first used
+    // const signer = toAccount({
+    //   address: account.address,
+    //   signMessage: async ({ message }) => {
+    //     const signer = await getOrDeriveSigner(acc.walletClient, acc.address)
+    //     return signer.signMessage({ message })
+    //   },
+    //   signTransaction: async () => {
+    //     throw new Error('Use sendTransaction instead')
+    //   },
+    //   signTypedData: async params => {
+    //     const signer = await getOrDeriveSigner(acc.walletClient, acc.address)
+    //     return signer.signTypedData(params)
+    //   }
+    // })
 
     const rhinestoneAccount = await rhinestoneSDK.createAccount({
       owners: {
         type: 'ecdsa',
-        accounts: [ownerAccount, privateKeyToAccount(BYTES32_ONE)]
+        accounts: [account, privateKeyToAccount(BYTES32_ONE)]
+        // accounts: [
+        //   account,
+        //   signer
+        // ]
       }
     })
 
@@ -225,7 +269,7 @@ const subaccount: IStream<Promise<ISubaccountState>> = op(
       }).catch(console.warn)
     }
 
-    return { ownerAddress: acc.address, subaccountAddress, rhinestoneAccount }
+    return { walletClient: acc.walletClient, address: acc.address, rhinestoneAccount }
   }),
   state
 )
@@ -255,6 +299,7 @@ async function connect(preferredConnectorId?: string): Promise<Address[]> {
 }
 
 async function disconnect() {
+  clearSigner()
   const current = getConnection(wagmi)
   if (current.connector) {
     await wagmiDisconnect(wagmi, { connector: current.connector })
@@ -323,7 +368,6 @@ const wallet = {
   getTokenBalance,
   getMultichainBalances,
   account,
-  subaccount,
   connect,
   disconnect,
   publicClient,
@@ -333,5 +377,5 @@ const wallet = {
   walletConnectProjectId: WALLETCONNECT_PROJECT_ID
 }
 
-export type { IAccountState, ISubaccountState, ChainBalance }
+export type { IAccountState, SubaccountSigner, ChainBalance, DerivedSigner }
 export default wallet

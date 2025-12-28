@@ -7,7 +7,7 @@ import { type Address, BaseError, type Chain, ContractFunctionRevertedError, typ
 import { arbitrum } from 'viem/chains'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import wallet, { type ISubaccountState } from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$ConnectWallet.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -40,9 +40,9 @@ export const $SendTransaction = ({
       const subaccountState = op(
         merge(
           map(() => null, accountChange), // trigger refresh on connect
-          awaitPromises(wallet.subaccount)
+          awaitPromises(wallet.account)
         ),
-        filter((s): s is NonNullable<ISubaccountState> => s !== null)
+        filter((s): s is NonNullable<IAccountState> => s !== null)
       )
 
       const txQuery = op(
@@ -62,7 +62,13 @@ export const $SendTransaction = ({
           // Execute through rhinestone subaccount
           const result = await params.subaccountState.rhinestoneAccount.sendTransaction({
             chain,
-            calls
+            calls,
+            // signers: {
+            //   type: 'owner',
+            //   kind: 'ecdsa',
+            //   // The signer you've created before
+            //   accounts: [params.subaccountState.signer]
+            // }
           })
 
           // Wait for execution to complete

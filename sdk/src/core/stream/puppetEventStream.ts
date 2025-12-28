@@ -26,34 +26,42 @@ function createFilteredStream<const T extends readonly AbiParameter[]>(
   )
 }
 
-export function createActionStream(client: PublicClient) {
+export function createCreateSubaccountStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.Action.hash,
-    CONTRACT_EVENT_MAP.Allocation.Action.args
+    CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.hash,
+    CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.args
   )
 }
 
-export function createAllocateStream(client: PublicClient) {
+export function createExecuteMasterDepositStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.Allocate.hash,
-    CONTRACT_EVENT_MAP.Allocation.Allocate.args
+    CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.hash,
+    CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.args
   )
 }
 
-export function createSettleStream(client: PublicClient) {
+export function createExecuteAllocateStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.Settle.hash,
-    CONTRACT_EVENT_MAP.Allocation.Settle.args
+    CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.hash,
+    CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.args
   )
 }
 
-export function createAllocationWithdrawStream(client: PublicClient) {
+export function createExecuteWithdrawStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.Withdraw.hash,
-    CONTRACT_EVENT_MAP.Allocation.Withdraw.args
+    CONTRACT_EVENT_MAP.Allocation.ExecuteWithdraw.hash,
+    CONTRACT_EVENT_MAP.Allocation.ExecuteWithdraw.args
+  )
+}
+
+export function createExecuteOrderStream(client: PublicClient) {
+  return createFilteredStream(
+    client,
+    CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.hash,
+    CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.args
   )
 }

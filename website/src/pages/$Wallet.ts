@@ -23,94 +23,92 @@ export const $WalletPage = () =>
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
-      // Combine account and subaccount streams
-      const pageState = op(
-        wallet.subaccount,
-        map(async subaccountPromise => {
-          const subaccountState = await subaccountPromise
-          const account = await wallet.account
-          return { account, subaccountState }
-        })
-      )
-
       return [
         $intermediatePromise({
-          $display: map(async pageStateValue => {
-            const { account, subaccountState } = await pageStateValue
+          $display: op(
+            wallet.account,
+            map(async accountPromise => {
+              const account = await accountPromise
 
-            if (!account) {
-              return $column(
-                spacing.big,
-                style({ alignItems: 'center', justifyContent: 'center', padding: '60px 24px', flex: 1 })
-              )(
-                $icon({ $content: $info, viewBox: '0 0 32 32', width: '48px', fill: pallete.foreground }),
-                $column(spacing.small, style({ alignItems: 'center', textAlign: 'center' }))(
-                  $node(style({ fontSize: '1.2rem', fontWeight: 'bold' }))($text('Connect Your Wallet')),
-                  $node(style({ color: pallete.foreground }))($text('Connect to create a subaccount'))
-                ),
-                $WalletConnect()({ connect: walletConnectTether() })
-              )
-            }
+              // const { account, subaccountState } = await pageStateValue
 
-            const subaccountAddress = subaccountState?.subaccountAddress
-
-            const walletBalance = state(
-              op(
-                switchMap(
-                  () => wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, account.address, 42161, true),
-                  wallet.account
+              if (!account) {
+                return $column(
+                  spacing.big,
+                  style({ alignItems: 'center', justifyContent: 'center', padding: '60px 24px', flex: 1 })
+                )(
+                  $icon({ $content: $info, viewBox: '0 0 32 32', width: '48px', fill: pallete.foreground }),
+                  $column(spacing.small, style({ alignItems: 'center', textAlign: 'center' }))(
+                    $node(style({ fontSize: '1.2rem', fontWeight: 'bold' }))($text('Connect Your Wallet')),
+                    $node(style({ color: pallete.foreground }))($text('Connect to create a subaccount'))
+                  ),
+                  $WalletConnect()({ connect: walletConnectTether() })
                 )
-              ),
-              0n
-            )
+              }
 
-            // Deposit execution
-            const depositExecution = op(
-              changeDeposit,
-              tap(draft => {
-                if (!subaccountAddress) return alert('Subaccount not ready')
-                account.walletClient
-                  .writeContract({
-                    address: draft.token,
-                    abi: erc20Abi,
-                    functionName: 'transfer',
-                    args: [subaccountAddress, draft.amount],
-                    chain: account.walletClient.chain,
-                    account: account.walletClient.account!
-                  })
-                  .then(tx => alert(`Deposit sent: ${tx}`))
-                  .catch(e => alert(`Failed: ${e.message}`))
-              })
-            )
+              const subaccountAddress = account.rhinestoneAccount.getAddress()
 
-            return $column(spacing.big, style({ padding: '24px', maxWidth: '600px', margin: '0 auto', width: '100%' }))(
-              ignoreAll(depositExecution),
-
-              // Main card
-              $card(spacing.default)(
-                $column(spacing.default)(
-                  $node(style({ color: pallete.foreground, fontSize: '0.75rem' }))($text('Subaccount')),
-                  subaccountAddress
-                    ? $node(style({ fontFamily: 'monospace' }))($text(readableAddress(subaccountAddress)))
-                    : $node(style({ color: pallete.foreground }))($text('Initializing...')),
-                  subaccountAddress
-                    ? $TokenBalanceEditor({
-                        token: ARBITRUM_ADDRESS.USDC,
-                        balance: walletBalance,
-                        account
-                      })({
-                        changeDeposit: changeDepositTether(),
-                        changeWithdraw: changeWithdrawTether()
-                      })
-                    : $node()
+              const walletBalance = state(
+                op(
+                  switchMap(
+                    () => wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, account.address, 42161, true),
+                    wallet.account
+                  )
                 ),
+                0n
+              )
 
-                $ButtonSecondary({ $content: $text('Disconnect') })({
-                  click: clickDisconnectTether(tap(() => wallet.disconnect()))
+              // Deposit execution
+              const depositExecution = op(
+                changeDeposit,
+                tap(draft => {
+                  if (!subaccountAddress) return alert('Subaccount not ready')
+                  account.walletClient
+                    .writeContract({
+                      address: draft.token,
+                      abi: erc20Abi,
+                      functionName: 'transfer',
+                      args: [subaccountAddress, draft.amount],
+                      chain: account.walletClient.chain,
+                      account: account.walletClient.account!
+                    })
+                    .then(tx => alert(`Deposit sent: ${tx}`))
+                    .catch(e => alert(`Failed: ${e.message}`))
                 })
               )
-            )
-          }, pageState)
+
+              return $column(
+                spacing.big,
+                style({ padding: '24px', maxWidth: '600px', margin: '0 auto', width: '100%' })
+              )(
+                ignoreAll(depositExecution),
+
+                // Main card
+                $card(spacing.default)(
+                  $column(spacing.default)(
+                    $node(style({ color: pallete.foreground, fontSize: '0.75rem' }))($text('Subaccount')),
+                    subaccountAddress
+                      ? $node(style({ fontFamily: 'monospace' }))($text(readableAddress(subaccountAddress)))
+                      : $node(style({ color: pallete.foreground }))($text('Initializing...')),
+                    subaccountAddress
+                      ? $TokenBalanceEditor({
+                          token: ARBITRUM_ADDRESS.USDC,
+                          balance: walletBalance,
+                          account
+                        })({
+                          changeDeposit: changeDepositTether(),
+                          changeWithdraw: changeWithdrawTether()
+                        })
+                      : $node()
+                  ),
+
+                  $ButtonSecondary({ $content: $text('Disconnect') })({
+                    click: clickDisconnectTether(tap(() => wallet.disconnect()))
+                  })
+                )
+              )
+            })
+          )
         }),
 
         { walletConnect, clickDisconnect, changeDeposit, changeWithdraw }
