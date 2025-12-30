@@ -1,5 +1,5 @@
 import type { IAnchor, Route } from 'aelea/router'
-import { constant, empty, map, o, start } from 'aelea/stream'
+import { constant, empty, type IStream, map, o, start } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import {
   $element,
@@ -18,7 +18,7 @@ import {
 import { $column, $row, isDesktopScreen, isMobileScreen, layoutSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete, type Theme, theme } from 'aelea/ui-components-theme'
 import { $seperator2 } from 'src/pages/common.js'
-import wallet from 'src/wallet/wallet.js'
+import type { IAccountState } from 'src/wallet/wallet.js'
 import type { Address } from 'viem'
 import {
   $alertIntermediateSpinnerContainer,
@@ -41,6 +41,7 @@ import { $ButtonSecondary } from './form/$Button.js'
 
 interface MainMenu extends IPageParams {
   route: Route
+  accountQuery: IStream<Promise<IAccountState | null>>
 }
 
 export const $MainMenu = (config: MainMenu) =>
@@ -198,9 +199,7 @@ export const $MainMenu = (config: MainMenu) =>
                   return $Popover({
                     $target,
                     $open: map(() => {
-                      return $WalletConnect()({
-                        connect: selectConnectorTether()
-                      })
+                      return $WalletConnect()({})
                     }, targetClick),
                     dismiss: selectConnector
                   })({})
@@ -226,7 +225,7 @@ export const $MainMenu = (config: MainMenu) =>
                     click: routeChangeTether()
                   })
                 )
-              }, wallet.account)
+              }, config.accountQuery)
             })
           ),
 

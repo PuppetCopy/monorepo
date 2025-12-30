@@ -2,9 +2,14 @@ import { type IOps, type IStream, join, just, map, op } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
-import { type Address, keccak256, toBytes } from 'viem'
+import { keccak256, toBytes, toHex } from 'viem'
 import { $intermediatePromise } from '@/ui-components'
-import wallet, { type IAccountState } from '../wallet/wallet.js'
+import {
+  type connectWallet,
+  type IAccountState,
+  initializeAccountState,
+  setExtensionWalletState
+} from '../wallet/wallet.js'
 import { $Popover } from './$Popover.js'
 import { $WalletConnect } from './$WalletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
@@ -19,15 +24,13 @@ export interface IConnectWalletPopover {
 export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
   component(
     (
-      [connect, connectTether]: IBehavior<Address[]>, //
+      [connect, connectTether]: IBehavior<ReturnType<typeof connectWallet>>, //
       [openPopover, openPopoverTether]: IBehavior<PointerEvent>,
       [changeAccount, changeAccountTether]: IBehavior<PointerEvent, Promise<IAccountState>>
     ) => {
       const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
 
-      const $walletConnect = $WalletConnect()({
-        connect: connectTether()
-      })
+      const $walletConnect = $WalletConnect()({})
 
       const $baseButton = $container(
         $ButtonSecondary({
@@ -55,8 +58,8 @@ This signature will not cost any gas and does not grant access to your funds.`
             })({})
           }
 
-          if (!account.signer) {
-            $ButtonCore({
+          if (!account.subaccount) {
+            return $ButtonCore({
               $content: $text('Sign')
             })({
               click: changeAccountTether(
@@ -68,17 +71,19 @@ This signature will not cost any gas and does not grant access to your funds.`
 
                   const privateKey = keccak256(toBytes(message))
 
-                  const nextAccountState = await wallet.initializeAccountState(account.connection, privateKey)
+                  // Initialize account to get rhinestone smart wallet address
+                  const nextAccountState = await initializeAccountState(account.connection, privateKey)
 
-                  await wallet.sendToExtension(
-                    'PUPPET_SET_WALLET_STATE',
-                    {
-                      ownerAddress: account.address,
-                      smartWalletAddress: nextAccountState!.rhinestoneAccount!.getAddress(),
+                  // Store complete wallet entry in extension
+                  if (nextAccountState?.subaccount) {
+                    const smartWalletAddress = nextAccountState.subaccount.getAddress()
+                    const subaccountName = toHex('default', { size: 32 })
+                    await setExtensionWalletState(account.address, {
+                      smartWalletAddress,
+                      subaccountName,
                       privateKey
-                    },
-                    5000
-                  )
+                    })
+                  }
 
                   return nextAccountState
                 })

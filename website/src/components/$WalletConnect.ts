@@ -1,12 +1,12 @@
+import { ignoreAll } from '@puppet/sdk/core'
 import type { Connector } from '@wagmi/core'
-import { awaitPromises, filter, map } from 'aelea/stream'
+import { map } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $element, $text, attr, component, style } from 'aelea/ui'
 import { $column, $icon, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import type { Address } from 'viem'
 import { $walletConnectLogo } from '../common/$icons.js'
-import wallet from '../wallet/wallet.js'
+import wallet, { connectWallet } from '../wallet/wallet.js'
 import { $ButtonSecondary } from './form/$Button.js'
 import { $defaultButtonCore } from './form/$ButtonCore.js'
 
@@ -61,37 +61,46 @@ const $walletIcon = (connector: Connector) => {
 }
 
 export const $WalletConnect = () =>
-  component(([connect, connectTether]: IBehavior<PointerEvent, Address[]>) => {
-    const connectors = wallet.wagmi.connectors.slice().reverse()
+  component(
+    (
+      [connect, connectTether]: IBehavior<PointerEvent, ReturnType<typeof connectWallet>> //
+    ) => {
+      const connectors = wallet.wagmi.connectors.slice().reverse()
 
-    return [
-      $column(spacing.small)(
-        ...connectors.map(connector =>
-          $ButtonSecondary({
-            $container: $defaultButtonCore(
-              style({
-                color: pallete.message,
-                borderStyle: 'solid',
-                backgroundColor: pallete.background,
-                borderWidth: '1px',
-                borderRadius: '100px',
-                padding: '12px 16px',
-                borderColor: colorAlpha(pallete.foreground, 0.25)
-              })
-            ),
-            $content: $row(spacing.default, style({ alignItems: 'center', width: '100%' }))(
-              $walletIcon(connector),
-              $text(connector.name || 'Connect Wallet')
-            )
-          })({
-            click: connectTether(
-              map(() => wallet.connect(connector.id)),
-              awaitPromises,
-              filter(addresses => addresses.length > 0)
-            )
-          })
-        )
-      ),
-      { connect }
-    ]
-  })
+      return [
+        $column(spacing.small)(
+          ignoreAll(connect),
+          ...connectors.map(connector =>
+            $ButtonSecondary({
+              $container: $defaultButtonCore(
+                style({
+                  color: pallete.message,
+                  borderStyle: 'solid',
+                  backgroundColor: pallete.background,
+                  borderWidth: '1px',
+                  borderRadius: '100px',
+                  padding: '12px 16px',
+                  borderColor: colorAlpha(pallete.foreground, 0.25)
+                })
+              ),
+              $content: $row(spacing.default, style({ alignItems: 'center', width: '100%' }))(
+                $walletIcon(connector),
+                $text(connector.name || 'Connect Wallet')
+              )
+            })({
+              click: connectTether(
+                map(async () => {
+                  const connecting = await connectWallet(connector.id)
+
+                  return connecting
+                }) //
+                // awaitPromises,
+                // map(x => Promise.resolve(x))
+              )
+            })
+          )
+        ),
+        { connect }
+      ]
+    }
+  )

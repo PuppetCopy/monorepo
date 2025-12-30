@@ -7,7 +7,7 @@ import { type Address, BaseError, type Chain, ContractFunctionRevertedError, typ
 import { arbitrum } from 'viem/chains'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import wallet, { type IAccountState } from '../../wallet/wallet.js'
+import type { IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$IntermediateConnectButton.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -21,28 +21,27 @@ export type ContractCall = {
 }
 
 export interface ISendTransaction {
+  accountQuery: IStream<Promise<IAccountState | null>>
   operations: IStream<ContractCall[]>
   chain?: Chain
   $content?: I$Slottable
 }
 
 export const $SendTransaction = ({
-  operations, //
+  accountQuery,
+  operations,
   chain = arbitrum,
   $content = $text('Submit')
 }: ISendTransaction) =>
   component(
     (
-      [submit, submitTether]: IBehavior<PointerEvent>, //
-      [accountChange, accountChangeTether]: IBehavior<Address[]>
+      [submit, submitTether]: IBehavior<PointerEvent>,
+      [changeAccount, changeAccountTether]: IBehavior<Promise<IAccountState>>
     ) => {
       // Get subaccount with rhinestone account for transaction execution
       const subaccountState = op(
-        merge(
-          map(() => null, accountChange), // trigger refresh on connect
-          awaitPromises(wallet.account)
-        ),
-        filter((s): s is NonNullable<IAccountState> => s !== null)
+        merge(awaitPromises(changeAccount), awaitPromises(accountQuery)),
+        filter((s): s is NonNullable<IAccountState> => s !== null && !!s.subaccount)
       )
 
       const txQuery = op(
@@ -59,20 +58,14 @@ export const $SendTransaction = ({
             value: op.value ?? 0n
           }))
 
-          // Execute through rhinestone subaccount
-          const result = await params.subaccountState.rhinestoneAccount.sendTransaction({
+          // Execute through rhinestone subaccount (guaranteed by filter)
+          const result = await params.subaccountState.subaccount!.sendTransaction({
             chain,
             calls
-            // signers: {
-            //   type: 'owner',
-            //   kind: 'ecdsa',
-            //   // The signer you've created before
-            //   accounts: [params.subaccountState.signer]
-            // }
           })
 
           // Wait for execution to complete
-          const receipt = await params.subaccountState.rhinestoneAccount.waitForExecution(result)
+          const receipt = await params.subaccountState.subaccount!.waitForExecution(result)
 
           // Extract transaction hash from result
           const hashes: Hex[] = []
@@ -148,6 +141,7 @@ export const $SendTransaction = ({
         $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
           $status,
           $IntermediateConnectButton({
+            accountQuery,
             $$display: map(() =>
               $ButtonCore({
                 $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
@@ -158,7 +152,7 @@ export const $SendTransaction = ({
               })
             )
           })({
-            connect: accountChangeTether()
+            changeAccount: changeAccountTether()
           })
         ),
         { subaccountState, success }

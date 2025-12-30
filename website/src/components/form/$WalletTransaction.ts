@@ -7,7 +7,7 @@ import { type Address, BaseError, type Chain, ContractFunctionRevertedError, typ
 import { arbitrum } from 'viem/chains'
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef } from '@/ui-components'
 import { getContractErrorMessage } from '../../const/contractErrorMessage.js'
-import wallet, { type IAccountState } from '../../wallet/wallet.js'
+import type { IAccountState } from '../../wallet/wallet.js'
 import { $IntermediateConnectButton } from '../$IntermediateConnectButton.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
@@ -21,19 +21,25 @@ export type ContractCall = {
 }
 
 export interface IWalletTransaction {
+  accountQuery: IStream<Promise<IAccountState | null>>
   operations: IStream<ContractCall[]>
   chain?: Chain
   $content?: I$Slottable
 }
 
-export const $WalletTransaction = ({ operations, chain = arbitrum, $content = $text('Submit') }: IWalletTransaction) =>
+export const $WalletTransaction = ({
+  accountQuery,
+  operations,
+  chain = arbitrum,
+  $content = $text('Submit')
+}: IWalletTransaction) =>
   component(
-    ([submit, submitTether]: IBehavior<PointerEvent>, [accountChange, accountChangeTether]: IBehavior<Address[]>) => {
+    (
+      [submit, submitTether]: IBehavior<PointerEvent>,
+      [changeAccount, changeAccountTether]: IBehavior<Promise<IAccountState>>
+    ) => {
       const accountState = op(
-        merge(
-          map(() => null, accountChange),
-          awaitPromises(wallet.account)
-        ),
+        merge(awaitPromises(changeAccount), awaitPromises(accountQuery)),
         filter((s): s is NonNullable<IAccountState> => s !== null)
       )
 
@@ -119,6 +125,7 @@ export const $WalletTransaction = ({ operations, chain = arbitrum, $content = $t
         $row(spacing.small, style({ minWidth: 0, alignItems: 'center', placeContent: 'flex-end' }))(
           $status,
           $IntermediateConnectButton({
+            accountQuery,
             $$display: map(() =>
               $ButtonCore({
                 $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
@@ -129,7 +136,7 @@ export const $WalletTransaction = ({ operations, chain = arbitrum, $content = $t
               })
             )
           })({
-            connect: accountChangeTether()
+            changeAccount: changeAccountTether()
           })
         ),
         { success }

@@ -1,49 +1,39 @@
-import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { GMX_V2_CONTRACT_MAP } from '@puppet/contracts/gmx'
-import { CALL_INTENT, type CallIntent } from '@puppet/sdk/matching'
-import {
-  createPublicClient,
-  encodeAbiParameters,
-  getAddress,
-  type Hex,
-  http,
-  keccak256,
-  parseAbiParameters,
-  toHex
-} from 'viem'
+import { getAddress, type Hex, toHex } from 'viem'
 import { signMessage, signTypedData } from 'viem/accounts'
 import { arbitrum } from 'viem/chains'
-import { parseCreateOrderParams } from '../lib/gmx.js'
 import type { TransactionParams } from '../types.js'
 
-const GMX_EXCHANGE_ROUTER = GMX_V2_CONTRACT_MAP.GmxExchangeRouter.address
-const ALLOCATION_ADDRESS = PUPPET_CONTRACT_MAP.Allocation.address
 const BALANCE_OF_SELECTOR = '0x70a08231'
 
 const PUPPET_URL = import.meta.env.VITE_PUPPET_URL ?? 'http://localhost:3000'
 const RPC_URL = import.meta.env.VITE_RPC_URL ?? arbitrum.rpcUrls.default.http[0]
 const MATCHMAKER_WS_URL = import.meta.env.VITE_MATCHMAKER_WS_URL ?? 'ws://localhost:8080'
 
-interface WalletState {
-  ownerAddress: string | null
-  smartWalletAddress: string | null
-  subaccountName: string | null
-  privateKey: string | null
+interface WalletEntry {
+  smartWalletAddress: string
+  subaccountName: string
+  privateKey: string
 }
 
-const DEFAULT_STATE: WalletState = {
-  ownerAddress: null,
-  smartWalletAddress: null,
-  subaccountName: null,
-  privateKey: null
+interface StoredWallets {
+  wallets: Record<string, WalletEntry> // keyed by ownerAddress (lowercase)
+  activeOwner: string | null
+}
+
+const DEFAULT_STORAGE: StoredWallets = {
+  wallets: {},
+  activeOwner: null
 }
 
 interface OrderRequest {
   type: 'order'
-  intent: CallIntent
-  signature: Hex
   target: Hex
   calldata: Hex
+  ownerAddress: Hex
+  smartWalletAddress: Hex
+  subaccountName: Hex
+  privateKey: Hex
+  timestamp: number
 }
 
 interface MatchmakerResponse {
@@ -53,10 +43,15 @@ interface MatchmakerResponse {
 }
 
 export default defineBackground(async () => {
-  const stored = await chrome.storage.local.get(['walletState'])
-  let walletState: WalletState = (stored.walletState as WalletState) ?? DEFAULT_STATE
+  const stored = await chrome.storage.local.get(['storedWallets'])
+  const storage: StoredWallets = (stored.storedWallets as StoredWallets) ?? DEFAULT_STORAGE
 
-  const publicClient = createPublicClient({ chain: arbitrum, transport: http(RPC_URL) })
+  function getActiveEntry(): (WalletEntry & { ownerAddress: string }) | null {
+    if (!storage.activeOwner) return null
+    const entry = storage.wallets[storage.activeOwner.toLowerCase()]
+    if (!entry) return null
+    return { ...entry, ownerAddress: storage.activeOwner }
+  }
 
   // Open wallet page when extension icon is clicked
   chrome.action.onClicked.addListener(() => {
@@ -78,34 +73,52 @@ export default defineBackground(async () => {
 
   async function handleWebsiteMessage(message: { type: string; payload?: unknown }): Promise<unknown> {
     switch (message.type) {
-      case 'PUPPET_GET_WALLET_KEY':
-        return walletState.privateKey
+      // Get wallet entry for a specific owner address
+      case 'PUPPET_GET_WALLET_STATE': {
+        const payload = message.payload as { ownerAddress?: string } | undefined
+        const ownerAddress = payload?.ownerAddress?.toLowerCase()
+        if (!ownerAddress) return null
+        const entry = storage.wallets[ownerAddress]
+        if (!entry) return null
+        return { ...entry, privateKey: undefined }
+      }
 
-      case 'PUPPET_CLEAR_WALLET_STATE':
-        walletState = { ...DEFAULT_STATE }
-        await chrome.storage.local.set({ walletState })
-        return { success: true }
+      // Get the private key for a specific owner (used for session derivation)
+      case 'PUPPET_GET_WALLET_KEY': {
+        const payload = message.payload as { ownerAddress?: string } | undefined
+        const ownerAddress = payload?.ownerAddress?.toLowerCase()
+        if (!ownerAddress) return null
+        return storage.wallets[ownerAddress]?.privateKey ?? null
+      }
 
+      // Set wallet entry for a specific owner (requires all fields)
       case 'PUPPET_SET_WALLET_STATE': {
+        const payload = message.payload as { ownerAddress: string } & WalletEntry
+        if (!payload.ownerAddress?.startsWith('0x')) throw new Error('Invalid owner address')
+        if (!payload.smartWalletAddress?.startsWith('0x')) throw new Error('Invalid smart wallet address')
+        if (!payload.subaccountName) throw new Error('Missing subaccount name')
+        if (!payload.privateKey?.startsWith('0x')) throw new Error('Invalid private key format')
+
+        const key = payload.ownerAddress.toLowerCase()
+        const entry: WalletEntry = {
+          smartWalletAddress: payload.smartWalletAddress,
+          subaccountName: payload.subaccountName,
+          privateKey: payload.privateKey
+        }
+
+        storage.wallets[key] = entry
+        await chrome.storage.local.set({ storedWallets: storage })
+
+        return { ...entry, privateKey: undefined }
+      }
+
+      // Set active wallet (based on website connection)
+      case 'PUPPET_SET_ACTIVE_WALLET': {
+        const payload = message.payload as { ownerAddress: string | null }
         const prevAddress = getActiveAddress()
-        const payload = message.payload as Partial<WalletState>
-        if (payload.ownerAddress !== undefined) {
-          if (payload.ownerAddress && !payload.ownerAddress.startsWith('0x')) throw new Error('Invalid owner address')
-          walletState.ownerAddress = payload.ownerAddress
-        }
-        if (payload.smartWalletAddress !== undefined) {
-          if (payload.smartWalletAddress && !payload.smartWalletAddress.startsWith('0x'))
-            throw new Error('Invalid smart wallet address')
-          walletState.smartWalletAddress = payload.smartWalletAddress
-        }
-        if (payload.subaccountName !== undefined) {
-          walletState.subaccountName = payload.subaccountName
-        }
-        if (payload.privateKey !== undefined) {
-          if (payload.privateKey && !payload.privateKey.startsWith('0x')) throw new Error('Invalid private key format')
-          walletState.privateKey = payload.privateKey
-        }
-        await chrome.storage.local.set({ walletState })
+        storage.activeOwner = payload.ownerAddress?.toLowerCase() ?? null
+        await chrome.storage.local.set({ storedWallets: storage })
+
         const newAddress = getActiveAddress()
         if (newAddress !== prevAddress) {
           const tabs = await chrome.tabs.query({})
@@ -117,7 +130,20 @@ export default defineBackground(async () => {
               .catch(() => {})
           }
         }
-        return { walletState: { ...walletState, privateKey: undefined } }
+        return { activeOwner: storage.activeOwner }
+      }
+
+      // Clear wallet entry for a specific owner
+      case 'PUPPET_CLEAR_WALLET_STATE': {
+        const payload = message.payload as { ownerAddress: string }
+        if (!payload.ownerAddress?.startsWith('0x')) throw new Error('Invalid owner address')
+
+        const key = payload.ownerAddress.toLowerCase()
+        delete storage.wallets[key]
+        if (storage.activeOwner === key) storage.activeOwner = null
+
+        await chrome.storage.local.set({ storedWallets: storage })
+        return null
       }
 
       default:
@@ -149,10 +175,11 @@ export default defineBackground(async () => {
       case 'eth_call': {
         const [callParams] = (params || []) as [{ to?: string; data?: string }]
         const { data } = callParams || {}
+        const activeEntry = getActiveEntry()
 
-        if (data?.toLowerCase().startsWith(BALANCE_OF_SELECTOR) && walletState.smartWalletAddress) {
+        if (data?.toLowerCase().startsWith(BALANCE_OF_SELECTOR) && activeEntry?.smartWalletAddress) {
           const queriedAddress = `0x${data.slice(34, 74).toLowerCase()}`
-          if (queriedAddress === walletState.smartWalletAddress.toLowerCase()) {
+          if (queriedAddress === activeEntry.smartWalletAddress.toLowerCase()) {
             const actualBalance = BigInt((await rpcCall('eth_call', params)) as string)
             const matchableAmount = 1000_000000n // STUB: 1000 USDC for testing
             return `0x${(actualBalance + matchableAmount).toString(16).padStart(64, '0')}`
@@ -162,11 +189,9 @@ export default defineBackground(async () => {
       }
 
       case 'eth_sendTransaction': {
-        throw new Error('TEST: eth_sendTransaction intercepted')
-        if (!walletState.smartWalletAddress) throw new Error('Smart wallet not configured')
-        if (!walletState.ownerAddress) throw new Error('Owner address not configured')
-        if (!walletState.privateKey) throw new Error('Private key not configured')
-        if (!walletState.subaccountName) throw new Error('Subaccount name not configured')
+        const activeEntry = getActiveEntry()
+        if (!activeEntry)
+          throw new Error('No active wallet configured. Please set up your session on puppet.tech first.')
 
         const [txParams] = (params || []) as [TransactionParams]
         if (!txParams?.to) throw new Error('Missing transaction recipient')
@@ -174,31 +199,29 @@ export default defineBackground(async () => {
         const target = getAddress(txParams.to)
         const calldata = (txParams.data ?? '0x') as Hex
 
-        if (target === GMX_EXCHANGE_ROUTER) {
-          return handleGmxOrder(target, calldata)
-        }
-
-        throw new Error('Unsupported venue')
+        return handleOrder(target, calldata, activeEntry)
       }
 
       case 'personal_sign': {
-        if (!walletState.privateKey) {
+        const activeEntry = getActiveEntry()
+        if (!activeEntry?.privateKey) {
           chrome.tabs.create({ url: `${PUPPET_URL}/wallet` })
           throw new Error('Please connect your wallet on Puppet first')
         }
         const [message] = (params || []) as [Hex]
-        return signMessage({ privateKey: walletState.privateKey as Hex, message: { raw: message } })
+        return signMessage({ privateKey: activeEntry.privateKey as Hex, message: { raw: message } })
       }
 
       case 'eth_signTypedData_v4': {
-        if (!walletState.privateKey) {
+        const activeEntry = getActiveEntry()
+        if (!activeEntry?.privateKey) {
           chrome.tabs.create({ url: `${PUPPET_URL}/wallet` })
           throw new Error('Please connect your wallet on Puppet first')
         }
         const [, typedDataJson] = (params || []) as [string, string]
         const typedData = JSON.parse(typedDataJson)
         return signTypedData({
-          privateKey: walletState.privateKey as Hex,
+          privateKey: activeEntry.privateKey as Hex,
           domain: typedData.domain,
           types: typedData.types,
           primaryType: typedData.primaryType,
@@ -211,38 +234,16 @@ export default defineBackground(async () => {
     }
   }
 
-  async function handleGmxOrder(target: Hex, calldata: Hex): Promise<Hex> {
-    // Parse CreateOrderParams from calldata to extract token and amount
-    const { token, amount } = parseCreateOrderParams(calldata)
-
-    // Get nonce from Allocation contract
-    const matchingKey = getMatchingKey(token, walletState.smartWalletAddress as Hex, walletState.subaccountName as Hex)
-    const nonce = await getNonce(matchingKey)
-
-    // Build CallIntent
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 300) // 5 minutes
-    const intent: CallIntent = {
-      account: walletState.ownerAddress as Hex,
-      subaccount: walletState.smartWalletAddress as Hex,
-      subaccountName: walletState.subaccountName as Hex,
-      token,
-      amount,
-      deadline,
-      nonce
-    }
-
-    const signature = await signTypedData({
-      ...CALL_INTENT,
-      privateKey: walletState.privateKey as Hex,
-      message: intent
-    })
-
+  async function handleOrder(target: Hex, calldata: Hex, entry: WalletEntry & { ownerAddress: string }): Promise<Hex> {
     const response = await submitToMatchmaker({
       type: 'order',
-      intent,
-      signature,
       target,
-      calldata
+      calldata,
+      ownerAddress: entry.ownerAddress as Hex,
+      smartWalletAddress: entry.smartWalletAddress as Hex,
+      subaccountName: entry.subaccountName as Hex,
+      privateKey: entry.privateKey as Hex,
+      timestamp: Date.now()
     })
 
     if (!response.success || !response.txHash) {
@@ -252,70 +253,77 @@ export default defineBackground(async () => {
     return response.txHash
   }
 
-  function getMatchingKey(token: Hex, subaccount: Hex, name: Hex): Hex {
-    return keccak256(encodeAbiParameters(parseAbiParameters('address, address, bytes32'), [token, subaccount, name]))
+  // Persistent WebSocket connection to matchmaker
+  let ws: WebSocket | null = null
+  let requestId = 0
+  const pendingRequests = new Map<number, { resolve: (r: MatchmakerResponse) => void; reject: (e: Error) => void }>()
+
+  function connectMatchmaker() {
+    if (ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return
+
+    ws = new WebSocket(MATCHMAKER_WS_URL)
+
+    ws.onopen = () => {
+      console.log('[Puppet] Matchmaker connected')
+    }
+
+    ws.onmessage = event => {
+      try {
+        const data = JSON.parse(event.data as string) as MatchmakerResponse & { id?: number }
+        if (data.id !== undefined && pendingRequests.has(data.id)) {
+          const { resolve } = pendingRequests.get(data.id)!
+          pendingRequests.delete(data.id)
+          resolve(data)
+        }
+      } catch {
+        console.error('[Puppet] Invalid matchmaker message')
+      }
+    }
+
+    ws.onclose = () => {
+      console.log('[Puppet] Matchmaker disconnected, reconnecting...')
+      setTimeout(connectMatchmaker, 3000)
+    }
+
+    ws.onerror = () => {
+      ws?.close()
+    }
   }
 
-  async function getNonce(matchingKey: Hex): Promise<bigint> {
-    const result = await publicClient.readContract({
-      address: ALLOCATION_ADDRESS,
-      abi: [
-        {
-          name: 'nonceMap',
-          type: 'function',
-          stateMutability: 'view',
-          inputs: [{ name: 'matchingKey', type: 'bytes32' }],
-          outputs: [{ name: '', type: 'uint256' }]
-        }
-      ],
-      functionName: 'nonceMap',
-      args: [matchingKey]
-    })
-    return result as bigint
-  }
+  // Connect on startup
+  connectMatchmaker()
 
   async function submitToMatchmaker(request: OrderRequest): Promise<MatchmakerResponse> {
     return new Promise((resolve, reject) => {
-      const ws = new WebSocket(MATCHMAKER_WS_URL)
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        reject(new Error('Matchmaker not connected'))
+        return
+      }
+
+      const id = requestId++
       const timeout = setTimeout(() => {
-        ws.close()
+        pendingRequests.delete(id)
         reject(new Error('Matchmaker timeout'))
-      }, 30000)
+      }, 500)
 
-      ws.onopen = () => {
-        ws.send(
-          JSON.stringify({
-            ...request,
-            intent: {
-              ...request.intent,
-              amount: request.intent.amount.toString(),
-              deadline: request.intent.deadline.toString(),
-              nonce: request.intent.nonce.toString()
-            }
-          })
-        )
-      }
-
-      ws.onmessage = event => {
-        clearTimeout(timeout)
-        ws.close()
-        try {
-          const response = JSON.parse(event.data as string) as MatchmakerResponse
-          resolve(response)
-        } catch {
-          reject(new Error('Invalid matchmaker response'))
+      pendingRequests.set(id, {
+        resolve: (r: MatchmakerResponse) => {
+          clearTimeout(timeout)
+          resolve(r)
+        },
+        reject: (e: Error) => {
+          clearTimeout(timeout)
+          reject(e)
         }
-      }
+      })
 
-      ws.onerror = () => {
-        clearTimeout(timeout)
-        reject(new Error('Matchmaker connection failed'))
-      }
+      ws.send(JSON.stringify({ ...request, id }))
     })
   }
 
   function getActiveAddress(): string | null {
-    return walletState.smartWalletAddress ?? walletState.ownerAddress
+    const entry = getActiveEntry()
+    return entry?.smartWalletAddress ?? entry?.ownerAddress ?? null
   }
 
   async function rpcCall(method: string, params: unknown[] = []): Promise<unknown> {

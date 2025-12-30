@@ -12,12 +12,12 @@ import {
   skipRepeatsWith,
   switchMap
 } from 'aelea/stream'
-import { type IBehavior, PromiseStatus } from 'aelea/stream-extended'
+import { type IBehavior, PromiseStatus, promiseState } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { type Address, encodeFunctionData, erc20Abi } from 'viem'
-import { $alertPositiveTooltip, $alertTooltip, $Checkbox, $spinner, $spinnerTooltip, $xCross } from '@/ui-components'
+import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $xCross } from '@/ui-components'
 import { $heading3 } from '../common/$text.js'
 import { $card2 } from '../common/elements/$common.js'
 import { fadeIn } from '../transitions/enter.js'
@@ -35,28 +35,18 @@ export interface IActionDraft<T = unknown> {
 }
 
 interface IActionDrawer {
-  accountQuery: IStream<Promise<IAccountState>>
+  accountQuery: IStream<Promise<IAccountState | null>>
   drafts: IStream<IActionDraft[]>
-  hasSession: IStream<boolean>
-  sessionState: IStream<{ status: PromiseStatus; error?: Error } | null>
-  txState: IStream<{ status: PromiseStatus; error?: Error } | null>
+  depositDrafts: IStream<BalanceDraft[]>
   title?: string
 }
 
-export const $ActionDrawer = ({
-  accountQuery,
-  drafts,
-  hasSession,
-  sessionState,
-  txState,
-  title = 'Pending Actions'
-}: IActionDrawer) =>
+export const $ActionDrawer = ({ accountQuery, drafts, depositDrafts, title = 'Pending Actions' }: IActionDrawer) =>
   component(
     (
       [clickSubmit, clickSubmitTether]: IBehavior<PointerEvent>,
       [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
       [clickRemove, clickRemoveTether]: IBehavior<PointerEvent, string>,
-      [checkSession, checkSessionTether]: IBehavior<boolean>,
       [changeAccount, changeAccountTether]: IBehavior<Promise<IAccountState>>
     ) => {
       const hasContent = op(
@@ -65,14 +55,34 @@ export const $ActionDrawer = ({
         skipRepeatsWith((a, b) => a === b)
       )
 
-      const submitPayload = op(
+      // Handle submit: execute deposit operations
+      const submitQuery = op(
         clickSubmit,
-        map(() => null as null)
+        switchMap(() =>
+          map(
+            async ({ acc: accPromise, deposits }: { acc: Promise<IAccountState | null>; deposits: BalanceDraft[] }) => {
+              const acc = await accPromise
+              if (!acc?.subaccount) throw new Error('No account or session')
+
+              const subaccountAddress = acc.subaccount.getAddress()
+              const encodedDeposits = deposits.flatMap(draft => encodeBalanceDraft(draft, subaccountAddress))
+
+              for (const call of encodedDeposits) {
+                await acc.walletClient.sendTransaction({
+                  to: call.to,
+                  data: call.data,
+                  value: call.value,
+                  account: acc.walletClient.account!
+                })
+              }
+            },
+            combine({ acc: accountQuery, deposits: depositDrafts })
+          )
+        )
       )
 
+      const txState = promiseState(submitQuery)
       const isLoading = map(s => s?.status === PromiseStatus.PENDING, txState)
-      const isSigningSession = map(s => s?.status === PromiseStatus.PENDING, sessionState)
-      const canSubmit = combine({ hasSession, isLoading })
 
       const txSuccess = op(
         txState,
@@ -81,11 +91,6 @@ export const $ActionDrawer = ({
             s !== null && s.status !== PromiseStatus.PENDING && s.status !== PromiseStatus.ERROR
         ),
         map(() => null as null)
-      )
-
-      const requestSession = op(
-        checkSession,
-        filter(checked => checked)
       )
 
       const $status = op(
@@ -149,17 +154,13 @@ export const $ActionDrawer = ({
           ),
 
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
-            $Checkbox({ value: hasSession, disabled: isSigningSession, label: 'Session' })({
-              check: checkSessionTether()
-            }),
-            switchMap(signing => (signing ? $spinner : empty), isSigningSession),
             $node(style({ flex: 1 }))(),
             $status,
             $IntermediateConnectButton({
               accountQuery,
-              $$display: map(account =>
+              $$display: map(() =>
                 $ButtonCore({
-                  // $container: $defaultButtonPrimary(style({ position: 'relative', overflow: 'hidden' })),
+                  disabled: isLoading,
                   $content: $text('Submit')
                 })({
                   click: clickSubmitTether()
@@ -172,13 +173,12 @@ export const $ActionDrawer = ({
 
       return [
         op(
-          combine({ hasContent }),
-          switchMap(params => (params.hasContent ? fadeIn($drawerContent) : empty))
+          hasContent,
+          switchMap(has => (has ? fadeIn($drawerContent) : empty))
         ),
 
         {
           changeAccount,
-          submit: submitPayload,
           removeDraft: clickRemove,
           clearDrafts: merge(constant(null, clickClose), txSuccess)
         }

@@ -1,81 +1,16 @@
-import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { ARBITRUM_ADDRESS } from '@puppet/sdk/const'
 import { readableAddress } from '@puppet/sdk/core'
-import { type IStream, just, map, merge, op, sampleMap, switchMap, tap } from 'aelea/stream'
+import { type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { encodeFunctionData, type Hex, keccak256, stringToHex, toBytes } from 'viem'
-import type { Address } from 'viem/accounts'
-import { arbitrum } from 'viem/chains'
-import { $icon, $intermediatePromise, $spinner } from '@/ui-components'
+import { $intermediatePromise } from '@/ui-components'
 import { $card } from '../common/elements/$common.js'
-import { $WalletConnect } from '../components/$WalletConnect.js'
-import { $ButtonSecondary } from '../components/form/$Button.js'
+import { $ConnectWalletCard } from '../components/$ConnectWalletCard.js'
 import type { BalanceDraft, IDepositEditorDraft, IWithdrawEditorDraft } from '../components/portfolio/$DepositEditor.js'
 import { $TokenBalanceEditor } from '../components/portfolio/$TokenBalanceEditor.js'
-import { $info } from '../ui-components/$icons.js'
 import wallet, { type IAccountState } from '../wallet/wallet.js'
-
-interface RegisterMasterSubaccountParams {
-  accountState: IAccountState
-  token: Address
-  subaccountName: string
-}
-
-export async function registerMasterSubaccount({
-  accountState,
-  token,
-  subaccountName
-}: RegisterMasterSubaccountParams): Promise<{ txHash: Hex; signerAddress: Address }> {
-  const { walletClient, address, rhinestoneAccount } = accountState
-  const subaccountAddress = rhinestoneAccount.getAddress()
-  const subaccountNameBytes32 = stringToHex(subaccountName, { size: 32 })
-
-  // const signer = await getOrDeriveSigner(accountState)
-
-  const result = await rhinestoneAccount.sendTransaction({
-    chain: arbitrum,
-    calls: [
-      {
-        to: PUPPET_CONTRACT_MAP.Allocation.address,
-        data: encodeFunctionData({
-          abi: PUPPET_CONTRACT_MAP.Allocation.abi,
-          functionName: 'createMasterSubaccount',
-          args: [address, signer.address, subaccountAddress, token, subaccountNameBytes32]
-        })
-      }
-    ]
-  })
-
-  const receipt = await rhinestoneAccount.waitForExecution(result)
-  const txHash = ('transactionHash' in receipt ? receipt.transactionHash : null) as Hex
-
-  const hasExtension = await checkExtension()
-  if (hasExtension) {
-    const privateKey = keccak256(
-      toBytes(
-        await walletClient.signMessage({
-          message: SIGNER_DERIVATION_MESSAGE,
-          account: address
-        })
-      )
-    )
-    await sendToExtension(
-      'PUPPET_SET_WALLET_STATE',
-      {
-        ownerAddress: address,
-        smartWalletAddress: subaccountAddress,
-        subaccountName: subaccountNameBytes32,
-        privateKey
-      },
-      5000
-    )
-  }
-
-  return { txHash, signerAddress: signer.address }
-}
 
 function updateDraftList(changeList: BalanceDraft[], draft: BalanceDraft): BalanceDraft[] {
   const normalizedToken = draft.token.toLowerCase()
@@ -89,93 +24,73 @@ function updateDraftList(changeList: BalanceDraft[], draft: BalanceDraft): Balan
 }
 
 interface IWalletPage {
+  accountQuery: IStream<Promise<IAccountState | null>>
   draftDepositTokenList: IStream<BalanceDraft[]>
 }
 
-export const $WalletPage = ({ draftDepositTokenList }: IWalletPage) =>
+export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage) =>
   component(
     (
-      [walletConnect, walletConnectTether]: IBehavior<any>,
-      [clickDisconnect, clickDisconnectTether]: IBehavior<any>,
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
       return [
         $intermediatePromise({
           $display: op(
-            wallet.account,
-            map(async accountPromise => {
-              const account = await accountPromise
-
-              // const { account, subaccountState } = await pageStateValue
+            accountQuery,
+            map(async query => {
+              const account = await query
 
               if (!account) {
                 return $column(
                   spacing.big,
-                  style({ alignItems: 'center', justifyContent: 'center', padding: '60px 24px', flex: 1 })
-                )(
-                  $icon({ $content: $info, viewBox: '0 0 32 32', width: '48px', fill: pallete.foreground }),
-                  $column(spacing.small, style({ alignItems: 'center', textAlign: 'center' }))(
-                    $node(style({ fontSize: '1.2rem', fontWeight: 'bold' }))($text('Connect Your Wallet')),
-                    $node(style({ color: pallete.foreground }))($text('Connect to create a subaccount'))
-                  ),
-                  $WalletConnect()({ connect: walletConnectTether() })
-                )
+                  style({ padding: '24px', maxWidth: '600px', margin: '0 auto', width: '100%' })
+                )($ConnectWalletCard({}))
               }
 
-              const subaccountAddress = account.rhinestoneAccount.getAddress()
-
-              const extensionStatus = checkExtension().then(async hasExtension => {
-                if (hasExtension) {
-                  const extensionState = (await sendToExtension('PUPPET_GET_WALLET_STATE', {})) as {
-                    privateKey?: string
-                  }
-                  if (extensionState?.privateKey) {
-                    await sendToExtension(
-                      'PUPPET_SET_WALLET_STATE',
-                      {
-                        ownerAddress: account.address,
-                        smartWalletAddress: subaccountAddress
-                      },
-                      5000
-                    ).catch(console.warn)
-                  }
-                }
-                return hasExtension
-              })
+              const subaccountAddress = account.subaccount?.getAddress()
+              const hasSession = !!account.subaccount
 
               const walletBalance = state(
-                op(
-                  switchMap(
-                    () => wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, account.address, 42161, true),
-                    wallet.account
-                  )
+                switchMap(
+                  () => wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, account.address, 42161, true),
+                  just(null)
                 ),
                 0n
               )
 
-              const $extensionStatus = $row(spacing.small, style({ alignItems: 'center' }))(
-                $node(style({ color: pallete.foreground, fontSize: '0.75rem' }))($text('Extension')),
-                $intermediatePromise({
-                  $loader: $spinner,
-                  $display: just(
-                    extensionStatus.then(connected =>
-                      $row(spacing.small, style({ alignItems: 'center' }))(
-                        $node(
-                          style({
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%',
-                            background: connected ? pallete.positive : pallete.negative
-                          })
-                        )(),
-                        $node(style({ fontSize: '0.75rem', color: connected ? pallete.positive : pallete.negative }))(
-                          $text(connected ? 'Connected' : 'Not detected')
-                        )
-                      )
+              const $statusIndicator = (
+                label: string,
+                isActive: boolean,
+                activeText: string,
+                inactiveText: string,
+                inactiveColor = pallete.foreground
+              ) =>
+                $row(spacing.small, style({ alignItems: 'center' }))(
+                  $node(style({ color: pallete.foreground, fontSize: '0.75rem' }))($text(label)),
+                  $row(spacing.small, style({ alignItems: 'center' }))(
+                    $node(
+                      style({
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: isActive ? pallete.positive : inactiveColor
+                      })
+                    )(),
+                    $node(style({ fontSize: '0.75rem', color: isActive ? pallete.positive : inactiveColor }))(
+                      $text(isActive ? activeText : inactiveText)
                     )
                   )
-                })
+                )
+
+              // Only show "Not synced" if user has a subaccount but extension isn't connected
+              // If no subaccount exists, user hasn't set up yet - don't show sync status
+              const showSyncStatus = !!subaccountAddress
+              const $statusRow = $row(spacing.default, style({ alignItems: 'center' }))(
+                showSyncStatus
+                  ? $statusIndicator('Extension', account.isSynced, 'Synced', 'Not synced', pallete.negative)
+                  : $node(),
+                hasSession ? $statusIndicator('Session', true, 'Active', '') : $node()
               )
 
               return $column(
@@ -184,14 +99,16 @@ export const $WalletPage = ({ draftDepositTokenList }: IWalletPage) =>
               )(
                 $card(spacing.default)(
                   $column(spacing.default)(
-                    $row(style({ justifyContent: 'space-between' }))(
+                    $row(style({ justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }))(
                       $column(spacing.small)(
                         $node(style({ color: pallete.foreground, fontSize: '0.75rem' }))($text('Subaccount')),
                         subaccountAddress
                           ? $node(style({ fontFamily: 'monospace' }))($text(readableAddress(subaccountAddress)))
-                          : $node(style({ color: pallete.foreground }))($text('Initializing...'))
+                          : $node(style({ color: pallete.foreground }))(
+                              $text(hasSession ? 'Initializing...' : 'Sign to initialize')
+                            )
                       ),
-                      $extensionStatus
+                      $statusRow
                     ),
                     subaccountAddress
                       ? $TokenBalanceEditor({
@@ -203,11 +120,7 @@ export const $WalletPage = ({ draftDepositTokenList }: IWalletPage) =>
                           changeWithdraw: changeWithdrawTether()
                         })
                       : $node()
-                  ),
-
-                  $ButtonSecondary({ $content: $text('Disconnect') })({
-                    click: clickDisconnectTether(tap(() => wallet.disconnect()))
-                  })
+                  )
                 )
               )
             })
@@ -215,8 +128,6 @@ export const $WalletPage = ({ draftDepositTokenList }: IWalletPage) =>
         }),
 
         {
-          walletConnect,
-          clickDisconnect,
           changeDepositTokenList: merge(
             sampleMap(updateDraftList, draftDepositTokenList, changeDeposit),
             sampleMap(updateDraftList, draftDepositTokenList, changeWithdraw)

@@ -5,6 +5,8 @@ import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@r
 import { porto, walletConnect } from '@wagmi/connectors'
 import {
   type Config,
+  type ConnectReturnType,
+  connect,
   createConfig,
   createStorage,
   type GetConnectionReturnType,
@@ -14,7 +16,6 @@ import {
   type ReadContractParameters,
   readContract,
   reconnect,
-  connect as wagmiConnect,
   disconnect as wagmiDisconnect,
   watchConnection
 } from '@wagmi/core'
@@ -35,20 +36,10 @@ import {
   type Transport,
   type WalletClient
 } from 'viem'
-import { type Address, privateKeyToAccount, type toAccount } from 'viem/accounts'
+import { type Address, privateKeyToAccount } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 export type ChainBalance = { chainId: number; balance: bigint }
-
-export type SubaccountSigner = ReturnType<typeof toAccount>
-
-export type IAccountState = {
-  connection: GetConnectionReturnType<typeof wallet.wagmi>
-  walletClient: WalletClient<Transport, Chain>
-  address: Address
-  rhinestoneAccount?: RhinestoneAccount
-  signer?: SubaccountSigner
-}
 
 const chainList = [arbitrum] as const
 const chainMap = groupList(chainList, 'id')
@@ -90,6 +81,18 @@ const wagmi: Config = createConfig({
   ) as any
 })
 
+export type SubaccountSigner = ReturnType<typeof privateKeyToAccount>
+
+export type IAccountState = {
+  connection: GetConnectionReturnType<typeof wagmi>
+  walletClient: WalletClient<Transport, Chain>
+  address: Address
+  subaccountAddress?: Address
+  subaccount?: RhinestoneAccount
+  signer?: SubaccountSigner
+  isSynced: boolean
+}
+
 const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(cb => {
   const storedConnections = getConnections(wagmi)
   const hasPortoConnection = storedConnections.some(conn => conn.connector.id === 'xyz.ithaca.porto')
@@ -100,25 +103,78 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
     cb(getConnection(wagmi))
   }
 
-  return watchConnection(wagmi, { onChange: cb })
+  return watchConnection(wagmi, {
+    onChange(connection) {
+      // if (connection.isReconnecting) return
+
+      cb(connection)
+    }
+  })
 })
 
-async function initializeAccountState(
+// LocalStorage helpers for subaccount address (enables view-mode without extension)
+const SUBACCOUNT_STORAGE_KEY = 'puppet:subaccounts'
+
+function getStoredSubaccountAddress(ownerAddress: Address): Address | null {
+  try {
+    const stored = localStorage.getItem(SUBACCOUNT_STORAGE_KEY)
+    if (!stored) return null
+    const map = JSON.parse(stored) as Record<string, Address>
+    return map[ownerAddress.toLowerCase()] ?? null
+  } catch {
+    return null
+  }
+}
+
+function setStoredSubaccountAddress(ownerAddress: Address, subaccountAddress: Address): void {
+  try {
+    const stored = localStorage.getItem(SUBACCOUNT_STORAGE_KEY)
+    const map = stored ? (JSON.parse(stored) as Record<string, Address>) : {}
+    map[ownerAddress.toLowerCase()] = subaccountAddress
+    localStorage.setItem(SUBACCOUNT_STORAGE_KEY, JSON.stringify(map))
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export async function initializeAccountState(
   connection: GetConnectionReturnType,
   subaccountPrivateKey?: Hex | null
 ): Promise<IAccountState | null> {
   const conn = connection
-  if (conn.status !== 'connected' || !conn.connector) return null
+  if (conn.status !== 'connected' || !conn.connector || !conn.chainId) return null
+  if (typeof conn.connector.getChainId !== 'function') return null
 
   const walletClient = await getWalletClient(wallet.wagmi, { chainId: conn.chainId })
+  const address = walletClient.account.address
 
-  if (subaccountPrivateKey == null) {
-    return { walletClient, address: walletClient.account.address, connection }
+  // Check localStorage for cached subaccountAddress (enables view-mode)
+  const cachedSubaccountAddress = getStoredSubaccountAddress(address)
+
+  // Try to sync with extension - isSynced only if extension has wallet state for this address
+  let isSynced = false
+  let privateKey = subaccountPrivateKey ?? null
+
+  try {
+    // Verify extension has wallet state matching connected address
+    const walletState = await getExtensionWalletState(address)
+    if (walletState) {
+      isSynced = true
+      privateKey = privateKey ?? (await getExtensionWalletKey(address))
+      setActiveWallet(address)
+    }
+  } catch {
+    isSynced = false // Timeout - extension not available
+  }
+
+  if (!privateKey) {
+    // View-mode: no private key, but may have cached subaccountAddress
+    return { walletClient, address, subaccountAddress: cachedSubaccountAddress ?? undefined, connection, isSynced }
   }
 
   const account = walletClientToAccount(walletClient)
-  const signer = privateKeyToAccount(subaccountPrivateKey)
-  const rhinestoneAccount = await rhinestoneSDK.createAccount({
+  const signer = privateKeyToAccount(privateKey)
+  const subaccount = await rhinestoneSDK.createAccount({
     owners: {
       type: 'ecdsa',
       accounts: [account, signer]
@@ -132,70 +188,66 @@ async function initializeAccountState(
     ]
   })
 
-  return { walletClient, address: walletClient.account.address, rhinestoneAccount, connection }
+  const subaccountAddress = subaccount.getAddress()
+
+  // Cache subaccountAddress for view-mode
+  setStoredSubaccountAddress(address, subaccountAddress)
+
+  return { walletClient, address, subaccountAddress, subaccount, signer, connection, isSynced }
 }
 
-async function connect(preferredConnectorId?: string): Promise<Address[]> {
-  try {
-    const current = getConnection(wagmi)
-    const targetConnector = wagmi.connectors.find(c => c.id === preferredConnectorId) ?? wagmi.connectors[0]
+export async function connectWallet(preferredConnectorId?: string): Promise<ConnectReturnType<typeof wagmi>> {
+  const currentConnection = getConnection(wagmi)
 
-    if (!targetConnector) throw new Error('No wallet connector configured')
+  if (currentConnection.status === 'connected') throw new Error('Wallet already connected')
 
-    if (current.status === 'connected' && current.connector?.id === targetConnector.id) {
-      const addresses = (current as any).addresses ?? ((current as any).address ? [(current as any).address] : [])
-      return addresses as Address[]
-    }
+  if (currentConnection.status === 'connecting') await new Promise(() => {})
 
-    const result = await wagmiConnect(wagmi, { connector: targetConnector })
-    return [...(result.accounts ?? [])]
-  } catch (error: any) {
-    if (error?.message?.includes('rejected') || error?.message?.includes('User rejected')) {
-      console.log('User cancelled wallet connection')
-      return []
-    }
-    console.error('Failed to connect:', error)
-    return []
-  }
+  const targetConnector = wagmi.connectors.find(c => c.id === preferredConnectorId) ?? wagmi.connectors[0]
+
+  if (!targetConnector) throw new Error('No compatible wallet found. Please install a supported wallet.')
+
+  if (currentConnection.connector?.id === targetConnector.id) throw new Error('Wallet already connected')
+
+  return connect(wagmi, { connector: targetConnector })
 }
 
-const pendingExtensionMessages = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>()
+// Extension communication helpers
+let extensionRequestId = 0
+const pendingExtensionRequests = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>()
 
+// Listen for extension responses
 if (typeof window !== 'undefined') {
   window.addEventListener('message', event => {
     if (event.source !== window || event.data?.target !== 'puppet-website') return
+
     const { id, response } = event.data
-    const pending = pendingExtensionMessages.get(id)
-    if (pending) {
-      pendingExtensionMessages.delete(id)
-      response?.success === false ? pending.reject(new Error(response.error)) : pending.resolve(response)
+    if (id !== undefined && pendingExtensionRequests.has(id)) {
+      const { resolve, reject } = pendingExtensionRequests.get(id)!
+      pendingExtensionRequests.delete(id)
+      if (response?.success === false) {
+        reject(new Error(response.error || 'Extension request failed'))
+      } else {
+        resolve(response?.result)
+      }
     }
   })
 }
 
-function checkExtension(): Promise<boolean> {
-  if (typeof window === 'undefined') return Promise.resolve(false)
-  return sendToExtension('PUPPET_GET_WALLET_STATE', {})
-    .then(() => true)
-    .catch(() => false)
-}
-
-let extensionMessageId = 0
-
-async function sendToExtension(type: string, payload: unknown = {}, timeoutMs = 1000): Promise<unknown> {
+async function sendExtensionMessage<T = unknown>(type: string, payload?: unknown): Promise<T> {
   return new Promise((resolve, reject) => {
-    const id = extensionMessageId++
+    const id = extensionRequestId++
     const timeout = setTimeout(() => {
-      pendingExtensionMessages.delete(id)
-      reject(new Error('Extension timeout'))
-    }, timeoutMs)
+      pendingExtensionRequests.delete(id)
+      reject(new Error('Extension request timeout'))
+    }, 500)
 
-    pendingExtensionMessages.set(id, {
-      resolve: v => {
+    pendingExtensionRequests.set(id, {
+      resolve: (v: unknown) => {
         clearTimeout(timeout)
-        resolve(v)
+        resolve(v as T)
       },
-      reject: e => {
+      reject: (e: Error) => {
         clearTimeout(timeout)
         reject(e)
       }
@@ -203,6 +255,41 @@ async function sendToExtension(type: string, payload: unknown = {}, timeoutMs = 
 
     window.postMessage({ target: 'puppet-extension', id, type, payload }, '*')
   })
+}
+
+
+// Get stored wallet state for a specific owner address (verifies wallet exists in extension)
+export async function getExtensionWalletState(
+  ownerAddress: Address
+): Promise<{ smartWalletAddress: string; subaccountName: string } | null> {
+  return sendExtensionMessage('PUPPET_GET_WALLET_STATE', { ownerAddress })
+}
+
+// Get stored private key for a specific owner address
+export async function getExtensionWalletKey(ownerAddress: Address): Promise<Hex | null> {
+  return sendExtensionMessage<Hex | null>('PUPPET_GET_WALLET_KEY', { ownerAddress })
+}
+
+// Set wallet state for a specific owner address (requires all fields)
+export async function setExtensionWalletState(
+  ownerAddress: Address,
+  data: { smartWalletAddress: string; subaccountName: string; privateKey: Hex }
+): Promise<void> {
+  await sendExtensionMessage('PUPPET_SET_WALLET_STATE', { ownerAddress, ...data })
+}
+
+// Set the active wallet in the extension (synced with website connection)
+export async function setActiveWallet(ownerAddress: Address | null): Promise<void> {
+  try {
+    await sendExtensionMessage('PUPPET_SET_ACTIVE_WALLET', { ownerAddress })
+  } catch {
+    // Extension not installed, ignore
+  }
+}
+
+// Clear wallet state for a specific owner
+export async function clearExtensionWalletState(ownerAddress: Address): Promise<void> {
+  await sendExtensionMessage('PUPPET_CLEAR_WALLET_STATE', { ownerAddress })
 }
 
 async function disconnect() {
@@ -275,9 +362,6 @@ const wallet = {
   getTokenBalance,
   getMultichainBalances,
   connection,
-  connect,
-  initializeAccountState,
-  sendToExtension,
   disconnect,
   publicClient,
   wagmi,

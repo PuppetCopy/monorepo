@@ -1,14 +1,14 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import { combine, type IStream, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
+import { awaitPromises, combine, type IStream, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { component } from 'aelea/ui'
 import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $intermediatePromise } from '@/ui-components'
 import type { IComponentPageParams } from '../../pages/types.js'
-import wallet from '../../wallet/wallet.js'
+import wallet, { type IAccountState } from '../../wallet/wallet.js'
 import {
   BALANCE_ACTION,
   type BalanceDraft,
@@ -18,6 +18,7 @@ import {
 import { $TokenBalanceEditor } from './$TokenBalanceEditor.js'
 
 interface IRouteBalanceEditor extends IComponentPageParams {
+  accountQuery: IStream<Promise<IAccountState | null>>
   walletAddress?: Address
   collateralToken: Address
   draftDepositTokenList: IStream<BalanceDraft[]>
@@ -29,7 +30,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
-      const { draftDepositTokenList, collateralToken } = config
+      const { accountQuery, draftDepositTokenList, collateralToken } = config
 
       const balanceModel = op(
         draftDepositTokenList,
@@ -48,9 +49,8 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
       const depositBalanceStream = op(
-        wallet.account,
-        switchMap(async accountQuery => {
-          const account = await accountQuery
+        awaitPromises(accountQuery),
+        switchMap(async account => {
           if (!account) return 0n
 
           try {
@@ -110,7 +110,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
             changeDeposit: changeDepositTether(),
             changeWithdraw: changeWithdrawTether()
           })
-        }, wallet.account)
+        }, awaitPromises(accountQuery))
       })
 
       const updateDraftList = (changeList: BalanceDraft[], draft: BalanceDraft) => {

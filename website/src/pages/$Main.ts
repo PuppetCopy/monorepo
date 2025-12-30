@@ -4,9 +4,7 @@ import * as router from 'aelea/router'
 import {
   awaitPromises,
   combine,
-  filter,
   type IStream,
-  just,
   map,
   merge,
   op,
@@ -16,12 +14,12 @@ import {
   switchMap,
   tap
 } from 'aelea/stream'
-import { type IBehavior, multicast, PromiseStatus, promiseState, state } from 'aelea/stream-extended'
+import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } from 'aelea/ui'
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $heading3 } from 'src/common/$text.js'
-import { getAddress, type Hex } from 'viem'
+import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
@@ -29,16 +27,15 @@ import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryUserSubscribeRuleList } from '../common/query.js'
 import { getStatus } from '../common/sqlClient.js'
-import { $ActionDrawer, balanceDraftToAction, encodeBalanceDraft } from '../components/$ActionDrawer.js'
+import { $ActionDrawer, balanceDraftToAction } from '../components/$ActionDrawer.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
-import type { ContractCall } from '../components/form/$WalletTransaction.js'
 import type { BalanceDraft } from '../components/portfolio/$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
-import wallet, { type IAccountState } from '../wallet/wallet.js'
+import wallet, { type IAccountState, initializeAccountState } from '../wallet/wallet.js'
 import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
 import { $MasterPage } from './$Trader.js'
@@ -68,8 +65,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
       [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
-      [submitDrawer, submitDrawerTether]: IBehavior<null>,
-      [requestSession, requestSessionTether]: IBehavior<boolean>,
       [removeDraft, removeDraftTether]: IBehavior<string>,
       [clearDrafts, clearDraftsTether]: IBehavior<null>
     ) => {
@@ -108,10 +103,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         changeAccount,
         op(
           combine({ connection: wallet.connection }),
-          map(async params => {
-            const storedKey = (await wallet.sendToExtension('PUPPET_GET_WALLET_KEY').catch(() => null)) as Hex | null
-
-            return wallet.initializeAccountState(params.connection, storedKey)
+          map(params => {
+            return initializeAccountState(params.connection)
           }),
           state
         )
@@ -186,7 +179,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             )
           }, pwaUpgradeNotification),
 
-          $MainMenu({ route: rootRoute })({
+          $MainMenu({ route: rootRoute, accountQuery })({
             routeChange: changeRouteTether()
           }),
 
@@ -234,6 +227,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $PortfolioPage({
+                  accountQuery,
                   draftMatchingRuleList,
                   draftDepositTokenList,
                   userMatchingRuleQuery,
@@ -253,7 +247,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           contains(walletRoute)(
             $midContainer(
               fadeIn(
-                $WalletPage({ draftDepositTokenList })({
+                $WalletPage({ accountQuery, draftDepositTokenList })({
                   changeDepositTokenList: changeDepositTokenListTether()
                 })
               )
@@ -329,118 +323,15 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 zIndex: 10
               })
             )(
-              (() => {
-                // Handle session signing when checkbox is clicked
-                const sessionQuery = op(
-                  requestSession,
-                  filter(() => true),
-                  switchMap(() =>
-                    map(async (accPromise: Promise<IAccountState | null>) => {
-                      const acc = await accPromise
-                      if (!acc) throw new Error('No account')
-                      await signAndStoreSession(acc)
-                    }, accountQuery)
-                  )
-                )
-                const sessionState = state(promiseState(sessionQuery), null)
-
-                // Session signed successfully
-                const sessionSuccess = op(
-                  sessionState,
-                  filter(s => s !== null && s.status !== PromiseStatus.PENDING && s.status !== PromiseStatus.ERROR),
-                  map(() => null as null)
-                )
-
-                // Session check - re-evaluate after session signed or drafts clear
-                const hasSession: IStream<boolean> = state(
-                  switchMap((accPromise: Promise<IAccountState | null>) => {
-                    return switchMap(
-                      async () => {
-                        const acc = await accPromise
-                        if (!acc) return false
-                        return checkNeedsOnboarding(acc).then(needs => !needs)
-                      },
-                      merge(just(null), sessionSuccess, clearDrafts)
-                    )
-                  }, accountQuery)
-                )
-
-                // Derive operations from drafts and account
-                const actionDrafts = map(list => list.map(draft => balanceDraftToAction(draft)), draftDepositTokenList)
-
-                // TODO: subaccount operations from matching rules, etc
-                const subaccountOperations = just([] as ContractCall[])
-
-                // Handle submit: deposits first, then subaccount operations
-                const submitQuery = op(
-                  submitDrawer,
-                  filter(() => true),
-                  switchMap(() =>
-                    map(
-                      async ({
-                        acc: accPromise,
-                        deposits,
-                        subaccountOps
-                      }: {
-                        acc: Promise<IAccountState | null>
-                        deposits: BalanceDraft[]
-                        subaccountOps: ContractCall[]
-                      }) => {
-                        const acc = await accPromise
-                        if (!acc) throw new Error('No account')
-
-                        const subaccountAddress = acc.rhinestoneAccount.getAddress()
-                        const encodedDeposits = deposits.flatMap(draft => encodeBalanceDraft(draft, subaccountAddress))
-
-                        // 1. Execute deposit operations (wallet → subaccount)
-                        if (encodedDeposits.length > 0) {
-                          for (const call of encodedDeposits) {
-                            await acc.walletClient.sendTransaction({
-                              to: call.to,
-                              data: call.data,
-                              value: call.value,
-                              account: acc.walletClient.account!
-                            })
-                          }
-                        }
-
-                        // 2. Execute subaccount operations via Rhinestone
-                        if (subaccountOps.length > 0) {
-                          await acc.rhinestoneAccount.sendTransaction({
-                            chain: await acc.walletClient.getChainId().then(id => ({ id }) as any),
-                            calls: subaccountOps.map(op => ({
-                              to: op.to,
-                              data: op.data,
-                              value: op.value
-                            }))
-                          })
-                        }
-                      },
-                      combine({
-                        acc: account,
-                        deposits: draftDepositTokenList,
-                        subaccountOps: subaccountOperations
-                      })
-                    )
-                  )
-                )
-                const submitState = state(promiseState(submitQuery), null)
-
-                const txState = submitState
-
-                return $ActionDrawer({
-                  accountQuery,
-                  drafts: actionDrafts,
-                  hasSession,
-                  sessionState,
-                  txState
-                })({
-                  submit: submitDrawerTether(),
-                  changeAccount: changeAccountTether(),
-                  removeDraft: removeDraftTether(),
-                  clearDrafts: clearDraftsTether()
-                })
-              })()
+              $ActionDrawer({
+                accountQuery,
+                drafts: map(list => list.map(draft => balanceDraftToAction(draft)), draftDepositTokenList),
+                depositDrafts: draftDepositTokenList
+              })({
+                changeAccount: changeAccountTether(),
+                removeDraft: removeDraftTether(),
+                clearDrafts: clearDraftsTether()
+              })
             )
           )
         )
