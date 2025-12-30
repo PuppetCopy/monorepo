@@ -12,7 +12,7 @@ import { $IntermediateConnectButton } from '../$IntermediateConnectButton.js'
 import { $defaultButtonPrimary } from './$Button.js'
 import { $ButtonCore } from './$ButtonCore.js'
 
-type TxResult = { hashes: Hex[]; chain: Chain }
+type TxResult = { hash: Hex; chain: Chain }
 
 export type ContractCall = {
   to: Address
@@ -20,70 +20,45 @@ export type ContractCall = {
   value?: bigint
 }
 
-export interface ISendTransaction {
+export interface IWalletTransaction {
   operations: IStream<ContractCall[]>
   chain?: Chain
   $content?: I$Slottable
 }
 
-export const $SendTransaction = ({
-  operations, //
-  chain = arbitrum,
-  $content = $text('Submit')
-}: ISendTransaction) =>
+export const $WalletTransaction = ({ operations, chain = arbitrum, $content = $text('Submit') }: IWalletTransaction) =>
   component(
-    (
-      [submit, submitTether]: IBehavior<PointerEvent>, //
-      [accountChange, accountChangeTether]: IBehavior<Address[]>
-    ) => {
-      // Get subaccount with rhinestone account for transaction execution
-      const subaccountState = op(
+    ([submit, submitTether]: IBehavior<PointerEvent>, [accountChange, accountChangeTether]: IBehavior<Address[]>) => {
+      const accountState = op(
         merge(
-          map(() => null, accountChange), // trigger refresh on connect
+          map(() => null, accountChange),
           awaitPromises(wallet.account)
         ),
         filter((s): s is NonNullable<IAccountState> => s !== null)
       )
 
       const txQuery = op(
-        sample(combine({ operations, subaccountState }), submit),
+        sample(combine({ operations, accountState }), submit),
         map(async params => {
           if (params.operations.length === 0) {
             throw new Error('No operations to execute')
           }
 
-          // Convert ContractCall[] to Rhinestone calls format
-          const calls = params.operations.map(op => ({
-            to: op.to,
-            data: op.data,
-            value: op.value ?? 0n
-          }))
+          const { walletClient } = params.accountState
 
-          // Execute through rhinestone subaccount
-          const result = await params.subaccountState.rhinestoneAccount.sendTransaction({
-            chain,
-            calls
-            // signers: {
-            //   type: 'owner',
-            //   kind: 'ecdsa',
-            //   // The signer you've created before
-            //   accounts: [params.subaccountState.signer]
-            // }
-          })
+          for (const call of params.operations) {
+            const hash = await walletClient.sendTransaction({
+              to: call.to,
+              data: call.data,
+              value: call.value,
+              chain,
+              account: walletClient.account!
+            })
 
-          // Wait for execution to complete
-          const receipt = await params.subaccountState.rhinestoneAccount.waitForExecution(result)
-
-          // Extract transaction hash from result
-          const hashes: Hex[] = []
-          if ('transactionHash' in receipt && receipt.transactionHash) {
-            hashes.push(receipt.transactionHash as Hex)
-          }
-          if (hashes.length === 0 && 'receipt' in receipt && (receipt as any).receipt?.transactionHash) {
-            hashes.push((receipt as any).receipt.transactionHash)
+            return { hash, chain } as TxResult
           }
 
-          return { hashes, chain } as TxResult
+          throw new Error('No operations executed')
         })
       )
 
@@ -92,7 +67,6 @@ export const $SendTransaction = ({
       const $status = op(
         combine({ operations, txState }),
         switchMap(params => {
-          // Show tx status when there's an active transaction
           if (params.txState !== null) {
             if (params.txState.status === PromiseStatus.PENDING) {
               return $spinnerTooltip($node($text('Awaiting confirmation')))
@@ -122,11 +96,8 @@ export const $SendTransaction = ({
             }
 
             if (params.txState.value) {
-              const { hashes, chain: txChain } = params.txState.value
-              return $alertPositiveTooltip(
-                $text('Success'),
-                $column(spacing.small)(...hashes.map(hash => $txHashRef(hash, txChain)))
-              )
+              const { hash, chain: txChain } = params.txState.value
+              return $alertPositiveTooltip($text('Success'), $column(spacing.small)($txHashRef(hash, txChain)))
             }
 
             return $spinnerTooltip($node($text('Awaiting execution')))
@@ -161,7 +132,7 @@ export const $SendTransaction = ({
             connect: accountChangeTether()
           })
         ),
-        { subaccountState, success }
+        { success }
       ]
     }
   )

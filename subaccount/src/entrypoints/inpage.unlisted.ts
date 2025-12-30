@@ -18,7 +18,9 @@ export default defineUnlistedScript(() => {
     }
 
     if (payload?.type === 'event') {
-      listeners.get(payload.event)?.forEach(fn => { fn(...payload.args) })
+      listeners.get(payload.event)?.forEach(fn => {
+        fn(...payload.args)
+      })
     }
   })
 

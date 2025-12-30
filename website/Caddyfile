@@ -77,6 +77,24 @@ handle /api/matchmaker {
     }
 }
 
+# Rhinestone Orchestrator proxy (/api/orchestrator/* → /*)
+handle /api/orchestrator/* {
+    @notFromSite {
+        not header Referer https://puppet.tech*
+        not header Referer https://www.puppet.tech*
+    }
+    respond @notFromSite "Forbidden" 403
+
+    uri strip_prefix /api/orchestrator
+    reverse_proxy https://v1.orchestrator.rhinestone.dev {
+        header_up Host {upstream_hostport}
+        header_up x-api-key {$ORCHESTRATOR_API_KEY}
+        transport http {
+            tls
+        }
+    }
+}
+
 # Health check endpoint
 handle /health {
     respond "OK" 200

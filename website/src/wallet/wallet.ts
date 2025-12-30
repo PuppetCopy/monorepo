@@ -10,17 +10,17 @@ import {
   type GetConnectionReturnType,
   getConnection,
   getConnections,
+  getWalletClient,
   type ReadContractParameters,
   readContract,
   reconnect,
   connect as wagmiConnect,
   disconnect as wagmiDisconnect,
-  getWalletClient as wagmiGetWalletClient,
   watchConnection
 } from '@wagmi/core'
 import { erc20Abi } from 'abitype/abis'
-import { type IStream, map, op } from 'aelea/stream'
-import { fromCallback, state } from 'aelea/stream-extended'
+import type { IStream } from 'aelea/stream'
+import { fromCallback } from 'aelea/stream-extended'
 import { Dialog, Mode } from 'porto'
 import {
   type Abi,
@@ -31,87 +31,27 @@ import {
   fallback,
   type Hex,
   http,
-  keccak256,
   type ReadContractReturnType,
-  toBytes,
   type Transport,
   type WalletClient
 } from 'viem'
 import { type Address, privateKeyToAccount, type toAccount } from 'viem/accounts'
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
-type ChainBalance = { chainId: number; balance: bigint }
+export type ChainBalance = { chainId: number; balance: bigint }
 
-type SubaccountSigner = ReturnType<typeof toAccount>
+export type SubaccountSigner = ReturnType<typeof toAccount>
 
-type IAccountState = {
+export type IAccountState = {
+  connection: GetConnectionReturnType<typeof wallet.wagmi>
   walletClient: WalletClient<Transport, Chain>
   address: Address
-  rhinestoneAccount: RhinestoneAccount
-}
-
-const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
-
-Sign this message to authorize your trading session.
-
-This signature will not cost any gas and does not grant access to your funds.`
-
-type DerivedSigner = ReturnType<typeof privateKeyToAccount>
-const derivedSigners = new Map<Address, DerivedSigner>()
-
-async function getOrDeriveSigner(accountState: IAccountState): Promise<DerivedSigner> {
-  const { walletClient, address } = accountState
-  const existing = derivedSigners.get(address)
-  if (existing) return existing
-
-  const signature = await walletClient.signMessage({
-    message: SIGNER_DERIVATION_MESSAGE,
-    account: address
-  })
-
-  const privateKey = keccak256(toBytes(signature)) as Hex
-  const signer = privateKeyToAccount(privateKey)
-  derivedSigners.set(address, signer)
-
-  return signer
-}
-
-function clearSigner(address?: Address): void {
-  if (address) {
-    derivedSigners.delete(address)
-  } else {
-    derivedSigners.clear()
-  }
+  rhinestoneAccount?: RhinestoneAccount
+  signer?: SubaccountSigner
 }
 
 const chainList = [arbitrum] as const
-
 const chainMap = groupList(chainList, 'id')
-
-// Rhinestone SDK for smart account creation
-const rhinestoneSDK = new RhinestoneSDK({
-  apiKey: 'proxy',
-  endpointUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/orchestrator`
-})
-
-// Subaccount storage
-const SUBACCOUNT_STORAGE_KEY = 'subaccounts'
-
-function getStoredSubaccount(address: Address): Address | null {
-  if (typeof window === 'undefined') return null
-  const stored = localStorage.getItem(SUBACCOUNT_STORAGE_KEY)
-  if (!stored) return null
-  const data = JSON.parse(stored)
-  return data[address]?.subaccountAddress ?? null
-}
-
-function storeSubaccount(ownerAddress: Address, subaccountAddress: Address): void {
-  if (typeof window === 'undefined') return
-  const existingData = localStorage.getItem(SUBACCOUNT_STORAGE_KEY)
-  const data = existingData ? JSON.parse(existingData) : {}
-  data[ownerAddress] = { subaccountAddress }
-  localStorage.setItem(SUBACCOUNT_STORAGE_KEY, JSON.stringify(data))
-}
 
 const CHAIN_NETWORK: Record<number, string> = {
   [mainnet.id]: 'ethereum',
@@ -120,6 +60,12 @@ const CHAIN_NETWORK: Record<number, string> = {
   [base.id]: 'base',
   [polygon.id]: 'polygon'
 }
+
+// Rhinestone SDK for smart account creation
+const rhinestoneSDK = new RhinestoneSDK({
+  apiKey: 'proxy',
+  endpointUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/orchestrator`
+})
 
 const WALLETCONNECT_PROJECT_ID = 'b81521b9a6d17b1d070aa5899c2fdcfe'
 
@@ -157,50 +103,37 @@ const connection: IStream<GetConnectionReturnType<typeof wagmi>> = fromCallback(
   return watchConnection(wagmi, { onChange: cb })
 })
 
-const account: IStream<Promise<IAccountState | null>> = op(
-  connection,
-  map(async connection => {
-    if (connection.status !== 'connected' || !connection.connector) return null
+async function initializeAccountState(
+  connection: GetConnectionReturnType,
+  subaccountPrivateKey?: Hex | null
+): Promise<IAccountState | null> {
+  const conn = connection
+  if (conn.status !== 'connected' || !conn.connector) return null
 
-    try {
-      const walletClient = await wagmiGetWalletClient(wagmi, { chainId: connection.chainId })
-      return { walletClient, address: walletClient.account.address }
-    } catch (error) {
-      console.warn('Failed to get wallet client:', error)
-      return null
-    }
-  }),
-  map(async accountPromise => {
-    const acc = await accountPromise
-    if (!acc) return null
+  const walletClient = await getWalletClient(wallet.wagmi, { chainId: conn.chainId })
 
-    const account = walletClientToAccount(acc.walletClient)
+  if (subaccountPrivateKey == null) {
+    return { walletClient, address: walletClient.account.address, connection }
+  }
 
-    const rhinestoneAccount = await rhinestoneSDK.createAccount({
-      owners: {
-        type: 'ecdsa',
-        accounts: [account]
-      },
-      modules: [
-        {
-          type: 'executor',
-          address: PUPPET_CONTRACT_MAP.Allocation.address,
-          initData: '0x'
-        }
-      ]
-    })
+  const account = walletClientToAccount(walletClient)
+  const signer = privateKeyToAccount(subaccountPrivateKey)
+  const rhinestoneAccount = await rhinestoneSDK.createAccount({
+    owners: {
+      type: 'ecdsa',
+      accounts: [account, signer]
+    },
+    modules: [
+      {
+        type: 'executor',
+        address: PUPPET_CONTRACT_MAP.Allocation.address,
+        initData: '0x'
+      }
+    ]
+  })
 
-    const subaccountAddress = rhinestoneAccount.getAddress()
-
-    const storedAddress = getStoredSubaccount(acc.address)
-    if (!storedAddress) {
-      storeSubaccount(acc.address, subaccountAddress)
-    }
-
-    return { walletClient: acc.walletClient, address: acc.address, rhinestoneAccount }
-  }),
-  state
-)
+  return { walletClient, address: walletClient.account.address, rhinestoneAccount, connection }
+}
 
 async function connect(preferredConnectorId?: string): Promise<Address[]> {
   try {
@@ -226,8 +159,54 @@ async function connect(preferredConnectorId?: string): Promise<Address[]> {
   }
 }
 
+const pendingExtensionMessages = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>()
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('message', event => {
+    if (event.source !== window || event.data?.target !== 'puppet-website') return
+    const { id, response } = event.data
+    const pending = pendingExtensionMessages.get(id)
+    if (pending) {
+      pendingExtensionMessages.delete(id)
+      response?.success === false ? pending.reject(new Error(response.error)) : pending.resolve(response)
+    }
+  })
+}
+
+function checkExtension(): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false)
+  return sendToExtension('PUPPET_GET_WALLET_STATE', {})
+    .then(() => true)
+    .catch(() => false)
+}
+
+let extensionMessageId = 0
+
+async function sendToExtension(type: string, payload: unknown = {}, timeoutMs = 1000): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const id = extensionMessageId++
+    const timeout = setTimeout(() => {
+      pendingExtensionMessages.delete(id)
+      reject(new Error('Extension timeout'))
+    }, timeoutMs)
+
+    pendingExtensionMessages.set(id, {
+      resolve: v => {
+        clearTimeout(timeout)
+        resolve(v)
+      },
+      reject: e => {
+        clearTimeout(timeout)
+        reject(e)
+      }
+    })
+
+    window.postMessage({ target: 'puppet-extension', id, type, payload }, '*')
+  })
+}
+
 async function disconnect() {
-  clearSigner()
+  // clearSigner()
   const current = getConnection(wagmi)
   if (current.connector) {
     await wagmiDisconnect(wagmi, { connector: current.connector })
@@ -295,8 +274,10 @@ const wallet = {
   read,
   getTokenBalance,
   getMultichainBalances,
-  account,
+  connection,
   connect,
+  initializeAccountState,
+  sendToExtension,
   disconnect,
   publicClient,
   wagmi,
@@ -305,6 +286,4 @@ const wallet = {
   walletConnectProjectId: WALLETCONNECT_PROJECT_ID
 }
 
-export { getOrDeriveSigner, SIGNER_DERIVATION_MESSAGE }
-export type { IAccountState, SubaccountSigner, ChainBalance, DerivedSigner }
 export default wallet

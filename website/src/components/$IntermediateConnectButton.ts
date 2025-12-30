@@ -1,0 +1,102 @@
+import { type IOps, type IStream, join, just, map, op } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
+import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
+import { $row, spacing } from 'aelea/ui-components'
+import { type Address, keccak256, toBytes } from 'viem'
+import { $intermediatePromise } from '@/ui-components'
+import wallet, { type IAccountState } from '../wallet/wallet.js'
+import { $Popover } from './$Popover.js'
+import { $WalletConnect } from './$WalletConnect.js'
+import { $ButtonSecondary } from './form/$Button.js'
+import { $ButtonCore } from './form/$ButtonCore.js'
+
+export interface IConnectWalletPopover {
+  $$display: IOps<IAccountState, I$Node>
+  $container?: INodeCompose
+  accountQuery: IStream<Promise<IAccountState>>
+}
+
+export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
+  component(
+    (
+      [connect, connectTether]: IBehavior<Address[]>, //
+      [openPopover, openPopoverTether]: IBehavior<PointerEvent>,
+      [changeAccount, changeAccountTether]: IBehavior<PointerEvent, Promise<IAccountState>>
+    ) => {
+      const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
+
+      const $walletConnect = $WalletConnect()({
+        connect: connectTether()
+      })
+
+      const $baseButton = $container(
+        $ButtonSecondary({
+          $content: $row(spacing.default, style({ alignItems: 'center' }))($text('Connect Wallet'))
+        })({
+          click: openPopoverTether()
+        })
+      )
+
+      const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
+      
+Sign this message to authorize your trading session.
+
+This signature will not cost any gas and does not grant access to your funds.`
+
+      const $content = op(
+        config.accountQuery, //
+        map(async query => {
+          const account = await query
+          if (!account) {
+            return $Popover({
+              $target: $baseButton,
+              $open: map(() => $walletConnect, openPopover),
+              dismiss: connect
+            })({})
+          }
+
+          if (!account.signer) {
+            $ButtonCore({
+              $content: $text('Sign')
+            })({
+              click: changeAccountTether(
+                map(async () => {
+                  const message = await account.walletClient.signMessage({
+                    message: SIGNER_DERIVATION_MESSAGE,
+                    account: account.address
+                  })
+
+                  const privateKey = keccak256(toBytes(message))
+
+                  const nextAccountState = await wallet.initializeAccountState(account.connection, privateKey)
+
+                  await wallet.sendToExtension(
+                    'PUPPET_SET_WALLET_STATE',
+                    {
+                      ownerAddress: account.address,
+                      smartWalletAddress: nextAccountState!.rhinestoneAccount!.getAddress(),
+                      privateKey
+                    },
+                    5000
+                  )
+
+                  return nextAccountState
+                })
+              )
+            })
+          }
+
+          return join(config.$$display(just(account)))
+        })
+      )
+
+      return [
+        $intermediatePromise({
+          $display: $content
+        }),
+        {
+          changeAccount
+        }
+      ]
+    }
+  )

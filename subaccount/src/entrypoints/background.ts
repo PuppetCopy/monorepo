@@ -1,8 +1,17 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { GMX_V2_CONTRACT_MAP } from '@puppet/contracts/gmx'
 import { CALL_INTENT, type CallIntent } from '@puppet/sdk/matching'
-import { createPublicClient, encodeAbiParameters, getAddress, type Hex, http, keccak256, parseAbiParameters, toHex } from 'viem'
-import { signTypedData } from 'viem/accounts'
+import {
+  createPublicClient,
+  encodeAbiParameters,
+  getAddress,
+  type Hex,
+  http,
+  keccak256,
+  parseAbiParameters,
+  toHex
+} from 'viem'
+import { signMessage, signTypedData } from 'viem/accounts'
 import { arbitrum } from 'viem/chains'
 import { parseCreateOrderParams } from '../lib/gmx.js'
 import type { TransactionParams } from '../types.js'
@@ -22,7 +31,12 @@ interface WalletState {
   privateKey: string | null
 }
 
-const DEFAULT_STATE: WalletState = { ownerAddress: null, smartWalletAddress: null, subaccountName: null, privateKey: null }
+const DEFAULT_STATE: WalletState = {
+  ownerAddress: null,
+  smartWalletAddress: null,
+  subaccountName: null,
+  privateKey: null
+}
 
 interface OrderRequest {
   type: 'order'
@@ -64,8 +78,8 @@ export default defineBackground(async () => {
 
   async function handleWebsiteMessage(message: { type: string; payload?: unknown }): Promise<unknown> {
     switch (message.type) {
-      case 'PUPPET_GET_WALLET_STATE':
-        return { walletState: { ...walletState, privateKey: undefined } }
+      case 'PUPPET_GET_WALLET_KEY':
+        return walletState.privateKey
 
       case 'PUPPET_CLEAR_WALLET_STATE':
         walletState = { ...DEFAULT_STATE }
@@ -167,9 +181,30 @@ export default defineBackground(async () => {
         throw new Error('Unsupported venue')
       }
 
-      case 'personal_sign':
-      case 'eth_signTypedData_v4':
-        throw new Error('Signing not yet implemented')
+      case 'personal_sign': {
+        if (!walletState.privateKey) {
+          chrome.tabs.create({ url: `${PUPPET_URL}/wallet` })
+          throw new Error('Please connect your wallet on Puppet first')
+        }
+        const [message] = (params || []) as [Hex]
+        return signMessage({ privateKey: walletState.privateKey as Hex, message: { raw: message } })
+      }
+
+      case 'eth_signTypedData_v4': {
+        if (!walletState.privateKey) {
+          chrome.tabs.create({ url: `${PUPPET_URL}/wallet` })
+          throw new Error('Please connect your wallet on Puppet first')
+        }
+        const [, typedDataJson] = (params || []) as [string, string]
+        const typedData = JSON.parse(typedDataJson)
+        return signTypedData({
+          privateKey: walletState.privateKey as Hex,
+          domain: typedData.domain,
+          types: typedData.types,
+          primaryType: typedData.primaryType,
+          message: typedData.message
+        })
+      }
 
       default:
         return rpcCall(method, params)

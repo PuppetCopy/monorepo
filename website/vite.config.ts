@@ -77,6 +77,19 @@ export default defineConfig({
         changeOrigin: true,
         ws: true,
         rewrite: path => path.replace(/^\/api\/matchmaker/, '/ws')
+      },
+      '/api/orchestrator': {
+        target: 'https://v1.orchestrator.rhinestone.dev',
+        changeOrigin: true,
+        secure: true,
+        rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
+        configure: proxy => {
+          proxy.on('proxyReq', proxyReq => {
+            if (process.env.ORCHESTRATOR_API_KEY) {
+              proxyReq.setHeader('x-api-key', process.env.ORCHESTRATOR_API_KEY)
+            }
+          })
+        }
       }
     }
   },
