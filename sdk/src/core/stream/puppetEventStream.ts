@@ -26,19 +26,11 @@ function createFilteredStream<const T extends readonly AbiParameter[]>(
   )
 }
 
-export function createCreateSubaccountStream(client: PublicClient) {
+export function createCreateMasterSubaccountStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.hash,
-    CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.args
-  )
-}
-
-export function createExecuteMasterDepositStream(client: PublicClient) {
-  return createFilteredStream(
-    client,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.hash,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.args
+    CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.hash,
+    CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.args
   )
 }
 

@@ -1,13 +1,6 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    "outDir": "./dist",
-    "rootDir": ".",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["bun", "chrome"]
-  },
-  "include": ["src/**/*.ts", "build.ts"],
-  "exclude": ["node_modules", "dist"]
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  }
 }

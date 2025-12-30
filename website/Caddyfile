@@ -65,6 +65,18 @@ handle /api/rpc {
     }
 }
 
+# Matchmaker WebSocket proxy (/api/matchmaker → /ws)
+handle /api/matchmaker {
+    rewrite * /ws
+    reverse_proxy {$MATCHMAKER_URL} {
+        header_up Host {upstream_hostport}
+        transport http {
+            read_timeout 60s
+            write_timeout 60s
+        }
+    }
+}
+
 # Health check endpoint
 handle /health {
     respond "OK" 200

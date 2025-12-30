@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@puppet/contracts": "workspace:*",
+    "@puppet/database": "workspace:*",
     "abitype": "catalog:",
     "aelea": "catalog:",
     "lightweight-charts": "catalog:",

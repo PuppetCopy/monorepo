@@ -1,4 +1,5 @@
-import { ADDRESS_ZERO, BYTES32_ONE, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { groupList } from '@puppet/sdk/core'
 import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
 import { porto, walletConnect } from '@wagmi/connectors'
@@ -32,8 +33,8 @@ import {
   http,
   keccak256,
   type ReadContractReturnType,
-  type Transport,
   toBytes,
+  type Transport,
   type WalletClient
 } from 'viem'
 import { type Address, privateKeyToAccount, type toAccount } from 'viem/accounts'
@@ -46,8 +47,41 @@ type SubaccountSigner = ReturnType<typeof toAccount>
 type IAccountState = {
   walletClient: WalletClient<Transport, Chain>
   address: Address
-  // signer: SubaccountSigner
   rhinestoneAccount: RhinestoneAccount
+}
+
+const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
+
+Sign this message to authorize your trading session.
+
+This signature will not cost any gas and does not grant access to your funds.`
+
+type DerivedSigner = ReturnType<typeof privateKeyToAccount>
+const derivedSigners = new Map<Address, DerivedSigner>()
+
+async function getOrDeriveSigner(accountState: IAccountState): Promise<DerivedSigner> {
+  const { walletClient, address } = accountState
+  const existing = derivedSigners.get(address)
+  if (existing) return existing
+
+  const signature = await walletClient.signMessage({
+    message: SIGNER_DERIVATION_MESSAGE,
+    account: address
+  })
+
+  const privateKey = keccak256(toBytes(signature)) as Hex
+  const signer = privateKeyToAccount(privateKey)
+  derivedSigners.set(address, signer)
+
+  return signer
+}
+
+function clearSigner(address?: Address): void {
+  if (address) {
+    derivedSigners.delete(address)
+  } else {
+    derivedSigners.clear()
+  }
 }
 
 const chainList = [arbitrum] as const
@@ -77,89 +111,6 @@ function storeSubaccount(ownerAddress: Address, subaccountAddress: Address): voi
   const data = existingData ? JSON.parse(existingData) : {}
   data[ownerAddress] = { subaccountAddress }
   localStorage.setItem(SUBACCOUNT_STORAGE_KEY, JSON.stringify(data))
-}
-
-// Extension messaging
-let extensionMessageId = 0
-const pendingExtensionMessages = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>()
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('message', event => {
-    if (event.source !== window || event.data?.target !== 'puppet-website') return
-    const { id, response } = event.data
-    const pending = pendingExtensionMessages.get(id)
-    if (pending) {
-      pendingExtensionMessages.delete(id)
-      response?.success === false ? pending.reject(new Error(response.error)) : pending.resolve(response)
-    }
-  })
-}
-
-function sendToExtension(type: string, payload: unknown): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    const id = extensionMessageId++
-    const timeout = setTimeout(() => {
-      pendingExtensionMessages.delete(id)
-      reject(new Error('Extension timeout'))
-    }, 5000)
-
-    pendingExtensionMessages.set(id, {
-      resolve: v => {
-        clearTimeout(timeout)
-        resolve(v)
-      },
-      reject: e => {
-        clearTimeout(timeout)
-        reject(e)
-      }
-    })
-
-    window.postMessage({ target: 'puppet-extension', id, type, payload }, '*')
-  })
-}
-
-const extensionDetected =
-  typeof window !== 'undefined'
-    ? sendToExtension('PUPPET_GET_WALLET_STATE', {})
-        .then(() => true)
-        .catch(() => false)
-    : Promise.resolve(false)
-
-// Session signers - derived from signature, stored in memory only (per account)
-type DerivedSigner = ReturnType<typeof privateKeyToAccount>
-const derivedSigners = new Map<Address, DerivedSigner>()
-
-const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
-
-Sign this message to authorize your trading session.
-
-This signature will not cost any gas and does not grant access to your funds.`
-
-async function getOrDeriveSigner(
-  walletClient: WalletClient<Transport, Chain>,
-  address: Address
-): Promise<DerivedSigner> {
-  const existing = derivedSigners.get(address)
-  if (existing) return existing
-
-  const signature = await walletClient.signMessage({
-    message: SIGNER_DERIVATION_MESSAGE,
-    account: address
-  })
-
-  const privateKey = keccak256(toBytes(signature)) as Hex
-  const signer = privateKeyToAccount(privateKey)
-  derivedSigners.set(address, signer)
-
-  return signer
-}
-
-function clearSigner(address?: Address): void {
-  if (address) {
-    derivedSigners.delete(address)
-  } else {
-    derivedSigners.clear()
-  }
 }
 
 const CHAIN_NETWORK: Record<number, string> = {
@@ -225,48 +176,25 @@ const account: IStream<Promise<IAccountState | null>> = op(
 
     const account = walletClientToAccount(acc.walletClient)
 
-    // Lazy signer - derives from signature when first used
-    // const signer = toAccount({
-    //   address: account.address,
-    //   signMessage: async ({ message }) => {
-    //     const signer = await getOrDeriveSigner(acc.walletClient, acc.address)
-    //     return signer.signMessage({ message })
-    //   },
-    //   signTransaction: async () => {
-    //     throw new Error('Use sendTransaction instead')
-    //   },
-    //   signTypedData: async params => {
-    //     const signer = await getOrDeriveSigner(acc.walletClient, acc.address)
-    //     return signer.signTypedData(params)
-    //   }
-    // })
-
     const rhinestoneAccount = await rhinestoneSDK.createAccount({
       owners: {
         type: 'ecdsa',
-        accounts: [account, privateKeyToAccount(BYTES32_ONE)]
-        // accounts: [
-        //   account,
-        //   signer
-        // ]
-      }
+        accounts: [account]
+      },
+      modules: [
+        {
+          type: 'executor',
+          address: PUPPET_CONTRACT_MAP.Allocation.address,
+          initData: '0x'
+        }
+      ]
     })
 
     const subaccountAddress = rhinestoneAccount.getAddress()
 
-    // Store address for quick lookup on reload
     const storedAddress = getStoredSubaccount(acc.address)
     if (!storedAddress) {
       storeSubaccount(acc.address, subaccountAddress)
-    }
-
-    // Sync to extension if available
-    const hasExtension = await extensionDetected
-    if (hasExtension) {
-      sendToExtension('PUPPET_SET_WALLET_STATE', {
-        ownerAddress: acc.address,
-        smartWalletAddress: subaccountAddress
-      }).catch(console.warn)
     }
 
     return { walletClient: acc.walletClient, address: acc.address, rhinestoneAccount }
@@ -377,5 +305,6 @@ const wallet = {
   walletConnectProjectId: WALLETCONNECT_PROJECT_ID
 }
 
+export { getOrDeriveSigner, SIGNER_DERIVATION_MESSAGE }
 export type { IAccountState, SubaccountSigner, ChainBalance, DerivedSigner }
 export default wallet

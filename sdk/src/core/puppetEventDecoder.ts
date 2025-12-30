@@ -9,10 +9,8 @@ export const eventKey = (contractName: string, eventHash: string) => `${contract
 
 export const EVENT_DECODER_MAP = {
   // Allocation.sol decoders
-  [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.CreateSubaccount.args, data),
-  [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.ExecuteMasterDeposit.args, data),
+  [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.args, data),
   [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.hash)]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.args, data),
   [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.ExecuteAllocateFailed.hash)]: (data: Hex) =>
@@ -21,6 +19,8 @@ export const EVENT_DECODER_MAP = {
     decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.ExecuteWithdraw.args, data),
   [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.hash)]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.args, data),
+  [eventKey('Allocation', CONTRACT_EVENT_MAP.Allocation.ExecuteOrderFailed.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocation.ExecuteOrderFailed.args, data),
 
   // FeeMarketplace.sol decoders
   [eventKey('FeeMarketplace', CONTRACT_EVENT_MAP.FeeMarketplace.Deposit.hash)]: (data: Hex) =>

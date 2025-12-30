@@ -71,6 +71,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: path => path.replace(/^\/api\/indexer/, '')
+      },
+      '/api/matchmaker': {
+        target: process.env.MATCHMAKER_URL,
+        changeOrigin: true,
+        ws: true,
+        rewrite: path => path.replace(/^\/api\/matchmaker/, '/ws')
       }
     }
   },

@@ -19,7 +19,7 @@ import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { BalanceDraft } from '../components/portfolio/$DepositEditor.js'
 import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
-import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
+// import { $PortfolioEditorDrawer } from '../components/portfolio/$PortfolioEditorDrawer.js'
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
@@ -281,17 +281,17 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 zIndex: 10
               })
             )(
-              $PortfolioEditorDrawer({
-                route: rootRoute,
-                userMatchingRuleQuery,
-                draftDepositTokenList,
-                draftMatchingRuleList
-              })({
-                routeChange: changeRouteTether(),
-                changeMatchRuleList: changeMatchRuleListTether(),
-                changeDepositTokenList: changeDepositTokenListTether(),
-                txSuccess: txSuccessTether()
-              })
+              // $PortfolioEditorDrawer({
+              //   route: rootRoute,
+              //   userMatchingRuleQuery,
+              //   draftDepositTokenList,
+              //   draftMatchingRuleList
+              // })({
+              //   routeChange: changeRouteTether(),
+              //   changeMatchRuleList: changeMatchRuleListTether(),
+              //   changeDepositTokenList: changeDepositTokenListTether(),
+              //   txSuccess: txSuccessTether()
+              // })
             )
           )
         )

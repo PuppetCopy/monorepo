@@ -62,7 +62,7 @@ export const $SendTransaction = ({
           // Execute through rhinestone subaccount
           const result = await params.subaccountState.rhinestoneAccount.sendTransaction({
             chain,
-            calls,
+            calls
             // signers: {
             //   type: 'owner',
             //   kind: 'ecdsa',
