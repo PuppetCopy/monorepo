@@ -58,7 +58,14 @@ export const $defaultButtonSecondary = $defaultButtonCore(
 )
 
 export const $defaultMiniButtonSecondary = $defaultButtonSecondary(
-  style({ alignSelf: 'center', borderWidth: '1px', height: '28px', padding: '0 10px', fontSize: '.8rem' })
+  style({
+    alignSelf: 'center',
+    borderWidth: '1px',
+    height: '28px',
+    padding: '0 10px',
+    fontSize: '.8rem',
+    borderColor: colorAlpha(pallete.foreground, 0.35)
+  })
 )
 
 export const $ButtonPrimary = (config: IButtonCore) => {

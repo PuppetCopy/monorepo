@@ -41,7 +41,7 @@ export const $ButtonCore = ({ $content, $container = $defaultButtonCore, disable
           ? styleBehavior(
               op(
                 disabled,
-                start(true),
+                start(false),
                 map(isDisabled => {
                   return isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : null
                 })

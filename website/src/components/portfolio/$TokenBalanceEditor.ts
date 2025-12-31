@@ -1,6 +1,6 @@
-import { readableTokenAmountLabel } from '@puppet/sdk/core'
+import { readableTokenAmount } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import { constant, type IStream, just, map, merge, switchMap } from 'aelea/stream'
+import { combine, constant, type IStream, just, map, merge, switchMap } from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
@@ -25,7 +25,6 @@ export interface ITokenBalanceEditor {
   balance: IStream<bigint>
   account: IAccountState
   model?: IStream<BalanceDraft>
-  adjustmentChange?: IStream<string>
   withdrawBalance?: IStream<bigint>
 }
 
@@ -36,7 +35,7 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
-      const { token, balance, account, model, adjustmentChange, withdrawBalance } = config
+      const { token, balance, account, model, withdrawBalance } = config
 
       const tokenDescription = getTokenDescription(token)
 
@@ -56,23 +55,33 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
         )
 
       // Color based on action type
-      const adjustmentColor = model
-        ? map(
-            draft =>
-              draft ? (draft.action === BALANCE_ACTION.DEPOSIT ? pallete.positive : pallete.negative) : undefined,
-            model
-          )
-        : just(undefined)
+      const adjustmentColor = map(
+        draft =>
+          draft?.amount > 0n
+            ? draft.action === BALANCE_ACTION.DEPOSIT
+              ? pallete.positive
+              : pallete.negative
+            : undefined,
+        depositModel
+      )
+
+      // Compute adjustment change from model and balance
+      const adjustmentChange = map(
+        ({ draft, bal }) => {
+          if (!draft || draft.amount === 0n) return ''
+          const newBalance =
+            draft.action === BALANCE_ACTION.DEPOSIT ? bal + draft.amount : bal - draft.amount
+          return readableTokenAmount(tokenDescription, newBalance)
+        },
+        combine({ draft: depositModel, bal: balance })
+      )
 
       const $balanceDisplay = (bal: bigint): I$Node => {
-        if (adjustmentChange) {
-          return $labeledhintAdjustment({
-            color: adjustmentColor,
-            change: adjustmentChange,
-            $val: $text(readableTokenAmountLabel(tokenDescription, bal))
-          })
-        }
-        return $node($text(readableTokenAmountLabel(tokenDescription, bal)))
+        return $labeledhintAdjustment({
+          color: adjustmentColor,
+          change: adjustmentChange,
+          $val: $text(readableTokenAmount(tokenDescription, bal))
+        })
       }
 
       const $depositEditor = $DepositEditor({
@@ -95,7 +104,7 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
 
       return [
         $Popover({
-          $target: $row(spacing.big, style({ padding: '6px 0', alignItems: 'center' }))(
+          $target: $row(spacing.small, style({ padding: '6px 0', alignItems: 'center' }))(
             $route(tokenDescription),
             switchMap((bal): I$Node => {
               return $row(spacing.small, style({ alignItems: 'center' }))(

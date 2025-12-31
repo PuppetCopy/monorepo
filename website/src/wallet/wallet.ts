@@ -32,8 +32,11 @@ import {
   fallback,
   type Hex,
   http,
+  keccak256,
   type ReadContractReturnType,
   type Transport,
+  toBytes,
+  toHex,
   type WalletClient
 } from 'viem'
 import { type Address, privateKeyToAccount } from 'viem/accounts'
@@ -41,7 +44,7 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains'
 
 export type ChainBalance = { chainId: number; balance: bigint }
 
-const chainList = [arbitrum] as const
+const chainList = [arbitrum, base, optimism, polygon] as const
 const chainMap = groupList(chainList, 'id')
 
 const CHAIN_NETWORK: Record<number, string> = {
@@ -137,6 +140,37 @@ function setStoredSubaccountAddress(ownerAddress: Address, subaccountAddress: Ad
   }
 }
 
+const SIGNER_DERIVATION_MESSAGE = `Puppet Protocol Session Authorization
+
+Sign this message to authorize your trading session.
+
+This signature will not cost any gas and does not grant access to your funds.`
+
+export async function signAndEnableSession(account: IAccountState): Promise<IAccountState | null> {
+  const message = await account.walletClient.signMessage({
+    message: SIGNER_DERIVATION_MESSAGE,
+    account: account.address
+  })
+
+  const privateKey = keccak256(toBytes(message))
+
+  // Initialize account to get rhinestone smart wallet address
+  const nextAccountState = await initializeAccountState(account.connection, privateKey)
+
+  // Store complete wallet entry in extension
+  if (nextAccountState?.subaccount) {
+    const smartWalletAddress = nextAccountState.subaccount.getAddress()
+    const subaccountName = toHex('default', { size: 32 })
+    await setExtensionWalletState(account.address, {
+      smartWalletAddress,
+      subaccountName,
+      privateKey
+    })
+  }
+
+  return nextAccountState
+}
+
 export async function initializeAccountState(
   connection: GetConnectionReturnType,
   subaccountPrivateKey?: Hex | null
@@ -160,7 +194,7 @@ export async function initializeAccountState(
     const walletState = await getExtensionWalletState(address)
     if (walletState) {
       isSynced = true
-      privateKey = privateKey ?? (await getExtensionWalletKey(address))
+      privateKey = privateKey ?? walletState.privateKey
       setActiveWallet(address)
     }
   } catch {
@@ -177,7 +211,11 @@ export async function initializeAccountState(
   const subaccount = await rhinestoneSDK.createAccount({
     owners: {
       type: 'ecdsa',
-      accounts: [account, signer]
+      accounts: [account, signer],
+      threshold: 1 // Either owner can sign alone
+    },
+    experimental_sessions: {
+      enabled: true
     },
     modules: [
       {
@@ -188,12 +226,14 @@ export async function initializeAccountState(
     ]
   })
 
+  // debugger
+
   const subaccountAddress = subaccount.getAddress()
 
   // Cache subaccountAddress for view-mode
   setStoredSubaccountAddress(address, subaccountAddress)
 
-  return { walletClient, address, subaccountAddress, subaccount, signer, connection, isSynced }
+  return { walletClient, address, subaccountAddress, subaccount, connection, isSynced: true }
 }
 
 export async function connectWallet(preferredConnectorId?: string): Promise<ConnectReturnType<typeof wagmi>> {
@@ -240,7 +280,7 @@ async function sendExtensionMessage<T = unknown>(type: string, payload?: unknown
     const timeout = setTimeout(() => {
       pendingExtensionRequests.delete(id)
       reject(new Error('Extension request timeout'))
-    }, 500)
+    }, 50)
 
     pendingExtensionRequests.set(id, {
       resolve: (v: unknown) => {
@@ -257,17 +297,11 @@ async function sendExtensionMessage<T = unknown>(type: string, payload?: unknown
   })
 }
 
-
-// Get stored wallet state for a specific owner address (verifies wallet exists in extension)
+// Get stored wallet state for a specific owner address (includes privateKey)
 export async function getExtensionWalletState(
   ownerAddress: Address
-): Promise<{ smartWalletAddress: string; subaccountName: string } | null> {
+): Promise<{ smartWalletAddress: string; subaccountName: string; privateKey: Hex } | null> {
   return sendExtensionMessage('PUPPET_GET_WALLET_STATE', { ownerAddress })
-}
-
-// Get stored private key for a specific owner address
-export async function getExtensionWalletKey(ownerAddress: Address): Promise<Hex | null> {
-  return sendExtensionMessage<Hex | null>('PUPPET_GET_WALLET_KEY', { ownerAddress })
 }
 
 // Set wallet state for a specific owner address (requires all fields)
@@ -290,6 +324,11 @@ export async function setActiveWallet(ownerAddress: Address | null): Promise<voi
 // Clear wallet state for a specific owner
 export async function clearExtensionWalletState(ownerAddress: Address): Promise<void> {
   await sendExtensionMessage('PUPPET_CLEAR_WALLET_STATE', { ownerAddress })
+}
+
+// Clear all extension storage (full reset)
+export async function clearAllExtensionStorage(): Promise<void> {
+  await sendExtensionMessage('PUPPET_CLEAR_ALL')
 }
 
 async function disconnect() {

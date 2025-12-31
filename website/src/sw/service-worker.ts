@@ -30,8 +30,8 @@ self.addEventListener('fetch', event => {
   // Do not cache POST requests (they are typically state-changing)
   if (event.request.method !== 'GET') return
 
-  // Do not cache orchestrator stateful endpoints (write operations)
-  const noCachePaths = ['/api/indexer/status', '/api/indexer/sql/db']
+  // Do not cache stateful endpoints (status polls, write operations)
+  const noCachePaths = ['/api/indexer/status', '/api/indexer/sql/db', '/api/orchestrator']
   const isNoCache = noCachePaths.some(path => url.pathname.startsWith(path))
   if (isNoCache) return
 

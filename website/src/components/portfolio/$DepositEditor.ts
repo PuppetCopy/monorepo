@@ -82,7 +82,7 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
         sample(selectedChainBalance, clickMax),
         inputAmount,
         constant(0n, selectChain),
-        map(m => m.amount, model)
+        map(m => (m.action === BALANCE_ACTION.DEPOSIT ? m.amount : 0n), model)
       )
 
       const alert = op(

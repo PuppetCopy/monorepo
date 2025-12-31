@@ -27,7 +27,7 @@ import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
 import { queryUserSubscribeRuleList } from '../common/query.js'
 import { getStatus } from '../common/sqlClient.js'
-import { $ActionDrawer, balanceDraftToAction } from '../components/$ActionDrawer.js'
+import { $ActionDrawer } from '../components/$ActionDrawer.js'
 import { $MainMenu } from '../components/$MainMenu.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../components/form/$Button.js'
 import type { BalanceDraft } from '../components/portfolio/$DepositEditor.js'
@@ -248,7 +248,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             $midContainer(
               fadeIn(
                 $WalletPage({ accountQuery, draftDepositTokenList })({
-                  changeDepositTokenList: changeDepositTokenListTether()
+                  changeDepositTokenList: changeDepositTokenListTether(),
+                  changeAccount: changeAccountTether()
                 })
               )
             )
@@ -325,7 +326,6 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
             )(
               $ActionDrawer({
                 accountQuery,
-                drafts: map(list => list.map(draft => balanceDraftToAction(draft)), draftDepositTokenList),
                 depositDrafts: draftDepositTokenList
               })({
                 changeAccount: changeAccountTether(),

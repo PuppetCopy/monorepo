@@ -73,22 +73,12 @@ export default defineBackground(async () => {
 
   async function handleWebsiteMessage(message: { type: string; payload?: unknown }): Promise<unknown> {
     switch (message.type) {
-      // Get wallet entry for a specific owner address
+      // Get wallet entry for a specific owner address (includes privateKey)
       case 'PUPPET_GET_WALLET_STATE': {
         const payload = message.payload as { ownerAddress?: string } | undefined
         const ownerAddress = payload?.ownerAddress?.toLowerCase()
         if (!ownerAddress) return null
-        const entry = storage.wallets[ownerAddress]
-        if (!entry) return null
-        return { ...entry, privateKey: undefined }
-      }
-
-      // Get the private key for a specific owner (used for session derivation)
-      case 'PUPPET_GET_WALLET_KEY': {
-        const payload = message.payload as { ownerAddress?: string } | undefined
-        const ownerAddress = payload?.ownerAddress?.toLowerCase()
-        if (!ownerAddress) return null
-        return storage.wallets[ownerAddress]?.privateKey ?? null
+        return storage.wallets[ownerAddress] ?? null
       }
 
       // Set wallet entry for a specific owner (requires all fields)
@@ -143,6 +133,14 @@ export default defineBackground(async () => {
         if (storage.activeOwner === key) storage.activeOwner = null
 
         await chrome.storage.local.set({ storedWallets: storage })
+        return null
+      }
+
+      // Clear all extension storage (full reset)
+      case 'PUPPET_CLEAR_ALL': {
+        storage.wallets = {}
+        storage.activeOwner = null
+        await chrome.storage.local.clear()
         return null
       }
 
