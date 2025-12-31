@@ -1,4 +1,5 @@
-import { CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
+import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
+import { ARBITRUM_ADDRESS, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { getMappedValueFallback, readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
 import {
@@ -19,7 +20,7 @@ import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { waitForTransactionReceipt } from '@wagmi/core'
-import { encodeFunctionData, erc20Abi, type Hex } from 'viem'
+import { encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, keccak256, toHex, zeroAddress } from 'viem'
 import { arbitrum, base, optimism, polygon, type Chain } from 'viem/chains'
 import type { IDepositEditorDraft } from './portfolio/$DepositEditor.js'
 
@@ -59,8 +60,9 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
       // Submit: sample current state on click, execute transactions
       const submitQuery = sampleMap(
         async ({ acc: accPromise, deposits }) => {
-          const acc = await accPromise
-          if (!acc?.subaccount) throw new Error('No account or session')
+          try {
+            const acc = await accPromise
+            if (!acc?.subaccount) throw new Error('No account or session')
 
           const subaccountAddress = acc.subaccount.getAddress()
           const ownerAddress = acc.address
@@ -145,6 +147,62 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
             }
           }
 
+          // Register subaccount with Allocation module if needed (enables one-click trading)
+          if (depositDrafts.length > 0) {
+            const subaccountName = toHex('default', { size: 32 })
+            const matchingKey = keccak256(
+              encodeAbiParameters(
+                [{ type: 'address' }, { type: 'address' }, { type: 'bytes32' }],
+                [ARBITRUM_ADDRESS.USDC, subaccountAddress, subaccountName]
+              )
+            )
+
+            // Check if already registered
+            const registeredMaster = await wallet.read({
+              abi: PUPPET_CONTRACT_MAP.Allocation.abi,
+              address: PUPPET_CONTRACT_MAP.Allocation.address,
+              functionName: 'masterSubaccountMap',
+              args: [matchingKey]
+            })
+
+            if (registeredMaster === zeroAddress) {
+              // Wait for any pending deposit tx to confirm first
+              const lastDepositTx = txResults[txResults.length - 1]
+              if (lastDepositTx) {
+                await waitForTransactionReceipt(wallet.wagmi, {
+                  hash: lastDepositTx.hash,
+                  chainId: lastDepositTx.chain.id
+                })
+              }
+
+              // Register subaccount via subaccount tx (deploys account + installs Allocation module)
+              const registerResult = await acc.subaccount.sendTransaction({
+                chain: arbitrum,
+                calls: [
+                  {
+                    to: PUPPET_CONTRACT_MAP.Allocation.address,
+                    data: encodeFunctionData({
+                      abi: PUPPET_CONTRACT_MAP.Allocation.abi,
+                      functionName: 'createMasterSubaccount',
+                      args: [ownerAddress, acc.signer!.address, subaccountAddress, ARBITRUM_ADDRESS.USDC, subaccountName]
+                    }),
+                    value: 0n
+                  }
+                ],
+                sponsored: true
+              })
+              const registerReceipt = await acc.subaccount.waitForExecution(registerResult)
+              console.log('[ActionDrawer] Register receipt:', registerReceipt)
+              const registerHash =
+                ('transactionHash' in registerReceipt && registerReceipt.transactionHash) ||
+                ('hash' in registerReceipt && registerReceipt.hash)
+              console.log('[ActionDrawer] Register txHash:', registerHash)
+              if (registerHash) {
+                txResults.push({ hash: registerHash as Hex, chain: arbitrum })
+              }
+            }
+          }
+
           // Execute withdrawals via subaccount on Arbitrum (7579 intent call)
           if (withdrawDrafts.length > 0) {
             const withdrawCalls = withdrawDrafts.map(draft => ({
@@ -163,17 +221,24 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
               sponsored: true
             })
             const receipt = await acc.subaccount.waitForExecution(result)
+            console.log('[ActionDrawer] Withdraw receipt:', receipt)
 
             // Handle different receipt formats from Rhinestone SDK
             const txHash =
               ('transactionHash' in receipt && receipt.transactionHash) ||
               ('hash' in receipt && receipt.hash)
+            console.log('[ActionDrawer] Extracted txHash:', txHash)
             if (txHash) {
               txResults.push({ hash: txHash as Hex, chain: arbitrum })
             }
           }
 
+          console.log('[ActionDrawer] Final txResults:', txResults)
           return { txResults }
+          } catch (err) {
+            console.error('[ActionDrawer] Submit error:', err)
+            throw err
+          }
         },
         combine({ acc: accountQuery, deposits: depositDrafts }),
         clickSubmit
@@ -210,9 +275,16 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
         skipRepeats
       )
 
-      // Status indicator
-      const $status = switchMap(s => {
-        if (!s) return empty
+      // Fee label based on action type (deposits cost gas, withdrawals are sponsored)
+      const $feeLabel = switchMap(list => {
+        const hasDeposit = list.some(d => d.action === BALANCE_ACTION.DEPOSIT)
+        const feeText = hasDeposit ? '~$0.01 fee' : 'Free'
+        return $node(style({ fontSize: '0.75rem', color: pallete.foreground }))($text(feeText))
+      }, depositDrafts)
+
+      // Status indicator (switches with fee estimate)
+      const $statusOrFee = switchMap(s => {
+        if (!s) return $feeLabel
         if (s.status === PromiseStatus.PENDING) return $spinnerTooltip($text('Processing...'))
         if (s.status === PromiseStatus.ERROR) {
           const err = s.error
@@ -231,12 +303,18 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
             $column(spacing.small)(...txResults.map(tx => $txHashRef(tx.hash, tx.chain)))
           )
         }
-        return empty
+        return $feeLabel
       }, txState)
 
-      // Draft item row with remove button
+      // Draft item row with remove button (visible on hover)
       const $draftItem = (draft: { id: string; $display: I$Node }) =>
-        $row(spacing.default, style({ alignItems: 'center' }))(
+        $row(
+          spacing.default,
+          style({
+            alignItems: 'center',
+            cursor: 'pointer'
+          })
+        )(
           $ButtonCircular({
             $iconPath: $xCross,
             $container: $node(
@@ -244,7 +322,9 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
                 backgroundColor: pallete.horizon,
                 borderRadius: '50%',
                 padding: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                opacity: '0.3',
+                transition: 'opacity 0.15s ease'
               })
             )
           })({
@@ -282,7 +362,7 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
           // Footer with submit
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
             $node(style({ flex: 1 }))(),
-            $status,
+            $statusOrFee,
             $IntermediateConnectButton({
               accountQuery,
               $$display: map(() =>

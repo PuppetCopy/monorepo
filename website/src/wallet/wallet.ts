@@ -191,13 +191,16 @@ export async function initializeAccountState(
 
   try {
     // Verify extension has wallet state matching connected address
+    console.log('[Wallet] Checking extension for wallet:', address)
     const walletState = await getExtensionWalletState(address)
+    console.log('[Wallet] Extension state:', walletState ? 'found' : 'not found')
     if (walletState) {
       isSynced = true
       privateKey = privateKey ?? walletState.privateKey
       setActiveWallet(address)
     }
-  } catch {
+  } catch (err) {
+    console.log('[Wallet] Extension check failed:', err)
     isSynced = false // Timeout - extension not available
   }
 
@@ -233,7 +236,7 @@ export async function initializeAccountState(
   // Cache subaccountAddress for view-mode
   setStoredSubaccountAddress(address, subaccountAddress)
 
-  return { walletClient, address, subaccountAddress, subaccount, connection, isSynced: true }
+  return { walletClient, address, subaccountAddress, subaccount, signer, connection, isSynced: true }
 }
 
 export async function connectWallet(preferredConnectorId?: string): Promise<ConnectReturnType<typeof wagmi>> {
@@ -330,6 +333,7 @@ export async function clearExtensionWalletState(ownerAddress: Address): Promise<
 export async function clearAllExtensionStorage(): Promise<void> {
   await sendExtensionMessage('PUPPET_CLEAR_ALL')
 }
+  // await sendExtensionMessage('PUPPET_CLEAR_ALL')
 
 async function disconnect() {
   // clearSigner()
