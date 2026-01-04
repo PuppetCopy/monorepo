@@ -26,34 +26,34 @@ function createFilteredStream<const T extends readonly AbiParameter[]>(
   )
 }
 
-export function createCreateMasterSubaccountStream(client: PublicClient) {
+export function createRegisterMasterSubaccountStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.hash,
-    CONTRACT_EVENT_MAP.Allocation.CreateMasterSubaccount.args
+    CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.hash,
+    CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.args
   )
 }
 
 export function createExecuteAllocateStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.hash,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteAllocate.args
+    CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.hash,
+    CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.args
   )
 }
 
 export function createExecuteWithdrawStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteWithdraw.hash,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteWithdraw.args
+    CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.hash,
+    CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.args
   )
 }
 
-export function createExecuteOrderStream(client: PublicClient) {
+export function createCreateOrderStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.hash,
-    CONTRACT_EVENT_MAP.Allocation.ExecuteOrder.args
+    CONTRACT_EVENT_MAP.Position.CreateOrder.hash,
+    CONTRACT_EVENT_MAP.Position.CreateOrder.args
   )
 }

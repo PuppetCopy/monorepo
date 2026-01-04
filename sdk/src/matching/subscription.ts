@@ -1,109 +1,39 @@
 import * as sql from '@puppet/database/client'
 import * as schema from '@puppet/database/schema'
-import type { Address, Hex } from 'viem'
+import type { Address } from 'viem'
 import { getAddress } from 'viem'
 import { getUnixTimestamp } from '../core/utils.js'
-import { deriveSpecificKey, deriveWildcardKey } from './keys.js'
-import type { Subscription } from './types.js'
+import type { Policy } from './types.js'
 
-export interface SubscriptionClient {
+export interface PolicyClient {
   db: ReturnType<typeof sql.createClient>
-  policyVersion: number
 }
 
-/** Query subscriptions for a specific master and token from the indexer */
-export async function getSubscriptionsForMaster(
-  client: SubscriptionClient,
-  master: Address,
-  token: Address,
+/** Query policies for a specific trader from the indexer */
+export async function getPoliciesForTrader(
+  client: PolicyClient,
+  trader: Address,
   nowSeconds?: bigint
-): Promise<Subscription[]> {
+): Promise<Policy[]> {
   const now = nowSeconds ?? BigInt(getUnixTimestamp())
-  const masterAddr = getAddress(master)
-  const tokenAddr = getAddress(token)
+  const traderAddr = getAddress(trader)
 
-  const specificKey = deriveSpecificKey(client.policyVersion, tokenAddr, masterAddr)
-  const wildcardKey = deriveWildcardKey(client.policyVersion, tokenAddr)
-
-  const subscriptions = await client.db
+  const policies = await client.db
     .select()
-    .from(schema.subscriptionPolicy__Subscribe)
+    .from(schema.match__SetPolicy)
     .where(
       sql.filter.and(
-        sql.filter.gt(schema.subscriptionPolicy__Subscribe.expiry, now),
-        sql.filter.inArray(schema.subscriptionPolicy__Subscribe.key, [specificKey, wildcardKey])
+        sql.filter.gt(schema.match__SetPolicy.expiry, now),
+        sql.filter.eq(schema.match__SetPolicy.trader, traderAddr)
       )
     )
 
-  const result: Subscription[] = []
-  const seenPuppets = new Set<Address>()
-
-  // Process specific subscriptions first (they take priority)
-  for (const sub of subscriptions) {
-    if (sub.key !== specificKey) continue
-    const puppet = getAddress(sub.account)
-    if (seenPuppets.has(puppet)) continue
-    seenPuppets.add(puppet)
-
-    result.push({
-      configId: sub.configId as Hex,
-      puppet,
-      key: sub.key as Hex,
-      allowanceRate: sub.allowanceRate,
-      throttlePeriod: sub.throttlePeriod,
-      expiry: sub.expiry,
-      blockTimestamp: sub.blockTimestamp
-    })
-  }
-
-  // Then add wildcard subscriptions for puppets not already matched
-  for (const sub of subscriptions) {
-    if (sub.key !== wildcardKey) continue
-    const puppet = getAddress(sub.account)
-    if (seenPuppets.has(puppet)) continue
-    seenPuppets.add(puppet)
-
-    result.push({
-      configId: sub.configId as Hex,
-      puppet,
-      key: sub.key as Hex,
-      allowanceRate: sub.allowanceRate,
-      throttlePeriod: sub.throttlePeriod,
-      expiry: sub.expiry,
-      blockTimestamp: sub.blockTimestamp
-    })
-  }
-
-  return result
-}
-
-/** Query all subscriptions for a token (any master) */
-export async function getSubscriptionsForToken(
-  client: SubscriptionClient,
-  token: Address,
-  nowSeconds?: bigint
-): Promise<Subscription[]> {
-  const now = nowSeconds ?? BigInt(getUnixTimestamp())
-  const tokenAddr = getAddress(token)
-  const wildcardKey = deriveWildcardKey(client.policyVersion, tokenAddr)
-
-  const subscriptions = await client.db
-    .select()
-    .from(schema.subscriptionPolicy__Subscribe)
-    .where(
-      sql.filter.and(
-        sql.filter.gt(schema.subscriptionPolicy__Subscribe.expiry, now),
-        sql.filter.eq(schema.subscriptionPolicy__Subscribe.key, wildcardKey)
-      )
-    )
-
-  return subscriptions.map(sub => ({
-    configId: sub.configId as Hex,
-    puppet: getAddress(sub.account),
-    key: sub.key as Hex,
-    allowanceRate: sub.allowanceRate,
-    throttlePeriod: sub.throttlePeriod,
-    expiry: sub.expiry,
-    blockTimestamp: sub.blockTimestamp
+  return policies.map(policy => ({
+    puppet: getAddress(policy.puppet),
+    trader: getAddress(policy.trader),
+    allowanceRate: Number(policy.allowanceRate),
+    throttlePeriod: Number(policy.throttlePeriod),
+    expiry: policy.expiry,
+    blockTimestamp: policy.blockTimestamp
   }))
 }

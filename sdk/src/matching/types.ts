@@ -1,35 +1,39 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import type { Address, ContractFunctionArgs, Hex } from 'viem'
+import type { Address, ContractFunctionArgs } from 'viem'
 import { arbitrum } from 'viem/chains'
 
-const subscriptionPolicy = PUPPET_CONTRACT_MAP.SubscriptionPolicy
-const allocation = PUPPET_CONTRACT_MAP.Allocation
+const allocate = PUPPET_CONTRACT_MAP.Allocate
 
-export type ExecuteAllocateArgs = ContractFunctionArgs<typeof allocation.abi, 'nonpayable', 'executeAllocate'>
+export type ExecuteAllocateArgs = ContractFunctionArgs<typeof allocate.abi, 'nonpayable', 'executeAllocate'>
 export type CallIntent = ExecuteAllocateArgs[0]
-
-const executeAllocateAbi = allocation.abi.find(
-  (item): item is Extract<typeof item, { name: 'executeAllocate' }> => 'name' in item && item.name === 'executeAllocate'
-)!
 
 export const CALL_INTENT = {
   domain: {
-    name: 'Puppet Allocation',
+    name: 'Puppet Allocate',
     version: '1',
     chainId: arbitrum.id,
-    verifyingContract: allocation.address
+    verifyingContract: allocate.address
   },
   types: {
-    CallIntent: executeAllocateAbi.inputs[0].components.map(({ name, type }) => ({ name, type }))
+    CallIntent: [
+      { name: 'account', type: 'address' },
+      { name: 'subaccount', type: 'address' },
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'triggerNetValue', type: 'uint256' },
+      { name: 'acceptableNetValue', type: 'uint256' },
+      { name: 'positionParamsHash', type: 'bytes32' },
+      { name: 'deadline', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' }
+    ]
   },
   primaryType: 'CallIntent'
 } as const
 
-/** Subscription record from the indexer */
-export interface Subscription {
-  configId: Hex
+/** Policy record from the indexer */
+export interface Policy {
   puppet: Address
-  key: Hex
+  trader: Address
   allowanceRate: number
   throttlePeriod: number
   expiry: bigint
@@ -57,13 +61,8 @@ export interface MatchResult {
   simulation: MatchSimulation
 }
 
-/** Subscription query parameters */
-export interface SubscriptionQuery {
-  token: Address
-  master?: Address // if omitted, returns all subscriptions for token
+/** Policy query parameters */
+export interface PolicyQuery {
+  trader: Address
   nowSeconds?: bigint // current timestamp, defaults to now
 }
-
-/** Key derivation version from SubscriptionPolicy contract */
-export type KeyVersion =
-  ContractFunctionArgs<typeof subscriptionPolicy.abi, 'view', 'config'> extends infer R ? R : number
