@@ -6,7 +6,7 @@ const ICON =
 
 export const PROVIDER_INFO: EIP6963ProviderInfo = {
   uuid: 'f0c6e830-9a7d-4b9e-8c3f-1a2b3c4d5e6f',
-  name: 'Puppet Wallet',
+  name: 'Puppet',
   icon: ICON,
-  rdns: 'tech.puppet.wallet'
+  rdns: 'tech.puppet'
 }
