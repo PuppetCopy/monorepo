@@ -19,18 +19,20 @@ import { $TokenBalanceEditor } from './$TokenBalanceEditor.js'
 
 interface IRouteBalanceEditor extends IComponentPageParams {
   accountQuery: IStream<Promise<IAccountState | null>>
-  walletAddress?: Address
+  // Master subaccount address - this IS the route in the new architecture
+  masterSubaccount: Address
   collateralToken: Address
   draftDepositTokenList: IStream<BalanceDraft[]>
 }
 
+// Each Master subaccount is a Route - puppets allocate shares to it
 export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
   component(
     (
       [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
       [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
     ) => {
-      const { accountQuery, draftDepositTokenList, collateralToken } = config
+      const { accountQuery, draftDepositTokenList, collateralToken, masterSubaccount } = config
 
       const balanceModel = op(
         draftDepositTokenList,
@@ -48,19 +50,21 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
       const collateralTokenDescription = getTokenDescription(collateralToken)
 
-      const depositBalanceStream = op(
+      // Read user's share balance in the master's subaccount (route)
+      const shareBalanceStream = op(
         awaitPromises(accountQuery),
         switchMap(async account => {
           if (!account) return 0n
 
           try {
             return await wallet.read({
-              ...PUPPET_CONTRACT_MAP.Account,
-              functionName: 'userBalanceMap',
-              args: [collateralToken, account.address]
+              abi: PUPPET_CONTRACT_MAP.Allocate.abi,
+              address: PUPPET_CONTRACT_MAP.Allocate.address,
+              functionName: 'shareBalanceMap',
+              args: [masterSubaccount, account.address]
             })
           } catch (error) {
-            console.warn('Failed to read deposit balance for target, account may not be initialized:', error)
+            console.warn('Failed to read share balance:', error)
             return 0n
           }
         }),
@@ -81,7 +85,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
           return readableTokenAmountLabel(collateralTokenDescription, newBalance)
         },
-        combine({ draft: balanceModel, balance: depositBalanceStream })
+        combine({ draft: balanceModel, balance: shareBalanceStream })
       )
 
       const targetDisplay = $intermediatePromise({
@@ -91,7 +95,7 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
           if (!account) {
             return $TokenBalanceEditor({
               token: collateralToken,
-              balance: depositBalanceStream,
+              balance: shareBalanceStream,
               account: account!
             })({
               changeDeposit: changeDepositTether(),
@@ -101,11 +105,10 @@ export const $RouteBalanceEditor = (config: IRouteBalanceEditor) =>
 
           return $TokenBalanceEditor({
             token: collateralToken,
-            balance: depositBalanceStream,
+            balance: shareBalanceStream,
             account,
             model: balanceModel,
-            adjustmentChange: adjustmentChangeStream,
-            withdrawBalance: depositBalanceStream
+            withdrawBalance: shareBalanceStream
           })({
             changeDeposit: changeDepositTether(),
             changeWithdraw: changeWithdrawTether()

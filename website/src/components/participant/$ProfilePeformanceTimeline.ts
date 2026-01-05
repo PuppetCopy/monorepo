@@ -19,12 +19,12 @@ import type { BaselineData, MouseEventParams } from 'lightweight-charts'
 import type { Hex } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $Baseline, $infoTooltipLabel, $intermediatePromise, type ISeriesTime } from '@/ui-components'
-import type { IMasterRouteMetricSummary, IPageFilterParams } from '../../pages/types.js'
+import type { IPageFilterParams, ISubaccountMetricSummary } from '../../pages/types.js'
 import { $SelectCollateralToken } from '../$CollateralTokenSelector.js'
 import { $LastAtivity } from '../$LastActivity.js'
 
 interface IProfilePeformanceTimeline extends IPageFilterParams {
-  metricsQuery: IStream<Promise<IMasterRouteMetricSummary>>
+  metricsQuery: IStream<Promise<ISubaccountMetricSummary>>
 }
 
 export const $MasterRouteTimeline = ({
@@ -50,9 +50,9 @@ export const $MasterRouteTimeline = ({
         const endTime = getUnixTimestamp()
         const startTime = endTime - params.activityTimeframe
         const sourceList = [
-          { value: 0n, time: startTime, masterMatchingKey: pos.pnlTimeline[0].masterMatchingKey },
-          ...pos.pnlTimeline.filter(item => item.time > startTime),
-          { value: 0n, time: endTime, masterMatchingKey: '0xdead' as Hex }
+          { value: 0n, time: startTime, subaccount: pos.pnlTimeline[0].subaccount },
+          ...pos.pnlTimeline.filter((item: { time: number }) => item.time > startTime),
+          { value: 0n, time: endTime, subaccount: '0xdead' as Hex }
         ]
 
         const sumMap = new Map<Hex, bigint>()
@@ -62,7 +62,7 @@ export const $MasterRouteTimeline = ({
           ticks: 280,
           getTime: item => item.time,
           sourceMap: next => {
-            sumMap.set(next.masterMatchingKey, next.value)
+            sumMap.set(next.subaccount, next.value)
 
             const sum = [...sumMap.values()].reduce((acc, curr) => acc + curr, 0n)
 

@@ -7,11 +7,7 @@ import type { MatchResult, Policy, PuppetAllocation } from './types.js'
  * Core matching algorithm - calculates puppet allocations (sync)
  * Returns both the allocation list for transactions and detailed simulation for UI
  */
-export function calculateMatch(
-  policies: Policy[],
-  balances: Map<Address, bigint>,
-  amount: bigint
-): MatchResult {
+export function calculateMatch(policies: Policy[], balances: Map<Address, bigint>, amount: bigint): MatchResult {
   const allocations: { puppet: Address; amount: bigint }[] = []
   const puppets: PuppetAllocation[] = []
   let totalAllocation = 0n

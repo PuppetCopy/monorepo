@@ -1,8 +1,8 @@
 import { getPublicClient } from '@wagmi/core'
 import wallet from 'src/wallet/wallet'
 import type { Address } from 'viem'
+import { mainnet } from 'viem/chains'
 import { normalize } from 'viem/ens'
-import { mainnet } from 'wagmi/chains'
 
 export function getMainnetPublicClient() {
   return getPublicClient(wallet.wagmi, { chainId: mainnet.id })

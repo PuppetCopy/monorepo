@@ -1,9 +1,7 @@
-import type { ISubscribeRule } from '@puppet/database/schema'
 import { type IntervalTime, PRICEFEED_INTERVAL_LIST } from '@puppet/sdk/const'
 import { getClosestNumber, getUnixTimestamp, groupManyList } from '@puppet/sdk/core'
 import { combine, type IStream, map } from 'aelea/stream'
 import type { Address } from 'viem/accounts'
-import type { IAccountState } from '../wallet/wallet.js'
 import { sqlClient } from './sqlClient'
 
 export type StateParams<T> = {
@@ -35,17 +33,4 @@ export function queryPricefeed(
 
     // map results by token
   }, combine(queryParams))
-}
-
-export function queryUserSubscribeRuleList(
-  accountQuery: IStream<Promise<IAccountState | null>>
-): IStream<Promise<ISubscribeRule[]>> {
-  return map(async query => {
-    const account = await query
-    if (!account) return []
-
-    return sqlClient.query.subscribe__Rule.findMany({
-      where: (t, f) => f.eq(t.user, account.address)
-    })
-  }, accountQuery)
 }

@@ -1,4 +1,4 @@
-import type { IGmxPositionDecrease, IGmxPositionIncrease, IMasterRouteLatestMetric } from '@puppet/database/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease } from '@puppet/database/schema'
 import type { IntervalTime } from '@puppet/sdk/const'
 import type * as router from 'aelea/router'
 import type { IStream } from 'aelea/stream'
@@ -77,21 +77,12 @@ export type IRoute = {
   account: string
 }
 
-export interface IMasterRouteMetricSummary
-  extends Omit<
-    IMasterRouteLatestMetric,
-    | 'collateralToken'
-    | 'masterMatchingKey'
-    | 'id'
-    | 'pnlList'
-    | 'pnlTimestampList'
-    | 'lastUpdatedTimestamp'
-    | 'interval'
-    | 'indexTokenList'
-    | 'indexTokenTimestampList'
-  > {
+export interface ISubaccountMetricSummary {
+  account: Address
+  realisedPnl: bigint
+  allocatedVolume: bigint
   winCount: number
   lossCount: number
-  pnlTimeline: { time: number; value: bigint; masterMatchingKey: Hex }[]
-  indexTokenList: Address[]
+  pnlTimeline: { time: number; value: bigint; subaccount: Hex }[]
+  matchedPuppetList: Address[]
 }

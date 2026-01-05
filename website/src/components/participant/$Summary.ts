@@ -7,7 +7,7 @@ import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { intermediateText } from '@/ui-components'
 import { $heading2 } from '../../common/$text.js'
-import type { IMasterRouteMetricSummary, IPosition } from '../../pages/types.js'
+import type { IPosition, ISubaccountMetricSummary } from '../../pages/types.js'
 import { $profileDisplay } from '../$AccountProfile.js'
 
 export interface IAccountSummary {
@@ -30,23 +30,13 @@ export const $PuppetSummary = (config: IAccountSummary) =>
         // Return empty summary for now
         return {
           account: puppet || account,
-          sizeInUsd: 0n,
-          sizeLongInUsd: 0n,
-          collateralInUsd: 0n,
-          openSizeInUsd: 0n,
-          openCollateralInUsd: 0n,
-          openSizeLongInUsd: 0n,
-          longShortRatio: 0n,
-          pnl: 0n,
           realisedPnl: 0n,
-          realisedRoi: 0n,
-          roi: 0n,
+          allocatedVolume: 0n,
           lossCount: 0,
           winCount: 0,
           pnlTimeline: [],
-          matchedPuppetList: [],
-          indexTokenList: []
-        } as IMasterRouteMetricSummary
+          matchedPuppetList: []
+        } as ISubaccountMetricSummary
       }, combine({ positionListQuery }))
     )
 

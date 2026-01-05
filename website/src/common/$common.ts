@@ -87,7 +87,7 @@ export const $route = (collateralTokenDescription: ITokenDescription, displayLab
       // ),
       style({
         width: '32px',
-        height: '34x',
+        height: '34x'
       })($tokenIcon(collateralTokenDescription))
     ),
     displayLabel ? $column($text(`${collateralTokenDescription.symbol}`)) : empty

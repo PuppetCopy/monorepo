@@ -296,5 +296,3 @@ export default defineBackground(async () => {
     }
   }
 })
-
-

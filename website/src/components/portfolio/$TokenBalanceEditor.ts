@@ -69,8 +69,7 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
       const adjustmentChange = map(
         ({ draft, bal }) => {
           if (!draft || draft.amount === 0n) return ''
-          const newBalance =
-            draft.action === BALANCE_ACTION.DEPOSIT ? bal + draft.amount : bal - draft.amount
+          const newBalance = draft.action === BALANCE_ACTION.DEPOSIT ? bal + draft.amount : bal - draft.amount
           return readableTokenAmount(tokenDescription, newBalance)
         },
         combine({ draft: depositModel, bal: balance })

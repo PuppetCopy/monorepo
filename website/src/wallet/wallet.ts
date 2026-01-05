@@ -1,5 +1,5 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { ADDRESS_ZERO, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
+import { ADDRESS_ZERO, ARBITRUM_ADDRESS, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { groupList } from '@puppet/sdk/core'
 import { type RhinestoneAccount, RhinestoneSDK, walletClientToAccount } from '@rhinestone/sdk'
 import { porto, walletConnect } from '@wagmi/connectors'
@@ -29,6 +29,7 @@ import {
   type ContractFunctionArgs,
   type ContractFunctionName,
   createPublicClient,
+  encodeAbiParameters,
   fallback,
   type Hex,
   http,
@@ -146,7 +147,10 @@ Sign this message to authorize your trading session.
 
 This signature will not cost any gas and does not grant access to your funds.`
 
-export async function signAndEnableSession(account: IAccountState): Promise<IAccountState | null> {
+export async function signAndEnableSession(
+  account: IAccountState,
+  subaccountName: Hex = toHex('default', { size: 32 })
+): Promise<IAccountState | null> {
   const message = await account.walletClient.signMessage({
     message: SIGNER_DERIVATION_MESSAGE,
     account: account.address
@@ -160,7 +164,6 @@ export async function signAndEnableSession(account: IAccountState): Promise<IAcc
   // Store complete wallet entry in extension
   if (nextAccountState?.subaccount) {
     const smartWalletAddress = nextAccountState.subaccount.getAddress()
-    const subaccountName = toHex('default', { size: 32 })
     await setExtensionWalletState(account.address, {
       smartWalletAddress,
       subaccountName,
@@ -169,6 +172,64 @@ export async function signAndEnableSession(account: IAccountState): Promise<IAcc
   }
 
   return nextAccountState
+}
+
+export interface MasterSubaccountParams {
+  baseToken: Address
+  name?: Hex
+}
+
+export async function createMasterSubaccount(
+  account: IAccountState,
+  params: MasterSubaccountParams
+): Promise<RhinestoneAccount> {
+  if (!account.subaccount || !account.signer) {
+    throw new Error('Account not initialized with session')
+  }
+
+  const ownerAccount = walletClientToAccount(account.walletClient)
+  const name = params.name ?? toHex('', { size: 32 })
+
+  // Encode MasterHook install params: (address account, address signer, address baseToken, bytes32 name)
+  const hookInitData = encodeAbiParameters(
+    [
+      { name: 'account', type: 'address' },
+      { name: 'signer', type: 'address' },
+      { name: 'baseToken', type: 'address' },
+      { name: 'name', type: 'bytes32' }
+    ],
+    [account.address, account.signer.address, params.baseToken, name]
+  )
+
+  // Create Master subaccount with MasterHook + Allocate executor
+  const masterSubaccount = await rhinestoneSDK.createAccount({
+    account: {
+      type: 'nexus',
+      version: '1.2.0'
+    },
+    owners: {
+      type: 'ecdsa',
+      accounts: [ownerAccount, account.signer],
+      threshold: 1
+    },
+    experimental_sessions: {
+      enabled: true
+    },
+    modules: [
+      {
+        type: 'executor',
+        address: PUPPET_CONTRACT_MAP.Allocate.address,
+        initData: '0x'
+      },
+      {
+        type: 'hook',
+        address: PUPPET_CONTRACT_MAP.MasterHook.address,
+        initData: hookInitData
+      }
+    ]
+  })
+
+  return masterSubaccount
 }
 
 export async function initializeAccountState(
@@ -211,7 +272,13 @@ export async function initializeAccountState(
 
   const account = walletClientToAccount(walletClient)
   const signer = privateKeyToAccount(privateKey)
+
+  // Main Account = 7579 operational account for trading
   const subaccount = await rhinestoneSDK.createAccount({
+    account: {
+      type: 'nexus',
+      version: '1.2.0'
+    },
     owners: {
       type: 'ecdsa',
       accounts: [account, signer],
@@ -223,13 +290,11 @@ export async function initializeAccountState(
     modules: [
       {
         type: 'executor',
-        address: PUPPET_CONTRACT_MAP.Allocation.address,
+        address: PUPPET_CONTRACT_MAP.Allocate.address,
         initData: '0x'
       }
     ]
   })
-
-  // debugger
 
   const subaccountAddress = subaccount.getAddress()
 
@@ -303,14 +368,14 @@ async function sendExtensionMessage<T = unknown>(type: string, payload?: unknown
 // Get stored wallet state for a specific owner address (includes privateKey)
 export async function getExtensionWalletState(
   ownerAddress: Address
-): Promise<{ smartWalletAddress: string; subaccountName: string; privateKey: Hex } | null> {
+): Promise<{ smartWalletAddress: string; subaccountName: Hex; privateKey: Hex } | null> {
   return sendExtensionMessage('PUPPET_GET_WALLET_STATE', { ownerAddress })
 }
 
 // Set wallet state for a specific owner address (requires all fields)
 export async function setExtensionWalletState(
   ownerAddress: Address,
-  data: { smartWalletAddress: string; subaccountName: string; privateKey: Hex }
+  data: { smartWalletAddress: string; subaccountName: Hex; privateKey: Hex }
 ): Promise<void> {
   await sendExtensionMessage('PUPPET_SET_WALLET_STATE', { ownerAddress, ...data })
 }
@@ -333,7 +398,7 @@ export async function clearExtensionWalletState(ownerAddress: Address): Promise<
 export async function clearAllExtensionStorage(): Promise<void> {
   await sendExtensionMessage('PUPPET_CLEAR_ALL')
 }
-  // await sendExtensionMessage('PUPPET_CLEAR_ALL')
+// await sendExtensionMessage('PUPPET_CLEAR_ALL')
 
 async function disconnect() {
   // clearSigner()

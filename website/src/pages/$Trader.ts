@@ -1,14 +1,22 @@
 import * as sql from '@puppet/database/client'
-import { gmx__PositionIncrease, type ISubscribeRule } from '@puppet/database/schema'
+import { gmx__PositionIncrease, type subaccountLatestMetric } from '@puppet/database/schema'
+
+// TODO: Replace with actual schema type when matching rules are implemented
+type ISubscribeRule = {
+  id: string
+  blockTimestamp: number
+  transactionHash: string
+  account: `0x${string}`
+  collateralToken: `0x${string}`
+  master: `0x${string}`
+  masterMatchingKey: `0x${string}`
+  allowanceRate: bigint
+  throttleActivity: bigint
+  expiry: bigint
+}
+
 import type { IntervalTime } from '@puppet/sdk/const'
-import {
-  getDebankProfileUrl,
-  getUnixTimestamp,
-  pagingQuery,
-  readableAddress,
-  readableLeverage,
-  readableUsd
-} from '@puppet/sdk/core'
+import { getDebankProfileUrl, getUnixTimestamp, pagingQuery, readableAddress, readableUsd } from '@puppet/sdk/core'
 import { combine, type IStream, map, start } from 'aelea/stream'
 import { type IBehavior, multicast, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
@@ -73,7 +81,7 @@ export const $MasterPage = ({
         map(async params => {
           const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
-          const routeMetricList = await sqlClient.query.masterRouteLatestMetric.findMany({
+          const routeMetricList = await sqlClient.query.subaccountLatestMetric.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.account, account),
@@ -227,25 +235,22 @@ export const $MasterPage = ({
                     $intermediateText(
                       map(async summaryQuery => {
                         const summary = await summaryQuery
-                        const totalSize = summary.sizeInUsd + summary.openSizeInUsd
-                        return readableUsd(totalSize)
+                        return readableUsd(summary.allocatedVolume)
                       }, metricsQuery)
                     )
                   ),
-                  $metricLabel($text('Volume'))
+                  $metricLabel($text('Allocated Volume'))
                 ),
                 $metricRow(
                   $heading2(
                     $intermediateText(
                       map(async summaryQuery => {
                         const summary = await summaryQuery
-                        const totalSize = summary.sizeInUsd + summary.openSizeInUsd
-                        const totalCollateral = summary.collateralInUsd + summary.openCollateralInUsd
-                        return readableLeverage(totalSize, totalCollateral)
+                        return readableUsd(summary.realisedPnl)
                       }, metricsQuery)
                     )
                   ),
-                  $metricLabel($text('Avg Leverage'))
+                  $metricLabel($text('Realised PnL'))
                 )
               )
             ),
@@ -264,7 +269,7 @@ export const $MasterPage = ({
                 }
 
                 return $column(spacing.big)(
-                  ...params.routeMetricList.map(routeMetric => {
+                  ...params.routeMetricList.map((routeMetric: typeof subaccountLatestMetric.$inferSelect) => {
                     const dataSource = map(async pageParams => {
                       const result = pagingQuery(
                         { ...pageParams.paging, ...pageParams.sortBy },

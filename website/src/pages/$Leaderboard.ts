@@ -1,5 +1,4 @@
 import * as sql from '@puppet/database/client'
-import type { IMasterRouteLatestMetric, ISubscribeRule } from '@puppet/database/schema'
 import * as schema from '@puppet/database/schema'
 import { type IntervalTime, USD_DECIMALS } from '@puppet/sdk/const'
 import {
@@ -8,25 +7,20 @@ import {
   getMappedValue,
   getUnixTimestamp,
   type InferStream,
-  readablePnl,
   readableUsd
 } from '@puppet/sdk/core'
-import { getTokenDescription } from '@puppet/sdk/gmx'
-import { combine, empty, type IStream, just, map, merge, op, start, switchMap } from 'aelea/stream'
+import { combine, type IStream, just, map, start, switchMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, style } from 'aelea/ui'
 import { $column, $row, isDesktopScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { type BaselineData, LineType, type Time } from 'lightweight-charts'
+import { type BaselineData, LineType } from 'lightweight-charts'
 import type { Address } from 'viem/accounts'
 import {
   $Baseline,
-  $ButtonToggle,
   $defaultTableCell,
   $defaultTableContainer,
   $defaultTableRowContainer,
-  $icon,
-  $infoLabel,
   $spinner,
   $Table,
   type IMarker,
@@ -36,66 +30,53 @@ import {
   type TableColumn
 } from '@/ui-components'
 import { uiStorage } from '@/ui-storage'
-import {
-  $drawdownDisplay,
-  $MasterDisplay,
-  $pnlDisplay,
-  $roiDisplay,
-  $sharpeDisplay,
-  $size,
-  $tokenIcon,
-  $winRateDisplay
-} from '../common/$common.js'
+import { $MasterDisplay, $pnlDisplay } from '../common/$common.js'
 import { $card2 } from '../common/elements/$common.js'
-import { $bagOfCoins, $trophy } from '../common/elements/$icons.js'
 import { sqlClient } from '../common/sqlClient.js'
 import { $SelectCollateralToken } from '../components/$CollateralTokenSelector.js'
 import { $LastAtivity, activityOptionLabelMap } from '../components/$LastActivity.js'
-import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
-import { $RouteEditor } from '../components/portfolio/$RouteEditor.js'
-import { $tableHeader } from '../components/table/$TableColumn.js'
 import { localStore } from '../const/localStore.js'
-import { $seperator2 } from './common.js'
 import type { IPageFilterParams, IPageParams } from './types.js'
 
+// Basic metric type for the simplified leaderboard
+type IBasicMetric = {
+  account: `0x${string}`
+  collateralToken: `0x${string}`
+  allocatedVolume: bigint
+  realisedPnl: bigint
+  pnlList: bigint[]
+  pnlTimestampList: number[]
+  matchedPuppetList: `0x${string}`[]
+}
+
+// TODO: Replace with proper type once schema is updated
+type IMatchingRuleDraft = unknown
+
 interface ILeaderboard extends IPageFilterParams, IPageParams {
-  userMatchingRuleQuery: IStream<Promise<ISubscribeRule[]>>
-  draftMatchingRuleList: IStream<ISetMatchingRuleEditorDraft[]>
+  // TODO: These are placeholders until schema has subscription types
+  userMatchingRuleQuery: IStream<Promise<unknown[]>>
+  draftMatchingRuleList: IStream<IMatchingRuleDraft[]>
 }
 
 export const $Leaderboard = (config: ILeaderboard) =>
   component(
     (
       [scrollRequest, scrollRequestTether]: IBehavior<IQuantumScrollPage>,
-      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<IMasterRouteLatestMetric>>,
-      [changeScreenerFocus, changeScreenerFocusTether]: IBehavior<'roi' | 'pnl'>,
+      [sortByChange, sortByChangeTether]: IBehavior<ISortBy<IBasicMetric>>,
 
       [changeActivityTimeframe, changeActivityTimeframeTether]: IBehavior<IntervalTime>,
       [selectCollateralTokenList, selectCollateralTokenListTether]: IBehavior<Address[]>,
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [routeChange, routeChangeTether]: IBehavior<any, string>,
-      // [switchIsLong, switchIsLongTether]: IBehavior<boolean | undefined>,
       [filterAccount, _filterAccountTether]: IBehavior<string | undefined>,
 
-      [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>
+      // TODO: Placeholder for draft matching rules - not functional until schema updated
+      [changeMatchRuleList, _changeMatchRuleListTether]: IBehavior<IMatchingRuleDraft[]>
     ) => {
-      const { activityTimeframe, collateralTokenList, indexTokenList, draftMatchingRuleList, userMatchingRuleQuery } =
-        config
+      const { activityTimeframe, collateralTokenList } = config
 
-      // const pricefeedMapQuery = queryPricefeed({ activityTimeframe })
-
-      const screenerFocus = uiStorage.replayWrite(localStore.leaderboard.focus, changeScreenerFocus)
-      const sortBy = uiStorage.replayWrite(
-        localStore.leaderboard.sortBy,
-        merge(
-          sortByChange,
-          map(selector => {
-            return { direction: 'desc', selector } as const
-          }, changeScreenerFocus)
-        )
-      )
-      // const isLong = uiStorage.replayWrite(localStore.leaderboard.isLong, switchIsLong)
+      const sortBy = uiStorage.replayWrite(localStore.leaderboard.sortBy, sortByChange)
       const account = uiStorage.replayWrite(localStore.leaderboard.account, filterAccount)
       const paging = start({ offset: 0, pageSize: 20 }, scrollRequest)
 
@@ -111,25 +92,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   spacing.default,
                   style({ padding: '12px', placeContent: 'center', flexWrap: 'wrap', alignItems: 'flex-start' })
                 ))(
-              $ButtonToggle({
-                value: screenerFocus,
-                optionList: ['pnl', 'roi'],
-                $$option: map(option => {
-                  return $row(spacing.small, style({ alignItems: 'center' }))(
-                    option === undefined
-                      ? empty
-                      : $icon({
-                          $content: option === 'pnl' ? $bagOfCoins : $trophy,
-                          width: '18px',
-                          viewBox: '0 0 32 32'
-                        }),
-                    $text(option === 'roi' ? 'Performance' : 'Profit & Loss')
-                  )
-                })
-              })({
-                select: changeScreenerFocusTether()
-              }),
-
               $SelectCollateralToken({ selectedList: collateralTokenList })({
                 changeCollateralTokenList: selectCollateralTokenListTether()
               }),
@@ -137,54 +99,28 @@ export const $Leaderboard = (config: ILeaderboard) =>
               $LastAtivity(activityTimeframe)({
                 changeActivityTimeframe: changeActivityTimeframeTether()
               })
-              // $ButtonToggle({
-              //   selected: isLong,
-              //   options: [undefined, true, false],
-              //   $$option: map((il) => {
-              //     return $row(spacing.tiny, style({ alignItems: 'center' }))(
-              //       il === undefined
-              //         ? empty
-              //         : $icon({ $content: il ? $bull : $bear, width: '18px', viewBox: '0 0 32 32' }),
-              //       $text(il === undefined ? 'Both' : il ? 'Long' : 'Short')
-              //     )
-              //   })
-              // })({
-              //   select: switchIsLongTether()
-              // }),
             ),
             switchMap(params => {
-              // const interval = IntervalTime.MIN
               const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
-              // const startActivityTimeframeTimeSlot = Math.floor(startActivityTimeframe / interval) * interval
 
               const dataSource = map(async filterParams => {
-                const t = schema.masterRouteLatestMetric
+                const t = schema.subaccountLatestMetric
 
                 const filter = sql.filter.and(
                   sql.filter.eq(t.interval, params.activityTimeframe),
                   params.account ? sql.filter.ilike(t.account, params.account) : undefined,
-                  // params.isLong !== undefined
-                  //   ? params.isLong
-                  //     ? filter.gte(t.longShortRatio, 5000n)
-                  //     : filter.lte(t.longShortRatio, 5000n)
-                  //   : undefined,
-                  // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
                   params.collateralTokenList.length > 0
                     ? sql.filter.inArray(t.collateralToken, params.collateralTokenList)
-                    : undefined,
-                  params.indexTokenList.length > 0
-                    ? sql.filter
-                        .sql`${t.indexTokenList} && ARRAY[${sql.filter.sql.raw(params.indexTokenList.map(token => `'${token.toLowerCase()}'`).join(','))}]::text[]`
                     : undefined,
                   sql.filter.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
                 )
                 const orderBy = params.sortBy
                   ? params.sortBy.direction === 'asc'
-                    ? sql.filter.asc(schema.masterRouteLatestMetric[params.sortBy.selector])
-                    : sql.filter.desc(schema.masterRouteLatestMetric[params.sortBy.selector])
-                  : undefined
+                    ? sql.filter.asc(schema.subaccountLatestMetric[params.sortBy.selector])
+                    : sql.filter.desc(schema.subaccountLatestMetric[params.sortBy.selector])
+                  : sql.filter.desc(schema.subaccountLatestMetric.realisedPnl)
 
-                const metrictList = await sqlClient.query.masterRouteLatestMetric.findMany({
+                const metricList = await sqlClient.query.subaccountLatestMetric.findMany({
                   where: filter,
                   limit: filterParams.paging.pageSize,
                   offset: filterParams.paging.offset,
@@ -192,29 +128,15 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   columns: {
                     account: true,
                     collateralToken: true,
-
-                    sizeInUsd: true,
-                    collateralInUsd: true,
-                    openSizeInUsd: true,
-                    openCollateralInUsd: true,
-                    longShortRatio: true,
-                    pnl: true,
-                    roi: true,
-
                     allocatedVolume: true,
-                    maxDrawdown: true,
-                    sharpeRatio: true,
-                    winCount: true,
-                    lossCount: true,
-
+                    realisedPnl: true,
                     pnlList: true,
                     pnlTimestampList: true,
-                    matchedPuppetList: true,
-                    indexTokenList: true
+                    matchedPuppetList: true
                   }
                 })
 
-                const page = metrictList.map(metric => ({ metric }))
+                const page = metricList.map(metric => ({ metric }))
                 return { ...filterParams.paging, page, $items: page }
               }, combine({ paging }))
 
@@ -240,14 +162,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     padding: '16px 0'
                   })($spinner)
                 },
-                // $headerContainer: $defaultTableRowContainer(style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })),
-                // $rowContainer: $defaultTableRowContainer(
-                //   stylePseudo(':last-child', { borderRadius: '0 0 18px 18px', marginBottom: '2px' }),
-                //   style({ background: pallete.background, padding: isDesktopScreen ? '8px 26px' : '8px' })
-                // ),
-                // $bodyRowContainer: $defaultTableRowContainer(
-                //   style({ margin: '0 1px' })
-                // ),
                 sortBy: params.sortBy as any,
                 dataSource: dataSource as any,
                 columns: [
@@ -258,8 +172,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       return $MasterDisplay({
                         route: config.route,
                         address: pos.metric.account,
-                        // ensNameStream: fromPromise(resolveEnsName(pos.metric.account as Address)),
-                        puppetList: []
+                        puppetList: pos.metric.matchedPuppetList as Address[]
                       })({
                         click: routeChangeTether()
                       })
@@ -268,104 +181,37 @@ export const $Leaderboard = (config: ILeaderboard) =>
                   {
                     $head: $text('Collateral'),
                     gridTemplate: isDesktopScreen ? '104px' : '58px',
-                    $bodyCallback: map((routeMetric: ILeaderboardCellData) => {
-                      return $RouteEditor({
-                        draftMatchingRuleList,
-                        collateralToken: routeMetric.metric.collateralToken,
-                        userMatchingRuleQuery,
-                        master: routeMetric.metric.account
-                      })({
-                        changeMatchRuleList: changeMatchRuleListTether()
-                      })
+                    $bodyCallback: map((pos: ILeaderboardCellData) => {
+                      return $row(style({}))($text(`${pos.metric.collateralToken.slice(0, 10)}...`))
                     })
                   },
                   ...((isDesktopScreen
                     ? [
-                        // {
-                        //   $head: $text('Win/Loss'),
-                        //   gridTemplate: '70px',
-                        //   columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                        //   $bodyCallback: map((pos: ILeaderboardCellData) => {
-                        //     const totalCount = pos.metric.winCount + pos.metric.lossCount
-                        //     return $row(spacing.small)(
-                        //       $text(`${pos.metric.winCount} / ${totalCount - pos.metric.lossCount}`)
-                        //     )
-                        //   })
-                        // },
-                        {
-                          $head: $text('Traded Tokens'),
-                          gridTemplate: isDesktopScreen ? '120px' : undefined,
-                          $bodyCallback: map(pos => {
-                            const indexTokenList = pos.metric.indexTokenList
-                            const indexTokenListLength = indexTokenList.length
-                            return $row(spacing.small)(
-                              ...indexTokenList.slice(0, 3).map((token: Address) => {
-                                const tokenDesc = getTokenDescription(token)
-                                return tokenDesc
-                                  ? op(
-                                      $tokenIcon(tokenDesc),
-                                      style({ marginRight: '-16px', border: `2px solid ${pallete.background}` })
-                                    )
-                                  : empty
-                              }),
-                              indexTokenListLength > 4
-                                ? style({ fontSize: '.8rem', marginLeft: '18px', placeContent: 'center' })(
-                                    $infoLabel($text(`+${indexTokenListLength - 3} more`))
-                                  )
-                                : empty
-                            )
-                          })
-                        },
-                        {
-                          $head: $tableHeader('Volume', 'Leverage'),
-                          sortBy: 'sizeInUsd',
-                          // $headerCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
-                          // $bodyCellContainer: $defaultTableCell(style({ placeContent: 'flex-end' })),
-                          $bodyCallback: map(pos => {
-                            const totalSize = pos.metric.sizeInUsd + pos.metric.openSizeInUsd
-                            const totalCollateral = pos.metric.collateralInUsd + pos.metric.openCollateralInUsd
-                            return $size(totalSize, totalCollateral)
-                          })
-                        },
                         {
                           $head: $text('Allocated'),
                           sortBy: 'allocatedVolume',
-                          gridTemplate: '90px',
+                          gridTemplate: '120px',
                           $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            return $text(readableUsd(pos.metric.allocatedVolume))
+                            return $row(style({}))($text(readableUsd(pos.metric.allocatedVolume)))
                           })
                         },
                         {
-                          $head: $text('Win Rate'),
-                          gridTemplate: '80px',
-                          columnOp: style({ alignItems: 'center', placeContent: 'center' }),
-                          $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            return $winRateDisplay(pos.metric.winCount, pos.metric.lossCount)
-                          })
-                        },
-                        {
-                          $head: $tableHeader('Max DD', 'Sharpe'),
-                          sortBy: 'maxDrawdown',
+                          $head: $text('Puppets'),
                           gridTemplate: '80px',
                           $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            return $column(spacing.tiny)(
-                              $drawdownDisplay(pos.metric.maxDrawdown),
-                              $seperator2,
-                              $sharpeDisplay(pos.metric.sharpeRatio)
-                            )
+                            return $row(style({}))($text(`${pos.metric.matchedPuppetList.length}`))
                           })
                         }
                       ]
                     : []) as TableColumn<ILeaderboardCellData>[]),
                   {
-                    // columnOp: style({ placeContent: 'flex-start' }),
                     $head: $row(spacing.small, style({ flex: 1, placeContent: 'space-between', alignItems: 'center' }))(
-                      params.screenerFocus === 'roi' ? $tableHeader('ROI %', 'PNL $') : $tableHeader('PNL $', 'ROI %'),
+                      $text('Realised PnL'),
                       $node(style({ textAlign: 'right', alignSelf: 'center' }))(
-                        $text(`${getMappedValue(activityOptionLabelMap, params.activityTimeframe)} Activtiy`)
+                        $text(`${getMappedValue(activityOptionLabelMap, params.activityTimeframe)} Activity`)
                       )
                     ),
-                    sortBy: params.screenerFocus,
+                    sortBy: 'realisedPnl',
                     gridTemplate: isDesktopScreen ? '150px' : undefined,
                     $bodyCallback: map(pos => {
                       const endTime = getUnixTimestamp()
@@ -378,7 +224,10 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             time: pos.metric.pnlTimestampList[index]
                           }))
                           .filter((item: { value: bigint; time: number }) => item.time > startTime),
-                        { value: pos.metric.pnlList[pos.metric.pnlList.length - 1], time: endTime }
+                        {
+                          value: pos.metric.pnlList[pos.metric.pnlList.length - 1] ?? 0n,
+                          time: endTime
+                        }
                       ]
 
                       const timeline = fillTimeline({
@@ -390,24 +239,6 @@ export const $Leaderboard = (config: ILeaderboard) =>
                       })
 
                       const markerList: IMarker[] = []
-
-                      const crossOpenSizeInUsd = pos.metric.openSizeInUsd
-
-                      if (crossOpenSizeInUsd > 0n) {
-                        markerList.push({
-                          position: 'inBar',
-                          color: pos.metric.pnl > 0 ? pallete.positive : pallete.negative,
-                          time: getUnixTimestamp() as Time,
-                          shape: 'circle'
-                        })
-                        markerList.push({
-                          position: 'inBar',
-                          color: colorAlpha(pos.metric.pnl > 0 ? pallete.positive : pallete.negative, 0.25),
-                          time: getUnixTimestamp() as Time,
-                          size: 2.25,
-                          shape: 'circle'
-                        })
-                      }
 
                       return $row(style({ position: 'relative', height: '100%', flex: 1 }))(
                         style({
@@ -421,32 +252,18 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             markers: just(markerList),
                             chartConfig: {
                               leftPriceScale: {
-                                // autoScale: true,
                                 ticksVisible: true,
-                                scaleMargins: {
-                                  top: 0.1,
-                                  bottom: 0.1
-                                }
+                                scaleMargins: { top: 0.1, bottom: 0.1 }
                               },
                               crosshair: {
-                                horzLine: {
-                                  visible: false
-                                },
-                                vertLine: {
-                                  visible: false
-                                }
+                                horzLine: { visible: false },
+                                vertLine: { visible: false }
                               },
-                              timeScale: {
-                                visible: false
-                              }
+                              timeScale: { visible: false }
                             },
                             data: timeline as any as BaselineData<ISeriesTime>[],
-                            // containerOp: style({  inset: '0px 0px 0px 0px' }),
                             baselineOptions: {
-                              baseValue: {
-                                price: 0,
-                                type: 'price'
-                              },
+                              baseValue: { price: 0, type: 'price' },
                               lineWidth: 1,
                               lineType: LineType.Curved
                             }
@@ -460,19 +277,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                             zIndex: 1,
                             alignItems: 'center'
                           })
-                        )(
-                          params.screenerFocus === 'roi'
-                            ? $column(spacing.tiny)(
-                                $roiDisplay(pos.metric.roi),
-                                $seperator2,
-                                $node(style({ fontSize: '.8rem' }))($text(readablePnl(pos.metric.pnl)))
-                              )
-                            : $column(spacing.tiny)(
-                                $pnlDisplay(pos.metric.pnl),
-                                $seperator2,
-                                $node(style({ fontSize: '.8rem' }))($text(`${formatFixed(2, pos.metric.roi)}%`))
-                              )
-                        )
+                        )($pnlDisplay(pos.metric.realisedPnl))
                       )
                     })
                   }
@@ -481,7 +286,7 @@ export const $Leaderboard = (config: ILeaderboard) =>
                 sortBy: sortByChangeTether() as any,
                 scrollRequest: scrollRequestTether()
               })
-            }, combine({ screenerFocus, sortBy, activityTimeframe, account, collateralTokenList, indexTokenList }))
+            }, combine({ sortBy, activityTimeframe, account, collateralTokenList }))
           )
         ),
 

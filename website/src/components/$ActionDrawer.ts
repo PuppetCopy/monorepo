@@ -2,6 +2,7 @@ import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
 import { ARBITRUM_ADDRESS, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { getMappedValueFallback, readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
+import { waitForTransactionReceipt } from '@wagmi/core'
 import {
   combine,
   constant,
@@ -19,9 +20,8 @@ import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { waitForTransactionReceipt } from '@wagmi/core'
-import { encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, keccak256, toHex, zeroAddress } from 'viem'
-import { arbitrum, base, optimism, polygon, type Chain } from 'viem/chains'
+import { encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, toHex } from 'viem'
+import { arbitrum, base, type Chain, optimism, polygon } from 'viem/chains'
 import type { IDepositEditorDraft } from './portfolio/$DepositEditor.js'
 
 const chainById: Record<number, Chain> = {
@@ -30,11 +30,12 @@ const chainById: Record<number, Chain> = {
   [optimism.id]: optimism,
   [polygon.id]: polygon
 }
+
 import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef, $xCross } from '@/ui-components'
 import { $heading3 } from '../common/$text.js'
 import { $card2 } from '../common/elements/$common.js'
 import { fadeIn } from '../transitions/enter.js'
-import wallet, { type IAccountState } from '../wallet/wallet.js'
+import wallet, { getExtensionWalletState, type IAccountState } from '../wallet/wallet.js'
 import { $IntermediateConnectButton } from './$IntermediateConnectButton.js'
 import { $ButtonCircular, $defaultButtonPrimary } from './form/$Button.js'
 import { $ButtonCore } from './form/$ButtonCore.js'
@@ -55,7 +56,10 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
       [changeAccount, changeAccountTether]: IBehavior<Promise<IAccountState>>
     ) => {
       // Derive action drafts from deposit drafts (state() caches for late subscribers when drawer re-opens)
-      const drafts = state(map(list => list.map(balanceDraftToAction), depositDrafts), [])
+      const drafts = state(
+        map(list => list.map(balanceDraftToAction), depositDrafts),
+        []
+      )
 
       // Submit: sample current state on click, execute transactions
       const submitQuery = sampleMap(
@@ -64,177 +68,208 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
             const acc = await accPromise
             if (!acc?.subaccount) throw new Error('No account or session')
 
-          const subaccountAddress = acc.subaccount.getAddress()
-          const ownerAddress = acc.address
-          const txResults: { hash: Hex; chain: Chain }[] = []
+            const subaccountAddress = acc.subaccount.getAddress()
+            const ownerAddress = acc.address
+            const txResults: { hash: Hex; chain: Chain }[] = []
 
-          // Separate deposits (wallet → subaccount) from withdrawals (subaccount → wallet)
-          const depositDrafts = deposits.filter(
-            (d): d is IDepositEditorDraft => d.action === BALANCE_ACTION.DEPOSIT
-          )
-          const withdrawDrafts = deposits.filter(d => d.action === BALANCE_ACTION.WITHDRAW)
+            // Separate deposits (wallet → subaccount) from withdrawals (subaccount → wallet)
+            const depositDrafts = deposits.filter((d): d is IDepositEditorDraft => d.action === BALANCE_ACTION.DEPOSIT)
+            const withdrawDrafts = deposits.filter(d => d.action === BALANCE_ACTION.WITHDRAW)
 
-          // Execute deposits: transfer to subaccount on selected chain
-          // Rhinestone's unified balance allows using funds from any chain
-          for (const draft of depositDrafts) {
-            const isArbitrum = draft.chainId === arbitrum.id
+            // Execute deposits: transfer to subaccount on selected chain
+            // Rhinestone's unified balance allows using funds from any chain
+            for (const draft of depositDrafts) {
+              const isArbitrum = draft.chainId === arbitrum.id
 
-            // Get token address for the deposit chain
-            const tokenDesc = getTokenDescription(draft.token)
-            const tokenMap = CROSS_CHAIN_TOKEN_MAP[draft.chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
-            const tokenAddress = getMappedValueFallback(tokenMap, tokenDesc.symbol, null)
-            if (!tokenAddress) throw new Error(`Token ${tokenDesc.symbol} not available on chain ${draft.chainId}`)
+              // Get token address for the deposit chain
+              const tokenDesc = getTokenDescription(draft.token)
+              const tokenMap = CROSS_CHAIN_TOKEN_MAP[draft.chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
+              const tokenAddress = getMappedValueFallback(tokenMap, tokenDesc.symbol, null)
+              if (!tokenAddress) throw new Error(`Token ${tokenDesc.symbol} not available on chain ${draft.chainId}`)
 
-            // For non-Arbitrum chains: deposit on source chain, then bridge to Arbitrum
-            if (!isArbitrum) {
-              const depositChain = chainById[draft.chainId]
-              if (!depositChain) throw new Error(`Unsupported chain: ${draft.chainId}`)
+              // For non-Arbitrum chains: deposit on source chain, then bridge to Arbitrum
+              if (!isArbitrum) {
+                const depositChain = chainById[draft.chainId]
+                if (!depositChain) throw new Error(`Unsupported chain: ${draft.chainId}`)
 
-              // Step 1: Switch chain and transfer to subaccount on source chain
-              if (acc.walletClient.chain?.id !== draft.chainId) {
-                await acc.walletClient.switchChain({ id: draft.chainId })
-              }
+                // Step 1: Switch chain and transfer to subaccount on source chain
+                if (acc.walletClient.chain?.id !== draft.chainId) {
+                  await acc.walletClient.switchChain({ id: draft.chainId })
+                }
 
-              const depositHash = await acc.walletClient.sendTransaction({
-                to: tokenAddress,
-                data: encodeFunctionData({
-                  abi: erc20Abi,
-                  functionName: 'transfer',
-                  args: [subaccountAddress, draft.amount]
-                }),
-                account: acc.walletClient.account!,
-                chain: depositChain
-              })
-              txResults.push({ hash: depositHash, chain: depositChain })
-
-              // Wait for deposit tx to confirm before bridging
-              await waitForTransactionReceipt(wallet.wagmi, {
-                hash: depositHash,
-                chainId: draft.chainId
-              })
-
-              // Step 2: Bridge from source chain to Arbitrum via subaccount
-              const bridgeResult = await acc.subaccount.sendTransaction({
-                sourceChains: [depositChain],
-                targetChain: arbitrum,
-                calls: [],
-                tokenRequests: [
-                  {
-                    address: tokenAddress, // Use source chain token address
-                    amount: draft.amount
-                  }
-                ]
-              })
-              const bridgeReceipt = await acc.subaccount.waitForExecution(bridgeResult)
-              const bridgeTxHash =
-                ('transactionHash' in bridgeReceipt && bridgeReceipt.transactionHash) ||
-                ('hash' in bridgeReceipt && bridgeReceipt.hash)
-              if (bridgeTxHash) {
-                txResults.push({ hash: bridgeTxHash as Hex, chain: arbitrum })
-              }
-            } else {
-              // Arbitrum: direct transfer
-              const hash = await acc.walletClient.sendTransaction({
-                to: tokenAddress,
-                data: encodeFunctionData({
-                  abi: erc20Abi,
-                  functionName: 'transfer',
-                  args: [subaccountAddress, draft.amount]
-                }),
-                account: acc.walletClient.account!
-              })
-              txResults.push({ hash, chain: arbitrum })
-            }
-          }
-
-          // Register subaccount with Allocation module if needed (enables one-click trading)
-          if (depositDrafts.length > 0) {
-            const subaccountName = toHex('default', { size: 32 })
-            const matchingKey = keccak256(
-              encodeAbiParameters(
-                [{ type: 'address' }, { type: 'address' }, { type: 'bytes32' }],
-                [ARBITRUM_ADDRESS.USDC, subaccountAddress, subaccountName]
-              )
-            )
-
-            // Check if already registered
-            const registeredMaster = await wallet.read({
-              abi: PUPPET_CONTRACT_MAP.Allocation.abi,
-              address: PUPPET_CONTRACT_MAP.Allocation.address,
-              functionName: 'masterSubaccountMap',
-              args: [matchingKey]
-            })
-
-            if (registeredMaster === zeroAddress) {
-              // Wait for any pending deposit tx to confirm first
-              const lastDepositTx = txResults[txResults.length - 1]
-              if (lastDepositTx) {
-                await waitForTransactionReceipt(wallet.wagmi, {
-                  hash: lastDepositTx.hash,
-                  chainId: lastDepositTx.chain.id
+                const depositHash = await acc.walletClient.sendTransaction({
+                  to: tokenAddress,
+                  data: encodeFunctionData({
+                    abi: erc20Abi,
+                    functionName: 'transfer',
+                    args: [subaccountAddress, draft.amount]
+                  }),
+                  account: acc.walletClient.account!,
+                  chain: depositChain
                 })
-              }
+                txResults.push({ hash: depositHash, chain: depositChain })
 
-              // Register subaccount via subaccount tx (deploys account + installs Allocation module)
-              const registerResult = await acc.subaccount.sendTransaction({
+                // Wait for deposit tx to confirm before bridging
+                await waitForTransactionReceipt(wallet.wagmi, {
+                  hash: depositHash,
+                  chainId: draft.chainId
+                })
+
+                // Step 2: Bridge from source chain to Arbitrum via subaccount
+                const bridgeResult = await acc.subaccount.sendTransaction({
+                  sourceChains: [depositChain],
+                  targetChain: arbitrum,
+                  calls: [],
+                  tokenRequests: [
+                    {
+                      address: tokenAddress, // Use source chain token address
+                      amount: draft.amount
+                    }
+                  ]
+                })
+                const bridgeReceipt = await acc.subaccount.waitForExecution(bridgeResult)
+                const bridgeTxHash =
+                  ('transactionHash' in bridgeReceipt && bridgeReceipt.transactionHash) ||
+                  ('hash' in bridgeReceipt && bridgeReceipt.hash)
+                if (bridgeTxHash) {
+                  txResults.push({ hash: bridgeTxHash as Hex, chain: arbitrum })
+                }
+              } else {
+                // Arbitrum: direct transfer
+                const hash = await acc.walletClient.sendTransaction({
+                  to: tokenAddress,
+                  data: encodeFunctionData({
+                    abi: erc20Abi,
+                    functionName: 'transfer',
+                    args: [subaccountAddress, draft.amount]
+                  }),
+                  account: acc.walletClient.account!
+                })
+                txResults.push({ hash, chain: arbitrum })
+              }
+            }
+
+            // Install MasterHook if not registered (enables one-click trading via hook's onInstall)
+            if (depositDrafts.length > 0) {
+              // Check if MasterHook is already installed (which means already registered)
+              const isRegistered = await wallet.read({
+                abi: PUPPET_CONTRACT_MAP.Allocate.abi,
+                address: PUPPET_CONTRACT_MAP.Allocate.address,
+                functionName: 'registeredMap',
+                args: [subaccountAddress]
+              })
+
+              if (!isRegistered) {
+                // Wait for any pending deposit tx to confirm first
+                const lastDepositTx = txResults[txResults.length - 1]
+                if (lastDepositTx) {
+                  await waitForTransactionReceipt(wallet.wagmi, {
+                    hash: lastDepositTx.hash,
+                    chainId: lastDepositTx.chain.id
+                  })
+                }
+
+                // Get stored subaccount name from extension
+                const walletState = await getExtensionWalletState(ownerAddress)
+                const subaccountName = walletState?.subaccountName ?? toHex('default', { size: 32 })
+
+                // Encode MasterHook.InstallParams
+                const installParams = encodeAbiParameters(
+                  [
+                    {
+                      type: 'tuple',
+                      components: [
+                        { name: 'account', type: 'address' },
+                        { name: 'signer', type: 'address' },
+                        { name: 'baseToken', type: 'address' },
+                        { name: 'name', type: 'bytes32' }
+                      ]
+                    }
+                  ],
+                  [
+                    {
+                      account: ownerAddress,
+                      signer: acc.signer!.address,
+                      baseToken: ARBITRUM_ADDRESS.USDC,
+                      name: subaccountName
+                    }
+                  ]
+                )
+
+                // ERC-7579 MODULE_TYPE_HOOK = 4
+                const MODULE_TYPE_HOOK = 4n
+
+                // Install MasterHook module - this calls onInstall which registers the subaccount
+                const registerResult = await acc.subaccount.sendTransaction({
+                  chain: arbitrum,
+                  calls: [
+                    {
+                      to: subaccountAddress,
+                      data: encodeFunctionData({
+                        abi: [
+                          {
+                            name: 'installModule',
+                            type: 'function',
+                            inputs: [
+                              { name: 'moduleTypeId', type: 'uint256' },
+                              { name: 'module', type: 'address' },
+                              { name: 'initData', type: 'bytes' }
+                            ],
+                            outputs: [],
+                            stateMutability: 'payable'
+                          }
+                        ],
+                        functionName: 'installModule',
+                        args: [MODULE_TYPE_HOOK, PUPPET_CONTRACT_MAP.MasterHook.address, installParams]
+                      }),
+                      value: 0n
+                    }
+                  ],
+                  sponsored: true
+                })
+                const registerReceipt = await acc.subaccount.waitForExecution(registerResult)
+                console.log('[ActionDrawer] MasterHook install receipt:', registerReceipt)
+                const registerHash =
+                  ('transactionHash' in registerReceipt && registerReceipt.transactionHash) ||
+                  ('hash' in registerReceipt && registerReceipt.hash)
+                console.log('[ActionDrawer] MasterHook install txHash:', registerHash)
+                if (registerHash) {
+                  txResults.push({ hash: registerHash as Hex, chain: arbitrum })
+                }
+              }
+            }
+
+            // Execute withdrawals via subaccount on Arbitrum (7579 intent call)
+            if (withdrawDrafts.length > 0) {
+              const withdrawCalls = withdrawDrafts.map(draft => ({
+                to: draft.token,
+                data: encodeFunctionData({
+                  abi: erc20Abi,
+                  functionName: 'transfer',
+                  args: [ownerAddress, draft.amount]
+                }),
+                value: 0n
+              }))
+
+              const result = await acc.subaccount.sendTransaction({
                 chain: arbitrum,
-                calls: [
-                  {
-                    to: PUPPET_CONTRACT_MAP.Allocation.address,
-                    data: encodeFunctionData({
-                      abi: PUPPET_CONTRACT_MAP.Allocation.abi,
-                      functionName: 'createMasterSubaccount',
-                      args: [ownerAddress, acc.signer!.address, subaccountAddress, ARBITRUM_ADDRESS.USDC, subaccountName]
-                    }),
-                    value: 0n
-                  }
-                ],
+                calls: withdrawCalls,
                 sponsored: true
               })
-              const registerReceipt = await acc.subaccount.waitForExecution(registerResult)
-              console.log('[ActionDrawer] Register receipt:', registerReceipt)
-              const registerHash =
-                ('transactionHash' in registerReceipt && registerReceipt.transactionHash) ||
-                ('hash' in registerReceipt && registerReceipt.hash)
-              console.log('[ActionDrawer] Register txHash:', registerHash)
-              if (registerHash) {
-                txResults.push({ hash: registerHash as Hex, chain: arbitrum })
+              const receipt = await acc.subaccount.waitForExecution(result)
+              console.log('[ActionDrawer] Withdraw receipt:', receipt)
+
+              // Handle different receipt formats from Rhinestone SDK
+              const txHash =
+                ('transactionHash' in receipt && receipt.transactionHash) || ('hash' in receipt && receipt.hash)
+              console.log('[ActionDrawer] Extracted txHash:', txHash)
+              if (txHash) {
+                txResults.push({ hash: txHash as Hex, chain: arbitrum })
               }
             }
-          }
 
-          // Execute withdrawals via subaccount on Arbitrum (7579 intent call)
-          if (withdrawDrafts.length > 0) {
-            const withdrawCalls = withdrawDrafts.map(draft => ({
-              to: draft.token,
-              data: encodeFunctionData({
-                abi: erc20Abi,
-                functionName: 'transfer',
-                args: [ownerAddress, draft.amount]
-              }),
-              value: 0n
-            }))
-
-            const result = await acc.subaccount.sendTransaction({
-              chain: arbitrum,
-              calls: withdrawCalls,
-              sponsored: true
-            })
-            const receipt = await acc.subaccount.waitForExecution(result)
-            console.log('[ActionDrawer] Withdraw receipt:', receipt)
-
-            // Handle different receipt formats from Rhinestone SDK
-            const txHash =
-              ('transactionHash' in receipt && receipt.transactionHash) ||
-              ('hash' in receipt && receipt.hash)
-            console.log('[ActionDrawer] Extracted txHash:', txHash)
-            if (txHash) {
-              txResults.push({ hash: txHash as Hex, chain: arbitrum })
-            }
-          }
-
-          console.log('[ActionDrawer] Final txResults:', txResults)
-          return { txResults }
+            console.log('[ActionDrawer] Final txResults:', txResults)
+            return { txResults }
           } catch (err) {
             console.error('[ActionDrawer] Submit error:', err)
             throw err
@@ -247,11 +282,18 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
       const txState = state(
         merge(
           promiseState(submitQuery),
-          op(drafts, filter(list => list.length > 0), constant(null)) // Reset on new drafts
+          op(
+            drafts,
+            filter(list => list.length > 0),
+            constant(null)
+          ) // Reset on new drafts
         ),
         null
       )
-      const isLoading = state(map(s => s?.status === PromiseStatus.PENDING, txState), false)
+      const isLoading = state(
+        map(s => s?.status === PromiseStatus.PENDING, txState),
+        false
+      )
       const txSuccess = op(
         txState,
         filter(s => s !== null && 'value' in s && s.value !== undefined),
@@ -263,7 +305,11 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
         merge(
           constant(true, clickClose), // X button dismisses
           constant(false, clickSubmit), // New submit re-opens
-          op(drafts, filter(list => list.length > 0), constant(false)) // New drafts re-open
+          op(
+            drafts,
+            filter(list => list.length > 0),
+            constant(false)
+          ) // New drafts re-open
         ),
         false
       )
@@ -352,12 +398,10 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
           ),
 
           // Draft list
-          $column(designSheet.customScroll, style({ overflow: 'auto', maxHeight: '35vh', padding: '0 24px' }))(
-            switchMap(
-              list => (list.length === 0 ? empty : $column(spacing.small)(...list.map($draftItem))),
-              drafts
-            )
-          ),
+          $column(
+            designSheet.customScroll,
+            style({ overflow: 'auto', maxHeight: '35vh', padding: '0 24px' })
+          )(switchMap(list => (list.length === 0 ? empty : $column(spacing.small)(...list.map($draftItem))), drafts)),
 
           // Footer with submit
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
@@ -413,4 +457,3 @@ function balanceDraftToAction(draft: BalanceDraft) {
     )
   }
 }
-

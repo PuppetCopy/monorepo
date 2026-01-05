@@ -1,10 +1,10 @@
-import type { IGmxPositionDecrease, IGmxPositionIncrease, IMasterRouteLatestMetric } from '@puppet/database/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease, ISubaccountLatestMetric } from '@puppet/database/schema'
 import { getUnixTimestamp } from '@puppet/sdk/core'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IMasterRouteMetricSummary, IPosition } from './types'
+import type { IPosition, ISubaccountMetricSummary } from './types'
 
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
@@ -113,49 +113,21 @@ export function aggregatePositionList(list: (IGmxPositionIncrease | IGmxPosition
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: IMasterRouteLatestMetric[]
-): IMasterRouteMetricSummary {
-  const seedAccountSummary: IMasterRouteMetricSummary = {
+  metricList: ISubaccountLatestMetric[]
+): ISubaccountMetricSummary {
+  const seedAccountSummary: ISubaccountMetricSummary = {
     account,
-
-    sizeInUsd: 0n,
-    sizeLongInUsd: 0n,
-    collateralInUsd: 0n,
-
-    openSizeInUsd: 0n,
-    openCollateralInUsd: 0n,
-    openSizeLongInUsd: 0n,
-    longShortRatio: 0n,
-    pnl: 0n,
     realisedPnl: 0n,
-    realisedRoi: 0n,
-    roi: 0n,
-
+    allocatedVolume: 0n,
     lossCount: 0,
     winCount: 0,
-
     pnlTimeline: [],
-
-    // positionList: [],
-    matchedPuppetList: [],
-
-    indexTokenList: []
+    matchedPuppetList: []
   }
 
-  const summary = metricList.reduce((seed, next, _idx): IMasterRouteMetricSummary => {
-    seed.sizeInUsd += next.sizeInUsd
-    seed.sizeLongInUsd += next.sizeLongInUsd
-    seed.collateralInUsd += next.collateralInUsd
-
-    seed.openSizeInUsd += next.openSizeInUsd
-    seed.openCollateralInUsd += next.openCollateralInUsd
-    seed.openSizeLongInUsd += next.openSizeLongInUsd
-    seed.longShortRatio += next.longShortRatio
-
-    seed.pnl += next.pnl
+  const summary = metricList.reduce((seed, next, _idx): ISubaccountMetricSummary => {
     seed.realisedPnl += next.realisedPnl
-    seed.realisedRoi += next.realisedRoi
-    seed.roi += next.roi
+    seed.allocatedVolume += next.allocatedVolume
 
     next.pnlList.forEach((pnl: bigint, idx: number) => {
       seed.lossCount += pnl < 0n ? 1 : 0
@@ -164,11 +136,10 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        masterMatchingKey: next.masterMatchingKey
+        subaccount: next.subaccount
       })
     })
 
-    seed.indexTokenList = [...new Set([...seed.indexTokenList, ...next.indexTokenList])]
     seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
 
     return seed

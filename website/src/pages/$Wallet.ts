@@ -1,12 +1,22 @@
 import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { ARBITRUM_ADDRESS } from '@puppet/sdk/const'
+import { ADDRESS_ZERO, ARBITRUM_ADDRESS } from '@puppet/sdk/const'
 import { getDebankProfileUrl, readableAddress } from '@puppet/sdk/core'
-import { awaitPromises, filter, type IStream, just, map, merge, op, sampleMap, switchMap } from 'aelea/stream'
+import {
+  awaitPromises,
+  filter,
+  fromPromise,
+  type IStream,
+  just,
+  map,
+  merge,
+  op,
+  sampleMap,
+  switchMap
+} from 'aelea/stream'
 import { type IBehavior, state } from 'aelea/stream-extended'
 import { $node, $text, attr, component, style } from 'aelea/ui'
 import { $column, $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
-import { encodeAbiParameters, keccak256, toHex, zeroAddress } from 'viem'
 import {
   $anchor,
   $defaultTooltipDropContainer,
@@ -28,7 +38,7 @@ import {
   type IWithdrawEditorDraft
 } from '../components/portfolio/$DepositEditor.js'
 import { $TokenBalanceEditor } from '../components/portfolio/$TokenBalanceEditor.js'
-import wallet, { type IAccountState, signAndEnableSession } from '../wallet/wallet.js'
+import wallet, { createMasterSubaccount, type IAccountState, signAndEnableSession } from '../wallet/wallet.js'
 
 function updateDraftList(changeList: BalanceDraft[], draft: BalanceDraft): BalanceDraft[] {
   const normalizedToken = draft.token.toLowerCase()
@@ -49,8 +59,8 @@ interface IWalletPage {
 export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage) =>
   component(
     (
-      [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
-      [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>,
+      [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>, //
+      [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>, //
       [changeAccount, changeAccountTether]: IBehavior<PointerEvent, Promise<IAccountState | null>>
     ) => {
       return [
@@ -67,7 +77,22 @@ export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage
                 )($ConnectWalletCard({}))
               }
 
-              const subaccountAddress = account.subaccount?.getAddress()
+              // Master Account = account with MasterHook for receiving puppet allocations
+              const masterAccount = account.signer
+                ? await createMasterSubaccount(account, { baseToken: ARBITRUM_ADDRESS.USDC })
+                : null
+
+              const subaccountInfo = masterAccount
+                ? await wallet.read({
+                    abi: PUPPET_CONTRACT_MAP.Allocate.abi,
+                    address: PUPPET_CONTRACT_MAP.Allocate.address,
+                    functionName: 'getSubaccountInfo',
+                    args: [masterAccount.getAddress()] as const
+                  })
+                : null
+
+              // Main Account = 7579 operational account for trading
+              const mainAccountAddress = account.subaccount?.getAddress()
               const hasSession = !!account.subaccount
 
               // Refresh balance on mount and when drafts are cleared (tx success)
@@ -78,33 +103,12 @@ export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage
               const walletBalance = state(
                 switchMap(
                   () => {
-                    if (!subaccountAddress) return just(0n)
-                    return wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, subaccountAddress, 42161, true)
+                    if (!mainAccountAddress) return just(0n)
+                    return wallet.getTokenBalance(ARBITRUM_ADDRESS.USDC, mainAccountAddress, 42161, true)
                   },
                   merge(just(null), draftsCleared)
                 ),
                 0n
-              )
-
-              // Check if subaccount is registered with Allocation module
-              const subaccountName = toHex('default', { size: 32 })
-              const isRegistered = state(
-                switchMap(() => {
-                  if (!subaccountAddress) return just(zeroAddress)
-                  const matchingKey = keccak256(
-                    encodeAbiParameters(
-                      [{ type: 'address' }, { type: 'address' }, { type: 'bytes32' }],
-                      [ARBITRUM_ADDRESS.USDC, subaccountAddress, subaccountName]
-                    )
-                  )
-                  return wallet.read({
-                    abi: PUPPET_CONTRACT_MAP.Allocation.abi,
-                    address: PUPPET_CONTRACT_MAP.Allocation.address,
-                    functionName: 'masterSubaccountMap',
-                    args: [matchingKey] as const
-                  })
-                }, just(null)),
-                zeroAddress
               )
 
               // Combined status: extension, session, registered
@@ -127,47 +131,43 @@ export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage
                   $statusDot(isActive)
                 )
 
-              const combinedStatus = map(
-                registered => ({
-                  extension: account.isSynced,
-                  session: hasSession,
-                  registered: registered !== zeroAddress
-                }),
-                isRegistered
-              )
+              const combinedStatus = {
+                extension: account.isSynced,
+                session: hasSession,
+                registered: !!subaccountInfo && subaccountInfo.account !== ADDRESS_ZERO
+              }
 
-              // Subaccount label with status-colored info icon
-              const $subaccountLabel = switchMap(status => {
-                const allGood = status.extension && status.session && status.registered
-                const iconColor = allGood ? pallete.positive : pallete.negative
-                return $row(style({ alignItems: 'center' }))(
-                  $infoLabel($text('Subaccount')),
-                  $Tooltip({
-                    $dropContainer: $defaultTooltipDropContainer,
-                    $content: $column(spacing.default, style({ maxWidth: '280px' }))(
-                      $node(style({  fontSize: '0.85rem', lineHeight: '1.4' }))(
-                        $text('A smart wallet for one-click trading without wallet popups. Your trades can be matched by puppets based on your performance.')
-                      ),
-                      $column(spacing.default, style({ paddingTop: '8px', borderTop: `1px solid ${pallete.horizon}` }))(
-                        $statusLine('Extension', 'Browser extension installed', status.extension),
-                        $statusLine('Session', 'Signed trading session', status.session),
-                        $statusLine('Registered', 'On-chain subaccount setup', status.registered)
+              // Main Account label with status-colored info icon
+              const allGood = combinedStatus.extension && combinedStatus.session && combinedStatus.registered
+              const iconColor = allGood ? pallete.positive : pallete.negative
+              const $mainAccountLabel = $row(style({ alignItems: 'center' }))(
+                $infoLabel($text('Main Account')),
+                $Tooltip({
+                  $dropContainer: $defaultTooltipDropContainer,
+                  $content: $column(spacing.default, style({ maxWidth: '280px' }))(
+                    $node(style({ fontSize: '0.85rem', lineHeight: '1.4' }))(
+                      $text(
+                        'A smart wallet for one-click trading without wallet popups. Your trades can be matched by puppets based on your performance.'
                       )
                     ),
-                    $anchor: $icon({
-                      $content: $info,
-                      viewBox: '0 0 32 32',
-                      fill: iconColor,
-                      svgOps: style({ width: '24px', height: '24px', padding: '2px 4px' })
-                    })
-                  })({})
-                )
-              }, combinedStatus)
+                    $column(spacing.default, style({ paddingTop: '8px', borderTop: `1px solid ${pallete.horizon}` }))(
+                      $statusLine('Extension', 'Browser extension installed', combinedStatus.extension),
+                      $statusLine('Registered', 'Deployed on first deposit', combinedStatus.registered)
+                    )
+                  ),
+                  $anchor: $icon({
+                    $content: $info,
+                    viewBox: '0 0 32 32',
+                    fill: iconColor,
+                    svgOps: style({ width: '24px', height: '24px', padding: '2px 4px' })
+                  })
+                })({})
+              )
 
               const $setupGuide = $column(spacing.default)(
                 $node(style({ fontSize: '1rem', fontWeight: '600' }))($text('Enable Trading Session')),
                 $node(style({ color: pallete.foreground, lineHeight: '1.5' }))(
-                  $text('Sign a message to enable session connection and a one-click trading. No gas required.')
+                  $text('Sign a message to enable session connection and one-click trading. No gas required.')
                 ),
                 $ButtonPrimary({
                   $content: $text('Enable')
@@ -185,18 +185,18 @@ export const $WalletPage = ({ accountQuery, draftDepositTokenList }: IWalletPage
                 style({ padding: '24px', maxWidth: '600px', margin: '0 auto', width: '100%' })
               )(
                 $card(spacing.default)(
-                  subaccountAddress
+                  mainAccountAddress
                     ? $column(spacing.default)(
                         $column(spacing.small)(
-                          $subaccountLabel,
+                          $mainAccountLabel,
                           $row(spacing.small, style({ alignItems: 'center' }))(
                             $node(style({ width: '24px', height: '24px', borderRadius: '50%', flexShrink: '0' }))(
-                              $jazzicon(subaccountAddress)
+                              $jazzicon(mainAccountAddress)
                             ),
                             $anchor(
-                              attr({ href: getDebankProfileUrl(subaccountAddress), target: '_blank' }),
+                              attr({ href: getDebankProfileUrl(mainAccountAddress), target: '_blank' }),
                               style({ fontFamily: 'monospace' })
-                            )($text(readableAddress(subaccountAddress))),
+                            )($text(readableAddress(mainAccountAddress))),
                             $icon({ $content: $external, width: '12px', fill: pallete.foreground })
                           )
                         ),

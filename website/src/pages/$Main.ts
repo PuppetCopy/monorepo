@@ -25,7 +25,6 @@ import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $T
 import { contains } from '@/ui-router/resolveUrl.js'
 import { uiStorage } from '@/ui-storage'
 import { $midContainer } from '../common/$common.js'
-import { queryUserSubscribeRuleList } from '../common/query.js'
 import { getStatus } from '../common/sqlClient.js'
 import { $ActionDrawer } from '../components/$ActionDrawer.js'
 import { $MainMenu } from '../components/$MainMenu.js'
@@ -110,7 +109,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
         )
       )
 
-      const userMatchingRuleQuery = state(queryUserSubscribeRuleList(accountQuery))
+      // TODO: Implement subscription rule query when schema is ready
+      const userMatchingRuleQuery = state(map(() => Promise.resolve([]), accountQuery))
 
       const indexerStatus = state(awaitPromises(map(() => getStatus(), start(0, periodic(IntervalTime.MIN * 1000)))))
 

@@ -1,4 +1,17 @@
-import type { ISubscribeRule } from '@puppet/database/schema'
+// TODO: Replace with actual schema type when matching rules are implemented
+type ISubscribeRule = {
+  id: string
+  blockTimestamp: number
+  transactionHash: string
+  account: `0x${string}`
+  collateralToken: `0x${string}`
+  master: `0x${string}`
+  masterMatchingKey: `0x${string}`
+  allowanceRate: bigint
+  throttleActivity: bigint
+  expiry: bigint
+}
+
 import { getMasterMatchingKey, getUnixTimestamp } from '@puppet/sdk/core'
 import { awaitPromises, combine, empty, type IStream, map, op, sampleMap } from 'aelea/stream'
 import type { IBehavior } from 'aelea/stream-extended'

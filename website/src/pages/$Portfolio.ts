@@ -1,4 +1,17 @@
-import type { ISubscribeRule } from '@puppet/database/schema'
+// TODO: Replace with actual schema type when matching rules are implemented
+type ISubscribeRule = {
+  id: string
+  blockTimestamp: number
+  transactionHash: string
+  account: `0x${string}`
+  collateralToken: `0x${string}`
+  master: `0x${string}`
+  masterMatchingKey: `0x${string}`
+  allowanceRate: bigint
+  throttleActivity: bigint
+  expiry: bigint
+}
+
 import { type IntervalTime, PUPPET_COLLATERAL_LIST } from '@puppet/sdk/const'
 import {
   getDuration,
@@ -26,7 +39,6 @@ import { $Popover } from '../components/$Popover.js'
 import { $ButtonCircular, $defaultButtonCircularContainer } from '../components/form/$Button.js'
 import type { IDepositEditorDraft } from '../components/portfolio/$DepositEditor.js'
 import { $MatchingRuleEditor, type ISetMatchingRuleEditorDraft } from '../components/portfolio/$MatchingRuleEditor.js'
-import { $RouteBalanceEditor } from '../components/portfolio/$RouteBalanceEditor.js'
 import type { IAccountState } from '../wallet/wallet.js'
 import { $seperator2 } from './common.js'
 import type { IPageFilterParams } from './types.js'
@@ -66,7 +78,8 @@ export const $PortfolioPage = ({
           const address = params.wallet.address
           const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
-          const result = await sqlClient.query.position.findMany({
+          // TODO: Update to use new schema when puppetAllocation or similar is available
+          const result = await sqlClient.query.puppetAllocation.findMany({
             where: (t, f) =>
               f.and(
                 f.eq(t.puppet, address),
@@ -76,50 +89,16 @@ export const $PortfolioPage = ({
                   : undefined
               ),
             columns: {
-              masterMatchingKey: true,
+              subaccount: true,
               master: true,
               collateralToken: true,
-              allocationAddress: true,
+              allocation: true,
               createdAt: true,
-              amount: true,
               createdTxHash: true
-            },
-            with: {
-              mirror__Match: {
-                columns: {
-                  master: true,
-                  sizeDelta: true,
-                  requestKey: true,
-                  isLong: true,
-                  market: true
-                },
-                with: {
-                  positionList: {
-                    columns: {
-                      amount: true,
-                      puppet: true
-                    }
-                  },
-                  mirror__AdjustList: {
-                    columns: {
-                      sizeDelta: true
-                    }
-                  },
-                  settle__SettleList: {
-                    columns: {
-                      distributedAmount: true,
-                      platformFeeAmount: true,
-                      nextBalanceList: true,
-                      transactionHash: true,
-                      blockTimestamp: true
-                    }
-                  }
-                }
-              }
             }
           })
 
-          return groupManyList(result, 'masterMatchingKey')
+          return groupManyList(result, 'subaccount')
         })
       )
 
@@ -230,13 +209,8 @@ export const $PortfolioPage = ({
                         spacing.big
                         // style({ padding: '6px 0' })
                       )(
-                        $RouteBalanceEditor({
-                          draftDepositTokenList,
-                          accountQuery,
-                          collateralToken
-                        })({
-                          changeDepositTokenList: changeDepositTokenListTether()
-                        })
+                        // TODO: $RouteBalanceEditor requires masterSubaccount - needs UI update
+                        $text(`Route: ${getTokenDescription(collateralToken).symbol}`)
                       ),
                       $row(spacing.default)(
                         style({ marginBottom: '30px' })($seperator2),
