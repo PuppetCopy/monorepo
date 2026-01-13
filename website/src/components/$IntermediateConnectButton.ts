@@ -3,7 +3,7 @@ import type { IBehavior } from 'aelea/stream-extended'
 import { $text, component, type I$Node, type INodeCompose, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { $intermediatePromise } from '@/ui-components'
-import { type IAccountState, signAndEnableSession } from '../wallet/wallet.js'
+import { type IAccountState, type ISmartAccountState, initializeSmartAccount, signSession } from '../wallet/wallet.js'
 import { $Popover } from './$Popover.js'
 import { $WalletConnect } from './$WalletConnect.js'
 import { $ButtonSecondary } from './form/$Button.js'
@@ -19,7 +19,7 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
   component(
     (
       [openPopover, openPopoverTether]: IBehavior<PointerEvent>,
-      [changeAccount, changeAccountTether]: IBehavior<PointerEvent, Promise<IAccountState>>
+      [changeAccount, changeAccountTether]: IBehavior<PointerEvent, Promise<ISmartAccountState>>
     ) => {
       const $container = config.$container || $row(style({ minHeight: '48px', minWidth: '0px' }))
 
@@ -44,11 +44,17 @@ export const $IntermediateConnectButton = (config: IConnectWalletPopover) =>
             })({})
           }
 
-          if (!account.subaccount) {
+          if (account.sessionSigner === null) {
             return $ButtonCore({
               $content: $text('Sign')
             })({
-              click: changeAccountTether(map(() => signAndEnableSession(account)))
+              click: changeAccountTether(
+                map(async () => {
+                  const skey = await signSession(account)
+
+                  return initializeSmartAccount(account, skey)
+                })
+              )
             })
           }
 

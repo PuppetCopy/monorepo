@@ -25,11 +25,6 @@ export default defineConfig({
       treeshake: 'recommended',
       output: {
         manualChunks(id) {
-          // Porto wallet SDK - isolate for better caching
-          if (id.includes('porto')) {
-            return 'wallet'
-          }
-
           // Don't manually chunk web3 packages - let Vite handle them
           // to avoid platform-specific circular dependency issues
 
@@ -54,26 +49,26 @@ export default defineConfig({
     }
   },
   server: {
-    port: Number(process.env.PORT) || 3000,
+    port: Number(Bun.env.PORT) || 3000,
     proxy: {
       '/api/rpc': {
-        target: process.env.RPC_URL,
+        target: Bun.env.RPC_URL,
         changeOrigin: true,
         secure: true,
         rewrite: path => {
           const url = new URL(path, 'http://localhost')
           const network = url.searchParams.get('network')
-          return `/${network}/${process.env.RPC_KEY}`
+          return `/${network}/${Bun.env.RPC_KEY}`
         }
       },
       '/api/indexer': {
-        target: process.env.INDEXER_ENDPOINT,
+        target: Bun.env.INDEXER_ENDPOINT,
         changeOrigin: true,
         secure: true,
         rewrite: path => path.replace(/^\/api\/indexer/, '')
       },
       '/api/matchmaker': {
-        target: process.env.MATCHMAKER_URL,
+        target: Bun.env.MATCHMAKER_URL,
         changeOrigin: true,
         ws: true,
         rewrite: path => path.replace(/^\/api\/matchmaker/, '/ws')
@@ -84,9 +79,32 @@ export default defineConfig({
         secure: true,
         rewrite: path => path.replace(/^\/api\/orchestrator/, ''),
         configure: proxy => {
-          proxy.on('proxyReq', proxyReq => {
-            if (process.env.ORCHESTRATOR_API_KEY) {
-              proxyReq.setHeader('x-api-key', process.env.ORCHESTRATOR_API_KEY)
+          proxy.on('proxyReq', (proxyReq, req) => {
+            if (Bun.env.ORCHESTRATOR_API_KEY) {
+              proxyReq.setHeader('x-api-key', Bun.env.ORCHESTRATOR_API_KEY)
+              // Request uncompressed response for logging
+              proxyReq.removeHeader('accept-encoding')
+              console.log('[Proxy] Forwarding to orchestrator:', req.url)
+            } else {
+              console.warn('[Proxy] ORCHESTRATOR_API_KEY not set!')
+            }
+          })
+          proxy.on('proxyRes', (proxyRes, req) => {
+            if (req.url?.includes('/intent')) {
+              let body = ''
+              proxyRes.on('data', chunk => {
+                body += chunk.toString()
+              })
+              proxyRes.on('end', () => {
+                console.log(
+                  '[Proxy] Orchestrator response for',
+                  req.url,
+                  '(status:',
+                  proxyRes.statusCode,
+                  '):',
+                  body.slice(0, 2000)
+                )
+              })
             }
           })
         }
@@ -131,7 +149,7 @@ export default defineConfig({
       // Note: workbox options are not used with injectManifest strategy
       // Service worker lifecycle is controlled in src/sw/service-worker.ts
       devOptions: {
-        enabled: !!process.env.VITE_PWA_DEV,
+        enabled: !!Bun.env.VITE_PWA_DEV,
         navigateFallback: 'index.html',
         suppressWarnings: true,
         type: 'module'

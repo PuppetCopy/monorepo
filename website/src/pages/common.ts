@@ -1,10 +1,10 @@
-import type { IGmxPositionDecrease, IGmxPositionIncrease, ISubaccountLatestMetric } from '@puppet/database/schema'
+import type { IGmxPositionDecrease, IGmxPositionIncrease, IMasterLatestMetric } from '@puppet/database/schema'
 import { getUnixTimestamp } from '@puppet/sdk/core'
 import { style } from 'aelea/ui'
 import { $seperator } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address, Hex } from 'viem'
-import type { IPosition, ISubaccountMetricSummary } from './types'
+import type { IMasterMetricSummary, IPosition } from './types'
 
 export const $seperator2 = style(
   { backgroundColor: colorAlpha(pallete.foreground, 0.2), alignSelf: 'stretch', display: 'block' },
@@ -113,9 +113,9 @@ export function aggregatePositionList(list: (IGmxPositionIncrease | IGmxPosition
 
 export function accountSettledPositionListSummary(
   account: Address,
-  metricList: ISubaccountLatestMetric[]
-): ISubaccountMetricSummary {
-  const seedAccountSummary: ISubaccountMetricSummary = {
+  metricList: IMasterLatestMetric[]
+): IMasterMetricSummary {
+  const seedAccountSummary: IMasterMetricSummary = {
     account,
     realisedPnl: 0n,
     allocatedVolume: 0n,
@@ -125,9 +125,9 @@ export function accountSettledPositionListSummary(
     matchedPuppetList: []
   }
 
-  const summary = metricList.reduce((seed, next, _idx): ISubaccountMetricSummary => {
+  const summary = metricList.reduce((seed, next, _idx): IMasterMetricSummary => {
     seed.realisedPnl += next.realisedPnl
-    seed.allocatedVolume += next.allocatedVolume
+    seed.allocatedVolume += next.allocated
 
     next.pnlList.forEach((pnl: bigint, idx: number) => {
       seed.lossCount += pnl < 0n ? 1 : 0
@@ -136,11 +136,12 @@ export function accountSettledPositionListSummary(
       seed.pnlTimeline.push({
         time: next.pnlTimestampList[idx],
         value: pnl,
-        subaccount: next.subaccount
+        master: next.master
       })
     })
 
-    seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
+    // TODO: matchedPuppetList not available on IMasterLatestMetric - needs schema update
+    // seed.matchedPuppetList = [...new Set([...seed.matchedPuppetList, ...next.matchedPuppetList])]
 
     return seed
   }, seedAccountSummary)

@@ -6,20 +6,37 @@
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
-    "build": "wxt build",
+    "build": "wxt build && bun run build:client",
     "build:firefox": "wxt build -b firefox",
+    "build:client": "tsc -b tsconfig-client.json",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare"
   },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./client": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./client/types": {
+      "types": "./dist/types/types.d.ts",
+      "import": "./dist/esm/types.js"
+    },
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "@puppet/contracts": "workspace:*",
     "@puppet/sdk": "workspace:*",
-    "viem": "catalog:"
+    "viem": "catalog:",
+    "@types/bun": "1.3.6"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
     "@types/bun": "catalog:",
+    "@types/chrome": "catalog:",
     "typescript": "catalog:",
     "wxt": "^0.20.13"
   }

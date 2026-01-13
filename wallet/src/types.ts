@@ -2,6 +2,9 @@ export interface EIP1193Provider {
   request(args: { method: string; params?: unknown[] }): Promise<unknown>
   on(event: string, listener: (...args: unknown[]) => void): void
   removeListener(event: string, listener: (...args: unknown[]) => void): void
+  // Legacy properties for dApp compatibility
+  isConnected?: () => boolean
+  selectedAddress?: string | null
 }
 
 export interface EIP6963ProviderInfo {

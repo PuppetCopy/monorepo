@@ -4,6 +4,8 @@ import * as router from 'aelea/router'
 import {
   awaitPromises,
   combine,
+  empty,
+  filter,
   type IStream,
   map,
   merge,
@@ -19,7 +21,6 @@ import { $node, $text, $wrapNativeElement, component, fromEventTarget, style } f
 import { $column, $row, designSheet, isDesktopScreen, isMobileScreen, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import { $heading3 } from 'src/common/$text.js'
-import { getAddress } from 'viem'
 import type { Address } from 'viem/accounts'
 import { $alertNegativeContainer, $alertPositiveContainer, $infoLabeledValue, $Tooltip } from '@/ui-components'
 import { contains } from '@/ui-router/resolveUrl.js'
@@ -34,7 +35,7 @@ import type { ISetMatchingRuleEditorDraft } from '../components/portfolio/$Match
 import { localStore } from '../const/localStore.js'
 import { pwaUpgradeNotification } from '../sw/swUtils.js'
 import { fadeIn } from '../transitions/enter.js'
-import wallet, { type IAccountState, initializeAccountState } from '../wallet/wallet.js'
+import wallet, { type IAccountState, type ISmartAccountState, initializeAccountState } from '../wallet/wallet.js'
 import { $Leaderboard } from './$Leaderboard.js'
 import { $PortfolioPage } from './$Portfolio.js'
 import { $MasterPage } from './$Trader.js'
@@ -63,7 +64,7 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       [selectIndexTokenList, selectIndexTokenListTether]: IBehavior<Address[]>,
 
       [changeMatchRuleList, changeMatchRuleListTether]: IBehavior<ISetMatchingRuleEditorDraft[]>,
-      [changeDepositTokenList, changeDepositTokenListTether]: IBehavior<BalanceDraft[]>,
+      [changeDraft, changeDraftTether]: IBehavior<BalanceDraft>,
       [removeDraft, removeDraftTether]: IBehavior<string>,
       [clearDrafts, clearDraftsTether]: IBehavior<null>
     ) => {
@@ -98,15 +99,32 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
       )
       const indexTokenList = uiStorage.replayWrite(localStore.global.indexTokenList, selectIndexTokenList)
 
-      const accountQuery: IStream<Promise<IAccountState | null>> = merge(
-        changeAccount,
-        op(
-          combine({ connection: wallet.connection }),
-          map(params => {
-            return initializeAccountState(params.connection)
-          }),
-          state
+      const accountQuery: IStream<Promise<IAccountState>> = state(
+        merge(
+          changeAccount,
+          op(
+            combine({ connection: wallet.connection }),
+            map(async params => {
+              try {
+                return await initializeAccountState(params.connection)
+              } catch {
+                return null
+              }
+            })
+          )
         )
+      )
+
+      // Filter to only emit smart accounts (has subaccount)
+      const smartAccountQuery: IStream<ISmartAccountState | null> = op(
+        accountQuery,
+        switchMap(async accountPromise => {
+          const account = await accountPromise
+          if (account && 'subaccount' in account) {
+            return account as ISmartAccountState
+          }
+          return null
+        })
       )
 
       // TODO: Implement subscription rule query when schema is ready
@@ -116,22 +134,26 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
 
       const draftMatchingRuleList = state(changeMatchRuleList, [])
 
-      type DraftEvent = { type: 'update'; list: BalanceDraft[] } | { type: 'remove'; id: string } | { type: 'clear' }
+      // Key by token for deduplication (single active smart account)
+      const getDraftKey = (draft: BalanceDraft) => draft.token.toLowerCase()
+
+      type DraftEvent = { type: 'upsert'; draft: BalanceDraft } | { type: 'remove'; key: string } | { type: 'clear' }
 
       const draftDepositTokenList = reduce(
         (list: BalanceDraft[], event: DraftEvent) => {
           if (event.type === 'clear') return []
-          if (event.type === 'remove') return list.filter(d => `${d.action}-${d.token}` !== event.id)
-          const deduped = event.list.reduce((acc, draft) => {
-            acc.set(getAddress(draft.token), draft)
-            return acc
-          }, new Map<Address, BalanceDraft>())
-          return Array.from(deduped.values())
+          if (event.type === 'remove') return list.filter(d => getDraftKey(d) !== event.key)
+          // Upsert: zero amount removes, otherwise upsert by key
+          const key = getDraftKey(event.draft)
+          if (event.draft.amount === 0n) return list.filter(d => getDraftKey(d) !== key)
+          const idx = list.findIndex(d => getDraftKey(d) === key)
+          if (idx >= 0) return [...list.slice(0, idx), event.draft, ...list.slice(idx + 1)]
+          return [...list, event.draft]
         },
         [] as BalanceDraft[],
         merge(
-          map((list): DraftEvent => ({ type: 'update', list }), changeDepositTokenList),
-          map((id): DraftEvent => ({ type: 'remove', id }), removeDraft),
+          map((draft): DraftEvent => ({ type: 'upsert', draft }), changeDraft),
+          map((key): DraftEvent => ({ type: 'remove', key }), removeDraft),
           map((): DraftEvent => ({ type: 'clear' }), clearDrafts)
         )
       )
@@ -235,11 +257,12 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                   collateralTokenList,
                   indexTokenList
                 })({
-                  changeDepositTokenList: changeDepositTokenListTether(),
                   selectCollateralTokenList: selectCollateralTokenListTether(),
                   selectIndexTokenList: selectIndexTokenListTether(),
                   changeActivityTimeframe: changeActivityTimeframeTether(),
-                  changeMatchRuleList: changeMatchRuleListTether()
+                  changeMatchRuleList: changeMatchRuleListTether(),
+                  changeDraft: changeDraftTether(),
+                  changeAccount: changeAccountTether()
                 })
               )
             )
@@ -247,8 +270,8 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
           contains(walletRoute)(
             $midContainer(
               fadeIn(
-                $WalletPage({ accountQuery, draftDepositTokenList })({
-                  changeDepositTokenList: changeDepositTokenListTether(),
+                $WalletPage({ draftDepositTokenList })({
+                  changeDraft: changeDraftTether(),
                   changeAccount: changeAccountTether()
                 })
               )
@@ -324,14 +347,19 @@ export const $Main = ({ baseRoute = '' }: IApp) =>
                 zIndex: 10
               })
             )(
-              $ActionDrawer({
-                accountQuery,
-                depositDrafts: draftDepositTokenList
-              })({
-                changeAccount: changeAccountTether(),
-                removeDraft: removeDraftTether(),
-                clearDrafts: clearDraftsTether()
-              })
+              switchMap(
+                acc => {
+                  if (!acc) return empty
+                  return $ActionDrawer({
+                    accountState: smartAccountQuery as IStream<ISmartAccountState>,
+                    depositDrafts: draftDepositTokenList
+                  })({
+                    removeDraft: removeDraftTether(),
+                    clearDrafts: clearDraftsTether()
+                  })
+                },
+                filter((acc): acc is ISmartAccountState => acc !== null, smartAccountQuery)
+              )
             )
           )
         )

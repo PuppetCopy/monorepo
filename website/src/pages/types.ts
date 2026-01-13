@@ -77,12 +77,12 @@ export type IRoute = {
   account: string
 }
 
-export interface ISubaccountMetricSummary {
+export interface IMasterMetricSummary {
   account: Address
   realisedPnl: bigint
   allocatedVolume: bigint
   winCount: number
   lossCount: number
-  pnlTimeline: { time: number; value: bigint; subaccount: Hex }[]
+  pnlTimeline: { time: number; value: bigint; master: Hex }[]
   matchedPuppetList: Address[]
 }

@@ -26,34 +26,34 @@ function createFilteredStream<const T extends readonly AbiParameter[]>(
   )
 }
 
-export function createRegisterMasterSubaccountStream(client: PublicClient) {
+export function createCreateMasterStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.hash,
-    CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.args
+    CONTRACT_EVENT_MAP.Registry.CreateMaster.hash,
+    CONTRACT_EVENT_MAP.Registry.CreateMaster.args
   )
 }
 
-export function createExecuteAllocateStream(client: PublicClient) {
+export function createAllocateStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.hash,
-    CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.args
+    CONTRACT_EVENT_MAP.Allocate.Allocate.hash,
+    CONTRACT_EVENT_MAP.Allocate.Allocate.args
   )
 }
 
-export function createExecuteWithdrawStream(client: PublicClient) {
+export function createWithdrawStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.hash,
-    CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.args
+    CONTRACT_EVENT_MAP.Withdraw.Withdraw.hash,
+    CONTRACT_EVENT_MAP.Withdraw.Withdraw.args
   )
 }
 
-export function createCreateOrderStream(client: PublicClient) {
+export function createMasterPostCallStream(client: PublicClient) {
   return createFilteredStream(
     client,
-    CONTRACT_EVENT_MAP.Position.CreateOrder.hash,
-    CONTRACT_EVENT_MAP.Position.CreateOrder.args
+    CONTRACT_EVENT_MAP.Call.MasterPostCall.hash,
+    CONTRACT_EVENT_MAP.Call.MasterPostCall.args
   )
 }

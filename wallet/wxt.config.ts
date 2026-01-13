@@ -2,6 +2,8 @@ import { defineConfig } from 'wxt'
 
 export default defineConfig({
   srcDir: 'src',
+  // Exclude client SDK from extension build
+  exclude: ['**/client/**'],
   dev: {
     reloadCommand: 'Alt+R'
   },

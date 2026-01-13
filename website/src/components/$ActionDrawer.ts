@@ -1,5 +1,4 @@
-import { PUPPET_CONTRACT_MAP } from '@puppet/contracts'
-import { ARBITRUM_ADDRESS, CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
+import { CROSS_CHAIN_TOKEN_MAP } from '@puppet/sdk/const'
 import { getMappedValueFallback, readableTokenAmountLabel } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
 import { waitForTransactionReceipt } from '@wagmi/core'
@@ -20,9 +19,8 @@ import { type IBehavior, PromiseStatus, promiseState, state } from 'aelea/stream
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $column, $row, designSheet, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
-import { encodeAbiParameters, encodeFunctionData, erc20Abi, type Hex, toHex } from 'viem'
+import { encodeFunctionData, erc20Abi, type Hex } from 'viem'
 import { arbitrum, base, type Chain, optimism, polygon } from 'viem/chains'
-import type { IDepositEditorDraft } from './portfolio/$DepositEditor.js'
 
 const chainById: Record<number, Chain> = {
   [arbitrum.id]: arbitrum,
@@ -35,247 +33,169 @@ import { $alertPositiveTooltip, $alertTooltip, $spinnerTooltip, $txHashRef, $xCr
 import { $heading3 } from '../common/$text.js'
 import { $card2 } from '../common/elements/$common.js'
 import { fadeIn } from '../transitions/enter.js'
-import wallet, { getExtensionWalletState, type IAccountState } from '../wallet/wallet.js'
-import { $IntermediateConnectButton } from './$IntermediateConnectButton.js'
+import wallet, { getPortfolio, type ISmartAccountState } from '../wallet/wallet.js'
 import { $ButtonCircular, $defaultButtonPrimary } from './form/$Button.js'
 import { $ButtonCore } from './form/$ButtonCore.js'
-import { BALANCE_ACTION, type BalanceDraft } from './portfolio/$DepositEditor.js'
+import type { BalanceDraft } from './portfolio/$DepositEditor.js'
 
 interface IActionDrawer {
-  accountQuery: IStream<Promise<IAccountState | null>>
+  accountState: IStream<ISmartAccountState>
   depositDrafts: IStream<BalanceDraft[]>
   title?: string
 }
 
-export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Actions' }: IActionDrawer) =>
+export const $ActionDrawer = ({ accountState, depositDrafts, title = 'Pending Actions' }: IActionDrawer) =>
   component(
     (
       [clickSubmit, clickSubmitTether]: IBehavior<PointerEvent>,
       [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
-      [clickRemove, clickRemoveTether]: IBehavior<PointerEvent, string>,
-      [changeAccount, changeAccountTether]: IBehavior<Promise<IAccountState>>
+      [clickRemove, clickRemoveTether]: IBehavior<PointerEvent, string>
     ) => {
       // Derive action drafts from deposit drafts (state() caches for late subscribers when drawer re-opens)
-      const drafts = state(
-        map(list => list.map(balanceDraftToAction), depositDrafts),
-        []
+      const drafts = state(map(list => list.map(balanceDraftToAction), depositDrafts))
+
+      // Track account address to detect account switches
+      const accountAddress = op(
+        accountState,
+        map(acc => {
+          return acc?.address
+        }),
+        skipRepeats
       )
 
-      // Submit: sample current state on click, execute transactions
-      const submitQuery = sampleMap(
-        async ({ acc: accPromise, deposits }) => {
-          try {
-            const acc = await accPromise
-            if (!acc?.subaccount) throw new Error('No account or session')
+      // Pre-calculate intent when drafts change (fetches portfolio for sourceChains)
+      const intentQuery = switchMap(
+        async params => {
+          const { drafts, acc } = params
+          if (drafts.length === 0) return null
 
-            const subaccountAddress = acc.subaccount.getAddress()
-            const ownerAddress = acc.address
-            const txResults: { hash: Hex; chain: Chain }[] = []
+          const smartAccount = acc.subaccount
+          const deposits = drafts.filter(d => d.amount > 0n)
+          const withdrawals = drafts.filter(d => d.amount < 0n)
 
-            // Separate deposits (wallet → subaccount) from withdrawals (subaccount → wallet)
-            const depositDrafts = deposits.filter((d): d is IDepositEditorDraft => d.action === BALANCE_ACTION.DEPOSIT)
-            const withdrawDrafts = deposits.filter(d => d.action === BALANCE_ACTION.WITHDRAW)
+          // For withdrawals, pre-fetch portfolio to determine sourceChains
+          const withdrawIntents = await Promise.all(
+            withdrawals.map(async draft => {
+              const tokenItem = acc.portfolio.find(item =>
+                item.tokenChainBalance.some(tcb => tcb.tokenAddress.toLowerCase() === draft.token.toLowerCase())
+              )
+              const sourceChainIds = tokenItem?.tokenChainBalance
+                .filter(tcb => tcb.balance.locked + tcb.balance.unlocked > 0n)
+                .map(tcb => tcb.chainId) ?? [arbitrum.id]
+              const sourceChains = sourceChainIds.map(id => chainById[id]).filter((c): c is Chain => c !== undefined)
+              if (sourceChains.length === 0) sourceChains.push(arbitrum)
 
-            // Execute deposits: transfer to subaccount on selected chain
-            // Rhinestone's unified balance allows using funds from any chain
-            for (const draft of depositDrafts) {
-              const isArbitrum = draft.chainId === arbitrum.id
-
-              // Get token address for the deposit chain
-              const tokenDesc = getTokenDescription(draft.token)
-              const tokenMap = CROSS_CHAIN_TOKEN_MAP[draft.chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
-              const tokenAddress = getMappedValueFallback(tokenMap, tokenDesc.symbol, null)
-              if (!tokenAddress) throw new Error(`Token ${tokenDesc.symbol} not available on chain ${draft.chainId}`)
-
-              // For non-Arbitrum chains: deposit on source chain, then bridge to Arbitrum
-              if (!isArbitrum) {
-                const depositChain = chainById[draft.chainId]
-                if (!depositChain) throw new Error(`Unsupported chain: ${draft.chainId}`)
-
-                // Step 1: Switch chain and transfer to subaccount on source chain
-                if (acc.walletClient.chain?.id !== draft.chainId) {
-                  await acc.walletClient.switchChain({ id: draft.chainId })
-                }
-
-                const depositHash = await acc.walletClient.sendTransaction({
-                  to: tokenAddress,
-                  data: encodeFunctionData({
-                    abi: erc20Abi,
-                    functionName: 'transfer',
-                    args: [subaccountAddress, draft.amount]
-                  }),
-                  account: acc.walletClient.account!,
-                  chain: depositChain
-                })
-                txResults.push({ hash: depositHash, chain: depositChain })
-
-                // Wait for deposit tx to confirm before bridging
-                await waitForTransactionReceipt(wallet.wagmi, {
-                  hash: depositHash,
-                  chainId: draft.chainId
-                })
-
-                // Step 2: Bridge from source chain to Arbitrum via subaccount
-                const bridgeResult = await acc.subaccount.sendTransaction({
-                  sourceChains: [depositChain],
-                  targetChain: arbitrum,
-                  calls: [],
-                  tokenRequests: [
-                    {
-                      address: tokenAddress, // Use source chain token address
-                      amount: draft.amount
-                    }
-                  ]
-                })
-                const bridgeReceipt = await acc.subaccount.waitForExecution(bridgeResult)
-                const bridgeTxHash =
-                  ('transactionHash' in bridgeReceipt && bridgeReceipt.transactionHash) ||
-                  ('hash' in bridgeReceipt && bridgeReceipt.hash)
-                if (bridgeTxHash) {
-                  txResults.push({ hash: bridgeTxHash as Hex, chain: arbitrum })
-                }
-              } else {
-                // Arbitrum: direct transfer
-                const hash = await acc.walletClient.sendTransaction({
-                  to: tokenAddress,
-                  data: encodeFunctionData({
-                    abi: erc20Abi,
-                    functionName: 'transfer',
-                    args: [subaccountAddress, draft.amount]
-                  }),
-                  account: acc.walletClient.account!
-                })
-                txResults.push({ hash, chain: arbitrum })
+              return {
+                draft,
+                sourceChains,
+                amount: -draft.amount
               }
-            }
+            })
+          )
 
-            // Install MasterHook if not registered (enables one-click trading via hook's onInstall)
-            if (depositDrafts.length > 0) {
-              // Check if MasterHook is already installed (which means already registered)
-              const isRegistered = await wallet.read({
-                abi: PUPPET_CONTRACT_MAP.Allocate.abi,
-                address: PUPPET_CONTRACT_MAP.Allocate.address,
-                functionName: 'registeredMap',
-                args: [subaccountAddress]
-              })
-
-              if (!isRegistered) {
-                // Wait for any pending deposit tx to confirm first
-                const lastDepositTx = txResults[txResults.length - 1]
-                if (lastDepositTx) {
-                  await waitForTransactionReceipt(wallet.wagmi, {
-                    hash: lastDepositTx.hash,
-                    chainId: lastDepositTx.chain.id
-                  })
-                }
-
-                // Get stored subaccount name from extension
-                const walletState = await getExtensionWalletState(ownerAddress)
-                const subaccountName = walletState?.subaccountName ?? toHex('default', { size: 32 })
-
-                // Encode MasterHook.InstallParams
-                const installParams = encodeAbiParameters(
-                  [
-                    {
-                      type: 'tuple',
-                      components: [
-                        { name: 'account', type: 'address' },
-                        { name: 'signer', type: 'address' },
-                        { name: 'baseToken', type: 'address' },
-                        { name: 'name', type: 'bytes32' }
-                      ]
-                    }
-                  ],
-                  [
-                    {
-                      account: ownerAddress,
-                      signer: acc.signer!.address,
-                      baseToken: ARBITRUM_ADDRESS.USDC,
-                      name: subaccountName
-                    }
-                  ]
-                )
-
-                // ERC-7579 MODULE_TYPE_HOOK = 4
-                const MODULE_TYPE_HOOK = 4n
-
-                // Install MasterHook module - this calls onInstall which registers the subaccount
-                const registerResult = await acc.subaccount.sendTransaction({
-                  chain: arbitrum,
-                  calls: [
-                    {
-                      to: subaccountAddress,
-                      data: encodeFunctionData({
-                        abi: [
-                          {
-                            name: 'installModule',
-                            type: 'function',
-                            inputs: [
-                              { name: 'moduleTypeId', type: 'uint256' },
-                              { name: 'module', type: 'address' },
-                              { name: 'initData', type: 'bytes' }
-                            ],
-                            outputs: [],
-                            stateMutability: 'payable'
-                          }
-                        ],
-                        functionName: 'installModule',
-                        args: [MODULE_TYPE_HOOK, PUPPET_CONTRACT_MAP.MasterHook.address, installParams]
-                      }),
-                      value: 0n
-                    }
-                  ],
-                  sponsored: true
-                })
-                const registerReceipt = await acc.subaccount.waitForExecution(registerResult)
-                console.log('[ActionDrawer] MasterHook install receipt:', registerReceipt)
-                const registerHash =
-                  ('transactionHash' in registerReceipt && registerReceipt.transactionHash) ||
-                  ('hash' in registerReceipt && registerReceipt.hash)
-                console.log('[ActionDrawer] MasterHook install txHash:', registerHash)
-                if (registerHash) {
-                  txResults.push({ hash: registerHash as Hex, chain: arbitrum })
-                }
-              }
-            }
-
-            // Execute withdrawals via subaccount on Arbitrum (7579 intent call)
-            if (withdrawDrafts.length > 0) {
-              const withdrawCalls = withdrawDrafts.map(draft => ({
-                to: draft.token,
-                data: encodeFunctionData({
-                  abi: erc20Abi,
-                  functionName: 'transfer',
-                  args: [ownerAddress, draft.amount]
-                }),
-                value: 0n
-              }))
-
-              const result = await acc.subaccount.sendTransaction({
-                chain: arbitrum,
-                calls: withdrawCalls,
-                sponsored: true
-              })
-              const receipt = await acc.subaccount.waitForExecution(result)
-              console.log('[ActionDrawer] Withdraw receipt:', receipt)
-
-              // Handle different receipt formats from Rhinestone SDK
-              const txHash =
-                ('transactionHash' in receipt && receipt.transactionHash) || ('hash' in receipt && receipt.hash)
-              console.log('[ActionDrawer] Extracted txHash:', txHash)
-              if (txHash) {
-                txResults.push({ hash: txHash as Hex, chain: arbitrum })
-              }
-            }
-
-            console.log('[ActionDrawer] Final txResults:', txResults)
-            return { txResults }
-          } catch (err) {
-            console.error('[ActionDrawer] Submit error:', err)
-            throw err
+          return {
+            account: acc,
+            smartAccount,
+            deposits,
+            withdrawIntents,
+            hasWithdraw: withdrawals.length > 0
           }
         },
-        combine({ acc: accountQuery, deposits: depositDrafts }),
+        combine({ drafts: depositDrafts, acc: accountState })
+      )
+
+      const intentState = state(intentQuery, null)
+
+      // Submit using pre-calculated intent
+      const submitQuery = sampleMap(
+        async intent => {
+          if (!intent) throw new Error('No intent calculated')
+
+          const acc = intent.account
+          const smartAccount = intent.smartAccount
+          const txResults: { hash: Hex; chain: Chain }[] = []
+
+          // Process deposits
+          for (const draft of intent.deposits) {
+            const tokenDesc = getTokenDescription(draft.token)
+            const tokenMap = CROSS_CHAIN_TOKEN_MAP[draft.chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
+            const tokenAddress = getMappedValueFallback(tokenMap, tokenDesc.symbol, null)
+            if (!tokenAddress) throw new Error(`Token ${tokenDesc.symbol} not available on chain ${draft.chainId}`)
+
+            const chain = chainById[draft.chainId]
+            if (!chain) throw new Error(`Unsupported chain: ${draft.chainId}`)
+
+            const targetAddress = smartAccount.getAddress()
+
+            // Deposit: transfer from EOA to smart account
+            if (acc.walletClient.chain?.id !== draft.chainId) {
+              await acc.walletClient.switchChain({ id: draft.chainId })
+            }
+
+            const hash = await acc.walletClient.sendTransaction({
+              to: tokenAddress,
+              data: encodeFunctionData({
+                abi: erc20Abi,
+                functionName: 'transfer',
+                args: [targetAddress, draft.amount]
+              }),
+              account: acc.walletClient.account!,
+              chain,
+              sponsored: true
+            })
+            txResults.push({ hash, chain })
+
+            await waitForTransactionReceipt(wallet.wagmi, { hash, chainId: draft.chainId })
+
+            // Cross-chain: bridge to Arbitrum after transfer confirms
+            if (draft.chainId !== arbitrum.id) {
+              const result = await smartAccount.sendTransaction({
+                sourceChains: [chain],
+                targetChain: arbitrum,
+                signers: { type: 'owner', kind: 'ecdsa', accounts: [acc.sessionSigner!] },
+                calls: [],
+                tokenRequests: [{ address: tokenAddress, amount: draft.amount }]
+              })
+              const receipt = await smartAccount.waitForExecution(result)
+              const bridgeHash =
+                ('transactionHash' in receipt && receipt.transactionHash) || ('hash' in receipt && receipt.hash)
+              if (bridgeHash) txResults.push({ hash: bridgeHash as Hex, chain: arbitrum })
+            }
+          }
+
+          // Process withdrawals using pre-calculated sourceChains
+          for (const wi of intent.withdrawIntents) {
+            const result = await smartAccount.sendTransaction({
+              targetChain: arbitrum,
+              sourceChains: wi.sourceChains,
+              signers: { type: 'owner', kind: 'ecdsa', accounts: [acc.sessionSigner!] },
+              calls: [
+                {
+                  to: wi.draft.token,
+                  data: encodeFunctionData({
+                    abi: erc20Abi,
+                    functionName: 'transfer',
+                    args: [acc.address, wi.amount]
+                  }),
+                  value: 0n
+                }
+              ],
+              tokenRequests: [],
+              // Sponsor gas and bridging fees to avoid leaving dust
+              sponsored: { gas: true, bridging: true, swaps: false }
+            })
+            const receipt = await smartAccount.waitForExecution(result)
+            const hash =
+              ('transactionHash' in receipt && receipt.transactionHash) || ('hash' in receipt && receipt.hash)
+            if (hash) txResults.push({ hash: hash as Hex, chain: arbitrum })
+          }
+
+          // Refresh portfolio after successful transactions
+          await getPortfolio(smartAccount.getAddress(), true).catch(() => {})
+
+          return { txResults }
+        },
+        intentState,
         clickSubmit
       )
 
@@ -321,36 +241,178 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
         skipRepeats
       )
 
-      // Fee label based on action type (deposits cost gas, withdrawals are sponsored)
-      const $feeLabel = switchMap(list => {
-        const hasDeposit = list.some(d => d.action === BALANCE_ACTION.DEPOSIT)
-        const feeText = hasDeposit ? '~$0.01 fee' : 'Free'
-        return $node(style({ fontSize: '0.75rem', color: pallete.foreground }))($text(feeText))
-      }, depositDrafts)
+      // Fetch intent cost using pre-calculated intent
+      const costQuery = switchMap(async intent => {
+        if (!intent) return null
+        if (!intent.hasWithdraw) return { type: 'deposit' as const }
 
-      // Status indicator (switches with fee estimate)
-      const $statusOrFee = switchMap(s => {
-        if (!s) return $feeLabel
-        if (s.status === PromiseStatus.PENDING) return $spinnerTooltip($text('Processing...'))
-        if (s.status === PromiseStatus.ERROR) {
-          const err = s.error
-          const msg =
-            err && typeof err === 'object' && 'shortMessage' in err
-              ? String(err.shortMessage)
-              : err instanceof Error
-                ? err.message
-                : 'Transaction failed'
-          return $alertTooltip($text(msg))
+        try {
+          // Build token requests from pre-calculated withdraw intents
+          const tokenRequests = intent.withdrawIntents.map(wi => ({
+            tokenAddress: wi.draft.token,
+            amount: wi.amount
+          }))
+
+          const cost = await wallet.getIntentCost({
+            destinationChainId: arbitrum.id,
+            tokenRequests,
+            account: {
+              address: intent.smartAccount.getAddress(),
+              accountType: 'ERC7579',
+              setupOps: []
+            },
+            destinationExecutions: [],
+            // topupCompact consolidates tokens; sponsorSettings requests bridging fee sponsorship
+            options: {
+              topupCompact: true,
+              sponsorSettings: { gasSponsored: true, bridgeFeesSponsored: true, swapFeesSponsored: false }
+            }
+          } as unknown as Parameters<typeof wallet.getIntentCost>[0])
+
+          return { type: 'withdraw' as const, cost }
+        } catch (e) {
+          console.error('Failed to fetch intent cost:', e)
+          return { type: 'withdraw' as const, error: e }
         }
-        if ('value' in s && s.value !== undefined) {
-          const { txResults } = s.value
-          return $alertPositiveTooltip(
-            $text('Success'),
-            $column(spacing.small)(...txResults.map(tx => $txHashRef(tx.hash, tx.chain)))
+      }, intentState)
+
+      const costState = state(costQuery, null)
+
+      // Derive alert from cost state (null = no error, string = error message)
+      const quoteAlert = map(cost => {
+        if (!cost) return null
+        if (cost.type === 'deposit') return null
+        if ('error' in cost) {
+          const err = cost.error
+          return err instanceof Error ? err.message : 'Failed to get quote'
+        }
+        if ('cost' in cost) {
+          const response = cost.cost as { hasFulfilledAll?: boolean; totalTokenShortfallInUSD?: number }
+          if (response.hasFulfilledAll === false) {
+            const shortfall = response.totalTokenShortfallInUSD
+            return shortfall ? `Insufficient balance (~$${shortfall.toFixed(2)} short)` : 'Insufficient balance'
+          }
+        }
+        return null
+      }, costState)
+
+      // Fee label based on intent cost quote
+      const $feeLabel = switchMap(cost => {
+        if (!cost) return $node(style({ fontSize: '0.75rem', color: pallete.foreground }))($text('...'))
+        if (cost.type === 'deposit') {
+          return $node(style({ fontSize: '0.75rem', color: pallete.positive }))($text('Sponsored'))
+        }
+        if ('error' in cost) {
+          return $alertTooltip(
+            $text(cost.error instanceof Error ? cost.error.message : 'Failed to get quote'),
+            $text('Quote failed')
           )
         }
-        return $feeLabel
-      }, txState)
+        if ('cost' in cost) {
+          const response = cost.cost as {
+            hasFulfilledAll?: boolean
+            sponsorFee?: { relayer: number; protocol: number }
+            totalTokenShortfallInUSD?: number
+            tokenShortfall?: Array<{
+              tokenSymbol: string
+              destinationAmount: string
+              fee: string
+              tokenDecimals: number
+            }>
+          }
+          // Check if quote is insufficient - show detailed tooltip
+          if (response.hasFulfilledAll === false) {
+            const shortfall = response.tokenShortfall?.[0]
+            const shortfallUSD = response.totalTokenShortfallInUSD
+
+            const $tooltipContent = $column(spacing.small)(
+              $node(style({ fontWeight: '600', marginBottom: '4px' }))($text('Insufficient Balance')),
+              shortfall
+                ? $column(spacing.tiny)(
+                    $row(spacing.small)(
+                      $node(style({ color: pallete.foreground }))($text('Requested:')),
+                      $text(
+                        `${(Number(shortfall.destinationAmount) / 10 ** shortfall.tokenDecimals).toFixed(2)} ${shortfall.tokenSymbol}`
+                      )
+                    ),
+                    $row(spacing.small)(
+                      $node(style({ color: pallete.foreground }))($text('Bridge fee:')),
+                      $text(
+                        `${(Number(shortfall.fee) / 10 ** shortfall.tokenDecimals).toFixed(4)} ${shortfall.tokenSymbol}`
+                      )
+                    )
+                  )
+                : empty,
+              shortfallUSD
+                ? $node(style({ color: pallete.negative, marginTop: '4px' }))(
+                    $text(`Short by ~$${shortfallUSD.toFixed(2)}`)
+                  )
+                : empty,
+              $node(style({ color: pallete.foreground, fontSize: '0.7rem', marginTop: '8px' }))(
+                $text('Cross-chain withdrawals have bridging fees deducted from the token amount.')
+              )
+            )
+
+            return $alertTooltip($tooltipContent, $text('Insufficient'))
+          }
+          // Show sponsor fee
+          if (response.sponsorFee) {
+            const totalFee = response.sponsorFee.relayer + response.sponsorFee.protocol
+            const feeText = totalFee > 0 ? `~$${totalFee.toFixed(4)} fee` : 'Free'
+            return $node(style({ fontSize: '0.75rem', color: pallete.foreground }))($text(feeText))
+          }
+        }
+        return $node(style({ fontSize: '0.75rem', color: pallete.foreground }))($text('Free'))
+      }, costState)
+
+      // Status indicator (switches with fee estimate)
+      const $statusOrFee = switchMap(
+        params => {
+          const s = params.tx
+          if (!s) return $feeLabel
+          if (s.status === PromiseStatus.PENDING) return $spinnerTooltip($text('Processing...'))
+          if (s.status === PromiseStatus.ERROR) {
+            const err = s.error
+            console.error(err)
+
+            // Extract error message
+            const errorMsg =
+              err && typeof err === 'object' && 'shortMessage' in err
+                ? String(err.shortMessage)
+                : err instanceof Error
+                  ? err.message
+                  : 'Transaction failed'
+
+            // Derive intent details from pre-calculated intent
+            const intent = params.intent
+            const action = intent?.hasWithdraw ? 'Withdraw' : 'Deposit'
+
+            // Get source chains from pre-calculated intent (has actual portfolio-based sourceChains)
+            const sourceChainNames = intent?.withdrawIntents.length
+              ? [...new Set(intent.withdrawIntents.flatMap(wi => wi.sourceChains.map(c => c.name)))].join(', ')
+              : intent?.deposits.length
+                ? [...new Set(intent.deposits.map(d => chainById[d.chainId]?.name ?? `Chain ${d.chainId}`))].join(', ')
+                : 'Unknown'
+
+            // Build tooltip content with intent details
+            const $tooltipContent = $column(spacing.small)(
+              $row(spacing.small)($node(style({ color: pallete.foreground }))($text('Action:')), $text(action)),
+              $row(spacing.small)($node(style({ color: pallete.foreground }))($text('From:')), $text(sourceChainNames)),
+              $row(spacing.small)($node(style({ color: pallete.foreground }))($text('To:')), $text('Arbitrum')),
+              $node(style({ borderTop: `1px solid ${pallete.horizon}`, paddingTop: '8px', marginTop: '4px' }))(
+                $text(errorMsg)
+              )
+            )
+
+            return $alertTooltip($tooltipContent, $text(`${action} failed`))
+          }
+          if ('value' in s && s.value !== undefined) {
+            return $alertPositiveTooltip($text('Success'))
+          }
+          return $feeLabel
+        },
+        combine({ tx: txState, intent: intentState })
+      )
 
       // Draft item row with remove button (visible on hover)
       const $draftItem = (draft: { id: string; $display: I$Node }) =>
@@ -397,28 +459,67 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
             })
           ),
 
-          // Draft list
+          // Draft list OR success tx results
           $column(
             designSheet.customScroll,
             style({ overflow: 'auto', maxHeight: '35vh', padding: '0 24px' })
-          )(switchMap(list => (list.length === 0 ? empty : $column(spacing.small)(...list.map($draftItem))), drafts)),
+          )(
+            switchMap(
+              params => {
+                // Show tx results on success
+                if (params.tx && 'value' in params.tx && params.tx.value !== undefined) {
+                  const { txResults } = params.tx.value
+                  if (txResults.length > 0) {
+                    return $column(spacing.small)(
+                      ...txResults.map(tx =>
+                        $row(spacing.small, style({ alignItems: 'center' }))(
+                          $node(
+                            style({
+                              backgroundColor: pallete.positive,
+                              color: pallete.background,
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem'
+                            })
+                          )($text(tx.chain.name)),
+                          $txHashRef(tx.hash, tx.chain)
+                        )
+                      )
+                    )
+                  }
+                  // Success but no tx hashes (shouldn't happen, but handle gracefully)
+                  return $node(style({ color: pallete.positive, padding: '8px 0' }))(
+                    $text('Transaction completed successfully')
+                  )
+                }
+                // Show draft list otherwise
+                return params.list.length === 0 ? empty : $column(spacing.small)(...params.list.map($draftItem))
+              },
+              combine({ list: drafts, tx: txState })
+            )
+          ),
 
           // Footer with submit
           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
             $node(style({ flex: 1 }))(),
             $statusOrFee,
-            $IntermediateConnectButton({
-              accountQuery,
-              $$display: map(() =>
-                $ButtonCore({
-                  $container: $defaultButtonPrimary,
-                  disabled: isLoading,
-                  $content: $text('Submit')
-                })({
-                  click: clickSubmitTether()
-                })
-              )
-            })({ changeAccount: changeAccountTether() })
+            $ButtonCore({
+              $container: $defaultButtonPrimary,
+              disabled: map(
+                params => {
+                  // Disabled if: tx loading, has alert, or quote pending for withdrawals
+                  if (params.loading) return true
+                  if (params.alert !== null) return true
+                  // For withdrawals, disable while quote is pending (cost is null but intent has withdrawals)
+                  if (params.cost === null && params.intent?.hasWithdraw) return true
+                  return false
+                },
+                combine({ loading: isLoading, alert: quoteAlert, cost: costState, intent: intentState })
+              ),
+              $content: $text('Submit')
+            })({
+              click: clickSubmitTether()
+            })
           )
         )
       )
@@ -427,9 +528,8 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
         switchMap(has => (has ? fadeIn($drawerContent) : empty), hasContent),
 
         {
-          changeAccount,
           removeDraft: clickRemove,
-          clearDrafts: merge(constant(null, clickClose), txSuccess)
+          clearDrafts: merge(constant(null, clickClose), txSuccess, accountAddress)
         }
       ]
     }
@@ -437,16 +537,18 @@ export const $ActionDrawer = ({ accountQuery, depositDrafts, title = 'Pending Ac
 
 function balanceDraftToAction(draft: BalanceDraft) {
   const tokenDesc = getTokenDescription(draft.token)
-  const actionLabel = draft.action === BALANCE_ACTION.DEPOSIT ? 'Deposit' : 'Withdraw'
-  const amountLabel = readableTokenAmountLabel(tokenDesc, draft.amount)
+  const isDeposit = draft.amount > 0n
+  const actionLabel = isDeposit ? 'Deposit' : 'Withdraw'
+  const absAmount = isDeposit ? draft.amount : -draft.amount
+  const amountLabel = readableTokenAmountLabel(tokenDesc, absAmount)
 
   return {
-    id: `${draft.action}-${draft.token}`,
+    id: draft.token.toLowerCase(), // Key by token (single active smart account)
     data: draft,
     $display: $row(spacing.small, style({ alignItems: 'center' }))(
       $node(
         style({
-          backgroundColor: draft.action === BALANCE_ACTION.DEPOSIT ? pallete.positive : pallete.negative,
+          backgroundColor: isDeposit ? pallete.positive : pallete.negative,
           color: pallete.background,
           padding: '4px 8px',
           borderRadius: '4px',

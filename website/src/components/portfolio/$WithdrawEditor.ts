@@ -7,14 +7,14 @@ import { $column, $row, spacing } from 'aelea/ui-components'
 import { colorAlpha, pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $FieldLabeled } from '@/ui-components'
-import type { IAccountState } from '../../wallet/wallet.js'
+import type { ISignerAccountBase } from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import { BALANCE_ACTION, type IWithdrawEditorDraft } from './$DepositEditor.js'
+import type { BalanceDraft } from './$DepositEditor.js'
 
 export const $WithdrawEditor = (config: {
-  depositBalance: IStream<bigint>
+  balance: IStream<bigint>
   token: Address
-  account: IAccountState
+  walletAccount: ISignerAccountBase
   validation?: IOps<bigint, string | null>
 }) =>
   component(
@@ -25,15 +25,15 @@ export const $WithdrawEditor = (config: {
     ) => {
       const tokenDescription = getTokenDescription(config.token)
 
-      const inputValue = merge(sample(config.depositBalance, clickMax), inputAmount)
+      const inputValue: IStream<bigint> = merge(sample(config.balance, clickMax), inputAmount)
 
       const value = merge(inputValue, constant(0n, clickSave))
 
       const alert = merge(
         map(
           params => {
-            if (params.value > params.depositBalance) {
-              return `Exceeds deposit balance of ${readableTokenAmountLabel(tokenDescription, params.depositBalance)}`
+            if (params.value > params.balance) {
+              return `Exceeds balance of ${readableTokenAmountLabel(tokenDescription, params.balance)}`
             }
 
             if (params.value < 0n) {
@@ -46,7 +46,7 @@ export const $WithdrawEditor = (config: {
 
             return null
           },
-          combine({ value, depositBalance: config.depositBalance })
+          combine({ value, balance: config.balance })
         ),
         config.validation ? config.validation(value) : empty
       )
@@ -97,13 +97,12 @@ export const $WithdrawEditor = (config: {
         ),
 
         {
-          withdraw: map(
-            v =>
-              ({
-                action: BALANCE_ACTION.WITHDRAW,
-                token: config.token,
-                amount: v
-              }) as IWithdrawEditorDraft,
+          changeModel: map(
+            (amount: bigint): BalanceDraft => ({
+              token: config.token,
+              amount: -amount, // Negative = withdraw
+              chainId: config.walletAccount.walletClient.chain!.id
+            }),
             sample(inputValue, clickSave)
           )
         }

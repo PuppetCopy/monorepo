@@ -41,7 +41,7 @@ import { $ButtonSecondary } from './form/$Button.js'
 
 interface MainMenu extends IPageParams {
   route: Route
-  accountQuery: IStream<Promise<IAccountState | null>>
+  accountQuery: IStream<Promise<IAccountState>>
 }
 
 export const $MainMenu = (config: MainMenu) =>

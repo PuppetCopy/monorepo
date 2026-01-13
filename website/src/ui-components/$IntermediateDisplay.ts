@@ -89,6 +89,7 @@ export const $intermediatePromise = <T>({
     }
 
     if (state.status === PromiseStatus.ERROR) {
+      console.error(state.error)
       return $$fail(state.error)
     }
 

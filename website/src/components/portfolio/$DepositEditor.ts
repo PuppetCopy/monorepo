@@ -18,9 +18,10 @@ import type { Address } from 'viem/accounts'
 import { $DropSelect, $defaultDropSelectContainer, $FieldLabeled } from '@/ui-components'
 import type { ValueOf } from '@/utils/types.js'
 import { $tokenIconWithAmount } from '../../common/$common.js'
-import wallet, { type IAccountState } from '../../wallet/wallet.js'
+import wallet, { type ISignerAccountBase } from '../../wallet/wallet.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
 
+// Used internally for UI state (which popup to show)
 export const BALANCE_ACTION = {
   DEPOSIT: 'deposit',
   WITHDRAW: 'withdraw'
@@ -28,28 +29,21 @@ export const BALANCE_ACTION = {
 
 export type BalanceAction = ValueOf<typeof BALANCE_ACTION>
 
-export interface IDepositEditorDraft {
-  action: typeof BALANCE_ACTION.DEPOSIT
+// Amount sign denotes action: positive = deposit, negative = withdraw, zero = no pending action
+// Uses the active smartAccount from ISmartAccountState - no need to track account per draft
+export interface BalanceDraft {
   token: Address
-  amount: bigint
+  amount: bigint // positive = deposit, negative = withdraw
   chainId: number
 }
 
-export interface IWithdrawEditorDraft {
-  action: typeof BALANCE_ACTION.WITHDRAW
-  token: Address
-  amount: bigint
-}
-
-export type BalanceDraft = IDepositEditorDraft | IWithdrawEditorDraft
-
 export interface IDepositEditor {
-  model: IStream<IDepositEditorDraft>
+  model: IStream<BalanceDraft>
   token: Address
-  account: IAccountState
+  walletAccount: ISignerAccountBase
 }
 
-export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
+export const $DepositEditor = ({ model, token, walletAccount }: IDepositEditor) =>
   component(
     (
       [clickMax, clickMaxTether]: IBehavior<PointerEvent>,
@@ -58,7 +52,7 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
       [selectChain, selectChainTether]: IBehavior<number>
     ) => {
       const tokenDescription = getTokenDescription(token)
-      const chainSelection = state(selectChain, account.walletClient.chain!.id)
+      const chainSelection = state(selectChain, walletAccount.walletClient.chain!.id)
 
       // Cache balance per chain - single RPC call shared across all usages
       const chainBalanceCache = new Map<number, Promise<bigint>>()
@@ -68,7 +62,7 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
           const tokenMap = CROSS_CHAIN_TOKEN_MAP[chainId as keyof typeof CROSS_CHAIN_TOKEN_MAP]
           const tokenAddress = getMappedValueFallback(tokenMap, tokenDescription.symbol, null)
           cached = tokenAddress
-            ? wallet.getTokenBalance(tokenAddress, account.address, chainId, true)
+            ? wallet.getTokenBalance(tokenAddress, walletAccount.address, chainId, true)
             : Promise.resolve(0n)
           chainBalanceCache.set(chainId, cached)
         }
@@ -82,7 +76,7 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
         sample(selectedChainBalance, clickMax),
         inputAmount,
         constant(0n, selectChain),
-        map(m => (m.action === BALANCE_ACTION.DEPOSIT ? m.amount : 0n), model)
+        map(m => (m.amount > 0n ? m.amount : 0n), model) // Show deposit amount (positive) from model
       )
 
       const alert = op(
@@ -141,7 +135,14 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
             })({
               change: inputAmountTether(
                 map(val => {
-                  return val ? parseFixed(tokenDescription.decimals, parseReadableNumber(val)) : 0n
+                  if (!val) return 0n
+                  const parsed = parseReadableNumber(val)
+                  if (!parsed) return 0n
+                  try {
+                    return parseFixed(tokenDescription.decimals, parsed)
+                  } catch {
+                    return 0n
+                  }
                 })
               )
             }),
@@ -181,14 +182,11 @@ export const $DepositEditor = ({ model, token, account }: IDepositEditor) =>
 
         {
           changeModel: sampleMap(
-            ({ value, chainId }): IDepositEditorDraft => {
-              return {
-                action: BALANCE_ACTION.DEPOSIT,
-                token,
-                amount: value,
-                chainId
-              }
-            },
+            ({ value, chainId }): BalanceDraft => ({
+              token,
+              amount: value, // Positive = deposit
+              chainId
+            }),
             combine({ value, chainId: chainSelection }),
             clickSave
           )

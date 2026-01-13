@@ -29,7 +29,7 @@
 // import type { IComponentPageParams } from '../../pages/types.js'
 // import { fadeIn } from '../../transitions/enter.js'
 // import { buildEnableSessionCall, type PuppetPolicyConfig } from '../../wallet/session.js'
-// import type { ISubaccountState } from '../../wallet/wallet.js'
+// import type { ISmartAccountState } from '../../wallet/wallet.js'
 // import { $ButtonCircular, $defaultButtonCircularContainer } from '../form/$Button.js'
 // import { $SendTransaction, type ContractCall } from '../form/$SendTransaction.js'
 // import { BALANCE_ACTION, type BalanceDraft } from './$DepositEditor.js'
@@ -61,7 +61,7 @@
 // }: IPortfolioEditorDrawer) =>
 //   component(
 //     (
-//       [subaccountState, subaccountStateTether]: IBehavior<NonNullable<ISubaccountState>>,
+//       [smartAccountState, smartAccountStateTether]: IBehavior<NonNullable<ISmartAccountState>>,
 //       [txSuccess, txSuccessTether]: IBehavior<null>,
 //       [clickClose, clickCloseTether]: IBehavior<PointerEvent>,
 //       [clickRemoveSubsc, clickRemoveSubscTether]: IBehavior<PointerEvent, ISetMatchingRuleEditorDraft>,
@@ -76,7 +76,7 @@
 
 //       // Operations stream for $SendTransaction - defined outside switchMap to avoid re-renders
 //       const operations = op(
-//         combine({ draftDepositTokenList, draftMatchingRuleList, subaccountState }),
+//         combine({ draftDepositTokenList, draftMatchingRuleList, smartAccountState }),
 //         map(async params => {
 //           const ops: ContractCall[] = []
 
@@ -105,7 +105,7 @@
 //                 data: encodeFunctionData({
 //                   abi: PUPPET_CONTRACT_MAP.UserRouter.abi,
 //                   functionName: 'withdraw',
-//                   args: [draft.token, params.subaccountState.ownerAddress, draft.amount]
+//                   args: [draft.token, params.smartAccountState.ownerAddress, draft.amount]
 //                 })
 //               })
 //             }
@@ -327,7 +327,7 @@
 //           $row(spacing.small, style({ padding: '0 24px', alignItems: 'center' }))(
 //             $node(style({ flex: 1, minWidth: 0 }))(),
 //             $SendTransaction({ operations })({
-//               subaccountState: subaccountStateTether(),
+//               smartAccountState: smartAccountStateTether(),
 //               success: txSuccessTether()
 //             })
 //           )

@@ -1,78 +1,54 @@
 import { readableTokenAmount } from '@puppet/sdk/core'
 import { getTokenDescription } from '@puppet/sdk/gmx'
-import { combine, constant, type IStream, just, map, merge, switchMap } from 'aelea/stream'
-import { type IBehavior, state } from 'aelea/stream-extended'
+import { combine, constant, type IStream, map, merge, sampleMap, switchMap } from 'aelea/stream'
+import type { IBehavior } from 'aelea/stream-extended'
 import { $node, $text, component, type I$Node, style } from 'aelea/ui'
 import { $row, spacing } from 'aelea/ui-components'
 import { pallete } from 'aelea/ui-components-theme'
 import type { Address } from 'viem/accounts'
 import { $labeledhintAdjustment } from '@/ui-components'
 import { $route } from '../../common/$common.js'
-import type { IAccountState } from '../../wallet/wallet.js'
+import type { ISignerAccountBase } from '../../wallet/wallet.js'
 import { $Popover } from '../$Popover.js'
 import { $ButtonSecondary, $defaultMiniButtonSecondary } from '../form/$Button.js'
-import {
-  $DepositEditor,
-  BALANCE_ACTION,
-  type BalanceDraft,
-  type IDepositEditorDraft,
-  type IWithdrawEditorDraft
-} from './$DepositEditor.js'
+import { $DepositEditor, BALANCE_ACTION, type BalanceDraft } from './$DepositEditor.js'
 import { $WithdrawEditor } from './$WithdrawEditor.js'
 
 export interface ITokenBalanceEditor {
   token: Address
   balance: IStream<bigint>
-  account: IAccountState
-  model?: IStream<BalanceDraft>
-  withdrawBalance?: IStream<bigint>
+  walletAccount: ISignerAccountBase
+  model: IStream<BalanceDraft> // Current draft state from parent (amount: positive=deposit, negative=withdraw)
 }
 
 export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
   component(
     (
       [popEditor, popEditorTether]: IBehavior<PointerEvent, 'deposit' | 'withdraw'>,
-      [changeDeposit, changeDepositTether]: IBehavior<IDepositEditorDraft>,
-      [changeWithdraw, changeWithdrawTether]: IBehavior<IWithdrawEditorDraft>
+      [addDeposit, addDepositTether]: IBehavior<BalanceDraft>,
+      [addWithdraw, addWithdrawTether]: IBehavior<BalanceDraft>
     ) => {
-      const { token, balance, account, model, withdrawBalance } = config
+      const { token, balance, walletAccount, model } = config
 
       const tokenDescription = getTokenDescription(token)
 
-      // Default model if not provided
-      const depositModel =
-        model ??
-        state(
-          map(
-            (): BalanceDraft => ({
-              action: BALANCE_ACTION.DEPOSIT,
-              token,
-              amount: 0n,
-              chainId: account.walletClient.chain!.id
-            }),
-            just(null)
-          )
-        )
+      // Amount from model: positive = deposit, negative = withdraw
+      const draftAmount = map(draft => draft.amount, model)
 
-      // Color based on action type
+      // Color based on sign: positive = green (deposit), negative = red (withdraw)
       const adjustmentColor = map(
-        draft =>
-          draft?.amount > 0n
-            ? draft.action === BALANCE_ACTION.DEPOSIT
-              ? pallete.positive
-              : pallete.negative
-            : undefined,
-        depositModel
+        (amount: bigint) => (amount > 0n ? pallete.positive : amount < 0n ? pallete.negative : undefined),
+        draftAmount
       )
 
-      // Compute adjustment change from model and balance
+      // Compute new balance preview
       const adjustmentChange = map(
-        ({ draft, bal }) => {
-          if (!draft || draft.amount === 0n) return ''
-          const newBalance = draft.action === BALANCE_ACTION.DEPOSIT ? bal + draft.amount : bal - draft.amount
+        (params: { amount: bigint; bal: bigint }) => {
+          if (params.amount === 0n) return ''
+          const newBalance = params.bal + params.amount
           return readableTokenAmount(tokenDescription, newBalance)
         },
-        combine({ draft: depositModel, bal: balance })
+        combine({ amount: draftAmount, bal: balance })
       )
 
       const $balanceDisplay = (bal: bigint): I$Node => {
@@ -84,22 +60,41 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
       }
 
       const $depositEditor = $DepositEditor({
-        model: depositModel,
+        model,
         token,
-        account
+        walletAccount
       })({
-        changeModel: changeDepositTether()
+        changeModel: addDepositTether()
       })
 
-      const $withdrawEditor = withdrawBalance
-        ? $WithdrawEditor({
-            depositBalance: withdrawBalance,
-            token,
-            account
-          })({
-            withdraw: changeWithdrawTether()
-          })
-        : null
+      const $withdrawEditor = $WithdrawEditor({
+        balance,
+        token,
+        walletAccount
+      })({
+        changeModel: addWithdrawTether()
+      })
+
+      // Replace current model with new deposit/withdraw
+      // Deposit emits positive amount, withdraw emits negative amount
+      const depositChange = sampleMap(
+        params => ({
+          ...params.current,
+          amount: params.deposit.amount,
+          chainId: params.deposit.chainId
+        }),
+        combine({ current: model, deposit: addDeposit }),
+        addDeposit
+      )
+
+      const withdrawChange = sampleMap(
+        params => ({
+          ...params.current,
+          amount: params.withdraw.amount // withdraw.amount is already negative
+        }),
+        combine({ current: model, withdraw: addWithdraw }),
+        addWithdraw
+      )
 
       return [
         $Popover({
@@ -118,7 +113,7 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
                 $ButtonSecondary({
                   $container: $defaultMiniButtonSecondary,
                   $content: $text('Withdraw'),
-                  disabled: just(bal === 0n || !withdrawBalance)
+                  disabled: map(b => b === 0n, balance)
                 })({
                   click: popEditorTether(constant(BALANCE_ACTION.WITHDRAW))
                 })
@@ -129,14 +124,13 @@ export const $TokenBalanceEditor = (config: ITokenBalanceEditor) =>
             if (action === BALANCE_ACTION.DEPOSIT) {
               return $depositEditor
             }
-            return $withdrawEditor!
+            return $withdrawEditor
           }, popEditor),
-          dismiss: merge(changeDeposit, changeWithdraw)
+          dismiss: merge(addDeposit, addWithdraw)
         })({}),
 
         {
-          changeDeposit,
-          changeWithdraw
+          changeDraft: merge(depositChange, withdrawChange)
         }
       ]
     }

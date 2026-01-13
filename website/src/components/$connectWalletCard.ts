@@ -19,7 +19,7 @@ export const $ConnectWalletCard = component(([connect, connectTether]: IBehavior
       $column(spacing.big, style({ alignItems: 'center', textAlign: 'center', padding: '24px' }))(
         $column(spacing.default, style({ alignItems: 'center' }))(
           $node(style({ fontSize: '1.25rem', fontWeight: '600' }))($text('Connect a wallet')),
-          $node(style({ color: pallete.foreground }))($text('To manage your subaccount and copy top traders'))
+          $node(style({ color: pallete.foreground }))($text('To manage your puppet account and copy top traders'))
         ),
 
         $WalletConnect()({

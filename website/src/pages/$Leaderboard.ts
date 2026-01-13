@@ -38,15 +38,15 @@ import { $LastAtivity, activityOptionLabelMap } from '../components/$LastActivit
 import { localStore } from '../const/localStore.js'
 import type { IPageFilterParams, IPageParams } from './types.js'
 
-// Basic metric type for the simplified leaderboard
+// Basic metric type matching masterLatestMetric schema
 type IBasicMetric = {
-  account: `0x${string}`
-  collateralToken: `0x${string}`
-  allocatedVolume: bigint
+  master: `0x${string}`
+  user: `0x${string}`
+  baseToken: `0x${string}`
+  allocated: bigint
   realisedPnl: bigint
   pnlList: bigint[]
   pnlTimestampList: number[]
-  matchedPuppetList: `0x${string}`[]
 }
 
 // TODO: Replace with proper type once schema is updated
@@ -104,35 +104,35 @@ export const $Leaderboard = (config: ILeaderboard) =>
               const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
               const dataSource = map(async filterParams => {
-                const t = schema.subaccountLatestMetric
+                const t = schema.masterLatestMetric
 
                 const filter = sql.filter.and(
                   sql.filter.eq(t.interval, params.activityTimeframe),
-                  params.account ? sql.filter.ilike(t.account, params.account) : undefined,
+                  params.account ? sql.filter.ilike(t.master, params.account) : undefined,
                   params.collateralTokenList.length > 0
-                    ? sql.filter.inArray(t.collateralToken, params.collateralTokenList)
+                    ? sql.filter.inArray(t.baseToken, params.collateralTokenList)
                     : undefined,
                   sql.filter.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
                 )
                 const orderBy = params.sortBy
                   ? params.sortBy.direction === 'asc'
-                    ? sql.filter.asc(schema.subaccountLatestMetric[params.sortBy.selector])
-                    : sql.filter.desc(schema.subaccountLatestMetric[params.sortBy.selector])
-                  : sql.filter.desc(schema.subaccountLatestMetric.realisedPnl)
+                    ? sql.filter.asc(schema.masterLatestMetric[params.sortBy.selector])
+                    : sql.filter.desc(schema.masterLatestMetric[params.sortBy.selector])
+                  : sql.filter.desc(schema.masterLatestMetric.realisedPnl)
 
-                const metricList = await sqlClient.query.subaccountLatestMetric.findMany({
+                const metricList = await sqlClient.query.masterLatestMetric.findMany({
                   where: filter,
                   limit: filterParams.paging.pageSize,
                   offset: filterParams.paging.offset,
                   orderBy: orderBy,
                   columns: {
-                    account: true,
-                    collateralToken: true,
-                    allocatedVolume: true,
+                    master: true,
+                    user: true,
+                    baseToken: true,
+                    allocated: true,
                     realisedPnl: true,
                     pnlList: true,
-                    pnlTimestampList: true,
-                    matchedPuppetList: true
+                    pnlTimestampList: true
                   }
                 })
 
@@ -171,35 +171,28 @@ export const $Leaderboard = (config: ILeaderboard) =>
                     $bodyCallback: map(pos => {
                       return $MasterDisplay({
                         route: config.route,
-                        address: pos.metric.account,
-                        puppetList: pos.metric.matchedPuppetList as Address[]
+                        address: pos.metric.master,
+                        puppetList: [] // TODO: puppetList not available on masterLatestMetric
                       })({
                         click: routeChangeTether()
                       })
                     })
                   },
                   {
-                    $head: $text('Collateral'),
+                    $head: $text('Base Token'),
                     gridTemplate: isDesktopScreen ? '104px' : '58px',
                     $bodyCallback: map((pos: ILeaderboardCellData) => {
-                      return $row(style({}))($text(`${pos.metric.collateralToken.slice(0, 10)}...`))
+                      return $row(style({}))($text(`${pos.metric.baseToken.slice(0, 10)}...`))
                     })
                   },
                   ...((isDesktopScreen
                     ? [
                         {
                           $head: $text('Allocated'),
-                          sortBy: 'allocatedVolume',
+                          sortBy: 'allocated',
                           gridTemplate: '120px',
                           $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            return $row(style({}))($text(readableUsd(pos.metric.allocatedVolume)))
-                          })
-                        },
-                        {
-                          $head: $text('Puppets'),
-                          gridTemplate: '80px',
-                          $bodyCallback: map((pos: ILeaderboardCellData) => {
-                            return $row(style({}))($text(`${pos.metric.matchedPuppetList.length}`))
+                            return $row(style({}))($text(readableUsd(pos.metric.allocated)))
                           })
                         }
                       ]

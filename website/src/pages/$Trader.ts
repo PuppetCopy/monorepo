@@ -1,5 +1,5 @@
 import * as sql from '@puppet/database/client'
-import { gmx__PositionIncrease, type subaccountLatestMetric } from '@puppet/database/schema'
+import { gmx__PositionIncrease, type masterLatestMetric } from '@puppet/database/schema'
 
 // TODO: Replace with actual schema type when matching rules are implemented
 type ISubscribeRule = {
@@ -81,16 +81,14 @@ export const $MasterPage = ({
         map(async params => {
           const startActivityTimeframe = getUnixTimestamp() - params.activityTimeframe
 
-          const routeMetricList = await sqlClient.query.subaccountLatestMetric.findMany({
+          const routeMetricList = await sqlClient.query.masterLatestMetric.findMany({
             where: (t, f) =>
               f.and(
-                f.eq(t.account, account),
+                f.eq(t.master, account),
                 f.eq(t.interval, params.activityTimeframe),
 
                 // filterParams.collateralTokenList.length > 0 ? arrayContains(t.marketList, filterParams.collateralTokenList) : undefined,
-                params.collateralTokenList.length > 0
-                  ? f.inArray(t.collateralToken, params.collateralTokenList)
-                  : undefined,
+                params.collateralTokenList.length > 0 ? f.inArray(t.baseToken, params.collateralTokenList) : undefined,
                 f.gte(t.lastUpdatedTimestamp, startActivityTimeframe)
               )
           })
@@ -269,11 +267,11 @@ export const $MasterPage = ({
                 }
 
                 return $column(spacing.big)(
-                  ...params.routeMetricList.map((routeMetric: typeof subaccountLatestMetric.$inferSelect) => {
+                  ...params.routeMetricList.map((routeMetric: typeof masterLatestMetric.$inferSelect) => {
                     const dataSource = map(async pageParams => {
                       const result = pagingQuery(
                         { ...pageParams.paging, ...pageParams.sortBy },
-                        params.openPositionList.filter(item => item.collateralToken === routeMetric.collateralToken)
+                        params.openPositionList.filter(item => item.collateralToken === routeMetric.baseToken)
                       )
                       return { ...result, $items: result.page }
                     }, combine({ sortBy, paging }))
@@ -281,10 +279,10 @@ export const $MasterPage = ({
                       // style({ padding: '0 0 12px' })($route(collateralTokenDescription)),
 
                       $RouteEditor({
-                        collateralToken: routeMetric.collateralToken,
+                        collateralToken: routeMetric.baseToken,
                         userMatchingRuleQuery,
                         draftMatchingRuleList,
-                        master: routeMetric.account,
+                        master: routeMetric.master,
                         $container: $defaultMasterMatchRouteEditorContainer(
                           style({ marginLeft: '-12px', paddingBottom: '12px' })
                         )

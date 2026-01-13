@@ -9,26 +9,40 @@ export const eventKey = (contractName: string, eventHash: string) => `${contract
 
 export const EVENT_DECODER_MAP = {
   // Allocate.sol decoders
-  [eventKey('Allocate', CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocate.RegisterMasterSubaccount.args, data),
-  [eventKey('Allocate', CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocate.ExecuteAllocate.args, data),
-  [eventKey('Allocate', CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocate.ExecuteWithdraw.args, data),
-  [eventKey('Allocate', CONTRACT_EVENT_MAP.Allocate.DisposeSubaccount.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocate.DisposeSubaccount.args, data),
+  [eventKey('Allocate', CONTRACT_EVENT_MAP.Allocate.Allocate.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Allocate.Allocate.args, data),
+
+  // Registry.sol decoders
+  [eventKey('Registry', CONTRACT_EVENT_MAP.Registry.CreateMaster.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Registry.CreateMaster.args, data),
+  [eventKey('Registry', CONTRACT_EVENT_MAP.Registry.SetTokenCap.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Registry.SetTokenCap.args, data),
 
   // Match.sol decoders
   [eventKey('Match', CONTRACT_EVENT_MAP.Match.SetFilter.hash)]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Match.SetFilter.args, data),
   [eventKey('Match', CONTRACT_EVENT_MAP.Match.SetPolicy.hash)]: (data: Hex) =>
     decodeAbiParameters(CONTRACT_EVENT_MAP.Match.SetPolicy.args, data),
+  [eventKey('Match', CONTRACT_EVENT_MAP.Match.Throttle.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Match.Throttle.args, data),
 
-  // Position.sol decoders
-  [eventKey('Position', CONTRACT_EVENT_MAP.Position.CreateOrder.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Position.CreateOrder.args, data),
-  [eventKey('Position', CONTRACT_EVENT_MAP.Position.SettleOrders.hash)]: (data: Hex) =>
-    decodeAbiParameters(CONTRACT_EVENT_MAP.Position.SettleOrders.args, data),
+  // Call.sol (Position) decoders
+  [eventKey('Call', CONTRACT_EVENT_MAP.Call.MasterPreCall.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Call.MasterPreCall.args, data),
+  [eventKey('Call', CONTRACT_EVENT_MAP.Call.MasterPostCall.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Call.MasterPostCall.args, data),
+  [eventKey('Call', CONTRACT_EVENT_MAP.Call.SettleOrders.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Call.SettleOrders.args, data),
+  [eventKey('Call', CONTRACT_EVENT_MAP.Call.SetStage.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Call.SetStage.args, data),
+
+  // Withdraw.sol decoders
+  [eventKey('Withdraw', CONTRACT_EVENT_MAP.Withdraw.Withdraw.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.Withdraw.Withdraw.args, data),
+
+  // TokenRouter.sol decoders
+  [eventKey('TokenRouter', CONTRACT_EVENT_MAP.TokenRouter.Transfer.hash)]: (data: Hex) =>
+    decodeAbiParameters(CONTRACT_EVENT_MAP.TokenRouter.Transfer.args, data),
 
   // FeeMarketplace.sol decoders
   [eventKey('FeeMarketplace', CONTRACT_EVENT_MAP.FeeMarketplace.Deposit.hash)]: (data: Hex) =>

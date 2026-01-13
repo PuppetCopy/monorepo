@@ -9,14 +9,14 @@ export interface PolicyClient {
   db: ReturnType<typeof sql.createClient>
 }
 
-/** Query policies for a specific trader from the indexer */
+/** Query policies for a specific master from the indexer */
 export async function getPoliciesForTrader(
   client: PolicyClient,
-  trader: Address,
+  master: Address,
   nowSeconds?: bigint
 ): Promise<Policy[]> {
   const now = nowSeconds ?? BigInt(getUnixTimestamp())
-  const traderAddr = getAddress(trader)
+  const masterAddr = getAddress(master)
 
   const policies = await client.db
     .select()
@@ -24,13 +24,13 @@ export async function getPoliciesForTrader(
     .where(
       sql.filter.and(
         sql.filter.gt(schema.match__SetPolicy.expiry, now),
-        sql.filter.eq(schema.match__SetPolicy.trader, traderAddr)
+        sql.filter.eq(schema.match__SetPolicy.master, masterAddr)
       )
     )
 
   return policies.map(policy => ({
     puppet: getAddress(policy.puppet),
-    trader: getAddress(policy.trader),
+    master: getAddress(policy.master),
     allowanceRate: Number(policy.allowanceRate),
     throttlePeriod: Number(policy.throttlePeriod),
     expiry: policy.expiry,

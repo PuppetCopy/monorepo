@@ -21,31 +21,33 @@
     "matchmaker"
   ],
   "scripts": {
-    "sherif:fix": "sherif --fix",
     "biome:fix": "biome check --fix --unsafe",
-    "clean": "rm -rf contracts/dist contracts/forge-cache contracts/forge-artifacts contracts/script/generated sdk/dist indexer/dist website/dist wallet/.wxt wallet/dist",
+    "clean": "rm -rf contracts/dist contracts/forge-cache contracts/forge-artifacts contracts/src-ts sdk/dist indexer/dist indexer/src/generated indexer/public/schema/ponder.schema.generated.ts website/dist wallet/.wxt wallet/dist",
     "build": "bun run build:contracts && bun run build:indexer && bun run build:sdk && bun run build:website",
     "build:contracts": "cd contracts && bun run build && bun run generate && bun run build:ts",
     "build:sdk": "cd sdk && bun run build",
     "build:indexer": "cd indexer && bun run build",
     "build:docs": "cd docs && bun vitepress build",
     "build:website": "cd website && bun run build",
-    "build:wallet": "cd wallet && bun run build"
+    "build:wallet": "cd wallet && bun run build",
+    "sherif:fix": "sherif --fix"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
     "sherif": "1.9.0"
   },
   "catalog": {
-    "viem": "2.43.5",
+    "viem": "2.44.2",
     "aelea": "2.5.31",
+    "ponder": "0.16.1",
     "abitype": "1.2.3",
     "superjson": "2.2.6",
     "lightweight-charts": "5.1.0",
     "typescript": "^5.9.2",
-    "@types/bun": "1.3.5",
-    "@types/chrome": "0.1.32",
+    "@types/bun": "1.3.6",
+    "@types/chrome": "0.1.33",
     "dotenv": "17.2.3",
-    "drizzle-orm": "0.41.0"
+    "drizzle-orm": "0.41.0",
+    "@rhinestone/sdk": "1.1.3"
   }
 }
